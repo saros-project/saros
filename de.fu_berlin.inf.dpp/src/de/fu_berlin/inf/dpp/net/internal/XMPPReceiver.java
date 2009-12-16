@@ -7,22 +7,29 @@ import java.util.Map.Entry;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector.CancelHook;
 
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
  * 
- * XMPPReceiver implements addPacketListener and removePacketListener just
- * like a XMPPConnection but hides the complexity of dealing with new connection
+ * XMPPReceiver implements addPacketListener and removePacketListener just like
+ * a XMPPConnection but hides the complexity of dealing with new connection
  * objects appearing and old one's disappearing. Users can just register with
  * the XMPPReceiver for the whole application life-cycle.
  * 
  */
 @Component(module = "net")
 public class XMPPReceiver {
+
+    @Inject
+    protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
     protected Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
@@ -80,5 +87,20 @@ public class XMPPReceiver {
         addPacketListener(collector, filter);
 
         return collector;
+    }
+
+    /**
+     * This is method is used by the DataTransferManager to inform the upper
+     * Layer about incoming Packet based Objects.
+     * 
+     * @sarosThread must be called from the Dispatch Thread
+     */
+    public void processIncomingTransferObject(TransferDescription description,
+        IncomingTransferObject incomingTransferObject) {
+        final Packet packet = new Message();
+        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
+        packet.setFrom(description.sender.toString());
+        packet.addExtension(incomingExtProv.create(incomingTransferObject));
+        processPacket(packet);
     }
 }

@@ -21,8 +21,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -199,69 +197,78 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
+    /**
+     * Adds an incoming transfer.
+     * 
+     * @param transferObjectDescription
+     *            An IncomingTransferObject that has the TransferDescription as
+     *            content to provide information of the incoming transfer to
+     *            upper layers.
+     */
     protected void addIncomingTransferObject(
-        final IncomingTransferObject transferObject) {
+        final IncomingTransferObject transferObjectDescription) {
 
-        final TransferDescription description = transferObject
+        final TransferDescription description = transferObjectDescription
             .getTransferDescription();
 
-        final Packet packet = new Message();
-        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.sender.toString());
-        packet.addExtension(incomingExtProv
-            .create(new IncomingTransferObject() {
-                public byte[] accept(final SubMonitor progress)
-                    throws SarosCancellationException, IOException {
+        final IncomingTransferObject transferObjectData = new IncomingTransferObject() {
 
-                    addIncomingFileTransfer(description);
-                    try {
+            /**
+             * Accepts a transfer and returns the incoming data.
+             */
+            public byte[] accept(final SubMonitor progress)
+                throws SarosCancellationException, IOException {
+                addIncomingFileTransfer(description);
+                try {
+                    // TODO Put size in TransferDescription, so we can
+                    // display it here
+                    log.debug("[" + getTransferMode().toString()
+                        + "] Starting incoming file transfer: "
+                        + description.toString());
 
-                        // TODO Put size in TransferDescription, so we can
-                        // display it here
-                        log.debug("[" + getTransferMode().toString()
-                            + "] Starting incoming file transfer: "
-                            + description.toString());
+                    long startTime = System.nanoTime();
 
-                        long startTime = System.nanoTime();
+                    byte[] content = transferObjectDescription.accept(progress);
 
-                        byte[] content = transferObject.accept(progress);
+                    long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
-                        long duration = Math.max(0, System.nanoTime()
-                            - startTime) / 1000000;
+                    log.debug("[" + getTransferMode().toString()
+                        + "] Finished incoming file transfer: "
+                        + description.toString() + ", size: "
+                        + Util.throughput(content.length, duration));
 
-                        log.debug("[" + getTransferMode().toString()
-                            + "] Finished incoming file transfer: "
-                            + description.toString() + ", size: "
-                            + Util.throughput(content.length, duration));
+                    transferModeDispatch.transferFinished(description
+                        .getSender(), getTransferMode(), true, content.length,
+                        duration);
 
-                        transferModeDispatch.transferFinished(description
-                            .getSender(), getTransferMode(), true,
-                            content.length, duration);
+                    return content;
 
-                        return content;
-
-                    } finally {
-                        removeIncomingFileTransfer(description);
-                    }
+                } finally {
+                    removeIncomingFileTransfer(description);
                 }
+            }
 
-                public TransferDescription getTransferDescription() {
-                    return transferObject.getTransferDescription();
-                }
+            public TransferDescription getTransferDescription() {
+                return description;
+            }
 
-                public void reject() throws IOException {
-                    transferObject.reject();
-                }
+            /**
+             * Rejects the incoming transfer data.
+             */
+            public void reject() throws IOException {
+                transferObjectDescription.reject();
+            }
 
-                public NetTransferMode getTransferMode() {
-                    return transferObject.getTransferMode();
-                }
-            }));
+            public NetTransferMode getTransferMode() {
+                return transferObjectDescription.getTransferMode();
+            }
+        };
 
+        // ask upper layer to accept
         dispatchThreadContext.executeAsDispatch(new Runnable() {
             public void run() {
-                // ask upper layer to accept
-                receiver.processPacket(packet);
+                receiver.processIncomingTransferObject(description,
+                    transferObjectData);
             }
         });
     }
