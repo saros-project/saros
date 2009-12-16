@@ -377,8 +377,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             try {
                 Socket socket = socketFuture.get();
                 this.connectionType = futures.get(socketFuture).getType();
-                binaryChannel = new BinaryChannel(socket, incomingExtProv,
-                    this.connectionType);
+                binaryChannel = new BinaryChannel(socket, this.connectionType);
                 this.receiveThread = new ReceiverThread(binaryChannel);
                 this.receiveThread.start();
 

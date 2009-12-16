@@ -16,15 +16,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryHeader.BinaryHeaderType;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -119,13 +116,6 @@ public class BinaryChannel {
             }
         }
 
-        public Packet getPacket() {
-            Packet packet = new Message();
-            packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-            packet.addExtension(packetProvider.create(this));
-            return packet;
-        }
-
         public TransferDescription getTransferDescription() {
             return transferDescription;
         }
@@ -192,8 +182,6 @@ public class BinaryChannel {
      */
     protected int currentObjectId = 0;
 
-    protected XStreamExtensionProvider<IncomingTransferObject> packetProvider;
-
     /**
      * NetTransferMode to identify the transport method of the underlying socket
      * connection.
@@ -215,11 +203,9 @@ public class BinaryChannel {
      * 
      * @throws IOException
      */
-    public BinaryChannel(Socket socket,
-        XStreamExtensionProvider<IncomingTransferObject> packetProvider,
-        NetTransferMode transferMode) throws IOException {
+    public BinaryChannel(Socket socket, NetTransferMode transferMode)
+        throws IOException {
         this.socket = socket;
-        this.packetProvider = packetProvider;
         this.transferMode = transferMode;
 
         objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
