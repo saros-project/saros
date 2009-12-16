@@ -192,9 +192,16 @@ public class BinaryChannel {
      * Returns the byte Array for the given List of BinaryPacket.
      */
     public static byte[] getData(List<BinaryPacket> list) {
-        ByteBuffer buf = ByteBuffer.allocate(list.size() * CHUNKSIZE);
+        int size = 0;
+
+        for (BinaryPacket packet : list) {
+            size += packet.getSize();
+        }
+
+        ByteBuffer buf = ByteBuffer.allocate(size);
         for (BinaryPacket packet : list)
             buf.put(packet.body);
+
         return buf.array();
     }
 
