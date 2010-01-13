@@ -199,10 +199,18 @@ public class BinaryChannel {
         }
 
         ByteBuffer buf = ByteBuffer.allocate(size);
-        for (BinaryPacket packet : list)
+        for (BinaryPacket packet : list) {
             buf.put(packet.body);
+        }
 
-        return buf.array();
+        if (buf.hasArray())
+            return buf.array();
+
+        byte[] result = new byte[size];
+        buf.rewind();
+        buf.get(result);
+
+        return result;
     }
 
     /**

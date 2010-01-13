@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.net.jingle.protocol;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -92,20 +91,6 @@ public class BinaryHeader implements Serializable {
         return "binaryPacket(type:" + BinaryHeaderType.toTYPE(type)
             + ", remaining:" + remaining + ", size:" + size + ", objectid:"
             + objectid;
-    }
-
-    public byte[] toByte() {
-        return toByteBuffer().array();
-    }
-
-    public ByteBuffer toByteBuffer() {
-        ByteBuffer buf = ByteBuffer.allocate(HEADERSIZE);
-        buf.put(type);
-        buf.putInt(remaining);
-        buf.putInt(size);
-        buf.putInt(objectid);
-
-        return buf;
     }
 
     public boolean isReject() {

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.net.jingle.protocol;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryHeader.BinaryHeaderType;
 
@@ -57,11 +56,6 @@ public class BinaryPacket implements Serializable {
     @Override
     public String toString() {
         return head.toString();
-    }
-
-    public byte[] toByteArray() {
-        ByteBuffer buf = head.toByteBuffer();
-        return buf.put(body).array();
     }
 
     public boolean isCancel() {
