@@ -569,20 +569,24 @@ public class Util {
      */
     public static String getNickname(Saros saros, JID jid) {
 
-        if (saros != null) {
-            XMPPConnection connection = saros.getConnection();
-            if (connection != null) {
-                Roster roster = connection.getRoster();
-                if (roster != null) {
-                    RosterEntry entry = roster.getEntry(jid.getBase());
-                    if (entry != null) {
-                        String nickName = entry.getName();
-                        if (nickName != null && nickName.trim().length() > 0) {
-                            return nickName;
-                        }
-                    }
-                }
-            }
+        if (saros == null)
+            return null;
+
+        XMPPConnection connection = saros.getConnection();
+        if (connection == null)
+            return null;
+
+        Roster roster = connection.getRoster();
+        if (roster == null)
+            return null;
+
+        RosterEntry entry = roster.getEntry(jid.getBase());
+        if (entry == null)
+            return null;
+
+        String nickName = entry.getName();
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName;
         }
         return null;
     }
