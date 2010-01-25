@@ -6,19 +6,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.JFileChooser;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * Stand-alone tool for taking all statistics files found in a directory and
@@ -29,6 +27,9 @@ public class StatisticsAggregator {
     private static final Logger log = Logger
         .getLogger(StatisticsAggregator.class);
 
+    /**
+     * FileChooser used for selecting input and output directories
+     */
     protected JFileChooser fc = new JFileChooser();
 
     public static void main(String[] args) {
@@ -37,10 +38,6 @@ public class StatisticsAggregator {
 
         new StatisticsAggregator().run(args);
     }
-
-    List<Map<String, String>> allData = new ArrayList<Map<String, String>>();
-
-    Set<String> headers = new HashSet<String>();
 
     public void run(String... args) {
 
@@ -55,34 +52,49 @@ public class StatisticsAggregator {
 
         File rootFolder = fc.getSelectedFile();
 
-        headers.add("filename");
-        for (File item : listFiles(rootFolder, "txt")) {
+        // Set of all column headers
+        Set<String> headers = new HashSet<String>();
 
-            log.info("Processing " + item);
+        headers.add("filename");
+
+        log.info("Building file list in directory " + rootFolder);
+
+        Collection<File> files = listFiles(rootFolder, "txt");
+
+        if (files.size() == 0) {
+            MessageDialog.openError(null, "No statistics files found",
+                "The folder\n" + rootFolder
+                    + "\n does not contain any txt files.");
+            return;
+        }
+
+        // 1st pass: Build headers
+        Collection<File> secondPassFiles = new ArrayList<File>(files.size());
+        int failures = 0;
+
+        for (File file : files) {
+
+            log.info("Processing " + file);
 
             Properties data = new Properties();
             try {
-                FileInputStream fileInputStream = new FileInputStream(item);
+                FileInputStream fileInputStream = new FileInputStream(file);
                 try {
                     data.load(fileInputStream);
                 } finally {
                     fileInputStream.close();
                 }
             } catch (Exception e) {
-                log.error("Failure to parse statistics: " + item, e);
+                log.error("Failure to parse statistics: " + file, e);
+                failures++;
+                continue;
             }
 
-            Map<String, String> values = new HashMap<String, String>();
-            values.put("filename", item.getAbsolutePath());
-            allData.add(values);
-
-            for (Entry<Object, Object> b : data.entrySet()) {
-                String key = b.getKey().toString();
-                String value = b.getValue().toString();
-
-                values.put(key, value);
-                headers.add(key);
+            for (Object key : data.keySet()) {
+                headers.add(key.toString());
             }
+
+            secondPassFiles.add(file);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -95,25 +107,59 @@ public class StatisticsAggregator {
         }
         sb.append("\n");
 
-        for (Map<String, String> row : allData) {
+        // 2nd pass: Output data in correct order
+        for (File file : secondPassFiles) {
+
+            Properties data = new Properties();
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                try {
+                    data.load(fileInputStream);
+                } finally {
+                    fileInputStream.close();
+                }
+            } catch (Exception e) {
+                log.error("Failure to parse statistics: " + file, e);
+                failures++;
+                continue;
+            }
+
+            data.put("filename", file.getAbsolutePath());
+
             for (String header : headersSorted) {
 
-                if (row.containsKey(header)) {
-                    sb.append(row.get(header).replaceAll("\\s", " "));
-
+                if (data.containsKey(header)) {
+                    sb.append(data.get(header).toString()
+                        .replaceAll("\\s", " "));
                 }
                 sb.append('\t');
             }
             sb.append("\n");
         }
 
-        File output = new File("log/statistics-aggregate.txt");
+        if (failures > 0) {
+            MessageDialog.openWarning(null, "Errors reading statistics files",
+                "There were " + failures
+                    + " files which could not be parsed.\n"
+                    + "Check the command line output.");
+        }
+
+        fc.setDialogTitle("Please select the log file to save the results to");
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        returnVal = fc.showSaveDialog(null);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            log.info("Saving statistics aggregate to disk canceled by user");
+            return;
+        }
+
+        File output = fc.getSelectedFile();
         try {
             FileUtils.writeStringToFile(output, sb.toString());
         } catch (IOException e) {
             log.error("Could not write statistics aggregation to " + output, e);
         }
-        log.info("Output written to " + output);
+        log.info("Output written to " + output.getAbsolutePath());
     }
 
     @SuppressWarnings("unchecked")
