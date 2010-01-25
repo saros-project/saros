@@ -15,6 +15,9 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 public interface IncomingTransferObject {
 
     /**
+     * Reads the data from the underlying transfer (for instance a
+     * BinaryChannel) and decompresses it if enabled in the TransferDescription
+     * 
      * @throws SarosCancellationException
      *             If an user (remote or local) has canceled.
      * @throws IOException
