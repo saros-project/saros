@@ -39,7 +39,8 @@ Bundle-ClassPath: bin/,
  lib/easymock-2.0.jar,
  lib/easymockclassextension-2.0-pre-release.jar,
  lib/commons-httpclient-3.1.jar,
- lib/joda-time-1.6.jar
+ lib/joda-time-1.6.jar,
+ lib/protobuf-2.3.0.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,

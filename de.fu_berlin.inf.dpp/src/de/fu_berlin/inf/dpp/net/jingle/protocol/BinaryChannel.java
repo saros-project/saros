@@ -1,21 +1,21 @@
 package de.fu_berlin.inf.dpp.net.jingle.protocol;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
+
+import com.google.protobuf.ByteString;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -23,7 +23,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryHeader.BinaryHeaderType;
+import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket;
+import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -32,155 +33,69 @@ import de.fu_berlin.inf.dpp.util.Util;
  * BinaryChannel is a class that encapsulates a bidirectional communication
  * channel between two participants.
  * 
- * @author sszuecs
+ * The threading requirements of this class are the following:
  * 
+ * 1.) sendDirect() is a reentrant method for sending data. Any number of
+ * threads can call it in parallel.
+ * 
+ * 2.) {@link #receiveIncomingTransferObject(SubMonitor)} is the mainloop of
+ * this class. No sending/receiving will work if this method is not called
+ * repeatedly. BUT it may only be called from a single thread at any point in
+ * time!
+ * 
+ * 3.) Calling {@link BinaryChannelTransferObject#accept(SubMonitor)} must be
+ * done from a thread different than
+ * {@link #receiveIncomingTransferObject(SubMonitor)}. Otherwise the
+ * BinaryChannel will be blocked.
+ * 
+ * @author sszuecs
+ * @author coezbek
  */
 public class BinaryChannel {
-
-    protected final class BinaryChannelTransferObject implements
-        IncomingTransferObject {
-
-        protected final TransferDescription transferDescription;
-
-        protected final int objectid;
-
-        protected AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
-
-        protected BinaryChannelTransferObject(
-            TransferDescription transferDescription, int objectid) {
-
-            this.transferDescription = transferDescription;
-            this.objectid = objectid;
-        }
-
-        public byte[] accept(SubMonitor progress)
-            throws SarosCancellationException, IOException {
-
-            try {
-
-                if (!acceptedOrRejected.compareAndSet(false, true))
-                    throw new IllegalStateException(
-                        "This IncomingTransferObject has already"
-                            + " been accepted or rejected");
-
-                BlockingQueue<BinaryPacket> myPackets = incomingPackets
-                    .get(objectid);
-
-                boolean first = true;
-
-                LinkedList<BinaryPacket> resultList = new LinkedList<BinaryPacket>();
-
-                while (true) {
-                    if (progress.isCanceled()) {
-                        reject();
-                        throw new LocalCancellationException();
-                    }
-
-                    BinaryPacket packet;
-                    try {
-                        packet = myPackets.take();
-                    } catch (InterruptedException e) {
-                        log.error("Code not designed to be interrupted");
-                        Thread.currentThread().interrupt();
-                        return null;
-                    }
-
-                    if (packet.isCancel()) {
-                        assert packet.getObjectID() == objectid;
-
-                        throw new RemoteCancellationException();
-                    }
-
-                    if (first) {
-                        progress.beginTask("Receiving", packet.head.remaining
-                            + (transferDescription
-                                .compressInDataTransferManager() ? 1 : 0));
-                        first = false;
-                    }
-
-                    resultList.add(packet);
-                    progress.worked(1);
-                    if (packet.isLast())
-                        break;
-                }
-
-                send(BinaryPacket.create(objectid, BinaryHeaderType.FINISHED));
-                byte[] data = getData(resultList);
-
-                if (transferDescription.compressInDataTransferManager())
-                    data = Util.inflate(data, progress.newChild(1));
-
-                return data;
-            } finally {
-                incomingPackets.remove(objectid);
-            }
-        }
-
-        public TransferDescription getTransferDescription() {
-            return transferDescription;
-        }
-
-        public void reject() throws IOException {
-            if (!acceptedOrRejected.compareAndSet(false, true))
-                throw new IllegalStateException(
-                    "This IncomingTransferObject has already"
-                        + " been accepted or rejected");
-
-            send(BinaryPacket.create(objectid, BinaryHeaderType.REJECT));
-        }
-
-        public NetTransferMode getTransferMode() {
-            return transferMode;
-        }
-    }
 
     private static final Logger log = Logger.getLogger(BinaryChannel.class);
 
     /**
      * Max size of data chunks
      */
-    public static final int CHUNKSIZE = 65535;
-
-    /**
-     * bound for resetting the objectOutputStream
-     * 
-     * This is private because it is used exclusively by
-     * {@link #send(BinaryPacket)}
-     */
-    private static final int RESETBOUND = 128;
-
-    /**
-     * count the objects send through the objectOutputStream
-     * 
-     * This is private because it is used exclusively by
-     * {@link #send(BinaryPacket)}
-     */
-    private int resetCounter = 0;
+    public static final int CHUNKSIZE = 2 * 65535;
 
     /**
      * Collect the Packets until an entire Object is received. objectid -->
      * [Packet0, Packet1, ..]
      */
-    protected AutoHashMap<Integer, BlockingQueue<BinaryPacket>> incomingPackets = AutoHashMap
-        .getBlockingQueueHashMap();
+    protected Map<Integer, BlockingQueue<BinaryPacket>> incomingPackets;
+    {
+        // the intermediate Map MUST not be used for anything except as a
+        // backing
+        // map for the incomingTransfers
+        Map<Integer, BlockingQueue<BinaryPacket>> intermediate = AutoHashMap
+            .getBlockingQueueHashMap();
+        incomingPackets = Collections.synchronizedMap(intermediate);
+    }
 
     protected AutoHashMap<Integer, List<BinaryPacket>> incomingDescriptionPackets = AutoHashMap
         .getListHashMap();
 
-    protected Map<Integer, BlockingQueue<BinaryPacket>> intermediate = AutoHashMap
-        .getBlockingQueueHashMap();
-    protected Map<Integer, BlockingQueue<BinaryPacket>> remoteTransfers = Collections
-        .synchronizedMap(intermediate);
+    /**
+     * Contains BinaryPackets by objectID sent to us by the remote side in
+     * confirmation of our packets. The objectIDs are thus ours (this is also
+     * the reason why this is a separate Map than the incomingPackets-Map.
+     */
+    protected Map<Integer, BlockingQueue<BinaryPacket>> remoteTransfers;
+    {
+        // the intermediate Map MUST not be used for anything except as a
+        // backing
+        // map for the remoteTransfers
+        Map<Integer, BlockingQueue<BinaryPacket>> intermediate = AutoHashMap
+            .getBlockingQueueHashMap();
+        remoteTransfers = Collections.synchronizedMap(intermediate);
+    }
 
     // network stuff
     protected Socket socket;
-    protected ObjectInputStream objectInputStream;
-    protected ObjectOutputStream objectOutputStream;
-
-    /**
-     * The next ID to use when sending {@link BinaryPacket}s
-     */
-    protected int currentObjectId = 0;
+    protected InputStream inputStream;
+    protected OutputStream outputStream;
 
     /**
      * NetTransferMode to identify the transport method of the underlying socket
@@ -195,21 +110,15 @@ public class BinaryChannel {
         int size = 0;
 
         for (BinaryPacket packet : list) {
-            size += packet.getSize();
+            size += packet.getData().size();
         }
-
-        ByteBuffer buf = ByteBuffer.allocate(size);
-        for (BinaryPacket packet : list) {
-            buf.put(packet.body);
-        }
-
-        if (buf.hasArray())
-            return buf.array();
 
         byte[] result = new byte[size];
-        buf.rewind();
-        buf.get(result);
-
+        int offset = 0;
+        for (BinaryPacket packet : list) {
+            packet.getData().copyTo(result, offset);
+            offset += packet.getData().size();
+        }
         return result;
     }
 
@@ -223,11 +132,27 @@ public class BinaryChannel {
         this.socket = socket;
         this.transferMode = transferMode;
 
-        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        objectOutputStream.flush();
-        objectInputStream = new ObjectInputStream(socket.getInputStream());
+        outputStream = new BufferedOutputStream(socket.getOutputStream());
+        inputStream = new BufferedInputStream(socket.getInputStream());
     }
 
+    /**
+     * Run the BinaryChannels main loop until the next IncomingTransferObject is
+     * received.
+     * 
+     * Without calling this method, the BinaryChannel will not work.
+     * 
+     * @nonreentrant This method is not reentrant! Use only with a single
+     *               thread!
+     * 
+     * @throws SarosCancellationException
+     *             If waiting was canceled using the supplied progress.
+     * @throws IOException
+     *             If the associated socket broke, while reading or if the
+     *             socket has already been disposed.
+     * @throws ClassNotFoundException
+     *             If the data sent from the other side could not be decoded.
+     */
     public IncomingTransferObject receiveIncomingTransferObject(
         SubMonitor progress) throws SarosCancellationException, IOException,
         ClassNotFoundException {
@@ -238,20 +163,23 @@ public class BinaryChannel {
                 if (progress.isCanceled())
                     throw new LocalCancellationException();
 
-                BinaryPacket packet = receiveInternal();
-                if (packet == null)
+                if (inputStream == null)
+                    throw new IOException("Socket already disposed");
+
+                BinaryPacket packet = BinaryPacket
+                    .parseDelimitedFrom(inputStream);
+                if (packet == null) {
+                    log.error("Null Packet received. Discarding.");
                     continue;
+                }
 
-                if (log.isTraceEnabled())
-                    log.trace("Incoming packet: " + packet);
-
-                final int objectid = packet.getObjectID();
+                final int objectid = packet.getObjectid();
 
                 switch (packet.getType()) {
                 case TRANSFERDESCRIPTION:
                     incomingDescriptionPackets.get(objectid).add(packet);
 
-                    if (packet.head.isLast()) {
+                    if (packet.getRemaining() == 0) {
                         List<BinaryPacket> list = incomingDescriptionPackets
                             .remove(objectid);
 
@@ -260,16 +188,39 @@ public class BinaryChannel {
                         final TransferDescription transferDescription = buildTransferDescription(
                             objectid, data, progress);
 
-                        return new BinaryChannelTransferObject(
+                        // Side-effect! Create a new BlockingQueue in the
+                        // incomingPackets AutoHashMap!
+                        BlockingQueue<BinaryPacket> queue = incomingPackets
+                            .get(objectid);
+                        if (queue.size() > 0) {
+                            log.warn("New incoming transfer, but already"
+                                + " packets exist with the given ID!"
+                                + " Discarding - " + transferDescription);
+                            queue.clear();
+                        }
+
+                        return new BinaryChannelTransferObject(this,
                             transferDescription, objectid);
                     }
                     break;
                 case DATA:
-                    incomingPackets.get(objectid).add(packet);
+                    // Only keep packets for DATA we are expecting!
+                    if (incomingPackets.containsKey(objectid))
+                        incomingPackets.get(objectid).add(packet);
+                    else {
+                        if (log.isDebugEnabled())
+                            log.warn("Discarding Packet: " + packet);
+                    }
                     break;
                 case CANCEL:
                     incomingDescriptionPackets.remove(objectid);
-                    incomingPackets.get(objectid).add(packet);
+                    if (incomingPackets.containsKey(objectid)) {
+                        // Pass the cancelation to the
+                        // BinaryChanelTransferObject
+                        // if no incomingPackets is found the transfer has
+                        // already been finished
+                        incomingPackets.get(objectid).add(packet);
+                    }
                     break;
                 case FINISHED: // fall through
                 case REJECT:
@@ -286,7 +237,6 @@ public class BinaryChannel {
         } finally {
             progress.done();
         }
-
     }
 
     /**
@@ -294,42 +244,11 @@ public class BinaryChannel {
      * 
      * @throws IOException
      */
-    protected synchronized void send(BinaryPacket packet) throws IOException {
-
-        if (log.isTraceEnabled())
-            log.trace("send packet " + packet.head.toString());
-
-        objectOutputStream.writeUnshared(packet);
-        objectOutputStream.flush();
-
-        if (resetCounter++ > RESETBOUND) {
-            // Reset periodically to flush stream handles to the data
-            objectOutputStream.reset();
-            resetCounter = 0;
+    protected void send(BinaryPacket packet) throws IOException {
+        synchronized (outputStream) {
+            packet.writeDelimitedTo(outputStream);
+            outputStream.flush();
         }
-    }
-
-    /**
-     * This is the whole process for receiving the next packet from the socket.
-     * It returns the next BinaryPacket.
-     * 
-     * @blocking
-     */
-    protected BinaryPacket receiveInternal() throws IOException,
-        ClassNotFoundException {
-
-        BinaryPacket packet = null;
-        synchronized (objectInputStream) {
-            packet = (BinaryPacket) objectInputStream.readUnshared();
-        }
-        log.debug("packet received: " + packet);
-
-        if (packet == null || packet.head == null) {
-            log.error("packet or head is null");
-            return null;
-        }
-
-        return packet;
     }
 
     protected TransferDescription buildTransferDescription(int objectid,
@@ -343,12 +262,14 @@ public class BinaryChannel {
     }
 
     public boolean isConnected() {
-        return objectInputStream != null && objectOutputStream != null;
+        return inputStream != null && outputStream != null;
     }
 
     /**
      * It sends the given transferDescription and data direct. Supports
      * cancellation by given SubMonitor.
+     * 
+     * @reentrant This method may be called from multiple threads at once
      * 
      * @blocking
      * 
@@ -386,15 +307,14 @@ public class BinaryChannel {
             progress.setWorkRemaining(countData + countDescription);
 
             // send TRANSFERDESCRIPTION
-            sendDirect(BinaryHeaderType.TRANSFERDESCRIPTION, countDescription,
+            sendDirect(PacketType.TRANSFERDESCRIPTION, countDescription,
                 objectid, descData, progress);
 
             if (isRejected(objectid))
                 throw new RemoteCancellationException();
 
             // send DATA
-            sendDirect(BinaryHeaderType.DATA, countData, objectid, data,
-                progress);
+            sendDirect(PacketType.DATA, countData, objectid, data, progress);
 
             BinaryPacket confirmation;
             try {
@@ -404,16 +324,16 @@ public class BinaryChannel {
                     new StackTrace());
                 return;
             }
-            if (confirmation.isReject())
+            if (confirmation.getType() == PacketType.REJECT)
                 throw new RemoteCancellationException();
 
-            assert confirmation.getType() == BinaryHeaderType.FINISHED;
+            assert confirmation.getType() == PacketType.FINISHED;
 
         } catch (LocalCancellationException e) {
 
             log.debug("send was canceled:" + transferDescription.objectid);
 
-            send(BinaryPacket.create(objectid, BinaryHeaderType.CANCEL));
+            send(buildPacket(PacketType.CANCEL, objectid));
             throw e;
 
         } finally {
@@ -421,10 +341,14 @@ public class BinaryChannel {
         }
     }
 
-    private boolean isRejected(int objectid) {
+    public static BinaryPacket buildPacket(PacketType type, int objectid) {
+        return buildPacket(type, 0, objectid, ByteString.EMPTY);
+    }
+
+    protected boolean isRejected(int objectid) {
         BinaryPacket packet = remoteTransfers.get(objectid).poll();
         if (packet != null) {
-            return packet.isReject();
+            return packet.getType() == PacketType.REJECT;
         }
         return false;
     }
@@ -432,13 +356,13 @@ public class BinaryChannel {
     /**
      * Splits the given data into chunks of CHUNKSIZE to send the BinaryPackets.
      */
-    protected void sendDirect(BinaryHeaderType type, int remaining,
-        int objectid, byte[] data, SubMonitor progress)
-        throws SarosCancellationException, IOException {
+    protected void sendDirect(PacketType type, int remaining, int objectid,
+        byte[] data, SubMonitor progress) throws SarosCancellationException,
+        IOException {
 
         int offset = 0;
-        // splits into chunks with BinaryHeader.remaining=0 is the last packet
-        int size = Math.min(data.length - offset, CHUNKSIZE);
+        // splits into chunks with remaining == 0 is the last packet
+        int size;
         for (int idx = remaining; idx > 0; idx--) {
 
             if (isRejected(objectid))
@@ -454,27 +378,40 @@ public class BinaryChannel {
             }
 
             size = Math.min(data.length - offset, CHUNKSIZE);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(size + 1);
-            bos.write(data, offset, size);
+            send(buildPacket(type, idx - 1, objectid, ByteString.copyFrom(data,
+                offset, size)));
             offset += size;
-            byte[] chunk = bos.toByteArray();
-            BinaryHeader dataHeader = new BinaryHeader(type, idx, chunk.length,
-                objectid);
-
-            log.debug("Sending: " + dataHeader.toString());
-
-            send(new BinaryPacket(dataHeader, chunk));
             progress.worked(1);
         }
     }
 
-    protected synchronized int nextObjectId() {
-        if (currentObjectId >= Integer.MAX_VALUE)
-            currentObjectId = 0;
-        else
-            currentObjectId++;
+    public static BinaryPacket buildPacket(PacketType type, int index,
+        int objectID, ByteString data) {
+        return BinaryPacket.newBuilder().setType(type).setRemaining(index)
+            .setObjectid(objectID).setData(data).setSize(data.size()).build();
+    }
 
-        return currentObjectId;
+    /**
+     * The next ID to use when sending {@link BinaryPacket}s.
+     * 
+     * This object should only be accessed from nextObjectId()
+     */
+    protected int currentObjectId = 0;
+
+    /**
+     * This object is internally used by nextObjectID for synchronizing access
+     * to currentObjectId;
+     */
+    private Object nextObjectIdLock = new Object();
+
+    protected int nextObjectId() {
+        synchronized (nextObjectIdLock) {
+            if (currentObjectId >= Integer.MAX_VALUE)
+                currentObjectId = 0;
+            else
+                currentObjectId = currentObjectId + 1;
+            return currentObjectId;
+        }
     }
 
     /**
@@ -485,13 +422,13 @@ public class BinaryChannel {
         try {
             if (socket != null && !socket.isClosed())
                 socket.close();
-            IOUtils.closeQuietly(objectInputStream);
-            IOUtils.closeQuietly(objectOutputStream);
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         } catch (IOException e) {
             log.error("Close failed cause:", e);
         }
-        objectInputStream = null;
-        objectOutputStream = null;
+        inputStream = null;
+        outputStream = null;
         socket = null;
     }
 
@@ -501,7 +438,17 @@ public class BinaryChannel {
     public void sendReject(TransferDescription transferDescription)
         throws IOException {
         log.debug("sendReject objectid:" + transferDescription.objectid);
-        send(BinaryPacket.create(transferDescription.objectid,
-            BinaryHeaderType.REJECT));
+        send(buildPacket(PacketType.REJECT, transferDescription.objectid));
+    }
+
+    /**
+     * Returns a new BinaryPacket in which the data field has been trimmed to
+     * max 30 bytes so that the BinaryPacket can be printed using toString().
+     */
+    public static BinaryPacket trimForLogging(BinaryPacket binaryPacket) {
+
+        return BinaryPacket.newBuilder(binaryPacket).setData(
+            ByteString.copyFrom(binaryPacket.getData().toByteArray(), 0, Math
+                .min(30, binaryPacket.getData().size()))).build();
     }
 }
