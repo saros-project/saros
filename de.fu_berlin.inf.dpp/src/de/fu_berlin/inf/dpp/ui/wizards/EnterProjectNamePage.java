@@ -468,4 +468,17 @@ class EnterProjectNamePage extends WizardPage {
         }
         return false;
     }
+
+    /**
+     * @return <code>true</code> if the synchronization options chosen by the
+     *         user could lead to overwriting project resources,
+     *         <code>false</code> otherwise.
+     */
+    public boolean overwriteProjectResources() {
+        if (isUpdateSelected() && !copyCheckbox.getSelection()
+            && !isSyncSkippingSelected()) {
+            return true;
+        }
+        return false;
+    }
 }

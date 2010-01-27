@@ -20,12 +20,14 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IPageChangingListener;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -171,9 +173,21 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
-        final IProject source = this.namePage.getSourceProject();
-        final String target = this.namePage.getTargetProjectName();
-        final boolean skip = this.namePage.isSyncSkippingSelected();
+        final IProject source = namePage.getSourceProject();
+        final String target = namePage.getTargetProjectName();
+        final boolean skip = namePage.isSyncSkippingSelected();
+
+        /*
+         * Ask the user whether to overwrite local resources only if resources
+         * are supposed to be overwritten based on the synchronization options
+         * and if there are differences between the remote and local project.
+         */
+        if (namePage.overwriteProjectResources()
+            && JoinSessionWizardUtils.getMatch(process.getRemoteFileList(),
+                source) != 100) {
+            if (!confirmOverwritingProjectResources(source.getName()))
+                return false;
+        }
 
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
@@ -198,6 +212,28 @@ public class JoinSessionWizard extends Wizard {
 
         getShell().forceActive();
         return true;
+    }
+
+    public boolean confirmOverwritingProjectResources(final String projectName) {
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    String message = "The selected project '"
+                        + projectName
+                        + "' will be used as a target project to carry out "
+                        + "the synchronization. All differences will be resolved "
+                        + "using the hosts project, so local project data may be lost. "
+                        + "(You can use the 'Create copy...' option as an alternative.)"
+                        + "\n\n Do you want to proceed?";
+                    return MessageDialog.openQuestion(getShell(),
+                        "Project synchronization confirmation", message);
+                }
+            });
+        } catch (Exception e) {
+            log.error(
+                "An error ocurred while trying to open the confirm dialog.", e);
+            return false;
+        }
     }
 
     @Override
