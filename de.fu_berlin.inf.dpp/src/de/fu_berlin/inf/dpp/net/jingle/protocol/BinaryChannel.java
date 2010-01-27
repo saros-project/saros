@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.jingle.protocol;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -169,8 +170,8 @@ public class BinaryChannel {
                 BinaryPacket packet = BinaryPacket
                     .parseDelimitedFrom(inputStream);
                 if (packet == null) {
-                    log.error("Null Packet received. Discarding.");
-                    continue;
+                    log.debug("Socket closed.");
+                    throw new EOFException();
                 }
 
                 final int objectid = packet.getObjectid();
