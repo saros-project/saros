@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -81,16 +80,6 @@ public class JoinSessionWizardUtils {
         return runner.project;
     }
 
-    public static int getMatch(FileList remoteFileList, IProject project) {
-        try {
-            return remoteFileList.match(new FileList(project));
-        } catch (CoreException e) {
-            log.debug("Couldn't calculate match for project " + project, e);
-
-            return -1;
-        }
-    }
-
     /**
      * Return the best match among all project from workspace with the given
      * remote file list or null if no best match could be found or if the
@@ -98,7 +87,7 @@ public class JoinSessionWizardUtils {
      * 
      * To be considered a match, projects have to match at least 80%.
      */
-    public static IProject getLocalProject(FileList remoteFileList,
+    public static IProject getLocalProject(FileList hostFileList,
         IProgressMonitor monitor) throws InterruptedException {
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -123,8 +112,7 @@ public class JoinSessionWizardUtils {
                 continue;
             }
 
-            int matchScore = JoinSessionWizardUtils.getMatch(remoteFileList,
-                projects[i]);
+            int matchScore = hostFileList.computeMatch(projects[i]);
 
             if (matchScore > bestMatchScore) {
                 bestMatchScore = matchScore;

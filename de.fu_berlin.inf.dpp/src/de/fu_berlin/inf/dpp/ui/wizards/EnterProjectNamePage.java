@@ -82,10 +82,9 @@ class EnterProjectNamePage extends WizardPage {
             this.updateProjectStatusResult.setText("Your project "
                 + project.getName()
                 + " matches with "
-                + JoinSessionWizardUtils
-                    .getMatch(this.joinSessionWizard.process
-                        .getRemoteFileList(), project) + "% accuracy.\n"
-                + "This fact will used to shorten the process of "
+                + this.joinSessionWizard.process.getRemoteFileList()
+                    .computeMatch(project) + "% accuracy.\n"
+                + "This fact will be used to shorten the process of "
                 + "downloading the remote project.");
 
             this.updateProjectText.setText(this.similarProject.getName());

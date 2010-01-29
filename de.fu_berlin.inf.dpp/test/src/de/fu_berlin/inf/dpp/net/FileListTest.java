@@ -34,146 +34,163 @@ import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 /**
  * TODO [TEST] Add Testcases for non-existing files
+ *  florianthiel: Does FileList care about existence of files?
  * 
  * TODO [TEST] Add Testcases for derived files
+ * florianthiel: What are "derived files" in this context?
  */
 public class FileListTest extends TestCase {
-    private IFile[] files;
-    private IFile[] otherFiles;
 
-    private FileList fileList;
-    private FileList otherFileList;
-    private FileList emptyFileList;
+    protected IFile fileInRoot1 = new FileStub("root1", "fileInRoot1");
+    protected IFile fileInRoot2 = new FileStub("root2", "fileInRoot2");
+    protected IFile fileInSubDir1 = new FileStub("subdir/file1", "fileInSubDir1");
+    protected IFile fileInSubDir2 = new FileStub("subdir/file2", "fileInSubDir2");
+    protected IFile fileInSubDir1changed = new FileStub("subdir/file1",
+        "changed fileInSubDir1");
+
+    protected IFile[] threeFileArray = new IFile[] { fileInRoot1, fileInRoot2,
+        fileInSubDir1 };
+
+    protected FileList threeEntryList;
+    protected FileList fourEntryList; // contains one additional entry 
+                                    // in respect to threeEntryList
+    protected FileList modifiedFourEntryList; // contains one modified entry in
+                                            // respect to fourEntryList
+    protected FileList emptyFileList;
 
     @Override
     protected void setUp() throws Exception {
-        files = new IFile[] { new FileStub("root.txt", "this in the root"),
-            new FileStub("foo/bar/unit.java", "class Test {}"),
-            new FileStub("foo/bar/test.txt", "") };
-        fileList = new FileList(files);
-
-        otherFiles = new IFile[] {
-            new FileStub("root.txt", "this in the root"),
-            new FileStub("foo/bar/unit.java", "class Test {void foo(){}}"),
-            new FileStub("foo/test.txt", "another test content") };
-        otherFileList = new FileList(otherFiles);
+        threeEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
+            fileInSubDir1 });
+        fourEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
+            fileInSubDir1, fileInSubDir2 });
+        modifiedFourEntryList = new FileList(new IFile[] { fileInRoot1,
+            fileInRoot2, fileInSubDir1changed, fileInSubDir2 });
 
         emptyFileList = new FileList();
     }
 
     public void testGetFilePaths() {
-        List<IPath> paths = fileList.getPaths();
+        List<IPath> paths = threeEntryList.getPaths();
 
-        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
-            "foo/bar/test.txt" }, paths);
+        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
     public void testGetFileUnalteredPaths() {
-        Collection<IPath> paths = fileList.getUnalteredPaths();
+        Collection<IPath> paths = threeEntryList.getUnalteredPaths();
 
-        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
-            "foo/bar/test.txt" }, paths);
+        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
     public void testDiffGetAddedFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getAddedPaths();
+        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
+            .getAddedPaths();
 
-        assertPaths(new String[] { "foo/test.txt" }, paths);
+        assertPaths(new String[] { "subdir/file2" }, paths);
     }
 
     public void testReversedDiffGetAddedFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList).getAddedPaths();
+        Collection<IPath> paths = fourEntryList.diff(threeEntryList)
+            .getAddedPaths();
 
-        assertPaths(new String[] { "foo/bar/test.txt" }, paths);
+        assertPaths(new String[] {}, paths);
     }
 
     public void testDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList)
+        Collection<IPath> paths = fourEntryList.diff(threeEntryList)
             .getRemovedPaths();
 
-        assertPaths(new String[] { "foo/bar/test.txt" }, paths);
+        assertPaths(new String[] { "subdir/file2" }, paths);
     }
 
     public void testReversedDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList)
+        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
             .getRemovedPaths();
 
-        assertPaths(new String[] { "foo/test.txt" }, paths);
+        assertPaths(new String[] {}, paths);
     }
 
     public void testDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList)
+        Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
             .getAlteredPaths();
 
-        assertPaths(new String[] { "foo/bar/unit.java" }, paths);
+        assertPaths(new String[] { "subdir/file1" }, paths);
     }
 
     public void testReversedDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList)
+        Collection<IPath> paths = modifiedFourEntryList.diff(fourEntryList)
             .getAlteredPaths();
 
-        assertPaths(new String[] { "foo/bar/unit.java" }, paths);
+        assertPaths(new String[] { "subdir/file1" }, paths);
+    }
+
+    public void testDiffGetAlteredFilesAddedFiles() {
+        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
+            .getAlteredPaths();
+
+        assertPaths(new String[] {}, paths);
     }
 
     public void testDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList)
+        Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
             .getUnalteredPaths();
 
-        assertPaths(new String[] { "root.txt" }, paths);
+        assertPaths(new String[] { "root1", "root2", "subdir/file2" }, paths);
     }
 
     public void testReversedDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList)
+        Collection<IPath> paths = modifiedFourEntryList.diff(threeEntryList)
             .getUnalteredPaths();
 
-        assertPaths(new String[] { "root.txt" }, paths);
+        assertPaths(new String[] { "root1", "root2" }, paths);
     }
 
     public void testDiffGetFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getPaths();
+        Collection<IPath> paths = threeEntryList.diff(modifiedFourEntryList)
+            .getPaths();
 
-        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
-            "foo/test.txt" }, paths);
+        assertPaths(new String[] { "root1", "root2", "subdir/file2",
+            "subdir/file1" }, paths);
 
-        paths = emptyFileList.diff(fileList).getPaths();
-        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
-            "foo/bar/test.txt" }, paths);
-        paths = fileList.diff(emptyFileList).getRemovedPaths();
-        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
-            "foo/bar/test.txt" }, paths);
+        paths = emptyFileList.diff(threeEntryList).getPaths();
+        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
+        paths = threeEntryList.diff(emptyFileList).getRemovedPaths();
+        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
     public void testMatch() {
-        assertEquals(33, fileList.match(otherFileList));
-        assertEquals(33, otherFileList.match(fileList));
-        assertEquals(100, fileList.match(fileList));
-        assertEquals(0, fileList.match(emptyFileList));
-        assertEquals(0, emptyFileList.match(fileList));
-        assertEquals(100, emptyFileList.match(emptyFileList));
+        assertEquals(75, threeEntryList.computeMatch(fourEntryList));
+        assertEquals(75, fourEntryList.computeMatch(threeEntryList));
+        assertEquals(100, threeEntryList.computeMatch(threeEntryList));
+        assertEquals(0, threeEntryList.computeMatch(emptyFileList));
+        assertEquals(0, emptyFileList.computeMatch(threeEntryList));
+        assertEquals(50, threeEntryList.computeMatch(modifiedFourEntryList)); 
+        assertEquals(50, modifiedFourEntryList.computeMatch(threeEntryList)); 
     }
 
     public void testEquals() throws CoreException {
-        FileList sameFileList = new FileList(files);
-        assertEquals(fileList, sameFileList);
+        FileList sameFileList = new FileList(threeFileArray);
+        assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 
-        assertFalse(fileList.equals(otherFileList));
-        assertFalse(emptyFileList.equals(otherFileList));
+        assertFalse(threeEntryList.equals(fourEntryList));
+        assertFalse(emptyFileList.equals(threeEntryList));
     }
 
     public void testRoundtripSerialization() {
-
-        FileList replicated = FileList.fromXML(fileList.toXML());
-        assertEquals(fileList, replicated);
+        FileList replicated = FileList.fromXML(threeEntryList.toXML());
+        assertEquals(threeEntryList, replicated);
     }
 
     private void assertPaths(String[] expected, Collection<IPath> actual) {
         for (int i = 0; i < expected.length; i++) {
             Path path = new Path(expected[i]);
-            assertTrue(actual.contains(path));
+            assertTrue("Expected " + path + " to appear in: " + actual, actual
+                .contains(path));
         }
 
-        assertEquals(expected.length, actual.size());
+        assertEquals("Expected: '" + expected.toString() + "' actual: '"
+            + actual + "'", expected.length, actual.size());
     }
 
 }
