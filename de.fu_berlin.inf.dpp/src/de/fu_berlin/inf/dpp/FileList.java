@@ -51,6 +51,12 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
  * A FileList is a list of resources - files and folders - which can be compared
  * to other file lists. Folders are denoted by a trailing separator.
  * 
+ * NOTE: As computation of a FileList involves a complete rescan of the project,
+ * creating new instances should be avoided. TODO: This class should be split up
+ * to clearly separate between file lists and differences between file lists.
+ * Fields like removed, added, etc. do not make sense for plain lists and just
+ * add confusion.
+ * 
  * @author rdjemili
  */
 @XStreamAlias("fileList")
@@ -138,16 +144,29 @@ public class FileList {
         this.unaltered.putAll(this.all);
     }
 
-    // TODO invert diff direction
     /**
-     * Returns a new FileList which contains the diff from the two FileLists.
+     * Returns a new FileList which contains the difference of two FileLists,
+     * consisting of files missing in <code>other</code> but present in
+     * <code>this</code> and files in <code>other</code> which are not present
+     * in <code>this</code>.
      * 
      * @param other
-     *            the other FileList with which this FileList is compared with.
+     *            the <code>FileList</code> to compare to.
      * 
-     * @return a new FileList which contains the diff information from the two
-     *         FileLists. The diff contains the operations which are needed to
-     *         get from this FileList to the other FileList.
+     * @return a new <code>FileList</code> which contains the difference
+     *         information of the two <code>FileList</code>s:
+     *         <code>result.removed</code> contains paths present in
+     *         <code>this.all</code> but not in <code>other.all</code>.
+     *         <code>result.added</code> contains paths present in
+     *         <code>other.all</code> but not in <code>this.all</code>.
+     *         <code>result.unaltered</code>/<code>results.altered</code>
+     *         contain paths where the checksum is equal to/differs between
+     *         <code>this</code> and <code>other</code>. <code>result.all</code>
+     *         contains all paths from <code>other</code>.
+     * 
+     *         The diff contains the operations which are needed to - * get from
+     *         <code>this</code> <code>FileList</code> to the <code>other</code>
+     *         <code>FileList</code>.
      */
     public FileList diff(FileList other) {
         FileList result = new FileList();
@@ -188,27 +207,54 @@ public class FileList {
     }
 
     /**
-     * @return the amount in percentage by which this file list has the same
-     *         files as the other file list. Returns 100 only if the given
-     *         FileList matches perfectly.
+     * Calculate an approximation of how equal <code>this</code>
+     * <code>FileList</code> is to <code>other</code>. NOTE: This is a
+     * long-running method linear to size of the length of the two file lists.
+     * 
+     * @param other
+     * @return Percentage of "sameness" of <code>this</code> and
+     *         <code>other</code> counting the number of identical files
+     *         relative to the size of the larger list. 100 means identical
+     *         <code>FileList</code>s.
      */
-    public int match(FileList other) {
-        int nPaths = getPaths().size();
+    public int computeMatch(FileList other) {
+        // calculate "sameness" of ratio of longer list
+        int nPaths = Math.max(getPaths().size(), other.getPaths().size());
 
         if (nPaths == 0 && other.getPaths().isEmpty())
             return 100; // both are empty -> perfect match
 
-        if (nPaths == 0) {
+        if (nPaths == 0) { // other is empty
             return 0;
         } else {
-            FileList diff = this.diff(other);
-            int nUnalteredPaths = diff.getUnalteredPaths().size();
+            FileList difference = this.diff(other);
+            int nUnalteredPaths = difference.getUnalteredPaths().size();
             if (nPaths == nUnalteredPaths) {
                 return 100;
             } else {
                 return Math.min(99, nUnalteredPaths * 100 / nPaths);
             }
         }
+    }
+
+    /**
+     * Calculate an approximation of how equal <code>this</code>
+     * <code>FileList</code> is to <code>project</code>. NOTE: This is a
+     * long-running method linear to size of the length of the two file lists.
+     * 
+     * @param project
+     * @return Percentage of "sameness" of <code>this</code> and
+     *         <code>other</code> counting the number of identical files
+     *         relative to the size of the larger list. 100 means identical
+     *         <code>FileList</code>s. On error, returns 0.
+     */
+    public int computeMatch(IProject project) {
+        try {
+            return this.computeMatch(new FileList(project));
+        } catch (CoreException e) {
+            log.error("Failed to generate FileList for match computation", e);
+        }
+        return 0;
     }
 
     protected static synchronized XStream getXStream() {
@@ -441,5 +487,4 @@ public class FileList {
         monitor.done();
         return result;
     }
-
 }

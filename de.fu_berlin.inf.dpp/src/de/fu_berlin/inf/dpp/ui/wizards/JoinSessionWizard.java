@@ -183,8 +183,7 @@ public class JoinSessionWizard extends Wizard {
          * and if there are differences between the remote and local project.
          */
         if (namePage.overwriteProjectResources()
-            && JoinSessionWizardUtils.getMatch(process.getRemoteFileList(),
-                source) != 100) {
+            && process.getRemoteFileList().computeMatch(source) != 100) {
             if (!confirmOverwritingProjectResources(source.getName()))
                 return false;
         }
