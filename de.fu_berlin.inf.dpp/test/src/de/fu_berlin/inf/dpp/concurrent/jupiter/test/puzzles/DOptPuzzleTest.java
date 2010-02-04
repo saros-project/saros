@@ -1,5 +1,10 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
@@ -22,6 +27,7 @@ public class DOptPuzzleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testThreeConcurrentInsertOperations() throws Exception {
         /* init simulated client and server components. */
         ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
@@ -67,6 +73,7 @@ public class DOptPuzzleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testThreeConcurrentInsertStringOperations() throws Exception {
 
         ClientSynchronizedDocument[] clients = setUp(3, "abcd");
@@ -90,6 +97,7 @@ public class DOptPuzzleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testThreeConcurrentDeleteOperations() throws Exception {
 
         ClientSynchronizedDocument[] clients = setUp(3, "abcdefg");
@@ -109,17 +117,24 @@ public class DOptPuzzleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testConcurrentInsertDeleteOperations() throws Exception {
 
         ClientSynchronizedDocument[] clients = setUp(3, "abc");
+        
+        try {
+            clients[0].sendOperation(new InsertOperation(0, "a"), 0);
+            clients[1].sendOperation(new InsertOperation(1, "b"), 100);
 
-        clients[0].sendOperation(new InsertOperation(0, "a"), 0);
-        clients[1].sendOperation(new InsertOperation(1, "b"), 100);
-
-        Thread.sleep(200);
-        clients[2].sendOperation(new DeleteOperation(1, "ab"), 700);
-        clients[1].sendOperation(new InsertOperation(2, "by"), 100);
-        clients[0].sendOperation(new InsertOperation(1, "x"), 400);
+            Thread.sleep(200);
+            clients[2].sendOperation(new DeleteOperation(1, "ab"), 700);
+            clients[1].sendOperation(new InsertOperation(2, "by"), 100);
+            clients[0].sendOperation(new InsertOperation(1, "x"), 400);
+        } catch (RuntimeException e) {
+            // Document.execOperation throws RuntimeException on inconsistency
+            // Convert this to a test failure.
+            fail(e.getMessage());
+        }
 
         Thread.sleep(1000);
 

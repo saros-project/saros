@@ -1,9 +1,10 @@
-package de.fu_berlin.inf.dpp.net.test;
+package de.fu_berlin.inf.dpp.test.util;
 
 import java.util.concurrent.BlockingQueue;
 
 import junit.framework.AssertionFailedError;
 
+// FIXME: Is this run by TestRunners?
 /**
  * A Thread which puts all Exceptions and AssertionFailedErrors caught into the
  * given BlockingQueue

@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 // TODO: Actually the IFile interface is not intended to be implemented by clients.
+/**
+ * FileStub provides a mockup implementation for eclipse's IFile
+ */
 public class FileStub implements IFile {
 
     private IPath path;

@@ -4,6 +4,11 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
  * This test class represent local execution of document changes and
  * appropriate jupiter operations.
  */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -19,6 +24,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
      * simple test to generate local operations and compute the
      * JupiterActivities for other sides.
      */
+    @Test
     public void testExecuteLocalOperations() {
         Algorithm algo = new Jupiter(true);
 

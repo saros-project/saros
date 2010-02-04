@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.undo;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Before;
+import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -15,7 +17,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 /**
  * testing TextOperationHistory and UndoManager
  */
-public class UndoTest extends TestCase {
+public class UndoTest {
 
     // private static Logger log = Logger.getLogger(UndoTest.class.getName());
 
@@ -25,7 +27,7 @@ public class UndoTest extends TestCase {
     protected OperationHistory history;
     protected UndoManager undoManager;
 
-    @Override
+    @Before
     public void setUp() {
         undoManager = new UndoManager();
         history = undoManager.getHistory();
@@ -43,12 +45,14 @@ public class UndoTest extends TestCase {
         return undoManager.calcRedoOperation(path);
     }
 
+    @Test
     public void testEmptyHistory() {
         assertEquals(nop(), undo(path1));
         assertEquals(nop(), undo(path2));
         assertEquals(nop(), redo(path1));
     }
 
+    @Test
     public void testHistoryWithoutLocals() {
         history.add(path1, Type.REMOTE, new InsertOperation(5, "abc"));
         history.add(path1, Type.REMOTE, new DeleteOperation(11, "ghi"));
@@ -58,6 +62,7 @@ public class UndoTest extends TestCase {
         assertEquals(nop(), redo(path1));
     }
 
+    @Test
     public void testHistoryWithoutRemotes() {
         history.add(path1, Type.LOCAL, new InsertOperation(5, "abc"));
         history.add(path1, Type.LOCAL, new DeleteOperation(11, "ghi"));
@@ -71,6 +76,7 @@ public class UndoTest extends TestCase {
         assertEquals(nop(), undo(path2));
     }
 
+    @Test
     public void testMixedHistoryWithOnePath() {
         // Text: 0123456789
         history.add(path1, Type.LOCAL, new InsertOperation(8, "first")); // 01234567first89
@@ -86,6 +92,7 @@ public class UndoTest extends TestCase {
         assertEquals(nop(), undo(path2));
     }
 
+    @Test
     public void testMixedHistoryWithTwoPaths() {
         // Text: 0123456789
         history.add(path1, Type.LOCAL, new InsertOperation(8, "first")); // 01234567first89
@@ -116,6 +123,7 @@ public class UndoTest extends TestCase {
         assertEquals(expected2.invert(), redo(path2));
     }
 
+    @Test
     public void testTwoUndos() {
         // Text: 0123456789
         history.add(path1, Type.LOCAL, new InsertOperation(8, "first")); // 01234567first89
@@ -135,6 +143,7 @@ public class UndoTest extends TestCase {
         assertEquals(expected1.invert(), redo(path1)); // 0Xsecfirst89
     }
 
+    @Test
     public void testRedoAfterNewRemotes() {
         // Text: 0123456789
         history.add(path1, Type.LOCAL, new InsertOperation(8, "first")); // 01234567first89
@@ -167,6 +176,7 @@ public class UndoTest extends TestCase {
         assertEquals(expected, redo(path1));
     }
 
+    @Test
     public void testUndoRedoUndo() {
         history.add(path1, Type.LOCAL, new InsertOperation(3, "abc"));
         history.add(path1, Type.LOCAL, new InsertOperation(6, "defghi"));
@@ -178,6 +188,7 @@ public class UndoTest extends TestCase {
         assertEquals(expected, undo(path1));
     }
 
+    @Test
     public void testUndoUndoRedoRedoUndo() {
         history.add(path1, Type.LOCAL, new InsertOperation(3, "abc"));
         history.add(path1, Type.LOCAL, new InsertOperation(6, "defghi")); // abcdefghi
@@ -194,6 +205,7 @@ public class UndoTest extends TestCase {
         assertEquals(expected, undo(path1));
     }
 
+    @Test
     public void testBackspaceUndo() {
         history.add(path1, Type.LOCAL, new InsertOperation(3, "abc"));
         history.add(path1, Type.LOCAL, new DeleteOperation(3, "abc"));

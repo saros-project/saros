@@ -1,15 +1,16 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.junit.Test;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -40,7 +41,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 
-public class ActivitiesExtensionProviderTest extends TestCase {
+public class ActivitiesExtensionProviderTest {
 
     protected static final JID jid = new JID("testman@jabber.cc");
     protected static final SPathDataObject path = new SPathDataObject("pid",
@@ -74,6 +75,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected ActivitiesExtensionProvider aProvider = new ActivitiesExtensionProvider();
 
+    @Test
     public void testJupiterActivities() throws XmlPullParserException,
         IOException {
         assertRoundtrip(timestamp);
@@ -84,48 +86,26 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         assertRoundtrip(nestedSplit);
     }
 
-    public void assertRoundtrip(Operation op) throws XmlPullParserException,
-        IOException {
-
-        assertRoundtrip(new JupiterActivityDataObject(jupiterTime, op, jid,
-            path));
-    }
-
-    public void assertRoundtrip(IActivityDataObject activityDataObject)
-        throws XmlPullParserException, IOException {
-
-        assertRoundtrip(createPacketExtension(activityDataObject));
-    }
-
+    @Test
     public void testActivities() throws XmlPullParserException, IOException {
         for (IActivityDataObject activityDataObject : activityDataObjects) {
             assertRoundtrip(activityDataObject);
         }
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testEditorActivity() {
-        for (EditorActivity.Type type : EditorActivity.Type.values()) {
-            try {
-                new EditorActivity(null, type, null);
-                if (type != EditorActivity.Type.Activated) {
-                    fail();
-                }
-            } catch (IllegalArgumentException e) {
-                // Expected exception.
-            }
-        }
+        for (EditorActivity.Type type : EditorActivity.Type.values())
+            new EditorActivity(null, type, null);
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testEmptyExtension() {
         List<TimedActivityDataObject> activities = Collections.emptyList();
-        try {
-            aProvider.create("Session-ID", activities);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // Expected exception.
-        }
+        aProvider.create("Session-ID", activities);
     }
 
+    @Test
     public void testGapInSequenceNumbers() throws XmlPullParserException,
         IOException {
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
@@ -144,11 +124,25 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         assertRoundtrip(extension);
     }
 
+    @Test
     public void testLineDelimiters() throws XmlPullParserException, IOException {
         for (String lineEnding : new String[] { "\n", "\r", "\r\n" }) {
             assertRoundtrip(new TextEditActivityDataObject(jid, 42, lineEnding,
                 "", path));
         }
+    }
+
+    public void assertRoundtrip(Operation op) throws XmlPullParserException,
+        IOException {
+
+        assertRoundtrip(new JupiterActivityDataObject(jupiterTime, op, jid,
+            path));
+    }
+
+    public void assertRoundtrip(IActivityDataObject activityDataObject)
+        throws XmlPullParserException, IOException {
+
+        assertRoundtrip(createPacketExtension(activityDataObject));
     }
 
     protected void assertRoundtrip(PacketExtension extension)

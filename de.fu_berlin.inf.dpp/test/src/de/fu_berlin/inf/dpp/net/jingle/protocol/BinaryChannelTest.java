@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.net.jingle.protocol;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.ServerSocket;
@@ -11,20 +15,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
+import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.test.TestThread;
+import de.fu_berlin.inf.dpp.test.util.TestThread;
 
-public class BinaryChannelTest extends TestCase {
+public class BinaryChannelTest {
 
     /**
      * Field used exclusive by getTestArray to memoize the created TestArrays
@@ -82,6 +85,7 @@ public class BinaryChannelTest extends TestCase {
      * 
      * @throws Throwable
      */
+    @Test
     public void testBinaryChannelClientToServer() throws Throwable {
 
         final ServerSocket server = new ServerSocket(4278);
@@ -197,6 +201,7 @@ public class BinaryChannelTest extends TestCase {
     /**
      * Test bidirectional sending at the same time
      */
+    @Test
     public void testBinaryChannelBiDi() throws Throwable {
 
         final ServerSocket server = new ServerSocket(4278);
@@ -357,6 +362,7 @@ public class BinaryChannelTest extends TestCase {
     /**
      * Test two people sending at the same time
      */
+    @Test
     public void testBinaryChannelMultiSend() throws Throwable {
 
         final ServerSocket server = new ServerSocket(4278);

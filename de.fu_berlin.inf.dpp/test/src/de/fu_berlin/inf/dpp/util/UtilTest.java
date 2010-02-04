@@ -1,17 +1,20 @@
 package de.fu_berlin.inf.dpp.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.junit.Test;
 
-public class UtilTest extends TestCase {
+public class UtilTest {
+    @Test
     public void testInflateDeflate() throws IOException {
         String shortString = "foobar";
         StringBuilder sb = new StringBuilder();
@@ -35,6 +38,7 @@ public class UtilTest extends TestCase {
         assertEquals(longString, longResult);
     }
 
+    @Test
     public void testReadLines() throws IOException {
         String source = "a\nb\rc\r\nd";
         InputStream stream = new ByteArrayInputStream(source.getBytes());

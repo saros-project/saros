@@ -19,15 +19,18 @@
  */
 package de.fu_berlin.inf.dpp.net;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
-public class JIDTest extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+
+public class JIDTest {
 
     private JID id;
     private JID idWithResource;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         id = new JID("riad@jabber.org");
         idWithResource = new JID("riad@jabber.org/saros");
     }
@@ -35,35 +38,36 @@ public class JIDTest extends TestCase {
     /**
      * TODO Test also other malformatted JID formats.
      */
+    @Test(expected = IllegalArgumentException.class)
     public void testMalformatedJID() {
-        try {
-            new JID(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // okay
-        }
+        new JID(null);
     }
 
+    @Test
     public void testGetUser() {
         assertEquals("riad", id.getName());
         assertEquals("riad", idWithResource.getName());
     }
 
+    @Test
     public void testGetHost() {
         assertEquals("jabber.org", id.getDomain());
         assertEquals("jabber.org", idWithResource.getDomain());
     }
 
+    @Test
     public void testGetResource() {
         assertEquals("", id.getResource());
         assertEquals("saros", idWithResource.getResource());
     }
 
+    @Test
     public void testGetBase() {
         assertEquals("riad@jabber.org", id.getBase());
         assertEquals("riad@jabber.org", idWithResource.getBase());
     }
 
+    @Test
     public void testEquals() {
         assertEquals(id, id);
         assertEquals(idWithResource, idWithResource);

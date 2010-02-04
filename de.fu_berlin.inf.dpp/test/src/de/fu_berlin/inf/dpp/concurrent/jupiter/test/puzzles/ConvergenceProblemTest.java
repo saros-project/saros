@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
@@ -20,6 +22,7 @@ public class ConvergenceProblemTest extends JupiterTestCase {
     /**
      * Scenario in fig. 3 described in 3.1 Scenarios violating convergence.
      */
+    @Test
     public void testC2PuzzleP1() throws Exception {
 
         ClientSynchronizedDocument[] c = setUp(3, "core");
@@ -37,6 +40,7 @@ public class ConvergenceProblemTest extends JupiterTestCase {
     /**
      * Scenario in fig. 5 described in 3.1 Scenarios violating convergence.
      */
+    @Test
     public void testC2PuzzleP2() throws Exception {
 
         ClientSynchronizedDocument[] c = setUp(5, "abcd");

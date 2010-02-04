@@ -1,12 +1,13 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.Path;
+import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -21,7 +22,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 /**
  * testing SplitOperation.toTextEdit()
  */
-public class SplitOperationTest extends TestCase {
+public class SplitOperationTest {
 
     protected SPath path = new SPath(new Path("path"));
     protected User source = JupiterTestCase.createUserMock("source");
@@ -42,6 +43,7 @@ public class SplitOperationTest extends TestCase {
         return new NoOperation();
     }
 
+    @Test
     public void testInsertInsert() {
         // Ins(4,"0ab") + Ins(7,"cd") -> Ins(4,"0abcd")
         Operation split1 = S(I(4, "0ab"), I(7, "cd"));
@@ -58,6 +60,7 @@ public class SplitOperationTest extends TestCase {
             path.getProjectRelativePath(), source));
     }
 
+    @Test
     public void testDeleteDelete() {
         // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
         Operation split1 = S(D(5, "ab"), D(5, "cde"));
@@ -73,6 +76,7 @@ public class SplitOperationTest extends TestCase {
             path.getProjectRelativePath(), source));
     }
 
+    @Test
     public void testInsertDelete() {
         // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
         Operation split1 = S(I(5, "ab"), D(5, "abcd"));
@@ -88,6 +92,7 @@ public class SplitOperationTest extends TestCase {
             path.getProjectRelativePath(), source));
     }
 
+    @Test
     public void testDeleteInsert() {
         // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with "ghijk"
         Operation split1 = S(D(8, "abc"), I(8, "ghijk"));
@@ -97,6 +102,7 @@ public class SplitOperationTest extends TestCase {
             path.getProjectRelativePath(), source));
     }
 
+    @Test
     public void testDelSplit() {
         // Split(Del(8,"abc"), Split(NoOperation, Ins(8,"ghijk")
         Operation split = S(D(8, "abc"), S(nop(), I(8, "ghijk")));
@@ -106,6 +112,7 @@ public class SplitOperationTest extends TestCase {
             .getProjectRelativePath(), source));
     }
 
+    @Test
     public void testSplitChain1() {
         // Split(Split(A,B), Split(C,D)) with B and C can be combined
         Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), D(
@@ -120,6 +127,7 @@ public class SplitOperationTest extends TestCase {
             source));
     }
 
+    @Test
     public void testSplitChain2() {
         // Split(Split(A,B), Split(C,D)) with B, C and D can be combined
         Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), I(3,
@@ -134,6 +142,7 @@ public class SplitOperationTest extends TestCase {
 
     }
 
+    @Test
     public void testSplitChain3() {
         // Split(Split(A,B), Split(C,D)) with A, B, C and D can be combined
         Operation split = S(S(D(8, "abc"), D(8, "defg")), S(I(8, "1234"), I(12,

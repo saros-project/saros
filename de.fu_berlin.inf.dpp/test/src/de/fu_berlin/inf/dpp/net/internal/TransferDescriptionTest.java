@@ -1,9 +1,13 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class TransferDescriptionTest extends TestCase {
+public class TransferDescriptionTest {
 
     private TransferDescription td;
     private JID recipient;
@@ -11,8 +15,8 @@ public class TransferDescriptionTest extends TestCase {
     private String invitationID;
     private String sessionID;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         recipient = new JID("receiver@foo");
         sender = new JID("sender@bar");
         invitationID = "invitation";
@@ -21,6 +25,7 @@ public class TransferDescriptionTest extends TestCase {
             sender, sessionID, invitationID);
     }
 
+    @Test
     public void testByteArray() throws ClassNotFoundException {
         byte[] data = td.toByteArray();
         TransferDescription td2 = TransferDescription.fromByteArray(data);

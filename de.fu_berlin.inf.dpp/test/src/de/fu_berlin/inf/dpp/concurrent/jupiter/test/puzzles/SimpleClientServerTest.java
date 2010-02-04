@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
@@ -12,8 +16,9 @@ public class SimpleClientServerTest extends JupiterTestCase {
     ClientSynchronizedDocument client;
     TwoWayJupiterServerDocument server;
 
-    public void setUp(String initialText) {
-        super.setUp();
+    // NOTE: Manually called fixture because it has a parameter
+    public void setupClientServer(String initialText) {
+        super.setup();
 
         client = new TwoWayJupiterClientDocument(initialText, network);
         server = new TwoWayJupiterServerDocument(initialText, network);
@@ -29,9 +34,10 @@ public class SimpleClientServerTest extends JupiterTestCase {
      * have different document state and jupiter algorithm has to converge the
      * document states.
      */
+    @Test
     public void test2WayProtocol() throws Exception {
 
-        setUp("abc");
+        setupClientServer("abc");
 
         client.sendOperation(new InsertOperation(0, "e"), 500);
 
@@ -63,9 +69,10 @@ public class SimpleClientServerTest extends JupiterTestCase {
      * Site A insert a char into the delete area of site b. The delete operation
      * has delay of two seconds.
      */
+    @Test
     public void testDeleteStringWithConcurentInsert() throws Exception {
 
-        setUp("abcdefg");
+        setupClientServer("abcdefg");
 
         client.sendOperation(new InsertOperation(3, "x"), 100);
         server.sendOperation(client.getUser().getJID(), new DeleteOperation(1,
@@ -81,9 +88,10 @@ public class SimpleClientServerTest extends JupiterTestCase {
     /**
      * Client insert a char into the delete area of Server.
      */
+    @Test
     public void testInsertStringWithConcurentDelete() throws Exception {
 
-        setUp("abcdefg");
+        setupClientServer("abcdefg");
 
         client.sendOperation(new InsertOperation(3, "x"), 300);
         server

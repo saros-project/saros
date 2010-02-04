@@ -19,32 +19,38 @@
  */
 package de.fu_berlin.inf.dpp.net;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Before;
+import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 /**
- * TODO [TEST] Add Testcases for non-existing files
- *  florianthiel: Does FileList care about existence of files?
+ * TODO [TEST] Add Testcases for non-existing files florianthiel: Does FileList
+ * care about existence of files?
  * 
- * TODO [TEST] Add Testcases for derived files
- * florianthiel: What are "derived files" in this context?
+ * TODO [TEST] Add Testcases for derived files florianthiel: What are
+ * "derived files" in this context?
  */
-public class FileListTest extends TestCase {
+public class FileListTest {
 
     protected IFile fileInRoot1 = new FileStub("root1", "fileInRoot1");
     protected IFile fileInRoot2 = new FileStub("root2", "fileInRoot2");
-    protected IFile fileInSubDir1 = new FileStub("subdir/file1", "fileInSubDir1");
-    protected IFile fileInSubDir2 = new FileStub("subdir/file2", "fileInSubDir2");
+    protected IFile fileInSubDir1 = new FileStub("subdir/file1",
+        "fileInSubDir1");
+    protected IFile fileInSubDir2 = new FileStub("subdir/file2",
+        "fileInSubDir2");
     protected IFile fileInSubDir1changed = new FileStub("subdir/file1",
         "changed fileInSubDir1");
 
@@ -52,14 +58,14 @@ public class FileListTest extends TestCase {
         fileInSubDir1 };
 
     protected FileList threeEntryList;
-    protected FileList fourEntryList; // contains one additional entry 
-                                    // in respect to threeEntryList
+    protected FileList fourEntryList; // contains one additional entry
+                                      // in respect to threeEntryList
     protected FileList modifiedFourEntryList; // contains one modified entry in
-                                            // respect to fourEntryList
+                                              // respect to fourEntryList
     protected FileList emptyFileList;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         threeEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
             fileInSubDir1 });
         fourEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
@@ -70,18 +76,21 @@ public class FileListTest extends TestCase {
         emptyFileList = new FileList();
     }
 
+    @Test
     public void testGetFilePaths() {
         List<IPath> paths = threeEntryList.getPaths();
 
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
+    @Test
     public void testGetFileUnalteredPaths() {
         Collection<IPath> paths = threeEntryList.getUnalteredPaths();
 
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
+    @Test
     public void testDiffGetAddedFilePaths() {
         Collection<IPath> paths = threeEntryList.diff(fourEntryList)
             .getAddedPaths();
@@ -89,6 +98,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "subdir/file2" }, paths);
     }
 
+    @Test
     public void testReversedDiffGetAddedFilePaths() {
         Collection<IPath> paths = fourEntryList.diff(threeEntryList)
             .getAddedPaths();
@@ -96,6 +106,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] {}, paths);
     }
 
+    @Test
     public void testDiffGetRemovedFilePaths() {
         Collection<IPath> paths = fourEntryList.diff(threeEntryList)
             .getRemovedPaths();
@@ -103,6 +114,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "subdir/file2" }, paths);
     }
 
+    @Test
     public void testReversedDiffGetRemovedFilePaths() {
         Collection<IPath> paths = threeEntryList.diff(fourEntryList)
             .getRemovedPaths();
@@ -110,6 +122,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] {}, paths);
     }
 
+    @Test
     public void testDiffGetAlteredFilePaths() {
         Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
             .getAlteredPaths();
@@ -117,6 +130,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "subdir/file1" }, paths);
     }
 
+    @Test
     public void testReversedDiffGetAlteredFilePaths() {
         Collection<IPath> paths = modifiedFourEntryList.diff(fourEntryList)
             .getAlteredPaths();
@@ -124,6 +138,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "subdir/file1" }, paths);
     }
 
+    @Test
     public void testDiffGetAlteredFilesAddedFiles() {
         Collection<IPath> paths = threeEntryList.diff(fourEntryList)
             .getAlteredPaths();
@@ -131,6 +146,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] {}, paths);
     }
 
+    @Test
     public void testDiffGetUnalteredFilePaths() {
         Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
             .getUnalteredPaths();
@@ -138,6 +154,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "root1", "root2", "subdir/file2" }, paths);
     }
 
+    @Test
     public void testReversedDiffGetUnalteredFilePaths() {
         Collection<IPath> paths = modifiedFourEntryList.diff(threeEntryList)
             .getUnalteredPaths();
@@ -145,6 +162,7 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "root1", "root2" }, paths);
     }
 
+    @Test
     public void testDiffGetFilePaths() {
         Collection<IPath> paths = threeEntryList.diff(modifiedFourEntryList)
             .getPaths();
@@ -158,16 +176,18 @@ public class FileListTest extends TestCase {
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
+    @Test
     public void testMatch() {
         assertEquals(75, threeEntryList.computeMatch(fourEntryList));
         assertEquals(75, fourEntryList.computeMatch(threeEntryList));
         assertEquals(100, threeEntryList.computeMatch(threeEntryList));
         assertEquals(0, threeEntryList.computeMatch(emptyFileList));
         assertEquals(0, emptyFileList.computeMatch(threeEntryList));
-        assertEquals(50, threeEntryList.computeMatch(modifiedFourEntryList)); 
-        assertEquals(50, modifiedFourEntryList.computeMatch(threeEntryList)); 
+        assertEquals(50, threeEntryList.computeMatch(modifiedFourEntryList));
+        assertEquals(50, modifiedFourEntryList.computeMatch(threeEntryList));
     }
 
+    @Test
     public void testEquals() throws CoreException {
         FileList sameFileList = new FileList(threeFileArray);
         assertEquals(threeEntryList, sameFileList);
@@ -177,6 +197,7 @@ public class FileListTest extends TestCase {
         assertFalse(emptyFileList.equals(threeEntryList));
     }
 
+    @Test
     public void testRoundtripSerialization() {
         FileList replicated = FileList.fromXML(threeEntryList.toXML());
         assertEquals(threeEntryList, replicated);

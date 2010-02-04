@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -32,6 +36,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
     protected Operation splitOp3 = new SplitOperation(insertOp,
         new InsertOperation(6, "ins"));
 
+    @Test
     public void testSplitInsertTransformation() {
 
         // User A:
@@ -53,7 +58,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         Operation expectedOp = new SplitOperation(new SplitOperation(
             new DeleteOperation(2, "2"), new DeleteOperation(5, "34")),
             new DeleteOperation(6, "6"));
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
 
         // Transform Operations from B to be used by A:
         newOp = inclusion.transform(b1, new SplitOperation(a1, a2),
@@ -62,9 +67,10 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         // now position 2 but origin is 3
         expectedOp = new InsertOperation(2, "abc", 3);
 
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
     }
 
+    @Test
     public void testSplitSplitTransformation() {
 
         // User A:
@@ -93,21 +99,22 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
                 new DeleteOperation(2, "2"), new DeleteOperation(5, "3")),
                 new SplitOperation(new DeleteOperation(8, "4"),
                     new DeleteOperation(9, "6")));
-            assertEquals(expectedOp, newOp);
+            assertOpEquals(expectedOp, newOp);
         }
 
         { // User A perspective:
             Operation newOp = inclusion.transform(b, a, Boolean.TRUE);
             Operation expectedOp = new SplitOperation(new InsertOperation(2,
                 "abc", 3), new InsertOperation(5, "ins", 7));
-            assertEquals(expectedOp, newOp);
+            assertOpEquals(expectedOp, newOp);
         }
     }
 
-    public void assertEquals(Operation op1, Operation op2) {
+    public void assertOpEquals(Operation op1, Operation op2) {
         assertEquals(op1.getTextOperations(), op2.getTextOperations());
     }
 
+    @Test
     public void testSplitSplitTransformation2() {
 
         // User A:
@@ -135,17 +142,18 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation expectedOp = new SplitOperation(new DeleteOperation(2,
                 "2"), new SplitOperation(new DeleteOperation(8, "34"),
                 new DeleteOperation(9, "6")));
-            assertEquals(expectedOp, newOp);
+            assertOpEquals(expectedOp, newOp);
         }
 
         { // User A perspective:
             Operation newOp = inclusion.transform(b, a, Boolean.TRUE);
             Operation expectedOp = new SplitOperation(new InsertOperation(2,
                 "abc", 3), new InsertOperation(5, "ins", 6));
-            assertEquals(expectedOp, newOp);
+            assertOpEquals(expectedOp, newOp);
         }
     }
 
+    @Test
     public void testReplaceTransformation() {
 
         // abcdefghi -> abc345ghi
@@ -160,9 +168,10 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         Operation newOp = inclusion.transform(replace1, replace2, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new DeleteOperation(4, "ef"),
             new InsertOperation(4, "345", 3));
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
     }
 
+    @Test
     public void testSplitTransformation() {
 
         // 0123456789 -> 01234fuenf5689
@@ -177,29 +186,31 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         Operation newOp = inclusion.transform(op1, op2, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new DeleteOperation(8, "7"),
             new InsertOperation(7, "fuenf", 5));
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
 
         // op2'(op1)
         newOp = inclusion.transform(op2, op1, Boolean.TRUE);
         expectedOp = new SplitOperation(new SplitOperation(new DeleteOperation(
             4, "4"), new DeleteOperation(9, "5")),
             new InsertOperation(4, "abc"));
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
     }
 
+    @Test
     public void testNoOperation() {
 
         Operation op1 = new NoOperation();
         Operation op2 = S(D(4, "AB"), I(4, "D"));
 
         // op1'(op2)
-        assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+        assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
             Boolean.FALSE));
 
         // op2'(op1)
-        assertEquals(op2, inclusion.transform(op2, op1, Boolean.FALSE));
+        assertOpEquals(op2, inclusion.transform(op2, op1, Boolean.FALSE));
     }
 
+    @Test
     public void testPartiallyConsumedDeleteOperation() {
 
         {
@@ -207,16 +218,16 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(5, "BC");
 
             // op1'(op2)
-            assertEquals(D(4, "A"), inclusion
-                .transform(op1, op2, Boolean.FALSE));
+            assertOpEquals(D(4, "A"), inclusion.transform(op1, op2,
+                Boolean.FALSE));
         }
         {
             Operation op1 = D(4, "ABC");
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertEquals(D(4, "C"), inclusion
-                .transform(op1, op2, Boolean.FALSE));
+            assertOpEquals(D(4, "C"), inclusion.transform(op1, op2,
+                Boolean.FALSE));
         }
 
         {
@@ -224,20 +235,21 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(5, "BCDEF");
 
             // op1'(op2)
-            assertEquals(D(4, "A"), inclusion
-                .transform(op1, op2, Boolean.FALSE));
+            assertOpEquals(D(4, "A"), inclusion.transform(op1, op2,
+                Boolean.FALSE));
         }
         {
             Operation op1 = D(4, "ABC");
             Operation op2 = D(2, "89AB");
 
             // op1'(op2)
-            assertEquals(D(2, "C"), inclusion
-                .transform(op1, op2, Boolean.FALSE));
+            assertOpEquals(D(2, "C"), inclusion.transform(op1, op2,
+                Boolean.FALSE));
         }
 
     }
 
+    @Test
     public void testTotallyConsumedDeleteOperation() {
 
         {
@@ -245,7 +257,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
                 Boolean.FALSE));
         }
         {
@@ -253,7 +265,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
                 Boolean.FALSE));
         }
 
@@ -262,12 +274,13 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(4, "ABC");
 
             // op1'(op2)
-            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
                 Boolean.FALSE));
         }
 
     }
 
+    @Test
     public void testNoOperationInternal() {
 
         /**
@@ -280,7 +293,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         // op1'(op2)
         Operation newOp = inclusion.transform(op1, op2, Boolean.FALSE);
         Operation expectedOp = new InsertOperation(5, "C", 4);
-        assertEquals(expectedOp, newOp);
+        assertOpEquals(expectedOp, newOp);
 
     }
 }

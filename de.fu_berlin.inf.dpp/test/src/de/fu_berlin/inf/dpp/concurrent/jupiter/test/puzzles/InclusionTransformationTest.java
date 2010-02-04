@@ -1,5 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -33,13 +39,14 @@ public class InclusionTransformationTest extends JupiterTestCase {
     TwoWayJupiterServerDocument server;
 
     @Override
-    public void setUp() {
-        super.setUp();
+    @Before
+    public void setup() {
+        super.setup();
         setUp("abcdefg");
     }
 
     public void setUp(String initialText) {
-        super.setUp();
+        super.setup();
 
         client = new TwoWayJupiterClientDocument(initialText, network);
         server = new TwoWayJupiterServerDocument(initialText, network);
@@ -53,7 +60,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase1() throws Exception {
+    @Test
+    public void insertBeforeInsert() throws Exception {
         client.sendOperation(I(0, "x"), 100);
         server.sendOperation(I(0, "y"), 200);
 
@@ -75,7 +83,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase2() throws Exception {
+    @Test
+    public void insertAfterInsert() throws Exception {
         client.sendOperation(I(1, "xx"), 100);
         server.sendOperation(D(0, "abc"), 200);
 
@@ -97,7 +106,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase3() throws Exception {
+    @Test
+    public void insertBeforeDelete() throws Exception {
         client.sendOperation(I(1, "x"), 100);
         server.sendOperation(D(2, "c"), 200);
 
@@ -119,7 +129,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase4() throws Exception {
+    @Test
+    public void insertAfterDelete() throws Exception {
         client.sendOperation(I(1, "x"), 100);
         server.sendOperation(D(0, "a"), 200);
 
@@ -134,7 +145,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase5() throws Exception {
+    @Test
+    public void insertInsideDelete() throws Exception {
         client.sendOperation(I(1, "x"), 100);
         server.sendOperation(D(0, "abc"), 200);
 
@@ -149,7 +161,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase6() throws Exception {
+    @Test
+    public void insertAfterDeleteClient() throws Exception {
         client.sendOperation(D(0, "a"), 100);
         server.sendOperation(I(1, "x"), 200);
 
@@ -164,7 +177,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase7() throws Exception {
+    @Test
+    public void insertDeleteSamePosition() throws Exception {
         client.sendOperation(D(0, "a"), 200);
         server.sendOperation(I(0, "x"), 100);
 
@@ -179,7 +193,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase8() throws Exception {
+    @Test
+    public void insertAreaOfDelete() throws Exception {
         client.sendOperation(D(0, "abc"), 100);
         server.sendOperation(I(1, "x"), 200);
 
@@ -194,7 +209,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase9() throws Exception {
+    @Test
+    public void deleteRace() throws Exception {
         client.sendOperation(D(0, "a"), 100);
         server.sendOperation(D(1, "bc"), 200);
 
@@ -209,7 +225,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase10() throws Exception {
+    @Test
+    public void deleteInsideDelete() throws Exception {
         client.sendOperation(D(0, "abcd"), 100);
         server.sendOperation(D(1, "bc"), 200);
 
@@ -224,7 +241,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase11() throws Exception {
+    @Test
+    public void deleteDeleteTimeOverlap() throws Exception {
         client.sendOperation(D(0, "ab"), 100);
         server.sendOperation(D(1, "bcd"), 200);
 
@@ -240,7 +258,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase12() throws Exception {
+    @Test
+    public void deleteInsideDeleteTimeOverlap() throws Exception {
         client.sendOperation(D(1, "bcd"), 100);
         server.sendOperation(D(0, "abc"), 200);
 
@@ -255,7 +274,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
-    public void testCase13() throws Exception {
+    @Test
+    public void deleteAreaInsideDeleteArea() throws Exception {
         client.sendOperation(D(1, "b"), 100);
         server.sendOperation(D(0, "abc"), 200);
 
@@ -265,7 +285,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase14OverlappingSplitOperations() throws Exception {
+    @Test
+    public void overlappingSplitOperations() throws Exception {
         client.sendOperation(S(D(1, "bcd"), I(0, "xyz")), 100);
         server.sendOperation(S(D(0, "abc"), I(0, "uvw")), 200);
 
@@ -275,7 +296,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase15SplitOperations() throws Exception {
+    @Test
+    public void splitOperations() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -290,7 +312,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase16DeleteOperations() throws Exception {
+    @Test
+    public void deleteOperations() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -305,7 +328,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase17DeleteSplitOperations() throws Exception {
+    @Test
+    public void deleteSplitOperations() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -331,7 +355,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase18DeleteSplitOperations2() throws Exception {
+    @Test
+    public void deleteSplitOperations2() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -349,7 +374,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase19DeleteInsertDelete() throws Exception {
+    @Test
+    public void deleteInsertDelete() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -365,7 +391,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase20InsertInsideDelete() throws Exception {
+    @Test
+    public void insertInsideDelete2() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -379,7 +406,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
         assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
-    public void testCase21NestedSplitOperation() throws Exception {
+    @Test
+    public void nestedSplitOperation() throws Exception {
 
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
@@ -397,7 +425,8 @@ public class InclusionTransformationTest extends JupiterTestCase {
      * The following test case failed during a real world stress Test and
      * revealed an incorrect handling of NoOperations.
      */
-    public void testCaseRealworldFailure() throws Exception {
+    @Test
+    public void realworldFailure() throws Exception {
 
         // ----------------------------------------01234567890
         JupiterSimulator j = new JupiterSimulator("XXXX-pqrstu");

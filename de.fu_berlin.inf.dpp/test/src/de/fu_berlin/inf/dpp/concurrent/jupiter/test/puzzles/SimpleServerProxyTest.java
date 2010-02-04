@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
@@ -17,15 +21,15 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
     public SimpleServerProxyTest() {
         super();
-        setName("Test for Proxy Test.");
     }
 
     protected ClientSynchronizedDocument client_1;
     protected ClientSynchronizedDocument client_2;
     protected ServerSynchronizedDocument server;
 
+    // FIXME: This should not have any parameters
     public void setUp(String text) {
-        super.setUp();
+        super.setup();
 
         // 01234567890123456789012345
         // abcdefghijklmnopqrstuvwxyz
@@ -50,6 +54,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTwoConcurrentInsertOperations() throws Exception {
         System.out.println("START: testTwoConcurrentInsertOperations");
         setUp("X");
@@ -68,6 +73,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
      * two clients connect with jupiter server.
      * 
      */
+    @Test
     public void testThreeConcurrentInsertOperations() throws Exception {
 
         setUp("X");
@@ -87,6 +93,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTwoClientWithJupiterProxy() throws Exception {
 
         setUp("abcdefg");
@@ -125,6 +132,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testTwoClientWithJupiterProxyDeleteInsertOperations()
         throws Exception {
 

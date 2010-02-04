@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
@@ -23,6 +27,7 @@ public class CounterExampleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testCounterExampleViolatingConditionC1() throws Exception {
         String initDocumentState = "abc";
 
@@ -63,6 +68,7 @@ public class CounterExampleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testCounterExampleViolatingConditionC2() throws Exception {
         String initDocumentState = "abc";
 
@@ -106,6 +112,7 @@ public class CounterExampleTest extends JupiterTestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testCounterExample2ViolatingConditionC2() throws Exception {
         String initDocumentState = "abc";
 
