@@ -120,8 +120,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 "This IncomingTransferObject has already"
                     + " been accepted or rejected");
 
-        this.binaryChannel.send(this.binaryChannel.buildPacket(
-            PacketType.REJECT, objectid));
+        this.binaryChannel.send(BinaryChannel.buildPacket(PacketType.REJECT,
+            objectid));
     }
 
     public NetTransferMode getTransferMode() {
