@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
@@ -23,6 +22,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
@@ -89,9 +90,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         return this.inconsistencyToResolve;
     }
 
-    protected HashMap<IPath, ChecksumActivity> stats = new HashMap<IPath, ChecksumActivity>();
+    protected HashMap<SPath, ChecksumActivity> stats = new HashMap<SPath, ChecksumActivity>();
 
-    protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+    protected Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         private ISharedProjectListener sharedProjectListner = new AbstractSharedProjectListener() {
@@ -144,21 +145,21 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         this.sessionManager.removeSessionListener(sessionListener);
     }
 
-    public Map<IPath, ChecksumActivity> latestChecksums = new HashMap<IPath, ChecksumActivity>();
+    public Map<SPath, ChecksumActivity> latestChecksums = new HashMap<SPath, ChecksumActivity>();
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(ChecksumActivity checksumActivityDataObject) {
 
-            latestChecksums.put(checksumActivityDataObject.getPath()
-                .getProjectRelativePath(), checksumActivityDataObject);
+            latestChecksums.put(checksumActivityDataObject.getPath(),
+                checksumActivityDataObject);
 
             performCheck(checksumActivityDataObject);
         }
 
         @Override
         public void receive(TextEditActivity text) {
-            latestChecksums.remove(text.getEditor().getProjectRelativePath());
+            latestChecksums.remove(text.getEditor());
         }
 
         @Override
@@ -176,14 +177,11 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             switch (fileActivityDataObject.getType()) {
             case Created:
             case Removed:
-                latestChecksums.remove(fileActivityDataObject.getPath()
-                    .getProjectRelativePath());
+                latestChecksums.remove(fileActivityDataObject.getPath());
                 break;
             case Moved:
-                latestChecksums.remove(fileActivityDataObject.getPath()
-                    .getProjectRelativePath());
-                latestChecksums.remove(fileActivityDataObject.getOldPath()
-                    .getProjectRelativePath());
+                latestChecksums.remove(fileActivityDataObject.getPath());
+                latestChecksums.remove(fileActivityDataObject.getOldPath());
                 break;
             default:
                 log.error("Unhandled FileActivity.Type: "
@@ -196,7 +194,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      * Returns the set of files for which the ConsistencyWatchdog has identified
      * an inconsistency
      */
-    public Set<IPath> getPathsWithWrongChecksums() {
+    public Set<SPath> getPathsWithWrongChecksums() {
         return this.pathsWithWrongChecksums;
     }
 
@@ -245,10 +243,12 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         try {
             cancelRecovery.set(false);
 
-            Set<IPath> pathsOfHandledFiles = new HashSet<IPath>(
+            Set<SPath> pathsOfHandledFiles = new HashSet<SPath>(
                 pathsWithWrongChecksums);
 
-            for (final IPath path : pathsOfHandledFiles) {
+            Set<SPathDataObject> toSend = new HashSet<SPathDataObject>();
+
+            for (final SPath path : pathsOfHandledFiles) {
 
                 if (cancelRecovery.get())
                     return;
@@ -260,6 +260,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                     // Sending the checksum error message should recreate
                     // this file
                 }
+
+                toSend.add(path.toSPathDataObject(sharedProject));
             }
 
             if (cancelRecovery.get())
@@ -270,12 +272,13 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 .size());
 
             // Send checksumErrorMessage to host
-            transmitter.sendFileChecksumErrorMessage(Collections
-                .singletonList(sharedProject.getHost().getJID()),
-                pathsOfHandledFiles, false);
+            transmitter
+                .sendFileChecksumErrorMessage(Collections
+                    .singletonList(sharedProject.getHost().getJID()), toSend,
+                    false);
 
             // block until all inconsistencies are resolved
-            Set<IPath> remainingFiles = new HashSet<IPath>(pathsOfHandledFiles);
+            Set<SPath> remainingFiles = new HashSet<SPath>(pathsOfHandledFiles);
             while (remainingFiles.size() > 0) {
 
                 if (cancelRecovery.get())
@@ -303,10 +306,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     }
 
     private boolean isInconsistent(ChecksumActivity checksum) {
-        IPath path = checksum.getPath().getProjectRelativePath();
 
-        ISharedProject sharedProject = sessionManager.getSharedProject();
-        IFile file = sharedProject.getProject().getFile(path);
+        SPath path = checksum.getPath();
+        IFile file = path.getFile();
 
         if (!checksum.existsFile()) {
             /*
@@ -331,7 +333,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         try {
             provider.connect(input);
         } catch (CoreException e) {
-            log.warn("Could not check checksum of file " + path.toOSString());
+            log.warn("Could not check checksum of file " + path.toString());
             return false;
         }
 
@@ -340,8 +342,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
             // if doc is still null give up
             if (doc == null) {
-                log.warn("Could not check checksum of file "
-                    + path.toOSString());
+                log.warn("Could not check checksum of file " + path.toString());
                 return false;
             }
 
@@ -374,7 +375,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      * 
      * @client This can only be called on the client
      */
-    public boolean performCheck(IPath path) {
+    public boolean performCheck(SPath path) {
 
         if (sharedProject == null) {
             log.warn("Session already ended. Cannot perform consistency check",
@@ -399,11 +400,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return;
 
         if (isInconsistent(checksumActivity)) {
-            pathsWithWrongChecksums.add(checksumActivity.getPath()
-                .getProjectRelativePath());
+            pathsWithWrongChecksums.add(checksumActivity.getPath());
         } else {
-            pathsWithWrongChecksums.remove(checksumActivity.getPath()
-                .getProjectRelativePath());
+            pathsWithWrongChecksums.remove(checksumActivity.getPath());
         }
 
         if (pathsWithWrongChecksums.isEmpty()) {

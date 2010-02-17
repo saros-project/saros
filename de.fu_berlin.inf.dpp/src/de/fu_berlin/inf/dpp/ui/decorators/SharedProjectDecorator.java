@@ -65,14 +65,14 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         @Override
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
-            updateDecoratorsAsync(project.getProject());
+            updateDecoratorsAsync(project.getProjects().toArray());
         }
 
         @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
             sharedProject = null;
-            updateDecoratorsAsync(project.getProject());
+            updateDecoratorsAsync(project.getProjects().toArray());
         }
     };
 
@@ -99,9 +99,9 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         // Enablement in the Plugin.xml ensures that we only get IProjects
 
         if (element instanceof IProject) {
-            if (!this.sharedProject.getProject().equals(element)) {
+            if (!this.sharedProject.isShared((IProject) element))
                 return;
-            }
+
             decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
                 IDecoration.TOP_LEFT);
             return;
@@ -124,11 +124,15 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         return false;
     }
 
-    protected void updateDecoratorsAsync(final IProject project) {
+    /**
+     * Will tell Eclipse to refresh the decorators of the given elements in the
+     * workspace.
+     */
+    protected void updateDecoratorsAsync(final Object... projects) {
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-                    SharedProjectDecorator.this, new Object[] { project });
+                    SharedProjectDecorator.this, projects);
 
                 for (ILabelProviderListener listener : listeners) {
                     listener.labelProviderChanged(event);

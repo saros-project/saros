@@ -61,6 +61,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
@@ -178,7 +179,9 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
-    public IEditorPart openEditor(IFile file) {
+    public IEditorPart openEditor(SPath path) {
+
+        IFile file = path.getFile();
 
         if (!file.exists()) {
             log.error("EditorAPI cannot open file which does not exist: "
@@ -896,7 +899,7 @@ public class EditorAPI implements IEditorAPI {
      * Syntactic sugar for getting the path of the IEditorPart returned by
      * getActiveEditor()
      */
-    public IPath getActiveEditorPath() {
+    public SPath getActiveEditorPath() {
         IEditorPart newActiveEditor = getActiveEditor();
         if (newActiveEditor == null)
             return null;
@@ -907,7 +910,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * Syntactic sugar for getting the path of the given editor part.
      */
-    public IPath getEditorPath(IEditorPart editorPart) {
+    public SPath getEditorPath(IEditorPart editorPart) {
 
         IResource resource = getEditorResource(editorPart);
         if (resource == null) {
@@ -919,6 +922,6 @@ public class EditorAPI implements IEditorAPI {
             log.warn("Could not get path from resource " + resource);
         }
 
-        return path;
+        return new SPath(resource);
     }
 }

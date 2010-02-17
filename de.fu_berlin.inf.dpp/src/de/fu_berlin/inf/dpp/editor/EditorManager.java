@@ -149,9 +149,9 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected final StoppableDocumentListener documentListener = new StoppableDocumentListener(
         this);
 
-    protected IPath locallyActiveEditor;
+    protected SPath locallyActiveEditor;
 
-    protected Set<IPath> locallyOpenEditors = new HashSet<IPath>();
+    protected Set<SPath> locallyOpenEditors = new HashSet<SPath>();
 
     protected ITextSelection localSelection;
 
@@ -160,9 +160,9 @@ public class EditorManager implements IActivityProvider, Disposable {
     /** all files that have connected document providers */
     protected final Set<IFile> connectedFiles = new HashSet<IFile>();
 
-    protected HashMap<IPath, Long> lastEditTimes = new HashMap<IPath, Long>();
+    protected HashMap<SPath, Long> lastEditTimes = new HashMap<SPath, Long>();
 
-    protected HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
+    protected HashMap<SPath, Long> lastRemoteEditTimes = new HashMap<SPath, Long>();
 
     protected ContributionAnnotationManager contributionAnnotationManager;
 
@@ -172,16 +172,15 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             User sender = editorActivity.getSource();
             SPath sPath = editorActivity.getPath();
-            IPath path = sPath != null ? sPath.getProjectRelativePath() : null;
             switch (editorActivity.getType()) {
             case Activated:
-                execActivated(sender, path);
+                execActivated(sender, sPath);
                 break;
             case Closed:
-                execClosed(sender, path);
+                execClosed(sender, sPath);
                 break;
             case Saved:
-                saveText(path);
+                saveText(sPath);
                 break;
             default:
                 log.warn("Unexpected type: " + editorActivity.getType());
@@ -277,20 +276,20 @@ public class EditorManager implements IActivityProvider, Disposable {
             List<User> recipient = Collections.singletonList(user);
 
             User localUser = sharedProject.getLocalUser();
-            for (IPath path : getLocallyOpenEditors()) {
+            for (SPath path : getLocallyOpenEditors()) {
                 sharedProject.sendActivity(recipient, new EditorActivity(
-                    localUser, Type.Activated, new SPath(path)));
+                    localUser, Type.Activated, path));
             }
 
             if (locallyActiveEditor == null)
                 return;
 
             sharedProject.sendActivity(recipient, new EditorActivity(localUser,
-                Type.Activated, new SPath(locallyActiveEditor)));
+                Type.Activated, locallyActiveEditor));
 
             if (localViewport != null) {
                 sharedProject.sendActivity(recipient, new ViewportActivity(
-                    localUser, localViewport, new SPath(locallyActiveEditor)));
+                    localUser, localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -302,7 +301,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
                 sharedProject.sendActivity(recipient,
                     new TextSelectionActivity(localUser, offset, length,
-                        new SPath(locallyActiveEditor)));
+                        locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -396,7 +395,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                         }
                     });
 
-                    editorPool.removeAllEditors(sharedProject.getProject());
+                    editorPool.removeAllEditors(sharedProject);
 
                     sharedProject.removeListener(sharedProjectListener);
                     sharedProject.removeActivityProvider(EditorManager.this);
@@ -523,7 +522,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      *         <code>null</code>. A empty set is returned if there are no
      *         currently opened editors.
      */
-    public Set<IPath> getLocallyOpenEditors() {
+    public Set<SPath> getLocallyOpenEditors() {
         return this.locallyOpenEditors;
     }
 
@@ -536,7 +535,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      *            currently editing or null if the local user has no editor
      *            open.
      */
-    public void generateEditorActivated(@Nullable IPath path) {
+    public void generateEditorActivated(@Nullable SPath path) {
 
         this.locallyActiveEditor = path;
 
@@ -546,7 +545,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         editorListener.activeEditorChanged(sharedProject.getLocalUser(), path);
 
         fireActivity(new EditorActivity(sharedProject.getLocalUser(),
-            Type.Activated, new SPath(path)));
+            Type.Activated, path));
     }
 
     /**
@@ -575,7 +574,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        IPath path = editorAPI.getEditorPath(part);
+        SPath path = editorAPI.getEditorPath(part);
         if (path == null) {
             log.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -585,7 +584,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             this.localViewport = viewport;
 
         fireActivity(new ViewportActivity(sharedProject.getLocalUser(),
-            viewport, new SPath(path)));
+            viewport, path));
     }
 
     /**
@@ -602,7 +601,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void generateSelection(IEditorPart part, ITextSelection newSelection) {
 
-        IPath path = editorAPI.getEditorPath(part);
+        SPath path = editorAPI.getEditorPath(part);
         if (path == null) {
             log.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -615,7 +614,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         int length = newSelection.getLength();
 
         fireActivity(new TextSelectionActivity(sharedProject.getLocalUser(),
-            offset, length, new SPath(path)));
+            offset, length, path));
     }
 
     /**
@@ -674,7 +673,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        IPath path = editorAPI.getEditorPath(changedEditor);
+        SPath path = editorAPI.getEditorPath(changedEditor);
         if (path == null) {
             log.warn("Could not find path for editor "
                 + changedEditor.getTitle());
@@ -696,7 +695,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
         fireActivity(new TextEditActivity(sharedProject.getLocalUser(), offset,
-            text, replacedText, new SPath(path)));
+            text, replacedText, path));
 
         // inform all registered ISharedEditorListeners about this text edit
         editorListener.textEditRecieved(sharedProject.getLocalUser(), path,
@@ -749,8 +748,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         wpLog.trace("EditorManager.execTextEdit invoked");
 
-        IPath path = textEdit.getEditor().getProjectRelativePath();
-        IFile file = sharedProject.getProject().getFile(path);
+        SPath path = textEdit.getEditor();
+        IFile file = path.getFile();
 
         if (!file.exists()) {
             log.error("TextEditActivity refers to file which"
@@ -767,7 +766,7 @@ public class EditorManager implements IActivityProvider, Disposable {
          */
         documentListener.enabled = false;
 
-        replaceText(file, textEdit.getOffset(), textEdit.getReplacedText(),
+        replaceText(path, textEdit.getOffset(), textEdit.getReplacedText(),
             textEdit.getText(), user);
 
         documentListener.enabled = true;
@@ -804,7 +803,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         wpLog.trace("EditorManager.execTextSelection invoked");
 
-        IPath path = selection.getEditor().getProjectRelativePath();
+        SPath path = selection.getEditor();
 
         if (path == null) {
             EditorManager.log
@@ -857,7 +856,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         Set<IEditorPart> editors = this.editorPool.getEditors(viewport
-            .getEditor().getProjectRelativePath());
+            .getEditor());
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
             if (following || user.isDriver())
@@ -868,7 +867,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     }
 
-    protected void execActivated(User user, IPath path) {
+    protected void execActivated(User user, SPath path) {
 
         wpLog.trace("EditorManager.execActivated invoked");
 
@@ -876,11 +875,11 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         // Path null means this driver has no active editor any more
         if (user.equals(getFollowedUser()) && path != null) {
-            editorAPI.openEditor(sharedProject.getProject().getFile(path));
+            editorAPI.openEditor(path);
         }
     }
 
-    protected void execClosed(User user, IPath path) {
+    protected void execClosed(User user, SPath path) {
 
         wpLog.trace("EditorManager.execClosed invoked");
 
@@ -973,7 +972,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
 
-        IPath editorPath = this.editorAPI.getEditorPath(editorPart);
+        SPath editorPath = this.editorAPI.getEditorPath(editorPart);
         ILineRange viewport = this.editorAPI.getViewport(editorPart);
         ITextSelection selection = this.editorAPI.getSelection(editorPart);
 
@@ -998,8 +997,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             // Pretend as if the editor was closed locally (but use the old part
             // before the move happened) and then simulate it being opened again
-            IPath path = editorPool.getCurrentPath(editor, sharedProject
-                .getProject());
+            SPath path = editorPool.getCurrentPath(editor, sharedProject);
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
@@ -1022,12 +1020,12 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        IPath path = editorAPI.getEditorPath(editorPart);
+        SPath path = editorAPI.getEditorPath(editorPart);
 
         partClosedOfPath(editorPart, path);
     }
 
-    protected void partClosedOfPath(IEditorPart editorPart, IPath path) {
+    protected void partClosedOfPath(IEditorPart editorPart, SPath path) {
 
         // if closing the followed editor, leave follow mode
         if (getFollowedUser() != null) {
@@ -1039,7 +1037,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
 
-        this.editorPool.remove(editorPart, sharedProject.getProject());
+        this.editorPool.remove(editorPart, sharedProject);
 
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);
@@ -1049,7 +1047,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         editorListener.editorRemoved(sharedProject.getLocalUser(), path);
 
         fireActivity(new EditorActivity(sharedProject.getLocalUser(),
-            Type.Closed, new SPath(path)));
+            Type.Closed, path));
 
         /**
          * TODO We need a reliable way to communicate editors which are outside
@@ -1069,7 +1067,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @return <code>true</code> if the given resource is opened accoring to the
      *         editor pool.
      */
-    public boolean isOpened(IPath path) {
+    public boolean isOpened(SPath path) {
         return this.editorPool.getEditors(path).size() > 0;
     }
 
@@ -1080,7 +1078,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      *            the project-relative path to the resource.
      * @return the set of editors
      */
-    protected Set<IEditorPart> getEditors(IPath path) {
+    protected Set<IEditorPart> getEditors(SPath path) {
         return this.editorPool.getEditors(path);
     }
 
@@ -1106,16 +1104,15 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (resource == null)
             return false;
 
-        return ObjectUtils.equals(resource.getProject(), this.sharedProject
-            .getProject());
+        return this.sharedProject.isShared(resource.getProject());
     }
 
     /**
      * This method is called when a remote text edit has been received over the
      * network to apply the change to the local files.
      * 
-     * @param file
-     *            The file in which the change should be made.
+     * @param path
+     *            The path in which the change should be made.
      * 
      *            TODO We would like to be able to allow changing editors which
      *            are not driven by files someday, but it is not possible yet.
@@ -1135,9 +1132,10 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @param source
      *            The User who caused this change.
      */
-    protected void replaceText(IFile file, int offset, String replacedText,
+    protected void replaceText(SPath path, int offset, String replacedText,
         String text, User source) {
 
+        IFile file = path.getFile();
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
 
@@ -1189,11 +1187,9 @@ public class EditorManager implements IActivityProvider, Disposable {
                     text));
                 return;
             }
-            lastRemoteEditTimes.put(file.getProjectRelativePath(), System
-                .currentTimeMillis());
+            lastRemoteEditTimes.put(path, System.currentTimeMillis());
 
-            for (IEditorPart editorPart : editorPool.getEditors(file
-                .getProjectRelativePath())) {
+            for (IEditorPart editorPart : editorPool.getEditors(path)) {
 
                 if (editorPart instanceof ITextEditor) {
                     ITextEditor textEditor = (ITextEditor) editorPart;
@@ -1222,7 +1218,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @nonSWT This method is not intended to be called from SWT (but it should
      *         be okay)
      */
-    public void saveLazy(final IPath path) throws FileNotFoundException {
+    public void saveLazy(final SPath path) throws FileNotFoundException {
         if (!isDirty(path)) {
             return;
         }
@@ -1248,9 +1244,9 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * 
      */
-    public boolean isDirty(IPath path) throws FileNotFoundException {
+    public boolean isDirty(SPath path) throws FileNotFoundException {
 
-        IFile file = this.sharedProject.getProject().getFile(path);
+        IFile file = path.getFile();
 
         if (file == null || !file.exists()) {
             throw new FileNotFoundException("File not found: " + path);
@@ -1280,9 +1276,9 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * @nonReentrant This method cannot be called twice at the same time.
      */
-    public void saveText(IPath path) {
+    public void saveText(SPath path) {
 
-        IFile file = this.sharedProject.getProject().getFile(path);
+        IFile file = path.getFile();
 
         wpLog.trace("EditorManager.saveText (" + file.getName() + ") invoked");
 
@@ -1373,7 +1369,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      *            the project relative path to the resource that the driver was
      *            editing.
      */
-    public void sendEditorActivitySaved(IPath path) {
+    public void sendEditorActivitySaved(SPath path) {
 
         wpLog.trace("EditorManager.sendEditorActivitySaved started for "
             + path.toString());
@@ -1384,7 +1380,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.driverEditorSaved(path, false);
         fireActivity(new EditorActivity(sharedProject.getLocalUser(),
-            Type.Saved, new SPath(path)));
+            Type.Saved, path));
     }
 
     /**
@@ -1525,7 +1521,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Return the Viewport for one of the EditorParts (it is undefined which)
      * associated with the given path or null if no Viewport has been found.
      */
-    public ILineRange getCurrentViewport(IPath path) {
+    public ILineRange getCurrentViewport(SPath path) {
 
         // TODO We need to find a way to identify individual editors on the
         // client and not only paths.
@@ -1551,7 +1547,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void refreshAnnotations(IEditorPart editorPart) {
 
-        IPath path = editorAPI.getEditorPath(editorPart);
+        SPath path = editorAPI.getEditorPath(editorPart);
         if (path == null) {
             log.warn("Could not find path for editor " + editorPart.getTitle());
             return;
@@ -1603,8 +1599,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        IEditorPart newEditor = this.editorAPI.openEditor(this.sharedProject
-            .getProject().getFile(activeEditor.getPath()));
+        IEditorPart newEditor = this.editorAPI.openEditor(activeEditor
+            .getPath());
 
         if (newEditor == null) {
             return;
@@ -1627,15 +1623,15 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * Returns an empty set if the user has no editors open.
      */
-    public Set<IPath> getRemoteOpenEditors(User user) {
+    public Set<SPath> getRemoteOpenEditors(User user) {
         return remoteEditorManager.getRemoteOpenEditors(user);
     }
 
-    public List<User> getRemoteOpenEditorUsers(IPath path) {
+    public List<User> getRemoteOpenEditorUsers(SPath path) {
         return remoteEditorManager.getRemoteOpenEditorUsers(path);
     }
 
-    public List<User> getRemoteActiveEditorUsers(IPath path) {
+    public List<User> getRemoteActiveEditorUsers(SPath path) {
         return remoteEditorManager.getRemoteActiveEditorUsers(path);
     }
 
@@ -1645,8 +1641,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * Returns an empty set if no editors are opened.
      */
-    public Set<IPath> getOpenEditorsOfAllParticipants() {
-        Set<IPath> result = remoteEditorManager.getRemoteOpenEditors();
+    public Set<SPath> getOpenEditorsOfAllParticipants() {
+        Set<SPath> result = remoteEditorManager.getRemoteOpenEditors();
         result.addAll(locallyOpenEditors);
         return result;
     }
@@ -1714,10 +1710,12 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @param oldContent
      *            old content of the document (before reverting)
      */
-    public void triggerRevert(IPath path, String newContent, String oldContent) {
+    public void triggerRevert(SPath path, String newContent, String oldContent) {
 
         wpLog.trace(".triggerRevert invoked");
-        wpLog.trace(".triggerRevert File: " + path.toOSString());
+        wpLog.trace(".triggerRevert File: " + path.toString());
+
+        // TODO Check if we are in the shared project!!
 
         User localUser = sharedProject.getLocalUser();
         int offset = 0;
@@ -1730,17 +1728,16 @@ public class EditorManager implements IActivityProvider, Disposable {
          * revert just those
          */
         IActivity textEditActivity = new TextEditActivity(localUser, offset,
-            newContent, oldContent, new SPath(path));
+            newContent, oldContent, path);
 
-        IActivity saveActivity = new EditorActivity(localUser, Type.Saved,
-            new SPath(path));
+        IActivity saveActivity = new EditorActivity(localUser, Type.Saved, path);
 
         fireActivity(textEditActivity);
         fireActivity(saveActivity);
 
     }
 
-    public Set<IPath> getRemoteOpenEditors() {
+    public Set<SPath> getRemoteOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
     }
 

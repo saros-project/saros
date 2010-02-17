@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.concurrent.undo;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -17,7 +18,6 @@ import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +30,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
@@ -112,7 +113,7 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     protected List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    protected IPath currentActiveEditor = null;
+    protected SPath currentActiveEditor = null;
 
     /**
      * This UndoManager is disabled when not in a Saros session.
@@ -289,9 +290,10 @@ public class UndoManager implements Disposable, IActivityProvider {
     protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void activeEditorChanged(User user, IPath newActiveEditor) {
+        public void activeEditorChanged(User user, SPath newActiveEditor) {
 
-            if (!user.isLocal() || currentActiveEditor == newActiveEditor)
+            if (!user.isLocal()
+                || ObjectUtils.equals(currentActiveEditor, newActiveEditor))
                 return;
 
             updateCurrentLocalAtomicOperation(null);
@@ -300,8 +302,8 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
 
         @Override
-        public void editorRemoved(User user, IPath closedEditor) {
-            if (currentActiveEditor == closedEditor) {
+        public void editorRemoved(User user, SPath closedEditor) {
+            if (ObjectUtils.equals(currentActiveEditor, closedEditor)) {
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
                 currentActiveEditor = null;
@@ -356,11 +358,11 @@ public class UndoManager implements Disposable, IActivityProvider {
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivityDataObject.getEditor()
-                    .getProjectRelativePath(), Type.REMOTE, operation);
+                undoHistory.add(textEditActivityDataObject.getEditor(),
+                    Type.REMOTE, operation);
             } else {
-                if (!textEditActivityDataObject.getEditor()
-                    .getProjectRelativePath().equals(currentActiveEditor)) {
+                if (!textEditActivityDataObject.getEditor().equals(
+                    currentActiveEditor)) {
                     log
                         .error("Editor of the local TextEditActivity is not the current "
                             + "active editor. Possibly the current active editor is not"
@@ -435,7 +437,7 @@ public class UndoManager implements Disposable, IActivityProvider {
      * @return operation that reverts the effect of the latest local operation
      *         in the given editor
      */
-    protected Operation calcUndoOperation(IPath editor) {
+    protected Operation calcUndoOperation(SPath editor) {
 
         if (!undoHistory.canUndo(editor))
             return new NoOperation(); // nothing to undo
@@ -469,7 +471,7 @@ public class UndoManager implements Disposable, IActivityProvider {
      * @return operation that reverts the effect of the latest undo in the given
      *         editor
      */
-    protected Operation calcRedoOperation(IPath editor) {
+    protected Operation calcRedoOperation(SPath editor) {
 
         if (!undoHistory.canRedo(editor))
             return new NoOperation(); // nothing to redo
@@ -495,7 +497,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         return redoOperation;
     }
 
-    protected void undo(IPath editor) {
+    protected void undo(SPath editor) {
 
         Operation op = calcUndoOperation(editor);
         log.debug("calculated undo: " + op);
@@ -513,7 +515,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
     }
 
-    protected void redo(IPath editor) {
+    protected void redo(SPath editor) {
 
         Operation op = calcRedoOperation(editor);
 
@@ -554,7 +556,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         List<ITextOperation> textOps = activity.toOperation()
             .getTextOperations();
 
-        IFile file = sharedProject.getProject().getFile(currentActiveEditor);
+        IFile file = currentActiveEditor.getFile();
 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorManager.getDocumentProvider(input);

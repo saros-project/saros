@@ -1,21 +1,35 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Nullable;
+
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- * This class represents a document in the workspace, possibly with information
- * about a specific open editor for that document.
+ * Objects of this class point to a document in the *workspace*, possibly with
+ * information about a specific open editor for that document.
+ * 
+ * An SPath consists of an IProject reference, IPath reference and editorType
+ * identifier.
+ * 
+ * @immutable SPaths are value objects and thus immutable.
  */
 public class SPath {
-    /**
-     * Global project ID.
-     * 
-     * @TODO Use a real project ID.
-     */
-    String projectID = "42";
 
-    /** Project relative path. */
-    IPath projectRelativePath;
+    /**
+     * The project relative path of the resource or editor this SPath
+     * represents.
+     */
+    protected IPath projectRelativePath;
+
+    /**
+     * The local IProject in which the document is contained which this SPath
+     * represents
+     */
+    protected IProject project;
 
     /**
      * Type of the editor (plain text, Java, XML, ...).
@@ -26,24 +40,62 @@ public class SPath {
      * @TODO Change to something that can be used to identify different editor
      *       types in Eclipse.
      */
-    String editorType = "txt";
+    protected String editorType = "txt";
 
-    public SPath(IPath path) {
+    /**
+     * Default constructor, initializing this SPath as a reference to the
+     * resource or editor identified by the given path in the given project.
+     * 
+     * A Null path is allowed for representing no editor
+     */
+    public SPath(IProject project, @Nullable IPath path) {
+        if (project == null)
+            throw new IllegalArgumentException(
+                "SPath must be initialized with an IProject");
+
+        this.project = project;
         this.projectRelativePath = path;
     }
 
-    public SPathDataObject toSPathDataObject() {
-        return new SPathDataObject(projectID, projectRelativePath, editorType);
+    /**
+     * Convenience constructor, which retrieves path and project from the given
+     * resource
+     */
+    public SPath(IResource resource) {
+        this(resource.getProject(), resource.getProjectRelativePath());
     }
 
-    public String getProjectID() {
-        return projectID;
+    /**
+     * Turns this SPath into an SPathDataObject representing it globally.
+     */
+    public SPathDataObject toSPathDataObject(ISharedProject sharedProject) {
+
+        String id = sharedProject.getProjectMapper().getID(project);
+        if (id == null)
+            throw new IllegalArgumentException(
+                "Trying to send a SPath which refers to a file in project which is not shared: "
+                    + this);
+
+        return new SPathDataObject(id, projectRelativePath, editorType);
     }
 
+    /**
+     * Returns the project relative path of the resource or editor represented
+     * by this SPath.
+     * 
+     * @return May return null if this SPath is used to represent no editor.
+     */
     public IPath getProjectRelativePath() {
         return projectRelativePath;
     }
 
+    /**
+     * Return the identifier of the editor which this SPath references. This
+     * identifier should be used to select one of several editors displaying the
+     * same resource.
+     * 
+     * TODO Make use of this information
+     */
     public String getEditorType() {
         return editorType;
     }
@@ -58,8 +110,7 @@ public class SPath {
             * result
             + ((projectRelativePath == null) ? 0 : projectRelativePath
                 .hashCode());
-        result = prime * result
-            + ((projectID == null) ? 0 : projectID.hashCode());
+        result = prime * result + ((project == null) ? 0 : project.hashCode());
         return result;
     }
 
@@ -82,10 +133,10 @@ public class SPath {
                 return false;
         } else if (!projectRelativePath.equals(other.projectRelativePath))
             return false;
-        if (projectID == null) {
-            if (other.projectID != null)
+        if (project == null) {
+            if (other.project != null)
                 return false;
-        } else if (!projectID.equals(other.projectID))
+        } else if (!project.equals(other.project))
             return false;
         return true;
     }
@@ -96,7 +147,27 @@ public class SPath {
             + editorType
             + ", path="
             + (projectRelativePath != null ? projectRelativePath
-                .toPortableString() : "<no path>") + ", projectID=" + projectID
-            + "]";
+                .toPortableString() : "<no path>") + ", project="
+            + project.getName() + "]";
+    }
+
+    /**
+     * Will return the IFile represented by this SPath.
+     * 
+     * @return the IFile contained in the associated IProject for the given
+     *         project relative path
+     * 
+     * @convenience This method is using a straight forward implementation
+     */
+    public IFile getFile() {
+        return project.getFile(projectRelativePath);
+    }
+
+    /**
+     * Returns the project in which the referenced resource or editor is
+     * located.
+     */
+    public IProject getProject() {
+        return project;
     }
 }

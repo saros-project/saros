@@ -47,19 +47,20 @@ public class PreferenceManager {
             public void sessionStarted(ISharedProject session) {
 
                 // TODO The user should be told that we are changing options...
-                IProject project = session.getProject();
-                if (session.isHost()) {
-                    for (IPreferenceManipulator manipulator : manipulators) {
-                        if (manipulator.isDangerousForHost()
-                            && manipulator.isEnabled(project)) {
-                            restorePoints.add(manipulator.change(project));
+                for (IProject project : session.getProjects()) {
+                    if (session.isHost()) {
+                        for (IPreferenceManipulator manipulator : manipulators) {
+                            if (manipulator.isDangerousForHost()
+                                && manipulator.isEnabled(project)) {
+                                restorePoints.add(manipulator.change(project));
+                            }
                         }
-                    }
-                } else {
-                    for (IPreferenceManipulator manipulator : manipulators) {
-                        if (manipulator.isDangerousForClient()
-                            && manipulator.isEnabled(project)) {
-                            restorePoints.add(manipulator.change(project));
+                    } else {
+                        for (IPreferenceManipulator manipulator : manipulators) {
+                            if (manipulator.isDangerousForClient()
+                                && manipulator.isEnabled(project)) {
+                                restorePoints.add(manipulator.change(project));
+                            }
                         }
                     }
                 }

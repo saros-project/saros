@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -127,9 +126,9 @@ public class DeleteOperation implements ITextOperation {
         return result;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, User source) {
+    public List<TextEditActivity> toTextEdit(SPath path, User source) {
         return Collections.singletonList(new TextEditActivity(source,
-            getPosition(), "", getText(), new SPath(path)));
+            getPosition(), "", getText(), path));
     }
 
     public List<ITextOperation> getTextOperations() {

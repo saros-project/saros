@@ -77,6 +77,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
     protected IProject localProject;
     protected int filesLeftToSynchronize;
     protected SubMonitor monitor;
+    /**
+     * The project ID sent to us by the host with this invitation.
+     */
     protected String projectName;
     protected SessionManager sessionManager;
     protected JoinSessionWizard inInvitationUI;
@@ -256,8 +259,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         // TODO joining the session will already send events, which will be
         // rejected by our peers, because they don't know us yet (JoinMessage is
         // send only later)
-        sharedProject = sessionManager.joinSession(this.localProject, peer,
-            colorID, sessionStart);
+        sharedProject = sessionManager.joinSession(this.projectName,
+            this.localProject, peer, colorID, sessionStart);
         log.debug("Inv" + Util.prefix(peer) + ": Joined the session.");
 
         monitor.beginTask("Synchronizing", 100);

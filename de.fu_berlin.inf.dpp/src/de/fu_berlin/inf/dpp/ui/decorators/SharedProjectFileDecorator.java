@@ -40,6 +40,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -123,7 +124,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         Map<User, IFile> oldActiveEditors = new HashMap<User, IFile>();
 
         @Override
-        public void activeEditorChanged(User user, IPath path) {
+        public void activeEditorChanged(User user, SPath path) {
             try {
                 List<IFile> paths = new LinkedList<IFile>();
 
@@ -134,7 +135,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
                 IFile newFile = null;
                 if (path != null && sharedProject != null) {
-                    newFile = sharedProject.getProject().getFile(path);
+                    newFile = path.getFile();
                     if (newFile.exists() && !newFile.equals(oldActiveEditor)) {
                         paths.add(newFile);
                     }
@@ -148,10 +149,10 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
 
         @Override
-        public void editorRemoved(User user, IPath path) {
+        public void editorRemoved(User user, SPath path) {
             try {
                 if (path != null && sharedProject != null) {
-                    IFile newFile = sharedProject.getProject().getFile(path);
+                    IFile newFile = path.getFile();
                     IFile oldActiveEditor = oldActiveEditors.get(user);
                     if (newFile.exists()) {
                         if (newFile.equals(oldActiveEditor)) {
@@ -213,8 +214,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         List<IFile> files = new ArrayList<IFile>();
 
-        for (IPath path : editorManager.getRemoteOpenEditors(user)) {
-            IFile openFile = sharedProject.getProject().getFile(path);
+        for (SPath path : editorManager.getRemoteOpenEditors(user)) {
+            IFile openFile = path.getFile();
             if (openFile.exists())
                 files.add(openFile);
         }
@@ -239,12 +240,14 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 return false;
 
             IFile file = (IFile) element;
-            if (!this.sharedProject.getProject().equals(file.getProject())) {
+            if (!this.sharedProject.isShared(file.getProject()))
                 return false;
-            }
-            IPath path = file.getProjectRelativePath();
-            if (path == null)
+
+            IPath iPath = file.getProjectRelativePath();
+            if (iPath == null)
                 return false;
+
+            SPath path = new SPath(file.getProject(), iPath);
 
             if (containsUserToDisplay(editorManager
                 .getRemoteActiveEditorUsers(path))) {

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
@@ -15,6 +14,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -92,7 +92,7 @@ public class ConsistencyAction extends Action {
             setEnabled(newValue);
 
             if (newValue) {
-                final Set<IPath> paths = new HashSet<IPath>(watchdogClient
+                final Set<SPath> paths = new HashSet<SPath>(watchdogClient
                     .getPathsWithWrongChecksums());
 
                 Util.runSafeSWTAsync(log, new Runnable() {

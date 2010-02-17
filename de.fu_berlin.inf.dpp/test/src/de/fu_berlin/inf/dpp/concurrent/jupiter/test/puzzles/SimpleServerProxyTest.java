@@ -59,9 +59,9 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         System.out.println("START: testTwoConcurrentInsertOperations");
         setUp("X");
 
-        client_1.sendOperation(new InsertOperation(0, "a"), 100);
-        client_2.sendOperation(new InsertOperation(1, "b"), 200);
-        Thread.sleep(400);
+        client_1.sendOperation(new InsertOperation(0, "a"), 300);
+        client_2.sendOperation(new InsertOperation(1, "b"), 400);
+        Thread.sleep(600);
 
         assertEquals("aXb", client_1.getDocument());
         assertEquals("aXb", client_2.getDocument());
@@ -78,11 +78,11 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
         setUp("X");
 
-        client_1.sendOperation(new InsertOperation(0, "a"), 100);
-        client_1.sendOperation(new InsertOperation(1, "b"), 200);
-        client_2.sendOperation(new InsertOperation(1, "c"), 300);
+        client_1.sendOperation(new InsertOperation(0, "a"), 200);
+        client_1.sendOperation(new InsertOperation(1, "b"), 400);
+        client_2.sendOperation(new InsertOperation(1, "c"), 600);
 
-        Thread.sleep(500);
+        Thread.sleep(800);
 
         assertEquals(client_1.getDocument(), client_2.getDocument());
         assertEquals("abXc", client_1.getDocument());

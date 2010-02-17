@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -77,13 +78,19 @@ public class InvitationWizardUserSelection extends WizardPage {
         composite.setLayout(new GridLayout(2, false));
 
         Label projectLabel = new Label(composite, SWT.NONE);
-        projectLabel.setText("Project");
+        projectLabel.setText("Projects");
 
         Text projectName = new Text(composite, SWT.READ_ONLY | SWT.SINGLE
             | SWT.BORDER);
         projectName
             .setLayoutData(new GridData(SWT.FILL, SWT.LEFT, false, false));
-        projectName.setText(sharedProject.getProject().getName());
+        StringBuilder sb = new StringBuilder();
+        for (IProject project : sharedProject.getProjects()) {
+            if (sb.length() > 0)
+                sb.append(", ");
+            sb.append(project.getName());
+        }
+        projectName.setText(sb.toString());
 
         // An empty label to skip a grid.
         // TODO: what about garbage collection?

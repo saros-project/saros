@@ -243,10 +243,10 @@ public class InclusionTransformationTest extends JupiterTestCase {
      */
     @Test
     public void deleteDeleteTimeOverlap() throws Exception {
-        client.sendOperation(D(0, "ab"), 100);
-        server.sendOperation(D(1, "bcd"), 200);
+        client.sendOperation(D(0, "ab"), 200);
+        server.sendOperation(D(1, "bcd"), 400);
 
-        Thread.sleep(300);
+        Thread.sleep(600);
 
         assertEqualDocs("efg", client, server);
         assertTrue("" + network.getLastError(), network.getLastError() == null);
@@ -287,10 +287,10 @@ public class InclusionTransformationTest extends JupiterTestCase {
 
     @Test
     public void overlappingSplitOperations() throws Exception {
-        client.sendOperation(S(D(1, "bcd"), I(0, "xyz")), 100);
-        server.sendOperation(S(D(0, "abc"), I(0, "uvw")), 200);
+        client.sendOperation(S(D(1, "bcd"), I(0, "xyz")), 200);
+        server.sendOperation(S(D(0, "abc"), I(0, "uvw")), 400);
 
-        Thread.sleep(300);
+        Thread.sleep(600);
 
         assertEqualDocs("uvwxyzefg", client, server);
         assertTrue("" + network.getLastError(), network.getLastError() == null);
@@ -302,11 +302,11 @@ public class InclusionTransformationTest extends JupiterTestCase {
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
 
-        client.sendOperation(S(D(4, "efg"), I(4, "123")), 100);
-        client.sendOperation(S(D(8, "ijk"), I(8, "789")), 200);
-        server.sendOperation(S(D(6, "ghi"), I(6, "456")), 200);
+        client.sendOperation(S(D(4, "efg"), I(4, "123")), 200);
+        client.sendOperation(S(D(8, "ijk"), I(8, "789")), 400);
+        server.sendOperation(S(D(6, "ghi"), I(6, "456")), 400);
 
-        Thread.sleep(500);
+        Thread.sleep(600);
 
         assertEqualDocs("abcd123456789lmnopqrstuvwxyz", client, server);
         assertTrue("" + network.getLastError(), network.getLastError() == null);
@@ -336,20 +336,20 @@ public class InclusionTransformationTest extends JupiterTestCase {
 
         client.sendOperation(S(D(4, "efg"), I(4, "123")), 100);
         assertEqualDocs("abcd123hijklmnopqrstuvwxyz", client);
-        client.sendOperation(D(8, "ijk"), 400);
+        client.sendOperation(D(8, "ijk"), 500);
         assertEqualDocs("abcd123hlmnopqrstuvwxyz", client);
-        server.sendOperation(D(6, "ghi"), 700);
+        server.sendOperation(D(6, "ghi"), 1000);
         assertEqualDocs("abcdefjklmnopqrstuvwxyz", server);
 
-        Thread.sleep(300);
+        Thread.sleep(400);
 
         assertEqualDocs("abcd123jklmnopqrstuvwxyz", server);
 
-        Thread.sleep(300);
+        Thread.sleep(400);
 
         assertEqualDocs("abcd123lmnopqrstuvwxyz", server);
 
-        Thread.sleep(300);
+        Thread.sleep(400);
 
         assertEqualDocs("abcd123lmnopqrstuvwxyz", client, server);
         assertTrue("" + network.getLastError(), network.getLastError() == null);
@@ -380,12 +380,12 @@ public class InclusionTransformationTest extends JupiterTestCase {
         // ----01234567890123456789012345
         setUp("abcdefghijklmnopqrstuvwxyz");
 
-        client.sendOperation(D(4, "efg"), 100);
-        client.sendOperation(I(4, "123"), 200);
-        client.sendOperation(D(8, "ijk"), 300);
-        server.sendOperation(D(6, "ghi"), 300);
+        client.sendOperation(D(4, "efg"), 300);
+        client.sendOperation(I(4, "123"), 500);
+        client.sendOperation(D(8, "ijk"), 700);
+        server.sendOperation(D(6, "ghi"), 700);
 
-        Thread.sleep(400);
+        Thread.sleep(1000);
 
         assertEqualDocs("abcd123lmnopqrstuvwxyz", client, server);
         assertTrue("" + network.getLastError(), network.getLastError() == null);

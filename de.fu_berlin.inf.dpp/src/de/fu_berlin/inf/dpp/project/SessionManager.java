@@ -166,12 +166,13 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     /**
      * {@inheritDoc}
      */
-    public ISharedProject joinSession(IProject project, JID host, int colorID,
-        DateTime sessionStart) {
+    public ISharedProject joinSession(String projectID, IProject project,
+        JID host, int colorID, DateTime sessionStart) {
 
         SharedProject sharedProject = new SharedProject(saros,
             this.transmitter, this.transferManager, dispatchThreadContext,
-            project, saros.getMyJID(), host, colorID, stopManager, sessionStart);
+            projectID, project, saros.getMyJID(), host, colorID, stopManager,
+            sessionStart);
         this.currentlySharedProject.setValue(sharedProject);
 
         for (ISessionListener listener : this.listeners) {
@@ -336,23 +337,25 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * @param toInvite
      *            the JID of the user that is to be invited.
      */
-    public void invite(JID toInvite) {
+    public void invite(JID toInvite, String description) {
         ISharedProject project = currentlySharedProject.getValue();
-        String description = project.getProject().getName();
 
-        final OutgoingInvitationProcess result = new OutgoingInvitationProcess(
+        // TODO We want to invite to all projects!!
+        IProject toInviteTo = project.getProjects().iterator().next();
+
+        OutgoingInvitationProcess result = new OutgoingInvitationProcess(
             transmitter, toInvite, project, partialProjectResources,
-            description, project.getFreeColor(), invitationProcesses,
-            versionManager, stopManager, discoveryManager);
+            toInviteTo, description, project.getFreeColor(),
+            invitationProcesses, versionManager, stopManager, discoveryManager);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
         outgoingInvitationJob.schedule();
     }
 
-    public void invite(Collection<JID> jidsToInvite) {
+    public void invite(Collection<JID> jidsToInvite, String description) {
         for (JID jid : jidsToInvite)
-            invite(jid);
+            invite(jid, description);
     }
 
     /**

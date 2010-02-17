@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * Activity that for activating, closing, and saving editors. If the
@@ -125,8 +126,8 @@ public class EditorActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new EditorActivityDataObject(source.getJID(), type,
-            (path != null ? path.toSPathDataObject() : null));
+            (path != null ? path.toSPathDataObject(project) : null));
     }
 }

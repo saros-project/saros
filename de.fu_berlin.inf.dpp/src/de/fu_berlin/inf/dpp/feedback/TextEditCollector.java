@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -103,7 +103,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void textEditRecieved(User user, IPath editor, String text,
+        public void textEditRecieved(User user, SPath editor, String text,
             String replacedText, int offset) {
             /*
              * delete whitespaces from the text because we don't want to count

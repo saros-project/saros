@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IProject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class FileActivity extends AbstractActivity implements IResourceActivity {
 
@@ -41,8 +41,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param path
      *            the path of the file to copy the data from
      */
-    public static FileActivity created(IProject project, User source,
-        SPath path, Purpose purpose) throws IOException {
+    public static FileActivity created(User source, SPath path, Purpose purpose)
+        throws IOException {
 
         // TODO Use Eclipse Method of getting the contents of a file:
         // IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -66,8 +66,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         // content,
         // purpose);
 
-        File f = new File(project.getFile(path.getProjectRelativePath())
-            .getLocation().toOSString());
+        File f = new File(path.getFile().getLocation().toOSString());
+
         byte[] content = FileUtils.readFileToByteArray(f);
 
         return new FileActivity(source, Type.Created, path, null, content,
@@ -90,14 +90,14 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @throws IOException
      *             the new content of the file could not be read
      */
-    public static FileActivity moved(IProject project, User source,
-        SPath destPath, SPath sourcePath, boolean contentChange)
-        throws IOException {
+    public static FileActivity moved(User source, SPath destPath,
+        SPath sourcePath, boolean contentChange) throws IOException {
 
         byte[] content = null;
         if (contentChange) {
-            File file = new File(project.findMember(
-                destPath.getProjectRelativePath()).getLocation().toOSString());
+            // TODO File should not be read using JDK methods but must use
+            // Eclipse!
+            File file = new File(destPath.getFile().getLocation().toOSString());
             content = FileUtils.readFileToByteArray(file);
         }
         return new FileActivity(source, Type.Moved, destPath, sourcePath,
@@ -243,9 +243,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return Purpose.RECOVERY.equals(purpose);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new FileActivityDataObject(source.getJID(), type, newPath
-            .toSPathDataObject(), (oldPath != null ? oldPath
-            .toSPathDataObject() : null), data, purpose);
+            .toSPathDataObject(project), (oldPath != null ? oldPath
+            .toSPathDataObject(project) : null), data, purpose);
     }
 }

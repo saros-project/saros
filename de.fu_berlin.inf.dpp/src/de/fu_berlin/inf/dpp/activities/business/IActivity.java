@@ -21,15 +21,17 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * An interface for all things that occur in a shared project session such as
  * editing a file, opening or closing editors, switching roles, etc.
  * 
- * All activityDataObjects should be implemented using the value pattern, i.e.
- * created activityDataObjects should be immutable.
+ * All {@link IActivity}s should be implemented using the value pattern, i.e.
+ * created {@link IActivity} should be immutable.
  * 
- * @author rdjemili
+ * {@link IActivity} are supposed to be "smart" and know about users and
+ * session.
  * 
  * @valueObject All IActivity subclasses should be Value Objects, i.e. they
  *              should be immutable
@@ -37,32 +39,37 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 public interface IActivity {
 
     /**
-     * Returns the the user which has caused this activityDataObject.
+     * Returns the the user which has caused this activity.
      */
     public User getSource();
 
     /**
-     * The activityDataObject will call the receive method of the given receiver
-     * with the actual type of this IActivity and return whether the receiver
-     * consumed the message.
+     * The activity will call the receive method of the given receiver with the
+     * actual type of this IActivity and return whether the receiver consumed
+     * the message.
      * 
      * For instance if dispatch is called on a FolderActivity it will call
      * {@link IActivityConsumer#consume(FolderActivity)}
      * 
-     * @return <code>true</code> if the receiver consumed this
-     *         activityDataObject, otherwise <code>false</code>.
+     * @return <code>true</code> if the receiver consumed this activity,
+     *         otherwise <code>false</code>.
      */
     public boolean dispatch(IActivityConsumer receiver);
 
     /**
-     * The activityDataObject will call the receive method of the given receiver
-     * with the actual type of this IActivity.
+     * The activity will call the receive method of the given receiver with the
+     * actual type of this IActivity.
      * 
      * For instance if dispatch is called on a FolderActivity it will call
      * {@link IActivityReceiver#receive(FolderActivity)}
      */
     public void dispatch(IActivityReceiver receiver);
 
-    public IActivityDataObject getActivityDataObject();
+    /**
+     * @return a "stupid" IActivityDataObject which can be used to send this
+     *         {@link IActivity} to peers.
+     */
+    public IActivityDataObject getActivityDataObject(
+        ISharedProject sharedProject);
 
 }

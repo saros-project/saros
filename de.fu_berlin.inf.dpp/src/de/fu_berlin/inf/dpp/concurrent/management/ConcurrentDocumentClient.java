@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
@@ -204,8 +204,7 @@ public class ConcurrentDocumentClient implements Disposable {
         @Override
         public void receive(FileActivity fileActivity) {
             if (fileActivity.getType() == FileActivity.Type.Removed) {
-                jupiterClient.reset(fileActivity.getPath()
-                    .getProjectRelativePath());
+                jupiterClient.reset(fileActivity.getPath());
             }
         }
     };
@@ -230,8 +229,7 @@ public class ConcurrentDocumentClient implements Disposable {
 
         // Transform to TextEdit so it can be executed locally
         for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
-            .getEditorPath().getProjectRelativePath(), jupiterActivity
-            .getSource())) {
+            .getEditorPath(), jupiterActivity.getSource())) {
 
             result.executeLocally.add(textEdit);
         }
@@ -252,7 +250,7 @@ public class ConcurrentDocumentClient implements Disposable {
      * 
      * When this is called on the client (or on the host for one of his
      * JupiterClient), a call to
-     * {@link ConcurrentDocumentServer#reset(de.fu_berlin.inf.dpp.net.JID, IPath)}
+     * {@link ConcurrentDocumentServer#reset(de.fu_berlin.inf.dpp.net.JID, SPath)}
      * should be executed at the same time on the side of the given user.
      * 
      * @client and @host This can be called on the host as well, if the host
@@ -260,8 +258,8 @@ public class ConcurrentDocumentClient implements Disposable {
      *         happens, because the version of the host is the authoritative one
      *         and thus does not need to be reset).
      */
-    public synchronized void reset(IPath path) {
-        log.debug("Resetting jupiter client: " + path.toOSString());
+    public synchronized void reset(SPath path) {
+        log.debug("Resetting jupiter client: " + path.toString());
         jupiterClient.reset(path);
     }
 

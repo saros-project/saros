@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -68,7 +69,15 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     private final static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
+    protected final static Random INVITATION_RAND = new Random();
+
     protected ISharedProject sharedProject;
+
+    /**
+     * This OutgoingInvitation is about the following IProject
+     */
+    protected IProject project;
+
     protected List<IResource> partialProjectResources;
     protected FileList remoteFileList;
     protected File archive;
@@ -89,11 +98,10 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SarosCancellationException cancellationCause;
     protected SarosPacketCollector invitationCompleteCollector;
-    protected final static Random INVITATION_RAND = new Random();
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
         ISharedProject sharedProject, List<IResource> partialProjectResources,
-        String description, int colorID,
+        IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
         DiscoveryManager discoveryManager) {
@@ -105,6 +113,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         this.versionManager = versionManager;
         this.stopManager = stopManager;
         this.discoveryManager = discoveryManager;
+        this.project = project;
     }
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
@@ -256,8 +265,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         SarosPacketCollector fileListRequestCollector = transmitter
             .getFileListRequestCollector(invitationID);
 
-        transmitter.sendInvitation(sharedProject, peer, description, colorID,
-            hostVersionInfo, invitationID);
+        transmitter.sendInvitation(sharedProject.getProjectMapper().getID(
+            this.project), peer, description, colorID, hostVersionInfo,
+            invitationID, sharedProject.getSessionStart());
 
         subMonitor.worked(25);
         subMonitor
@@ -297,7 +307,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                 localFileList = new FileList(partialProjectResources
                     .toArray(new IResource[partialProjectResources.size()]));
             } else {
-                localFileList = new FileList(sharedProject.getProject());
+                localFileList = new FileList(project);
             }
 
         } catch (CoreException e) {
@@ -360,7 +370,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // they have changed. How to ask Eclipse whether there are resource
             // changes?
             // if (outInvitationUI.confirmProjectSave(peer))
-            EditorAPI.saveProject(sharedProject.getProject(), false);
+            EditorAPI.saveProject(this.project, false);
             // else
             // throw new LocalCancellationException();
 
@@ -380,7 +390,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                 archive = File.createTempFile("SarosSyncArchive-"
                     + getPeer().getName(), ".zip");
                 FileZipper.createProjectZipArchive(toSend, archive,
-                    sharedProject.getProject(), archiveMonitor);
+                    this.project, archiveMonitor);
             }
             archiveMonitor.done();
 
@@ -413,9 +423,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         subMonitor.setTaskName("Sending archive...");
         if (archive == null)
             log.debug("Inv" + Util.prefix(peer) + ": The archive is empty.");
-        transmitter.sendProjectArchive(peer, invitationID, sharedProject
-            .getProject(), archive, subMonitor.newChild(100,
-            SubMonitor.SUPPRESS_ALL_LABELS));
+        transmitter.sendProjectArchive(peer, invitationID, this.project,
+            archive, subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
     protected void completeInvitation(SubMonitor subMonitor)
@@ -625,6 +634,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
     @Override
     public String getProjectName() {
-        return this.sharedProject.getProject().getName();
+        return project.getName();
     }
 }

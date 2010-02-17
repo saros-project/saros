@@ -39,7 +39,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -68,6 +67,7 @@ import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -634,13 +634,13 @@ public class Util {
      * Return a string representation of the given paths suitable for debugging
      * by joining their OS dependent representation by ', '
      */
-    public static String toOSString(final Set<IPath> paths) {
+    public static String toOSString(final Set<SPath> paths) {
         StringBuilder sb = new StringBuilder();
-        for (IPath path : paths) {
+        for (SPath path : paths) {
             if (sb.length() > 0)
                 sb.append(", ");
 
-            sb.append(path.toOSString());
+            sb.append(path.toString());
         }
         return sb.toString();
     }
@@ -905,7 +905,7 @@ public class Util {
      * Print the difference between the contents of the given file and the given
      * inputBytes to the given log.
      */
-    public static void logDiff(Logger log, JID from, IPath path,
+    public static void logDiff(Logger log, JID from, SPath path,
         byte[] inputBytes, IFile file) {
         try {
             if (file == null) {

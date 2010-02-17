@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class ViewportActivity extends AbstractActivity {
 
@@ -99,8 +100,8 @@ public class ViewportActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new ViewportActivityDataObject(source.getJID(), topIndex,
-            bottomIndex, path.toSPathDataObject());
+            bottomIndex, path.toSPathDataObject(project));
     }
 }

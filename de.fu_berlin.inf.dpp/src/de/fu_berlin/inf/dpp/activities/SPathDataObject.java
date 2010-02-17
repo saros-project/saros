@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
@@ -8,6 +9,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
+/**
+ * "Stupid" Data Object for transmitting an SPath. Serialized using XStream.
+ */
 @XStreamAlias("SPath")
 public class SPathDataObject {
 
@@ -20,16 +24,36 @@ public class SPathDataObject {
     @XStreamAsAttribute
     protected String editorType;
 
+    /**
+     * Create a new SPathDataObject for project using the given global ID.
+     * 
+     * Path may be null if this SPathDataObject represents "no editor".
+     * 
+     * editorType may be null if this SPathDataObject represents a resource
+     * path.
+     */
     public SPathDataObject(String projectID, @Nullable IPath path,
         @Nullable String editorType) {
-        
+
         this.projectID = projectID;
         this.path = path;
         this.editorType = editorType;
     }
 
+    /**
+     * Attach this SPathDataObject to the given ISharedProject. This will map
+     * projectIDs of the SPathDataObject to actual IProjects.
+     */
     public SPath toSPath(ISharedProject sharedProject) {
-        return new SPath(path);
+
+        IProject project = sharedProject.getProjectMapper().getProject(
+            projectID);
+        if (project == null)
+            throw new IllegalArgumentException(
+                "SPathDataObject cannot be connected to SharedProject because its ID is unknown: "
+                    + projectID);
+
+        return new SPath(project, path);
     }
 
     @Override

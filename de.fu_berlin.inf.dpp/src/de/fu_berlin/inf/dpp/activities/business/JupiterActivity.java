@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * A JupiterActivity is an Activity that can be handled by the Jupiter
@@ -104,8 +105,8 @@ public class JupiterActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new JupiterActivityDataObject(timestamp, operation, source
-            .getJID(), editor.toSPathDataObject());
+            .getJID(), editor.toSPathDataObject(project));
     }
 }

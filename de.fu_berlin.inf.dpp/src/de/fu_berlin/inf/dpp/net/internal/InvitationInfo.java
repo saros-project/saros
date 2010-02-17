@@ -25,19 +25,22 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
+/**
+ * Small class used by the invitation process as a first message
+ */
 @Component(module = "net")
 public class InvitationInfo extends DefaultInvitationInfo {
-    public String projectName;
+    public String projectID;
     public String projectDesc;
     public int colorID;
     public VersionInfo versionInfo;
     public DateTime sessionStart;
 
     public InvitationInfo(SessionIDObservable sessionID, String invitationID,
-        String projectName, String projectDesc, int colorID,
+        String projectID, String projectDesc, int colorID,
         VersionInfo versionInfo, DateTime sessionStart) {
         super(sessionID, invitationID);
-        this.projectName = projectName;
+        this.projectID = projectID;
         this.projectDesc = projectDesc;
         this.colorID = colorID;
         this.versionInfo = versionInfo;

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SarosProjectMapper;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -81,8 +83,6 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected DataTransferManager transferManager;
 
-    protected IProject project;
-
     protected StopManager stopManager;
 
     /* Instance fields */
@@ -97,6 +97,8 @@ public class SharedProject implements ISharedProject, Disposable {
     protected FreeColors freeColors = null;
 
     protected DateTime sessionStart;
+
+    protected SarosProjectMapper projectMapper = new SarosProjectMapper();
 
     protected Blockable stopManagerListener = new Blockable() {
 
@@ -129,15 +131,16 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     protected SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, IProject project,
-        StopManager stopManager, JID myJID, int myColorID, DateTime sessionStart) {
+        DispatchThreadContext threadContext, String projectID,
+        IProject project, StopManager stopManager, JID myJID, int myColorID,
+        DateTime sessionStart) {
 
         assert transmitter != null;
         assert myJID != null;
 
         this.saros = saros;
         this.transmitter = transmitter;
-        this.project = project;
+        this.projectMapper.addMapping(projectID, project);
         this.transferManager = transferManager;
         this.stopManager = stopManager;
         this.sessionStart = sessionStart;
@@ -157,8 +160,8 @@ public class SharedProject implements ISharedProject, Disposable {
         DispatchThreadContext threadContext, IProject project, JID myID,
         StopManager stopManager, DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, project,
-            stopManager, myID, 0, sessionStart);
+        this(saros, transmitter, transferManager, threadContext, project
+            .getName(), project, stopManager, myID, 0, sessionStart);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
@@ -177,12 +180,12 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     public SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, IProject project, JID myID,
-        JID hostID, int myColorID, StopManager stopManager,
-        DateTime sessionStart) {
+        DispatchThreadContext threadContext, String projectID,
+        IProject project, JID myID, JID hostID, int myColorID,
+        StopManager stopManager, DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, project,
-            stopManager, myID, myColorID, sessionStart);
+        this(saros, transmitter, transferManager, threadContext, projectID,
+            project, stopManager, myID, myColorID, sessionStart);
 
         this.host = new User(this, hostID, 0);
         this.host.invitationCompleted();
@@ -445,8 +448,8 @@ public class SharedProject implements ISharedProject, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
-    public IProject getProject() {
-        return this.project;
+    public Set<IProject> getProjects() {
+        return this.projectMapper.getProjects();
     }
 
     public Thread requestTransmitter = null;
@@ -602,7 +605,12 @@ public class SharedProject implements ISharedProject, Disposable {
             .size());
 
         for (IActivityDataObject dataObject : activityDataObjects) {
-            result.add(dataObject.getActivity(this));
+            try {
+                result.add(dataObject.getActivity(this));
+            } catch (IllegalArgumentException e) {
+                log.warn("DataObject should not be attached to SharedProject: "
+                    + dataObject, e);
+            }
         }
 
         return result;
@@ -643,8 +651,12 @@ public class SharedProject implements ISharedProject, Disposable {
         if (activity == null)
             throw new IllegalArgumentException();
 
-        activitySequencer
-            .sendActivity(toWhom, activity.getActivityDataObject());
+        try {
+            activitySequencer.sendActivity(toWhom, activity
+                .getActivityDataObject(this));
+        } catch (IllegalArgumentException e) {
+            log.warn("Could not convert Activity to DataObject: ", e);
+        }
     }
 
     public void addActivityProvider(IActivityProvider provider) {
@@ -661,5 +673,13 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public DateTime getSessionStart() {
         return sessionStart;
+    }
+
+    public boolean isShared(IProject project) {
+        return projectMapper.isShared(project);
+    }
+
+    public SarosProjectMapper getProjectMapper() {
+        return projectMapper;
     }
 }

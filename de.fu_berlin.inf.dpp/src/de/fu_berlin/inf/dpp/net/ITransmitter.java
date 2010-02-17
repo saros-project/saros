@@ -30,14 +30,15 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
+import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -63,17 +64,17 @@ public interface ITransmitter {
     /**
      * Sends an invitation message for given shared project to given user.
      * 
-     * @param sharedProject
-     *            the shared project to which the user should be invited to.
+     * @param projectID
+     *            the ID of the IProject to which the user should be invited to.
      * @param jid
      *            the Jabber ID of the user that is to be invited.
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
      */
-    public void sendInvitation(ISharedProject sharedProject, JID jid,
-        String description, int colorID, VersionInfo versionInfo,
-        String invitationID);
+    public void sendInvitation(String projectID, JID jid, String description,
+        int colorID, VersionInfo versionInfo, String invitationID,
+        DateTime sessionStart);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -356,17 +357,7 @@ public interface ITransmitter {
      *            further user operation.
      */
     public void sendFileChecksumErrorMessage(List<JID> recipients,
-        Set<IPath> paths, boolean resolved);
-
-    /**
-     * Sends the given DocumentChecksums to all clients.
-     * 
-     * If the XMPP connection is closed this method will fail silently.
-     * 
-     * @host This method should only be called on the host.
-     */
-    public void sendDocChecksumsToClients(List<JID> recipients,
-        Collection<DocumentChecksum> checksums);
+        Set<SPathDataObject> paths, boolean resolved);
 
     /**
      * Make sure that Jingle has sufficiently initialized so that a remote

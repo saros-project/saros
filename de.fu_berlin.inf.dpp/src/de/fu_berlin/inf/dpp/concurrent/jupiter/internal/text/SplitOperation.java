@@ -23,8 +23,6 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.User;
@@ -113,7 +111,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, User source) {
+    public List<TextEditActivity> toTextEdit(SPath path, User source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();
 
@@ -157,7 +155,7 @@ public class SplitOperation implements Operation {
 
             if (isReplace(lastOp, operation)) {
                 result.add(new TextEditActivity(source, lastOp.getPosition(),
-                    operation.getText(), lastOp.getText(), new SPath(path)));
+                    operation.getText(), lastOp.getText(), path));
                 lastOp = null;
                 continue;
             } else {

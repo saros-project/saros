@@ -3,9 +3,11 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -35,7 +37,11 @@ public class Document {
         .getLogger(Document.class.getName());
 
     /** document state. */
-    private StringBuffer doc;
+    protected StringBuffer doc;
+
+    protected IPath path;
+
+    protected IProject project;
 
     /**
      * constructor to init doc.
@@ -43,8 +49,10 @@ public class Document {
      * @param initState
      *            start document state.
      */
-    public Document(String initState) {
+    public Document(String initState, IProject project, IPath path) {
         doc = new StringBuffer(initState);
+        this.project = project;
+        this.path = path;
     }
 
     /**
@@ -69,8 +77,8 @@ public class Document {
     public void execOperation(Operation op) {
         User dummy = JupiterTestCase.createUserMock("dummy");
 
-        List<TextEditActivity> activities = op.toTextEdit(new Path("dummy"),
-            dummy);
+        List<TextEditActivity> activities = op.toTextEdit(new SPath(project,
+            path), dummy);
 
         for (TextEditActivity activity : activities) {
 

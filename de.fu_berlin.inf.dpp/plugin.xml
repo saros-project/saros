@@ -63,6 +63,12 @@
                id="Saros.action2"
                label="Share project partially (experimental)...">
          </action>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.AddToSessionAction"
+               icon="icons/transmit.png"
+               id="Saros.action2"
+               label="Add to session (experimental)...">
+         </action>
          <visibility>
                <objectClass name="org.eclipse.core.resources.IProject"/>
          </visibility>

@@ -1,8 +1,7 @@
 package de.fu_berlin.inf.dpp.editor;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 
 /**
  * Empty abstract implementation of the ISharedEditorListener interface
@@ -10,15 +9,15 @@ import de.fu_berlin.inf.dpp.User;
 public abstract class AbstractSharedEditorListener implements
     ISharedEditorListener {
 
-    public void activeEditorChanged(User user, IPath path) {
+    public void activeEditorChanged(User user, SPath path) {
         // does nothing
     }
 
-    public void editorRemoved(User user, IPath path) {
+    public void editorRemoved(User user, SPath path) {
         // does nothing
     }
 
-    public void driverEditorSaved(IPath path, boolean replicated) {
+    public void driverEditorSaved(SPath path, boolean replicated) {
         // does nothing
     }
 
@@ -26,7 +25,7 @@ public abstract class AbstractSharedEditorListener implements
         // does nothing
     }
 
-    public void textEditRecieved(User user, IPath editor, String text,
+    public void textEditRecieved(User user, SPath editor, String text,
         String replacedText, int offset) {
         // does nothing
     }

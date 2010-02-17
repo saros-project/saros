@@ -5,14 +5,15 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -21,14 +22,13 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
@@ -40,8 +40,8 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -83,51 +83,61 @@ public class ConsistencyWatchdogHandler {
 
     protected SessionManager sessionManager;
 
-    protected Handler handler;
-
-    public ConsistencyWatchdogHandler(SessionManager sessionManager,
+    public ConsistencyWatchdogHandler(final SessionManager sessionManager,
+        final ChecksumErrorExtensionProvider extensionProvider,
         XMPPReceiver receiver, SessionIDObservable sessionID) {
 
         this.sessionIDObservable = sessionID;
         this.sessionManager = sessionManager;
 
-        this.handler = new Handler(sessionID);
+        receiver.addPacketListener(new PacketListener() {
+            public void processPacket(Packet packet) {
+                try {
+                    ChecksumErrorDataObject payload = extensionProvider
+                        .getPayload(packet);
+                    if (payload == null) {
+                        log.warn("Invalid ChecksumErrorExtensionPacket"
+                            + " does not contain a payload: " + packet);
+                        return;
+                    }
+                    JID from = new JID(packet.getFrom());
 
-        receiver.addPacketListener(handler, handler.getFilter());
-    }
+                    if (!ObjectUtils.equals(sessionIDObservable.getValue(),
+                        payload.getSessionID())) {
+                        log.warn("Rcvd ("
+                            + String.format("%03d", payload.getPaths().size())
+                            + ") " + Util.prefix(from)
+                            + "from an old/unknown session: "
+                            + payload.getPaths());
+                        return;
+                    }
 
-    protected class Handler extends ChecksumErrorExtension {
+                    Set<SPath> paths = new HashSet<SPath>();
+                    ISharedProject project = sessionManager.getSharedProject();
+                    for (SPathDataObject dataObject : payload.getPaths()) {
+                        paths.add(dataObject.toSPath(project));
+                    }
 
-        public Handler(SessionIDObservable sessionID) {
-            super(sessionID);
-        }
+                    String checksumErrors = Util.toOSString(paths);
 
-        @Override
-        public PacketFilter getFilter() {
-            return new AndFilter(new MessageTypeFilter(Message.Type.chat),
-                PacketExtensionUtils.getSessionIDPacketFilter(sessionID), super
-                    .getFilter());
-        }
+                    if (payload.isResolved()) {
+                        log.info("Inconsistency resolved for "
+                            + Util.prefix(from) + "for " + checksumErrors);
+                        closeChecksumErrorMessage(checksumErrors, from);
+                        return;
+                    }
 
-        @Override
-        public void checksumErrorReceived(final JID from,
-            final Set<IPath> paths, boolean resolved) {
+                    log.debug("Received Checksum Error from "
+                        + Util.prefix(from) + "for " + checksumErrors);
 
-            // Concatenate paths
-            final String pathsOfInconsistencies = Util.toOSString(paths);
-
-            if (resolved) {
-                log.info("Inconsistency resolved for " + Util.prefix(from)
-                    + "for " + pathsOfInconsistencies);
-                closeChecksumErrorMessage(pathsOfInconsistencies, from);
-                return;
+                    startRecovery(checksumErrors, from, paths);
+                } catch (Exception e) {
+                    log.error(
+                        "An internal error occurred while processing packets",
+                        e);
+                }
             }
-
-            log.debug("Received Checksum Error from " + Util.prefix(from)
-                + "for " + pathsOfInconsistencies);
-
-            startRecovery(pathsOfInconsistencies, from, paths);
-        }
+        }, extensionProvider.getPacketFilter());
     }
 
     protected boolean inProgress(String pathsOfInconsistencies, JID from) {
@@ -147,7 +157,7 @@ public class ConsistencyWatchdogHandler {
      * 
      */
     protected void startRecovery(final String pathsOfInconsistencies,
-        final JID from, final Set<IPath> paths) {
+        final JID from, final Set<SPath> paths) {
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -187,7 +197,7 @@ public class ConsistencyWatchdogHandler {
 
     protected void runRecoveryInProgressDialog(
         final String pathsOfInconsistencies, final JID from,
-        final Set<IPath> paths) {
+        final Set<SPath> paths) {
 
         ProgressMonitorDialog md = actualChecksumErrorDialogs
             .get(new Pair<String, JID>(pathsOfInconsistencies, from));
@@ -218,7 +228,7 @@ public class ConsistencyWatchdogHandler {
     }
 
     protected void runRecovery(final String pathsOfInconsistencies,
-        final JID from, final Set<IPath> paths, SubMonitor progress)
+        final JID from, final Set<SPath> paths, SubMonitor progress)
         throws CancellationException {
         SubMonitor waiting;
 
@@ -278,7 +288,7 @@ public class ConsistencyWatchdogHandler {
      * 
      * @nonSWT This method should not be called from the SWT Thread!
      */
-    protected void performConsistencyRecovery(JID from, Set<IPath> paths,
+    protected void performConsistencyRecovery(JID from, Set<SPath> paths,
         SubMonitor progress) {
 
         progress.beginTask("Performing Consistency Recovery", paths.size());
@@ -289,26 +299,27 @@ public class ConsistencyWatchdogHandler {
         progress.done();
     }
 
-    protected void recoverFiles(JID from, Set<IPath> paths, SubMonitor progress) {
+    protected void recoverFiles(JID from, Set<SPath> paths, SubMonitor progress) {
 
         ISharedProject sharedProject = sessionManager.getSharedProject();
         progress.beginTask("Sending files", paths.size());
 
-        for (IPath path : paths) {
-            progress.subTask("Recovering file: " + path.lastSegment());
+        for (SPath path : paths) {
+            progress.subTask("Recovering file: "
+                + path.getProjectRelativePath().lastSegment());
             recoverFile(from, sharedProject, path, progress.newChild(1));
         }
         progress.done();
     }
 
     protected void recoverFile(JID from, final ISharedProject sharedProject,
-        final IPath path, SubMonitor progress) {
+        final SPath path, SubMonitor progress) {
 
         User fromUser = sharedProject.getUser(from);
 
-        progress.beginTask("Handling file: " + path.toOSString(), 10);
+        progress.beginTask("Handling file: " + path.toString(), 10);
 
-        IFile file = sharedProject.getProject().getFile(path);
+        IFile file = path.getFile();
 
         // Save document before sending to clients
         if (file.exists()) {
@@ -331,9 +342,8 @@ public class ConsistencyWatchdogHandler {
 
             try {
                 // Send the file to client
-                sharedProject.sendActivity(fromUser, FileActivity.created(
-                    sharedProject.getProject(), user, new SPath(path),
-                    Purpose.RECOVERY));
+                sharedProject.sendActivity(fromUser, FileActivity.created(user,
+                    path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -350,13 +360,13 @@ public class ConsistencyWatchdogHandler {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             sharedProject.activityCreated(new ChecksumActivity(
-                                user, new SPath(path), checksum.getHash(),
-                                checksum.getLength()));
+                                user, path, checksum.getHash(), checksum
+                                    .getLength()));
                         }
                     });
                 } catch (CoreException e) {
                     log.warn("Could not check checksum of file "
-                        + path.toOSString());
+                        + path.toString());
                 } finally {
                     provider.disconnect(input);
                 }
@@ -369,11 +379,11 @@ public class ConsistencyWatchdogHandler {
             // TODO Warn the user...
             // Tell the client to delete the file
             sharedProject.sendActivity(fromUser, FileActivity.removed(user,
-                new SPath(path), Purpose.RECOVERY));
+                path, Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     sharedProject.activityCreated(ChecksumActivity.missing(
-                        user, new SPath(path)));
+                        user, path));
                 }
             });
 
@@ -406,7 +416,7 @@ public class ConsistencyWatchdogHandler {
     }
 
     /**
-     * Runs a consistency recovery for the given IPath and the given JID
+     * Runs a consistency recovery for the given SPath and the given JID
      * 
      * @param inconsistentJID
      *            JID of the user having inconsistencies
@@ -415,9 +425,9 @@ public class ConsistencyWatchdogHandler {
      * 
      * @host
      */
-    public void runRecoveryForPath(final JID inconsistentJID, final IPath path) {
+    public void runRecoveryForPath(final JID inconsistentJID, final SPath path) {
 
-        Set<IPath> paths = Collections.singleton(path);
+        Set<SPath> paths = Collections.singleton(path);
         final String pathsOfInconsistencies = Util.toOSString(paths);
 
         startRecovery(pathsOfInconsistencies, inconsistentJID, paths);

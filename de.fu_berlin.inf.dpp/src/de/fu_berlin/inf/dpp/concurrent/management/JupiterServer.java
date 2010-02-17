@@ -3,9 +3,8 @@ package de.fu_berlin.inf.dpp.concurrent.management;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -26,7 +25,7 @@ public class JupiterServer {
      * 
      * @host
      */
-    protected HashMap<IPath, JupiterDocumentServer> concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
+    protected HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
 
     private ISharedProject project;
 
@@ -34,7 +33,7 @@ public class JupiterServer {
         this.project = project;
     }
 
-    public synchronized void removePath(IPath path) {
+    public synchronized void removePath(SPath path) {
         concurrentDocuments.remove(path);
     }
 
@@ -55,7 +54,7 @@ public class JupiterServer {
     /**
      * @host
      */
-    protected synchronized JupiterDocumentServer getServer(IPath path) {
+    protected synchronized JupiterDocumentServer getServer(SPath path) {
 
         JupiterDocumentServer docServer = this.concurrentDocuments.get(path);
 
@@ -76,7 +75,7 @@ public class JupiterServer {
         return docServer;
     }
 
-    public synchronized void reset(IPath path, JID jid) {
+    public synchronized void reset(SPath path, JID jid) {
         getServer(path).reset(jid);
     }
 
@@ -84,7 +83,7 @@ public class JupiterServer {
         JupiterActivity jupiterActivity) throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(jupiterActivity
-            .getEditorPath().getProjectRelativePath());
+            .getEditorPath());
 
         return docServer.transformJupiterActivity(jupiterActivity);
     }
@@ -94,7 +93,7 @@ public class JupiterServer {
         throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(checksumActivityDataObject
-            .getPath().getProjectRelativePath());
+            .getPath());
 
         return docServer.withTimestamp(checksumActivityDataObject);
     }

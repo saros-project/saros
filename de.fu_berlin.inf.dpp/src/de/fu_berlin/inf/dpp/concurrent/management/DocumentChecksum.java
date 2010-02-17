@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
+
+import de.fu_berlin.inf.dpp.activities.SPath;
 
 /**
  * This Class represents a checksum of an document. It contains the path, the
@@ -30,24 +31,29 @@ public class DocumentChecksum {
     };
 
     // the path to the concurrent document
-    private final IPath path;
+    protected final SPath path;
 
     // the length of the document
-    private int length;
+    protected int length;
 
     // the hash code of the document
-    private int hash;
+    protected int hash;
 
     protected IDocument document;
 
     protected boolean dirty;
 
-    public DocumentChecksum(IPath path) {
+    /**
+     * Creates a new Checksum for the document represented in the given path.
+     * 
+     * The checksum is initially created without being bound to a document.
+     */
+    public DocumentChecksum(SPath path) {
         this.path = path;
         this.dirty = true;
     }
 
-    public IPath getPath() {
+    public SPath getPath() {
         return path;
     }
 
@@ -124,6 +130,6 @@ public class DocumentChecksum {
 
     @Override
     public String toString() {
-        return path.toOSString() + " [" + this.length + "," + this.hash + "]";
+        return path.toString() + " [" + this.length + "," + this.hash + "]";
     }
 }

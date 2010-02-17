@@ -14,9 +14,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -80,7 +80,16 @@ public class RevertBufferListener {
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                 IResource fileResource = root
                     .findMember(tfBuffer.getLocation());
-                IPath path = fileResource.getProjectRelativePath();
+
+                if (fileResource == null)
+                    return;
+
+                // Is the revert in a shared IProject?
+                if (!sharedProject.isShared(fileResource.getProject()))
+                    return;
+
+                SPath path = new SPath(fileResource);
+
                 String oldContent = tfBuffer.getDocument().get();
 
                 // The new content of the file must be known

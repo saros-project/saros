@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * A role activityDataObject indicates that a user has a new Role in the
@@ -98,7 +99,7 @@ public class RoleActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new RoleActivityDataObject(source.getJID(), affectedUser
             .getJID(), role);
     }

@@ -3,11 +3,10 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
@@ -54,7 +53,7 @@ public class TimestampOperation implements Operation {
         return hashcode;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, User source) {
+    public List<TextEditActivity> toTextEdit(SPath path, User source) {
         return Collections.emptyList();
     }
 

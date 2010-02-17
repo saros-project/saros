@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
@@ -39,10 +38,10 @@ public class RemoteDriverManager {
         .getLogger(RemoteDriverManager.class);
 
     // stores users and their opened files (identified by their path)
-    protected Map<IPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
+    protected Map<SPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
 
     // stores files (identified by their path) connected by at least one driver
-    protected Set<IPath> connectedDriverFiles = new HashSet<IPath>();
+    protected Set<SPath> connectedDriverFiles = new HashSet<SPath>();
 
     protected ISharedProject sharedProject;
 
@@ -59,7 +58,7 @@ public class RemoteDriverManager {
          */
         @Override
         public void userLeft(User user) {
-            for (Entry<IPath, Set<User>> entry : editorStates.entrySet()) {
+            for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
                 if (entry.getValue().remove(user))
                     updateConnectionState(entry.getKey());
             }
@@ -72,7 +71,7 @@ public class RemoteDriverManager {
          */
         @Override
         public void roleChanged(User user) {
-            for (Entry<IPath, Set<User>> entry : editorStates.entrySet()) {
+            for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
                 if (entry.getValue().contains(user))
                     updateConnectionState(entry.getKey());
             }
@@ -84,16 +83,12 @@ public class RemoteDriverManager {
         @Override
         public void receive(final EditorActivity editorActivity) {
             User sender = editorActivity.getSource();
-            SPath sPath = editorActivity.getPath();
-            if (sPath == null) {
+            SPath path = editorActivity.getPath();
+            if (path == null) {
                 /*
                  * sPath == null means that the user has no active editor any
                  * more.
                  */
-                return;
-            }
-            IPath path = sPath.getProjectRelativePath();
-            if (path == null) {
                 return;
             }
 
@@ -125,7 +120,7 @@ public class RemoteDriverManager {
     public void dispose() {
         sharedProject.removeListener(sharedProjectListener);
 
-        for (Entry<IPath, Set<User>> entry : editorStates.entrySet()) {
+        for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
             entry.getValue().clear();
             updateConnectionState(entry.getKey());
         }
@@ -143,11 +138,11 @@ public class RemoteDriverManager {
      * Connects a document under the given path as a reaction on a remote
      * activityDataObject of a driver (e.g. Activate Editor).
      */
-    protected void connectDocumentProvider(IPath path) {
+    protected void connectDocumentProvider(SPath path) {
 
         assert !connectedDriverFiles.contains(path);
 
-        IFile file = sharedProject.getProject().getFile(path);
+        IFile file = path.getFile();
         if (!file.exists()) {
             log.error("Attempting to connect to file which"
                 + " is not available locally: " + path, new StackTrace());
@@ -171,13 +166,13 @@ public class RemoteDriverManager {
      * Disconnects a document under the given path as a reaction on a remote
      * activityDataObject of a driver (e.g. Close Editor)
      */
-    protected void disconnectDocumentProvider(final IPath path) {
+    protected void disconnectDocumentProvider(final SPath path) {
 
         assert connectedDriverFiles.contains(path);
 
         connectedDriverFiles.remove(path);
 
-        IFile file = sharedProject.getProject().getFile(path);
+        IFile file = path.getFile();
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorManager.getDocumentProvider(input);
         provider.disconnect(input);
@@ -188,9 +183,9 @@ public class RemoteDriverManager {
      * path. This method looks if this document is already connected, and
      * whether it needs to get connected/disconnected now.
      */
-    protected void updateConnectionState(final IPath path) {
+    protected void updateConnectionState(final SPath path) {
 
-        log.trace(".updateConnectionState(" + path.toOSString() + ")");
+        log.trace(".updateConnectionState(" + path.toString() + ")");
 
         boolean hadDriver = connectedDriverFiles.contains(path);
         boolean hasDriver = false;
@@ -203,13 +198,13 @@ public class RemoteDriverManager {
         }
 
         if (!hadDriver && hasDriver) {
-            log.trace(".updateConnectionState File " + path.toOSString()
+            log.trace(".updateConnectionState File " + path.toString()
                 + " will be connected ");
             connectDocumentProvider(path);
         }
 
         if (hadDriver && !hasDriver) {
-            log.trace(".updateConnectionState File " + path.toOSString()
+            log.trace(".updateConnectionState File " + path.toString()
                 + " will be disconnected ");
             disconnectDocumentProvider(path);
         }

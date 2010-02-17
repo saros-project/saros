@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.picocontainer.annotations.Inject;
@@ -117,8 +115,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
             return false;
 
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
-        IProject project = fileEditorInput.getFile().getProject();
 
-        return ObjectUtils.equals(project, sharedProject.getProject());
+        return sharedProject.isShared(fileEditorInput.getFile().getProject());
     }
 }

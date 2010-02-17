@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * A checksum activityDataObject is used to communicate checksums from the host
@@ -143,8 +144,8 @@ public class ChecksumActivity extends AbstractActivity {
         return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new ChecksumActivityDataObject(source.getJID(), path
-            .toSPathDataObject(), hash, length);
+            .toSPathDataObject(project), hash, length);
     }
 }

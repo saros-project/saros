@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.editor;
 
-import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 
 public interface ISharedEditorListener {
 
@@ -19,7 +19,7 @@ public interface ISharedEditorListener {
      *            the user which removed an editor (can be the local user)
      * 
      */
-    public void activeEditorChanged(User user, IPath path);
+    public void activeEditorChanged(User user, SPath path);
 
     /**
      * Is fired when the given editor is removed from the list of editors that
@@ -31,7 +31,7 @@ public interface ISharedEditorListener {
      * @param user
      *            the user which removed an editor (can be the local user)
      */
-    public void editorRemoved(User user, IPath path);
+    public void editorRemoved(User user, SPath path);
 
     /**
      * Is fired when the driver editor is saved.
@@ -45,7 +45,7 @@ public interface ISharedEditorListener {
      *            <code>false</code> if it is an replication of an action from
      *            another participant of the shared project.
      */
-    public void driverEditorSaved(IPath path, boolean replicated);
+    public void driverEditorSaved(SPath path, boolean replicated);
 
     /**
      * Is fired when the follow mode is changed.
@@ -80,7 +80,7 @@ public interface ISharedEditorListener {
      *            the character based offset inside the document where this edit
      *            happened
      */
-    public void textEditRecieved(User user, IPath editor, String text,
+    public void textEditRecieved(User user, SPath editor, String text,
         String replacedText, int offset);
 
 }

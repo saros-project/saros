@@ -93,7 +93,10 @@ public class InviteAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.invite(getSelected());
+                sessionManager.invite(getSelected(),
+                    "You have been invited to a Saros session by "
+                        + sessionManager.getSharedProject().getHost()
+                            .getHumanReadableName());
             }
         });
     }

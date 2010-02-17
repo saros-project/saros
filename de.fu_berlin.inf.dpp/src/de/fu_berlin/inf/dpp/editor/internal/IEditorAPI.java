@@ -2,15 +2,14 @@ package de.fu_berlin.inf.dpp.editor.internal;
 
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
@@ -24,12 +23,12 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 public interface IEditorAPI {
 
     /**
-     * Opens the editor with given file. Needs to be called from an UI thread.
+     * Opens the editor with given path. Needs to be called from an UI thread.
      * 
      * @return the opened editor or <code>null</code> if the editor couldn't be
      *         opened.
      */
-    public IEditorPart openEditor(IFile file);
+    public IEditorPart openEditor(SPath path);
 
     /**
      * Closes the given editorpart.
@@ -77,7 +76,7 @@ public interface IEditorAPI {
      *         the given editor is not showing a file or the file is not
      *         referenced via a path in the project.
      */
-    public IPath getEditorPath(IEditorPart editorPart);
+    public SPath getEditorPath(IEditorPart editorPart);
 
     /**
      * Show an viewport annotation in the given editorPart at the given viewport
@@ -140,7 +139,7 @@ public interface IEditorAPI {
      * Syntactic sugar for getting the path of the IEditorPart returned by
      * getActiveEditor()
      */
-    public IPath getActiveEditorPath();
+    public SPath getActiveEditorPath();
 
     /**
      * Returns the resource currently displayed in the given editorPart, this

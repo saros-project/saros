@@ -57,15 +57,13 @@ public class InvitationHandler {
                     return;
                 }
 
-                log
-                    .debug("Inv" + Util.prefix(fromJID)
-                        + ": Received invitation (invitationID: "
-                        + invInfo.invitationID + ", sessionID: "
-                        + invInfo.sessionID + ", projectName: "
-                        + invInfo.projectName + ", colorID: " + invInfo.colorID
-                        + ", sarosVersion: " + invInfo.versionInfo.version
-                        + ", sarosComp: " + invInfo.versionInfo.compatibility
-                        + ")");
+                log.debug("Inv" + Util.prefix(fromJID)
+                    + ": Received invitation (invitationID: "
+                    + invInfo.invitationID + ", sessionID: "
+                    + invInfo.sessionID + ", projectID: " + invInfo.projectID
+                    + ", colorID: " + invInfo.colorID + ", sarosVersion: "
+                    + invInfo.versionInfo.version + ", sarosComp: "
+                    + invInfo.versionInfo.compatibility + ")");
 
                 String sessionID = invInfo.sessionID;
                 String invitationID = invInfo.invitationID;
@@ -74,14 +72,14 @@ public class InvitationHandler {
                     SessionIDObservable.NOT_IN_SESSION)) {
                     sessionManager.invitationReceived(
                         new JID(packet.getFrom()), sessionID,
-                        invInfo.projectName, invInfo.projectDesc,
+                        invInfo.projectID, invInfo.projectDesc,
                         invInfo.colorID, invInfo.versionInfo,
                         invInfo.sessionStart, sarosUI, invitationID);
                 } else {
-                    transmitter.sendMessageToUser(new JID(packet
-                        .getFrom()), cancelInviteExtension.create(sessionID,
-                        "I am already in a Saros-Session,"
-                            + "try to contact me by chat first."));
+                    transmitter.sendMessageToUser(new JID(packet.getFrom()),
+                        cancelInviteExtension.create(sessionID,
+                            "I am already in a Saros-Session,"
+                                + "try to contact me by chat first."));
                 }
             }
         }, invExtProv.getPacketFilter());

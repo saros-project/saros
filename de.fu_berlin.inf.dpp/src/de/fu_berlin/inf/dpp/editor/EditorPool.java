@@ -5,10 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -19,8 +17,10 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -43,7 +43,7 @@ class EditorPool {
      * IPath. This can be potentielly many because a IFile (which can be
      * identified using a IPath) can be opened in multiple editors.
      */
-    protected Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
+    protected Map<SPath, HashSet<IEditorPart>> editorParts = new HashMap<SPath, HashSet<IEditorPart>>();
 
     /**
      * The editorInputMap contains all IEditorParts which are managed by the
@@ -77,7 +77,7 @@ class EditorPool {
      */
     public void add(IEditorPart editorPart) {
 
-        IPath path = this.editorManager.editorAPI.getEditorPath(editorPart);
+        SPath path = editorManager.editorAPI.getEditorPath(editorPart);
 
         if (path == null) {
             log.warn("Could not find path/resource for editor "
@@ -85,7 +85,7 @@ class EditorPool {
             return;
         }
 
-        log.trace("EditorPool.add (" + path.toOSString() + ") invoked");
+        log.trace("EditorPool.add (" + path.toString() + ") invoked");
 
         if (getEditors(path).contains(editorPart)) {
             log.error("EditorPart was added twice to the EditorPool: "
@@ -136,7 +136,7 @@ class EditorPool {
             .currentTimeMillis());
     }
 
-    public IPath getCurrentPath(IEditorPart editorPart, IProject project) {
+    public SPath getCurrentPath(IEditorPart editorPart, ISharedProject project) {
 
         IEditorInput input = editorInputMap.get(editorPart);
         if (input == null) {
@@ -152,7 +152,7 @@ class EditorPool {
             return null;
         }
 
-        if (!ObjectUtils.equals(file.getProject(), project)) {
+        if (!project.isShared(file.getProject())) {
             log.warn("File is from incorrect project: " + file.getProject()
                 + " should be " + project + ": " + file, new StackTrace());
         }
@@ -161,7 +161,7 @@ class EditorPool {
         if (path == null) {
             log.warn("Could not find path for editor " + editorPart.getTitle());
         }
-        return path;
+        return new SPath(file);
     }
 
     /**
@@ -182,7 +182,7 @@ class EditorPool {
      * @return {@link IPath} of the Editor that was removed from the Pool, or
      *         <code>null</code> on error.
      */
-    public IPath remove(IEditorPart editorPart, IProject project) {
+    public IPath remove(IEditorPart editorPart, ISharedProject project) {
 
         log.trace("EditorPool.remove " + editorPart + "invoked");
 
@@ -200,7 +200,7 @@ class EditorPool {
             return null;
         }
 
-        if (!ObjectUtils.equals(file.getProject(), project)) {
+        if (!project.isShared(file.getProject())) {
             log.warn("File is from incorrect project: " + file.getProject()
                 + " should be " + project + ": " + file, new StackTrace());
         }
@@ -212,7 +212,7 @@ class EditorPool {
         }
 
         // TODO Remove should remove empty HashSets
-        if (!getEditors(path).remove(editorPart)) {
+        if (!getEditors(new SPath(file)).remove(editorPart)) {
             log.error("EditorPart was never added to the EditorPool: "
                 + editorPart.getTitle());
             return null;
@@ -251,7 +251,7 @@ class EditorPool {
      * @return set of relating IEditorPart
      * 
      */
-    public Set<IEditorPart> getEditors(IPath path) {
+    public Set<IEditorPart> getEditors(SPath path) {
 
         log.trace(".getEditors(" + path.toString() + ") invoked");
         if (!editorParts.containsKey(path)) {
@@ -283,7 +283,7 @@ class EditorPool {
     /**
      * Removes all {@link IEditorPart} from the EditorPool.
      */
-    public void removeAllEditors(IProject project) {
+    public void removeAllEditors(ISharedProject project) {
 
         log.trace("EditorPool.removeAllEditors invoked");
 

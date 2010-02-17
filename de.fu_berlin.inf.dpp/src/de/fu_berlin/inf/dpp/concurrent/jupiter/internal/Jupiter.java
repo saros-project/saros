@@ -28,7 +28,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -90,14 +89,14 @@ public class Jupiter implements Algorithm {
     }
 
     /**
-     * @see Algorithm#generateJupiterActivity(Operation, User, IPath)
+     * @see Algorithm#generateJupiterActivity(Operation, User, SPath)
      */
     public JupiterActivity generateJupiterActivity(Operation op, User source,
-        IPath editor) {
+        SPath editor) {
 
         // send(op, myMsgs, otherMsgs);
         JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
-            op, source, new SPath(editor));
+            op, source, editor);
 
         // add(op, myMsgs) to outgoing;
         this.ackJupiterActivityList.add(new OperationWrapper(op,
@@ -324,7 +323,7 @@ public class Jupiter implements Algorithm {
      * @valueObject Instances of this class should be treated as value objects
      *              and should be treated as immutable.
      * 
-     * @see Jupiter#generateJupiterActivity(Operation, User, IPath)
+     * @see Jupiter#generateJupiterActivity(Operation, User, SPath)
      * @see Jupiter#receiveJupiterActivity(JupiterActivity)
      */
     protected static class OperationWrapper {

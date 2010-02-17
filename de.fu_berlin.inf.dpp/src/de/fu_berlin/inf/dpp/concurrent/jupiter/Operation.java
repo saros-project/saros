@@ -2,9 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 
@@ -23,7 +22,7 @@ public interface Operation {
      * operation if applied in order to the editor denoted by the given path by
      * the user identified by the given source.
      */
-    List<TextEditActivity> toTextEdit(IPath path, User source);
+    List<TextEditActivity> toTextEdit(SPath path, User source);
 
     /**
      * Returns a list of all operations represented by this operation that

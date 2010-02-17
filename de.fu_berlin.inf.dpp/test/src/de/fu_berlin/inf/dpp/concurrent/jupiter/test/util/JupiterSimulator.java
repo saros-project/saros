@@ -6,14 +6,19 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
+import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 public class JupiterSimulator {
 
@@ -25,22 +30,34 @@ public class JupiterSimulator {
     public Peer server;
 
     public JupiterSimulator(String document) {
-        client = new Peer(new Jupiter(true), document);
-        server = new Peer(new Jupiter(false), document);
+
+        IProject project = SarosTestUtils.replayFluid(EasyMock
+            .createMock(IProject.class));
+        IPath path = new Path("test");
+
+        client = new Peer(new Jupiter(true), document, project, path);
+        server = new Peer(new Jupiter(false), document, project, path);
     }
 
     public class Peer {
 
-        public Peer(Algorithm algorithm, String document) {
+        protected Algorithm algorithm = new Jupiter(true);
+
+        protected List<JupiterActivity> inQueue = new LinkedList<JupiterActivity>();
+
+        protected Document document;
+
+        protected IPath path;
+
+        protected IProject project;
+
+        public Peer(Algorithm algorithm, String document, IProject project,
+            IPath path) {
             this.algorithm = algorithm;
-            this.document = new Document(document);
+            this.document = new Document(document, project, path);
+            this.project = project;
+            this.path = path;
         }
-
-        Algorithm algorithm = new Jupiter(true);
-
-        List<JupiterActivity> inQueue = new LinkedList<JupiterActivity>();
-
-        Document document;
 
         public void generate(Operation operation) {
 
@@ -50,7 +67,8 @@ public class JupiterSimulator {
             User user = JupiterTestCase.createUserMock("DUMMY");
 
             JupiterActivity jupiterActivity = algorithm
-                .generateJupiterActivity(operation, user, new Path("DUMMY"));
+                .generateJupiterActivity(operation, user, new SPath(project,
+                    path));
 
             if (this == client) {
                 server.inQueue.add(jupiterActivity);

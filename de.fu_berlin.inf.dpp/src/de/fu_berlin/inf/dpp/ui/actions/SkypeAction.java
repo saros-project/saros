@@ -80,9 +80,17 @@ public class SkypeAction extends SelectionProviderAction {
         }
         Util.runSafeAsync("SkypeAction-", log, new Runnable() {
             public void run() {
-                setEnabled(false);
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        setEnabled(false);
+                    }
+                });
                 skypeURL = skypeManager.getSkypeURL(rosterEntry.getUser());
-                setEnabled(skypeURL != null);
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        setEnabled(skypeURL != null);
+                    }
+                });
             }
         });
     }

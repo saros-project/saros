@@ -1,18 +1,21 @@
 package de.fu_berlin.inf.dpp.concurrent.undo;
 
+import static org.easymock.classextension.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
+import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 /**
  * testing TextOperationHistory and UndoManager
@@ -21,8 +24,11 @@ public class UndoTest {
 
     // private static Logger log = Logger.getLogger(UndoTest.class.getName());
 
-    protected IPath path1 = new Path("path1");
-    protected IPath path2 = new Path("path2");
+    protected IProject project = SarosTestUtils
+        .replayFluid(createMock(IProject.class));
+
+    protected SPath path1 = new SPath(project, new Path("path1"));
+    protected SPath path2 = new SPath(project, new Path("path2"));
 
     protected OperationHistory history;
     protected UndoManager undoManager;
@@ -37,11 +43,11 @@ public class UndoTest {
         return new NoOperation();
     }
 
-    protected Operation undo(IPath path) {
+    protected Operation undo(SPath path) {
         return undoManager.calcUndoOperation(path);
     }
 
-    protected Operation redo(IPath path) {
+    protected Operation redo(SPath path) {
         return undoManager.calcRedoOperation(path);
     }
 

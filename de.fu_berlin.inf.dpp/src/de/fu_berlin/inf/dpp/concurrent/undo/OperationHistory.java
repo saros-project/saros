@@ -5,8 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.core.runtime.IPath;
-
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
 /**
@@ -19,7 +18,7 @@ public class OperationHistory {
     // TODO: has to be dependent on the Eclipse properties
     public final int MAX_SIZE = 1000;
 
-    protected HashMap<IPath, LinkedList<EditorHistoryEntry>> history = new HashMap<IPath, LinkedList<EditorHistoryEntry>>();
+    protected HashMap<SPath, LinkedList<EditorHistoryEntry>> history = new HashMap<SPath, LinkedList<EditorHistoryEntry>>();
 
     /**
      * An operation can have three types. A local operation can be undone. A
@@ -88,7 +87,7 @@ public class OperationHistory {
      * @param editor
      *            in which the operation was executed
      */
-    public void add(IPath editor, Type type, Operation operation) {
+    public void add(SPath editor, Type type, Operation operation) {
 
         LinkedList<EditorHistoryEntry> editorHistory = history.get(editor);
 
@@ -110,7 +109,7 @@ public class OperationHistory {
      * @return the latest local Operation in the editor's history, null if there
      *         is none
      */
-    public Operation getLatestLocal(IPath editor) {
+    public Operation getLatestLocal(SPath editor) {
 
         return getLatestOfType(Type.LOCAL, editor);
     }
@@ -119,12 +118,12 @@ public class OperationHistory {
      * @return the latest Operation in the editor's history that can be redone,
      *         null if there is none
      */
-    public Operation getLatestRedoable(IPath editor) {
+    public Operation getLatestRedoable(SPath editor) {
 
         return getLatestOfType(Type.REDOABLE, editor);
     }
 
-    protected Operation getLatestOfType(Type type, IPath editor) {
+    protected Operation getLatestOfType(Type type, SPath editor) {
 
         List<EditorHistoryEntry> editorHistory = history.get(editor);
         if (editorHistory == null)
@@ -141,8 +140,7 @@ public class OperationHistory {
      * @return all entries up to the latest local Operation (exclusive) in
      *         reverse order (oldest first)
      */
-    public List<EditorHistoryEntry> entriesToLatestLocal(IPath editor) {
-
+    public List<EditorHistoryEntry> entriesToLatestLocal(SPath editor) {
         return entriesToLatestOfType(Type.LOCAL, editor);
     }
 
@@ -150,8 +148,7 @@ public class OperationHistory {
      * @return all entries up to the latest redoable Operation (exclusive) in
      *         reverse order (oldest first)
      */
-    public List<EditorHistoryEntry> entriesToLatestRedoable(IPath editor) {
-
+    public List<EditorHistoryEntry> entriesToLatestRedoable(SPath editor) {
         return entriesToLatestOfType(Type.REDOABLE, editor);
     }
 
@@ -160,7 +157,7 @@ public class OperationHistory {
      *         (exclusive) in reverse order (oldest first)
      */
     protected List<EditorHistoryEntry> entriesToLatestOfType(Type type,
-        IPath editor) {
+        SPath editor) {
 
         List<EditorHistoryEntry> result = new LinkedList<EditorHistoryEntry>();
 
@@ -178,7 +175,7 @@ public class OperationHistory {
         return result;
     }
 
-    public void replaceType(IPath editor, Operation operation, Type oldType,
+    public void replaceType(SPath editor, Operation operation, Type oldType,
         Type newType) {
 
         EditorHistoryEntry oldEntry = new EditorHistoryEntry(oldType, operation);
@@ -203,7 +200,7 @@ public class OperationHistory {
             + operation + ", not in history");
     }
 
-    public void clearEditorHistory(IPath editor) {
+    public void clearEditorHistory(SPath editor) {
         history.remove(editor);
     }
 
@@ -211,19 +208,19 @@ public class OperationHistory {
         history.clear();
     }
 
-    public List<EditorHistoryEntry> getAllEntries(IPath editor) {
+    public List<EditorHistoryEntry> getAllEntries(SPath editor) {
         return (history.get(editor) != null) ? history.get(editor)
             : new LinkedList<EditorHistoryEntry>();
     }
 
-    public boolean canUndo(IPath editor) {
+    public boolean canUndo(SPath editor) {
         return getLatestLocal(editor) != null;
     }
 
     /**
      * Redo should only be possible if there was executed an undo.
      */
-    public boolean canRedo(IPath editor) {
+    public boolean canRedo(SPath editor) {
         return getLatestRedoable(editor) != null;
     }
 }

@@ -2,8 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.management;
 
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.IPath;
-
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
@@ -29,12 +28,12 @@ public class JupiterClient {
      * 
      * @host and @client
      */
-    protected final HashMap<IPath, Jupiter> clientDocs = new HashMap<IPath, Jupiter>();
+    protected final HashMap<SPath, Jupiter> clientDocs = new HashMap<SPath, Jupiter>();
 
     /**
      * @host and @client
      */
-    protected synchronized Jupiter get(IPath path) {
+    protected synchronized Jupiter get(SPath path) {
 
         Jupiter clientDoc = this.clientDocs.get(path);
         if (clientDoc == null) {
@@ -46,20 +45,19 @@ public class JupiterClient {
 
     public synchronized Operation receive(JupiterActivity jupiterActivity)
         throws TransformationException {
-        return get(jupiterActivity.getEditorPath().getProjectRelativePath())
-            .receiveJupiterActivity(jupiterActivity);
+        return get(jupiterActivity.getEditorPath()).receiveJupiterActivity(
+            jupiterActivity);
     }
 
     public synchronized boolean isCurrent(
         ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
 
-        return get(
-            checksumActivityDataObject.getPath().getProjectRelativePath())
-            .isCurrent(checksumActivityDataObject.getTimestamp());
+        return get(checksumActivityDataObject.getPath()).isCurrent(
+            checksumActivityDataObject.getTimestamp());
     }
 
-    public synchronized void reset(IPath path) {
+    public synchronized void reset(SPath path) {
         this.clientDocs.remove(path);
     }
 
@@ -69,11 +67,9 @@ public class JupiterClient {
 
     public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
-        IPath projectRelativePath = textEdit.getEditor()
-            .getProjectRelativePath();
-        return get(projectRelativePath).generateJupiterActivity(
-            textEdit.toOperation(), sharedProject.getLocalUser(),
-            projectRelativePath);
+        SPath path = textEdit.getEditor();
+        return get(path).generateJupiterActivity(textEdit.toOperation(),
+            sharedProject.getLocalUser(), path);
     }
 
     /**
@@ -85,9 +81,8 @@ public class JupiterClient {
     public synchronized ChecksumActivity withTimestamp(
         ChecksumActivity checksumActivityDataObject) {
 
-        return get(
-            checksumActivityDataObject.getPath().getProjectRelativePath())
-            .withTimestamp(checksumActivityDataObject);
+        return get(checksumActivityDataObject.getPath()).withTimestamp(
+            checksumActivityDataObject);
     }
 
 }

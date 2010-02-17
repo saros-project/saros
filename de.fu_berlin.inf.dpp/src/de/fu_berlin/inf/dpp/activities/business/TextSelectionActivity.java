@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class TextSelectionActivity extends AbstractActivity {
 
@@ -100,8 +101,8 @@ public class TextSelectionActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject() {
+    public IActivityDataObject getActivityDataObject(ISharedProject project) {
         return new TextSelectionActivityDataObject(source.getJID(), offset,
-            length, path.toSPathDataObject());
+            length, path.toSPathDataObject(project));
     }
 }

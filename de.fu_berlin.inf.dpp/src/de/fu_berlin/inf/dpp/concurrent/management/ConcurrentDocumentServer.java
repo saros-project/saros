@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
@@ -99,8 +99,7 @@ public class ConcurrentDocumentServer implements Disposable {
         @Override
         public void receive(FileActivity fileActivity) {
             if (fileActivity.getType() == FileActivity.Type.Removed) {
-                server.removePath(fileActivity.getPath()
-                    .getProjectRelativePath());
+                server.removePath(fileActivity.getPath());
             }
         }
     };
@@ -187,17 +186,17 @@ public class ConcurrentDocumentServer implements Disposable {
      * Resets the JupiterServer for the given combination and path and user.
      * 
      * When this is called on the host, a call to
-     * {@link ConcurrentDocumentClient#reset(IPath)} should be executed at the
+     * {@link ConcurrentDocumentClient#reset(SPath)} should be executed at the
      * same time on the side of the given user.
      * 
      * @host
      */
-    public synchronized void reset(JID jid, IPath path) {
+    public synchronized void reset(JID jid, SPath path) {
 
         assert sharedProject.isHost();
 
         log.debug("Resetting jupiter server for " + Util.prefix(jid) + ": "
-            + path.toOSString());
+            + path.toString());
         this.server.reset(path, jid);
     }
 

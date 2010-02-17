@@ -36,6 +36,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -250,9 +251,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return true;
             }
 
-            if (resource.getProject() != sharedProject.getProject()) {
+            if (!sharedProject.isShared(resource.getProject()))
                 return false;
-            }
 
             if (resource.isDerived()) {
                 return false;
@@ -280,14 +280,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.ADDED:
 
                 return new FolderActivity(sharedProject.getLocalUser(),
-                    FolderActivity.Type.Created, new SPath(resource
-                        .getProjectRelativePath()));
+                    FolderActivity.Type.Created, new SPath(resource));
 
             case IResourceDelta.REMOVED:
 
                 return new FolderActivity(sharedProject.getLocalUser(),
-                    FolderActivity.Type.Removed, new SPath(resource
-                        .getProjectRelativePath()));
+                    FolderActivity.Type.Removed, new SPath(resource));
 
             default:
                 return null;
@@ -314,20 +312,42 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 // is this an "ADD" while moving/renaming a file?
                 if (isMovedFrom(delta)) {
 
-                    IPath newPath = resource.getFullPath().makeRelative();
-                    IPath oldPath = delta.getMovedFromPath().makeRelative();
+                    IPath newPath = resource.getFullPath();
+                    // Adds have getMovedFrom set:
+                    IPath oldPath = delta.getMovedFromPath();
 
-                    newPath = newPath.removeFirstSegments(1);
-                    oldPath = oldPath.removeFirstSegments(1);
+                    IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
+                        .getRoot();
 
-                    try {
-                        return FileActivity.moved(sharedProject.getProject(),
-                            sharedProject.getLocalUser(), new SPath(newPath),
-                            new SPath(oldPath), isContentChange(delta));
-                    } catch (IOException e) {
-                        log
-                            .warn("Resource could not be read for sending to peers:"
-                                + resource.getLocation());
+                    IProject newProject = root.getProject(newPath.segment(0));
+                    IProject oldProject = root.getProject(oldPath.segment(0));
+
+                    if (sharedProject.isShared(newProject)) {
+                        if (sharedProject.isShared(oldProject)) {
+                            // Moving inside the shared project
+                            try {
+                                return FileActivity.moved(sharedProject
+                                    .getLocalUser(), new SPath(newProject,
+                                    newPath.removeFirstSegments(1)),
+                                    new SPath(oldProject, oldPath
+                                        .removeFirstSegments(1)),
+                                    isContentChange(delta));
+                            } catch (IOException e) {
+                                log.warn("Resource could not be read for"
+                                    + " sending to peers:"
+                                    + resource.getLocation());
+                            }
+                        } else {
+                            // Moving a file into the shared project
+                            // -> Treat like an add!
+
+                            // Fall-through
+                        }
+                    } else {
+                        // Moving away!
+                        return FileActivity.removed(sharedProject
+                            .getLocalUser(), new SPath(resource),
+                            Purpose.ACTIVITY);
                     }
                 }
 
@@ -337,16 +357,13 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 // CHANGED
                 // events for files that are also handled by the editor
                 // manager.
-                if (editorManager.isOpened(resource.getProjectRelativePath())) {
+                if (editorManager.isOpened(new SPath(resource))) {
                     // TODO Think about if this is needed...
                     return null;
                 }
                 try {
-
-                    return FileActivity.created(sharedProject.getProject(),
-                        sharedProject.getLocalUser(), new SPath(resource
-                            .getFullPath().makeRelative()
-                            .removeFirstSegments(1)), Purpose.ACTIVITY);
+                    return FileActivity.created(sharedProject.getLocalUser(),
+                        new SPath(resource), Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
                         + resource.getLocation(), e);
@@ -354,11 +371,26 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return null;
 
             case IResourceDelta.REMOVED:
-                if (isMoved(delta)) // Ignore "REMOVED" while moving
-                    return null;
+                if (isMoved(delta)) {
+
+                    // REMOVED deltas have MovedTo set
+                    IPath newPath = delta.getMovedToPath();
+
+                    IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
+                        .getRoot();
+
+                    IProject newProject = root.getProject(newPath.segment(0));
+
+                    if (sharedProject.isShared(newProject)) {
+                        // Ignore "REMOVED" while moving into shared project
+                        return null;
+                    }
+                    // else moving file away from shared project, need to tell
+                    // others to delete! Fall-through...
+                }
+
                 return FileActivity.removed(sharedProject.getLocalUser(),
-                    new SPath(resource.getProjectRelativePath()),
-                    Purpose.ACTIVITY);
+                    new SPath(resource), Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -536,10 +568,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             return;
         }
 
-        IProject project = this.sharedProject.getProject();
-
-        IPath path = activity.getPath().getProjectRelativePath();
-        IFile file = sharedProject.getProject().getFile(path);
+        SPath path = activity.getPath();
+        IFile file = path.getFile();
 
         if (activity.isRecovery()) {
             log.info("Received consistency file: " + activity);
@@ -564,23 +594,20 @@ public class SharedResourcesManager implements IResourceChangeListener,
             FileUtil.delete(file);
         } else if (activity.getType() == FileActivity.Type.Moved) {
 
-            IPath newFilePath = activity.getPath().getProjectRelativePath();
-            IResource fileOldResource = project.findMember(activity
-                .getOldPath().getProjectRelativePath());
-            IResource nfpR = project.getFile(newFilePath);
-            newFilePath = nfpR.getFullPath();
+            IPath newFilePath = activity.getPath().getFile().getFullPath();
 
-            if (fileOldResource == null) {
+            IResource oldResource = activity.getOldPath().getFile();
+
+            if (oldResource == null) {
                 log.error(".exec Old File is not availible while moving "
                     + activity.getOldPath());
             } else
-                FileUtil.move(newFilePath, fileOldResource);
+                FileUtil.move(newFilePath, oldResource);
 
             // while moving content of the file changed
             if (activity.getContents() != null) {
 
-                IFile fileResource = (IFile) project.findMember(newFilePath
-                    .removeFirstSegments(1));
+                IFile fileResource = activity.getPath().getFile();
 
                 fileResource.setContents(new ByteArrayInputStream(activity
                     .getContents()), true, true, null);
@@ -598,8 +625,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     protected void exec(FolderActivity activity) throws CoreException {
-        IFolder folder = this.sharedProject.getProject().getFolder(
-            activity.getPath().getProjectRelativePath());
+
+        SPath path = activity.getPath();
+
+        IFolder folder = path.getProject().getFolder(
+            path.getProjectRelativePath());
 
         if (activity.getType() == FolderActivity.Type.Created) {
             FileUtil.create(folder);

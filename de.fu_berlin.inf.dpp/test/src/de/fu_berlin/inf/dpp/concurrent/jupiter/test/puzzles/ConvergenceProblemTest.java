@@ -29,10 +29,10 @@ public class ConvergenceProblemTest extends JupiterTestCase {
 
         /* O2 || O1 */
         c[0].sendOperation(new InsertOperation(3, "f"), 100);
-        c[1].sendOperation(new DeleteOperation(2, "r"), 200);
-        c[2].sendOperation(new InsertOperation(2, "f"), 1000);
+        c[1].sendOperation(new DeleteOperation(2, "r"), 300);
+        c[2].sendOperation(new InsertOperation(2, "f"), 500);
 
-        Thread.sleep(1500);
+        Thread.sleep(700);
 
         assertEqualDocs("coffe", c);
     }
@@ -46,11 +46,10 @@ public class ConvergenceProblemTest extends JupiterTestCase {
         ClientSynchronizedDocument[] c = setUp(5, "abcd");
 
         c[0].sendOperation(new DeleteOperation(1, "b"), 100);
-        c[3].sendOperation(new InsertOperation(3, "x"), 1000);
-        c[4].sendOperation(new DeleteOperation(3, "d"), 1100);
-
-        c[0].sendOperation(new InsertOperation(3, "x"), 1500);
-        Thread.sleep(2000);
+        c[3].sendOperation(new InsertOperation(3, "x"), 300);
+        c[4].sendOperation(new DeleteOperation(3, "d"), 500);
+        c[0].sendOperation(new InsertOperation(3, "x"), 700);
+        Thread.sleep(1200);
 
         assertEqualDocs("acxx", c);
     }

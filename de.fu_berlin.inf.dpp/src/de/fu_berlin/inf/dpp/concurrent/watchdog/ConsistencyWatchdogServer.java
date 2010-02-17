@@ -6,9 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -57,7 +55,7 @@ public class ConsistencyWatchdogServer extends Job {
     protected static final long INTERVAL = 10000;
 
     // this map holds for all open editors of all participants the checksums
-    protected final HashMap<IPath, DocumentChecksum> docsChecksums = new HashMap<IPath, DocumentChecksum>();
+    protected final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
 
     @Inject
     protected Saros saros;
@@ -133,28 +131,26 @@ public class ConsistencyWatchdogServer extends Job {
             return Status.OK_STATUS;
         }
 
-        Set<IPath> missingDocuments = new HashSet<IPath>(docsChecksums.keySet());
+        Set<SPath> missingDocuments = new HashSet<SPath>(docsChecksums.keySet());
 
-        Set<IPath> localEditors = editorManager.getLocallyOpenEditors();
-        Set<IPath> remoteEditors = editorManager.getRemoteOpenEditors();
-        Set<IPath> allEditors = new HashSet<IPath>();
+        Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
+        Set<SPath> remoteEditors = editorManager.getRemoteOpenEditors();
+        Set<SPath> allEditors = new HashSet<SPath>();
         allEditors.addAll(localEditors);
         allEditors.addAll(remoteEditors);
 
-        IProject project = sharedProject.getProject();
-
         // Update Checksums for all open documents
-        for (IPath docPath : allEditors) {
+        for (SPath docPath : allEditors) {
 
             if (monitor.isCanceled())
                 return Status.CANCEL_STATUS;
 
             updateChecksum(missingDocuments, localEditors, remoteEditors,
-                project, docPath);
+                docPath);
         }
 
         // Unregister all documents that are no longer there
-        for (IPath missing : missingDocuments) {
+        for (SPath missing : missingDocuments) {
             docsChecksums.remove(missing).dispose();
         }
 
@@ -166,14 +162,14 @@ public class ConsistencyWatchdogServer extends Job {
         return Status.OK_STATUS;
     }
 
-    protected void updateChecksum(final Set<IPath> missingDocuments,
-        final Set<IPath> localEditors, final Set<IPath> remoteEditors,
-        final IProject project, final IPath docPath) {
+    protected void updateChecksum(final Set<SPath> missingDocuments,
+        final Set<SPath> localEditors, final Set<SPath> remoteEditors,
+        final SPath docPath) {
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
 
-                IFile file = project.getFile(docPath);
+                IFile file = docPath.getFile();
 
                 IDocument doc;
                 IDocumentProvider provider = null;
@@ -188,7 +184,7 @@ public class ConsistencyWatchdogServer extends Job {
                         doc = provider.getDocument(input);
                     } catch (CoreException e) {
                         log.warn("Could not check checksum of file "
-                            + docPath.toOSString());
+                            + docPath.toString());
                         provider = null;
                         doc = null;
                     }
@@ -232,9 +228,8 @@ public class ConsistencyWatchdogServer extends Job {
 
                     // Sent an checksum to everybody
                     ChecksumActivity checksumActivity = new ChecksumActivity(
-                        sharedProject.getLocalUser(), new SPath(checksum
-                            .getPath()), checksum.getHash(), checksum
-                            .getLength());
+                        sharedProject.getLocalUser(), checksum.getPath(),
+                        checksum.getHash(), checksum.getLength());
 
                     sharedProject.activityCreated(checksumActivity);
 

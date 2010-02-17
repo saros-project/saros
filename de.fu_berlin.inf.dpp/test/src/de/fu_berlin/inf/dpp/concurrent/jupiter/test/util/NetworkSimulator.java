@@ -3,8 +3,13 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 /**
  * This class simulates a network.
@@ -23,6 +28,11 @@ public class NetworkSimulator {
     private HashMap<JID, NetworkEventHandler> clients;
 
     private RuntimeException error;
+
+    public IProject project = SarosTestUtils.replayFluid(EasyMock
+        .createMock(IProject.class));
+
+    public IPath path = new Path("dummy");
 
     public NetworkSimulator() {
         clients = new HashMap<JID, NetworkEventHandler>();

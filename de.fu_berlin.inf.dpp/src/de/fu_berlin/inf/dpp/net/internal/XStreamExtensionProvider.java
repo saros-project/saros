@@ -61,6 +61,11 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
 
     protected XStream xstream;
 
+    /**
+     * Create a new XStreamExtensionProvider using the given elementName as the
+     * XML root element. The Provider is able to understand the given classes,
+     * which should be annotated using XStream annotations.
+     */
     public XStreamExtensionProvider(String elementName, Class<?>... classes) {
         this.elementName = elementName;
         this.namespace = PacketExtensionUtils.NAMESPACE;

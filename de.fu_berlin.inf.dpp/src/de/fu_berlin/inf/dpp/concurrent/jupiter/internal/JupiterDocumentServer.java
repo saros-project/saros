@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -29,9 +29,13 @@ public class JupiterDocumentServer {
      */
     protected final HashMap<JID, Jupiter> proxies = new HashMap<JID, Jupiter>();
 
-    protected final IPath editor;
+    protected final SPath editor;
 
-    public JupiterDocumentServer(IPath path) {
+    /**
+     * Create a new JupiterDocument (server-side) representing the document
+     * identified by the given SPath
+     */
+    public JupiterDocumentServer(SPath path) {
         this.editor = path;
     }
 

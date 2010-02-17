@@ -418,8 +418,9 @@ public class FileUtil {
 
     /**
      * Moves the given {@link IResource} to the place, that is pointed by the
-     * given {@link IPath}. This Method excepts relative to workspace Path and
-     * Resource.
+     * given {@link IPath}.
+     * 
+     * This method excepts both variables to be relative to the workspace.
      * 
      * @param destination
      *            Destination of moving the given resource.

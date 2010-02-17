@@ -49,6 +49,9 @@ public interface ISessionManager {
      * Creates a shared project for a session hosted remotely. The returned
      * project is NOT started!
      * 
+     * @param projectID
+     *            the ID to use when sending activities. This ID is set by the
+     *            host for all session participants
      * @param project
      *            the local Eclipse project which should be used to replicate
      *            the remote shared project.
@@ -59,8 +62,8 @@ public interface ISessionManager {
      * 
      * @return the shared project.
      */
-    public ISharedProject joinSession(IProject project, JID host,
-        int myColorID, DateTime sessionStart);
+    public ISharedProject joinSession(String projectID, IProject project,
+        JID host, int myColorID, DateTime sessionStart);
 
     /**
      * Leaves the currently active session. If the local user is the host, this

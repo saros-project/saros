@@ -111,11 +111,10 @@ import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
@@ -324,8 +323,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(ActivitiesHandler.class);
 
         // Extensions
-        this.container.addComponent(ChecksumErrorExtension.class);
-        this.container.addComponent(ChecksumExtension.class);
         this.container.addComponent(CancelInviteExtension.class);
         this.container.addComponent(UserListExtension.class);
         this.container.addComponent(RequestActivityExtension.class);
@@ -344,6 +341,7 @@ public class Saros extends AbstractUIPlugin {
             .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
         this.container
             .addComponent(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class);
+        this.container.addComponent(ChecksumErrorExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);

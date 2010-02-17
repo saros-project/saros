@@ -55,14 +55,15 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -79,12 +80,11 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmation
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
@@ -135,10 +135,7 @@ public class XMPPTransmitter implements ITransmitter,
     protected SharedProjectObservable sharedProject;
 
     @Inject
-    protected ChecksumErrorExtension checksumErrorExtension;
-
-    @Inject
-    protected ChecksumExtension checksumExtension;
+    protected ChecksumErrorExtensionProvider checksumErrorExtension;
 
     @Inject
     protected LeaveExtension leaveExtension;
@@ -189,16 +186,15 @@ public class XMPPTransmitter implements ITransmitter,
      * Invitation process' help functions --- START
      ********************************************************************************/
 
-    public void sendInvitation(ISharedProject sharedProject, JID guest,
-        String description, int colorID, VersionInfo versionInfo,
-        String invitationID) {
+    public void sendInvitation(String projectID, JID guest, String description,
+        int colorID, VersionInfo versionInfo, String invitationID,
+        DateTime sessionStart) {
 
         log.trace("Sending invitation to " + Util.prefix(guest)
             + " with description " + description);
 
         InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
-            sharedProject.getProject().getName(), description, colorID,
-            versionInfo, sharedProject.getSessionStart());
+            projectID, description, colorID, versionInfo, sessionStart);
 
         sendMessageToUser(guest, invExtProv.create(invInfo));
     }
@@ -613,39 +609,16 @@ public class XMPPTransmitter implements ITransmitter,
     }
 
     public void sendFileChecksumErrorMessage(List<JID> recipients,
-        Set<IPath> paths, boolean resolved) {
+        Set<SPathDataObject> paths, boolean resolved) {
 
         XMPPTransmitter.log.debug("Sending checksum message ("
-            + (resolved ? "resolved" : "error") + ") message of files "
-            + Util.toOSString(paths) + " to " + recipients);
+            + (resolved ? "resolved" : "error") + ") message of files " + paths
+            + " to " + recipients);
 
         for (JID recipient : recipients) {
             sendMessageToProjectUser(recipient, checksumErrorExtension.create(
-                paths, resolved));
-        }
-    }
-
-    public void sendDocChecksumsToClients(List<JID> recipients,
-        Collection<DocumentChecksum> checksums) {
-
-        if (!connection.isConnected())
-            return;
-
-        // TODO: Assert on the client side that this message was send by the
-        // host
-        // assert project.isHost() :
-        // "This message should only be called from the host";
-
-        for (JID jid : recipients) {
-            try {
-                Message message = new Message();
-                message.addExtension(checksumExtension.create(checksums));
-                sendMessageWithoutQueueing(jid, message);
-            } catch (IOException e) {
-                // If checksums are failed to be sent, this is not a big problem
-                log.warn("Sending Checksum to " + Util.prefix(jid)
-                    + " failed: ", e);
-            }
+                sessionID.getValue(), new ArrayList<SPathDataObject>(paths),
+                resolved));
         }
     }
 

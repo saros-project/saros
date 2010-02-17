@@ -14,10 +14,10 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * This model provider is responsible for preventing an session observer from
@@ -69,10 +69,8 @@ public class SharedModelProvider extends ModelProvider {
                 return true;
             }
 
-            if (resource.getProject() != SharedModelProvider.this.sharedProject
-                .getProject()) {
+            if (!sharedProject.isShared(resource.getProject()))
                 return false;
-            }
 
             if ((resource instanceof IFile) || (resource instanceof IFolder)) {
                 this.isAffectingSharedProjectFiles = true;

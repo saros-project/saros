@@ -121,12 +121,12 @@ public class DOptPuzzleTest extends JupiterTestCase {
     public void testConcurrentInsertDeleteOperations() throws Exception {
 
         ClientSynchronizedDocument[] clients = setUp(3, "abc");
-        
-        try {
-            clients[0].sendOperation(new InsertOperation(0, "a"), 0);
-            clients[1].sendOperation(new InsertOperation(1, "b"), 100);
 
-            Thread.sleep(200);
+        try {
+            clients[0].sendOperation(new InsertOperation(0, "a"), 200);
+            clients[1].sendOperation(new InsertOperation(1, "b"), 400);
+
+            Thread.sleep(600);
             clients[2].sendOperation(new DeleteOperation(1, "ab"), 700);
             clients[1].sendOperation(new InsertOperation(2, "by"), 100);
             clients[0].sendOperation(new InsertOperation(1, "x"), 400);

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 
@@ -43,17 +42,17 @@ public class RemoteEditorManager {
      */
     public static class RemoteEditor {
 
-        protected IPath path;
+        protected SPath path;
 
         protected ITextSelection selection;
 
         protected ILineRange viewport;
 
-        public RemoteEditor(IPath path) {
+        public RemoteEditor(SPath path) {
             this.path = path;
         }
 
-        public IPath getPath() {
+        public SPath getPath() {
             return path;
         }
 
@@ -82,7 +81,7 @@ public class RemoteEditorManager {
 
         protected User user;
 
-        protected LinkedHashMap<IPath, RemoteEditor> openEditors = new LinkedHashMap<IPath, RemoteEditor>();
+        protected LinkedHashMap<SPath, RemoteEditor> openEditors = new LinkedHashMap<SPath, RemoteEditor>();
 
         protected RemoteEditor activeEditor;
 
@@ -90,7 +89,7 @@ public class RemoteEditorManager {
             this.user = user;
         }
 
-        public void setSelection(IPath path, ITextSelection selection) {
+        public void setSelection(SPath path, ITextSelection selection) {
 
             if (!openEditors.containsKey(path)) {
                 log.warn("Received selection from user [" + this.user
@@ -102,7 +101,7 @@ public class RemoteEditorManager {
 
         }
 
-        public void setViewport(IPath path, ILineRange viewport) {
+        public void setViewport(SPath path, ILineRange viewport) {
 
             if (!openEditors.containsKey(path)) {
                 log.warn("Viewport for editor which was never activated: "
@@ -114,7 +113,7 @@ public class RemoteEditorManager {
 
         }
 
-        public void activated(IPath path) {
+        public void activated(SPath path) {
             if (path == null) {
                 activeEditor = null;
             } else {
@@ -140,7 +139,7 @@ public class RemoteEditorManager {
          * To query whether the user of this RemoteEditorState has the editor of
          * the given path open use isRemoteOpenEditor().
          */
-        public RemoteEditor getRemoteEditor(IPath path) {
+        public RemoteEditor getRemoteEditor(SPath path) {
             RemoteEditor result = openEditors.get(path);
             if (result == null) {
                 result = new RemoteEditor(path);
@@ -158,7 +157,7 @@ public class RemoteEditorManager {
             return editor;
         }
 
-        public void closed(IPath path) {
+        public void closed(SPath path) {
 
             RemoteEditor remoteEditor = openEditors.remove(path);
 
@@ -178,17 +177,15 @@ public class RemoteEditorManager {
             public void receive(EditorActivity editorActivity) {
 
                 SPath sPath = editorActivity.getPath();
-                IPath projectRelativePath = sPath != null ? sPath
-                    .getProjectRelativePath() : null;
 
                 switch (editorActivity.getType()) {
                 case Activated:
-                    activated(projectRelativePath);
+                    activated(sPath);
                     break;
                 case Saved:
                     break;
                 case Closed:
-                    closed(projectRelativePath);
+                    closed(sPath);
                     break;
                 default:
                     log.warn("Unexpected type: " + editorActivity.getType());
@@ -199,18 +196,16 @@ public class RemoteEditorManager {
             @Override
             public void receive(ViewportActivity viewportActivityDataObject) {
 
-                setViewport(viewportActivityDataObject.getEditor()
-                    .getProjectRelativePath(), viewportActivityDataObject
-                    .getLineRange());
+                setViewport(viewportActivityDataObject.getEditor(),
+                    viewportActivityDataObject.getLineRange());
             }
 
             @Override
             public void receive(
                 TextSelectionActivity textSelectionActivityDataObject) {
 
-                setSelection(textSelectionActivityDataObject.getEditor()
-                    .getProjectRelativePath(), textSelectionActivityDataObject
-                    .getSelection());
+                setSelection(textSelectionActivityDataObject.getEditor(),
+                    textSelectionActivityDataObject.getSelection());
             }
         };
 
@@ -222,13 +217,13 @@ public class RemoteEditorManager {
             return this.activeEditor;
         }
 
-        public boolean isRemoteActiveEditor(IPath path) {
+        public boolean isRemoteActiveEditor(SPath path) {
             if (activeEditor != null && activeEditor.getPath().equals(path))
                 return true;
             return false;
         }
 
-        public boolean isRemoteOpenEditor(IPath path) {
+        public boolean isRemoteOpenEditor(SPath path) {
             return openEditors.containsKey(path);
         }
 
@@ -240,8 +235,8 @@ public class RemoteEditorManager {
          * Returns a snapshot copy of the editors open for the remote user
          * represented by this RemoteEditorState.
          */
-        public Set<IPath> getRemoteOpenEditors() {
-            return new HashSet<IPath>(openEditors.keySet());
+        public Set<SPath> getRemoteOpenEditors() {
+            return new HashSet<SPath>(openEditors.keySet());
         }
 
         public void exec(IActivity activityDataObject) {
@@ -289,7 +284,7 @@ public class RemoteEditorManager {
         editorStates.remove(participant);
     }
 
-    public List<User> getRemoteOpenEditorUsers(IPath path) {
+    public List<User> getRemoteOpenEditorUsers(SPath path) {
         ArrayList<User> result = new ArrayList<User>();
         for (RemoteEditorState state : editorStates.values()) {
             if (state.isRemoteOpenEditor(path))
@@ -298,7 +293,7 @@ public class RemoteEditorManager {
         return result;
     }
 
-    public List<User> getRemoteActiveEditorUsers(IPath path) {
+    public List<User> getRemoteActiveEditorUsers(SPath path) {
 
         ArrayList<User> result = new ArrayList<User>();
 
@@ -316,8 +311,8 @@ public class RemoteEditorManager {
      * 
      * If no editors are opened an empty set is being returned.
      */
-    public Set<IPath> getRemoteOpenEditors() {
-        Set<IPath> result = new HashSet<IPath>();
+    public Set<SPath> getRemoteOpenEditors() {
+        Set<SPath> result = new HashSet<SPath>();
         for (RemoteEditorState state : editorStates.values()) {
             result.addAll(state.openEditors.keySet());
         }
@@ -332,7 +327,7 @@ public class RemoteEditorManager {
      * If no editors are opened by the given user an empty set is being
      * returned.
      */
-    public Set<IPath> getRemoteOpenEditors(User user) {
+    public Set<SPath> getRemoteOpenEditors(User user) {
         return getEditorState(user).getRemoteOpenEditors();
     }
 }

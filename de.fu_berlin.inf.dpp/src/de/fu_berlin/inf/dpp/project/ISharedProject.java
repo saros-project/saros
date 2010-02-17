@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
@@ -156,10 +157,11 @@ public interface ISharedProject extends IActivityListener {
     public void removeListener(ISharedProjectListener listener);
 
     /**
-     * @return the Eclipse project associtated with this shared project. This
-     *         never returns <code>null</code>.
+     * @return the Eclipse projects associated with this shared project. This
+     *         always returns a set non-null set, which contains at least one
+     *         element.
      */
-    public IProject getProject();
+    public Set<IProject> getProjects();
 
     /**
      * @return the sequencer that is responsible for sending and receiving
@@ -337,5 +339,17 @@ public interface ISharedProject extends IActivityListener {
      * Returns the DateTime at which this SharedProject was started on the host.
      */
     public DateTime getSessionStart();
+
+    /**
+     * Returns true if the given IProject is currently shared using this Saros
+     * session.
+     */
+    public boolean isShared(IProject project);
+
+    /**
+     * Returns the mapper, which can be used to translate project IDs to
+     * IProjects
+     */
+    public SarosProjectMapper getProjectMapper();
 
 }
