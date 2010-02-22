@@ -1,45 +1,74 @@
 <?xml version="1.0"?>
+<!--
+Saros build file for automatic plugin builds using ant4eclipse
+
+Florian Thiel <florian.thiel@fu-berlin.de>,
+created: 20100217
+
+USE: Run this in the project root directory as
+ant -lib lib/ant4eclipse -Declipse.plugin.dir=<DIR> [TARGET]
+
+NOTE:
+- requires the property "eclipse.plugin.dir" to be set externally
+  (use -Declipse.plugin.dir=DIR)
+- you can force the use of a specific JDK by uncommemnting
+  the <ant4eclipse:installedJREs> section below
+-->
+
 <project name="build.saros"
          basedir="."
          default="build"
          xmlns:ant4eclipse="antlib:org.ant4eclipse">
- 
+
 	<!-- define ant4eclipse tasks -->
 	<taskdef uri="antlib:org.ant4eclipse"
 	         resource="org/ant4eclipse/antlib.xml" />
- 
+
 	<!-- import the ant4eclipse pde macros -->
 	<import file="${basedir}/ant4eclipse/macros/a4e-pde-macros.xml" />
- 
+
 	<!-- define the workspace location here -->
 	<property name="workspaceDirectory" value="${basedir}/.."/>
- 
-	<!-- define the target platform location -->
-	<ant4eclipse:targetPlatform id="my.target.platform">
-		<location dir="/home/flo/Downloads/eclipse/plugins" />
-	</ant4eclipse:targetPlatform>
- 
-<ant4eclipse:getJdtClassPath pathId="saros.classpath"
-                             workspaceDirectory="${workspaceDirectory}"
-                             projectName="Saros_9.9.11" />
-	<!-- =================================
-          target: build
-         ================================= -->
-	<target name="build">
-				<buildPlugin workspaceDirectory="${workspaceDirectory}"
-				             projectname="Saros_9.9.11"
-				             targetplatformid="my.target.platform"
-				             destination="${basedir}/destination" />
-	</target>
-<target name="test" depends="build">
-       <junit>
-      <classpath refid="saros.classpath" />
-      <formatter type="brief" usefile="false" />
-      <test name="de.fu_berlin.inf.dpp.AllTestsSuite" />
-	<formatter type="xml"/>
-    </junit> 
-<junitreport/>
-</target>
 
-<target name="build-test" depends="test"/>
+	<!-- define your jdk location here
+		<ant4eclipse:installedJREs>
+			<jre id="jdk16" location="R:/software/jdk/jdk16" />
+		</ant4eclipse:installedJREs>
+	-->
+
+	<!-- (define eclipse.plugin.dir using -D syntax) the target platform
+			  location (can be an Eclipse plugin dir or another set of JARs
+			  satisfying the Saros platform dependencies) -->
+	<ant4eclipse:targetPlatform id="saros.target.platform">
+		<location dir="${eclipse.plugin.dir}" />
+	</ant4eclipse:targetPlatform>
+
+	<!-- acquire access to the project classpath for unit tests -->
+	<ant4eclipse:getJdtClassPath pathId="saros.classpath"
+                             workspaceDirectory="${workspaceDirectory}"
+                             projectName="Saros" />
+
+	<!-- Targets -->
+	<target name="build">
+		<buildPlugin workspaceDirectory="${workspaceDirectory}"
+			         projectname="Saros"
+			         targetplatformid="saros.target.platform"
+			         destination="${basedir}/build" />
+	</target>
+
+	<target name="test" depends="build">
+		<junit>
+			<classpath refid="saros.classpath" />
+			<formatter type="brief" usefile="false" />
+			<test name="de.fu_berlin.inf.dpp.AllTestsSuite" />
+			<formatter type="xml"/>
+		</junit>
+		<junitreport todir="${basedir}/build"/>
+	</target>
+
+	<target name="clean">
+		<delete failonerror="false">
+			<fileset dir="${basedir}/build" includes="**/*"/>
+		</delete>
+	</target>
 </project>
