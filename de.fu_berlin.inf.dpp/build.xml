@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<project name="build.saros"
+         basedir="."
+         default="build"
+         xmlns:ant4eclipse="antlib:org.ant4eclipse">
+ 
+	<!-- define ant4eclipse tasks -->
+	<taskdef uri="antlib:org.ant4eclipse"
+	         resource="org/ant4eclipse/antlib.xml" />
+ 
+	<!-- import the ant4eclipse pde macros -->
+	<import file="${basedir}/ant4eclipse/macros/a4e-pde-macros.xml" />
+ 
+	<!-- define the workspace location here -->
+	<property name="workspaceDirectory" value="${basedir}/.."/>
+ 
+	<!-- define the target platform location -->
+	<ant4eclipse:targetPlatform id="my.target.platform">
+		<location dir="/home/flo/Downloads/eclipse/plugins" />
+	</ant4eclipse:targetPlatform>
+ 
+<ant4eclipse:getJdtClassPath pathId="saros.classpath"
+                             workspaceDirectory="${workspaceDirectory}"
+                             projectName="Saros_9.9.11" />
+	<!-- =================================
+          target: build
+         ================================= -->
+	<target name="build">
+				<buildPlugin workspaceDirectory="${workspaceDirectory}"
+				             projectname="Saros_9.9.11"
+				             targetplatformid="my.target.platform"
+				             destination="${basedir}/destination" />
+	</target>
+<target name="test" depends="build">
+       <junit>
+      <classpath refid="saros.classpath" />
+      <formatter type="brief" usefile="false" />
+      <test name="de.fu_berlin.inf.dpp.AllTestsSuite" />
+	<formatter type="xml"/>
+    </junit> 
+<junitreport/>
+</target>
+
+<target name="build-test" depends="test"/>
+</project>
