@@ -363,7 +363,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected void createErrorLogGroup(Composite parent) {
         Group group = new Group(parent, SWT.NONE);
         group.setText(Messages.getString("feedback.page.group.error.log")); //$NON-NLS-1$
-        group.setLayout(new GridLayout(1, false));
+        group.setLayout(new GridLayout(2, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         allowErrorLogSubmission = new Button(group, SWT.CHECK);
@@ -378,10 +378,18 @@ public class FeedbackPreferencePage extends PreferencePage implements
             }
         });
 
-        /*
-         * TODO add a button to open the error log directory and let the user
-         * pick a log to view it in an editor
-         */
+        Button startErrorSubmissionButton = new Button(group, SWT.PUSH);
+        startErrorSubmissionButton.setText(Messages
+            .getString("feedback.page.error.submit.start")); //$NON-NLS-1$
+        startErrorSubmissionButton.setLayoutData(new GridData(SWT.RIGHT,
+            SWT.CENTER, true, false));
+
+        startErrorSubmissionButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                errorLogManager.submitErrorLog();
+            }
+        });
 
         allowFullErrorLogSubmission = new Button(group, SWT.CHECK);
         allowFullErrorLogSubmission.setText(Messages
@@ -394,6 +402,11 @@ public class FeedbackPreferencePage extends PreferencePage implements
                         .getSelection();
                 }
             });
+
+        /*
+         * TODO add a button to open the error log directory and let the user
+         * pick a log to view it in an editor
+         */
 
     }
 

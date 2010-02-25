@@ -9,8 +9,10 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -206,7 +208,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
         File file = new File(errorLogLocation);
 
         if (!file.exists()) {
-            log.error("There was no error log at " + errorLogLocation);
+            log.debug("There was no error log at " + errorLogLocation);
             return null;
         }
         return file;
@@ -223,7 +225,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
         File file = new File(errorLogLocation);
 
         if (!file.exists()) {
-            log.error("There was no error log at " + errorLogLocation);
+            log.debug("There was no error log at " + errorLogLocation);
             return null;
         }
         return file;
@@ -240,10 +242,13 @@ public class ErrorLogManager extends AbstractFeedbackManager {
      * @nonblocking
      * @cancelable
      */
-    protected void submitErrorLog() {
+    public void submitErrorLog() {
         // determine which log should be uploaded
         final File errorLog = isFullErrorLogSubmissionAllowed() ? getFullErrorLogFile()
             : getErrorsOnlyLogFile();
+
+        if (errorLog == null)
+            return; // If there is no error-log we cannot sent one
 
         /*
          * cut off a possible file extension and extend the log name to make it
@@ -253,24 +258,29 @@ public class ErrorLogManager extends AbstractFeedbackManager {
             .getName())
             + "_" + statisticManager.getUserID() + "_" + currentSessionID;
 
-        runAsyncInWorkbenchWindow(log, new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor) {
+        new Job("Uploading Error Log...") {
+
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
                 try {
                     FileSubmitter.uploadErrorLog(saros.getStateLocation()
                         .toOSString(), logNameExtended, errorLog, SubMonitor
                         .convert(monitor));
                 } catch (IOException e) {
-                    log.error(String.format("Couldn't upload file: %s. %s", e
-                        .getMessage(), e.getCause() != null ? e.getCause()
-                        .getMessage() : ""));
+                    String msg = String.format("Couldn't upload file: %s. %s",
+                        e.getMessage(), e.getCause() != null ? e.getCause()
+                            .getMessage() : "");
+                    log.error(msg);
+                    return new Status(IStatus.ERROR, Saros.SAROS, msg, e);
                 } catch (SarosCancellationException e) {
-                    log.warn("The submission of the error log file was"
-                        + " cancelled by the user.");
+                    return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
                 }
+                return Status.OK_STATUS;
             }
-        });
+
+        }.schedule();
     }
 
     @Override
