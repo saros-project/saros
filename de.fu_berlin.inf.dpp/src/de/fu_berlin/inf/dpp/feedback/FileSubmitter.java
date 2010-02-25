@@ -63,7 +63,7 @@ public class FileSubmitter {
     public static void uploadStatisticFile(File file, SubMonitor monitor)
         throws IOException {
 
-        monitor.beginTask("Upload statistic file..", 2);
+        monitor.beginTask("Upload statistic file...", 2);
 
         try {
             try {
@@ -105,7 +105,7 @@ public class FileSubmitter {
     public static void uploadErrorLog(String zipLocation, String zipName,
         File file, SubMonitor monitor) throws IOException,
         SarosCancellationException {
-        monitor.beginTask("Upload error log..", 3);
+        monitor.beginTask("Upload error log...", 3);
 
         try {
             File archive = new File(zipLocation, zipName + ".zip");
@@ -138,6 +138,9 @@ public class FileSubmitter {
      * @throws IOException
      *             is thrown, if the upload failed; the exception wraps the
      *             target exception that contains the main cause for the failure
+     * 
+     *             TODO Make cancellation more fine grained (if the user cancels
+     *             it takes too long to react)
      * 
      * @blocking
      * @cancelable
