@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -10,7 +11,6 @@ import org.jivesoftware.smack.packet.Packet;
  * SarosPacketCollector is a special version of a Packet Collector and does not
  * depend on a PacketReader for registration.
  */
-
 public class SarosPacketCollector implements PacketListener {
 
     public static interface CancelHook {
@@ -25,7 +25,7 @@ public class SarosPacketCollector implements PacketListener {
     private static final int MAX_PACKETS = 65536;
 
     private PacketFilter packetFilter;
-    private LinkedList<Packet> resultQueue;
+    private LinkedBlockingQueue<Packet> resultQueue = new LinkedBlockingQueue<Packet>();
     private CancelHook cancelHook;
     private boolean cancelled = false;
 
@@ -39,7 +39,6 @@ public class SarosPacketCollector implements PacketListener {
     public SarosPacketCollector(CancelHook cancelHook, PacketFilter packetFilter) {
         this.cancelHook = cancelHook;
         this.packetFilter = packetFilter;
-        this.resultQueue = new LinkedList<Packet>();
     }
 
     /**
@@ -78,7 +77,7 @@ public class SarosPacketCollector implements PacketListener {
         if (resultQueue.isEmpty()) {
             return null;
         } else {
-            return resultQueue.removeLast();
+            return resultQueue.poll();
         }
     }
 
@@ -88,61 +87,33 @@ public class SarosPacketCollector implements PacketListener {
      * 
      * @return the next available packet.
      */
-    public synchronized Packet nextResult() {
-        // Wait indefinitely until there is a result to return.
-        while (resultQueue.isEmpty()) {
-            try {
-                wait();
-            } catch (InterruptedException ie) {
-                // Ignore.
-            }
-        }
-        return resultQueue.removeLast();
+    public synchronized Packet nextResult() throws InterruptedException {
+        return resultQueue.take();
     }
 
     /**
      * Returns the next available packet. The method call will block (not
      * return) until a packet is available or the <tt>timeout</tt> has elapased.
-     * If the timeout elapses without a result, <tt>null</tt> will be returned.
+     * If the timeout elapses without a result (or the thread is interrupted),
+     * <tt>null</tt> will be returned.
      * 
      * @param timeout
-     *            the amount of time to wait for the next packet (in
-     *            milleseconds).
+     *            the amount of time in milliseconds to wait for the next
+     *            packet.
      * @return the next available packet.
      */
     public synchronized Packet nextResult(long timeout) {
-        // Wait up to the specified amount of time for a result.
-        if (resultQueue.isEmpty()) {
-            long waitTime = timeout;
-            long start = System.currentTimeMillis();
-            try {
-                // Keep waiting until the specified amount of time has elapsed,
-                // or
-                // a packet is available to return.
-                while (resultQueue.isEmpty()) {
-                    if (waitTime <= 0) {
-                        break;
-                    }
-                    wait(waitTime);
-                    long now = System.currentTimeMillis();
-                    waitTime -= (now - start);
-                    start = now;
-                }
-            } catch (InterruptedException ie) {
-                // Ignore.
-            }
-            // Still haven't found a result, so return null.
-            if (resultQueue.isEmpty()) {
-                return null;
-            }
-            // Return the packet that was found.
-            else {
-                return resultQueue.removeLast();
-            }
+
+        if (!resultQueue.isEmpty()) {
+            // There's already a packet waiting, so return it.
+            return resultQueue.poll();
         }
-        // There's already a packet waiting, so return it.
-        else {
-            return resultQueue.removeLast();
+
+        try {
+            return resultQueue.poll(timeout, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ie) {
+            // Ignore
+            return null;
         }
     }
 
@@ -154,19 +125,16 @@ public class SarosPacketCollector implements PacketListener {
      *            the packet to process.
      */
     public synchronized void processPacket(Packet packet) {
-        if (packet == null) {
+        if (packet == null)
             return;
-        }
+
         if (packetFilter == null || packetFilter.accept(packet)) {
             // If the max number of packets has been reached, remove the oldest
             // one.
-            if (resultQueue.size() == MAX_PACKETS) {
-                resultQueue.removeLast();
+            if (resultQueue.size() >= MAX_PACKETS) {
+                resultQueue.remove();
             }
-            // Add the new packet.
-            resultQueue.addFirst(packet);
-            // Notify waiting threads a result is available.
-            notifyAll();
+            resultQueue.add(packet);
         }
     }
 }
