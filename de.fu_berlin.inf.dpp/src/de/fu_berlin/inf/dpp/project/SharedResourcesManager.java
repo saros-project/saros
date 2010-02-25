@@ -59,7 +59,6 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -491,17 +490,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
              * might cause IResourceChangeEvents (which do not need to be
              * replicated)
              */
-            if (event.getResource() != null)
-                log.warn("Resource changed while paused: "
-                    + event.getResource().getProjectRelativePath(),
-                    new StackTrace());
-            else
-                log.warn("Resource changed while paused", new StackTrace());
+            logPauseWarning(event);
             return;
         }
 
         try {
-
             switch (event.getType()) {
 
             case IResourceChangeEvent.PRE_BUILD:
@@ -534,6 +527,49 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         } catch (Exception e) {
             log.error("Couldn't handle resource change.", e);
+        }
+    }
+
+    protected void logPauseWarning(IResourceChangeEvent event) {
+
+        switch (event.getType()) {
+
+        case IResourceChangeEvent.PRE_BUILD:
+        case IResourceChangeEvent.POST_BUILD:
+        case IResourceChangeEvent.POST_CHANGE:
+
+            IResourceDelta delta = event.getDelta();
+            if (delta == null) {
+                log.error("Resource changed while paused"
+                    + " but unexpected empty delta in "
+                    + "SharedResourcesManager: " + event);
+                return;
+            }
+
+            ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
+            try {
+                delta.accept(visitor);
+            } catch (CoreException e) {
+                log.error("ToStringResourceDelta visitor crashed", e);
+                return;
+            }
+            log.warn("Resource changed while paused:\n" + visitor.toString());
+            break;
+        case IResourceChangeEvent.PRE_CLOSE:
+        case IResourceChangeEvent.PRE_DELETE:
+        case IResourceChangeEvent.PRE_REFRESH:
+        
+            IResource resource = event.getResource();
+            if (resource != null){
+                log.warn("Resource changed while paused: "
+                    + event.getResource().getFullPath().toPortableString());
+            } else {
+                log.warn("ResourceChange occurred while paused with no resource given");
+            }
+            break;
+        default:
+            // Because additional events might be added in the future
+            log.error("Unhandled case in in SharedResourcesManager: " + event);
         }
     }
 
