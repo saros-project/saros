@@ -160,7 +160,7 @@ public class Saros extends AbstractUIPlugin {
     protected static boolean isInitialized;
 
     /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     * This is the Bundle-SymbolicName
      */
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 

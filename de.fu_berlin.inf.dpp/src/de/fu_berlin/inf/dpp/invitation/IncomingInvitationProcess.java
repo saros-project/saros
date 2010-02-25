@@ -337,7 +337,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
                             subMonitor);
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,
-                            Saros.SAROS, null, e));
+                            "pluginId", null, e));
                     }
                 }
             }, subMonitor);
@@ -538,12 +538,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
     public void remoteCancel(String errorMsg) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log
-            .debug("Inv"
-                + Util.prefix(peer)
-                + ": remoteCancel "
-                + (errorMsg == null ? " by user" : " because of error: "
-                    + errorMsg));
+        log.debug("Inv" + Util.prefix(peer) + ": remoteCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new RemoteCancellationException(errorMsg);

@@ -583,9 +583,8 @@ public class ActivitySequencer {
         incomingQueues.add(nextActivity);
 
         if (!started) {
-            log.debug("Received activityDataObject but "
-                + "ActivitySequencer has not yet been started: "
-                + nextActivity);
+            log.warn("Received activityDataObject but activityDataObject"
+                + " sequencer has not yet been started: " + nextActivity);
             return;
         }
 
