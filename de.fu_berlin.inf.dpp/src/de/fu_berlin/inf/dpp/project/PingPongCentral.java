@@ -39,8 +39,6 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     protected boolean sendPings = false;
 
-    protected long lastPingPrint = -1;
-
     protected AutoHashMap<User, PingStats> stats = new AutoHashMap<User, PingStats>(
         new Function<User, PingStats>() {
             public PingStats apply(User newKey) {
@@ -62,7 +60,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
         protected User user;
 
-        protected DateTime lastSeen = null;
+        protected DateTime lastSeen;
 
         public PingStats(User user) {
             this.user = user;
@@ -103,7 +101,7 @@ public class PingPongCentral extends AbstractActivityProvider {
             return "Ping Stats "
                 + Util.prefix(user.getJID())
                 + "Round trip time: All == "
-                + (sessionAverage.getMillis() / pingsReceived)
+                + getAverageRoundTripTime()
                 + "ms - "
                 + windowText
                 + "Pings recieved/sent == "
@@ -111,11 +109,28 @@ public class PingPongCentral extends AbstractActivityProvider {
                 + "/"
                 + pingsSent
                 + " ("
-                + String.format("%.1f", 100.0 * pingsReceived / pingsSent)
+                + String.format("%.1f", getPingSuccessPercentage())
                 + "%)"
                 + (lastSeen != null ? " - last seen: "
                     + new Duration(lastSeen, new DateTime()).getMillis()
                     + "ms ago" : "");
+        }
+
+        protected double getPingSuccessPercentage() {
+            if (pingsSent <= 0) {
+                return 100.0;
+            } else {
+                return 100.0 * pingsReceived / pingsSent;
+            }
+        }
+
+        /**
+         * Average round trip time or -1 if no pings have yet received.
+         */
+        protected long getAverageRoundTripTime() {
+            if (pingsReceived <= 0)
+                return -1;
+            return (sessionAverage.getMillis() / pingsReceived);
         }
     }
 
@@ -150,10 +165,10 @@ public class PingPongCentral extends AbstractActivityProvider {
                         return;
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            sendPings();
                             if (log.isDebugEnabled()) {
                                 log.debug(PingPongCentral.this.toString());
                             }
+                            sendPings();
                         }
                     });
                 }
@@ -252,7 +267,7 @@ public class PingPongCentral extends AbstractActivityProvider {
             if (entry.getKey().isClient())
                 sb.append("  ").append(entry.getValue()).append("\n");
         }
-        return sb.toString();
+        return sb.toString().trim();
     }
 
 }
