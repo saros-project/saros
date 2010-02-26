@@ -332,9 +332,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
         user.invitationCompleted();
 
-        log.debug("The isInvitationComplete status of "
-            + Util.prefix(user.getJID()) + " is now "
-            + user.isInvitationComplete());
+        log.debug("The invitation of " + Util.prefix(user.getJID())
+            + " is now complete");
 
         listenerDispatch.invitationCompleted(user);
     }
