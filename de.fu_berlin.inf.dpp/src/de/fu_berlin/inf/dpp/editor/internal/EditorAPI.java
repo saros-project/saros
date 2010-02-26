@@ -570,7 +570,7 @@ public class EditorAPI implements IEditorAPI {
                 if (newIsEditable == isEditable)
                     return;
 
-                log.debug(editorPart.getEditorInput().getName()
+                log.trace(editorPart.getEditorInput().getName()
                     + " set to editable: " + newIsEditable);
                 updateStatusLine(editorPart, newIsEditable);
 
