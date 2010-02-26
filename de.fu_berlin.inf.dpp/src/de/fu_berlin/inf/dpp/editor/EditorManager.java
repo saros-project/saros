@@ -645,18 +645,6 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        if (!this.isDriver) {
-            /**
-             * TODO If we are not a driver, then receiving this event might
-             * indicate that the user somehow achieved to change his document.
-             * We should run a consistency check.
-             * 
-             * But watch out for changes because of a consistency check!
-             */
-            log.warn("Local user caused text changes as an observer");
-            return;
-        }
-
         IEditorPart changedEditor = null;
 
         // FIXME: This is potentially slow and definitely ugly
@@ -692,10 +680,25 @@ public class EditorManager implements IActivityProvider, Disposable {
             replacedText = sb.toString();
         }
 
+        TextEditActivity textEdit = new TextEditActivity(sharedProject
+            .getLocalUser(), offset, text, replacedText, path);
+
+        if (!this.isDriver) {
+            /**
+             * TODO If we are not a driver, then receiving this event might
+             * indicate that the user somehow achieved to change his document.
+             * We should run a consistency check.
+             * 
+             * But watch out for changes because of a consistency check!
+             */
+            log.warn("Local user caused text changes as an observer: "
+                + textEdit);
+            return;
+        }
+
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
-        fireActivity(new TextEditActivity(sharedProject.getLocalUser(), offset,
-            text, replacedText, path));
+        fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
         editorListener.textEditRecieved(sharedProject.getLocalUser(), path,

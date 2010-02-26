@@ -90,7 +90,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
-    protected List<ISharedProjectListener> listeners = new ArrayList<ISharedProjectListener>();
+    protected SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
 
     protected User host;
 
@@ -309,9 +309,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
         log.info("User " + user + " is now a " + role);
 
-        for (ISharedProjectListener listener : SharedProject.this.listeners) {
-            listener.roleChanged(user);
-        }
+        this.listenerDispatch.roleChanged(user);
     }
 
     /**
@@ -334,13 +332,10 @@ public class SharedProject implements ISharedProject, Disposable {
 
         user.invitationCompleted();
 
-        log.debug("The isInvitationComplete status of "
-            + Util.prefix(user.getJID()) + " is now "
-            + user.isInvitationComplete());
+        log.debug("The invitation of " + Util.prefix(user.getJID())
+            + " is now complete");
 
-        for (ISharedProjectListener listener : SharedProject.this.listeners) {
-            listener.invitationCompleted(user);
-        }
+        listenerDispatch.invitationCompleted(user);
     }
 
     /*
@@ -394,9 +389,7 @@ public class SharedProject implements ISharedProject, Disposable {
             throw new IllegalArgumentException();
         }
 
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.userJoined(user);
-        }
+        listenerDispatch.userJoined(user);
 
         log.info("User " + Util.prefix(jid) + " joined session");
     }
@@ -415,10 +408,7 @@ public class SharedProject implements ISharedProject, Disposable {
         this.activitySequencer.userLeft(jid);
 
         // TODO what is to do here if no driver exists anymore?
-
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.userLeft(user);
-        }
+        listenerDispatch.userLeft(user);
 
         log.info("User " + Util.prefix(jid) + " left session");
     }
@@ -429,9 +419,7 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void addListener(ISharedProjectListener listener) {
-        if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
-        }
+        listenerDispatch.add(listener);
     }
 
     /*
@@ -440,7 +428,7 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void removeListener(ISharedProjectListener listener) {
-        this.listeners.remove(listener);
+        listenerDispatch.remove(listener);
     }
 
     /*
@@ -608,7 +596,7 @@ public class SharedProject implements ISharedProject, Disposable {
             try {
                 result.add(dataObject.getActivity(this));
             } catch (IllegalArgumentException e) {
-                log.warn("DataObject should not be attached to SharedProject: "
+                log.warn("DataObject could not be attached to SharedProject: "
                     + dataObject, e);
             }
         }

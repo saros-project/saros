@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
@@ -222,9 +223,17 @@ public class DataTransferManager implements ConnectionSessionListener {
                 try {
                     // TODO Put size in TransferDescription, so we can
                     // display it here
-                    log.debug("[" + getTransferMode().toString()
-                        + "] Starting incoming file transfer: "
-                        + description.toString());
+                    if (description.type == FileTransferType.ACTIVITY_TRANSFER) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("[" + getTransferMode().toString()
+                                + "] Starting incoming data transfer: "
+                                + description.toString());
+                        }
+                    } else {
+                        log.debug("[" + getTransferMode().toString()
+                            + "] Starting incoming data transfer: "
+                            + description.toString());
+                    }
 
                     long startTime = System.nanoTime();
 
@@ -232,10 +241,19 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                     long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
-                    log.debug("[" + getTransferMode().toString()
-                        + "] Finished incoming file transfer: "
-                        + description.toString() + ", size: "
-                        + Util.throughput(content.length, duration));
+                    if (description.type == FileTransferType.ACTIVITY_TRANSFER) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("[" + getTransferMode().toString()
+                                + "] Finished incoming data transfer: "
+                                + description.toString() + ", size: "
+                                + Util.throughput(content.length, duration));
+                        }
+                    } else {
+                        log.debug("[" + getTransferMode().toString()
+                            + "] Finished incoming data transfer: "
+                            + description.toString() + ", size: "
+                            + Util.throughput(content.length, duration));
+                    }
 
                     transferModeDispatch.transferFinished(description
                         .getSender(), getTransferMode(), true, content.length,

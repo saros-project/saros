@@ -107,8 +107,7 @@ public class DiscoveryManager implements Disposable {
         }
 
         public void presenceChanged(Presence current) {
-            log.debug("presenceChanged: " + current.toString());
-
+            log.trace("presenceChanged: " + current.toString());
             if (hasOnlineStateChanged(current))
                 clearCache(current);
             lastPresenceMap.put(current.getFrom(), current);

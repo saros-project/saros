@@ -64,7 +64,7 @@ public class InvitationWizard extends Wizard {
         for (JID user : usersToInvite) {
             sessionManager.invite(user,
                 "You have been invited to a Saros session by "
-                    + sharedProject.getHost().getHumanReadableName());
+                    + sharedProject.getHost().getJID().getBase());
         }
         return true;
     }

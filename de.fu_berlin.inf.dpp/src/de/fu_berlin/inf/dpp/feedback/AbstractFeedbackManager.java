@@ -1,12 +1,6 @@
 package de.fu_berlin.inf.dpp.feedback;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.apache.log4j.Logger;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Parent class for FeedbackManager and StatisticManager
@@ -58,33 +52,5 @@ public abstract class AbstractFeedbackManager {
         } else if (globalValue != localValue) {
             saros.getPreferenceStore().setValue(preferenceKey, globalValue);
         }
-    }
-
-    /**
-     * Tries to run the given IRunnableWithProgress asynchronously in the active
-     * workbench window, i.e. the progress of this operation will be shown in
-     * the status bar of the active window. If there is no active workbench
-     * window, e.g. during start or stop of the plugin, an IProgressMonitor is
-     * used to run the runnable and show its progress.
-     * 
-     * @nonblocking
-     * @cancelable
-     */
-    protected static void runAsyncInWorkbenchWindow(final Logger log,
-        final IRunnableWithProgress runnable) {
-
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                try {
-                    Util.getRunnableContext().run(true, true, runnable);
-                } catch (InvocationTargetException e) {
-                    log.error("An internal error occurred while running"
-                        + " this runnable:", e.getCause());
-                } catch (InterruptedException e) {
-                    log.warn("Running this runnable was interrupted"
-                        + " by the user");
-                }
-            }
-        });
     }
 }

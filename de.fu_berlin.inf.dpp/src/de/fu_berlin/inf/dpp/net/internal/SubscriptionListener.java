@@ -59,7 +59,7 @@ public class SubscriptionListener implements ConnectionSessionListener {
 
                 final Presence presence = (Presence) packet;
                 log
-                    .info("Received presence packet from: "
+                    .debug("Received presence packet from: "
                         + Util.prefix(new JID(presence.getFrom())) + " "
                         + presence);
 

@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -59,6 +60,8 @@ public class PingPongCentral extends AbstractActivityProvider {
 
         protected User user;
 
+        protected DateTime lastSeen;
+
         public PingStats(User user) {
             this.user = user;
         }
@@ -67,6 +70,8 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             // This is the reply to a ping the local user sent himself
             Duration rtt = pingPongActivityDataObject.getRoundtripTime();
+
+            lastSeen = new DateTime();
 
             sessionAverage = sessionAverage.plus(rtt);
 
@@ -78,8 +83,8 @@ public class PingPongCentral extends AbstractActivityProvider {
             }
             pingsReceived++;
 
-            if (log.isDebugEnabled())
-                log.debug(this.toString());
+            if (log.isTraceEnabled())
+                log.trace(this.toString());
         }
 
         @Override
@@ -93,13 +98,39 @@ public class PingPongCentral extends AbstractActivityProvider {
                     + slidingAverage.getLast().getMillis() + "ms - ";
             }
 
-            return "Ping Stats " + Util.prefix(user.getJID())
+            return "Ping Stats "
+                + Util.prefix(user.getJID())
                 + "Round trip time: All == "
-                + (sessionAverage.getMillis() / pingsReceived) + "ms - "
-                + windowText + "Pings recieved/sent == " + pingsReceived + "/"
-                + pingsSent + " ("
-                + String.format("%.1f", 100.0 * pingsReceived / pingsSent)
-                + "%)";
+                + getAverageRoundTripTime()
+                + "ms - "
+                + windowText
+                + "Pings recieved/sent == "
+                + pingsReceived
+                + "/"
+                + pingsSent
+                + " ("
+                + String.format("%.1f", getPingSuccessPercentage())
+                + "%)"
+                + (lastSeen != null ? " - last seen: "
+                    + new Duration(lastSeen, new DateTime()).getMillis()
+                    + "ms ago" : "");
+        }
+
+        protected double getPingSuccessPercentage() {
+            if (pingsSent <= 0) {
+                return 100.0;
+            } else {
+                return 100.0 * pingsReceived / pingsSent;
+            }
+        }
+
+        /**
+         * Average round trip time or -1 if no pings have yet received.
+         */
+        protected long getAverageRoundTripTime() {
+            if (pingsReceived <= 0)
+                return -1;
+            return (sessionAverage.getMillis() / pingsReceived);
         }
     }
 
@@ -117,23 +148,7 @@ public class PingPongCentral extends AbstractActivityProvider {
             pingPongHandle.cancel(true);
             sharedProject = null;
 
-            // Print results
-
-            synchronized (PingPongCentral.this) {
-
-                // First to host
-                for (Entry<User, PingStats> entry : stats.entrySet()) {
-                    if (entry.getKey().isHost())
-                        log.info(entry.getValue());
-                }
-
-                // Next to everybody else
-                for (Entry<User, PingStats> entry : stats.entrySet()) {
-                    if (entry.getKey().isClient())
-                        log.info(entry.getValue());
-                }
-            }
-
+            log.info(PingPongCentral.this.toString());
         }
 
         @Override
@@ -150,6 +165,9 @@ public class PingPongCentral extends AbstractActivityProvider {
                         return;
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
+                            if (log.isDebugEnabled()) {
+                                log.debug(PingPongCentral.this.toString());
+                            }
                             sendPings();
                         }
                     });
@@ -231,4 +249,25 @@ public class PingPongCentral extends AbstractActivityProvider {
 
         }
     }
+
+    @Override
+    public synchronized String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Ping statistics:\n");
+
+        // First to host
+        for (Entry<User, PingStats> entry : stats.entrySet()) {
+            if (entry.getKey().isHost())
+                sb.append("  ").append(entry.getValue()).append("\n");
+        }
+
+        // Next to everybody else
+        for (Entry<User, PingStats> entry : stats.entrySet()) {
+            if (entry.getKey().isClient())
+                sb.append("  ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
 }
