@@ -170,4 +170,12 @@ public class SPath {
     public IProject getProject() {
         return project;
     }
+
+    /**
+     * Convenience method for getting the full (workspace-relative) path of the
+     * file/editor identified by this SPath.
+     */
+    public IPath getFullPath() {
+        return getFile().getFullPath();
+    }
 }
