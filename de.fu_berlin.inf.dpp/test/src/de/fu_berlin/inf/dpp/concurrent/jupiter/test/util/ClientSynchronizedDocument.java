@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
@@ -11,7 +9,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -32,8 +29,6 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     protected User user;
     private JID server_jid;
     private NetworkSimulator connection;
-
-    private HashMap<String, JupiterDocumentListener> documentListener = new HashMap<String, JupiterDocumentListener>();
 
     public ClientSynchronizedDocument(JID server, String content,
         NetworkSimulator connection, User user) {
@@ -94,16 +89,13 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
 
         /* 3. send operation. */
         connection.sendOperation(new NetworkRequest(this.user, remoteJid,
-            jupiterActivity), delay);
-
-        informListener();
+            jupiterActivity, delay));
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
         log.info(this.user + " receive operation : "
             + jupiterActivity.getOperation().toString());
         receiveOperation(jupiterActivity);
-        informListener();
     }
 
     public String getDocument() {
@@ -115,17 +107,10 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
             + req.getJupiterActivity().getOperation().toString()
             + " timestamp : " + req.getJupiterActivity().getTimestamp());
         receiveOperation(req.getJupiterActivity());
-        informListener();
     }
 
     public Algorithm getAlgorithm() {
         return algorithm;
-    }
-
-    private void informListener() {
-        for (String key : documentListener.keySet()) {
-            documentListener.get(key).documentAction(user.getJID());
-        }
     }
 
     public void updateVectorTime(Timestamp timestamp) {

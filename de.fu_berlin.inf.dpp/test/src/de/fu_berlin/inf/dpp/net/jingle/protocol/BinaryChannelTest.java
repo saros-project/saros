@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.ServerSocket;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -27,6 +29,9 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.test.util.TestThread;
 
+/**
+ * @author coezbek
+ */
 public class BinaryChannelTest {
 
     /**
@@ -71,11 +76,15 @@ public class BinaryChannelTest {
         throws SarosCancellationException, IOException, ClassNotFoundException {
 
         while (true) {
-            IncomingTransferObject ito = channel
-                .receiveIncomingTransferObject(SubMonitor
-                    .convert(new NullProgressMonitor()));
+            try {
+                IncomingTransferObject ito = channel
+                    .receiveIncomingTransferObject(SubMonitor
+                        .convert(new NullProgressMonitor()));
 
-            queue.add(ito);
+                queue.add(ito);
+            } catch (EOFException e) {
+                return;
+            }
         }
 
     }
@@ -160,19 +169,13 @@ public class BinaryChannelTest {
                 public void run() {
 
                     try {
-
-                        long start = System.currentTimeMillis();
                         for (int i = 0; i < 128; i++) {
-                            System.out.println(i);
                             IncomingTransferObject ito = serverQueue.take();
 
                             assertTrue("" + i, Arrays.equals(getTestArray(i),
                                 ito.accept(SubMonitor
                                     .convert(new NullProgressMonitor()))));
                         }
-                        System.out.println("Time: "
-                            + (System.currentTimeMillis() - start) / 1000);
-
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -244,7 +247,6 @@ public class BinaryChannelTest {
                                     "/test/hello.jpg"), "" + 4722),
                             getTestArray(i * 1024), SubMonitor
                                 .convert(new NullProgressMonitor()));
-                        System.out.println("Client sent: " + i);
                     }
 
                 } catch (Exception e) {
@@ -286,8 +288,6 @@ public class BinaryChannelTest {
                                     "/test/hello.jpg"), "" + 4722),
                             getTestArray(i * 1024), SubMonitor
                                 .convert(new NullProgressMonitor()));
-
-                        System.out.println("Server sent: " + i);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -300,7 +300,6 @@ public class BinaryChannelTest {
             new Runnable() {
                 public void run() {
                     try {
-                        long start = System.currentTimeMillis();
                         for (int i = 1; i < 128; i += 2) {
                             IncomingTransferObject ito;
                             ito = clientQueue.take();
@@ -309,8 +308,6 @@ public class BinaryChannelTest {
                                 getTestArray(i * 1024), ito.accept(SubMonitor
                                     .convert(new NullProgressMonitor()))));
                         }
-                        System.out.println("Client Time: "
-                            + (System.currentTimeMillis() - start) / 1000);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -321,7 +318,6 @@ public class BinaryChannelTest {
         Thread serverReceiver = new Thread(new Runnable() {
             public void run() {
                 try {
-                    long start = System.currentTimeMillis();
                     for (int i = 0; i < 128; i += 2) {
                         IncomingTransferObject ito = serverQueue.take();
 
@@ -329,8 +325,6 @@ public class BinaryChannelTest {
                             getTestArray(i * 1024), ito.accept(SubMonitor
                                 .convert(new NullProgressMonitor()))));
                     }
-                    System.out.println("Server Time: "
-                        + (System.currentTimeMillis() - start) / 1000);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -360,7 +354,9 @@ public class BinaryChannelTest {
     }
 
     /**
-     * Test two people sending at the same time
+     * Test two people sending at the same time.
+     * 
+     * Currently crashing because testShutdown fails.
      */
     @Test
     public void testBinaryChannelMultiSend() throws Throwable {
@@ -426,8 +422,6 @@ public class BinaryChannelTest {
                                     "/test/hello.jpg"), "" + 4722),
                                 getTestArray(i * 1024), SubMonitor
                                     .convert(new NullProgressMonitor()));
-
-                            System.out.println("Client 1 sent: " + i);
                         } catch (Exception e) {
                             throw new RuntimeException("Failed sending " + i, e);
                         }
@@ -451,8 +445,6 @@ public class BinaryChannelTest {
                                     "/test/hello.jpg"), "" + 4722),
                                 getTestArray(i * 1024), SubMonitor
                                     .convert(new NullProgressMonitor()));
-
-                            System.out.println("Client 2 sent: " + i);
                         } catch (Exception e) {
                             throw new RuntimeException("Failed sending " + i, e);
                         }
@@ -465,8 +457,6 @@ public class BinaryChannelTest {
             new Runnable() {
                 public void run() {
                     try {
-                        long start = System.currentTimeMillis();
-
                         final boolean[] alreadyReceived = new boolean[512];
 
                         for (int i = 0; i < 512; i += 1) {
@@ -486,9 +476,6 @@ public class BinaryChannelTest {
                         for (int i = 0; i < 512; i += 1) {
                             assertTrue("" + i, alreadyReceived[i]);
                         }
-
-                        System.out.println("Server Time: "
-                            + (System.currentTimeMillis() - start) / 1000);
                     } catch (Exception e) {
                         fail("Server receive thread crashed");
                     }
@@ -503,18 +490,16 @@ public class BinaryChannelTest {
                 Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (t != null)
                     throw t;
-
             }
-            Throwable t = failureQueue.poll();
-            if (t != null)
-                throw t;
-
         } finally {
             clientChannel.dispose();
             serverSocket[0].close();
             clientSocket.close();
             server.close();
         }
+        Throwable t = failureQueue.poll();
+        if (t != null)
+            throw t;
     }
 
     public void pingOut() {
@@ -531,6 +516,173 @@ public class BinaryChannelTest {
             time = System.currentTimeMillis();
             System.out.flush();
         }
+    }
+
+    /**
+     * Test for checking whether Shutdown works as intended. It does not because
+     * there is a TODO in the BinaryChannel
+     */
+    @Test
+    public void testShutdown() throws Throwable {
+
+        final ServerSocket server = new ServerSocket(4278);
+
+        final BlockingQueue<IncomingTransferObject> serverQueue = new LinkedBlockingQueue<IncomingTransferObject>();
+        final BlockingQueue<IncomingTransferObject> clientQueue = new LinkedBlockingQueue<IncomingTransferObject>();
+        final BlockingQueue<Throwable> failureQueue = new LinkedBlockingQueue<Throwable>();
+
+        final AtomicReference<Socket> serverSocket = new AtomicReference<Socket>(
+            null);
+        final AtomicReference<BinaryChannel> serverChannel = new AtomicReference<BinaryChannel>(
+            null);
+
+        // Start the server in a separate thread
+        TestThread serverMainLoop = createServerThread(server, serverQueue,
+            failureQueue, serverSocket, serverChannel);
+        serverMainLoop.start();
+
+        // Connect to the server
+        Socket clientSocket = new Socket("localhost", 4278);
+        final BinaryChannel clientChannel = new BinaryChannel(clientSocket,
+            NetTransferMode.JINGLETCP);
+
+        // Start the clients main loop (for confirmations)
+        TestThread clientMainLoop = createMainLoopThread(clientQueue,
+            failureQueue, clientChannel);
+        clientMainLoop.start();
+
+        // Start sending data to the server
+        TestThread clientSender = createSenderThread(failureQueue,
+            clientChannel);
+        clientSender.start();
+
+        // Start receiving data from the client
+        TestThread serverReceiveThread = createReceivingThread(serverQueue,
+            failureQueue);
+        serverReceiveThread.start();
+
+        // Wait for sending to finish
+        while (clientSender.isAlive() || serverReceiveThread.isAlive()) {
+            Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
+            if (t != null)
+                throw t;
+        }
+
+        assertTrue(clientChannel.isConnected());
+        assertTrue(serverChannel.get().isConnected());
+
+        // Now shutdown channel from client side
+        clientChannel.dispose();
+
+        while (clientMainLoop.isAlive() || serverMainLoop.isAlive()) {
+            Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
+            if (t != null)
+                throw t;
+        }
+
+        assertFalse(clientChannel.isConnected());
+        assertFalse(serverChannel.get().isConnected());
+
+        serverSocket.get().close();
+        server.close();
+        clientSocket.close();
+
+        // No exceptions should still be pending at this point
+        Throwable t = failureQueue.poll();
+        if (t != null)
+            throw t;
+    }
+
+    protected TestThread createServerThread(final ServerSocket server,
+        final BlockingQueue<IncomingTransferObject> serverQueue,
+        final BlockingQueue<Throwable> failureQueue,
+        final AtomicReference<Socket> serverSocket,
+        final AtomicReference<BinaryChannel> serverChannel) {
+
+        TestThread serverMainLoop = new TestThread(failureQueue,
+            new Runnable() {
+                public void run() {
+                    try {
+                        serverSocket.set(server.accept());
+
+                        serverChannel.set(new BinaryChannel(serverSocket.get(),
+                            NetTransferMode.JINGLETCP));
+
+                        runBinaryChannelLoop(serverQueue, serverChannel.get());
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        return serverMainLoop;
+    }
+
+    protected TestThread createMainLoopThread(
+        final BlockingQueue<IncomingTransferObject> clientQueue,
+        final BlockingQueue<Throwable> failureQueue,
+        final BinaryChannel clientChannel) {
+
+        TestThread clientMainLoop = new TestThread(failureQueue,
+            new Runnable() {
+                public void run() {
+                    try {
+                        runBinaryChannelLoop(clientQueue, clientChannel);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        return clientMainLoop;
+    }
+
+    protected TestThread createReceivingThread(
+        final BlockingQueue<IncomingTransferObject> serverQueue,
+        final BlockingQueue<Throwable> failureQueue) {
+
+        TestThread serverReceiveThread = new TestThread(failureQueue,
+            new Runnable() {
+                public void run() {
+
+                    try {
+                        for (int i = 0; i < 128; i++) {
+                            IncomingTransferObject ito = serverQueue.take();
+
+                            assertTrue("" + i, Arrays.equals(getTestArray(i),
+                                ito.accept(SubMonitor
+                                    .convert(new NullProgressMonitor()))));
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        return serverReceiveThread;
+    }
+
+    protected TestThread createSenderThread(
+        final BlockingQueue<Throwable> failureQueue,
+        final BinaryChannel clientChannel) {
+
+        TestThread clientSender = new TestThread(failureQueue, new Runnable() {
+            public void run() {
+
+                for (int i = 0; i < 128; i++) {
+                    try {
+                        clientChannel.sendDirect(TransferDescription
+                            .createFileTransferDescription(new JID(
+                                "server@gmail.com"),
+                                new JID("client@gmail.com"), new Path(
+                                    "/test/hello.jpg"), "" + 4722),
+                            getTestArray(i), SubMonitor
+                                .convert(new NullProgressMonitor()));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        return clientSender;
     }
 
 }

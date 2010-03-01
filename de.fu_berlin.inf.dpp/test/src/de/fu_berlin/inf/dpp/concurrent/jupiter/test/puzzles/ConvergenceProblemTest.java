@@ -32,7 +32,7 @@ public class ConvergenceProblemTest extends JupiterTestCase {
         c[1].sendOperation(new DeleteOperation(2, "r"), 300);
         c[2].sendOperation(new InsertOperation(2, "f"), 500);
 
-        Thread.sleep(700);
+        network.execute(500);
 
         assertEqualDocs("coffe", c);
     }
@@ -49,7 +49,7 @@ public class ConvergenceProblemTest extends JupiterTestCase {
         c[3].sendOperation(new InsertOperation(3, "x"), 300);
         c[4].sendOperation(new DeleteOperation(3, "d"), 500);
         c[0].sendOperation(new InsertOperation(3, "x"), 700);
-        Thread.sleep(1200);
+        network.execute(700);
 
         assertEqualDocs("acxx", c);
     }

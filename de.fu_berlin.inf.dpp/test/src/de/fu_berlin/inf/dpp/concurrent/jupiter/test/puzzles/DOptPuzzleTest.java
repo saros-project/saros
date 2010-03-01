@@ -50,17 +50,16 @@ public class DOptPuzzleTest extends JupiterTestCase {
         server.addProxyClient(bob);
         server.addProxyClient(carl);
 
-        Thread.sleep(100);
-
         /* O3 || O2 */
         client_3.sendOperation(new InsertOperation(0, "z"), 100);
         client_2.sendOperation(new InsertOperation(0, "x"), 700);
 
-        Thread.sleep(300);
-        /* O1 -> O3 */
-        client_1.sendOperation(new InsertOperation(0, "y"), 100);
+        network.execute(300);
 
-        Thread.sleep(700);
+        /* O1 -> O3 */
+        client_1.sendOperation(new InsertOperation(0, "y"), 400);
+
+        network.execute(700);
 
         assertEquals(client_1.getDocument(), client_2.getDocument());
         assertEquals(client_2.getDocument(), client_3.getDocument());
@@ -82,11 +81,11 @@ public class DOptPuzzleTest extends JupiterTestCase {
         clients[2].sendOperation(new InsertOperation(0, "zzz"), 100);
         clients[1].sendOperation(new InsertOperation(0, "x"), 700);
 
-        Thread.sleep(300);
+        network.execute(300);
         /* O0 -> O2 */
-        clients[0].sendOperation(new InsertOperation(0, "yy"), 100);
+        clients[0].sendOperation(new InsertOperation(0, "yy"), 400);
 
-        Thread.sleep(700);
+        network.execute(700);
 
         assertEqualDocs("yyzzzxabcd", clients);
     }
@@ -103,11 +102,13 @@ public class DOptPuzzleTest extends JupiterTestCase {
         ClientSynchronizedDocument[] clients = setUp(3, "abcdefg");
 
         clients[0].sendOperation(new DeleteOperation(0, "a"), 100);
-        Thread.sleep(300);
-        clients[2].sendOperation(new DeleteOperation(1, "cde"), 500);
-        clients[1].sendOperation(new DeleteOperation(3, "e"), 300);
 
-        Thread.sleep(1000);
+        network.execute(300);
+
+        clients[2].sendOperation(new DeleteOperation(1, "cde"), 800);
+        clients[1].sendOperation(new DeleteOperation(3, "e"), 500);
+
+        network.execute(800);
 
         assertEqualDocs("bfg", clients);
     }
@@ -126,17 +127,17 @@ public class DOptPuzzleTest extends JupiterTestCase {
             clients[0].sendOperation(new InsertOperation(0, "a"), 200);
             clients[1].sendOperation(new InsertOperation(1, "b"), 400);
 
-            Thread.sleep(600);
-            clients[2].sendOperation(new DeleteOperation(1, "ab"), 700);
-            clients[1].sendOperation(new InsertOperation(2, "by"), 100);
-            clients[0].sendOperation(new InsertOperation(1, "x"), 400);
+            network.execute(600);
+            clients[1].sendOperation(new InsertOperation(2, "by"), 700);
+            clients[0].sendOperation(new InsertOperation(1, "x"), 1000);
+            clients[2].sendOperation(new DeleteOperation(1, "ab"), 1300);
         } catch (RuntimeException e) {
             // Document.execOperation throws RuntimeException on inconsistency
             // Convert this to a test failure.
             fail(e.getMessage());
         }
 
-        Thread.sleep(1000);
+        network.execute();
 
         assertEqualDocs("axbybc", clients);
     }

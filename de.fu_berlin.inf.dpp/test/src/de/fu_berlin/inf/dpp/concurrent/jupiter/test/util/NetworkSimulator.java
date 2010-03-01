@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
-import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -14,16 +14,9 @@ import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 /**
  * This class simulates a network.
  * 
- * TODO The use of threads is unnecessary and causes non-deterministic behavior
- * when running the tests for example in debug mode. This should be replaced by
- * an implementation that does not use threads to "send" the messages.
- * 
  * @author troll
- * 
  */
 public class NetworkSimulator {
-
-    private static Logger log = Logger.getLogger(NetworkSimulator.class);
 
     private HashMap<JID, NetworkEventHandler> clients;
 
@@ -34,35 +27,47 @@ public class NetworkSimulator {
 
     public IPath path = new Path("dummy");
 
+    protected PriorityQueue<NetworkRequest> sendQueue = new PriorityQueue<NetworkRequest>();
+
+    protected int presentTime = -1;
+
     public NetworkSimulator() {
         clients = new HashMap<JID, NetworkEventHandler>();
     }
 
-    private void sendOperation(NetworkRequest req) {
-        if (clients.containsKey(req.getTo())) {
-            log.debug("send message to " + req.getTo());
+    public void sendOperation(final NetworkRequest req) {
+
+        if (req.getDelay() == -1) {
             clients.get(req.getTo()).receiveNetworkEvent(req);
+            return;
+        }
+
+        if (req.getDelay() <= presentTime)
+            throw new IllegalArgumentException(
+                "Request cannot have a time in the past");
+
+        sendQueue.add(req);
+    }
+
+    public void execute() {
+        while (sendQueue.size() > 0) {
+            execute(sendQueue.peek().getDelay());
         }
     }
 
-    public void sendOperation(final NetworkRequest req, final int delay) {
-        new Thread(new Runnable() {
-            public void run() {
-                log.debug("Delay in send operation "
-                    + req.getJupiterActivity().getOperation().toString()
-                    + " of " + delay + " millis");
-                try {
-                    Thread.sleep(delay);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    sendOperation(req);
-                } catch (RuntimeException e) {
-                    error = e;
-                }
-            }
-        }).start();
+    public void execute(int newPresentTime) {
+
+        if (newPresentTime <= presentTime)
+            throw new IllegalArgumentException();
+
+        presentTime = newPresentTime;
+        int result = 0;
+        while (sendQueue.size() > 0
+            && sendQueue.peek().getDelay() <= presentTime) {
+            NetworkRequest nextRequest = sendQueue.poll();
+            clients.get(nextRequest.getTo()).receiveNetworkEvent(nextRequest);
+            result++;
+        }
     }
 
     public void addClient(NetworkEventHandler remote) {

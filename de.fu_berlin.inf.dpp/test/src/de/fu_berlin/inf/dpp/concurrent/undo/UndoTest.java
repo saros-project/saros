@@ -211,6 +211,14 @@ public class UndoTest {
         assertEquals(expected, undo(path1));
     }
 
+    /**
+     * This test currently fails, because the UndoManager is using GOTOTransform
+     * which swallows a delete during undo.
+     * 
+     * Reworking the UndoManager is necessary.
+     * 
+     * Ask Sebastian
+     */
     @Test
     public void testBackspaceUndo() {
         history.add(path1, Type.LOCAL, new InsertOperation(3, "abc"));

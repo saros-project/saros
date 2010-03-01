@@ -8,9 +8,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class ServerSynchronizedDocument implements JupiterServer,
@@ -140,16 +138,6 @@ public class ServerSynchronizedDocument implements JupiterServer,
     }
 
     /**
-     * send operation to special jid.
-     * 
-     * @param jid
-     * @param op
-     */
-    public void sendOperation(JID jid, Operation op) {
-        sendOperation(jid, op, 0);
-    }
-
-    /**
      * send operation only for two-way protocol test.
      * 
      * @param jid
@@ -165,7 +153,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
         /* sent to client */
         // connection.sendOperation(jid, req,delay);
         connection.sendOperation(new NetworkRequest(this.user, jid,
-            jupiterActivity), delay);
+            jupiterActivity, delay));
 
     }
 
@@ -190,11 +178,6 @@ public class ServerSynchronizedDocument implements JupiterServer,
         proxyQueues.remove(jid);
     }
 
-    public void sendTransformedOperation(Operation op, JID toJID) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void receiveNetworkEvent(NetworkRequest req) {
         receiveOperation(req.getJupiterActivity(), req.getFrom().getJID());
     }
@@ -202,20 +185,4 @@ public class ServerSynchronizedDocument implements JupiterServer,
     public Algorithm getAlgorithm() {
         return algorithm;
     }
-
-    public void addJupiterDocumentListener(JupiterDocumentListener jdl) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void removeJupiterDocumentListener(String id) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void updateVectorTime(Timestamp timestamp) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

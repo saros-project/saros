@@ -54,7 +54,7 @@ public class ProxySynchronizedQueue {
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
             this.user, null);
         connection.sendOperation(new NetworkRequest(this.user, user.getJID(),
-            jupiterActivity), 0);
+            jupiterActivity, -1));
     }
 
     public Algorithm getAlgorithm() {

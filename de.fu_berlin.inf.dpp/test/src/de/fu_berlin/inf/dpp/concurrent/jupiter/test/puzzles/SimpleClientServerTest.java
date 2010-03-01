@@ -39,30 +39,33 @@ public class SimpleClientServerTest extends JupiterTestCase {
 
         setupClientServer("abc");
 
-        client.sendOperation(new InsertOperation(0, "e"), 500);
+        client.sendOperation(new InsertOperation(0, "e"), 100);
 
-        Thread.sleep(100);
         assertEquals("eabc", client.getDocument());
         assertEquals("abc", server.getDocument());
 
-        client.sendOperation(new InsertOperation(0, "x"), 700);
+        client.sendOperation(new InsertOperation(0, "x"), 200);
 
-        Thread.sleep(100);
         assertEquals("xeabc", client.getDocument());
         assertEquals("abc", server.getDocument());
 
         server.sendOperation(client.getUser().getJID(), new DeleteOperation(0,
-            "a"), 0);
+            "a"), 50);
 
-        Thread.sleep(100);
+        assertEquals("xeabc", client.getDocument());
+        assertEquals("bc", server.getDocument());
+
+        network.execute(50);
         assertEquals("xebc", client.getDocument());
         assertEquals("bc", server.getDocument());
 
-        Thread.sleep(300); // 1st Client operation arrives
+        network.execute(100); // 1st Client operation arrives
+        assertEquals("xebc", client.getDocument());
         assertEquals("ebc", server.getDocument());
 
-        Thread.sleep(300); // Server operation arrives
-        assertEqualDocs("xebc", client, server);
+        network.execute(200); // 2nd client operation arrives
+        assertEquals("xebc", client.getDocument());
+        assertEquals("xebc", server.getDocument());
     }
 
     /**
@@ -77,11 +80,11 @@ public class SimpleClientServerTest extends JupiterTestCase {
         client.sendOperation(new InsertOperation(3, "x"), 100);
         server.sendOperation(client.getUser().getJID(), new DeleteOperation(1,
             "bcde"), 400);
-        Thread.sleep(300);
+
+        network.execute(200);
         assertEquals("abcxdefg", client.getDocument());
 
-        Thread.sleep(200);
-
+        network.execute(400);
         assertEqualDocs("axfg", client, server);
     }
 
@@ -94,13 +97,13 @@ public class SimpleClientServerTest extends JupiterTestCase {
         setupClientServer("abcdefg");
 
         client.sendOperation(new InsertOperation(3, "x"), 300);
-        server
-            .sendOperation(client.getJID(), new DeleteOperation(1, "bcde"), 0);
-        Thread.sleep(100);
+        server.sendOperation(client.getJID(), new DeleteOperation(1, "bcde"),
+            100);
+
+        network.execute(100);
         assertEquals("afg", server.getDocument());
 
-        Thread.sleep(500);
-
+        network.execute();
         assertEqualDocs("axfg", client, server);
     }
 }

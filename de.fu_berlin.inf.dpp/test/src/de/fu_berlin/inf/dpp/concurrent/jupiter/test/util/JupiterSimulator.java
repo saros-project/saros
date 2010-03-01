@@ -41,7 +41,7 @@ public class JupiterSimulator {
 
     public class Peer {
 
-        protected Algorithm algorithm = new Jupiter(true);
+        protected Algorithm algorithm;
 
         protected List<JupiterActivity> inQueue = new LinkedList<JupiterActivity>();
 

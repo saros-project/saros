@@ -46,8 +46,7 @@ public abstract class JupiterTestCase {
         }
     }
 
-    public ClientSynchronizedDocument[] setUp(int number, String initialText)
-        throws InterruptedException {
+    public ClientSynchronizedDocument[] setUp(int number, String initialText) {
 
         // Create Server
         ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
@@ -64,7 +63,6 @@ public abstract class JupiterTestCase {
             s1.addProxyClient(result[i].getUser());
         }
 
-        Thread.sleep(100);
         return result;
     }
 

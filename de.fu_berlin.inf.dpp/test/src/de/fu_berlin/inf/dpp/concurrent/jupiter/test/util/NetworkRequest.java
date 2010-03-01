@@ -4,17 +4,22 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class NetworkRequest {
+public class NetworkRequest implements Comparable<NetworkRequest> {
 
-    private User from;
+    protected User from;
 
-    private JID to;
+    protected JID to;
 
-    private JupiterActivity jupiterActivity;
+    protected JupiterActivity jupiterActivity;
 
-    public NetworkRequest(User from, JID to, JupiterActivity jupiterActivity) {
+    protected int delay;
+
+    public NetworkRequest(User from, JID to, JupiterActivity jupiterActivity,
+        int delay) {
         this.from = from;
         this.to = to;
+        this.delay = delay;
+
         /* adaption to new JupiterActivity format. */
         if (jupiterActivity.getSource() == null) {
             this.jupiterActivity = new JupiterActivity(jupiterActivity
@@ -35,5 +40,13 @@ public class NetworkRequest {
 
     public JupiterActivity getJupiterActivity() {
         return jupiterActivity;
+    }
+
+    public int compareTo(NetworkRequest o) {
+        return Integer.valueOf(delay).compareTo(o.delay);
+    }
+
+    public int getDelay() {
+        return delay;
     }
 }

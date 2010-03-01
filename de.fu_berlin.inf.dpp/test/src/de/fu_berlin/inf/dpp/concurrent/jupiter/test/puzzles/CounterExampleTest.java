@@ -50,14 +50,12 @@ public class CounterExampleTest extends JupiterTestCase {
         server.addProxyClient(alice);
         server.addProxyClient(bob);
 
-        Thread.sleep(100);
-
         /* O3 || O2 */
 
         client_1.sendOperation(new InsertOperation(1, "x"), 100);
         client_2.sendOperation(new DeleteOperation(1, "b"), 200);
 
-        Thread.sleep(400);
+        network.execute(200);
 
         assertEquals(client_1.getDocument(), client_2.getDocument());
         assertEquals("axc", client_1.getDocument());
@@ -93,14 +91,12 @@ public class CounterExampleTest extends JupiterTestCase {
         server.addProxyClient(bob);
         server.addProxyClient(carl);
 
-        Thread.sleep(100);
-
         /* O3 || O2 */
         client_1.sendOperation(new InsertOperation(1, "x"), 100);
         client_2.sendOperation(new DeleteOperation(1, "b"), 200);
         client_3.sendOperation(new InsertOperation(2, "y"), 1000);
 
-        Thread.sleep(2000);
+        network.execute(1000);
 
         assertEquals(client_1.getDocument(), client_2.getDocument());
         assertEquals(client_2.getDocument(), client_3.getDocument());
@@ -137,14 +133,12 @@ public class CounterExampleTest extends JupiterTestCase {
         server.addProxyClient(bob);
         server.addProxyClient(carl);
 
-        Thread.sleep(100);
-
         /* O3 || O2 */
         client_1.sendOperation(new InsertOperation(1, "y"), 100);
         client_2.sendOperation(new DeleteOperation(1, "b"), 200);
         client_3.sendOperation(new InsertOperation(2, "y"), 1000);
 
-        Thread.sleep(1200);
+        network.execute(1000);
 
         assertEquals(client_1.getDocument(), client_2.getDocument());
         assertEquals(client_2.getDocument(), client_3.getDocument());
