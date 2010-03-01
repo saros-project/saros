@@ -230,35 +230,22 @@ public class AddContactWizard extends Wizard {
                         + " The user chose to add it anyway.");
                 }
             } catch (XMPPException e) {
-                // handle the different exceptions
-                if (e.getMessage().contains("item-not-found")) {
-                    throw new InvocationTargetException(e, "Contact " + jid
-                        + " couldn't be found on server.");
-                }
 
-                if (e.getMessage().contains("remote-server-not-found")) {
-                    throw new InvocationTargetException(e, "The server "
-                        + jid.getDomain() + " couldn't be found.");
-                }
+                String error = extractDiscoveryErrorString(jid, e);
 
-                if (e.getMessage().contains("No response from the server")) {
-                    throw new InvocationTargetException(e,
-                        "Couldn't connect to server " + jid.getDomain());
-                }
                 // ask the user what to do
-                if (!openQuestionDialog("XMPP Error",
+                if (!openQuestionDialog("Contact look-up failed",
                     "We weren't able to determine wether your contact's JID "
-                        + jid + " is valid because the XMPP server"
-                        + " seems to not support the query.\n"
-                        + "Do you want to add it anyway?")) {
+                        + jid + " is valid because of the following error:\n\n"
+                        + error + "\n\n" + "Do you want to add it anyway?")) {
                     // don't add contact
                     throw new InvocationTargetException(e,
                         "The XMPP server did not support a query for whether "
                             + jid + " is a valid JID.");
                 }
-                log.debug("The XMPP server did not support a query for"
+                log.warn("The XMPP server did not support a query for"
                     + " whether " + jid + " is a valid JID: " + e.getMessage()
-                    + ". The user chose to add it anyway.");
+                    + ". The user chose to add it anyway.", e);
             }
 
             // now add the contact to the Roster
@@ -275,6 +262,21 @@ public class AddContactWizard extends Wizard {
             }
         } finally {
             monitor.done();
+        }
+    }
+
+    public String extractDiscoveryErrorString(JID jid, XMPPException e) {
+
+        if (e.getMessage().contains("item-not-found")) {
+            return "Contact " + jid + " couldn't be found on server.";
+        } else if (e.getMessage().contains("remote-server-not-found")) {
+            return "The server " + jid.getDomain()
+                + " couldn't be connected to.";
+        } else if (e.getMessage().contains("No response from the server")) {
+            return "Checking for contact " + jid.getName()
+                + " timed out on server " + jid.getDomain();
+        } else {
+            return e.getMessage();
         }
     }
 
