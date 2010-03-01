@@ -89,20 +89,30 @@ public class StartHandle {
         stopManager.initiateUnlock(this);
 
         if (stopManager.getStartHandles(user).isEmpty()) {
-            try {
-                while (!acknowledged.get() && !progress.isCanceled())
-                    Thread.sleep(stopManager.MILLISTOWAIT);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.error("Code not designed to be interruptable", e);
-            }
-            if (progress.isCanceled())
-                throw new CancellationException();
-
-            return acknowledged.get();
+            return await(progress);
         }
 
         return false;
+    }
+
+    /**
+     * Waits until the StartHandle is acknowledged or the waiting is canceled
+     * using the given progress monitor.
+     * 
+     * Returns whether the handle was acknowledged or not
+     */
+    public boolean await(final SubMonitor progress) {
+        try {
+            while (!acknowledged.get() && !progress.isCanceled())
+                Thread.sleep(stopManager.MILLISTOWAIT);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Code not designed to be interruptable", e);
+        }
+        if (progress.isCanceled())
+            throw new CancellationException();
+
+        return acknowledged.get();
     }
 
     public User getUser() {
