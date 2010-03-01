@@ -607,7 +607,7 @@ public class Util {
 
     /**
      * Return a string representation of the given paths suitable for debugging
-     * by joining their OS dependent representation by ', '
+     * by joining their OS dependent full path representation by ', '
      */
     public static String toOSString(final Set<SPath> paths) {
         StringBuilder sb = new StringBuilder();
@@ -615,7 +615,7 @@ public class Util {
             if (sb.length() > 0)
                 sb.append(", ");
 
-            sb.append(path.toString());
+            sb.append(path.getFullPath().toOSString());
         }
         return sb.toString();
     }
