@@ -24,16 +24,27 @@ import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 
+import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -56,7 +67,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
  * offers an option to transfer the settings
  * 
  * TODO Create a separate Wizard class with the following concerns implemented
- * more nicely: Long-Running Operation after each step, cancelation by a remote
+ * more nicely: Long-Running Operation after each step, cancellation by a remote
  * party, auto-advance.
  * 
  * @author rdjemili
@@ -182,10 +193,19 @@ public class JoinSessionWizard extends Wizard {
          * are supposed to be overwritten based on the synchronization options
          * and if there are differences between the remote and local project.
          */
-        if (namePage.overwriteProjectResources()
-            && process.getRemoteFileList().computeMatch(source) != 100) {
-            if (!confirmOverwritingProjectResources(source.getName()))
+        if (namePage.overwriteProjectResources()) {
+            FileList diff;
+            try {
+                diff = new FileList(source).diff(process.getRemoteFileList());
+            } catch (CoreException e) {
+                MessageDialog.openError(getShell(), "Error computing FileList",
+                    "Could not compute local FileList: " + e.getMessage());
                 return false;
+            }
+            if (diff.getRemovedPaths().size() > 0
+                || diff.getAlteredPaths().size() > 0)
+                if (!confirmOverwritingProjectResources(source.getName(), diff))
+                    return false;
         }
 
         try {
@@ -213,19 +233,59 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    public boolean confirmOverwritingProjectResources(final String projectName) {
+    public static class OverwriteErrorDialog extends ErrorDialog {
+
+        public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
+            String dialogMessage, IStatus status) {
+            super(parentShell, dialogTitle, dialogMessage, status, IStatus.OK
+                | IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
+        }
+
+        @Override
+        protected void createButtonsForButtonBar(Composite parent) {
+            super.createButtonsForButtonBar(parent);
+            Button ok = getButton(IDialogConstants.OK_ID);
+            ok.setText("Yes");
+            Button no = createButton(parent, IDialogConstants.CANCEL_ID, "No",
+                true);
+            no.moveBelow(ok);
+            no.setFocus();
+        }
+    }
+
+    public boolean confirmOverwritingProjectResources(final String projectName,
+        final FileList diff) {
         try {
             return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
+
                     String message = "The selected project '"
                         + projectName
-                        + "' will be used as a target project to carry out "
-                        + "the synchronization. All differences will be resolved "
-                        + "using the hosts project, so local project data may be lost. "
-                        + "(You can use the 'Create copy...' option as an alternative.)"
-                        + "\n\n Do you want to proceed?";
-                    return MessageDialog.openQuestion(getShell(),
-                        "Project synchronization confirmation", message);
+                        + "' will be used as a target project to carry out the synchronization.\n\n"
+                        + "All local changes in the project will be overwritten using the host's project and additional files will be deleted!\n\n"
+                        + "Press No and select 'Create copy...' in the invitation dialog if you are unsure.\n\n"
+                        + "Do you want to proceed?";
+
+                    String PID = Saros.SAROS;
+                    MultiStatus info = new MultiStatus(PID, 1, message, null);
+                    for (IPath path : diff.getRemovedPaths()) {
+                        info
+                            .add(new Status(IStatus.WARNING, PID, 1,
+                                "File will be removed: " + path.toOSString(),
+                                null));
+                    }
+                    for (IPath path : diff.getAlteredPaths()) {
+                        info.add(new Status(IStatus.WARNING, PID, 1,
+                            "File will be overwritten: " + path.toOSString(),
+                            null));
+                    }
+                    for (IPath path : diff.getAddedPaths()) {
+                        info.add(new Status(IStatus.INFO, PID, 1,
+                            "File will be added: " + path.toOSString(), null));
+                    }
+                    return new OverwriteErrorDialog(getShell(),
+                        "Warning: Local changes will be deleted", null, info)
+                        .open() == IDialogConstants.OK_ID;
                 }
             });
         } catch (Exception e) {
