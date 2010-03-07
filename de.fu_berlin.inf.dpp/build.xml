@@ -9,26 +9,39 @@ USE: Run this in the project root directory as
 ant -lib lib/ant4eclipse -Declipse.plugin.dir=<DIR> [TARGET]
 
 NOTE:
-- requires the property "eclipse.plugin.dir" to be set externally
-  (use -Declipse.plugin.dir=DIR)
+- requires following properties to be set
+  eclipse.plugin.dir=DIR (path to eclipse plugin libs)
+  cobertura.dir=DIR (cobertura libs)
 - you can force the use of a specific JDK by uncommemnting
   the <ant4eclipse:installedJREs> section below
 -->
 
-<project name="build.saros"
-         basedir="."
-         default="build"
-         xmlns:ant4eclipse="antlib:org.ant4eclipse">
+<project name="build.saros" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
 
 	<!-- define ant4eclipse tasks -->
-	<taskdef uri="antlib:org.ant4eclipse"
-	         resource="org/ant4eclipse/antlib.xml" />
+	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
 
 	<!-- import the ant4eclipse pde macros -->
 	<import file="${basedir}/ant4eclipse/macros/a4e-pde-macros.xml" />
 
+	<path id="cobertura.classpath">
+		<fileset dir="${cobertura.dir}">
+			<include name="cobertura.jar" />
+			<include name="lib/**/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
 	<!-- define the workspace location here -->
-	<property name="workspaceDirectory" value="${basedir}/.."/>
+	<property name="workspaceDirectory" value="${basedir}/.." />
+
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="report.dir" value="${build.dir}/report" />
+	<property name="instrumented.dir" value="${build.dir}/instrumented" />
+	<property name="uninstrumented.dir" value="${build.dir}/uninstrumented" />
+	<property name="cobertura.datafile" value="${report.dir}/cobertura.ser" />
 
 	<!-- define your jdk location here
 		<ant4eclipse:installedJREs>
@@ -44,31 +57,53 @@ NOTE:
 	</ant4eclipse:targetPlatform>
 
 	<!-- acquire access to the project classpath for unit tests -->
-	<ant4eclipse:getJdtClassPath pathId="saros.classpath"
-                             workspaceDirectory="${workspaceDirectory}"
-                             projectName="Saros" />
+	<ant4eclipse:getJdtClassPath pathId="saros.classpath" workspaceDirectory="${workspaceDirectory}" projectName="Saros" />
 
 	<!-- Targets -->
 	<target name="build">
-		<buildPlugin workspaceDirectory="${workspaceDirectory}"
-			         projectname="Saros"
-			         targetplatformid="saros.target.platform"
-			         destination="${basedir}/build" />
+		<mkdir dir="${uninstrumented.dir}" />
+		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectname="Saros" targetplatformid="saros.target.platform" destination="${uninstrumented.dir}" />
 	</target>
 
 	<target name="test" depends="build">
-		<junit>
+		<delete file="${cobertura.datafile}" />
+		<mkdir dir="${instrumented.dir}" />
+		<cobertura-instrument todir="${instrumented.dir}" datafile="${cobertura.datafile}">
+			<!-- only instrument Saros proper code -->
+			<includeClasses regex="de\.fu_berlin\.inf\.dpp.*" />
+			<!-- exclude classes ending in Test -->
+			<excludeClasses regex=".*Test" />
+			<!-- exclude classes starting with Test -->
+			<excludeClasses regex=".*\.Test.*" />
+			<!-- exclude classes in a test package -->
+			<excludeClasses regex=".*\.test\..*" />
+			<fileset dir="${uninstrumented.dir}/plugins">
+				<include name="de.fu_berlin.inf.dpp_*.jar" />
+			</fileset>
+		</cobertura-instrument>
+
+		<junit fork="yes">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
+			<!-- add instrumented binaries first -->
+			<classpath>
+				<fileset dir="${instrumented.dir}">
+					<include name="de.fu_berlin.inf.dpp_*.jar" />
+				</fileset>
+			</classpath>
 			<classpath refid="saros.classpath" />
-			<formatter type="brief" usefile="false" />
-			<test name="de.fu_berlin.inf.dpp.AllTestsSuite" />
-			<formatter type="xml"/>
+			<classpath refid="cobertura.classpath" />
+
+			<formatter type="xml" />
+
+			<test name="de.fu_berlin.inf.dpp.AllTestsSuite" todir="${report.dir}" />
 		</junit>
-		<junitreport todir="${basedir}/build"/>
+
+		<!-- srcdir is only used for cyclomatic complexity, you have to exclude tests from instrumentation
+		     if you don't want them included in the report -->
+		<cobertura-report format="xml" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
 	</target>
 
 	<target name="clean">
-		<delete failonerror="false">
-			<fileset dir="${basedir}/build" includes="**/*"/>
-		</delete>
+		<delete failonerror="false" dir="${build.dir}" />
 	</target>
 </project>
