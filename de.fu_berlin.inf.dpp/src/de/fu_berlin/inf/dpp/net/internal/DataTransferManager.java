@@ -321,6 +321,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                     monitor.beginTask("Receive via IBB", 10000);
 
+                    // TODO how to handle files larger than the max size of a
+                    // byte array
                     IncomingFileTransfer accept = request.accept();
                     monitor.worked(100);
 

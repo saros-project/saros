@@ -1005,6 +1005,7 @@ public class Util {
      *            Estimated size of data in bytes to be read from the input
      *            stream used for initializing the progress monitor. Note: The
      *            whole stream is read and not only the given number of bytes.
+     *            The estimated size MUST be greater than 0.
      * 
      * @cancelable This long-running operation can be canceled via the given
      *             progress monitor and will throw an UserCancellationException
@@ -1012,23 +1013,41 @@ public class Util {
      */
     public static byte[] toByteArray(InputStream in, long estimatedSize,
         SubMonitor subMonitor) throws IOException, LocalCancellationException {
+        if (estimatedSize <= 0)
+            throw new IllegalArgumentException("estimated size ("
+                + estimatedSize + ") must be greater than 0.");
 
         byte[] buf = new byte[CHUNKSIZE];
         int count;
+        final int totalProgess = 10000;
+        long totalBytesReceived = 0;
+        int lastWorked = 0;
+
         ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(
             estimatedSize, Integer.MAX_VALUE));
 
-        int steps = (int) Math
-            .min(Integer.MAX_VALUE, estimatedSize / CHUNKSIZE);
-        subMonitor.beginTask("Reading from Inputstream", Math.max(1, steps));
+        subMonitor.beginTask("Reading from Inputstream", totalProgess);
+
         try {
             while ((count = in.read(buf, 0, CHUNKSIZE)) > 0) {
 
                 if (subMonitor.isCanceled())
                     throw new LocalCancellationException();
-
                 bos.write(buf, 0, count);
-                subMonitor.worked(1);
+
+                totalBytesReceived += count;
+
+                // compute progress
+                int worked = (int) Math
+                    .round((totalBytesReceived / (double) estimatedSize)
+                        * totalProgess);
+                // set progress if any between the last loop and now
+                if (worked > lastWorked) {
+                    subMonitor.worked(worked - lastWorked);
+                }
+                // remember last progress for next loop
+                lastWorked = worked;
+
             }
             return bos.toByteArray();
         } finally {
