@@ -21,12 +21,14 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
+import org.jivesoftware.smackx.packet.Jingle;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -100,6 +102,17 @@ public class DataTransferManager implements ConnectionSessionListener {
                 // make sure the cast will work
                 if (value instanceof Boolean) {
                     forceFileTransferByChat = ((Boolean) value).booleanValue();
+
+                    // add/remove Jingle XMPP feature
+                    ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+                        .getInstanceFor(connection);
+                    if (forceFileTransferByChat) {
+                        sdm.removeFeature(Jingle.NAMESPACE);
+                    } else {
+                        if (!sdm.includesFeature(Jingle.NAMESPACE))
+                            sdm.addFeature(Jingle.NAMESPACE);
+                    }
+
                 } else {
                     log.warn("Preference value FORCE_FILETRANSFER_BY_CHAT"
                         + " is supposed to be a boolean, but it unexpectedly"

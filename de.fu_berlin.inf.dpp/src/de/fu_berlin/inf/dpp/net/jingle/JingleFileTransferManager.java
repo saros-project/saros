@@ -240,9 +240,6 @@ public class JingleFileTransferManager {
         jm = new JingleManager(xmppConnection, Collections
             .singletonList((JingleMediaManager) mediaManager));
 
-        // TODO [CO] This seems to be wrong
-        JingleManager.setJingleServiceEnabled();
-
         jm.addJingleSessionRequestListener(new JingleSessionRequestListener() {
             public void sessionRequested(JingleSessionRequest request) {
 

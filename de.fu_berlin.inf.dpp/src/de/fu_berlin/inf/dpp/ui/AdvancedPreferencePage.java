@@ -52,7 +52,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-            "Avoid direct file transfer connection (needs restart)",
+            "Avoid direct file transfer connection (needs session restart)",
             getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(

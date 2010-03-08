@@ -45,6 +45,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -54,7 +55,7 @@ import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.packet.Jingle;
+import org.jivesoftware.smackx.jingle.JingleManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -419,6 +420,32 @@ public class Saros extends AbstractUIPlugin {
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
+        /*
+         * add Saros as XMPP feature once XMPPConnection is connected to the
+         * XMPP server
+         */
+        XMPPConnection
+            .addConnectionCreationListener(new ConnectionCreationListener() {
+
+                public void connectionCreated(XMPPConnection connection) {
+                    ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+                        .getInstanceFor(connection);
+                    sdm.addFeature(Saros.NAMESPACE);
+                }
+
+            });
+
+        // add Jingle feature to the supported extensions
+        if (!getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
+            /*
+             * this call registers a ConnectionCreationListener which adds the
+             * Jingle feature once the XMPPConnection is connected to the XMPP
+             * server
+             */
+            JingleManager.setJingleServiceEnabled();
+        }
+
         setupLoggers();
         log.info("Starting Saros " + sarosVersion + " running:\n"
             + Util.getPlatformInfo());
@@ -612,18 +639,6 @@ public class Saros extends AbstractUIPlugin {
                     new XMPPConnectionListener());
             }
             connection.addConnectionListener(this.smackConnectionListener);
-
-            /* add Saros as XMPP feature */
-            ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                .getInstanceFor(connection);
-            sdm.addFeature(Saros.NAMESPACE);
-
-            // add Jingle feature to the supported extensions
-            if (!prefStore
-                .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
-                // add Jingle Support for the current connection
-                sdm.addFeature(Jingle.NAMESPACE);
-            }
 
             Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
