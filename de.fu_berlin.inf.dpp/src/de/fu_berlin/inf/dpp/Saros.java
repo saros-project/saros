@@ -1001,9 +1001,10 @@ public class Saros extends AbstractUIPlugin {
      */
     public boolean isJIDonServer(JID jid, SubMonitor monitor)
         throws XMPPException {
-        monitor.beginTask("", 2);
+        monitor.beginTask("Performing Service Discovery on JID " + jid, 2);
 
-        ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(connection);
+        ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+            .getInstanceFor(connection);
         monitor.worked(1);
 
         if (monitor.isCanceled())
