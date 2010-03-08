@@ -36,6 +36,7 @@ NOTE:
 	<!-- define the workspace location here -->
 	<property name="workspaceDirectory" value="${basedir}/.." />
 
+	<property name="cobertura.format" value="xml" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="report.dir" value="${build.dir}/report" />
@@ -100,7 +101,7 @@ NOTE:
 
 		<!-- srcdir is only used for cyclomatic complexity, you have to exclude tests from instrumentation
 		     if you don't want them included in the report -->
-		<cobertura-report format="xml" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
+		<cobertura-report format="${cobertura.format}" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
 	</target>
 
 	<target name="clean">
