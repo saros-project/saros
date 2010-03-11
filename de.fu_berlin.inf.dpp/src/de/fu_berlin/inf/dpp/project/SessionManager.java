@@ -35,8 +35,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
@@ -53,6 +51,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelOption;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -230,7 +229,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             }
 
             clearSessionID();
-
             log.info("Session left");
         } finally {
             stopSharedProjectLock.unlock();
@@ -359,154 +357,105 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     /**
-     * Represents the connection between the {@link OutgoingInvitationProcess}
-     * and the GUI. It wraps the instance of {@link OutgoingInvitationProcess}
-     * and cares about handling the exceptions and notifying the user about the
-     * progress using the Eclipse Jobs API.
      * 
-     * TODO: the jobs should be started in a dialog with the option
-     * "Run in background". But in this case if more jobs are started
-     * concurrently, a lots of dialogs pop up. Can they integrated in one
-     * dialog?
+     * OutgoingInvitationJob wraps the instance of
+     * {@link OutgoingInvitationProcess} and cares about handling the exceptions
+     * like local or remote cancellation.
+     * 
+     * It notifies the user about the progress using the Eclipse Jobs API and
+     * interrupts the process if the session closes.
+     * 
      */
-    protected static class OutgoingInvitationJob extends Job {
+    protected class OutgoingInvitationJob extends Job {
+
         protected OutgoingInvitationProcess process;
         protected String peer;
-        protected Shell dialogShell;
+        protected ISessionListener cancelListener = new ISessionListener() {
+
+            public void invitationReceived(IncomingInvitationProcess invitation) {
+                // Nothing to do here
+            }
+
+            public void sessionEnded(ISharedProject oldSharedProject) {
+                process.localCancel(null, CancelOption.NOTIFY_PEER);
+            }
+
+            public void sessionStarted(ISharedProject newSharedProject) {
+                // Nothing to do here
+            }
+
+        };
 
         public OutgoingInvitationJob(OutgoingInvitationProcess process) {
             super("Inviting " + process.getPeer().getBase() + "...");
             this.process = process;
             this.peer = process.getPeer().getBase();
-            setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
-                true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY, SarosUI
                 .getImageDescriptor("/icons/invites.png"));
-            dialogShell = EditorAPI.getShell();
-            if (dialogShell == null)
-                dialogShell = new Shell();
-        }
-
-        protected void jobCompleted() {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    MessageDialog.openInformation(dialogShell,
-                        "Invitation Complete",
-                        "Your invitation has completed!\n\n" + peer
-                            + " is now in the session.");
-                }
-            });
-        }
-
-        protected Action jobCompletedAction() {
-            return new Action("Invitation has completed.") {
-                @Override
-                public void run() {
-                    jobCompleted();
-                }
-            };
-        }
-
-        protected void jobCancelledLocally(final String errorMsg) {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    if (errorMsg != null)
-                        MessageDialog
-                            .openError(dialogShell, "Invitation Cancelled",
-                                "The invitation of " + peer
-                                    + " has been cancelled "
-                                    + "locally because of an error:\n\n"
-                                    + errorMsg);
-                    else
-                        MessageDialog.openInformation(dialogShell,
-                            "Invitation Cancelled",
-                            "You have cancelled the invitation of " + peer
-                                + "!");
-                }
-            });
-        }
-
-        protected Action jobCancelledLocallyAction(final String errorMsg) {
-            return new Action("Invitation has completed.") {
-                @Override
-                public void run() {
-                    jobCancelledLocally(errorMsg);
-                }
-            };
-        }
-
-        protected void jobCancelledRemotely(final String errorMsg) {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    if (errorMsg == null)
-                        MessageDialog.openInformation(dialogShell,
-                            "Invitation Cancelled",
-                            "Your invitation has been cancelled "
-                                + "remotely by " + peer + "!");
-                    else
-                        MessageDialog.openError(dialogShell,
-                            "Invitation Cancelled",
-                            "Your invitation has been cancelled "
-                                + "remotely by " + peer
-                                + " because of an error:\n\n" + errorMsg);
-                }
-            });
-        }
-
-        protected Action jobCancelledRemotelyAction(final String errorMsg) {
-            return new Action("Invitation has completed.") {
-                @Override
-                public void run() {
-                    jobCancelledRemotely(errorMsg);
-                }
-            };
         }
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
+
+                registerCancelListener();
                 process.start(SubMonitor.convert(monitor));
+
             } catch (LocalCancellationException e) {
-                if (isModal(this)) {
-                    setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
-                    jobCancelledLocally(e.getMessage());
-                } else {
-                    setProperty(IProgressConstants.ACTION_PROPERTY,
-                        jobCancelledLocallyAction(e.getMessage()));
-                }
+
                 return Status.CANCEL_STATUS;
+
             } catch (RemoteCancellationException e) {
-                if (isModal(this)) {
-                    setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
-                    jobCancelledRemotely(e.getMessage());
+
+                if (e.getMessage() == null) { // remote user canceled purposely
+
+                    return new Status(IStatus.ERROR, Saros.SAROS, peer
+                        + " has canceled your Invitation.");
+
                 } else {
-                    setProperty(IProgressConstants.ACTION_PROPERTY,
-                        jobCancelledRemotelyAction(e.getMessage()));
+
+                    return new Status(
+                        IStatus.ERROR,
+                        Saros.SAROS,
+                        "Your invitation to "
+                            + peer
+                            + " has been canceled remotely because of an error:\n\n"
+                            + e.getMessage());
                 }
-                return Status.CANCEL_STATUS;
+
             } catch (Exception e) {
-                // TODO: the user should be notified
+
                 log.error("This exception is not expected here: ", e);
+                return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
+
+            } finally {
+
+                releaseCancelListener();
+
             }
 
-            // Everything went well.
-            if (isModal(this)) {
-                setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
-                jobCompleted();
-            } else {
-                setProperty(IProgressConstants.ACTION_PROPERTY,
-                    jobCompletedAction());
-            }
             return Status.OK_STATUS;
         }
 
-        public boolean isModal(Job job) {
-            Boolean isModal = (Boolean) job
-                .getProperty(IProgressConstants.PROPERTY_IN_DIALOG);
-            if (isModal == null)
-                return false;
-            return isModal.booleanValue();
+        protected void registerCancelListener() {
+            Util.runSafeSWTSync(log, new Runnable() {
+
+                public void run() {
+                    SessionManager.this.addSessionListener(cancelListener);
+                }
+
+            });
+        }
+
+        protected void releaseCancelListener() {
+            Util.runSafeSWTSync(log, new Runnable() {
+
+                public void run() {
+                    SessionManager.this.removeSessionListener(cancelListener);
+                }
+
+            });
         }
     }
 }
