@@ -75,7 +75,15 @@ public class TransferDescription implements Serializable {
          * Transfer of an ActivityExtension as XML that was serialized using
          * UTF-8 and GZIPped
          */
-        ACTIVITY_TRANSFER
+        ACTIVITY_TRANSFER,
+        /**
+         * data in a stream
+         */
+        STREAM_DATA,
+        /**
+         * meta data for a stream
+         */
+        STREAM_META
     }
 
     public FileTransferType type;
@@ -132,6 +140,12 @@ public class TransferDescription implements Serializable {
         case ACTIVITY_TRANSFER:
             return "Activity from " + Util.prefix(getSender()) + ": [SID="
                 + sessionID + "]";
+        case STREAM_DATA:
+            return "Stream data from " + Util.prefix(getSender())
+                + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
+        case STREAM_META:
+            return "Stream metadata from " + Util.prefix(getSender())
+                + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
         default:
             return "Not a valid FileTransferType";
         }
@@ -188,6 +202,30 @@ public class TransferDescription implements Serializable {
         result.type = FileTransferType.ACTIVITY_TRANSFER;
         result.sessionID = sessionID;
         result.compressed = false;
+
+        return result;
+    }
+
+    public static TransferDescription createStreamDataTransferDescription(
+        JID recipient, JID sender, String sessionID, String streamPath) {
+
+        TransferDescription result = new TransferDescription();
+        result.recipient = recipient;
+        result.sender = sender;
+        result.type = FileTransferType.STREAM_DATA;
+        result.sessionID = sessionID;
+        result.file_project_path = streamPath;
+        result.compressed = true;
+
+        return result;
+    }
+
+    public static TransferDescription createStreamMetaTransferDescription(
+        JID recipient, JID sender, String streamPath, String sessionID) {
+        TransferDescription result = createStreamDataTransferDescription(
+            recipient, sender, sessionID, streamPath);
+
+        result.type = FileTransferType.STREAM_META;
 
         return result;
     }
@@ -281,4 +319,5 @@ public class TransferDescription implements Serializable {
     public boolean compressInDataTransferManager() {
         return !compressed;
     }
+
 }

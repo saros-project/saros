@@ -7,6 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -1054,5 +1058,56 @@ public class Util {
             IOUtils.closeQuietly(bos);
             subMonitor.done();
         }
+    }
+
+    /**
+     * Serializes an {@link Serializable}. Errors are logged to {@link Util#log}
+     * . .
+     * 
+     * @param o
+     *            {@link Serializable} to serialize
+     * @return the serialized data or <code>null</code> (when not serializable)
+     */
+    public static byte[] serialize(Serializable o) {
+        if (o == null) {
+            return null;
+        }
+        byte[] data = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+            out.writeObject(o);
+            out.close();
+            data = bos.toByteArray();
+        } catch (NotSerializableException e) {
+            log.error("'" + o + "' is not serializable: ", e);
+        } catch (IOException e) {
+            log.error("Unexpected error during serialization: ", e);
+        }
+        return data;
+    }
+
+    /**
+     * Restores a serialized {@link Serializable}. Errors are logged to
+     * {@link Util#log}.
+     * 
+     * @param serialized
+     *            serialized {@link Object}
+     * @return deserialized {@link Object} or <code>null</code>
+     */
+    public static Object deserialize(byte[] serialized) {
+        Object o = null;
+        try {
+            ObjectInputStream in = new ObjectInputStream(
+                new ByteArrayInputStream(serialized));
+            o = in.readObject();
+            in.close();
+        } catch (IOException e) {
+            log.error("Unexpected error during deserialization: ", e);
+        } catch (ClassNotFoundException e) {
+            log.error("Class not found in system: ", e);
+        }
+
+        return o;
     }
 }
