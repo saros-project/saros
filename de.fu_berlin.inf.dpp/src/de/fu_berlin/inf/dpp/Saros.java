@@ -132,6 +132,7 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosState;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -352,6 +353,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(ParticipantCollector.class);
         this.container.addComponent(SessionDataCollector.class);
         this.container.addComponent(TextEditCollector.class);
+
+        // STF
+        this.container.addComponent(SarosState.class);
 
         // streaming services
 

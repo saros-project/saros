@@ -33,5 +33,9 @@
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar" sourcepath="lib/joda-time-1.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib/protobuf-2.3.0.jar" sourcepath="lib/protobuf-2.3.0-src.jar"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0.jar" sourcepath="lib/google-collect-1.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

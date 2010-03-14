@@ -13,6 +13,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.jdt.core;resolution:=optional,
  org.eclipse.jdt.ui;resolution:=optional,
+ org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.0",
+ org.eclipse.swtbot.junit4_x;bundle-version="2.0.0",
+ org.eclipse.swtbot.swt.finder;bundle-version="2.0.0",
+ org.hamcrest;bundle-version="1.1.0",
  org.junit4;resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: bin/,
@@ -41,7 +45,11 @@ Bundle-ClassPath: bin/,
  lib/commons-httpclient-3.1.jar,
  lib/joda-time-1.6.jar,
  lib/protobuf-2.3.0.jar,
- lib/google-collect-1.0.jar
+ lib/google-collect-1.0.jar,
+ lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar,
+ lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar,
+ lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar,
+ lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,

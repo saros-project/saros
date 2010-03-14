@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
+import java.rmi.RemoteException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -15,6 +17,8 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosState;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -27,12 +31,15 @@ import de.fu_berlin.inf.dpp.util.Util;
  * <br>
  * Checks whether the release number changed.
  * 
- * @author Lisa Dohrmann
+ * @author Lisa Dohrmann, Sandor Sz√ºcs
  */
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
 
     private static final Logger log = Logger.getLogger(StartupSaros.class);
+
+    @Inject
+    protected SarosState state;
 
     @Inject
     protected Saros saros;
@@ -59,6 +66,17 @@ public class StartupSaros implements IStartup {
         String lastVersion = saros.getConfigPrefs().get(
             PreferenceConstants.SAROS_VERSION, "unknown");
 
+        String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
+        log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
+
+        boolean testmode = portNumber != null;
+
+        if (testmode) {
+            int port = Integer.parseInt(portNumber);
+            log.info("entered testmode, start RMI bot listen on port " + port);
+            startRmiBot(port);
+        }
+
         boolean assertEnabled = false;
 
         // Side-effect-full assert to set assertEnabled to true if -ea
@@ -75,6 +93,25 @@ public class StartupSaros implements IStartup {
 
         showRoster();
         showConfigurationWizard();
+    }
+
+    protected void startRmiBot(final int port) {
+        log.info("start RMI Bot");
+        Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
+            public void run() {
+                log.debug("Util.isSWT(): " + Util.isSWT());
+                SarosRmiSWTWorkbenchBot bot = SarosRmiSWTWorkbenchBot
+                    .getInstance();
+
+                try {
+                    bot.init("Bot", port);
+                    bot.exportState(state, "state");
+                    bot.listRmiObjects();
+                } catch (RemoteException e) {
+                    log.error("remote:", e);
+                }
+            }
+        });
     }
 
     protected void showRoster() {
