@@ -107,7 +107,6 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
@@ -302,7 +301,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SkypeManager.class);
         this.container.addComponent(StatisticManager.class);
         this.container.addComponent(StopManager.class);
-        this.container.addComponent(StreamServiceManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VersionManager.class);
