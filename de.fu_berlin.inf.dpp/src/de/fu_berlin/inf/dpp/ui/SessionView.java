@@ -253,6 +253,8 @@ public class SessionView extends ViewPart {
         private final Image userImage = SarosUI.getImage("icons/user.png");
         private final Image driverImage = SarosUI
             .getImage("icons/user_edit.png");
+        private final Image observerImage = SarosUI
+            .getImage("icons/user_observer.png");
         private Font boldFont = null;
 
         public String getColumnText(Object obj, int index) {
@@ -269,8 +271,13 @@ public class SessionView extends ViewPart {
             if (user.isAway()) {
                 return awayImage;
             } else {
-                return user.isDriver() ? driverImage : userImage;
+                if (user.isDriver())
+                    return driverImage;
+                else if (user.isObserver())
+                    return observerImage;
             }
+
+            return userImage;
         }
 
         public Image getColumnImage(Object obj, int index) {
