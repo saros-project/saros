@@ -1,7 +1,5 @@
 package com.Ostermiller.util;
 
-
-
 /*
  * Circular Byte Buffer
  * Copyright (C) 2002 Stephen Ostermiller
@@ -37,9 +35,6 @@ import java.nio.BufferOverflowException;
  * connecting them.
  * <p>
  * This class is thread safe.
- * 
- * @see CircularCharBuffer
- * @see CircularObjectBuffer
  * 
  * @author Stephen Ostermiller
  *         http://ostermiller.org/contact.pl?regarding=Java+Utilities
