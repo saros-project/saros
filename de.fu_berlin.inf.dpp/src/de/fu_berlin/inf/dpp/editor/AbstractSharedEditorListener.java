@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 
 /**
  * Empty abstract implementation of the ISharedEditorListener interface
@@ -29,4 +31,13 @@ public abstract class AbstractSharedEditorListener implements
         String replacedText, int offset) {
         // does nothing
     }
+
+    public void textSelectionMade(TextSelectionActivity selection) {
+        // does nothing
+    }
+
+    public void viewportChanged(ViewportActivity viewport) {
+        // does nothing
+    }
+
 }

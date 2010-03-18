@@ -4,6 +4,8 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 
 public interface ISharedEditorListener {
 
@@ -82,5 +84,23 @@ public interface ISharedEditorListener {
      */
     public void textEditRecieved(User user, SPath editor, String text,
         String replacedText, int offset);
+
+    /**
+     * Is fired after a text selection is executed locally when received by a
+     * remote user.
+     * 
+     * @param selection
+     *            The text selection made as a {@link TextSelectionActivity}
+     */
+    public void textSelectionMade(TextSelectionActivity selection);
+
+    /**
+     * Is fired after a change in the viewport has occurred.
+     * 
+     * @param viewport
+     *            The viewport to apply to the local editor as a
+     *            {@link ViewportActivity}
+     */
+    public void viewportChanged(ViewportActivity viewport);
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 
 /**
  * ISharedEditorListener which can dispatch to a changing set of
@@ -52,6 +54,19 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         String replacedText, int offset) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.textEditRecieved(user, editor, text, replacedText, offset);
+        }
+    }
+
+    public void textSelectionMade(TextSelectionActivity selection) {
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.textSelectionMade(selection);
+        }
+
+    }
+
+    public void viewportChanged(ViewportActivity viewport) {
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.viewportChanged(viewport);
         }
     }
 }

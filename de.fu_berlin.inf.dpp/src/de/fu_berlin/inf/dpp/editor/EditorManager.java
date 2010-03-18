@@ -825,6 +825,13 @@ public class EditorManager implements IActivityProvider, Disposable {
             this.editorAPI.setSelection(editorPart, textSelection, user, user
                 .equals(getFollowedUser()));
         }
+
+        /*
+         * inform all registered ISharedEditorListeners about a text selection
+         * made
+         */
+        editorListener.textSelectionMade(selection);
+
     }
 
     protected void execViewport(ViewportActivity viewport) {
@@ -868,6 +875,12 @@ public class EditorManager implements IActivityProvider, Disposable {
             if (following)
                 this.editorAPI.reveal(editorPart, lineRange);
         }
+        /*
+         * inform all registered ISharedEditorListeners about a change in
+         * viewport
+         */
+        editorListener.viewportChanged(viewport);
+
     }
 
     protected void execActivated(User user, SPath path) {
