@@ -493,11 +493,11 @@ public class StreamSession implements Disposable {
         }
 
         @Override
-        public void close() throws IOException {
+        public synchronized void close() throws IOException {
             if (closed)
                 return;
-            closedByInternal();
             streamServiceManager.closeStream(this);
+            closedByInternal();
         }
 
         public void closedByInternal() {
@@ -721,6 +721,12 @@ public class StreamSession implements Disposable {
 
         public void closedByRemote() {
             closedByRemote = true;
+            try {
+                if (remainingPackets.isEmpty() && available() == 0)
+                    threadAccessRecorder.interrupt();
+            } catch (IOException e) {
+                threadAccessRecorder.interrupt();
+            }
         }
 
         /**
@@ -734,23 +740,30 @@ public class StreamSession implements Disposable {
         }
 
         @Override
-        public synchronized int read() throws IOException {
+        public int read() throws IOException {
             checkState();
             try {
-                threadAccessRecorder.record();
-                fillBuffer();
                 if (closedByRemote && available() == 0)
                     return -1;
+                threadAccessRecorder.record();
+                fillBuffer();
                 final int readByte = buffer.getInputStream().read();
                 readBytes += 1;
                 return readByte;
             } catch (InterruptedException e) {
                 throw new InterruptedIOException();
+            } catch (IOException e) {
+                if (closedByRemote) {
+                    // closed while trying to read
+                    return -1;
+                }
+                throw e;
             } finally {
                 try {
                     threadAccessRecorder.release();
                 } catch (InterruptedException e) {
-                    throw new InterruptedIOException();
+                    if (!closedByRemote)
+                        throw new InterruptedIOException();
                 }
             }
         }
@@ -764,10 +777,10 @@ public class StreamSession implements Disposable {
         public synchronized void close() throws IOException {
             if (closed)
                 return;
-            closed = true;
-            buffer.getInputStream().close();
 
             streamServiceManager.closeStream(this);
+            closedByInternal();
+            closed = true;
         }
 
         public void closedByInternal() {
@@ -800,20 +813,27 @@ public class StreamSession implements Disposable {
             checkState();
 
             try {
-                threadAccessRecorder.record();
-                fillBuffer();
                 if (closedByRemote && available() == 0)
                     return -1;
+                threadAccessRecorder.record();
+                fillBuffer();
                 final int read = buffer.getInputStream().read(arg0);
                 readBytes += read;
                 return read;
             } catch (InterruptedException e) {
                 throw new InterruptedIOException();
+            } catch (IOException e) {
+                if (closedByRemote) {
+                    // closed while trying to read
+                    return -1;
+                }
+                throw e;
             } finally {
                 try {
                     threadAccessRecorder.release();
                 } catch (InterruptedException e) {
-                    throw new InterruptedIOException();
+                    if (!closedByRemote)
+                        throw new InterruptedIOException();
                 }
             }
         }
@@ -828,20 +848,27 @@ public class StreamSession implements Disposable {
             checkState();
 
             try {
-                threadAccessRecorder.record();
-                fillBuffer();
                 if (closedByRemote && available() == 0)
                     return -1;
+                threadAccessRecorder.record();
+                fillBuffer();
                 final int read = buffer.getInputStream().read(b, off, len);
                 readBytes += read;
                 return read;
             } catch (InterruptedException e) {
                 throw new InterruptedIOException();
+            } catch (IOException e) {
+                if (closedByRemote) {
+                    // closed while trying to read
+                    return -1;
+                }
+                throw e;
             } finally {
                 try {
                     threadAccessRecorder.release();
                 } catch (InterruptedException e) {
-                    throw new InterruptedIOException();
+                    if (!closedByRemote)
+                        throw new InterruptedIOException();
                 }
             }
         }
@@ -875,6 +902,14 @@ public class StreamSession implements Disposable {
         }
 
         protected void addPacket(StreamPacket packet) {
+            if (isClosed()) {
+                try {
+                    packet.reject();
+                } catch (IOException e) {
+                    log.error("Could not reject packet: ", e);
+                }
+                return;
+            }
             remainingPackets.add(packet);
             fillBuffer();
         }
@@ -913,7 +948,9 @@ public class StreamSession implements Disposable {
         }
 
         /**
-         * Check state of stream and throw {@link IOException} when necessary
+         * Check state of stream and throw {@link IOException} when it is closed
+         * local. When related {@link StreamSessionOutputStream} is closed, this
+         * stream is closed when no more data is available.
          * 
          * @throws IOException
          *             when this stream itself is closed
@@ -922,6 +959,11 @@ public class StreamSession implements Disposable {
         protected void checkState() throws IOException {
             if (closed)
                 throw new IOException("This stream is closed.");
+            if (closedByRemote && remainingPackets.isEmpty()
+                && available() == 0) {
+                closed = true;
+                threadAccessRecorder.interrupt();
+            }
         }
 
         public boolean isClosed() {

@@ -404,9 +404,13 @@ public class StreamServiceManager implements Startable {
 
         Runnable stopThread = Util.wrapSafe(log, new SessionKiller(session));
 
-        stopSessionExecutor.schedule(stopThread, SESSION_SHUTDOWN_LIMIT,
-            TimeUnit.SECONDS);
-        session.shutdown = stopThread;
+        if (stopSessionExecutor != null) {
+            stopSessionExecutor.schedule(stopThread, SESSION_SHUTDOWN_LIMIT,
+                TimeUnit.SECONDS);
+            session.shutdown = stopThread;
+        } else {
+            new Thread(stopThread).start();
+        }
 
         if (session.sessionListener != null)
             session.sessionListener.sessionStopped();
@@ -1049,12 +1053,13 @@ public class StreamServiceManager implements Startable {
                         // running
                         packetToSend = notification.getPacket();
 
-                        if (packetToSend != null
-                            && !blockedSessions.contains(packetToSend
+                        if (packetToSend == null
+                            || blockedSessions.contains(packetToSend
                                 .getSession())) {
-                            internalSend(packetToSend);
+                            continue;
                         }
                     }
+                    internalSend(packetToSend);
                 } catch (InterruptedException e) {
                     // shutdown
                     return;
@@ -1470,7 +1475,6 @@ public class StreamServiceManager implements Startable {
                                     transferDescription.sender,
                                     streamPath.sessionID, initiationDescription);
 
-                                sessions.put(streamPath, newSession);
                             }
 
                             if (sender != null) {
@@ -1480,9 +1484,10 @@ public class StreamServiceManager implements Startable {
                                         StreamMetaPacketData.ACCEPT
                                             .getIdentifier(), null);
                                 log.debug("Accept-packet send.");
+                                sessions.put(streamPath, newSession);
                             } else
                                 // can not create, not connected
-                                session.dispose();
+                                newSession.dispose();
 
                             sessionDispatcher.execute(Util.wrapSafe(log,
                                 new Runnable() {
