@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
+import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 
 /**
  * This is the ToolBar used by the SessionView
@@ -41,7 +42,8 @@ public class SessionViewToolBar implements Disposable {
         RemoveDriverRoleAction removeDriverRoleAction,
         RemoveAllDriverRoleAction removeAllDriverRoleAction,
         FollowModeAction followModeAction, SendFileAction sendFileAction,
-        LeaveSessionAction leaveSessionAction, PreferenceUtils preferences) {
+        VoIPAction voipAction, LeaveSessionAction leaveSessionAction,
+        PreferenceUtils preferences) {
 
         this.saros = saros;
         this.sessionView = sessionView;
@@ -60,6 +62,7 @@ public class SessionViewToolBar implements Disposable {
         IToolBarManager toolBar = bars.getToolBarManager();
 
         toolBar.add(sendFileAction);
+        toolBar.add(voipAction);
         toolBar.add(stoppedAction);
         toolBar.add(consistencyAction);
         toolBar.add(openInvitationInterfaceAction);

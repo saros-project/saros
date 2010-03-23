@@ -72,6 +72,9 @@ import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.audio.AudioService;
+import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
+import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -123,6 +126,7 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
@@ -305,6 +309,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(StatisticManager.class);
         this.container.addComponent(StopManager.class);
         this.container.addComponent(StreamServiceManager.class);
+        this.container.addComponent(AudioServiceManager.class);
+        this.container.addComponent(MixerManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VersionManager.class);
@@ -319,6 +325,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(SessionIDObservable.class);
         this.container.addComponent(SharedProjectObservable.class);
+        this.container.addComponent(VoIPSessionObservable.class);
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);
@@ -360,6 +367,7 @@ public class Saros extends AbstractUIPlugin {
         // streaming services
         this.container.addComponent(ArchiveStreamService.class);
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
+        this.container.addComponent(AudioService.class);
 
         /*
          * The following classes are initialized by the re-injector because they

@@ -4,17 +4,26 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.Mixer;
+import javax.sound.sampled.AudioFormat.Encoding;
+
+import org.xiph.speex.spi.SpeexEncoding;
+
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @Component(module = "prefs")
 public class PreferenceUtils {
 
     Saros saros;
+    protected MixerManager mixerManager;
 
-    public PreferenceUtils(Saros saros) {
+    public PreferenceUtils(Saros saros, MixerManager mixerManager) {
         this.saros = saros;
+        this.mixerManager = mixerManager;
     }
 
     public List<JID> getAutoInviteUsers() {
@@ -111,4 +120,52 @@ public class PreferenceUtils {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.PING_PONG);
     }
+
+    public Mixer getRecordingMixer() {
+        return mixerManager.getMixerByName(saros.getPreferenceStore()
+            .getString(PreferenceConstants.AUDIO_RECORD_DEVICE));
+    }
+
+    public Mixer getPlaybackMixer() {
+        return mixerManager.getMixerByName(saros.getPreferenceStore()
+            .getString(PreferenceConstants.AUDIO_PLAYBACK_DEVICE));
+    }
+
+    public AudioFormat getEncodingFormat() {
+        Encoding encoding;
+        float sampleRate = Float.parseFloat(saros.getPreferenceStore()
+            .getString(PreferenceConstants.AUDIO_SAMPLERATE));
+        int quality = Integer.parseInt(saros.getPreferenceStore().getString(
+            PreferenceConstants.AUDIO_QUALITY_LEVEL));
+        boolean vbr = saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.AUDIO_VBR);
+
+        Encoding encodingsVbr[] = new Encoding[] { SpeexEncoding.SPEEX_VBR0,
+            SpeexEncoding.SPEEX_VBR1, SpeexEncoding.SPEEX_VBR2,
+            SpeexEncoding.SPEEX_VBR3, SpeexEncoding.SPEEX_VBR4,
+            SpeexEncoding.SPEEX_VBR5, SpeexEncoding.SPEEX_VBR6,
+            SpeexEncoding.SPEEX_VBR7, SpeexEncoding.SPEEX_VBR8,
+            SpeexEncoding.SPEEX_VBR9, SpeexEncoding.SPEEX_VBR10 };
+
+        Encoding encodingsCbr[] = new Encoding[] { SpeexEncoding.SPEEX_Q0,
+            SpeexEncoding.SPEEX_Q1, SpeexEncoding.SPEEX_Q2,
+            SpeexEncoding.SPEEX_Q3, SpeexEncoding.SPEEX_Q4,
+            SpeexEncoding.SPEEX_Q5, SpeexEncoding.SPEEX_Q6,
+            SpeexEncoding.SPEEX_Q7, SpeexEncoding.SPEEX_Q8,
+            SpeexEncoding.SPEEX_Q9, SpeexEncoding.SPEEX_Q10 };
+
+        if (vbr) {
+            encoding = encodingsVbr[quality];
+        } else {
+            encoding = encodingsCbr[quality];
+        }
+        return new AudioFormat(encoding, sampleRate, 16, 1, 2, sampleRate,
+            false);
+    }
+
+    public boolean isDtxEnabled() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.AUDIO_ENABLE_DTX);
+    }
+
 }

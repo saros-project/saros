@@ -37,5 +37,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar"/>
+	<classpathentry kind="lib" path="lib/jspeex-0.9.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
