@@ -13,22 +13,19 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 
 @Component(module = "net")
 public class MultiUserChatManager {
 
-    private static Logger log = Logger.getLogger(MultiUserChatManager.class
-        .getName());
+    private static Logger log = Logger.getLogger(MultiUserChatManager.class);
 
-    // TODO Room name should be configured by settings.
-    /* name of multi user chat room */
-    private String room = "saros";
-
-    /* host name of jabber-server on which the muc room is created */
-    private final String server = "conference.jabber.org";
+    protected CommunicationPreferences comPrefs;
 
     /* current muc connection. */
-    private MultiUserChat muc;
+    protected MultiUserChat muc;
 
     @Inject
     protected Saros saros;
@@ -36,71 +33,83 @@ public class MultiUserChatManager {
     @Inject
     protected SessionIDObservable sessionID;
 
-    public void initMUC(XMPPConnection connection, String user, String room)
-        throws XMPPException {
-        this.room = room;
-        initMUC(connection, user);
-    }
+    @Inject
+    protected SessionManager sessionManager;
 
+    @Inject
+    protected CommunicationNegotiatingManager comNegotiatingManager;
+
+    /**
+     * Initialize the MultiUserChat
+     * 
+     * @param connection
+     * @param user
+     *            my username
+     * @throws XMPPException
+     */
     public void initMUC(XMPPConnection connection, String user)
         throws XMPPException {
 
+        if (sessionManager.getSharedProject().isHost()) {
+            comPrefs = comNegotiatingManager.getOwnPrefs();
+        } else {
+            comPrefs = comNegotiatingManager.getSessionPrefs();
+        }
+
         /* create room domain of current connection. */
         // JID(connection.getUser()).getDomain();
-        String host = this.room + "@" + this.server;
+        String host = this.comPrefs.chatroom + "@" + this.comPrefs.chatserver;
 
         // Create a MultiUserChat using an XMPPConnection for a room
         MultiUserChat muc = new MultiUserChat(connection, host);
 
-        // try to join to room
         try {
-            muc.join(user);
+            // Create the room
+            muc.create(user);
+
         } catch (XMPPException e) {
-            MultiUserChatManager.log.debug(e);
-            if (e.getMessage().contains("404")) {
-                // room doesn't exist
-
-                try {
-
-                    // Create the room
-                    muc.create("testbot");
-
-                    // Get the the room's configuration form
-                    Form form = muc.getConfigurationForm();
-
-                    // Create a new form to submit based on the original form
-                    Form submitForm = form.createAnswerForm();
-
-                    // Add default answers to the form to submit
-                    for (Iterator<FormField> fields = form.getFields(); fields
-                        .hasNext();) {
-                        FormField field = fields.next();
-                        if (!FormField.TYPE_HIDDEN.equals(field.getType())
-                            && (field.getVariable() != null)) {
-                            // Sets the default value as the answer
-                            submitForm.setDefaultAnswer(field.getVariable());
-                        }
-                    }
-
-                    // set configuration, see XMPP Specs
-                    submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
-                    submitForm.setAnswer("muc#roomconfig_allowinvites", true);
-                    submitForm
-                        .setAnswer("muc#roomconfig_persistentroom", false);
-
-                    // Send the completed form (with default values) to the
-                    // server to configure the room
-                    muc.sendConfigurationForm(submitForm);
-
-                } catch (XMPPException ee) {
-                    MultiUserChatManager.log.debug(e.getLocalizedMessage(), ee);
-                    throw ee;
-                }
-            } else {
-                MultiUserChatManager.log.debug(e.getLocalizedMessage(), e);
-                throw e;
-            }
+            log.debug(e);
         }
+
+        try {
+            // try to join to room
+            muc.join(user, this.comPrefs.password);
+
+            // Get the the room's configuration form
+            Form form = muc.getConfigurationForm();
+
+            // Create a new form to submit based on the original form
+            Form submitForm = form.createAnswerForm();
+
+            // Add default answers to the form to submit
+            for (Iterator<FormField> fields = form.getFields(); fields
+                .hasNext();) {
+                FormField field = fields.next();
+                if (!FormField.TYPE_HIDDEN.equals(field.getType())
+                    && (field.getVariable() != null)) {
+                    // Sets the default value as the answer
+                    submitForm.setDefaultAnswer(field.getVariable());
+                }
+            }
+
+            // set configuration, see XMPP Specs
+            submitForm.setAnswer("muc#roomconfig_moderatedroom", false);
+            submitForm.setAnswer("muc#roomconfig_publicroom", false);
+            submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+            submitForm.setAnswer("muc#roomconfig_roomsecret",
+                this.comPrefs.password);
+            submitForm.setAnswer("muc#roomconfig_allowinvites", true);
+            submitForm.setAnswer("muc#roomconfig_persistentroom", false);
+
+            // Send the completed form (with default values) to the
+            // server to configure the room
+            muc.sendConfigurationForm(submitForm);
+        } catch (XMPPException e) {
+            log.debug(e);
+        }
+
+        log.debug("MUC joined. Server: " + this.comPrefs.chatserver + " Room: "
+            + this.comPrefs.chatroom + " Password " + this.comPrefs.password);
         this.muc = muc;
     }
 
@@ -114,7 +123,11 @@ public class MultiUserChatManager {
     }
 
     public String getRoomName() {
-        return this.room;
+        return this.comPrefs.chatroom;
+    }
+
+    public String getRoomPassword() {
+        return this.comPrefs.password;
     }
 
     public boolean isConnected() {

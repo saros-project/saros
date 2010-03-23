@@ -77,5 +77,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             AbstractFeedbackManager.UNKNOWN);
         prefs.putInt(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
             AbstractFeedbackManager.FORBID);
+
+        // Communication default settings
+        prefs.put(PreferenceConstants.CHATSERVER, "conference.jabber.ccc.de");
     }
 }

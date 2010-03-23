@@ -469,7 +469,7 @@ public class MessagingManager implements PacketListener, MessageListener,
             MessagingManager.log.debug("Creating MUC session..");
             this.session = new MultiChatSession(muc);
         } else {
-            this.multitrans.getMUC().join(user);
+            this.multitrans.getMUC().join(user, multitrans.getRoomPassword());
         }
     }
 

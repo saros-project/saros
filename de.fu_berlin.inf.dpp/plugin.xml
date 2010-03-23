@@ -18,6 +18,12 @@
             icon="icons/transmit.png"
             id="de.fu_berlin.inf.dpp.ui.SessionView"
             name="Saros Session"/>
+      <view
+            category="Saros"
+            class="de.fu_berlin.inf.dpp.ui.ChatView"
+            icon="icons/comment.png"
+            id="de.fu_berlin.inf.dpp.ui.ChatView"
+            name="Chat View"/>
 	 <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.NetworkView"
@@ -37,6 +43,13 @@
       <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
          <view
                id="de.fu_berlin.inf.dpp.ui.SessionView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="de.fu_berlin.inf.dpp.ui.ChatView"
                ratio="0.5"
                relationship="right"
                relative="org.eclipse.ui.views.TaskList"/>
@@ -114,7 +127,12 @@
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
-            name="Feedback">
+            name="Feedback"/>
+      <page
+            category="de.fu_berlin.inf.dpp.preferences"
+            class="de.fu_berlin.inf.dpp.ui.CommunicationPreferencePage"
+            id="de.fu_berlin.dpp.preferences.communication"
+            name="Communication">
       </page>
    </extension>
    <extension

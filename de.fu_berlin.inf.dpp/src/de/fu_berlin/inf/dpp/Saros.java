@@ -137,6 +137,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -307,6 +308,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VersionManager.class);
+        this.container.addComponent(CommunicationNegotiatingManager.class);
         this.container.addComponent(XMPPReceiver.class);
         this.container.addComponent(XMPPTransmitter.class);
 

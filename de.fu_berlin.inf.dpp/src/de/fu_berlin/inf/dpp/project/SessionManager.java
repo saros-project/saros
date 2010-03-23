@@ -69,6 +69,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -115,6 +116,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     @Inject
     protected VersionManager versionManager;
+
+    @Inject
+    protected CommunicationNegotiatingManager comNegotiatingManager;
 
     @Inject
     protected RosterTracker rosterTracker;
@@ -344,7 +348,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         OutgoingInvitationProcess result = new OutgoingInvitationProcess(
             transmitter, toInvite, project, partialProjectResources,
             toInviteTo, description, project.getFreeColor(),
-            invitationProcesses, versionManager, stopManager, discoveryManager);
+            invitationProcesses, versionManager, stopManager, discoveryManager,
+            comNegotiatingManager);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);

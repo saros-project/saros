@@ -64,6 +64,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
@@ -102,6 +103,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
     protected SubMonitor monitor;
     protected VersionManager versionManager;
+    protected CommunicationNegotiatingManager comNegotiatingManager;
     protected StopManager stopManager;
     protected DiscoveryManager discoveryManager;
     protected String invitationID;
@@ -117,7 +119,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
-        DiscoveryManager discoveryManager) {
+        DiscoveryManager discoveryManager,
+        CommunicationNegotiatingManager comNegotiatingManager) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
 
@@ -126,6 +129,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         this.versionManager = versionManager;
         this.stopManager = stopManager;
         this.discoveryManager = discoveryManager;
+        this.comNegotiatingManager = comNegotiatingManager;
         this.project = project;
     }
 
@@ -134,7 +138,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         log.debug("Inv" + Util.prefix(peer) + ": Invitation has started.");
 
         this.monitor = monitor;
-        monitor.beginTask("Invitation has started.", 100);
+        monitor.beginTask("Invitation has started.", 101);
         this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
         try {
             checkAvailability(monitor.newChild(1));
@@ -144,6 +148,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             sendInvitation(monitor.newChild(1));
 
             getFileListDiff(monitor.newChild(1));
+
+            sendCommunicationInformation(monitor.newChild(1));
 
             streamArchive(monitor.newChild(93));
 
@@ -187,6 +193,22 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             }
             monitor.done();
         }
+    }
+
+    /**
+     * Send communication information during invitation process
+     */
+    protected void sendCommunicationInformation(SubMonitor subMonitor)
+        throws SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Sending Chat Information...");
+        subMonitor.beginTask("Sending Chat Information...", 1);
+
+        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
+
+        comNegotiatingManager.sendComPrefs(peer, subMonitor.newChild(1));
+        subMonitor.done();
+
     }
 
     /**
