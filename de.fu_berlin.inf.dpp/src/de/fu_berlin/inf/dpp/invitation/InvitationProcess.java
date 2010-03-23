@@ -19,8 +19,23 @@
  */
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
+import org.picocontainer.annotations.Inject;
+
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.StreamService;
+import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
+import de.fu_berlin.inf.dpp.net.internal.StreamSession;
+import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 
 /**
@@ -29,12 +44,37 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
  */
 public abstract class InvitationProcess {
 
+    private final static Logger log = Logger.getLogger(InvitationProcess.class);
+
     protected final ITransmitter transmitter;
     protected JID peer;
     protected String description;
     protected final int colorID;
 
+    @Inject
+    protected StreamServiceManager streamServiceManager;
+    @Inject
+    protected ArchiveStreamService archiveStreamService;
+    protected StreamSession streamSession;
+
     protected InvitationProcessObservable invitationProcesses;
+    protected boolean error = false;
+
+    protected StreamSessionListener sessionListener = new StreamSessionListener() {
+
+        public void sessionStopped() {
+            if (streamSession != null) {
+
+                streamSession.shutdownFinished();
+                streamSession = null;
+            }
+        }
+
+        public void errorOccured(StreamException e) {
+            log.debug("Got error while streaming project archive: ", e);
+            error = true;
+        }
+    };
 
     public InvitationProcess(ITransmitter transmitter, JID peer,
         String description, int colorID,
@@ -45,6 +85,8 @@ public abstract class InvitationProcess {
         this.colorID = colorID;
         this.invitationProcesses = invitationProcesses;
         this.invitationProcesses.addInvitationProcess(this);
+
+        Saros.reinject(this);
     }
 
     /**
@@ -102,4 +144,56 @@ public abstract class InvitationProcess {
     }
 
     public abstract void remoteCancel(String errorMsg);
+
+    public static class ArchiveStreamService extends StreamService {
+
+        protected IProject sharedProject;
+        protected int numOfFiles;
+
+        protected StreamSession streamSession;
+
+        protected Lock startLock = new ReentrantLock();
+        protected Condition sessionReceived = startLock.newCondition();
+
+        @Override
+        public String getServiceName() {
+            return "ArchiveProject";
+        }
+
+        @Override
+        public int getStreamsPerSession() {
+            return 1;
+        }
+
+        @Override
+        public int[] getChunkSize() {
+            return new int[] { 1024 * 1024 };
+        }
+
+        public void setProject(IProject sp) {
+            this.sharedProject = sp;
+        }
+
+        public void setFileNumber(int num) {
+            this.numOfFiles = num;
+        }
+
+        @Override
+        public boolean sessionRequest(User from, Object initial) {
+            log.info(from + " wants to stream the project archive.");
+
+            return true;
+        }
+
+        @Override
+        public void startSession(final StreamSession newSession) {
+
+            this.startLock.lock();
+            this.streamSession = newSession;
+            this.sessionReceived.signal();
+            this.startLock.unlock();
+
+        }
+
+    }
 }

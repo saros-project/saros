@@ -87,6 +87,7 @@ import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -132,7 +133,6 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosState;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -355,10 +355,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SessionDataCollector.class);
         this.container.addComponent(TextEditCollector.class);
 
-        // STF
-        this.container.addComponent(SarosState.class);
-
         // streaming services
+        this.container.addComponent(ArchiveStreamService.class);
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
 
         /*

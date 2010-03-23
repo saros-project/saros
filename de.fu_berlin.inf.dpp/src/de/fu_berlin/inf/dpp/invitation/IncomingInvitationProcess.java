@@ -25,8 +25,12 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -53,6 +57,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -261,6 +266,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         // send only later)
         sharedProject = sessionManager.joinSession(this.projectName,
             this.localProject, peer, colorID, sessionStart);
+
+        archiveStreamService.setProject(this.localProject);
         log.debug("Inv" + Util.prefix(peer) + ": Joined the session.");
 
         monitor.beginTask("Synchronizing", 100);
@@ -288,32 +295,63 @@ public class IncomingInvitationProcess extends InvitationProcess {
         log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
         monitor.subTask("Sending file list...");
 
-        SarosPacketCollector archiveCollector = transmitter
-            .getInvitationCollector(invitationID,
-                FileTransferType.ARCHIVE_TRANSFER);
+        transmitter.getInvitationCollector(invitationID,
+            FileTransferType.ARCHIVE_TRANSFER);
 
         transmitter.sendFileList(peer, invitationID, filesToSynchronize,
             monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
         checkCancellation();
 
-        monitor.subTask("Receiving archive...");
+        try {
+            archiveStreamService.startLock.lock();
+            archiveStreamService.sessionReceived.await();
+        } catch (InterruptedException e) {
+            log.debug("Method interrupted waiting for archive stream lock.");
+        } finally {
+            archiveStreamService.startLock.unlock();
+        }
 
-        InputStream archiveStream = transmitter.receiveArchive(
-            archiveCollector, monitor.newChild(90,
-                SubMonitor.SUPPRESS_ALL_LABELS), true);
+        StreamSession newSession = archiveStreamService.streamSession;
+        IFile currentFile = null;
 
-        log.debug("Inv" + Util.prefix(peer) + ": Archive received.");
-        checkCancellation();
+        monitor.beginTask("Receiving files...", 100);
 
-        monitor.subTask("Extracting archive...");
+        InputStream in = newSession.getInputStream(0);
+        ZipInputStream zin = new ZipInputStream(in);
+        try {
+            ZipEntry ze = null;
+            // byte[] buffer = new byte[archiveStreamService.getChunkSize()[0]];
+            while ((ze = zin.getNextEntry()) != null) {
+                monitor.subTask("Receiving " + ze.getName());
+                currentFile = this.localProject.getFile(ze.getName());
 
-        writeArchive(archiveStream, localProject, monitor.newChild(5,
-            SubMonitor.SUPPRESS_ALL_LABELS));
+                if (currentFile.exists()) {
+                    log.debug(currentFile
+                        + " already exists on invitee. Replacing this file.");
+                    currentFile.delete(true, null);
+                }
 
-        log.debug("Inv" + Util.prefix(peer)
-            + ": Archive has been written to disk.");
+                currentFile.create(new UnclosableInputStream(zin), true, null);
+                checkCancellation();
+            }
 
+        } catch (SarosCancellationException e) {
+            log.debug("Invitation process was cancelled.");
+        } catch (CoreException e) {
+            log.error("Exception while creating file. Message: ", e);
+            localCancel(
+                "A problem occurred while the project's files were being sent: \""
+                    + e.getMessage() + "\" The invitation was cancelled.",
+                CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (Exception e) {
+            log.error("Unknown exception: ", e);
+        } finally {
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(zin);
+            newSession.stopSession();
+        }
         completeInvitation();
     }
 
@@ -695,5 +733,79 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
     public void setInvitationUI(JoinSessionWizard inInvitationUI) {
         this.inInvitationUI = inInvitationUI;
+    }
+
+    /**
+     * A simple delegator class which won't forward calls to {@link #close()}.
+     */
+    protected static class UnclosableInputStream extends InputStream {
+
+        protected InputStream closeableInputStream;
+
+        public UnclosableInputStream(InputStream closeableInputStream) {
+            super();
+            this.closeableInputStream = closeableInputStream;
+        }
+
+        @Override
+        public int available() throws IOException {
+            return closeableInputStream.available();
+        }
+
+        @Override
+        public void close() throws IOException {
+            // NOP
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return closeableInputStream.equals(obj);
+        }
+
+        @Override
+        public int hashCode() {
+            return closeableInputStream.hashCode();
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            closeableInputStream.mark(readlimit);
+        }
+
+        @Override
+        public boolean markSupported() {
+            return closeableInputStream.markSupported();
+        }
+
+        @Override
+        public int read() throws IOException {
+            return closeableInputStream.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return closeableInputStream.read(b, off, len);
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return closeableInputStream.read(b);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            closeableInputStream.reset();
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            return closeableInputStream.skip(n);
+        }
+
+        @Override
+        public String toString() {
+            return closeableInputStream.toString();
+        }
+
     }
 }
