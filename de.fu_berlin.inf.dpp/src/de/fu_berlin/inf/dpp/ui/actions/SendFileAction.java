@@ -177,7 +177,7 @@ public class SendFileAction extends Action {
         });
         if (monitor != null) {
             if (e != null && e.getMessage() != null
-                && !e.getMessage().isEmpty())
+                && !(e.getMessage().length() == 0))
                 monitor.subTask(e.getMessage());
             else
                 monitor.subTask(message);
