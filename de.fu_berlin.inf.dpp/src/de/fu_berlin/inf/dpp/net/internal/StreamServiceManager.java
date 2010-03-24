@@ -1108,7 +1108,7 @@ public class StreamServiceManager implements Startable {
          * 
          * @param packet
          */
-        protected synchronized void sendPacket(StreamPacket packet) {
+        protected void sendPacket(StreamPacket packet) {
             if (packet.getSession() == null)
                 internalSend(packet);
             else
@@ -1121,9 +1121,8 @@ public class StreamServiceManager implements Startable {
          * 
          * @see #sendPacket(StreamPacket)
          */
-        protected synchronized void sendPacket(
-            TransferDescription transferDescription, byte[] data,
-            SubMonitor progress) {
+        protected void sendPacket(TransferDescription transferDescription,
+            byte[] data, SubMonitor progress) {
             try {
                 sendPacket(new StreamPacket(transferDescription, data, progress));
             } catch (IllegalArgumentException e) {
@@ -1223,7 +1222,8 @@ public class StreamServiceManager implements Startable {
             protected StreamPacket getPacket() {
                 if (stream != null) {
                     StreamSession session = stream.getSession();
-                    if (session.disposed)
+                    if (session.disposed || session.receiverStopped
+                        || session.stopped)
                         return null;
 
                     byte[] data = stream.getData(removeAllAvailableData);
