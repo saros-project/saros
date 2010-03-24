@@ -20,29 +20,21 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -55,16 +47,14 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.StreamService;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
+import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
@@ -111,9 +101,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected SarosCancellationException cancellationCause;
     protected SarosPacketCollector invitationCompleteCollector;
 
-    @Inject
-    protected SessionManager sessionManager;
-
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
         ISharedProject sharedProject, List<IResource> partialProjectResources,
         IProject project, String description, int colorID,
@@ -151,7 +138,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             sendCommunicationInformation(monitor.newChild(1));
 
-            streamArchive(monitor.newChild(93));
+            createArchive(monitor.newChild(3));
+
+            sendArchive(monitor.newChild(90));
 
             completeInvitation(monitor.newChild(3));
         } catch (LocalCancellationException e) {
@@ -367,9 +356,10 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         toSend.addAll(remoteFileList.getAlteredPaths());
     }
 
-    protected void streamArchive(SubMonitor subMonitor)
-        throws SarosCancellationException {
+    protected void createArchive(SubMonitor subMonitor) throws IOException,
+        SarosCancellationException {
 
+        log.debug("Inv" + Util.prefix(peer) + ": Creating archive...");
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         subMonitor.setWorkRemaining(100);
@@ -406,32 +396,34 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // else
             // throw new LocalCancellationException();
 
-            User newUser = null;
+            /**
+             * If the filelist <code>toSend</code> is empty, the projects are
+             * identical, so we only send a "empty" archive.
+             */
+            archive = null;
+            SubMonitor archiveMonitor = subMonitor.newChild(25,
+                SubMonitor.SUPPRESS_ALL_LABELS);
+            if (toSend.size() != 0) {
+                /*
+                 * FIX #2836964: Prefix string too short
+                 * 
+                 * Do not delete the "SarosSyncArchive" prefix.
+                 */
+                archive = File.createTempFile("SarosSyncArchive-"
+                    + getPeer().getName(), ".zip");
+                FileZipper.createProjectZipArchive(toSend, archive,
+                    this.project, archiveMonitor);
+            }
+            archiveMonitor.done();
+
             synchronized (sharedProject) {
-                newUser = new User(sharedProject, peer, colorID);
+                User newUser = new User(sharedProject, peer, colorID);
                 this.sharedProject.addUser(newUser);
                 log.debug(Util.prefix(peer) + " added to project, colorID: "
                     + colorID);
                 synchronizeUserList();
             }
-
-            if (toSend.size() != 0) {
-
-                streamSession = streamServiceManager.createSession(
-                    archiveStreamService, newUser, null, sessionListener);
-
-                archiveStreamService.setFileNumber(toSend.size());
-
-                streamSession.setListener(sessionListener);
-
-                subMonitor.setTaskName("Streaming archive...");
-
-                performFileStream(archiveStreamService, streamSession,
-                    subMonitor.newChild(75));
-            }
-
-        } catch (Exception e) {
-            log.error("Error while executing archive stream: ", e);
+            subMonitor.worked(25);
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
@@ -442,65 +434,19 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         }
     }
 
-    private void performFileStream(StreamService streamService,
-        final StreamSession session, SubMonitor subMonitor)
-        throws SarosCancellationException {
+    protected void sendArchive(SubMonitor subMonitor)
+        throws SarosCancellationException, IOException {
 
-        OutputStream output = session.getOutputStream(0);
-        ZipOutputStream zout = new ZipOutputStream(output);
-        int worked = 0;
-        int lastWorked = 0;
-        int filesSent = 0;
-        double increment = (double) 100 / toSend.size();
-        subMonitor.beginTask("Streaming files...", 100);
-        try {
-            for (IPath ip : toSend) {
-                IFile file = this.project.getFile(ip);
-                String absPath = file.getLocation().toPortableString();
+        subMonitor.setWorkRemaining(100);
+        invitationCompleteCollector = transmitter
+            .getInvitationCompleteCollector(invitationID);
 
-                byte[] buffer = new byte[streamService.getChunkSize()[0]];
-                InputStream input = new FileInputStream(absPath);
-
-                ZipEntry ze = new ZipEntry(ip.toPortableString());
-                zout.putNextEntry(ze);
-
-                int numRead = 0;
-                while ((numRead = input.read(buffer)) > 0) {
-                    zout.write(buffer, 0, numRead);
-                }
-                zout.flush();
-                zout.closeEntry();
-                input.close();
-
-                // Progress monitor
-                worked = (int) Math.round(increment * filesSent);
-
-                if ((worked - lastWorked) > 0) {
-                    subMonitor.worked((worked - lastWorked));
-                    lastWorked = worked;
-                }
-
-                filesSent++;
-
-                checkCancellation(CancelOption.NOTIFY_PEER);
-            }
-        } catch (IOException e) {
-            error = true;
-            log.error("Error while sending file: ", e);
-            localCancel(
-                "An I/O problem occurred while the project's files were being sent: \""
-                    + e.getMessage() + "\" The invitation was cancelled.",
-                CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (SarosCancellationException e) {
-            log.debug("Invitation process was cancelled.");
-        } catch (Exception e) {
-            log.error("Unknown exception: ", e);
-        } finally {
-            IOUtils.closeQuietly(output);
-            IOUtils.closeQuietly(zout);
-        }
-        subMonitor.done();
+        log.debug("Inv" + Util.prefix(peer) + ": Sending archive...");
+        subMonitor.setTaskName("Sending archive...");
+        if (archive == null)
+            log.debug("Inv" + Util.prefix(peer) + ": The archive is empty.");
+        transmitter.sendProjectArchive(peer, invitationID, this.project,
+            archive, subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
     protected void completeInvitation(SubMonitor subMonitor)
@@ -510,9 +456,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Waiting for invitation complete confirmation...");
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Waiting for peer to complete invitation...");
-
-        invitationCompleteCollector = transmitter
-            .getInvitationCompleteCollector(invitationID);
 
         transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50,
             SubMonitor.SUPPRESS_ALL_LABELS), invitationCompleteCollector);
@@ -556,8 +499,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     /**
      * This method does <strong>not</strong> execute the cancellation but only
      * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initiated by the <strong>local</strong> user. The
-     * cancellation will be ignored if the invitation has already been canceled
+     * cancellation was initated by the <strong>local</strong> user. The
+     * cancellation will be ignored if the invitation has already been cancelled
      * before. <br>
      * In order to cancel the invitation process {@link #executeCancellation()}
      * should be called.
@@ -715,5 +658,4 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     public String getProjectName() {
         return project.getName();
     }
-
 }
