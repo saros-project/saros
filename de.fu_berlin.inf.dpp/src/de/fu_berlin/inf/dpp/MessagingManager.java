@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.MessagingWindow;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -59,8 +60,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class MessagingManager implements PacketListener, MessageListener,
     IConnectionListener, InvitationListener {
 
-    private static Logger log = Logger.getLogger(MessagingManager.class
-        .getName());
+    private static Logger log = Logger.getLogger(MessagingManager.class);
 
     MessageEventManager messageEventManager;
 
@@ -342,7 +342,9 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     protected Saros saros;
 
-    public MessagingManager(Saros saros) {
+    protected boolean activeSession = false;
+
+    public MessagingManager(Saros saros, SessionManager sessionManager) {
         saros.addListener(this);
         this.saros = saros;
     }
@@ -461,12 +463,9 @@ public class MessagingManager implements PacketListener, MessageListener,
         }
         String user = saros.getConnection().getUser();
         if (this.session == null) {
+            this.multitrans.initMUC(saros.getConnection(), user);
             MultiUserChat muc = this.multitrans.getMUC();
-            if (muc == null) {
-                this.multitrans.initMUC(saros.getConnection(), user);
-                muc = this.multitrans.getMUC();
-            }
-            MessagingManager.log.debug("Creating MUC session..");
+            log.debug("Creating MUC session..");
             this.session = new MultiChatSession(muc);
         } else {
             this.multitrans.getMUC().join(user, multitrans.getRoomPassword());
@@ -474,7 +473,7 @@ public class MessagingManager implements PacketListener, MessageListener,
     }
 
     public void disconnectMultiUserChat() {
-        MessagingManager.log.debug("Leaving MUC session..");
+        log.debug("Leaving MUC session..");
         this.multitrans.getMUC().leave();
     }
 
