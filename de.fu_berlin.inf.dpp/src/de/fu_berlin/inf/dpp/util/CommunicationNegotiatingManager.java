@@ -150,7 +150,8 @@ public class CommunicationNegotiatingManager {
 
         if (prefs
             .getBoolean(PreferenceConstants.USER_DEFINED_CHATROOM_PASSWORD) == true) {
-            comPrefs.password = prefs.getString(PreferenceConstants.PASSWORD);
+            comPrefs.password = prefs
+                .getString(PreferenceConstants.CHATROOM_PASSWORD);
         } else {
             comPrefs.password = getRandomPassword();
         }
