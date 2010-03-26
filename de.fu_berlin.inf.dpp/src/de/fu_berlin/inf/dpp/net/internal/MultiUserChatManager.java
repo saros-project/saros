@@ -66,15 +66,14 @@ public class MultiUserChatManager {
         try {
             // Create the room
             muc.create(user);
-
         } catch (XMPPException e) {
             log.debug(e);
         }
 
-        try {
-            // try to join to room
-            muc.join(user, this.comPrefs.password);
+        // try to join to room
+        muc.join(user, this.comPrefs.password);
 
+        try {
             // Get the the room's configuration form
             Form form = muc.getConfigurationForm();
 

@@ -236,7 +236,9 @@ public class DataTransferManager implements ConnectionSessionListener {
                 try {
                     // TODO Put size in TransferDescription, so we can
                     // display it here
-                    if (description.type == FileTransferType.ACTIVITY_TRANSFER) {
+                    if (description.type == FileTransferType.ACTIVITY_TRANSFER
+                        || description.type == FileTransferType.STREAM_DATA
+                        || description.type == FileTransferType.STREAM_META) {
                         if (log.isTraceEnabled()) {
                             log.trace("[" + getTransferMode().toString()
                                 + "] Starting incoming data transfer: "
@@ -254,7 +256,9 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                     long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
-                    if (description.type == FileTransferType.ACTIVITY_TRANSFER) {
+                    if (description.type == FileTransferType.ACTIVITY_TRANSFER
+                        || description.type == FileTransferType.STREAM_DATA
+                        || description.type == FileTransferType.STREAM_META) {
                         if (log.isTraceEnabled()) {
                             log.trace("[" + getTransferMode().toString()
                                 + "] Finished incoming data transfer: "

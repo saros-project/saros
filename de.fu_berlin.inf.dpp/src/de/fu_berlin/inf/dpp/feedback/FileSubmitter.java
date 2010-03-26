@@ -32,12 +32,18 @@ public class FileSubmitter {
     protected static final Logger log = Logger.getLogger(FileSubmitter.class
         .getName());
 
-    /** the temporary URL of our Apache Tomcat server */
-    public static final String SERVER_URL_TEMP = "http://brazzaville.imp.fu-berlin.de:5900/";
-    /** the URL of our Apache Tomcat server */
-    public static final String SERVER_URL = "https://projects.mi.fu-berlin.de/saros/";
-    /** the name of the Servlet that is supposed to handle the upload */
-    public static final String SERVLET_NAME = "SarosStatisticServer/fileupload";
+    /**
+     * the host part of our Apache Tomcat server. This URL should point to a
+     * CNAME to make statistics server transitions independent of the release
+     * cycle. There are two legacy URLs which were in use before. Clients not
+     * updated may still try these: "https://projects.mi.fu-berlin.de/saros/"
+     * (was a redirect, obviously broken for months as of 2010/03)
+     * "http://brazzaville.imp.fu-berlin.de:5900/" (was broken for some weeks as
+     * of 2010/03)
+     */
+    public static final String SERVER_URL = "http://saros-statistics.imp.fu-berlin.de/";
+    /** the path of the Servlet that is supposed to handle the upload */
+    public static final String SERVLET_PATH = "SarosStatisticServer/fileupload";
 
     protected static final String STATISTIC_ID_PARAM = "?id=1";
     protected static final String ERROR_LOG_ID_PARAM = "?id=2";
@@ -46,16 +52,13 @@ public class FileSubmitter {
     protected static final int TIMEOUT = 30000;
 
     /**
-     * Convenience wrapper method for
-     * {@link #uploadFile(File, String, SubMonitor)}. <br>
-     * The statistic file is first tried to upload to the server specified by
-     * {@link #SERVER_URL} and then to our temporary server
-     * {@link #SERVER_URL_TEMP}.
+     * Wrapper for {@link #uploadFile(File, String, SubMonitor)} for uploading
+     * statistics files. (encapsulates URL and path for statistics submission)
      * 
      * @param file
-     *            the file to upload
+     *            the file to be uploaded
      * @throws IOException
-     *             is thrown, if the upload failed; the exception wraps the
+     *             is thrown if the upload failed; the exception wraps the
      *             target exception that contains the main cause for the failure
      * 
      * @blocking
@@ -63,30 +66,8 @@ public class FileSubmitter {
     public static void uploadStatisticFile(File file, SubMonitor monitor)
         throws IOException {
 
-        monitor.beginTask("Upload statistic file...", 2);
-
-        try {
-            try {
-                /*
-                 * TODO this first call is expected to fail at the moment,
-                 * because the tomcat server isn't yet installed on
-                 * projects.mi.fu-berlin.de/saros
-                 */
-                uploadFile(file,
-                    SERVER_URL + SERVLET_NAME + STATISTIC_ID_PARAM, monitor
-                        .newChild(1));
-                return;
-            } catch (IOException e) {
-                log.debug(String.format(
-                    "Because the real server is not running right now, "
-                        + "the following message is expected: %s. %s", e
-                        .getMessage(), e.getCause().getMessage()));
-            }
-            uploadFile(file, SERVER_URL_TEMP + SERVLET_NAME
-                + STATISTIC_ID_PARAM, monitor.newChild(1));
-        } finally {
-            monitor.done();
-        }
+        uploadFile(file, SERVER_URL + SERVLET_PATH + STATISTIC_ID_PARAM,
+            monitor);
     }
 
     /**
@@ -117,8 +98,8 @@ public class FileSubmitter {
             FileZipper.zipFiles(Collections.singletonList(file), archive,
                 monitor.newChild(1));
 
-            uploadFile(archive, SERVER_URL_TEMP + SERVLET_NAME
-                + ERROR_LOG_ID_PARAM, monitor.newChild(1));
+            uploadFile(archive, SERVER_URL + SERVLET_PATH + ERROR_LOG_ID_PARAM,
+                monitor.newChild(1));
         } finally {
             monitor.done();
         }

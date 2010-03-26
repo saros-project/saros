@@ -262,7 +262,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
                             .sendMessage("has joined the chat");
                     } catch (XMPPException e) {
                         ChatView.this.viewer.getDocument().set(
-                            "Error: Couldn't connect");
+                            "Error: Couldn't connect - " + e);
                     }
                 }
             }

@@ -513,6 +513,10 @@ public class SendFileAction extends Action {
                     do {
                         destinationFilename = fd.open();
 
+                        if (destinationFilename == null)
+                            // canceled
+                            return null;
+
                         file = new File(destinationFilename);
 
                         if (file.exists()) {
