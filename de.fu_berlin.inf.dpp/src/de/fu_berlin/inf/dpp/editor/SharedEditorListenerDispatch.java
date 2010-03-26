@@ -69,4 +69,10 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
             listener.viewportChanged(viewport);
         }
     }
+
+    public void jumpedToUser(User jumpedTo) {
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.jumpedToUser(jumpedTo);
+        }
+    }
 }

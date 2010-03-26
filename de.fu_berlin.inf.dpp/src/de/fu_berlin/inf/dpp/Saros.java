@@ -85,6 +85,8 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
+import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
 import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
 import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
@@ -362,6 +364,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(ParticipantCollector.class);
         this.container.addComponent(SessionDataCollector.class);
         this.container.addComponent(TextEditCollector.class);
+        this.container.addComponent(JumpFeatureUsageCollector.class);
+        this.container.addComponent(FollowModeCollector.class);
 
         // streaming services
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
@@ -1269,4 +1273,35 @@ public class Saros extends AbstractUIPlugin {
     public String getVersion() {
         return sarosVersion;
     }
+
+    /**
+     * Returns the configuration setting for multi driver support
+     * 
+     * @return the state of the feature as <code> boolean</code>
+     */
+    public boolean getMutliDriverEnabled() {
+        return getPreferenceStore()
+            .getBoolean(PreferenceConstants.MULTI_DRIVER);
+    }
+
+    /**
+     * Returns the configuration setting for enabled auto follow mode
+     * 
+     * @return the state of the feature as <code> boolean</code>
+     */
+    public boolean getAutoFollowEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_FOLLOW_MODE);
+    }
+
+    /**
+     * Returns the configuration setting for enabled follow exclusive driver
+     * 
+     * @return the state of the feature as <code> boolean</code>
+     */
+    public boolean getFollowExclusiveDriverEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER);
+    }
+
 }

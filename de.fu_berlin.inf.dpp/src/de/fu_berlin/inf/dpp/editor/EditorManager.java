@@ -1631,6 +1631,12 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         this.editorAPI.reveal(newEditor, viewport);
+
+        /*
+         * inform all registered ISharedEditorListeners about this jump
+         * performed
+         */
+        editorListener.jumpedToUser(jumpTo);
     }
 
     /**

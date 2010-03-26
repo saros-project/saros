@@ -1,3 +1,22 @@
+/*
+ * DPP - Serious Distributed Pair Programming
+ * (c) Lisa Dohrmann, Freie Universitaet Berlin 2009
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 1, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package de.fu_berlin.inf.dpp.feedback;
 
 import org.joda.time.DateTime;
@@ -55,7 +74,6 @@ public class SessionDataCollector extends AbstractStatisticCollector {
                 data.setPseudonym(pseudonym);
             }
         }
-
         storeGeneralInfos();
     }
 
@@ -73,7 +91,9 @@ public class SessionDataCollector extends AbstractStatisticCollector {
 
     /**
      * Stores some general platform information and settings, e.g. Saros
-     * version, Java version, feedback settings, etc.
+     * version, Java version, feedback settings, states of various settings
+     * (auto follow mode, mutli driver, follow exclusive driver)
+     * 
      */
     protected void storeGeneralInfos() {
         data.setSarosVersion(saros.getVersion());
@@ -81,10 +101,12 @@ public class SessionDataCollector extends AbstractStatisticCollector {
             "Unknown Java Version"));
         data.setOSName(System.getProperty("os.name", "Unknown OS"));
         data.setEclipseVersion(Util.getEclipsePlatformInfo());
-
         data.setFeedbackDisabled(feedbackManager.isFeedbackDisabled());
         data.setFeedbackInterval(feedbackManager.getSurveyInterval());
-
         data.setUserID(statisticManager.getUserID());
+        data.setMultiDriverEnabled(saros.getMutliDriverEnabled());
+        data.setAutoFollowModeEnabled(saros.getAutoFollowEnabled());
+        data.setFollowExclusiveDriverEnabled(saros
+            .getFollowExclusiveDriverEnabled());
     }
 }

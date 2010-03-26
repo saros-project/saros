@@ -103,4 +103,12 @@ public interface ISharedEditorListener {
      */
     public void viewportChanged(ViewportActivity viewport);
 
+    /**
+     * Is fired after a user used the jumpToFeature
+     * 
+     * @param jumpedTo
+     *            the user being jumped to
+     */
+    public void jumpedToUser(User jumpedTo);
+
 }

@@ -1,3 +1,22 @@
+/*
+ * DPP - Serious Distributed Pair Programming
+ * (c) Lisa Dohrmann, Freie Universitaet Berlin 2009
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 1, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
@@ -116,6 +135,39 @@ public class SessionStatistic {
      * @since 9.9.11
      */
     protected static final String KEY_PSEUDONYM = "user.pseudonym";
+
+    // Keys for jumpFeatureUsageCollector
+    /** Count of jumps to an observers position */
+    protected static final String KEY_JUMPED_TO_OBSERVER = "jumped.observer.count";
+
+    /** Count of jumps to a drivers position */
+    protected static final String KEY_JUMPED_TO_DRIVER = "jumped.driver.count";
+
+    /** Total count of jumps */
+    protected static final String KEY_TOTAL_JUMP_COUNT = "jumped.count";
+
+    // Keys for followModeCollector
+    /** Total time spent in follow mode */
+    protected static final String KEY_FOLLOWMODE_TOTAL = "followmode.time.total";
+
+    /**
+     * Percentage of time in respect to total session length spent in follow
+     * mode
+     */
+    protected static final String KEY_FOLLOWMODE_PERCENT = "followmode.time.percent";
+
+    /** Total count of follow mode toggles */
+    protected static final String KEY_FOLLOWMODE_TOGGLES = "followmode.toggles";
+
+    // Further Keys for SessionDataCollector
+    /** Preference setting of multi-driver support */
+    protected static final String KEY_MULTI_DRIVER_ENABLED = "multidriver.enabled";
+
+    /** Preference setting of auto follow mode */
+    protected static final String KEY_AUTO_FOLLOW_MODE_ENABLED = "auto.followmode.enabled";
+
+    /** Preference setting of follow exclusive driver */
+    protected static final String KEY_FOLLOW_EXCL_DRIVER_ENABLED = "follow.exclusivedriver.enabled";
 
     /**
      * This is the {@link Properties} object to hold our statistical data.
@@ -566,4 +618,145 @@ public class SessionStatistic {
         data.setProperty(KEY_SESSION_LOCAL_START, localSessionEnd.toDateTime(
             DateTimeZone.UTC).toString());
     }
+
+    /**
+     * Sets the number of jumps to the position of an observer
+     */
+    public void setJumpedToObserverCount(int jumpedToObserver) {
+        data.setProperty(appendToKey(KEY_JUMPED_TO_OBSERVER), String
+            .valueOf(jumpedToObserver));
+    }
+
+    /**
+     * Sets the number of jumps to the position of a driver
+     */
+    public void setJumpedToDriverCount(int jumpedToDriver) {
+        data.setProperty(appendToKey(KEY_JUMPED_TO_DRIVER), String
+            .valueOf(jumpedToDriver));
+    }
+
+    /**
+     * Sets the total count for jumps performed
+     */
+    public void setJumpedToCount(int jumpedToTotal) {
+        data.setProperty(appendToKey(KEY_TOTAL_JUMP_COUNT), String
+            .valueOf(jumpedToTotal));
+    }
+
+    /**
+     * Returns total number of jumps performed
+     */
+    public long getJumpedToCount() {
+        return Integer.parseInt(data.getProperty(KEY_TOTAL_JUMP_COUNT));
+    }
+
+    /**
+     * Returns the number of jumps to the position of a driver
+     */
+    public long getJumpedToDriverCount() {
+        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_DRIVER));
+    }
+
+    /**
+     * Returns the number of jumps to the position of an observer
+     */
+    public long getJumpedToObserverCount() {
+        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_OBSERVER));
+    }
+
+    /**
+     * Returns the number of follow mode toggles
+     */
+    public String getFollowModeTogglesCount() {
+        return data.getProperty(KEY_FOLLOWMODE_TOGGLES);
+    }
+
+    /**
+     * Returns the percentage of time spent in follow mode
+     */
+    public String getFollowModeTimePercentage() {
+        return data.getProperty(KEY_FOLLOWMODE_PERCENT);
+    }
+
+    /**
+     * Returns the total time spent in follow mode
+     */
+    public String getFollowModeTimeTotal() {
+        return data.getProperty(KEY_FOLLOWMODE_TOTAL);
+    }
+
+    /**
+     * Sets the total number of follow mode toggles
+     */
+    public void setFollowModeTogglesCount(int count) {
+        data.setProperty(KEY_FOLLOWMODE_TOGGLES, String.valueOf(count));
+    }
+
+    /**
+     * Sets the percentage of time spent in follow mode in respect to total
+     * session length
+     */
+    public void setFollowModeTimePercentage(int percentage) {
+        data.setProperty(KEY_FOLLOWMODE_PERCENT, String.valueOf(percentage));
+    }
+
+    /**
+     * Sets the total time of being in follow mode
+     */
+    public void setFollowModeTimeTotal(double time) {
+        data.setProperty(KEY_FOLLOWMODE_TOTAL, String.valueOf(time));
+    }
+
+    /**
+     * Sets the state of multi-driver support from configuration settings
+     */
+    public void setMultiDriverEnabled(boolean mutliDriverEnabled) {
+        data.setProperty(KEY_MULTI_DRIVER_ENABLED, String
+            .valueOf(mutliDriverEnabled));
+    }
+
+    /**
+     * Sets the state of the auto follow mode from configuration settings
+     */
+    public void setAutoFollowModeEnabled(boolean autoFollowEnabled) {
+        data.setProperty(KEY_AUTO_FOLLOW_MODE_ENABLED, String
+            .valueOf(autoFollowEnabled));
+    }
+
+    /**
+     * Sets the state of the follow exclusive driver setting from configuration
+     * settings
+     */
+    public void setFollowExclusiveDriverEnabled(
+        boolean followExclusiveDriverEnabled) {
+        data.setProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED, String
+            .valueOf(followExclusiveDriverEnabled));
+    }
+
+    /**
+     * Returns the state as <code>boolean</code> of multi-driver support from
+     * configuration settings
+     */
+    public boolean getMultiDriverEnabled() {
+        return Boolean.parseBoolean(data.getProperty(KEY_MULTI_DRIVER_ENABLED));
+    }
+
+    /**
+     * Returns the state as <code>boolean</code> of the auto follow mode feature
+     * from the configuration settings
+     */
+    public boolean getMAutoFollowModeEnabled() {
+        return Boolean.parseBoolean(data
+            .getProperty(KEY_AUTO_FOLLOW_MODE_ENABLED));
+    }
+
+    /**
+     * Returns the state as <code>boolean</code> of the follow exclusive driver
+     * setting
+     */
+    public boolean getFollowExclusiveDriverEnabled() {
+        return Boolean.parseBoolean(data
+            .getProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED));
+    }
+
 }

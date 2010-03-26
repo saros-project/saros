@@ -40,4 +40,7 @@ public abstract class AbstractSharedEditorListener implements
         // does nothing
     }
 
+    public void jumpedToUser(User jumpedTo) {
+        // does nothing
+    }
 }
