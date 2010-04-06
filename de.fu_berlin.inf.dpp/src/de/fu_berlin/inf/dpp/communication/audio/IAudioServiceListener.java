@@ -8,4 +8,6 @@ public interface IAudioServiceListener {
 
     public void stopSession(StreamSession session);
 
+    public void sessionStopped(StreamSession session);
+
 }

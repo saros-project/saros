@@ -13,4 +13,8 @@ public abstract class AbstractAudioServiceListener implements
         // nothing to do here
     }
 
+    public void sessionStopped(StreamSession session) {
+        // nothing to do here
+    }
+
 }

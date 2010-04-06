@@ -29,6 +29,11 @@ public class AudioServiceListenerDispatch implements IAudioServiceListener {
         for (IAudioServiceListener listener : audioListeners) {
             listener.stopSession(session);
         }
+    }
 
+    public void sessionStopped(StreamSession session) {
+        for (IAudioServiceListener listener : audioListeners) {
+            listener.sessionStopped(session);
+        }
     }
 }

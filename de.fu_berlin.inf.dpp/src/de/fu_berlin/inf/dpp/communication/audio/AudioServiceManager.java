@@ -95,8 +95,10 @@ public class AudioServiceManager {
         public void sessionStopped() {
             setStatus(VoIPStatus.STOPPING);
             log.debug("VoIP Status: STOPPING!");
-            session.dispose();
+            // inform audio listener about the event
+            audioListener.sessionStopped(session);
 
+            session.dispose();
             Util.runSafeSWTAsync(log, new Runnable() {
 
                 public void run() {
