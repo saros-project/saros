@@ -169,6 +169,15 @@ public class SessionStatistic {
     /** Preference setting of follow exclusive driver */
     protected static final String KEY_FOLLOW_EXCL_DRIVER_ENABLED = "follow.exclusivedriver.enabled";
 
+    /** Key for total observer selection count */
+    protected static final String KEY_TOTAL_OBSERVER_SELECTION_COUNT = "observer.selection.count";
+
+    /** Key for witnessed observer selections */
+    protected static final String KEY_WITNESSED_OBSERVER_SELECTION_COUNT = "observer.selection.count.witnessed";
+
+    /** Key for gesture count */
+    protected static final String KEY_GESTURE_COUNT = "gesture.count";
+
     /**
      * This is the {@link Properties} object to hold our statistical data.
      * Properties are supposed to store only strings for both keys and values,
@@ -646,21 +655,21 @@ public class SessionStatistic {
     /**
      * Returns total number of jumps performed
      */
-    public long getJumpedToCount() {
+    public int getJumpedToCount() {
         return Integer.parseInt(data.getProperty(KEY_TOTAL_JUMP_COUNT));
     }
 
     /**
      * Returns the number of jumps to the position of a driver
      */
-    public long getJumpedToDriverCount() {
+    public int getJumpedToDriverCount() {
         return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_DRIVER));
     }
 
     /**
      * Returns the number of jumps to the position of an observer
      */
-    public long getJumpedToObserverCount() {
+    public int getJumpedToObserverCount() {
         return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_OBSERVER));
     }
 
@@ -757,6 +766,36 @@ public class SessionStatistic {
     public boolean getFollowExclusiveDriverEnabled() {
         return Boolean.parseBoolean(data
             .getProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED));
+    }
+
+    public void setTotalOberserverSelectionCount(int observerSelectionCount) {
+        data.setProperty(appendToKey(KEY_TOTAL_OBSERVER_SELECTION_COUNT),
+            String.valueOf(observerSelectionCount));
+    }
+
+    public void setWitnessedObserverSelections(
+        int numberOfWitnessedObserverSelections) {
+        data.setProperty(appendToKey(KEY_WITNESSED_OBSERVER_SELECTION_COUNT),
+            String.valueOf(numberOfWitnessedObserverSelections));
+    }
+
+    public void setGestureCount(int driverSelectionCount) {
+        data.setProperty(appendToKey(KEY_GESTURE_COUNT), String
+            .valueOf(driverSelectionCount));
+    }
+
+    public int getGestureCount() {
+        return Integer.parseInt(data.getProperty(KEY_GESTURE_COUNT));
+    }
+
+    public int getWitnessedObserverSelections() {
+        return Integer.parseInt(data
+            .getProperty(KEY_WITNESSED_OBSERVER_SELECTION_COUNT));
+    }
+
+    public int getTotalOberserverSelectionCount() {
+        return Integer.parseInt(data
+            .getProperty(KEY_TOTAL_OBSERVER_SELECTION_COUNT));
     }
 
 }

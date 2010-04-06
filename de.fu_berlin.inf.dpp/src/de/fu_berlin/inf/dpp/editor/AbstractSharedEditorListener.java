@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.ui.IEditorPart;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
@@ -42,5 +45,11 @@ public abstract class AbstractSharedEditorListener implements
 
     public void jumpedToUser(User jumpedTo) {
         // does nothing
+    }
+
+    public void viewportGenerated(IEditorPart part, ILineRange viewport,
+        SPath path) {
+        // does nothing
+
     }
 }

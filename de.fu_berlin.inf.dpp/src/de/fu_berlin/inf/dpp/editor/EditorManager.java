@@ -546,6 +546,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         fireActivity(new EditorActivity(sharedProject.getLocalUser(),
             Type.Activated, path));
+
     }
 
     /**
@@ -585,6 +586,9 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         fireActivity(new ViewportActivity(sharedProject.getLocalUser(),
             viewport, path));
+
+        editorListener.viewportGenerated(part, viewport, path);
+
     }
 
     /**
@@ -831,7 +835,6 @@ public class EditorManager implements IActivityProvider, Disposable {
          * made
          */
         editorListener.textSelectionMade(selection);
-
     }
 
     protected void execViewport(ViewportActivity viewport) {

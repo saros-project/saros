@@ -89,6 +89,7 @@ import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
 import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
 import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
 import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
+import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
@@ -366,6 +367,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(TextEditCollector.class);
         this.container.addComponent(JumpFeatureUsageCollector.class);
         this.container.addComponent(FollowModeCollector.class);
+        this.container.addComponent(SelectionCollector.class);
 
         // streaming services
         this.container.addComponent(SendFileAction.SendFileStreamService.class);

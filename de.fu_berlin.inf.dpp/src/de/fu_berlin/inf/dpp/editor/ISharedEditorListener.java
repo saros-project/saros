@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.ui.IEditorPart;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
@@ -110,5 +112,16 @@ public interface ISharedEditorListener {
      *            the user being jumped to
      */
     public void jumpedToUser(User jumpedTo);
+
+    /**
+     * Is fired when the viewport for the local user gets changed
+     * 
+     * @param part
+     *            The part of the editor as {@link IEditorPart}
+     * @param viewport
+     *            The generated viewport as {@link ILineRange}
+     */
+    public void viewportGenerated(IEditorPart part, ILineRange viewport,
+        SPath path);
 
 }
