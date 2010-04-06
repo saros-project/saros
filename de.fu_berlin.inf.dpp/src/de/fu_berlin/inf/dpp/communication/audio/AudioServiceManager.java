@@ -258,6 +258,8 @@ public class AudioServiceManager {
             session = newSession;
             session.setListener(audioStreamSessionListener);
             obs.setValue(session);
+            // inform audio listener about the event
+            audioListener.startSession(newSession);
 
             if (recordDeviceOk) {
                 audioSenderRunnable = new AudioSenderRunnable(session
@@ -270,8 +272,6 @@ public class AudioServiceManager {
                     .getInputStream(0), this, preferenceUtils);
                 audioReceiverRunnable.start();
             }
-            // inform audio listener about the event
-            audioListener.startSession(newSession);
 
         } else {
             throw new IllegalStateException(
