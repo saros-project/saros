@@ -215,7 +215,13 @@ public class AddContactWizard extends Wizard {
         monitor.beginTask("Adding " + jid, 2);
         try {
             try {
-                if (!saros.isJIDonServer(jid, monitor.newChild(1))) {
+                if (saros.getRoster().contains(jid.toString())) {
+                    openError("Contact already added", "The contanct "
+                        + "you were looking to add is already stored in your "
+                        + "contact list.");
+                }
+
+                else if (!saros.isJIDonServer(jid, monitor.newChild(1))) {
                     if (!openQuestionDialog("Contact not found", "The contact "
                         + jid + " could not be found on the server."
                         + " Please make sure you spelled the name correctly.\n"
@@ -304,5 +310,31 @@ public class AddContactWizard extends Wizard {
                 + " to open the question dialog.");
             return false;
         }
+    }
+
+    /**
+     * Shows a error message to the user and waits for him to confirm.
+     * 
+     * @blocking
+     * 
+     * @param title
+     *            the error title
+     * @param message
+     *            the message to show to the user
+     */
+
+    protected void openError(final String title, final String message) {
+        try {
+            Util.runSWTSync(new Callable<Void>() {
+                public Void call() {
+                    MessageDialog.openError(getShell(), title, message);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the error message.");
+        }
+
     }
 }
