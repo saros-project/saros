@@ -128,7 +128,6 @@ public class FollowModeCollector extends AbstractStatisticCollector {
              */
             followModeChangeEvents.add(event);
             ++countFollowModeChanges;
-            assert countFollowModeChanges == (followModeChangeEvents.size() - 1);
         }
     };
 
