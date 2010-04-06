@@ -9,7 +9,7 @@ public abstract class AbstractAudioServiceListener implements
         // nothing to do here
     }
 
-    public void sessionStopped(StreamSession session) {
+    public void stopSession(StreamSession session) {
         // nothing to do here
     }
 
