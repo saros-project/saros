@@ -64,6 +64,8 @@ public class AudioServiceManager {
     protected boolean playbackDeviceOk = true;
     protected boolean recordDeviceOk = true;
 
+    protected AudioServiceListenerDispatch audioListener = new AudioServiceListenerDispatch();
+
     public enum VoIPStatus {
         STOPPED, RUNNING, STOPPING;
     }
@@ -268,10 +270,14 @@ public class AudioServiceManager {
                     .getInputStream(0), this, preferenceUtils);
                 audioReceiverRunnable.start();
             }
+            // inform audio listener about the event
+            audioListener.startSession(newSession);
+
         } else {
             throw new IllegalStateException(
                 "Another VoIP session is already started.");
         }
+
     }
 
     /**
@@ -281,6 +287,8 @@ public class AudioServiceManager {
         if (getStatus() != VoIPStatus.STOPPED) {
             log.debug("VoIP session will be stopped.");
             session.stopSession();
+            // inform the audio listener about the event
+            audioListener.stopSession(session);
         } else {
             log.error("stopSession called while no session is running");
         }
@@ -315,4 +323,13 @@ public class AudioServiceManager {
     public void setRecordDeviceOk(boolean recordDeviceOk) {
         this.recordDeviceOk = recordDeviceOk;
     }
+
+    public void addAudioListener(IAudioServiceListener audioListener) {
+        this.audioListener.add(audioListener);
+    }
+
+    public void remove(IAudioServiceListener audioListener) {
+        this.audioListener.remove(audioListener);
+    }
+
 }
