@@ -1,3 +1,22 @@
+/*
+ * DPP - Serious Distributed Pair Programming
+ * (c) Lisa Dohrmann, Freie Universitaet Berlin 2009
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 1, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.util.ArrayList;
@@ -17,6 +36,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -32,11 +52,31 @@ import de.fu_berlin.inf.dpp.util.Util;
  * when copy&paste or Eclipse's method generation was used) and how concurrent
  * the local user's writing was to remote users using different sample
  * intervals. <br>
- * <br>
+ * Furthermore, it accumulates the characters edited for all remote
+ * participants. <br>
+ * A little addition was made to track possible paste / auto generations. If a
+ * single text edit activity produces more than a certain number
+ * (pasteThreshold) of characters, it will be counted as possible paste action.
+ * The threshold was chosen to be 16 due to some testing. The characters within
+ * a textEditActivity heavily depends on the connection speed. When a the local
+ * user fires several textEdits within a short interval he might see those edits
+ * as several single edits with a few characters but a remote user will most
+ * likely get less textEditActivities containing a bunch of characters. The
+ * manual tests results were: When "typing" (rather thrashing the keyboard) as
+ * fast as one could, the remote user received text edits with up to 20
+ * characters. As this typing speed is beyond human capabilities, I've decided
+ * to set the threshold to 16 which will most likely prevent getting false
+ * positives (e.g. a really fast typer is typing instead of a paste).
+ * Unfortunately, this relatively high threshold will cause the collector to
+ * slip some true pastes as well. (E.g. an auto completion of a comment block)
+ * 
  * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when
  * restoring an editor) are counted as well. And refactorings can produce quite
  * a large number of characters that are counted. <br>
  * <br>
+ * Fixed: The number of non parallel edits was set to 100% if there are no
+ * concurrent edits, which is fine. But if there are no edits at all, the non
+ * parallel edits are still set to 100% even though this should rather be 0%.
  * Example:<br>
  * The percent numbers (for all intervals + non-parallel) should add up to
  * (nearly) 100, slight rounding errors are possible. The counted chars for all
@@ -45,6 +85,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * <code>
  * textedits.chars=5 <br>
  * textedits.count=5 <br>
+ * textedits.pastes.chars=0
+ * textedits.pastes=0
  * textedits.nonparallel.chars=1 <br>
  * textedits.nonparallel.percent=20 <br>
  * textedits.parallel.interval.1.chars=1 <br>
@@ -55,11 +97,24 @@ import de.fu_berlin.inf.dpp.util.Util;
  * textedits.parallel.interval.10.percent=40 <br>
  * textedits.parallel.interval.2.chars=1 <br>
  * textedits.parallel.interval.2.count=1 <br>
- * textedits.parallel.interval.2.percent=20
+ * textedits.parallel.interval.2.percent=20<br>
+ * textedits.remote.user.1.chars=1<br>
+ * textedits.remote.user.1.pastes.chars=0<br>
+ * textedits.remote.user.1.pastes=0<br>
  * </code>
  * 
+ * TODO: replace the HashMaps by AutoHashMaps which initializes missing values
+ * with a default. This will lead to easier code and help to get rid of these
+ * constructs:
  * 
- * @author Lisa Dohrmann
+ * Integer currentPasteCount = possiblePastes.get(id); if (currentPasteCount ==
+ * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
+ * 1);
+ * 
+ * TODO: synchronize the numbers the remote users get with the other collectors
+ * (E.g. Alice as remote user should appear as user.2 in all statistic fields.
+ * 
+ * @author Lisa Dohrmann, Moritz von Hoffen
  */
 @Component(module = "feedback")
 public class TextEditCollector extends AbstractStatisticCollector {
@@ -72,7 +127,6 @@ public class TextEditCollector extends AbstractStatisticCollector {
             this.time = time;
             this.chars = chars;
         }
-
     }
 
     protected static final Logger log = Logger
@@ -88,6 +142,17 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     protected long charsWritten = 0;
 
+    /**
+     * This threshold is the upper limit that is believed to have been produced
+     * by "hand". If a single text edit activity contains more characters than
+     * specified by this threshold it indicates that a paste action has
+     * occurred. That paste action could either mean an auto completion /
+     * generation using eclipse or a simple paste from the clip board.
+     */
+    protected int pasteThreshold = 16;
+
+    protected JID localUserJID = null;
+
     /** List to contain local text activityDataObjects */
     protected List<EditEvent> localEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
@@ -99,6 +164,18 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected Map<Integer, Integer> parallelTextEdits = new HashMap<Integer, Integer>();
     /** Maps sample interval to number of edits in this interval */
     protected Map<Integer, Integer> parallelTextEditsCount = new HashMap<Integer, Integer>();
+
+    /** A map which should possible detect auto generation and paste actions */
+    protected Map<JID, Integer> pastes = new HashMap<JID, Integer>();
+
+    /** A map which accumulates the characters produced within paste actions */
+    protected Map<JID, Integer> pastesCharCount = new HashMap<JID, Integer>();
+
+    /**
+     * for each key {@link JID} an Integer is stored which represents the total
+     * chars edited.
+     */
+    protected Map<JID, Integer> remoteCharCount = new HashMap<JID, Integer>();
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
@@ -112,8 +189,32 @@ public class TextEditCollector extends AbstractStatisticCollector {
              * starts lines with tabs or spaces
              */
             int textLength = StringUtils.deleteWhitespace(text).length();
+            // get the JID for the current edit
+            JID id = user.getJID();
             EditEvent event = new EditEvent(System.currentTimeMillis(),
                 textLength);
+
+            /*
+             * if the edit activity text length exceeds the threshold for
+             * possible pastes store this as a possible paste and file it under
+             * the according JID for the user who made that possible paste.
+             * Moreover, store the number of characters that were "pasted" or
+             * auto generated.
+             */
+            if (textLength > pasteThreshold) {
+                Integer currentPasteCount = pastes.get(id);
+                if (currentPasteCount == null) {
+                    currentPasteCount = 0;
+                }
+                pastes.put(id, currentPasteCount + 1);
+
+                Integer currentPasteChars = pastesCharCount.get(id);
+                if (currentPasteChars == null) {
+                    currentPasteChars = 0;
+                }
+                pastesCharCount.put(id, currentPasteChars + textLength);
+
+            }
 
             if (log.isTraceEnabled()) {
                 log.trace(String.format("Recieved chars written from %s "
@@ -135,9 +236,22 @@ public class TextEditCollector extends AbstractStatisticCollector {
                             + getCharsWritten());
                     }
                 } else {
-                    // store all remote text edits for future comparison
+                    /*
+                     * store all remote text edits for future comparison. As
+                     * those text edits are remote it needs to be determined,
+                     * who made the edit and to increase the appropriate edited
+                     * character count. The total text edit count is increased
+                     * by one for each text edit activity received.
+                     */
                     remoteEvents.add(event);
+                    Integer currentCharCount = remoteCharCount.get(id);
+                    if (currentCharCount == null) {
+                        currentCharCount = 0;
+                    }
+                    remoteCharCount.put(id, currentCharCount + textLength);
+
                 }
+
             }
         }
 
@@ -160,6 +274,51 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     @Override
     protected void processGatheredData() {
+
+        /*
+         * a variable to distinguish between remote users and assign a number to
+         * each of these remote users.
+         */
+        int userNumber = 1;
+
+        // iterate through the map and write written char count to session data
+        for (Map.Entry<JID, Integer> entry : remoteCharCount.entrySet()) {
+            JID currentId = entry.getKey();
+            // get character count for this remote user
+            Integer charCount = entry.getValue();
+            // write the count to the session data
+            data.setRemoteUserCharCount(userNumber, charCount);
+
+            /*
+             * check, whether pastes have been recorded for this user. if so,
+             * write those to the sessions statistics and if not, set the total
+             * pastes for this user to null.
+             */
+
+            if (pastes.get(currentId) == null) {
+                data.setRemoteUserPastes(userNumber, 0);
+                data.setRemoteUserPasteChars(userNumber, 0);
+            } else {
+                Integer pasteCount = pastes.get(currentId);
+                Integer pasteChars = pastesCharCount.get(currentId);
+                data.setRemoteUserPastes(userNumber, pasteCount);
+                data.setRemoteUserPasteChars(userNumber, pasteChars);
+            }
+            // increment n (so that next remote peer gets a different number)
+            userNumber++;
+        }
+
+        // determine the possible pastes for the local user
+        if (pastes.get(localUserJID) == null) {
+            data.setLocalUserPastes(0);
+            data.setLocalUserPasteChars(0);
+        } else {
+            Integer pasteCount = pastes.get(localUserJID);
+            Integer pasteChars = pastesCharCount.get(localUserJID);
+            data.setLocalUserPastes(pasteCount);
+            data.setLocalUserPasteChars(pasteChars);
+        }
+
         data.setTextEditsCount(localEvents.size());
         data.setTextEditChars(getCharsWritten());
 
@@ -174,14 +333,18 @@ public class TextEditCollector extends AbstractStatisticCollector {
         }
 
         /* store the results in the data map */
-
         if (parallelTextEditsCount.isEmpty()) {
             /*
              * there were no parallel text edits i.e. every edit was
              * non-parallel
              */
             data.setNonParallelTextEdits(getCharsWritten());
-            data.setNonParallelTextEditsPercent(100);
+            if (!(localEvents.isEmpty()) || !(remoteEvents.isEmpty())) {
+                data.setNonParallelTextEditsPercent(100);
+            } else {
+                data.setNonParallelTextEditsPercent(0);
+            }
+
             return;
         }
 
@@ -279,7 +442,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISharedProject project) {
-        // nothing to do here
+        // set local users JID at the beginning of the session
+        localUserJID = project.getLocalUser().getJID();
     }
 
     @Override
@@ -294,6 +458,11 @@ public class TextEditCollector extends AbstractStatisticCollector {
         remoteEvents.clear();
         parallelTextEdits.clear();
         parallelTextEditsCount.clear();
+        remoteCharCount.clear();
+        pastes.clear();
+        pastesCharCount.clear();
+        localUserJID = null;
+
         super.clearPreviousData();
     }
 }

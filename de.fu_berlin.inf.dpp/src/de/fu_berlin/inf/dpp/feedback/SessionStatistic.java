@@ -101,6 +101,7 @@ public class SessionStatistic {
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
 
+    // Keys for role changes
     protected static final String KEY_ROLE = "role";
     protected static final String KEY_ROLE_OBSERVER = "role.observer";
     protected static final String KEY_ROLE_DRIVER = "role.driver";
@@ -110,11 +111,15 @@ public class SessionStatistic {
     protected static final String KEY_PERCENT = "percent";
     protected static final String KEY_CHARS = "chars";
     protected static final String KEY_COUNT = "count";
+    protected static final String KEY_PASTES = "pastes";
 
+    // Keys for textedits and pastes
     protected static final String KEY_TEXTEDIT_CHARS = "textedits.chars";
     protected static final String KEY_TEXTEDIT_COUNT = "textedits.count";
+    protected static final String KEY_TEXTEDIT_PASTES = "textedits.pastes";
     protected static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.interval";
     protected static final String KEY_NON_PARALLEL_TEXT_EDITS = "textedits.nonparallel";
+    protected static final String KEY_REMOTE_USER = "textedits.remote.user";
 
     // Keys for DataTransferCollector
     protected static final String KEY_TRANSFER_STATS = "data_transfer";
@@ -169,6 +174,7 @@ public class SessionStatistic {
     /** Preference setting of follow exclusive driver */
     protected static final String KEY_FOLLOW_EXCL_DRIVER_ENABLED = "follow.exclusivedriver.enabled";
 
+    // Keys for selections and gestures
     /** Key for total observer selection count */
     protected static final String KEY_TOTAL_OBSERVER_SELECTION_COUNT = "observer.selection.count";
 
@@ -177,6 +183,16 @@ public class SessionStatistic {
 
     /** Key for gesture count */
     protected static final String KEY_GESTURE_COUNT = "gesture.count";
+
+    // Keys for VoIP Collector
+    /** Key for VoIP total time */
+    protected static final String KEY_VOIP_TOTAL = "voip.time.total";
+
+    /** Key for VoIP percentage */
+    protected static final String KEY_VOIP_PERCENT = "voip.time.percent";
+
+    /** Key for VoIP sessions established */
+    protected static final String KEY_VOIP_COUNT = "voip.session.count";
 
     /**
      * This is the {@link Properties} object to hold our statistical data.
@@ -653,10 +669,10 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns total number of jumps performed
+     * Returns the number of jumps to the position of an observer
      */
-    public int getJumpedToCount() {
-        return Integer.parseInt(data.getProperty(KEY_TOTAL_JUMP_COUNT));
+    public int getJumpedToObserverCount() {
+        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_OBSERVER));
     }
 
     /**
@@ -667,31 +683,31 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of jumps to the position of an observer
+     * Returns total number of jumps performed
      */
-    public int getJumpedToObserverCount() {
-        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_OBSERVER));
+    public int getJumpedToCount() {
+        return Integer.parseInt(data.getProperty(KEY_TOTAL_JUMP_COUNT));
     }
 
     /**
      * Returns the number of follow mode toggles
      */
-    public String getFollowModeTogglesCount() {
-        return data.getProperty(KEY_FOLLOWMODE_TOGGLES);
+    public int getFollowModeTogglesCount() {
+        return Integer.parseInt(data.getProperty(KEY_FOLLOWMODE_TOGGLES));
     }
 
     /**
      * Returns the percentage of time spent in follow mode
      */
-    public String getFollowModeTimePercentage() {
-        return data.getProperty(KEY_FOLLOWMODE_PERCENT);
+    public int getFollowModeTimePercentage() {
+        return Integer.parseInt(data.getProperty(KEY_FOLLOWMODE_PERCENT));
     }
 
     /**
      * Returns the total time spent in follow mode
      */
-    public String getFollowModeTimeTotal() {
-        return data.getProperty(KEY_FOLLOWMODE_TOTAL);
+    public double getFollowModeTimeTotal() {
+        return Double.parseDouble(data.getProperty(KEY_FOLLOWMODE_TOTAL));
     }
 
     /**
@@ -754,7 +770,7 @@ public class SessionStatistic {
      * Returns the state as <code>boolean</code> of the auto follow mode feature
      * from the configuration settings
      */
-    public boolean getMAutoFollowModeEnabled() {
+    public boolean getAutoFollowModeEnabled() {
         return Boolean.parseBoolean(data
             .getProperty(KEY_AUTO_FOLLOW_MODE_ENABLED));
     }
@@ -768,34 +784,197 @@ public class SessionStatistic {
             .getProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED));
     }
 
+    /**
+     * Sets the count of selections made by observers
+     * 
+     * @param observerSelectionCount
+     */
     public void setTotalOberserverSelectionCount(int observerSelectionCount) {
         data.setProperty(appendToKey(KEY_TOTAL_OBSERVER_SELECTION_COUNT),
             String.valueOf(observerSelectionCount));
     }
 
+    /**
+     * Sets the count of observer selections that were witnessed by another user
+     * 
+     * @param numberOfWitnessedObserverSelections
+     */
     public void setWitnessedObserverSelections(
         int numberOfWitnessedObserverSelections) {
         data.setProperty(appendToKey(KEY_WITNESSED_OBSERVER_SELECTION_COUNT),
             String.valueOf(numberOfWitnessedObserverSelections));
     }
 
+    /**
+     * Sets the number of observer selections where an edit occured.
+     * 
+     * @param driverSelectionCount
+     */
     public void setGestureCount(int driverSelectionCount) {
         data.setProperty(appendToKey(KEY_GESTURE_COUNT), String
             .valueOf(driverSelectionCount));
     }
 
-    public int getGestureCount() {
-        return Integer.parseInt(data.getProperty(KEY_GESTURE_COUNT));
-    }
-
-    public int getWitnessedObserverSelections() {
-        return Integer.parseInt(data
-            .getProperty(KEY_WITNESSED_OBSERVER_SELECTION_COUNT));
-    }
-
+    /**
+     * Returns the number of observer selections made
+     */
     public int getTotalOberserverSelectionCount() {
         return Integer.parseInt(data
             .getProperty(KEY_TOTAL_OBSERVER_SELECTION_COUNT));
     }
 
+    /**
+     * Returns the number of witnessed observer selections
+     */
+    public int getWitnessedObserverSelections() {
+        return Integer.parseInt(data
+            .getProperty(KEY_WITNESSED_OBSERVER_SELECTION_COUNT));
+    }
+
+    /**
+     * Returns the gesture count
+     */
+    public int getGestureCount() {
+        return Integer.parseInt(data.getProperty(KEY_GESTURE_COUNT));
+    }
+
+    /**
+     * Sets the characters edited by each remote user
+     * 
+     * @param userNumber
+     * @param charCount
+     */
+    public void setRemoteUserCharCount(int userNumber, Integer charCount) {
+        data.setProperty(appendToKey(KEY_REMOTE_USER, userNumber, KEY_CHARS),
+            String.valueOf(charCount));
+    }
+
+    /**
+     * Sets the number of remote paste events for each remote user
+     * 
+     * @param userNumber
+     * @param pasteCount
+     */
+    public void setRemoteUserPastes(int userNumber, int pasteCount) {
+        data.setProperty(appendToKey(KEY_REMOTE_USER, userNumber, KEY_PASTES),
+            String.valueOf(pasteCount));
+    }
+
+    /**
+     * Sets the number of local paste events
+     * 
+     * @param pasteCount
+     */
+    public void setLocalUserPastes(int pasteCount) {
+        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES), String
+            .valueOf(pasteCount));
+    }
+
+    /**
+     * Sets the number of chars that were added through a remote paste
+     * 
+     * @param userNumber
+     * @param pasteChars
+     */
+    public void setRemoteUserPasteChars(int userNumber, Integer pasteChars) {
+        data.setProperty(appendToKey(KEY_REMOTE_USER, userNumber, KEY_PASTES,
+            KEY_CHARS), String.valueOf(pasteChars));
+    }
+
+    /**
+     * Sets the number of chars that were added through a paste
+     * 
+     * @param pasteChars
+     */
+    public void setLocalUserPasteChars(Integer pasteChars) {
+        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES, KEY_CHARS), String
+            .valueOf(pasteChars));
+    }
+
+    /**
+     * Returns the remote chars for user with number n
+     */
+    public int getRemoteUserCharCount(int n) {
+        return Integer.parseInt(data.getProperty(appendToKey(KEY_CHARS, n,
+            KEY_REMOTE_USER)));
+    }
+
+    /**
+     * Returns the number of pastes conducted by user n
+     */
+    public int getRemoteUserPastes(int n) {
+        return Integer.parseInt(data.getProperty(appendToKey(KEY_PASTES, n,
+            KEY_REMOTE_USER)));
+    }
+
+    /**
+     * Returns the total pastes made by the local user
+     */
+    public int getLocalUserPastes() {
+        return Integer.parseInt(data.getProperty(KEY_TEXTEDIT_PASTES));
+    }
+
+    /**
+     * Returns the number of chars contained within the pastes of user n
+     */
+    public int getRemoteUserPasteChars(int n) {
+        return Integer.parseInt(data.getProperty(appendToKey(KEY_PASTES,
+            KEY_CHARS, n, KEY_REMOTE_USER)));
+    }
+
+    public int getLocalUserPasteChars() {
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_TEXTEDIT_PASTES, KEY_CHARS)));
+    }
+
+    /**
+     * Sets the time spent in VoIP sessions in minutes
+     * 
+     * @param timeInMinutes
+     */
+    public void setVoIPTime(double timeInMinutes) {
+        data.setProperty(KEY_VOIP_TOTAL, String.valueOf(timeInMinutes));
+    }
+
+    /**
+     * Sets the percentage spent in VoIP sessions in respect to the session
+     * length
+     * 
+     * @param percentage
+     */
+    public void setVoIPPercentage(int percentage) {
+        data.setProperty(appendToKey(KEY_VOIP_PERCENT), String
+            .valueOf(percentage));
+    }
+
+    /**
+     * Sets the number of established VoIP sessions
+     * 
+     * @param numberVoIPSessions
+     */
+    public void setVoIPSessionCount(int numberVoIPSessions) {
+        data.setProperty(appendToKey(KEY_VOIP_COUNT), String
+            .valueOf(numberVoIPSessions));
+    }
+
+    /**
+     * Returns the time spent in VoIP sessions
+     */
+    public double getVoIPTime() {
+        return Double.parseDouble(data.getProperty(KEY_VOIP_TOTAL));
+    }
+
+    /**
+     * Returns the percentage of time of a session spent in VoIP sessions
+     */
+    public int getVoIPPercentage() {
+        return Integer.parseInt(data.getProperty(KEY_VOIP_PERCENT));
+    }
+
+    /**
+     * Returns the total number of VoIP sessions in a session
+     */
+    public int getVoIPSessionCount() {
+        return Integer.parseInt(data.getProperty(KEY_VOIP_COUNT));
+    }
 }

@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -368,6 +369,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JumpFeatureUsageCollector.class);
         this.container.addComponent(FollowModeCollector.class);
         this.container.addComponent(SelectionCollector.class);
+        this.container.addComponent(VoIPCollector.class);
 
         // streaming services
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
