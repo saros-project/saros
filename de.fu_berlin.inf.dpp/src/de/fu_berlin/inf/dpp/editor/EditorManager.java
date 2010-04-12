@@ -1011,6 +1011,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      */
     public void partInputChanged(IEditorPart editor) {
+        User followedUser = getFollowedUser();
 
         if (editorPool.isManaged(editor)) {
 
@@ -1025,6 +1026,9 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
 
             partOpened(editor);
+
+            if (followedUser != null && followedUser != getFollowedUser())
+                setFollowing(followedUser);
         }
     }
 
