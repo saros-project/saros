@@ -1011,6 +1011,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      */
     public void partInputChanged(IEditorPart editor) {
+        // notice currently followed user before closing the editor
         User followedUser = getFollowedUser();
 
         if (editorPool.isManaged(editor)) {
@@ -1027,6 +1028,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             partOpened(editor);
 
+            // restore the previously followed user
+            // in case it was set and has changed
             if (followedUser != null && followedUser != getFollowedUser())
                 setFollowing(followedUser);
         }
