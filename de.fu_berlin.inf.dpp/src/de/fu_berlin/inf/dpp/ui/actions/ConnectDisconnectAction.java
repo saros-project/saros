@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -28,14 +27,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -43,7 +38,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class ConnectDisconnectAction extends Action implements Disposable {
@@ -140,7 +134,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 && errorLogManager.hasErrorLogAgreement();
 
             if (!hasUsername || !hasAgreement) {
-                boolean ok = showConfigurationWizard(!hasUsername,
+                boolean ok = Util.showConfigurationWizard(!hasUsername,
                     !hasAgreement);
                 if (!ok)
                     return;
@@ -150,38 +144,6 @@ public class ConnectDisconnectAction extends Action implements Disposable {
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
         }
-    }
-
-    /**
-     * Opens the ConfigurationWizard to let the user specify his account
-     * settings and the agreement for statistic and error log submissions.
-     * 
-     * @param askForAccount
-     * @param askAboutStatisticTransfer
-     * @return true if the user finished the wizard successfully, false if he
-     *         canceled the dialog or an error occurred
-     */
-    protected boolean showConfigurationWizard(final boolean askForAccount,
-        final boolean askAboutStatisticTransfer) {
-
-        try {
-            return Util.runSWTSync(new Callable<Boolean>() {
-
-                public Boolean call() {
-                    Wizard wiz = new ConfigurationWizard(askForAccount,
-                        askAboutStatisticTransfer);
-                    WizardDialog dialog = new WizardDialog(
-                        EditorAPI.getShell(), wiz);
-                    int status = dialog.open();
-                    return (status == Window.OK);
-                }
-
-            });
-        } catch (Exception e) {
-            log.error("Unable to open the ConfigurationWizard", e);
-            return false;
-        }
-
     }
 
     protected void setStatusBar(final String message, final boolean start) {

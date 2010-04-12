@@ -681,13 +681,13 @@ public class Saros extends AbstractUIPlugin {
 
         } catch (URISyntaxException e) {
             log.info("URI not parseable: " + e.getInput());
-            popUpFailureMessage("URI not parseable", e.getInput()
+            Util.popUpFailureMessage("URI not parseable", e.getInput()
                 + " is not a valid URI.", failSilently);
 
         } catch (IllegalArgumentException e) {
             log.info("Illegal argument: " + e.getMessage());
             setConnectionState(ConnectionState.ERROR, null);
-            popUpFailureMessage("Illegal argument", e.getMessage(),
+            Util.popUpFailureMessage("Illegal argument", e.getMessage(),
                 failSilently);
 
         } catch (XMPPException e) {
@@ -697,46 +697,36 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, cause);
 
             if (cause instanceof SaslException) {
-                popUpFailureMessage("Error Connecting via SASL", cause
+                Util.popUpFailureMessage("Error Connecting via SASL", cause
                     .getMessage(), failSilently);
             } else if (cause instanceof UnknownHostException) {
                 log.info("Unknown host: " + cause);
-                popUpFailureMessage("Error Connecting",
+                Util.popUpFailureMessage("Error Connecting",
                     "Error Connecting to XMPP server: " + cause.getMessage(),
                     failSilently);
             } else {
                 log.info("xmpp: " + cause.getMessage(), cause);
-                popUpFailureMessage("Error Connecting",
+
+                boolean ok = Util.popUpYesNoQuestion("Error Connecting",
                     "Could not connect to server '" + server + "' as user '"
-                        + username
-                        + "'. Please check your username and password in the"
-                        + " preferences.", failSilently);
+                        + username + "'. Do You want to use other parameters?",
+                    failSilently);
+
+                if (ok) {
+                    ok = Util.showConfigurationWizard(true, false);
+                    if (ok)
+                        connect(failSilently);
+                }
             }
 
         } catch (Exception e) {
             log.warn("Unhandled exception:", e);
             setConnectionState(ConnectionState.ERROR, e);
-            popUpFailureMessage("Error Connecting",
+            Util.popUpFailureMessage("Error Connecting",
                 "Could not connect to server '" + server + "' as user '"
                     + username + "'.\nErrorMessage was:\n" + e.getMessage(),
                 failSilently);
         }
-    }
-
-    /**
-     * Indicate the User that there was an error. It pops up an ErrorDialog with
-     * given title and message.
-     */
-    protected void popUpFailureMessage(final String title,
-        final String message, boolean failSilently) {
-        if (failSilently)
-            return;
-
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                MessageDialog.openError(EditorAPI.getShell(), title, message);
-            }
-        });
     }
 
     /**

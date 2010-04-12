@@ -45,6 +45,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -70,8 +74,10 @@ import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
 /**
  * Static Utility functions
@@ -1109,5 +1115,77 @@ public class Util {
         }
 
         return o;
+    }
+
+    /**
+     * Opens the ConfigurationWizard to let the user specify his account
+     * settings and the agreement for statistic and error log submissions.
+     * 
+     * @param askForAccount
+     * @param askAboutStatisticTransfer
+     * @return true if the user finished the wizard successfully, false if he
+     *         canceled the dialog or an error occurred
+     */
+    public static boolean showConfigurationWizard(final boolean askForAccount,
+        final boolean askAboutStatisticTransfer) {
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+
+                public Boolean call() {
+                    Wizard wiz = new ConfigurationWizard(askForAccount,
+                        askAboutStatisticTransfer);
+                    WizardDialog dialog = new WizardDialog(
+                        EditorAPI.getShell(), wiz);
+                    int status = dialog.open();
+                    return (status == Window.OK);
+                }
+
+            });
+        } catch (Exception e) {
+            log.error("Unable to open the ConfigurationWizard", e);
+            return false;
+        }
+    }
+
+    /**
+     * Indicate the User that there was an error. It pops up an ErrorDialog with
+     * given title and message.
+     */
+    public static void popUpFailureMessage(final String title,
+        final String message, boolean failSilently) {
+        if (failSilently)
+            return;
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                MessageDialog.openError(EditorAPI.getShell(), title, message);
+            }
+        });
+    }
+
+    /**
+     * Ask the User a given question. It pops up an QuestionDialog with given
+     * title and message.
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpYesNoQuestion(final String title,
+        final String message, boolean failSilently) {
+        if (failSilently)
+            return false;
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openQuestion(EditorAPI.getShell(),
+                        title, message);
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
     }
 }
