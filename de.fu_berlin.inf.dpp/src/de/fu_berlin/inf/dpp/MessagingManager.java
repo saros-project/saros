@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -418,7 +419,7 @@ public class MessagingManager implements PacketListener, MessageListener,
     }
 
     // TODO CJ Rework needed
-    public void invitationReceived(XMPPConnection conn, String room,
+    public void invitationReceived(Connection conn, String room,
         String inviter, String reason, String password, Message message) {
         try {
             // System.out.println(conn.getUser());

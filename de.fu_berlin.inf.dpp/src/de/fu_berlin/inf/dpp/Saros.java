@@ -44,11 +44,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
@@ -441,17 +443,17 @@ public class Saros extends AbstractUIPlugin {
 
         sarosFeatureID = SAROS + "_" + sarosVersion;
 
-        XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
+        Connection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
         /*
          * add Saros as XMPP feature once XMPPConnection is connected to the
          * XMPP server
          */
-        XMPPConnection
+        Connection
             .addConnectionCreationListener(new ConnectionCreationListener() {
 
-                public void connectionCreated(XMPPConnection connection) {
+                public void connectionCreated(Connection connection) {
                     ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                         .getInstanceFor(connection);
                     sdm.addFeature(Saros.NAMESPACE);
@@ -469,6 +471,10 @@ public class Saros extends AbstractUIPlugin {
              */
             JingleManager.setJingleServiceEnabled();
         }
+
+        // set local Socks5 proxy port
+        SmackConfiguration.setLocalSocks5ProxyPort(getPreferenceStore().getInt(
+            PreferenceConstants.FILE_TRANSFER_PORT));
 
         setupLoggers();
         log.info("Starting Saros " + sarosVersion + " running:\n"

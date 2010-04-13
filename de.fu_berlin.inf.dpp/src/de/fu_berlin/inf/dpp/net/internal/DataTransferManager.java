@@ -29,6 +29,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 import org.jivesoftware.smackx.packet.Jingle;
+import org.jivesoftware.smackx.socks5bytestream.Socks5ByteStreamManager;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -710,6 +711,10 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
         this.jingleManager.setValue(null);
+
+        Socks5ByteStreamManager socks5ByteStreamManager = Socks5ByteStreamManager
+            .getByteStreamManager(connection);
+        socks5ByteStreamManager.setTargetResponseTimeout(7000);
 
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager

@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
@@ -47,7 +47,7 @@ public class MultiUserChatManager {
      *            my username
      * @throws XMPPException
      */
-    public void initMUC(XMPPConnection connection, String user)
+    public void initMUC(Connection connection, String user)
         throws XMPPException {
 
         if (sessionManager.getSharedProject().isHost()) {
