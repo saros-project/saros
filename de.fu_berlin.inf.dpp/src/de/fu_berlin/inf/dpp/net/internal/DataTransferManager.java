@@ -105,13 +105,15 @@ public class DataTransferManager implements ConnectionSessionListener {
                     forceFileTransferByChat = ((Boolean) value).booleanValue();
 
                     // add/remove Jingle XMPP feature
-                    ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                        .getInstanceFor(connection);
-                    if (forceFileTransferByChat) {
-                        sdm.removeFeature(Jingle.NAMESPACE);
-                    } else {
-                        if (!sdm.includesFeature(Jingle.NAMESPACE))
-                            sdm.addFeature(Jingle.NAMESPACE);
+                    if (connection != null) {
+                        ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+                            .getInstanceFor(connection);
+                        if (forceFileTransferByChat) {
+                            sdm.removeFeature(Jingle.NAMESPACE);
+                        } else {
+                            if (!sdm.includesFeature(Jingle.NAMESPACE))
+                                sdm.addFeature(Jingle.NAMESPACE);
+                        }
                     }
 
                 } else {
