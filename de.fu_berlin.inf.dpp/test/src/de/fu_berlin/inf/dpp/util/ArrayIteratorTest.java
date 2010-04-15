@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.util;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,24 +15,24 @@ import org.junit.Test;
 
 public class ArrayIteratorTest {
     protected Integer[] intarr3, intarr1, intarr0;
-    
+
     @Before
     public void prepare() {
-        intarr3 = new Integer[] { -20, 0, 100};
+        intarr3 = new Integer[] { -20, 0, 100 };
         intarr1 = new Integer[] { -20 };
-        intarr0 = new Integer[] { };
+        intarr0 = new Integer[] {};
     }
-    
-    @Test
-    public void removeShouldBeUnsupported() {
-        ArrayIterator<Integer> iterator0 = new ArrayIterator<Integer>(intarr0);
-        ArrayIterator<Integer> iterator3 = new ArrayIterator<Integer>(intarr3, 0, 3);
 
-        try {
-            iterator0.remove();
-            iterator3.remove();
-            assertTrue(false);
-        } catch (RuntimeException e) { /**/ }
+    @Test(expected = RuntimeException.class)
+    public void removeShouldBeUnsupported0() {
+        ArrayIterator<Integer> iterator0 = new ArrayIterator<Integer>(intarr0);
+        iterator0.remove();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void removeShouldBeUnsupported3() {
+        ArrayIterator<Integer> iterator3 = new ArrayIterator<Integer>(intarr3, 0, 3);
+        iterator3.remove();
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ArrayIteratorTest {
         ArrayIterator<Integer> iterator3 = new ArrayIterator<Integer>(intarr3);
 
         assertTrue(iterator1.next().equals(-20));
-        
+
         assertTrue(iterator3.next().equals(-20));
         assertTrue(iterator3.next().equals(0));
         assertTrue(iterator3.next().equals(100));
@@ -74,16 +75,20 @@ public class ArrayIteratorTest {
         iterator3.next();
         try {
             iterator3.next();
-            assertTrue(false);
-        } catch (RuntimeException e) { /**/ }
+            fail();
+        } catch (RuntimeException e) {
+            // this is supposed to happen
+        }
 
         iterator1.next();
         try {
             iterator1.next();
-            assertTrue(false);
-        } catch (RuntimeException e) { /**/ }
+            fail();
+        } catch (RuntimeException e) {
+            // this is supposed to happen
+        }
     }
-    
+
     @Test
     public void constructorShouldExceptIfNullArray() {
         // ArrayIterator<Integer> iterator_null = new ArrayIterator<Integer>(null);
