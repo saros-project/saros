@@ -8,37 +8,37 @@ package de.fu_berlin.inf.dpp.activities.business;
  */
 public class AbstractActivityConsumer implements IActivityConsumer {
 
-    public boolean consume(ViewportActivity viewportActivityDataObject) {
+    public boolean consume(ViewportActivity viewportActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(TextSelectionActivity textSelectionActivityDataObject) {
+    public boolean consume(TextSelectionActivity textSelectionActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(TextEditActivity textEditActivityDataObject) {
+    public boolean consume(TextEditActivity textEditActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(RoleActivity roleActivityDataObject) {
+    public boolean consume(RoleActivity roleActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(FolderActivity folderActivityDataObject) {
+    public boolean consume(FolderActivity folderActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(FileActivity fileActivityDataObject) {
+    public boolean consume(FileActivity fileActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(EditorActivity editorActivityDataObject) {
+    public boolean consume(EditorActivity editorActivity) {
         // empty implementation
         return false;
     }
@@ -48,17 +48,27 @@ public class AbstractActivityConsumer implements IActivityConsumer {
         return false;
     }
 
-    public boolean consume(StopActivity stopActivityDataObject) {
+    public boolean consume(StopActivity stopActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(PingPongActivity pingPongActivityDataObject) {
+    public boolean consume(PingPongActivity pingPongActivity) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(ChecksumActivity checksumActivityDataObject) {
+    public boolean consume(ChecksumActivity checksumActivity) {
+        // empty implementation
+        return false;
+    }
+
+    public boolean consume(ChecksumErrorActivity checksumErrorActivity) {
+        // empty implementation
+        return false;
+    }
+
+    public boolean consume(ProgressActivity progressActivity) {
         // empty implementation
         return false;
     }
@@ -70,49 +80,56 @@ public class AbstractActivityConsumer implements IActivityConsumer {
     public static IActivityReceiver asReceiver(final IActivityConsumer consumer) {
         return new IActivityReceiver() {
 
-            public void receive(ViewportActivity viewportActivityDataObject) {
-                consumer.consume(viewportActivityDataObject);
+            public void receive(ViewportActivity viewportActivity) {
+                consumer.consume(viewportActivity);
             }
 
-            public void receive(
-                TextSelectionActivity textSelectionActivityDataObject) {
-                consumer.consume(textSelectionActivityDataObject);
+            public void receive(TextSelectionActivity textSelectionActivity) {
+                consumer.consume(textSelectionActivity);
             }
 
-            public void receive(TextEditActivity textEditActivityDataObject) {
-                consumer.consume(textEditActivityDataObject);
+            public void receive(TextEditActivity textEditActivity) {
+                consumer.consume(textEditActivity);
             }
 
-            public void receive(RoleActivity roleActivityDataObject) {
-                consumer.consume(roleActivityDataObject);
+            public void receive(RoleActivity roleActivity) {
+                consumer.consume(roleActivity);
             }
 
-            public void receive(FolderActivity folderActivityDataObject) {
-                consumer.consume(folderActivityDataObject);
+            public void receive(FolderActivity folderActivity) {
+                consumer.consume(folderActivity);
             }
 
-            public void receive(FileActivity fileActivityDataObject) {
-                consumer.consume(fileActivityDataObject);
+            public void receive(FileActivity fileActivity) {
+                consumer.consume(fileActivity);
             }
 
-            public void receive(EditorActivity editorActivityDataObject) {
-                consumer.consume(editorActivityDataObject);
+            public void receive(EditorActivity editorActivity) {
+                consumer.consume(editorActivity);
             }
 
             public void receive(JupiterActivity jupiterActivity) {
                 consumer.consume(jupiterActivity);
             }
 
-            public void receive(StopActivity stopActivityDataObject) {
-                consumer.consume(stopActivityDataObject);
+            public void receive(StopActivity stopActivity) {
+                consumer.consume(stopActivity);
             }
 
-            public void receive(PingPongActivity pingPongActivityDataObject) {
-                consumer.consume(pingPongActivityDataObject);
+            public void receive(PingPongActivity pingPongActivity) {
+                consumer.consume(pingPongActivity);
             }
 
-            public void receive(ChecksumActivity checksumActivityDataObject) {
-                consumer.consume(checksumActivityDataObject);
+            public void receive(ChecksumActivity checksumActivity) {
+                consumer.consume(checksumActivity);
+            }
+
+            public void receive(ChecksumErrorActivity checksumErrorActivity) {
+                consumer.consume(checksumErrorActivity);
+            }
+
+            public void receive(ProgressActivity progressActivity) {
+                consumer.consume(progressActivity);
             }
         };
     }

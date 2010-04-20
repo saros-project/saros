@@ -1,39 +1,41 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.io.FileNotFoundException;
-import java.util.Collections;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -41,19 +43,27 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * This class is responsible to process checksums sent to us from the server by
- * checking our locally existing files against them.
+ * This class is responsible for two things:
+ * 
+ * 1.) Process checksums sent to us from the server by checking our locally
+ * existing files against them.
+ * 
+ * See {@link #performCheck(ChecksumActivity)}
  * 
  * If an inconsistency is detected the inconsistency state is set via the
  * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
  * (a.k.a. the yellow triangle) in the {@link SessionView}.
  * 
+ * 2.) Send a ChecksumError to the host, if the user wants to recover from an
+ * inconsistency.
+ * 
+ * See {@link #runRecovery(SubMonitor)}
  */
 @Component(module = "consistency")
 public class ConsistencyWatchdogClient extends AbstractActivityProvider {
@@ -61,11 +71,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
 
-    protected ISharedProject sharedProject;
-
-    /**
-     * @Inject Injected via Constructor Injection
-     */
+    @Inject
     protected IsInconsistentObservable inconsistencyToResolve;
 
     @Inject
@@ -77,25 +83,16 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     protected SessionManager sessionManager;
 
     @Inject
-    protected ITransmitter transmitter;
+    protected RemoteProgressManager remoteProgressManager;
 
-    @Inject
-    protected DataTransferManager dataTransferManager;
-
-    /**
-     * Returns the variable proxy which stores the current inconsistency state
-     * 
-     */
-    public ObservableValue<Boolean> getConsistencyToResolve() {
-        return this.inconsistencyToResolve;
-    }
-
-    protected HashMap<SPath, ChecksumActivity> stats = new HashMap<SPath, ChecksumActivity>();
+    protected ISharedProject sharedProject;
 
     protected Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
 
+    protected Map<SPath, ChecksumActivity> latestChecksums = new HashMap<SPath, ChecksumActivity>();
+
     protected ISessionListener sessionListener = new AbstractSessionListener() {
-        private ISharedProjectListener sharedProjectListner = new AbstractSharedProjectListener() {
+        private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
             @Override
             public void roleChanged(User user) {
@@ -109,35 +106,37 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         };
 
         @Override
-        public void sessionEnded(ISharedProject newSharedProject) {
+        public void sessionEnded(ISharedProject oldSharedProject) {
 
-            newSharedProject
+            oldSharedProject
                 .removeActivityProvider(ConsistencyWatchdogClient.this);
-            newSharedProject.removeListener(sharedProjectListner);
+            oldSharedProject.removeListener(sharedProjectListener);
 
-            sharedProject = null;
+            latestChecksums.clear();
+            pathsWithWrongChecksums.clear();
+
+            synchronized (this) {
+                sharedProject = null;
+            }
         }
 
         @Override
         public void sessionStarted(ISharedProject newSharedProject) {
-            sharedProject = newSharedProject;
-
-            stats.clear();
+            synchronized (this) {
+                sharedProject = newSharedProject;
+            }
 
             pathsWithWrongChecksums.clear();
             inconsistencyToResolve.setValue(false);
 
             newSharedProject
                 .addActivityProvider(ConsistencyWatchdogClient.this);
-            newSharedProject.addListener(sharedProjectListner);
+            newSharedProject.addListener(sharedProjectListener);
         }
     };
 
-    public ConsistencyWatchdogClient(SessionManager sessionManager,
-        IsInconsistentObservable inconsistentObservable) {
+    public ConsistencyWatchdogClient(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.inconsistencyToResolve = inconsistentObservable;
-
         this.sessionManager.addSessionListener(sessionListener);
     }
 
@@ -145,9 +144,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         this.sessionManager.removeSessionListener(sessionListener);
     }
 
-    public Map<SPath, ChecksumActivity> latestChecksums = new HashMap<SPath, ChecksumActivity>();
-
-    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(ChecksumActivity checksumActivityDataObject) {
 
@@ -163,11 +160,30 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
 
         @Override
+        public void receive(ChecksumErrorActivity error) {
+            if (error.getSource().isHost()) {
+                String myRecoveryID = recoveryID;
+                if (myRecoveryID != null
+                    && myRecoveryID.equals(error.getRecoveryID())) {
+                    filesRemaining.set(0); // Host tell us he is done
+                }
+            }
+        }
+
+        @Override
         public void receive(FileActivity fileActivityDataObject) {
 
-            // Recoveries do not invalidate checksums :-)
-            if (fileActivityDataObject.isRecovery())
+            if (fileActivityDataObject.isRecovery()) {
+                int currentValue;
+                while ((currentValue = filesRemaining.get()) > 0) {
+                    if (filesRemaining.compareAndSet(currentValue,
+                        currentValue - 1)) {
+                        break;
+                    }
+                }
+                // Recoveries do not invalidate checksums :-)
                 return;
+            }
 
             /*
              * (we do not need to handle FolderActivities because all files are
@@ -205,6 +221,16 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     private AtomicBoolean cancelRecovery = new AtomicBoolean();
 
     /**
+     * The number of files remaining in the current recovery session.
+     */
+    protected AtomicInteger filesRemaining = new AtomicInteger();
+
+    /**
+     * The id of the currently running recovery
+     */
+    protected volatile String recoveryID;
+
+    /**
      * Lock used exclusively in {@link #runRecovery(SubMonitor)} to prevent two
      * recovery operations running concurrently.
      */
@@ -214,15 +240,27 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      * Start a consistency recovery by sending a checksum error to the host and
      * waiting for his reply. <br>
      * The <strong>cancellation</strong> of this method is <strong>not
-     * implemented</strong>, so cancelling the given monitor does not have any
+     * implemented</strong>, so canceling the given monitor does not have any
      * effect.
+     * 
+     * @noSWT This method should not be called from SWT
      * 
      * @blocking This method returns after the recovery has finished
      * 
      * @client Can only be called on the client!
      */
     public void runRecovery(SubMonitor monitor) {
-        if (sharedProject.isHost())
+
+        ISharedProject project;
+        synchronized (this) {
+            /*
+             * Keep a local copy, since the shareProject might end, while we
+             * doing this
+             */
+            project = sharedProject;
+        }
+
+        if (project.isHost())
             throw new IllegalStateException("Can only be called on the client");
 
         if (!lock.tryLock()) {
@@ -243,14 +281,12 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         try {
             cancelRecovery.set(false);
 
-            Set<SPath> pathsOfHandledFiles = new HashSet<SPath>(
+            final ArrayList<SPath> pathsOfHandledFiles = new ArrayList<SPath>(
                 pathsWithWrongChecksums);
 
-            Set<SPathDataObject> toSend = new HashSet<SPathDataObject>();
+            for (SPath path : pathsOfHandledFiles) {
 
-            for (final SPath path : pathsOfHandledFiles) {
-
-                if (cancelRecovery.get())
+                if (cancelRecovery.get() || monitor.isCanceled())
                     return;
 
                 // Save document before asking host to resend
@@ -260,52 +296,75 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                     // Sending the checksum error message should recreate
                     // this file
                 }
-
-                toSend.add(path.toSPathDataObject(sharedProject));
             }
 
             if (cancelRecovery.get())
                 return;
 
-            int remainingFilesBefore;
             monitor.beginTask("Consistency recovery", pathsOfHandledFiles
                 .size());
+            final IProgressMonitor remoteProgress = remoteProgressManager
+                .createRemoteProgress(project, project.getRemoteUsers());
+            recoveryID = getNextRecoveryID();
 
-            // Send checksumErrorMessage to host
-            transmitter
-                .sendFileChecksumErrorMessage(Collections
-                    .singletonList(sharedProject.getHost().getJID()), toSend,
-                    false);
+            filesRemaining.set(pathsOfHandledFiles.size());
 
-            // block until all inconsistencies are resolved
-            Set<SPath> remainingFiles = new HashSet<SPath>(pathsOfHandledFiles);
-            while (remainingFiles.size() > 0) {
+            remoteProgress.beginTask("Consistency recovery for user "
+                + project.getLocalUser().getJID().getBase(), filesRemaining
+                .get());
 
-                if (cancelRecovery.get())
-                    return;
+            project.sendActivity(project.getHost(), new ChecksumErrorActivity(
+                project.getLocalUser(), pathsOfHandledFiles, recoveryID));
 
-                remainingFilesBefore = remainingFiles.size();
-                remainingFiles.retainAll(pathsWithWrongChecksums);
-                monitor.worked(remainingFilesBefore - remainingFiles.size());
+            try {
+                // block until all inconsistencies are resolved
+                int filesRemainingBefore = filesRemaining.get();
+                int filesRemainingCurrently;
+                while ((filesRemainingCurrently = filesRemaining.get()) > 0) {
 
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    return;
+                    if (cancelRecovery.get() || monitor.isCanceled()
+                        || sharedProject == null)
+                        return;
+
+                    if (filesRemainingCurrently < filesRemainingBefore) {
+                        int worked = filesRemainingBefore
+                            - filesRemainingCurrently;
+
+                        // Inform others for progress...
+                        monitor.worked(worked);
+                        remoteProgress.worked(worked);
+
+                        filesRemainingBefore = filesRemainingCurrently;
+                    }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
                 }
+            } finally {
+                // Inform others for progress...
+                remoteProgress.done();
             }
+
         } finally {
             monitor.done();
             lock.unlock();
         }
     }
 
-    @Override
-    public void exec(IActivity activityDataObject) {
-        activityDataObject.dispatch(activityDataObjectReceiver);
+    protected SimpleDateFormat format = new SimpleDateFormat("HHmmssSS");
+
+    protected String getNextRecoveryID() {
+        return format.format(new Date()) + Saros.RANDOM.nextLong();
     }
 
-    private boolean isInconsistent(ChecksumActivity checksum) {
+    @Override
+    public void exec(IActivity activityDataObject) {
+        activityDataObject.dispatch(activityReceiver);
+    }
+
+    protected boolean isInconsistent(ChecksumActivity checksum) {
 
         SPath path = checksum.getPath();
         IFile file = path.getFile();
@@ -399,22 +458,27 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 checksumActivity))
             return;
 
+        boolean changed;
         if (isInconsistent(checksumActivity)) {
-            pathsWithWrongChecksums.add(checksumActivity.getPath());
+            changed = pathsWithWrongChecksums.add(checksumActivity.getPath());
         } else {
-            pathsWithWrongChecksums.remove(checksumActivity.getPath());
+            changed = pathsWithWrongChecksums
+                .remove(checksumActivity.getPath());
         }
+        if (!changed)
+            return;
 
+        // Update InconsistencyToResolve observable
         if (pathsWithWrongChecksums.isEmpty()) {
             if (inconsistencyToResolve.getValue()) {
                 log.info("All Inconsistencies are resolved");
-                inconsistencyToResolve.setValue(false);
             }
+            inconsistencyToResolve.setValue(false);
         } else {
             if (!inconsistencyToResolve.getValue()) {
                 log.info("Inconsistencies have been detected");
-                inconsistencyToResolve.setValue(true);
             }
+            inconsistencyToResolve.setValue(true);
         }
     }
 }

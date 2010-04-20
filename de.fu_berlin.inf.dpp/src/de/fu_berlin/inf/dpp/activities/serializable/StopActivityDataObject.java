@@ -166,14 +166,6 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
         return sb.toString();
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new StopActivity(sharedProject.getUser(source), sharedProject
             .getUser(initiator), sharedProject.getUser(user), type, state,

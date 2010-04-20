@@ -26,10 +26,13 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
@@ -58,7 +61,9 @@ public class ActivitiesExtensionProvider extends
             JupiterActivityDataObject.class, JupiterVectorTime.class,
             DeleteOperation.class, InsertOperation.class, NoOperation.class,
             SplitOperation.class, TimestampOperation.class, JID.class,
-            SPathDataObject.class);
+            SPathDataObject.class, ChecksumActivityDataObject.class,
+            ChecksumErrorActivityDataObject.class,
+            ProgressActivityDataObject.class);
     }
 
     public PacketExtension create(String sessionID,

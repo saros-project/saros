@@ -3,14 +3,9 @@ package de.fu_berlin.inf.dpp.net.business;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -22,53 +17,40 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This component is responsible for handling Consistency Errors and Checksums.
- * 
- * TODO Cancellation not handeled
+ * This component is responsible for handling Consistency Errors on the host
  */
 @Component(module = "consistency")
 public class ConsistencyWatchdogHandler {
 
     private static Logger log = Logger
-        .getLogger(ConsistencyWatchdogHandler.class.getName());
-
-    protected HashMap<Pair<String, JID>, ProgressMonitorDialog> actualChecksumErrorDialogs = new HashMap<Pair<String, JID>, ProgressMonitorDialog>();
-
-    @Inject
-    protected ITransmitter transmitter;
-
-    @Inject
-    protected SharedProjectObservable project;
+        .getLogger(ConsistencyWatchdogHandler.class);
 
     @Inject
     protected EditorManager editorManager;
@@ -79,70 +61,44 @@ public class ConsistencyWatchdogHandler {
     @Inject
     protected StopManager stopManager;
 
-    protected SessionIDObservable sessionIDObservable;
-
     protected SessionManager sessionManager;
 
-    public ConsistencyWatchdogHandler(final SessionManager sessionManager,
-        final ChecksumErrorExtensionProvider extensionProvider,
-        XMPPReceiver receiver, SessionIDObservable sessionID) {
+    protected ISharedProject sharedProject;
 
-        this.sessionIDObservable = sessionID;
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        @Override
+        public void receive(ChecksumErrorActivity checksumError) {
+            startRecovery(checksumError);
+        }
+    };
+
+    protected IActivityProvider activityProvider = new AbstractActivityProvider() {
+        @Override
+        public void exec(IActivity activity) {
+            activity.dispatch(activityReceiver);
+        }
+    };
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+
+        @Override
+        public void sessionEnded(ISharedProject newSharedProject) {
+            if (sharedProject.isHost())
+                newSharedProject.removeActivityProvider(activityProvider);
+            sharedProject = null;
+        }
+
+        @Override
+        public void sessionStarted(ISharedProject newSharedProject) {
+            sharedProject = newSharedProject;
+            if (sharedProject.isHost())
+                newSharedProject.addActivityProvider(activityProvider);
+        }
+    };
+
+    public ConsistencyWatchdogHandler(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
-
-        receiver.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                try {
-                    ChecksumErrorDataObject payload = extensionProvider
-                        .getPayload(packet);
-                    if (payload == null) {
-                        log.warn("Invalid ChecksumErrorExtensionPacket"
-                            + " does not contain a payload: " + packet);
-                        return;
-                    }
-                    JID from = new JID(packet.getFrom());
-
-                    if (!ObjectUtils.equals(sessionIDObservable.getValue(),
-                        payload.getSessionID())) {
-                        log.warn("Rcvd ("
-                            + String.format("%03d", payload.getPaths().size())
-                            + ") " + Util.prefix(from)
-                            + "from an old/unknown session: "
-                            + payload.getPaths());
-                        return;
-                    }
-
-                    Set<SPath> paths = new HashSet<SPath>();
-                    ISharedProject project = sessionManager.getSharedProject();
-                    for (SPathDataObject dataObject : payload.getPaths()) {
-                        paths.add(dataObject.toSPath(project));
-                    }
-
-                    String checksumErrors = Util.toOSString(paths);
-
-                    if (payload.isResolved()) {
-                        log.info("Inconsistency resolved for "
-                            + Util.prefix(from) + "for " + checksumErrors);
-                        closeChecksumErrorMessage(checksumErrors, from);
-                        return;
-                    }
-
-                    log.debug("Received Checksum Error from "
-                        + Util.prefix(from) + "for " + checksumErrors);
-
-                    startRecovery(checksumErrors, from, paths);
-                } catch (Exception e) {
-                    log.error(
-                        "An internal error occurred while processing packets",
-                        e);
-                }
-            }
-        }, extensionProvider.getPacketFilter());
-    }
-
-    protected boolean inProgress(String pathsOfInconsistencies, JID from) {
-        return actualChecksumErrorDialogs.containsKey(new Pair<String, JID>(
-            pathsOfInconsistencies, from));
+        this.sessionManager.addSessionListener(sessionListener);
     }
 
     /**
@@ -153,133 +109,102 @@ public class ConsistencyWatchdogHandler {
      * handled files as key. You can use <code>closeChecksumErrorMessage</code>
      * with the same arguments to close this message again.
      * 
-     * @see #closeChecksumErrorMessage(String, JID)
-     * 
      */
-    protected void startRecovery(final String pathsOfInconsistencies,
-        final JID from, final Set<SPath> paths) {
+    protected void startRecovery(final ChecksumErrorActivity checksumError) {
+
+        log.debug("Received Checksum Error: " + checksumError);
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                createRecoveryProgressDialog(pathsOfInconsistencies, from);
+
+                final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+                    EditorAPI.getAWorkbenchWindow().getShell()) {
+                    @Override
+                    protected Image getImage() {
+                        return getWarningImage();
+                    }
+
+                    // TODO add some text
+                    // "Inconsitent file state has detected. File "
+                    // + pathes
+                    // + " from user "
+                    // + from.getBase()
+                    // +
+                    // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
+                };
+
+                // Run async, so we can continue to receive messages over the
+                // network...
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+                        try {
+                            dialog.run(true, true, new IRunnableWithProgress() {
+                                public void run(IProgressMonitor monitor) {
+                                    runRecovery(checksumError, SubMonitor
+                                        .convert(monitor));
+                                }
+                            });
+                        } catch (InvocationTargetException e) {
+                            try {
+                                throw e.getCause();
+                            } catch (CancellationException c) {
+                                log
+                                    .info("Recovery was cancelled by local user");
+                            } catch (Throwable t) {
+                                log.error("Internal Error: ", t);
+                            }
+                        } catch (InterruptedException e) {
+                            log.error("Code not designed to be interruptable",
+                                e);
+                        }
+                    }
+                });
             }
         });
-
-        // Run async, so we can continue to receive messages over the network...
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                runRecoveryInProgressDialog(pathsOfInconsistencies, from, paths);
-            }
-        });
     }
 
-    protected void createRecoveryProgressDialog(
-        final String pathsOfInconsistencies, final JID from) {
-
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
-            .getAWorkbenchWindow().getShell()) {
-            @Override
-            protected Image getImage() {
-                return getWarningImage();
-            }
-        };
-
-        //
-        // "Inconsitent file state has detected. File "
-        // + pathes
-        // + " from user "
-        // + from.getBase()
-        // +
-        // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
-        actualChecksumErrorDialogs.put(new Pair<String, JID>(
-            pathsOfInconsistencies, from), dialog);
-    }
-
-    protected void runRecoveryInProgressDialog(
-        final String pathsOfInconsistencies, final JID from,
-        final Set<SPath> paths) {
-
-        ProgressMonitorDialog md = actualChecksumErrorDialogs
-            .get(new Pair<String, JID>(pathsOfInconsistencies, from));
-
-        if (md == null)
-            return;
-
-        try {
-            md.run(true, true, new IRunnableWithProgress() {
-                public void run(IProgressMonitor monitor) {
-
-                    SubMonitor progress = SubMonitor.convert(monitor);
-
-                    runRecovery(pathsOfInconsistencies, from, paths, progress);
-                }
-            });
-        } catch (InvocationTargetException e) {
-            try {
-                throw e.getCause();
-            } catch (CancellationException c) {
-                log.info("Recovery was cancelled by local user");
-            } catch (Throwable t) {
-                log.error("Internal Error: ", t);
-            }
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
-        }
-    }
-
-    protected void runRecovery(final String pathsOfInconsistencies,
-        final JID from, final Set<SPath> paths, SubMonitor progress)
-        throws CancellationException {
-        SubMonitor waiting;
+    protected void runRecovery(ChecksumErrorActivity checksumError,
+        SubMonitor progress) throws CancellationException {
 
         List<StartHandle> startHandles = null;
 
+        progress.beginTask("Performing recovery", 1200);
         try {
-            if (sessionManager.getSharedProject().isHost()) {
-                progress.beginTask("Performing recovery", 1200);
-                startHandles = stopManager.stop(sessionManager
-                    .getSharedProject().getParticipants(),
-                    "Consistency recovery", progress.newChild(200));
-                progress.subTask("Send files to clients");
-                performConsistencyRecovery(from, paths, progress.newChild(700));
 
-                progress.subTask("Wait for peers");
-                waiting = progress.newChild(300);
+            startHandles = stopManager.stop(sharedProject.getParticipants(),
+                "Consistency recovery", progress.newChild(200));
+
+            progress.subTask("Sending files to client...");
+            recoverFiles(checksumError, progress.newChild(700));
+
+            /*
+             * We have to start the StartHandle of the inconsistent user first
+             * (blocking!) because otherwise the other participants can be
+             * started before the inconsistent user completely processed the
+             * consistency recovery.
+             */
+            progress.subTask("Wait for peers...");
+
+            // find the StartHandle of the inconsistent user
+            StartHandle inconsistentStartHandle = null;
+            for (StartHandle startHandle : startHandles) {
+                if (checksumError.getSource().equals(startHandle.getUser())) {
+                    inconsistentStartHandle = startHandle;
+                    break;
+                }
+            }
+            if (inconsistentStartHandle == null) {
+                log.error("Could not find the StartHandle"
+                    + " of the inconsistent user");
             } else {
-                waiting = progress;
+                inconsistentStartHandle.startAndAwait(progress.newChild(200));
+                startHandles.remove(inconsistentStartHandle);
             }
-            waiting.beginTask("Waiting for peers", 500);
-
-            if (startHandles != null) {
-                /*
-                 * We have to start the StartHandle of the inconsistent user
-                 * first (blocking!) because otherwise the other participants
-                 * can be started before the inconsistent user completely
-                 * processed the consistency recovery.
-                 */
-                // find the StartHandle of the inconsistent user
-                StartHandle inconsistentStartHandle = null;
-                for (StartHandle startHandle : startHandles) {
-                    if (from.equals(startHandle.getUser().getJID())) {
-                        inconsistentStartHandle = startHandle;
-                        break;
-                    }
-                }
-                if (inconsistentStartHandle == null)
-                    log.error("Could not find the StartHandle"
-                        + " of the inconsistent user");
-                else {
-                    inconsistentStartHandle.startAndAwait(progress);
-                    startHandles.remove(inconsistentStartHandle);
-                }
-            }
-
         } finally {
             if (startHandles != null)
                 for (StartHandle startHandle : startHandles)
                     startHandle.start();
-
-            closeChecksumErrorMessage(pathsOfInconsistencies, from);
+            progress.done();
         }
     }
 
@@ -288,40 +213,43 @@ public class ConsistencyWatchdogHandler {
      * 
      * @nonSWT This method should not be called from the SWT Thread!
      */
-    protected void performConsistencyRecovery(JID from, Set<SPath> paths,
+    protected void recoverFiles(ChecksumErrorActivity checksumError,
         SubMonitor progress) {
 
-        progress.beginTask("Performing Consistency Recovery", paths.size());
-        progress.subTask("Sending files");
+        ISharedProject sharedProject = this.sharedProject;
 
-        recoverFiles(from, paths, progress.newChild(paths.size()));
+        progress
+            .beginTask("Sending files", checksumError.getPaths().size() + 1);
 
-        progress.done();
-    }
+        try {
+            for (SPath path : checksumError.getPaths()) {
+                progress.subTask("Recovering file: "
+                    + path.getProjectRelativePath().lastSegment());
+                recoverFile(checksumError.getSource(), sharedProject, path,
+                    progress.newChild(1));
+            }
 
-    protected void recoverFiles(JID from, Set<SPath> paths, SubMonitor progress) {
-
-        ISharedProject sharedProject = sessionManager.getSharedProject();
-        progress.beginTask("Sending files", paths.size());
-
-        for (SPath path : paths) {
-            progress.subTask("Recovering file: "
-                + path.getProjectRelativePath().lastSegment());
-            recoverFile(from, sharedProject, path, progress.newChild(1));
+            // Tell the user that we sent all files
+            sharedProject.sendActivity(checksumError.getSource(),
+                new ChecksumErrorActivity(sharedProject.getLocalUser(), null,
+                    checksumError.getRecoveryID()));
+        } finally {
+            progress.done();
         }
-        progress.done();
     }
 
-    protected void recoverFile(JID from, final ISharedProject sharedProject,
+    /**
+     * Recover a single file for the given user (that is either send the file or
+     * tell the user to remove it).
+     */
+    protected void recoverFile(User from, final ISharedProject sharedProject,
         final SPath path, SubMonitor progress) {
-
-        User fromUser = sharedProject.getUser(from);
 
         progress.beginTask("Handling file: " + path.toString(), 10);
 
         IFile file = path.getFile();
 
-        // Save document before sending to clients
+        // Save document before sending to client
         if (file.exists()) {
             try {
                 editorManager.saveLazy(path);
@@ -333,7 +261,7 @@ public class ConsistencyWatchdogHandler {
         progress.worked(1);
 
         // Reset jupiter
-        sharedProject.getConcurrentDocumentServer().reset(from, path);
+        sharedProject.getConcurrentDocumentServer().reset(from.getJID(), path);
 
         progress.worked(1);
         final User user = sharedProject.getLocalUser();
@@ -342,7 +270,7 @@ public class ConsistencyWatchdogHandler {
 
             try {
                 // Send the file to client
-                sharedProject.sendActivity(fromUser, FileActivity.created(user,
+                sharedProject.sendActivity(from, FileActivity.created(user,
                     path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
@@ -378,8 +306,8 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            sharedProject.sendActivity(fromUser, FileActivity.removed(user,
-                path, Purpose.RECOVERY));
+            sharedProject.sendActivity(from, FileActivity.removed(user, path,
+                Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     sharedProject.activityCreated(ChecksumActivity.missing(
@@ -392,44 +320,4 @@ public class ConsistencyWatchdogHandler {
         progress.done();
     }
 
-    /**
-     * Closes the ChecksumError message identified by the JID from the user who
-     * had the inconsistencies and a string representation of the handled files.
-     * The string representation must be the same which are used to show the
-     * message with <code>showChecksumErrorMessage</code>.
-     * 
-     * @see #startRecovery(String, JID, Set)
-     * 
-     * @param from
-     *            JID of user who had the inconsistencies
-     * @param paths
-     *            a string representation of the paths of handled files
-     * 
-     */
-    protected void closeChecksumErrorMessage(final String paths, final JID from) {
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                actualChecksumErrorDialogs.remove(new Pair<String, JID>(paths,
-                    from));
-            }
-        });
-    }
-
-    /**
-     * Runs a consistency recovery for the given SPath and the given JID
-     * 
-     * @param inconsistentJID
-     *            JID of the user having inconsistencies
-     * @param path
-     *            of the inconsistent resource
-     * 
-     * @host
-     */
-    public void runRecoveryForPath(final JID inconsistentJID, final SPath path) {
-
-        Set<SPath> paths = Collections.singleton(path);
-        final String pathsOfInconsistencies = Util.toOSString(paths);
-
-        startRecovery(pathsOfInconsistencies, inconsistentJID, paths);
-    }
 }

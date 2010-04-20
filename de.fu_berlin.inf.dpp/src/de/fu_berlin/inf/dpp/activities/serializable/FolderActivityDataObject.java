@@ -74,14 +74,6 @@ public class FolderActivityDataObject extends AbstractActivityDataObject
             + ")";
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new FolderActivity(sharedProject.getUser(source), type, path
             .toSPath(sharedProject));

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,7 +61,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -84,7 +82,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
@@ -133,9 +130,6 @@ public class XMPPTransmitter implements ITransmitter,
 
     @Inject
     protected SharedProjectObservable sharedProject;
-
-    @Inject
-    protected ChecksumErrorExtensionProvider checksumErrorExtension;
 
     @Inject
     protected LeaveExtension leaveExtension;
@@ -606,20 +600,6 @@ public class XMPPTransmitter implements ITransmitter,
         dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
-    }
-
-    public void sendFileChecksumErrorMessage(List<JID> recipients,
-        Set<SPathDataObject> paths, boolean resolved) {
-
-        XMPPTransmitter.log.debug("Sending checksum message ("
-            + (resolved ? "resolved" : "error") + ") message of files " + paths
-            + " to " + recipients);
-
-        for (JID recipient : recipients) {
-            sendMessageToProjectUser(recipient, checksumErrorExtension.create(
-                sessionID.getValue(), new ArrayList<SPathDataObject>(paths),
-                resolved));
-        }
     }
 
     public void sendRemainingFiles() {

@@ -58,14 +58,6 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new PingPongActivity(sharedProject.getUser(source),
             sharedProject.getUser(initiator), departureTime);

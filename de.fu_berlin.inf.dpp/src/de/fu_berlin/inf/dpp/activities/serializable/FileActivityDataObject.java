@@ -145,14 +145,6 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         return true;
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public boolean isRecovery() {
         return Purpose.RECOVERY.equals(purpose);
     }

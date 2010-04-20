@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -35,7 +34,6 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -338,26 +336,6 @@ public interface ITransmitter {
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities);
-
-    /**
-     * Sends a FileChecksumErrorMessage with the given path to the given list of
-     * users.
-     * 
-     * @param recipients
-     *            The list of users to send this message to. The local user is
-     *            explicitly allowed to be contained in this list.
-     * 
-     * @param paths
-     *            The project relative path of files which are affected. This
-     *            information can be shown to the user.
-     * @param resolved
-     *            if true then the inconsistency is resolved and clients can
-     *            stop blocking all user operations. if false then a
-     *            inconsistency has been detected and clients should block all
-     *            further user operation.
-     */
-    public void sendFileChecksumErrorMessage(List<JID> recipients,
-        Set<SPathDataObject> paths, boolean resolved);
 
     /**
      * Make sure that Jingle has sufficiently initialized so that a remote

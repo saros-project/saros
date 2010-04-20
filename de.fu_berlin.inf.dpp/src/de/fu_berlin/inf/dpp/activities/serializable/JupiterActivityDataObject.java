@@ -114,14 +114,6 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
         return buffer.toString();
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new JupiterActivity(timestamp, operation, sharedProject
             .getUser(source), editor.toSPath(sharedProject));

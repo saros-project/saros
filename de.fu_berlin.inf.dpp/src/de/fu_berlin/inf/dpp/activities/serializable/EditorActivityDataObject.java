@@ -52,7 +52,7 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
      */
     public EditorActivityDataObject(JID source, Type type,
         @Nullable SPathDataObject sPathDataObject) {
-        
+
         super(source);
         if ((type != Type.Activated) && (sPathDataObject == null)) {
             throw new IllegalArgumentException(
@@ -110,14 +110,6 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
     public String toString() {
         return "EditorActivityDataObject(type:" + this.type + ",path:"
             + (this.path != null ? this.path : "no path") + ")";
-    }
-
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
     }
 
     public IActivity getActivity(ISharedProject sharedProject) {

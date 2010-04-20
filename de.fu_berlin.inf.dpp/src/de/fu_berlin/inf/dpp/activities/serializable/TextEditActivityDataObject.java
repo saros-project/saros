@@ -196,14 +196,6 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
         return null;
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new TextEditActivity(sharedProject.getUser(source), offset,
             text, replacedText, editor.toSPath(sharedProject));

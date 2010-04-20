@@ -33,4 +33,8 @@ public interface IActivityConsumer {
     boolean consume(ChecksumActivity checksumActivityDataObject);
 
     boolean consume(PingPongActivity pingPongActivityDataObject);
+
+    boolean consume(ChecksumErrorActivity checksumErrorActivity);
+
+    boolean consume(ProgressActivity progressActivity);
 }

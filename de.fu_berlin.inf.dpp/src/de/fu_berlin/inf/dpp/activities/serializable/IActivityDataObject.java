@@ -44,28 +44,8 @@ public interface IActivityDataObject {
     public JID getSource();
 
     /**
-     * The activityDataObject will call the receive method of the given receiver
-     * with the actual type of this IActivityDataObject and return whether the
-     * receiver consumed the message.
-     * 
-     * For instance if dispatch is called on a FolderActivityDataObject it will
-     * call
-     * {@link IActivityDataObjectConsumer#consume(FolderActivityDataObject)}
-     * 
-     * @return <code>true</code> if the receiver consumed this
-     *         activityDataObject, otherwise <code>false</code>.
+     * Turn this IActivityDataObject (which is detached from a SharedProject)
+     * into an IActivity, which is live within a shared project.
      */
-    public boolean dispatch(IActivityDataObjectConsumer receiver);
-
-    /**
-     * The activityDataObject will call the receive method of the given receiver
-     * with the actual type of this IActivityDataObject.
-     * 
-     * For instance if dispatch is called on a FolderActivityDataObject it will
-     * call
-     * {@link IActivityDataObjectReceiver#receive(FolderActivityDataObject)}
-     */
-    public void dispatch(IActivityDataObjectReceiver receiver);
-
     public IActivity getActivity(ISharedProject sharedProject);
 }

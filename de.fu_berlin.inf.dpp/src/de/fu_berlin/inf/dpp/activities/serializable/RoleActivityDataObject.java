@@ -100,14 +100,6 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
             + ",new role:" + this.getRole() + ")";
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new RoleActivity(sharedProject.getUser(source), sharedProject
             .getUser(affectedUser), role);

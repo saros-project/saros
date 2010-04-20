@@ -12,25 +12,29 @@ package de.fu_berlin.inf.dpp.activities.business;
  */
 public interface IActivityReceiver {
 
-    void receive(ViewportActivity viewportActivityDataObject);
+    void receive(ViewportActivity viewportActivity);
 
-    void receive(TextSelectionActivity textSelectionActivityDataObject);
+    void receive(TextSelectionActivity textSelectionActivity);
 
-    void receive(TextEditActivity textEditActivityDataObject);
+    void receive(TextEditActivity textEditActivity);
 
-    void receive(RoleActivity roleActivityDataObject);
+    void receive(RoleActivity roleActivity);
 
-    void receive(FolderActivity folderActivityDataObject);
+    void receive(FolderActivity folderActivity);
 
-    void receive(FileActivity fileActivityDataObject);
+    void receive(FileActivity fileActivity);
 
-    void receive(EditorActivity editorActivityDataObject);
+    void receive(EditorActivity editorActivity);
 
     void receive(JupiterActivity jupiterActivity);
 
-    void receive(StopActivity stopActivityDataObject);
+    void receive(StopActivity stopActivity);
 
-    void receive(ChecksumActivity checksumActivityDataObject);
+    void receive(ChecksumActivity checksumActivity);
 
-    void receive(PingPongActivity pingPongActivityDataObject);
+    void receive(PingPongActivity pingPongActivity);
+
+    void receive(ChecksumErrorActivity checksumErrorActivity);
+
+    void receive(ProgressActivity progressActivity);
 }

@@ -1,35 +1,37 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 /**
- * Abstract implementation of IActivityReceiver which does nothing
+ * Abstract implementation of IActivityReceiver which does nothing.
+ * 
+ * Useful, if just interested in some particular IActivity
  */
 public class AbstractActivityReceiver implements IActivityReceiver {
 
-    public void receive(ViewportActivity viewportActivityDataObject) {
+    public void receive(ViewportActivity viewportActivity) {
         // do nothing
     }
 
-    public void receive(TextSelectionActivity textSelectionActivityDataObject) {
+    public void receive(TextSelectionActivity textSelectionActivity) {
         // do nothing
     }
 
-    public void receive(TextEditActivity textEditActivityDataObject) {
+    public void receive(TextEditActivity textEditActivity) {
         // do nothing
     }
 
-    public void receive(RoleActivity roleActivityDataObject) {
+    public void receive(RoleActivity roleActivity) {
         // do nothing
     }
 
-    public void receive(FolderActivity folderActivityDataObject) {
+    public void receive(FolderActivity folderActivity) {
         // do nothing
     }
 
-    public void receive(FileActivity fileActivityDataObject) {
+    public void receive(FileActivity fileActivity) {
         // do nothing
     }
 
-    public void receive(EditorActivity editorActivityDataObject) {
+    public void receive(EditorActivity editorActivity) {
         // do nothing
     }
 
@@ -37,15 +39,23 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
-    public void receive(StopActivity stopActivityDataObject) {
+    public void receive(StopActivity stopActivity) {
         // do nothing
     }
 
-    public void receive(PingPongActivity pingPongActivityDataObject) {
+    public void receive(PingPongActivity pingPongActivity) {
         // do nothing
     }
 
-    public void receive(ChecksumActivity checksumActivityDataObject) {
+    public void receive(ChecksumActivity checksumActivity) {
+        // do nothing
+    }
+
+    public void receive(ChecksumErrorActivity checksumErrorActivity) {
+        // do nothing
+    }
+
+    public void receive(ProgressActivity progressActivity) {
         // do nothing
     }
 
@@ -59,39 +69,38 @@ public class AbstractActivityReceiver implements IActivityReceiver {
 
         return new IActivityConsumer() {
 
-            public boolean consume(ViewportActivity viewportActivityDataObject) {
-                receiver.receive(viewportActivityDataObject);
+            public boolean consume(ViewportActivity viewportActivity) {
+                receiver.receive(viewportActivity);
                 return consume;
             }
 
-            public boolean consume(
-                TextSelectionActivity textSelectionActivityDataObject) {
-                receiver.receive(textSelectionActivityDataObject);
+            public boolean consume(TextSelectionActivity textSelectionActivity) {
+                receiver.receive(textSelectionActivity);
                 return consume;
             }
 
-            public boolean consume(TextEditActivity textEditActivityDataObject) {
-                receiver.receive(textEditActivityDataObject);
+            public boolean consume(TextEditActivity textEditActivity) {
+                receiver.receive(textEditActivity);
                 return consume;
             }
 
-            public boolean consume(RoleActivity roleActivityDataObject) {
-                receiver.receive(roleActivityDataObject);
+            public boolean consume(RoleActivity roleActivity) {
+                receiver.receive(roleActivity);
                 return consume;
             }
 
-            public boolean consume(FolderActivity folderActivityDataObject) {
-                receiver.receive(folderActivityDataObject);
+            public boolean consume(FolderActivity folderActivity) {
+                receiver.receive(folderActivity);
                 return consume;
             }
 
-            public boolean consume(FileActivity fileActivityDataObject) {
-                receiver.receive(fileActivityDataObject);
+            public boolean consume(FileActivity fileActivity) {
+                receiver.receive(fileActivity);
                 return consume;
             }
 
-            public boolean consume(EditorActivity editorActivityDataObject) {
-                receiver.receive(editorActivityDataObject);
+            public boolean consume(EditorActivity editorActivity) {
+                receiver.receive(editorActivity);
                 return consume;
             }
 
@@ -100,18 +109,28 @@ public class AbstractActivityReceiver implements IActivityReceiver {
                 return consume;
             }
 
-            public boolean consume(StopActivity stopActivityDataObject) {
-                receiver.receive(stopActivityDataObject);
+            public boolean consume(StopActivity stopActivity) {
+                receiver.receive(stopActivity);
                 return consume;
             }
 
-            public boolean consume(PingPongActivity pingPongActivityDataObject) {
-                receiver.receive(pingPongActivityDataObject);
+            public boolean consume(PingPongActivity pingPongActivity) {
+                receiver.receive(pingPongActivity);
                 return consume;
             }
 
-            public boolean consume(ChecksumActivity checksumActivityDataObject) {
-                receiver.receive(checksumActivityDataObject);
+            public boolean consume(ChecksumActivity checksumActivity) {
+                receiver.receive(checksumActivity);
+                return consume;
+            }
+
+            public boolean consume(ChecksumErrorActivity checksumErrorActivity) {
+                receiver.receive(checksumErrorActivity);
+                return consume;
+            }
+
+            public boolean consume(ProgressActivity progressActivity) {
+                receiver.receive(progressActivity);
                 return consume;
             }
         };

@@ -27,6 +27,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -125,7 +126,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorDataObject.ChecksumErrorExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
@@ -144,6 +144,7 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
+import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
@@ -239,6 +240,8 @@ public class Saros extends AbstractUIPlugin {
      */
     protected Preferences configPrefs;
 
+    public static final Random RANDOM = new Random();
+
     protected Logger log;
 
     static {
@@ -322,6 +325,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(CommunicationNegotiatingManager.class);
         this.container.addComponent(XMPPReceiver.class);
         this.container.addComponent(XMPPTransmitter.class);
+        this.container.addComponent(RemoteProgressManager.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
@@ -360,7 +364,6 @@ public class Saros extends AbstractUIPlugin {
             .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
         this.container
             .addComponent(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class);
-        this.container.addComponent(ChecksumErrorExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);

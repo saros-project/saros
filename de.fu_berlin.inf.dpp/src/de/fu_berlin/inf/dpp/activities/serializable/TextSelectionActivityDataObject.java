@@ -102,14 +102,6 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
             + this.editor + ")";
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
-    }
-
     public IActivity getActivity(ISharedProject sharedProject) {
         return new TextSelectionActivity(sharedProject.getUser(source), offset,
             length, editor.toSPath(sharedProject));

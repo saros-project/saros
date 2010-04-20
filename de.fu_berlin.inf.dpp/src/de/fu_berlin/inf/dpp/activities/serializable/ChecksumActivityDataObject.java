@@ -16,16 +16,16 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * A checksum activityDataObject is used to communicate checksums from the host
  * to the clients.
  * 
- * A checksum activityDataObject always relates to a certain file (given a path)
- * and contains the hash and length of the file.
+ * A checksum always relates to a certain file (given a path) and contains the
+ * hash and length of the file.
  * 
  * To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  * 
- * A checksum activityDataObject also may contain a JupiterTimestamp to indicate
- * at which point of time the checksum was created. A remote user can use this
- * information to see whether the checksum can be used to check for consistency
- * or whether the local user has already written additional text which
- * invalidates the checksum.
+ * A checksum also may contain a JupiterTimestamp to indicate at which point of
+ * time the checksum was created. A remote user can use this information to see
+ * whether the checksum can be used to check for consistency or whether the
+ * local user has already written additional text which invalidates the
+ * checksum.
  */
 @XStreamAlias("checksumActivity")
 public class ChecksumActivityDataObject extends AbstractActivityDataObject {
@@ -90,14 +90,6 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     public String toString() {
         return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
             + length + ",vectorTime:" + jupiterTimestamp + ")";
-    }
-
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
-        return consumer.consume(this);
-    }
-
-    public void dispatch(IActivityDataObjectReceiver receiver) {
-        receiver.receive(this);
     }
 
     @Override

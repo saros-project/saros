@@ -13,10 +13,12 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -33,8 +35,12 @@ public class ConsistencyAction extends Action {
 
     protected ConsistencyWatchdogClient watchdogClient;
 
+    @Inject
+    protected IsInconsistentObservable inconsistentObservable;
+
     public ConsistencyAction(ConsistencyWatchdogClient watchdogClient,
         SessionManager sessionManager) {
+
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");
@@ -54,7 +60,6 @@ public class ConsistencyAction extends Action {
         });
 
         setSharedProject(sessionManager.getSharedProject());
-
     }
 
     protected ISharedProject sharedProject;
@@ -63,16 +68,14 @@ public class ConsistencyAction extends Action {
 
         // Unregister from previous project
         if (sharedProject != null) {
-            watchdogClient.getConsistencyToResolve().remove(
-                isConsistencyListener);
+            inconsistentObservable.remove(isConsistencyListener);
         }
 
         sharedProject = newSharedProject;
 
         // Register to new project
         if (sharedProject != null) {
-            watchdogClient.getConsistencyToResolve().addAndNotify(
-                isConsistencyListener);
+            inconsistentObservable.addAndNotify(isConsistencyListener);
         } else {
             setEnabled(false);
         }
@@ -138,7 +141,7 @@ public class ConsistencyAction extends Action {
                 ProgressMonitorDialog dialog = new ProgressMonitorDialog(
                     dialogShell);
                 try {
-                    dialog.run(true, false, new IRunnableWithProgress() {
+                    dialog.run(true, true, new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor)
                             throws InterruptedException {
 
