@@ -352,7 +352,7 @@ public class ActivitySequencer {
          * source set on the activityDataObject.
          * 
          * @param timedActivity
-         *            to add to the qeues.
+         *            to add to the queues.
          * 
          * @throws IllegalArgumentException
          *             if the source of the activityDataObject is
