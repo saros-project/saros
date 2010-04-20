@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * getting internal states from the outside.
  */
 public class SarosState implements ISarosState {
+
     private transient static final Logger log = Logger
         .getLogger(SarosState.class);
 
