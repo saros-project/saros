@@ -15,8 +15,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosState;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -39,9 +41,6 @@ public class StartupSaros implements IStartup {
     private static final Logger log = Logger.getLogger(StartupSaros.class);
 
     @Inject
-    protected SarosState state;
-
-    @Inject
     protected Saros saros;
 
     @Inject
@@ -52,6 +51,12 @@ public class StartupSaros implements IStartup {
 
     @Inject
     protected ErrorLogManager errorLogManager;
+
+    @Inject
+    protected SessionManager sessionManager;
+
+    @Inject
+    protected DataTransferManager dataTransferManager;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -105,7 +110,8 @@ public class StartupSaros implements IStartup {
 
                 try {
                     bot.init("Bot", port);
-                    bot.exportState(state, "state");
+                    bot.exportState(new SarosState(saros, sessionManager,
+                        dataTransferManager), "state");
                     bot.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);

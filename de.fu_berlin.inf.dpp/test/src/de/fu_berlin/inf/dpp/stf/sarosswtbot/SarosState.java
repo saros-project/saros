@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.limewire.collection.Tuple;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -26,13 +25,21 @@ public class SarosState implements ISarosState {
     private transient static final Logger log = Logger
         .getLogger(SarosState.class);
 
-    @Inject
+    public SarosState() {
+        // Default constructor needed for RMI
+    }
+
+    public SarosState(Saros saros, SessionManager sessionManager,
+        DataTransferManager dataTransferManager) {
+        this.saros = saros;
+        this.sessionManager = sessionManager;
+        this.dataTransferManager = dataTransferManager;
+    }
+
     protected transient Saros saros;
 
-    @Inject
     protected transient SessionManager sessionManager;
 
-    @Inject
     protected transient DataTransferManager dataTransferManager;
 
     public boolean areDrivers(List<JID> jids) {
