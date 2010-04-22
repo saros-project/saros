@@ -243,35 +243,52 @@ public class JingleFileTransferManager {
         jm.addJingleSessionRequestListener(new JingleSessionRequestListener() {
             public void sessionRequested(JingleSessionRequest request) {
 
-                JID jid = new JID(request.getFrom());
-                FileTransferConnection incoming = connections.get(jid);
-
-                // If we already have a session, which is not CLOSED then return
-                if (incoming != null
-                    && !(incoming.state == JingleConnectionState.CLOSED)) {
-
-                    return;
-                }
-
-                incoming = new FileTransferConnection(jid);
-                connections.put(jid, incoming);
-                // Inform listeners
-                incoming.setState(incoming.getState());
-
                 try {
-                    // Accept the call
-                    JingleSession session = request.accept();
-                    incoming.session = session;
+                    JID jid = new JID(request.getFrom());
+                    FileTransferConnection incoming = connections.get(jid);
 
-                    // Hook listeners
-                    initJingleListener(incoming, jid);
+                    // If we already have a session, which is not CLOSED then
+                    // return
+                    if (incoming != null
+                        && !(incoming.state == JingleConnectionState.CLOSED)) {
 
-                    // Start the call
-                    session.startIncoming();
-                } catch (XMPPException e) {
-                    log.error("Failed to start JingleSession", e);
-                    incoming.session = null;
-                    incoming.setState(JingleConnectionState.ERROR);
+                        // TODO If the user is once in a situation where his
+                        // JingleConnectionState is in ERROR it can never be
+                        // restarted
+
+                        log.info(Util.prefix(jid)
+                            + "Receiving Jingle Session Request but "
+                            + "local user already has a "
+                            + "FileTransferConnection " + "in state "
+                            + incoming.state + ". Thus rejecting");
+
+                        request.reject();
+                        return;
+                    }
+                    log.debug("Receiving Jingle Session Request from " + jid);
+
+                    incoming = new FileTransferConnection(jid);
+                    connections.put(jid, incoming);
+                    // Inform listeners
+                    incoming.setState(incoming.getState());
+
+                    try {
+                        // Accept the call
+                        JingleSession session = request.accept();
+                        incoming.session = session;
+
+                        // Hook listeners
+                        initJingleListener(incoming, jid);
+
+                        // Start the call
+                        session.startIncoming();
+                    } catch (XMPPException e) {
+                        log.error("Failed to start JingleSession", e);
+                        incoming.session = null;
+                        incoming.setState(JingleConnectionState.ERROR);
+                    }
+                } catch (Exception e) {
+                    log.error("Starting Session failed: ", e);
                 }
             }
         });
@@ -384,10 +401,20 @@ public class JingleFileTransferManager {
         FileTransferConnection connection = initialize(toJID);
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
-            return connection.fileTransfer.send(transferDescription, content,
-                progress);
+            try {
+                return connection.fileTransfer.send(transferDescription,
+                    content, progress);
+            } catch (JingleSessionException e) {
+                connection.setState(JingleConnectionState.CLOSED);
+                throw e;
+            } catch (IOException e) {
+                connection.setState(JingleConnectionState.CLOSED);
+                throw e;
+            }
         } else {
-            // If we want to reconnect, then we should not set this to ERROR
+            // WARN: If we want to reconnect, then we should not set this to ERROR
+            // Because connections are never retried once in ERROR state
+            // To fix this it is necessary that to find a way 
             connection.setState(JingleConnectionState.ERROR);
             throw new JingleSessionException(Util.prefix(toJID)
                 + "Could not establish connection when trying to send");
