@@ -321,6 +321,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                     .getDescription());
             } catch (IOException e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
+                request.reject(); // Reject (no way to tell remote user why)
                 return;
             }
 
