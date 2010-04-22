@@ -318,8 +318,8 @@ public class DiscoveryManager implements Disposable {
                 disco = info.item;
             else {
                 disco = info.item = querySupport(recipient);
-                log
-                    .debug("Inserted DiscoveryInfo into Cache for: "
+                if (disco != null)
+                    log.debug("Inserted DiscoveryInfo into Cache for: "
                         + recipient);
             }
         }
