@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -267,25 +268,42 @@ public class JingleFileTransferSession extends JingleMediaSession {
         ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
         creators.add(SocketCreator.getWrapped(NetTransferMode.JINGLETCP, Util
-            .retryEvery500ms(new Callable<Socket>() {
+            .retryEveryXms(new Callable<Socket>() {
                 public Socket call() throws Exception {
-                    return new Socket(remoteIp, remotePort);
+                    log.debug("Jingle/TCP connection attempt to " + remoteIp
+                        + ":" + remotePort);
+                    try {
+                        return new Socket(remoteIp, remotePort);
+                    } catch (Exception e) {
+                        log.debug("Jingle/TCP connection attempt FAILED to "
+                            + remoteIp + ":" + remotePort + " - "
+                            + e.getMessage());
+                        throw e;
+                    }
                 }
-            })));
+            }, 1000)));
 
         creators.add(SocketCreator.getWrapped(NetTransferMode.JINGLEUDP, Util
-            .delay(7500, Util.retryEvery500ms(new Callable<Socket>() {
+            .delay(7500, Util.retryEveryXms(new Callable<Socket>() {
                 public Socket call() throws Exception {
 
-                    Socket usock = udpSelectorProvider.openSocketChannel()
-                        .socket();
-                    usock.setSoTimeout(0);
-                    usock.setKeepAlive(true);
-                    usock.connect(new InetSocketAddress(InetAddress
-                        .getByName(remoteIp), remotePort));
-                    return usock;
+                    log.debug("Jingle/UDP connection attempt to " + remoteIp
+                        + ":" + remotePort);
+                    try {
+                        Socket usock = udpSelectorProvider.openSocketChannel()
+                            .socket();
+                        usock.setSoTimeout(0);
+                        usock.setKeepAlive(true);
+                        usock.connect(new InetSocketAddress(InetAddress
+                            .getByName(remoteIp), remotePort));
+                        return usock;
+                    } catch (Exception e) {
+                        log.debug("Jingle/UDP connection attempt FAILED to "
+                            + remoteIp + ":" + remotePort + " - " + e.getMessage());
+                        throw e;
+                    }
                 }
-            }))));
+            }, 1000))));
 
         connect(creators);
     }
@@ -298,23 +316,43 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
             public Socket call() throws Exception {
 
-                ServerSocket serverSocket = new ServerSocket(localPort);
-                serverSocket.setSoTimeout(30000);
+                log.debug("Starting Jingle/TCP Server Socket on port "
+                    + localPort);
+                try {
+                    ServerSocket serverSocket = new ServerSocket(localPort);
+                    serverSocket.setSoTimeout(30000);
 
-                return serverSocket.accept();
+                    return serverSocket.accept();
+                } catch (Exception e) {
+                    log.warn("Jingle/TCP Server Socket on port " + localPort
+                        + " did not receive a connection attempt within 30s: "
+                        + e.getMessage());
+                    throw e;
+                }
             }
         });
 
         creators.add(new SocketCreator(NetTransferMode.JINGLEUDP) {
 
             public Socket call() throws Exception {
-                Socket usock = udpSelectorProvider.openSocketChannel().socket();
-                usock.setSoTimeout(0);
-                usock.connect(new InetSocketAddress(InetAddress
-                    .getByName(remoteIp), remotePort));
-                usock.setKeepAlive(true);
 
-                return usock;
+                log.debug("Starting Jingle/UDP Server Socket on port "
+                    + localPort);
+
+                try {
+                    Socket usock = udpSelectorProvider.openSocketChannel()
+                        .socket();
+                    usock.setSoTimeout(0);
+                    usock.connect(new InetSocketAddress(InetAddress
+                        .getByName(remoteIp), remotePort));
+                    usock.setKeepAlive(true);
+
+                    return usock;
+                } catch (Exception e) {
+                    log.warn("Jingle/UDP Server Socket on port " + localPort
+                        + " failed to open: " + e.getMessage());
+                    throw e;
+                }
             }
         });
 
@@ -345,71 +383,78 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     protected void connect(Collection<SocketCreator> connects) {
 
-        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
-            Executors.newFixedThreadPool(connects.size(),
-                new NamedThreadFactory("Jingle-Connect-" + connectTo.getName()
-                    + "-")));
+        ExecutorService threadPool = Executors.newFixedThreadPool(connects
+            .size(), new NamedThreadFactory("Jingle-Connect-"
+            + connectTo.getName() + "-"));
 
-        Map<Future<Socket>, SocketCreator> futures = new HashMap<Future<Socket>, SocketCreator>();
+        try {
+            ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
+                threadPool);
 
-        for (SocketCreator creator : connects) {
-            futures.put(completionService.submit(creator), creator);
-        }
+            Map<Future<Socket>, SocketCreator> futures = new HashMap<Future<Socket>, SocketCreator>();
 
-        for (int i = 0; i < connects.size(); i++) {
-
-            Future<Socket> socketFuture = null;
-            try {
-                socketFuture = completionService.poll(TIMEOUTSECONDS,
-                    TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-                return;
+            for (SocketCreator creator : connects) {
+                futures.put(completionService.submit(creator), creator);
             }
 
-            if (socketFuture == null) {
-                log.debug("Jingle [" + connectTo.getName()
-                    + "] Could not connect with either TCP or UDP.");
-                break;
-            }
+            for (int i = 0; i < connects.size(); i++) {
 
-            try {
-                Socket socket = socketFuture.get();
-                this.connectionType = futures.get(socketFuture).getType();
-                binaryChannel = new BinaryChannel(socket, this.connectionType);
-                this.receiveThread = new ReceiverThread(binaryChannel);
-                this.receiveThread.start();
-
-                // Make sure the other connect-futures are canceled
-                for (Future<Socket> future : futures.keySet()) {
-                    future.cancel(true);
+                Future<Socket> socketFuture = null;
+                try {
+                    socketFuture = completionService.poll(TIMEOUTSECONDS,
+                        TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
+                    return;
                 }
-                return;
 
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-                return;
-            } catch (ExecutionException e) {
-                log.debug("Jingle [" + connectTo.getName()
-                    + "] Could not connect with either TCP or UDP.");
-                continue;
-            } catch (IOException e) {
-                log.debug("Jingle " + Util.prefix(connectTo)
-                    + "Failed to listen with either TCP or UDP.", e);
+                if (socketFuture == null) {
+                    log.debug("Jingle [" + connectTo.getName()
+                        + "] Could not connect with either TCP or UDP.");
+                    continue;
+                }
 
-                shutdown();
+                try {
+                    Socket socket = socketFuture.get();
+                    this.connectionType = futures.get(socketFuture).getType();
+                    binaryChannel = new BinaryChannel(socket,
+                        this.connectionType);
+                    this.receiveThread = new ReceiverThread(binaryChannel);
+                    this.receiveThread.start();
+
+                    // Make sure the other connect-futures are canceled
+                    for (Future<Socket> future : futures.keySet()) {
+                        future.cancel(true);
+                    }
+                    return;
+
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
+                    return;
+                } catch (ExecutionException e) {
+                    log.debug("Jingle [" + connectTo.getName()
+                        + "] Could not connect with either TCP or UDP.");
+                    continue;
+                } catch (IOException e) {
+                    log.debug("Jingle " + Util.prefix(connectTo)
+                        + "Failed to listen with either TCP or UDP.", e);
+
+                    shutdown();
+                }
             }
-        }
 
-        // Timeout, so cancel all
-        for (Future<Socket> future : futures.keySet()) {
-            future.cancel(true);
-        }
+            // Timeout, so cancel all
+            for (Future<Socket> future : futures.keySet()) {
+                future.cancel(true);
+            }
 
-        // Failed to connect...
-        assert !binaryChannel.isConnected();
+            // Failed to connect...
+            assert !isConnected();
+        } finally {
+            threadPool.shutdown();
+        }
     }
 
     /**
@@ -428,7 +473,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             throw new LocalCancellationException();
 
         if (!binaryChannel.isConnected()) {
-            throw new JingleSessionException("Failed to send files with Jingle");
+            throw new JingleSessionException("Binary Channel is not connected");
         }
 
         binaryChannel.sendDirect(transferDescription, content, progress);
@@ -481,12 +526,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     public synchronized void shutdown() {
-        binaryChannel.dispose();
+        if (binaryChannel != null) {
+            binaryChannel.dispose();
+            binaryChannel = null;
+        }
         connectionType = null;
     }
 
     public boolean isConnected() {
-        return binaryChannel.isConnected();
+        return binaryChannel != null && binaryChannel.isConnected();
     }
 
     public NetTransferMode getConnectionType() {

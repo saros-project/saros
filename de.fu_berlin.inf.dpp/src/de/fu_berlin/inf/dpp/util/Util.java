@@ -267,7 +267,8 @@ public class Util {
         };
     }
 
-    public static <T> Callable<T> retryEvery500ms(final Callable<T> callable) {
+    public static <T> Callable<T> retryEveryXms(final Callable<T> callable,
+        final int retryMillis) {
         return new Callable<T>() {
             public T call() {
                 T t = null;
@@ -286,7 +287,7 @@ public class Util {
                         // Log here for connection problems.
                         t = null;
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(retryMillis);
                         } catch (InterruptedException e2) {
                             log.error("Code not designed to be interruptable",
                                 e);
