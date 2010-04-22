@@ -73,6 +73,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
@@ -90,6 +91,7 @@ import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
+import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -119,6 +121,8 @@ public class RosterView extends ViewPart {
     protected InviteAction inviteAction;
 
     protected RenameContactAction renameContactAction;
+
+    protected ConnectionTestAction testAction;
 
     protected DeleteContactAction deleteContactAction;
 
@@ -154,6 +158,9 @@ public class RosterView extends ViewPart {
 
     @Inject
     protected DataTransferManager dataTransferManager;
+
+    @Inject
+    protected ConnectionTestManager connectionTestManager;
 
     @Inject
     protected RosterTracker rosterTracker;
@@ -842,6 +849,7 @@ public class RosterView extends ViewPart {
         manager.add(new Separator());
         manager.add(this.renameContactAction);
         manager.add(this.deleteContactAction);
+        manager.add(this.testAction);
 
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -854,5 +862,7 @@ public class RosterView extends ViewPart {
             this.viewer, discoManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
         this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
+        this.testAction = new ConnectionTestAction(saros, connectionTestManager,
+            this.viewer);
     }
 }

@@ -112,6 +112,7 @@ import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
@@ -344,6 +345,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RequestForActivityHandler.class);
         this.container.addComponent(ConsistencyWatchdogHandler.class);
         this.container.addComponent(ActivitiesHandler.class);
+        this.container.addComponent(ConnectionTestManager.class);
 
         // Extensions
         this.container.addComponent(CancelInviteExtension.class);
@@ -449,31 +451,27 @@ public class Saros extends AbstractUIPlugin {
         Connection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
+        // Jingle has to be started once!
+        JingleManager.setJingleServiceEnabled();
+
         /*
          * add Saros as XMPP feature once XMPPConnection is connected to the
          * XMPP server
          */
         Connection
             .addConnectionCreationListener(new ConnectionCreationListener() {
-
                 public void connectionCreated(Connection connection) {
                     ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                         .getInstanceFor(connection);
                     sdm.addFeature(Saros.NAMESPACE);
+
+                    // This disables Jingle if the user has selected to use XMPP
+                    // file transfer exclusively
+                    JingleManager.setServiceEnabled(connection,
+                        !getPreferenceStore().getBoolean(
+                            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
                 }
-
             });
-
-        // add Jingle feature to the supported extensions
-        if (!getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
-            /*
-             * this call registers a ConnectionCreationListener which adds the
-             * Jingle feature once the XMPPConnection is connected to the XMPP
-             * server
-             */
-            JingleManager.setJingleServiceEnabled();
-        }
 
         // set local Socks5 proxy port
         SmackConfiguration.setLocalSocks5ProxyPort(getPreferenceStore().getInt(
