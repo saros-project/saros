@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -317,14 +318,23 @@ public class BinaryChannel {
             // send DATA
             sendDirect(PacketType.DATA, countData, objectid, data, progress);
 
-            BinaryPacket confirmation;
+            BinaryPacket confirmation = null;
             try {
-                confirmation = remoteTransfers.get(objectid).take();
+                while (confirmation == null && isConnected()
+                    && !progress.isCanceled()) {
+                    confirmation = remoteTransfers.get(objectid).poll(500,
+                        TimeUnit.MILLISECONDS);
+                }
             } catch (InterruptedException e) {
-                log.error("Code not designed to be interrupted",
-                    new StackTrace());
-                return;
+                log.error("Code not designed to be interrupted", e);
+                throw new IOException(
+                    "Binary Channel received unexpected exception while waiting for confirmation package",
+                    e);
             }
+            if (confirmation == null)
+                throw new IOException(
+                    "Binary Channel was closed while waiting for confirmation package");
+
             if (confirmation.getType() == PacketType.REJECT)
                 throw new RemoteCancellationException();
 
