@@ -83,7 +83,11 @@ public class TransferDescription implements Serializable {
         /**
          * meta data for a stream
          */
-        STREAM_META
+        STREAM_META,
+        /**
+         * test data for connection tests
+         */
+        CONNECTION_TEST
     }
 
     public FileTransferType type;
@@ -124,6 +128,16 @@ public class TransferDescription implements Serializable {
      */
     public int objectid = -1;
 
+    /**
+     * If this TransferDescription is of type
+     * {@link FileTransferType#CONNECTION_TEST} then testID is set to the ID of
+     * the IQ packet to send in reply to receiving test data.
+     * 
+     * testID is null if this TransferDescription is not of type
+     * {@link FileTransferType#CONNECTION_TEST}
+     */
+    protected String testID = null;
+
     @Override
     public String toString() {
 
@@ -146,6 +160,8 @@ public class TransferDescription implements Serializable {
         case STREAM_META:
             return "Stream metadata from " + Util.prefix(getSender())
                 + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
+        case CONNECTION_TEST:
+            return "Connection test from " + Util.prefix(getSender());
         default:
             return "Not a valid FileTransferType";
         }
@@ -160,6 +176,16 @@ public class TransferDescription implements Serializable {
         result.sessionID = sessionID;
         result.invitationID = invitationID;
         result.compressed = false;
+        return result;
+    }
+
+    public static TransferDescription createTestTransferDescription(
+        JID recipient, String testID, JID sender) {
+        TransferDescription result = new TransferDescription();
+        result.recipient = recipient;
+        result.sender = sender;
+        result.testID = testID;
+        result.type = FileTransferType.CONNECTION_TEST;
         return result;
     }
 
