@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -71,6 +73,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
+    protected Lock jingleSetupLock = new ReentrantLock();
     /**
      * TransferModeListener which keeps track of the last type of transfer mode
      * *started* in both incoming and outgoing directions.
@@ -184,18 +187,27 @@ public class DataTransferManager implements ConnectionSessionListener {
         transferModeDispatch.add(trackingTransferModeListener);
     }
 
+    /**
+     * Return JingleFileTransferManager, guaranteeing that it has been fully
+     * initialized
+     * 
+     * @return
+     */
     public JingleFileTransferManager getJingleManager() {
+        this.jingleSetupLock.lock();
         try {
             if (startingJingleThread == null)
                 return null;
 
             startingJingleThread.join();
+            return jingleManager.getValue();
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);
             Thread.currentThread().interrupt();
             return null;
+        } finally {
+            this.jingleSetupLock.unlock();
         }
-        return jingleManager.getValue();
     }
 
     /**
@@ -707,48 +719,61 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
+    /**
+     * Set up Socks5 and Jingle for the given XMPPConnection
+     */
     public void prepareConnection(final XMPPConnection connection) {
+        try {
+            this.jingleSetupLock.lock();
+            this.jingleManager.setValue(null);
+            // reset startingJingleThread which is joined on to avoid
+            // race conditions where join is called on wrong JFTM
+            this.startingJingleThread = null;
 
-        // Create Containers
-        this.connection = connection;
+            // Create Containers
+            this.connection = connection;
 
-        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-        this.jingleManager.setValue(null);
+            this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
 
-        Socks5ByteStreamManager socks5ByteStreamManager = Socks5ByteStreamManager
-            .getByteStreamManager(connection);
-        socks5ByteStreamManager.setTargetResponseTimeout(7000);
+            Socks5ByteStreamManager socks5ByteStreamManager = Socks5ByteStreamManager
+                .getByteStreamManager(connection);
+            socks5ByteStreamManager.setTargetResponseTimeout(7000);
 
-        this.fileTransferManager = new FileTransferManager(connection);
-        this.fileTransferManager
-            .addFileTransferListener(new XMPPFileTransferListener());
+            this.fileTransferManager = new FileTransferManager(connection);
+            this.fileTransferManager
+                .addFileTransferListener(new XMPPFileTransferListener());
 
-        if (!preferenceUtils.forceFileTranserByChat()) {
-            // Start Jingle Manager asynchronous
-            this.startingJingleThread = new Thread(new Runnable() {
-                /**
-                 * @review runSafe OK
-                 */
-                public void run() {
-                    try {
-                        jingleManager
-                            .setValue(new JingleFileTransferManager(saros,
-                                connection, jingleListener, incomingExtProv));
-                        log.debug("Jingle Manager started");
-                    } catch (Exception e) {
+            if (!preferenceUtils.forceFileTranserByChat()) {
+                // Start Jingle Manager asynchronous
+                this.startingJingleThread = new Thread(new Runnable() {
+                    /**
+                     * @review runSafe OK
+                     */
+                    public void run() {
+                        try {
+                            jingleManager
+                                .setValue(new JingleFileTransferManager(saros,
+                                    connection, jingleListener, incomingExtProv));
+                            log.debug("Jingle Manager started");
+                        } catch (Exception e) {
 
-                        if (saros.isConnected())
-                            log.error("Jingle Manager could not be started", e);
-                        else
-                            log.debug("Jingle Manager could not be started,"
-                                + " because Saros was disconnected from"
-                                + " XMPP server.");
+                            if (saros.isConnected())
+                                log.error(
+                                    "Jingle Manager could not be started", e);
+                            else
+                                log
+                                    .debug("Jingle Manager could not be started,"
+                                        + " because Saros was disconnected from"
+                                        + " XMPP server.");
 
-                        jingleManager.setValue(null);
+                            jingleManager.setValue(null);
+                        }
                     }
-                }
-            });
-            this.startingJingleThread.start();
+                });
+                this.startingJingleThread.start();
+            }
+        } finally {
+            this.jingleSetupLock.unlock();
         }
     }
 
@@ -804,31 +829,37 @@ public class DataTransferManager implements ConnectionSessionListener {
     }
 
     public void disposeConnection() {
-        fileTransferQueue.clear();
-        transferModeDispatch.clear();
+        try {
+            this.jingleSetupLock.lock();
+            fileTransferQueue.clear();
+            transferModeDispatch.clear();
 
-        connection = null;
+            connection = null;
 
-        // If Jingle is still starting, wait for it...
-        if (startingJingleThread != null) {
-            try {
-                startingJingleThread.join();
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-                return;
+            // If Jingle is still starting, wait for it...
+            if (startingJingleThread != null) {
+                try {
+                    startingJingleThread.join();
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
+                    return;
+                }
             }
-        }
 
-        // Terminate all Jingle connections and notify everybody who used this
-        // JingleFileTransferManager
-        if (jingleManager.getValue() != null) {
-            jingleManager.getValue().terminateAllJingleSessions();
-            jingleManager.setValue(null);
-        }
+            // Terminate all Jingle connections and notify everybody who used
+            // this
+            // JingleFileTransferManager
+            if (jingleManager.getValue() != null) {
+                jingleManager.getValue().terminateAllJingleSessions();
+                jingleManager.setValue(null);
+            }
 
-        fileTransferManager = null;
-        startingJingleThread = null;
+            fileTransferManager = null;
+            startingJingleThread = null;
+        } finally {
+            this.jingleSetupLock.unlock();
+        }
     }
 
     public void startConnection() {
