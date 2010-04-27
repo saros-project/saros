@@ -658,9 +658,8 @@ public class Saros extends AbstractUIPlugin {
                 disconnect();
             }
 
-            this.connection = new XMPPConnection(getConnectionConfiguration());
-
             setConnectionState(ConnectionState.CONNECTING, null);
+            this.connection = new XMPPConnection(getConnectionConfiguration());
 
             this.connection.connect();
 
