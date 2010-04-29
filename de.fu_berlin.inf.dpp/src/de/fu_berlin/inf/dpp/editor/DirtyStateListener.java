@@ -1,12 +1,17 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -79,4 +84,39 @@ public class DirtyStateListener implements IElementStateListener {
     public void elementMoved(Object originalElement, Object movedElement) {
         // ignore
     }
+
+    AutoHashMap<IDocumentProvider, Set<IEditorInput>> documentProviders = AutoHashMap
+        .getSetHashMap();
+
+    public void register(IDocumentProvider documentProvider, IEditorInput input) {
+
+        Set<IEditorInput> inputs = documentProviders.get(documentProvider);
+        if (inputs.size() == 0) {
+            documentProvider.addElementStateListener(this);
+        }
+        inputs.add(input);
+    }
+
+    public void unregister(IDocumentProvider documentProvider,
+        IEditorInput input) {
+
+        Set<IEditorInput> inputs = documentProviders.get(documentProvider);
+        inputs.remove(input);
+        if (inputs.size() == 0) {
+            documentProvider.removeElementStateListener(this);
+            documentProviders.remove(documentProvider);
+        }
+    }
+
+    public void unregisterAll() {
+
+        for (IDocumentProvider provider : documentProviders.keySet()) {
+            log.warn("DocumentProvider was not correctly"
+                + " unregistered yet, EditorPool must be corrupted: "
+                + documentProviders);
+            provider.removeElementStateListener(this);
+        }
+        documentProviders.clear();
+    }
+
 }

@@ -40,7 +40,7 @@ class EditorPool {
 
     /**
      * The editorParts-map will return all EditorParts associated with a given
-     * IPath. This can be potentielly many because a IFile (which can be
+     * IPath. This can be potentially many because a IFile (which can be
      * identified using a IPath) can be opened in multiple editors.
      */
     protected Map<SPath, HashSet<IEditorPart>> editorParts = new HashMap<SPath, HashSet<IEditorPart>>();
@@ -121,8 +121,10 @@ class EditorPool {
 
         IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
-        documentProvider
-            .addElementStateListener(this.editorManager.dirtyStateListener);
+
+        // TODO Not registering is very helpful to find errors related to file
+        // transfer problems
+        this.editorManager.dirtyStateListener.register(documentProvider, input);
 
         IDocument document = EditorManager.getDocument(editorPart);
 
@@ -225,8 +227,8 @@ class EditorPool {
 
         IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
-        documentProvider
-            .removeElementStateListener(this.editorManager.dirtyStateListener);
+        this.editorManager.dirtyStateListener.unregister(documentProvider,
+            input);
 
         IDocument document = documentProvider.getDocument(input);
         if (document == null) {

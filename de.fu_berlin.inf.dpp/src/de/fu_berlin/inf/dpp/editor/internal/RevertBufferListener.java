@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -35,11 +36,15 @@ public class RevertBufferListener {
 
     protected ISharedProject sharedProject;
 
+    protected FileReplacementInProgressObservable fileReplacementInProgress;
+
     public RevertBufferListener(EditorManager editorManager,
-        ISharedProject sharedProject) {
+        ISharedProject sharedProject,
+        FileReplacementInProgressObservable fileReplacementInProgress) {
 
         this.editorManager = editorManager;
         this.sharedProject = sharedProject;
+        this.fileReplacementInProgress = fileReplacementInProgress;
 
         FileBuffers.getTextFileBufferManager().addFileBufferListener(
             bufferListener);
@@ -58,6 +63,9 @@ public class RevertBufferListener {
 
                 // If file did not change; no need for revert
                 if (!buffer.isDirty())
+                    return;
+
+                if (fileReplacementInProgress.isReplacementInProgress())
                     return;
 
                 if (!sharedProject.isDriver()) {

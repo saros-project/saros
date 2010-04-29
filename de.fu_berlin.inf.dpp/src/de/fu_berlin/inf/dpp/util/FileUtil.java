@@ -394,7 +394,8 @@ public class FileUtil {
 
     public static void delete(final IResource resource) throws CoreException {
         if (!resource.exists()) {
-            log.warn("File not found for deletion: " + resource);
+            log.warn("File not found for deletion: " + resource,
+                new StackTrace());
             return;
         }
 

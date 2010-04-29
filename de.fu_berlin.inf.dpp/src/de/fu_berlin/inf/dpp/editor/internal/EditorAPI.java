@@ -185,7 +185,7 @@ public class EditorAPI implements IEditorAPI {
 
         if (!file.exists()) {
             log.error("EditorAPI cannot open file which does not exist: "
-                + file);
+                + file, new StackTrace());
             return null;
         }
 
@@ -251,7 +251,7 @@ public class EditorAPI implements IEditorAPI {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
-            page.closeEditor(part, false);
+            page.closeEditor(part, true); // Close AND let user decide if saving is necessary
         }
     }
 

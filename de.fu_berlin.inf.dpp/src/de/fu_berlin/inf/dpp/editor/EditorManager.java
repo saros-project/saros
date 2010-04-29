@@ -370,7 +370,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                     // register bufferManager and initialize user's role in
                     // session
                     buffListener = new RevertBufferListener(EditorManager.this,
-                        sharedProject);
+                        sharedProject, fileReplacementInProgressObservable);
                 }
             });
         }
@@ -396,6 +396,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                     });
 
                     editorPool.removeAllEditors(sharedProject);
+
+                    dirtyStateListener.unregisterAll();
 
                     sharedProject.removeListener(sharedProjectListener);
                     sharedProject.removeActivityProvider(EditorManager.this);

@@ -558,9 +558,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
         case IResourceChangeEvent.PRE_CLOSE:
         case IResourceChangeEvent.PRE_DELETE:
         case IResourceChangeEvent.PRE_REFRESH:
-        
+
             IResource resource = event.getResource();
-            if (resource != null){
+            if (resource != null) {
                 log.warn("Resource changed while paused: "
                     + event.getResource().getFullPath().toPortableString());
             } else {
@@ -643,12 +643,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
             // while moving content of the file changed
             if (activity.getContents() != null) {
 
-                IFile fileResource = activity.getPath().getFile();
-
-                fileResource.setContents(new ByteArrayInputStream(activity
-                    .getContents()), true, true, null);
+                SubMonitor monitor = SubMonitor
+                    .convert(new NullProgressMonitor());
+                try {
+                    FileUtil.writeFile(new ByteArrayInputStream(activity
+                        .getContents()), file, monitor);
+                } catch (Exception e) {
+                    log.error("Could not write file: " + file);
+                }
             }
-
         }
 
         if (activity.isRecovery()) {
