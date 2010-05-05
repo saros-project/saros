@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
+import de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferenceHelper;
+import de.fu_berlin.inf.dpp.videosharing.source.Screen;
 
 /**
  * Class used to initialize default preference values.
@@ -87,5 +90,37 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.putBoolean(PreferenceConstants.AUDIO_ENABLE_DTX, true);
         prefs.put(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
         prefs.put(PreferenceConstants.AUDIO_QUALITY_LEVEL, "8");
+
+        // videosharing
+
+        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 10);
+        prefs.put(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
+            VideoSharingPreferenceHelper.RESOLUTIONS[2][1]);
+        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_WIDTH, 320);
+        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_HEIGHT, 240);
+        prefs.putInt(PreferenceConstants.ENCODING_MAX_BITRATE, 512000);
+        prefs.put(PreferenceConstants.ENCODING_CODEC,
+            VideoSharing.Codec.XUGGLER.name());
+
+        prefs.put(PreferenceConstants.XUGGLER_CONTAINER_FORMAT, "flv");
+        prefs.put(PreferenceConstants.XUGGLER_CODEC, "libx264");
+        prefs.putBoolean(PreferenceConstants.XUGGLER_USE_VBV, false);
+
+        prefs.put(PreferenceConstants.IMAGE_TILE_CODEC, "png");
+        prefs.putInt(PreferenceConstants.IMAGE_TILE_QUALITY, 60);
+        prefs.putInt(PreferenceConstants.IMAGE_TILE_COLORS, 256);
+        prefs.putBoolean(PreferenceConstants.IMAGE_TILE_DITHER, true);
+        prefs.putBoolean(PreferenceConstants.IMAGE_TILE_SERPENTINE, false);
+
+        prefs.putBoolean(PreferenceConstants.PLAYER_RESAMPLE, false);
+        prefs.putBoolean(PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO, true);
+
+        prefs.put(PreferenceConstants.SCREEN_INITIAL_MODE,
+            Screen.Mode.FOLLOW_MOUSE.name());
+        prefs.put(PreferenceConstants.SCREEN_MOUSE_AREA_QUALITY,
+            VideoSharingPreferenceHelper.ZOOM_LEVELS[0][1]);
+        prefs.putInt(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH, 320);
+        prefs.putInt(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT, 240);
+        prefs.putBoolean(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
     }
 }

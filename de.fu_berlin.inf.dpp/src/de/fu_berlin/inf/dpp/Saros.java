@@ -154,6 +154,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
+import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
+import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
 /**
  * The main plug-in of Saros.
@@ -322,6 +324,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(MixerManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
+        this.container.addComponent(VideoSharing.class);
         this.container.addComponent(VersionManager.class);
         this.container.addComponent(CommunicationNegotiatingManager.class);
         this.container.addComponent(XMPPReceiver.class);
@@ -381,6 +384,7 @@ public class Saros extends AbstractUIPlugin {
         // streaming services
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
         this.container.addComponent(AudioService.class);
+        this.container.addComponent(VideoSharingService.class);
 
         /*
          * The following classes are initialized by the re-injector because they

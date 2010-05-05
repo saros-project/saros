@@ -71,6 +71,8 @@ public class SarosUI {
 
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
+    private static final String VIDEO_PLAYER_VIEW = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
+
     @Inject
     protected DataTransferManager dataTransferManager;
 
@@ -155,6 +157,21 @@ public class SarosUI {
 
     protected void bringToFrontView(String view) {
         showView(view, IWorkbenchPage.VIEW_VISIBLE);
+    }
+
+    /**
+     * @swt
+     */
+    public void createVideoPlayerView() {
+        if (Util.findView(SarosUI.VIDEO_PLAYER_VIEW) == null)
+            createView(SarosUI.VIDEO_PLAYER_VIEW);
+    }
+
+    /**
+     * @swt
+     */
+    public void activateVideoPlayerView() {
+        activateView(SarosUI.VIDEO_PLAYER_VIEW);
     }
 
     protected void activateView(String view) {

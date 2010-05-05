@@ -24,6 +24,13 @@
             icon="icons/comment.png"
             id="de.fu_berlin.inf.dpp.ui.ChatView"
             name="Chat View"/>
+     <view
+            category="Saros"
+            class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
+            icon="icons/monitor_go.png"
+            id="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
+            name="Remote Screen"
+            restorable="true"/>
 	 <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.NetworkView"
@@ -133,6 +140,42 @@
             class="de.fu_berlin.inf.dpp.ui.CommunicationPreferencePage"
             id="de.fu_berlin.dpp.preferences.communication"
             name="Communication">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.preferences"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
+            name="Screensharing">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
+            name="Encoder">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
+            name="Xuggler">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
+            name="Image-Tile">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
+            name="Remote screen view">
+      </page>
+      <page
+            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
+            class="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
+            id="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
+            name="Desktop">
       </page>
    </extension>
    <extension

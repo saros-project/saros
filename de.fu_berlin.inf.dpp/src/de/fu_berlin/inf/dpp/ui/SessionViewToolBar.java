@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
+import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 
 /**
@@ -42,8 +43,8 @@ public class SessionViewToolBar implements Disposable {
         RemoveDriverRoleAction removeDriverRoleAction,
         RemoveAllDriverRoleAction removeAllDriverRoleAction,
         FollowModeAction followModeAction, SendFileAction sendFileAction,
-        VoIPAction voipAction, LeaveSessionAction leaveSessionAction,
-        PreferenceUtils preferences) {
+        VoIPAction voipAction, VideoSharingAction videoSharingAction,
+        LeaveSessionAction leaveSessionAction, PreferenceUtils preferences) {
 
         this.saros = saros;
         this.sessionView = sessionView;
@@ -61,6 +62,7 @@ public class SessionViewToolBar implements Disposable {
         IActionBars bars = sessionView.getViewSite().getActionBars();
         IToolBarManager toolBar = bars.getToolBarManager();
 
+        toolBar.add(videoSharingAction);
         toolBar.add(sendFileAction);
         toolBar.add(voipAction);
         toolBar.add(stoppedAction);

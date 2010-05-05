@@ -176,4 +176,55 @@ public class PreferenceConstants {
     /** Playback device for VoIP **/
     public static final String AUDIO_PLAYBACK_DEVICE = "AUDIO_PLAYBACK_DEVICE";
 
+    /*
+     * VideoSharing
+     */
+
+    /*
+     * encoder constants
+     */
+
+    public static final String ENCODING_VIDEO_FRAMERATE = "vs.encoding.framerate";
+    public static final String ENCODING_VIDEO_RESOLUTION = "vs.encoding.resolution";
+    public static final String ENCODING_VIDEO_WIDTH = "vs.encoding.width";
+    public static final String ENCODING_VIDEO_HEIGHT = "vs.encoding.height";
+    public static final String ENCODING_MAX_BITRATE = "vs.encoding.max_bitrate";
+    public static final String ENCODING_MAX_BITRATE_COMBO = "vs.encoding.max_bitrate_combo";
+    public static final String ENCODING_CODEC = "vs.encoding.codec";
+
+    /*
+     * xuggler encoder
+     */
+
+    public static final String XUGGLER_CONTAINER_FORMAT = "vs.encoding.xuggler.containerformat";
+    public static final String XUGGLER_CODEC = "vs.encoding.xuggler.codec";
+    public static final String XUGGLER_USE_VBV = "vs.encoding.xuggler.vbv";
+
+    /*
+     * tile encoder
+     */
+
+    public static final String IMAGE_TILE_CODEC = "vs.encoding.imagetile.codec";
+    public static final String IMAGE_TILE_QUALITY = "vs.encoding.imagetile.quality";
+    public static final String IMAGE_TILE_COLORS = "vs.encoding.imagetile.colors";
+    public static final String IMAGE_TILE_SERPENTINE = "vs.encoding.imagetile.serpentine";
+    public static final String IMAGE_TILE_DITHER = "vs.encoding.imagetile.dither";
+
+    /*
+     * player
+     */
+
+    public static final String PLAYER_RESAMPLE = "vs.player.resample";
+    public static final String PLAYER_KEEP_ASPECT_RATIO = "vs.player.ratio";
+
+    /*
+     * screen
+     */
+
+    public static final String SCREEN_INITIAL_MODE = "vs.source.screen.initial_mode";
+    public static final String SCREEN_MOUSE_AREA_QUALITY = "vs.source.mouse_area_quality";
+    public static final String SCREEN_MOUSE_AREA_WIDTH = "vs.source.screen.mouse_area_width";
+    public static final String SCREEN_MOUSE_AREA_HEIGHT = "vs.source.screen.mouse_area_height";
+    public static final String SCREEN_SHOW_MOUSEPOINTER = "vs.source.screen.show_mouse_pointer";
+
 }

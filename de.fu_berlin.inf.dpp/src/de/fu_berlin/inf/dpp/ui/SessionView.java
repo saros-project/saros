@@ -84,6 +84,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
+import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -436,6 +437,7 @@ public class SessionView extends ViewPart {
 
         this.viewer.setInput(null);
 
+        container.addComponent(VideoSharingAction.class);
         container.addComponent(SendFileAction.class);
         container.addComponent(VoIPAction.class);
         container.addComponent(StoppedAction.class);

@@ -46,7 +46,11 @@ Bundle-ClassPath: bin/,
  lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar,
  lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar,
  lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar,
- lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar
+ lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar,
+ lib/logback-classic.jar,
+ lib/logback-core.jar,
+ lib/slf4j-api.jar,
+ lib/xuggle-xuggler.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,

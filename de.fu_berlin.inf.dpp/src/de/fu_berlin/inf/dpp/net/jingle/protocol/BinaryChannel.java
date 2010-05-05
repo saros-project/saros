@@ -328,8 +328,7 @@ public class BinaryChannel {
             } catch (InterruptedException e) {
                 log.error("Code not designed to be interrupted", e);
                 throw new IOException(
-                    "Binary Channel received unexpected exception while waiting for confirmation package",
-                    e);
+                    "Binary Channel received unexpected exception while waiting for confirmation package");
             }
             if (confirmation == null)
                 throw new IOException(
