@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * On the bottom you will find the used configurations which is used by STF.
  */
 public class BotConfiguration {
-    public final static boolean DEVELOPMODE = true;
+    public final static boolean DEVELOPMODE = false;
 
     /**
      * Directory for temporary files for saving screen captures.
@@ -32,17 +32,17 @@ public class BotConfiguration {
     /**
      * VM test accounts
      */
-    private final static String JID_ALICE_VM = ("alice@xmpp1.internet.test/" + Saros.RESOURCE);
-    private final static String PASSWORD_ALICE_VM = "dddfffggg";
-    private final static String HOST_ALICE_VM = "rmiswtbot1.internet.test";
+    private final static String JID_ALICE_VM = ("testuser@saros-con.imp.fu-berlin.de");
+    private final static String PASSWORD_ALICE_VM = "test";
+    private final static String HOST_ALICE_VM = "192.168.66.71";
     private final static int PORT_ALICE_VM = 1099;
-    private final static String JID_BOB_VM = ("bob@xmpp1.internet.test/" + Saros.RESOURCE);
-    private final static String PASSWORD_BOB_VM = "dddfffggg";
-    private final static String HOST_BOB_VM = "rmiswtbot1.delay.test";
+    private final static String JID_BOB_VM = ("testuser2@saros-con.imp.fu-berlin.de");
+    private final static String PASSWORD_BOB_VM = "test";
+    private final static String HOST_BOB_VM = "192.168.66.72";
     private final static int PORT_BOB_VM = 1099;
-    private final static String JID_CARL_VM = ("carl@xmpp1.internet.test/" + Saros.RESOURCE);
-    private final static String PASSWORD_CARL_VM = "dddfffggg";
-    private final static String HOST_CARL_VM = "rmiswtbot2.internet.test";
+    private final static String JID_CARL_VM = ("unconfigured");
+    private final static String PASSWORD_CARL_VM = "unconfigured";
+    private final static String HOST_CARL_VM = "unconfigured";
     private final static int PORT_CARL_VM = 1099;
 
     /**
