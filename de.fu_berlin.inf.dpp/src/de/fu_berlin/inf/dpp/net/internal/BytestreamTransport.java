@@ -46,11 +46,6 @@ public abstract class BytestreamTransport implements Transport {
             dtm);
     }
 
-    @Override
-    public String toString() {
-        return "XEP 65 SOCKS5";
-    }
-
     /* 
      * 
      */
@@ -97,6 +92,11 @@ public abstract class BytestreamTransport implements Transport {
         this.dtm = dtm;
         manager = getManager(connection);
         manager.addIncomingBytestreamListener(streamListener);
+    }
+
+    @Override
+    public String toString() {
+        return getNetTransferMode().getXEP();
     }
 
     abstract protected NetTransferMode getNetTransferMode();
