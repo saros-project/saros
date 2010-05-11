@@ -115,7 +115,7 @@ public class BytestreamConnection implements IConnection {
 
     public void close() {
         if (binaryChannel != null) {
-            listener.connectionChanged(getPeer(), this);
+            listener.connectionClosed(getPeer(), this);
             binaryChannel.dispose();
             binaryChannel = null;
         }

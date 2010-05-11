@@ -42,8 +42,8 @@ public abstract class BytestreamTransport implements Transport {
             e.printStackTrace();
         }
 
-        return new BytestreamConnection(peer, this.getNetTransferMode(),
-            session, dtm);
+        return new BytestreamConnection(peer, getNetTransferMode(), session,
+            dtm);
     }
 
     /* 

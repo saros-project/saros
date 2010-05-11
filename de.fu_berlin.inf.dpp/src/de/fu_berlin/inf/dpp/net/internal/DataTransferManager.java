@@ -65,8 +65,9 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.saros = saros;
         this.transports = new Transport[] { // 
         // new JingleTransport(saros),
-        // new Socks5Transport(),
-        new IBBTransport() };
+        new Socks5Transport(),
+        // new IBBTransport()
+        };
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -317,8 +318,8 @@ public class DataTransferManager implements ConnectionSessionListener {
         transferModeDispatch.connectionChanged(peer, connection2);
     }
 
-    public void connectionClosed(JID peer, SocketConnection socketConnection) {
-        if (socketConnection == connections.get(peer)) {
+    public void connectionClosed(JID peer, IConnection connection2) {
+        if (connection2 == connections.get(peer)) {
             connections.remove(peer);
         }
         transferModeDispatch.connectionChanged(peer, null);
