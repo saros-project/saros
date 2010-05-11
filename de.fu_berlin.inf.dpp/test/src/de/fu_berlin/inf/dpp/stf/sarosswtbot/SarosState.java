@@ -86,9 +86,9 @@ public class SarosState implements ISarosState {
 
     public Tuple<NetTransferMode, NetTransferMode> getConnection(JID destJid) {
         NetTransferMode outgoingMode = dataTransferManager
-            .getOutgoingTransferMode(destJid);
+            .getTransferMode(destJid);
         NetTransferMode incomingMode = dataTransferManager
-            .getIncomingTransferMode(destJid);
+            .getTransferMode(destJid);
         return new Tuple<NetTransferMode, NetTransferMode>(incomingMode,
             outgoingMode);
     }
@@ -114,19 +114,19 @@ public class SarosState implements ISarosState {
     }
 
     public boolean isIncomingConnectionIBB(JID destJid) throws RemoteException {
-        return dataTransferManager.getIncomingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.IBB);
     }
 
     public boolean isIncomingConnectionJingleTCP(JID destJid)
         throws RemoteException {
-        return dataTransferManager.getIncomingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.JINGLETCP);
     }
 
     public boolean isIncomingConnectionJingleUDP(JID destJid)
         throws RemoteException {
-        return dataTransferManager.getIncomingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.JINGLEUDP);
     }
 
@@ -145,19 +145,19 @@ public class SarosState implements ISarosState {
     }
 
     public boolean isOutgoingConnectionIBB(JID destJid) throws RemoteException {
-        return dataTransferManager.getOutgoingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.IBB);
     }
 
     public boolean isOutgoingConnectionJingleTCP(JID destJid)
         throws RemoteException {
-        return dataTransferManager.getOutgoingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.JINGLETCP);
     }
 
     public boolean isOutgoingConnectionJingleUDP(JID destJid)
         throws RemoteException {
-        return dataTransferManager.getOutgoingTransferMode(destJid).equals(
+        return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.JINGLEUDP);
     }
 

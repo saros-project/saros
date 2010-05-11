@@ -22,10 +22,8 @@ package de.fu_berlin.inf.dpp.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
@@ -76,24 +74,19 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
+import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
-import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
@@ -134,9 +127,6 @@ public class RosterView extends ViewPart {
 
     @Inject
     protected DiscoveryManager discoManager;
-
-    @Inject
-    protected JingleFileTransferManagerObservable jingleManager;
 
     @Inject
     protected Saros saros;
@@ -216,25 +206,16 @@ public class RosterView extends ViewPart {
         ITransferModeListener {
 
         public void clear() {
-            lastStateMap[0].clear();
-            lastStateMap[1].clear();
             refreshRosterTree(true);
         }
 
-        @SuppressWarnings("unchecked")
-        private final Map<JID, NetTransferMode>[] lastStateMap = new HashMap[] {
-            new HashMap<JID, NetTransferMode>(),
-            new HashMap<JID, NetTransferMode>() };
-
         public void transferFinished(JID jid, NetTransferMode newMode,
             boolean incoming, long size, long transmissionMillisecs) {
+            // we are not interested in transfer statistics
+        }
 
-            final NetTransferMode lastState = lastStateMap[incoming ? 0 : 1]
-                .get(jid);
-            if (newMode != lastState) {
-                lastStateMap[incoming ? 0 : 1].put(jid, newMode);
-                refreshRosterTree(jid);
-            }
+        public void connectionChanged(JID jid, IConnection connection) {
+            refreshRosterTree(jid);
         }
     }
 
@@ -360,37 +341,12 @@ public class RosterView extends ViewPart {
 
                 final JID jid = new JID(user);
 
-                final NetTransferMode in = dataTransferManager
-                    .getIncomingTransferMode(jid);
-                final NetTransferMode out = dataTransferManager
-                    .getOutgoingTransferMode(jid);
+                final NetTransferMode transferMode = dataTransferManager
+                    .getTransferMode(jid);
 
-                if (in != NetTransferMode.UNKNOWN
-                    || out != NetTransferMode.UNKNOWN) {
-                    result.append(" Last Data Transfer -",
+                if (transferMode != null) {
+                    result.append(" Connected using: " + transferMode,
                         StyledString.QUALIFIER_STYLER);
-                }
-                if (in != NetTransferMode.UNKNOWN) {
-                    result.append(" In: " + in, StyledString.QUALIFIER_STYLER);
-                }
-                if (out != NetTransferMode.UNKNOWN) {
-                    result
-                        .append(" Out: " + out, StyledString.QUALIFIER_STYLER);
-                }
-
-                final JingleFileTransferManager manager = jingleManager
-                    .getValue();
-                if (manager != null) {
-
-                    final FileTransferConnection connection = manager
-                        .getConnection(jid);
-
-                    if (connection != null) {
-                        final JingleConnectionState state = connection
-                            .getState();
-                        result.append(" [" + state + "]",
-                            StyledString.QUALIFIER_STYLER);
-                    }
                 }
             }
             return result;
@@ -640,34 +596,6 @@ public class RosterView extends ViewPart {
         // Make sure that we get all dependencies injected
         Saros.reinject(this);
 
-        jingleManager
-            .addAndNotify(new ValueChangeListener<JingleFileTransferManager>() {
-
-                IJingleStateListener stateListener = new IJingleStateListener() {
-                    public void setState(JID jid, JingleConnectionState state) {
-                        log.debug("JingleFileTransferManager sent state"
-                            + " update for " + Util.prefix(jid) + ": " + state);
-                        refreshRosterTree(jid);
-                    }
-                };
-
-                JingleFileTransferManager currentManager = null;
-
-                public void setValue(JingleFileTransferManager newValue) {
-
-                    if (currentManager != null) {
-                        currentManager.removeJingleStateListener(stateListener);
-                    }
-
-                    currentManager = newValue;
-
-                    if (currentManager != null) {
-                        currentManager.addJingleStateListener(stateListener);
-                    }
-                    refreshRosterTree(true);
-                }
-            });
-
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
     }
 
@@ -862,7 +790,7 @@ public class RosterView extends ViewPart {
             this.viewer, discoManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
         this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
-        this.testAction = new ConnectionTestAction(saros, connectionTestManager,
-            this.viewer);
+        this.testAction = new ConnectionTestAction(saros,
+            connectionTestManager, this.viewer);
     }
 }

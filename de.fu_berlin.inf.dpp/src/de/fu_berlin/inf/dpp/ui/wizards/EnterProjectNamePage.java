@@ -98,8 +98,8 @@ class EnterProjectNamePage extends WizardPage {
      */
     protected void updateConnectionStatus() {
 
-        switch (dataTransferManager
-            .getIncomingTransferMode(joinSessionWizard.process.getPeer())) {
+        switch (dataTransferManager.getTransferMode(joinSessionWizard.process
+            .getPeer())) {
         case JINGLETCP:
         case JINGLEUDP:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");

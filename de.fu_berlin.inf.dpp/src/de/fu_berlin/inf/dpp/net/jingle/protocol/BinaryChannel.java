@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import com.google.protobuf.ByteString;
 
@@ -98,6 +99,7 @@ public class BinaryChannel {
     protected Socket socket;
     protected InputStream inputStream;
     protected OutputStream outputStream;
+    private BytestreamSession session;
 
     /**
      * NetTransferMode to identify the transport method of the underlying socket
@@ -138,6 +140,15 @@ public class BinaryChannel {
         inputStream = new BufferedInputStream(socket.getInputStream());
     }
 
+    public BinaryChannel(BytestreamSession session, NetTransferMode mode)
+        throws IOException {
+        this.session = session;
+        this.transferMode = mode;
+
+        outputStream = new BufferedOutputStream(session.getOutputStream());
+        inputStream = new BufferedInputStream(session.getInputStream());
+    }
+
     /**
      * Run the BinaryChannels main loop until the next IncomingTransferObject is
      * received.
@@ -171,7 +182,6 @@ public class BinaryChannel {
                 BinaryPacket packet = BinaryPacket
                     .parseDelimitedFrom(inputStream);
                 if (packet == null) {
-                    log.debug("Socket closed.");
                     throw new EOFException();
                 }
 
@@ -287,6 +297,9 @@ public class BinaryChannel {
     public void sendDirect(TransferDescription transferDescription,
         byte[] data, SubMonitor progress) throws IOException,
         SarosCancellationException {
+
+        if (!isConnected())
+            throw new IOException("BinaryChannel is closed");
 
         int countData = Math.max(0, data.length / CHUNKSIZE) + 1;
         progress.beginTask("send direct", countData + 1);
@@ -431,7 +444,9 @@ public class BinaryChannel {
      */
     public void dispose() {
         try {
-            if (socket != null && !socket.isClosed())
+            if (session != null)
+                session.close();
+            if (socket != null && socket.isClosed())
                 socket.close();
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
@@ -441,6 +456,16 @@ public class BinaryChannel {
         inputStream = null;
         outputStream = null;
         socket = null;
+        if (session != null)
+            try {
+                session.close();
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
     }
 
     /**

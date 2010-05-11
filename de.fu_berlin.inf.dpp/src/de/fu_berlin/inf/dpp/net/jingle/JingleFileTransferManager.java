@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
@@ -29,8 +32,10 @@ import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -50,29 +55,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class JingleFileTransferManager {
 
-    public enum JingleConnectionState {
-        /**
-         * A jingle connection starts in this state. It is not ready for sending
-         * yet. Trying to send will block.
-         */
-        INIT,
-        /**
-         * The jingle connection is ready for sending.
-         */
-        ESTABLISHED,
-        /**
-         * The jingle connection has been closed correctly. Trying to send will
-         * reopen the connection.
-         */
-        CLOSED,
-        /**
-         * The jingle connection has been closed on error. Trying to send will
-         * always return immediately.
-         */
-        ERROR
-    }
-
-    public class FileTransferConnection {
+    public class FileTransferConnection implements IConnection {
 
         protected final JID jid;
 
@@ -80,7 +63,7 @@ public class JingleFileTransferManager {
 
         protected JingleSession session = null;
 
-        protected JingleFileTransferSession fileTransfer = null;
+        protected JingleFileTransferSession fileTransferSession = null;
 
         public FileTransferConnection(JID jid) {
             this.jid = jid;
@@ -100,8 +83,8 @@ public class JingleFileTransferManager {
         }
 
         public NetTransferMode getTransferMode() {
-            if (fileTransfer != null) {
-                return fileTransfer.getConnectionType();
+            if (fileTransferSession != null) {
+                return fileTransferSession.getConnectionType();
             } else {
                 return NetTransferMode.UNKNOWN;
             }
@@ -112,7 +95,35 @@ public class JingleFileTransferManager {
         }
 
         public JingleFileTransferSession getFileTransfer() {
-            return fileTransfer;
+            return fileTransferSession;
+        }
+
+        public synchronized void close() {
+            if (fileTransferSession != null) {
+                fileTransferSession.shutdown();
+                fileTransferSession = null;
+            }
+        }
+
+        public NetTransferMode getMode() {
+            return getTransferMode();
+        }
+
+        public JID getPeer() {
+            return jid;
+        }
+
+        public void send(TransferDescription data, byte[] content,
+            SubMonitor progress) throws IOException, SarosCancellationException {
+
+            try {
+
+                fileTransferSession.getConnection().send(data, content,
+                    progress);
+            } catch (IOException e) {
+                close();
+                throw e;
+            }
         }
     }
 
@@ -122,8 +133,6 @@ public class JingleFileTransferManager {
     private XMPPConnection xmppConnection;
 
     private JingleManager jm;
-
-    protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
     private Map<JID, FileTransferConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, FileTransferConnection>());
@@ -151,12 +160,11 @@ public class JingleFileTransferManager {
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, remoteCandidate, localCandidate, null, jingleSession,
-                fileTransferListener, remoteJID, incomingExtProv);
+                dataTransferManager, remoteJID);
 
-            // TODO Make sure we don't need to do this asynchronously
             newSession.initialize();
 
-            connections.get(remoteJID).fileTransfer = newSession;
+            connections.get(remoteJID).fileTransferSession = newSession;
 
             if (newSession.isConnected()) {
                 log.debug("Jingle [" + remoteJID.getName()
@@ -164,6 +172,12 @@ public class JingleFileTransferManager {
                     + newSession.getConnectionType());
                 connections.get(remoteJID).setState(
                     JingleConnectionState.ESTABLISHED);
+
+                if (!isInitiator(jingleSession)) {
+                    dataTransferManager.connectionChanged(remoteJID,
+                        connections.get(remoteJID));
+                }
+
             } else {
                 log.debug("Jingle [" + remoteJID.getName()
                     + "] Media Session - Failure");
@@ -198,17 +212,15 @@ public class JingleFileTransferManager {
 
     protected Saros saros;
 
-    protected IJingleFileTransferListener fileTransferListener;
+    protected DataTransferManager dataTransferManager;
 
     public JingleFileTransferManager(Saros saros, XMPPConnection connection,
-        IJingleFileTransferListener listener,
-        IncomingTransferObjectExtensionProvider incomingExtProv) {
+        DataTransferManager dataTransferManager) {
         this.xmppConnection = connection;
         this.saros = saros;
-        this.incomingExtProv = incomingExtProv;
 
         // Add another layer of indirection
-        this.fileTransferListener = listener;
+        this.dataTransferManager = dataTransferManager;
 
         log.debug("Starting to initialize jingle file transfer manager.");
         initialize();
@@ -222,10 +234,6 @@ public class JingleFileTransferManager {
         final String stunServer = prefStore.getString(PreferenceConstants.STUN);
         final int stunServerPort = Integer.parseInt(prefStore
             .getString(PreferenceConstants.STUN_PORT));
-
-        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-        // "stunserver.org", 3478);
-        // STUNTransportManager stun = new STUNTransportManager();
 
         ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
             stunServer, stunServerPort);
@@ -246,7 +254,6 @@ public class JingleFileTransferManager {
                 try {
                     JID jid = new JID(request.getFrom());
                     FileTransferConnection incoming = connections.get(jid);
-
                     // If we already have a session, which is not CLOSED then
                     // return
                     if (incoming != null
@@ -384,118 +391,6 @@ public class JingleFileTransferManager {
     }
 
     /**
-     * Send the given binary content via jingle using the given transfer
-     * settings. Will create a jingle session on demand and block until the data
-     * has been send.
-     * 
-     * Note that only one JingleSession can be created at the same time.
-     * 
-     * @throws IOException
-     */
-    public NetTransferMode send(final TransferDescription transferDescription,
-        final byte[] content, SubMonitor progress)
-        throws SarosCancellationException, JingleSessionException, IOException {
-
-        JID toJID = transferDescription.getRecipient();
-
-        FileTransferConnection connection = initialize(toJID);
-
-        if (connection.state == JingleConnectionState.ESTABLISHED) {
-            try {
-                return connection.fileTransfer.send(transferDescription,
-                    content, progress);
-            } catch (JingleSessionException e) {
-                connection.setState(JingleConnectionState.CLOSED);
-                throw e;
-            } catch (IOException e) {
-                connection.setState(JingleConnectionState.CLOSED);
-                throw e;
-            }
-        } else {
-            // WARN: If we want to reconnect, then we should not set this to ERROR
-            // Because connections are never retried once in ERROR state
-            // To fix this it is necessary that to find a way 
-            connection.setState(JingleConnectionState.ERROR);
-            throw new JingleSessionException(Util.prefix(toJID)
-                + "Could not establish connection when trying to send");
-        }
-    }
-
-    protected synchronized FileTransferConnection initialize(JID toJID)
-        throws JingleSessionException {
-
-        FileTransferConnection connection = connections.get(toJID);
-
-        if (connection == null
-            || connection.state == JingleConnectionState.CLOSED) {
-            connection = startJingleSession(toJID);
-        }
-
-        if (connection.state == JingleConnectionState.INIT) {
-            waitForConnection(connection);
-        }
-
-        return connection;
-    }
-
-    /**
-     * Will wait up to 30 Seconds for the given FileTransferConnection get out
-     * of state INIT
-     */
-    public void waitForConnection(FileTransferConnection connection) {
-
-        InterruptedException interrupted = null;
-
-        int i = 0;
-        while (connection.state == JingleConnectionState.INIT && i < 60) {
-            if (i % 2 == 0)
-                log.debug(Util.prefix(connection.jid)
-                    + "Waiting for Init since " + (i * 500) / 1000 + "s");
-            i++;
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                interrupted = e;
-            }
-        }
-
-        if (interrupted != null) {
-            log.error("Code not designed to be interruptable", interrupted);
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private FileTransferConnection startJingleSession(JID toJID)
-        throws JingleSessionException {
-
-        log.debug(Util.prefix(toJID) + "Start Session");
-
-        FileTransferConnection connection = new FileTransferConnection(toJID);
-        connections.put(toJID, connection);
-        // Inform listeners
-        connection.setState(connection.getState());
-
-        try {
-            JingleSession session = jm.createOutgoingJingleSession(toJID
-                .toString());
-            connection.session = session;
-
-            // Hook listeners
-            initJingleListener(connection, toJID);
-
-            // Start the call
-            session.startOutgoing();
-        } catch (XMPPException e) {
-            connection.session = null;
-            connection.setState(JingleConnectionState.ERROR);
-
-            throw new JingleSessionException("Jingle [" + toJID.getName()
-                + "] Error connecting", e);
-        }
-        return connection;
-    }
-
-    /**
      * remove all jingle sessions.
      */
     public void terminateAllJingleSessions() {
@@ -525,7 +420,7 @@ public class JingleFileTransferManager {
                         + jid, e1);
             } finally {
                 outgoing.session = null;
-                outgoing.fileTransfer = null;
+                outgoing.fileTransferSession = null;
             }
         }
     }
@@ -568,5 +463,93 @@ public class JingleFileTransferManager {
 
     public void removeJingleStateListener(IJingleStateListener listener) {
         stateListeners.remove(listener);
+    }
+
+    public IConnection connect(JID toJID, SubMonitor progress)
+        throws JingleSessionException, IOException {
+        log.debug(Util.prefix(toJID) + "Start Session");
+
+        FileTransferConnection connection = new FileTransferConnection(toJID);
+
+        connections.put(toJID, connection);
+        try {
+            // Hook listeners
+
+            JingleSession session = jm.createOutgoingJingleSession(toJID
+                .toString());
+            connection.session = session;
+            initJingleListener(connection, toJID);
+
+            // Start the call
+            session.startOutgoing();
+        } catch (XMPPException e) {
+            throw new JingleSessionException("Jingle [" + toJID.getName()
+                + "] Error connecting", e);
+        }
+
+        InterruptedException interrupted = null;
+
+        int i = 0;
+        while (connection.state == JingleConnectionState.INIT && i < 60) {
+            if (i % 2 == 0)
+                log.debug(Util.prefix(connection.jid)
+                    + "Waiting for Init since " + (i * 500) / 1000 + "s");
+            i++;
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                interrupted = e;
+            }
+        }
+
+        if (interrupted != null) {
+            log.error("Code not designed to be interruptable", interrupted);
+            Thread.currentThread().interrupt();
+        }
+
+        if (connection.state != JingleConnectionState.ESTABLISHED)
+            throw new IOException();
+
+        return connection;
+    }
+
+    static FutureTask<JingleFileTransferManager> jingleManager;
+
+    public boolean isNUll() {
+        return jingleManager == null;
+    }
+
+    public void cancelThread() {
+        jingleManager.cancel(true);
+
+    }
+
+    public void setNull() {
+        jingleManager = null;
+    }
+
+    public static JingleFileTransferManager getManager(final Saros saros,
+        final XMPPConnection connection, final DataTransferManager dtm) {
+        jingleManager = new FutureTask<JingleFileTransferManager>(
+            new Callable<JingleFileTransferManager>() {
+                public JingleFileTransferManager call() throws Exception {
+                    return new JingleFileTransferManager(saros, connection, dtm);
+                }
+            });
+
+        Thread executor = new Thread(jingleManager);
+        executor.start();
+        JingleFileTransferManager tmp = null;
+        try {
+            tmp = jingleManager.get();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return tmp;
     }
 }
