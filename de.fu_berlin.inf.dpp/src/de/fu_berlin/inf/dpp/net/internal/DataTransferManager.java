@@ -270,7 +270,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         } catch (IOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
-                + ":", e.getCause());
+                + ":", e); // TODO: e.getCause()
             throw e;
         }
     }
@@ -412,6 +412,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         NetTransferMode(String name, String xep, boolean p2p) {
             this.name = name;
+            this.xep = xep;
             this.p2p = p2p;
         }
 

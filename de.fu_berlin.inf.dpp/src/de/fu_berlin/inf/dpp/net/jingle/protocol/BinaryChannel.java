@@ -335,6 +335,10 @@ public class BinaryChannel {
             try {
                 while (confirmation == null && isConnected()
                     && !progress.isCanceled()) {
+                    /*
+                     * TODO: will wait forever with unidirecitonal Connections
+                     * (Socks5 with OpenFire proxy)
+                     */
                     confirmation = remoteTransfers.get(objectid).poll(500,
                         TimeUnit.MILLISECONDS);
                 }
@@ -456,16 +460,7 @@ public class BinaryChannel {
         inputStream = null;
         outputStream = null;
         socket = null;
-        if (session != null)
-            try {
-                session.close();
-                IOUtils.closeQuietly(inputStream);
-                IOUtils.closeQuietly(outputStream);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
+        session = null;
     }
 
     /**

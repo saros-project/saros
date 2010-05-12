@@ -71,7 +71,8 @@ public class BytestreamConnection implements IConnection {
                         if (!progress.isCanceled())
                             progress.setCanceled(true);
                     } catch (SocketException e) {
-                        log.debug(prefix() + "Connection was closed by me.");
+                        log.debug(prefix() + "Connection was closed by me. "
+                            + e.getCause());
                         close();
                         return;
                     } catch (EOFException e) {

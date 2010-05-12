@@ -32,18 +32,19 @@ public abstract class BytestreamTransport implements Transport {
     public IConnection connect(final JID peer, SubMonitor progress)
         throws IOException {
 
-        BytestreamSession session = null;
         try {
-            session = manager.establishSession(peer.toString());
+
+            BytestreamSession session = establishSession(peer.toString(), true);
+
+            return new BytestreamConnection(peer, getNetTransferMode(),
+                session, dtm);
+
         } catch (XMPPException e) {
             throw new CausedIOException(e);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Interrupted while initiating Session:", e); // TODO
+            throw new CausedIOException(e);
         }
-
-        return new BytestreamConnection(peer, getNetTransferMode(), session,
-            dtm);
     }
 
     /* 
@@ -61,31 +62,49 @@ public abstract class BytestreamTransport implements Transport {
 
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
-            BytestreamSession session;
-            try {
-                session = request.accept();
-            } catch (XMPPException e) {
-                log.error("Socket crashed:", e); // TODO
+            BytestreamSession session = acceptRequest(request);
+
+            if (session == null)
                 return;
-            } catch (InterruptedException e) {
-                log.error("Socket crashed:", e); // TODO
-                return;
-            }
 
             JID peer = new JID(request.getFrom());
             try {
                 dtm.connectionChanged(peer, new BytestreamConnection(peer,
                     getNetTransferMode(), session, dtm));
             } catch (IOException e) {
-                log.error("Socket crashed:"); // TODO
+                log.error("Bytestream session crashed:", e); // TODO
                 try {
                     session.close();
                 } catch (IOException e1) {
-                    //
+                    // 
                 }
             }
         }
     };
+
+    protected BytestreamSession establishSession(String peer,
+        boolean isInitiator) throws XMPPException, IOException,
+        InterruptedException {
+        return manager.establishSession(peer.toString());
+    }
+
+    /**
+     * 
+     * @param request
+     * @return BytestreamSession, null if failed or if answer for bidirectional
+     *         connecting (to be overridden in subclasses)
+     */
+    protected BytestreamSession acceptRequest(BytestreamRequest request) {
+        BytestreamSession session = null;
+        try {
+            session = request.accept();
+        } catch (XMPPException e) {
+            log.error("Socket crashed:", e); // TODO
+        } catch (InterruptedException e) {
+            log.error("Interrupted while initiating Session:", e); // TODO
+        }
+        return session;
+    }
 
     public void prepareXMPPConnection(XMPPConnection connection,
         DataTransferManager dtm) {
