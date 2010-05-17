@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.SmackConfiguration;
@@ -20,32 +23,12 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 public class Socks5Transport extends BytestreamTransport {
 
-    protected static final int BIDIRECTIONAL = 5;
-    protected static final int TEST_TIMEOUT = 1000;
+    static final int BIDIRECTIONAL_TEST_INT = 5;
+    static final int TEST_TIMEOUT = 1000;
 
     private static Logger log = Logger.getLogger(Socks5Transport.class);
 
-    protected HashMap<String, Callback> runningConnects = new HashMap<String, Callback>();
-    protected HashMap<String, Socks5BytestreamSession> runningRequests = new HashMap<String, Socks5BytestreamSession>();
-
-    protected boolean isConnectingTo(String peer) {
-        return (runningConnects.get(peer) != null);
-    }
-
-    protected class Callback {
-        Socks5BytestreamSession pending = null;
-        public Thread thread;
-
-        public Socks5BytestreamSession get() throws InterruptedException,
-            XMPPException {
-            return pending;
-        }
-
-        public void set(Socks5BytestreamSession session) {
-            pending = session;
-        }
-
-    }
+    protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
 
     @Override
     protected BytestreamSession acceptRequest(BytestreamRequest request) {
@@ -56,39 +39,54 @@ public class Socks5Transport extends BytestreamTransport {
         if (inSession == null || inSession.isDirect())
             return inSession;
 
+        // return if bidirectional
         if (checkStreamDirection(inSession, true))
             return inSession;
 
-        String peer = request.getFrom();
         // any running connects?
-        Callback callback = runningConnects.get(peer);
+        String peer = request.getFrom();
+        Exchanger<Socks5BytestreamSession> exchanger = runningConnects
+            .get(peer);
 
-        if (callback != null) {
-            // if so, transmit session and wake up
-            callback.set(inSession);
-            callback.thread.resume();
+        // if so, transmit session to running connect thread and return null
+        if (exchanger != null) {
+            try {
+                exchanger.exchange(inSession);
+            } catch (InterruptedException e) {
+                log.debug(prefix()
+                    + "Wrapping bidirectional string was interrupted.");
+            }
             return null;
         }
+
+        // else try to establish a new stream to send
         try {
 
+            /*
+             * Use the superclass method because we know already the stream
+             * direction and there is no need to wait for another request
+             */
             Socks5BytestreamSession outSession = (Socks5BytestreamSession) super
-                .establishSession(peer, false);
+                .establishSession(peer);
 
+            log.debug(prefix() + "wrapped bidirectional session established");
             return new WrappedBidirectionalSocks5BytestreamSession(inSession,
                 outSession);
 
         } catch (XMPPException e) {
             log
                 .error(
-                    "Socket crashed for wrapped directional Socks5 connections:",
+                    prefix()
+                        + "Socket crashed while initiating sending session (for wrapping)",
                     e);
-        } catch (InterruptedException e) {
-            log.error("Interrupted while initiating Session:", e);
         } catch (IOException e) {
             log
                 .error(
-                    "Socket crashed for wrapped directional Socks5 connections:",
+                    prefix()
+                        + "Socket crashed while initiating sending session (for wrapping)",
                     e);
+        } catch (InterruptedException e) {
+            log.error(prefix() + "Interrupted while initiating Session:", e);
         }
 
         try {
@@ -100,90 +98,93 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     @Override
-    protected BytestreamSession establishSession(String peer,
-        boolean isInitiator) throws XMPPException, IOException,
-        InterruptedException {
+    protected BytestreamSession establishSession(String peer)
+        throws XMPPException, IOException, InterruptedException {
 
-        Callback callback = new Callback();
-        callback.thread = Thread.currentThread();
-        runningConnects.put(peer, callback);
+        // before establishing, we have to put the exchanger to the map
+        Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
+        runningConnects.put(peer, exchanger);
 
-        Socks5BytestreamSession outSession = (Socks5BytestreamSession) super
-            .establishSession(peer, isInitiator);
+        try {
 
-        if (outSession.isDirect())
-            return outSession;
+            Socks5BytestreamSession outSession = (Socks5BytestreamSession) super
+                .establishSession(peer);
 
-        if (checkStreamDirection(outSession, false))
-            return outSession;
+            if (outSession.isDirect())
+                return outSession;
 
-        Socks5BytestreamSession inSession = runningRequests.get(peer);
+            // return if bidirectional
+            if (checkStreamDirection(outSession, false))
+                return outSession;
 
-        if (inSession == null) {
-            // final Callback callback = new Callback();
-            // callback.thread = Thread.currentThread();
-            // runningConnects.put(peer, callback);
-            // TODO this is a hack only
+            // else wait for request
+            try {
+                Socks5BytestreamSession inSession = exchanger.exchange(null,
+                    TEST_TIMEOUT, TimeUnit.MILLISECONDS);
 
-            if (callback.get() == null)
-                callback.thread.suspend();
+                log.debug(prefix()
+                    + "wrapped bidirectional session established");
+                return new WrappedBidirectionalSocks5BytestreamSession(
+                    inSession, outSession);
 
-            /*
-             * FutureTask<Socks5BytestreamSession> future = new
-             * FutureTask<Socks5BytestreamSession>( new
-             * Callable<Socks5BytestreamSession>() { public
-             * Socks5BytestreamSession call() throws Exception {
-             * 
-             * return callback.get(); } });
-             */
+            } catch (TimeoutException e) {
+                throw new IOException(prefix()
+                    + "wrapping a bidirectional session timed out. ("
+                    + TEST_TIMEOUT + "ms)");
+            }
 
-            inSession = callback.get();
-
+        } finally {
+            runningConnects.remove(peer);
         }
-
-        return new WrappedBidirectionalSocks5BytestreamSession(inSession,
-            outSession);
     }
 
-    @SuppressWarnings( { "null" })
     protected boolean checkStreamDirection(Socks5BytestreamSession session,
-        boolean toSendFirst) {
+        boolean sendFirst) {
 
-        OutputStream out = null;
-        InputStream in = null;
         try {
-            session.setReadTimeout(TEST_TIMEOUT);
-
-            out = session.getOutputStream();
-            in = session.getInputStream();
+            OutputStream out = session.getOutputStream();
+            InputStream in = session.getInputStream();
             int test = 0;
 
-            if (toSendFirst) {
-                out.write(BIDIRECTIONAL);
+            session.setReadTimeout(TEST_TIMEOUT);
+
+            if (sendFirst) {
+                out.write(BIDIRECTIONAL_TEST_INT);
                 test = in.read();
             } else {
                 test = in.read();
-                out.write(BIDIRECTIONAL);
+                out.write(BIDIRECTIONAL_TEST_INT);
             }
 
-            if (test == BIDIRECTIONAL) {
-                log.debug("SOCKS5 stream is bidirectional. ("
-                    + (toSendFirst ? "sending" : "receiving") + ")");
+            if (test == BIDIRECTIONAL_TEST_INT) {
+                log.debug(prefix() + "stream is bidirectional. ("
+                    + (sendFirst ? "sending" : "receiving") + ")");
                 return true;
+            } else {
+                log
+                    .error(prefix()
+                        + "stream seems to work but recieved wrong result: "
+                        + test);
             }
 
         } catch (SocketTimeoutException ste) {
+            // expected if unidirectional stream
+        } catch (IOException e) {
             log
-                .debug("SOCKS5 stream is unidirectional. Trying to wrap bidirectional one.");
-        } catch (Exception e) {
-            log.error("SOCKS5 stream direction test failed. ", e);
+                .error(
+                    prefix()
+                        + "stream direction test failed. However, still trying to establish a bidirectional one.",
+                    e);
+            return false;
         }
-        // TODO: how to close and reopen the streams
-
         /*
-         * finally { try { out.close(); in.close(); } catch (IOException e) { //
-         * } }
+         * Note: the streams cannot be closed here - even not the unused ones -
+         * as setting the timeout later on would throw an exception
          */
+
+        log.debug(prefix()
+            + "stream is unidirectional. Trying to wrap bidirectional one.");
+
         return false;
     }
 
@@ -192,18 +193,17 @@ public class Socks5Transport extends BytestreamTransport {
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
         socks5ByteStreamManager.setTargetResponseTimeout(10000);
+        // TODO remove this line
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
-        /*
-         * neuer Port für jede Verbindung: bspw. für mehrere Eclipse auf einem
-         * Rechner oder um Probleme mit belegten Ports zu umgehen
-         */
-        SmackConfiguration
-            .setLocalSocks5ProxyPort((int) (Math.random() * 300) + 7778);
         return socks5ByteStreamManager;
     }
 
     @Override
     protected NetTransferMode getNetTransferMode() {
         return NetTransferMode.SOCKS5;
+    }
+
+    private String prefix() {
+        return "[" + getNetTransferMode().name() + "] ";
     }
 }

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
@@ -58,6 +59,10 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Saros saros;
 
     protected SessionIDObservable sessionID;
+
+    static {
+        SmackConfiguration.setLocalSocks5ProxyPort(-7777);
+    }
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
         PreferenceUtils prefUtils) {

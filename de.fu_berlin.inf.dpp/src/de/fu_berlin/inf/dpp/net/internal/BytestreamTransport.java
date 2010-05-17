@@ -34,15 +34,14 @@ public abstract class BytestreamTransport implements Transport {
 
         try {
 
-            BytestreamSession session = establishSession(peer.toString(), true);
-
+            BytestreamSession session = establishSession(peer.toString());
             return new BytestreamConnection(peer, getNetTransferMode(),
                 session, dtm);
 
         } catch (XMPPException e) {
             throw new CausedIOException(e);
         } catch (InterruptedException e) {
-            log.error("Interrupted while initiating Session:", e); // TODO
+            log.debug("Interrupted while initiating session:");
             throw new CausedIOException(e);
         }
     }
@@ -72,7 +71,7 @@ public abstract class BytestreamTransport implements Transport {
                 dtm.connectionChanged(peer, new BytestreamConnection(peer,
                     getNetTransferMode(), session, dtm));
             } catch (IOException e) {
-                log.error("Bytestream session crashed:", e); // TODO
+                log.error("Bytestream session crashed:", e);
                 try {
                     session.close();
                 } catch (IOException e1) {
@@ -82,9 +81,8 @@ public abstract class BytestreamTransport implements Transport {
         }
     };
 
-    protected BytestreamSession establishSession(String peer,
-        boolean isInitiator) throws XMPPException, IOException,
-        InterruptedException {
+    protected BytestreamSession establishSession(String peer)
+        throws XMPPException, IOException, InterruptedException {
         return manager.establishSession(peer.toString());
     }
 
@@ -99,9 +97,9 @@ public abstract class BytestreamTransport implements Transport {
         try {
             session = request.accept();
         } catch (XMPPException e) {
-            log.error("Socket crashed:", e); // TODO
+            log.error("Socket crashed, no session for request established:", e);
         } catch (InterruptedException e) {
-            log.error("Interrupted while initiating Session:", e); // TODO
+            log.debug("Interrupted while initiating new session.");
         }
         return session;
     }
