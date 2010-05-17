@@ -5,24 +5,33 @@ Saros build file for automatic plugin builds using ant4eclipse
 Florian Thiel <florian.thiel@fu-berlin.de>,
 created: 20100217
 
-USE: Run this in the project root directory as
-ant -lib lib/ant4eclipse -Declipse.plugin.dir=<DIR> [TARGET]
+use: ant -lib [ANT4ECLIPSE_LIBS]
+         -Declipse.plugin.dir=DIR
+         -Dant4eclipse.dir=DIR
+         -Dcobertura.dir=DIR
+         -Dfeature.version=DIR
+         TARGET
 
 NOTE:
 - requires following properties to be set
   eclipse.plugin.dir=DIR (path to eclipse plugin libs)
   cobertura.dir=DIR (cobertura libs)
-- you can force the use of a specific JDK by uncommemnting
+  ant4eclipse.dir=DIR (ant4eclipse root)
+  feature.version=VERSION (version # for feature (has to match plugin)
+- you can force the use of a specific JDK by uncommenting
   the <ant4eclipse:installedJREs> section below
 -->
 
 <project name="build.saros" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
 
+	<!-- define ant-contrib macros -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	
 	<!-- define ant4eclipse tasks -->
 	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
 
 	<!-- import the ant4eclipse pde macros -->
-	<import file="${basedir}/ant4eclipse/macros/a4e-pde-macros.xml" />
+	<import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
 
 	<path id="cobertura.classpath">
 		<fileset dir="${cobertura.dir}">
@@ -63,7 +72,7 @@ NOTE:
 	<!-- Targets -->
 	<target name="build">
 		<mkdir dir="${uninstrumented.dir}" />
-		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectname="Saros" targetplatformid="saros.target.platform" destination="${uninstrumented.dir}" />
+		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="Saros" targetplatformid="saros.target.platform" destination="${uninstrumented.dir}" />
 	</target>
 
 	<target name="test" depends="build">
@@ -103,7 +112,26 @@ NOTE:
 		     if you don't want them included in the report -->
 		<cobertura-report format="${cobertura.format}" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
 	</target>
-
+	
+	<!-- NOTE: only executes if feature.version is set -->
+	<target name="buildSarosFeature">
+		<if>
+			<isset property="feature.version"/>
+			<then>
+				<mkdir dir="${uninstrumented.dir}" />
+				<buildFeature
+					workspaceDirectory="${workspaceDirectory}"
+					featureId="de.fu_berlin.inf.dpp.feature"
+					featureVersion="${feature.version}"
+					targetplatformid="saros.target.platform"
+					destination="${uninstrumented.dir}" />
+			</then>
+			<else>
+				<echo message="buildSarosFeature called without feature.version being set. Not executing!" />
+			</else>
+		</if>
+	</target>
+		
 	<target name="clean">
 		<delete failonerror="false" dir="${build.dir}" />
 	</target>
