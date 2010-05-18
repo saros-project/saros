@@ -74,7 +74,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -214,7 +214,7 @@ public class RosterView extends ViewPart {
             // we are not interested in transfer statistics
         }
 
-        public void connectionChanged(JID jid, IConnection connection) {
+        public void connectionChanged(JID jid, IBytestreamConnection connection) {
             refreshRosterTree(jid);
         }
     }

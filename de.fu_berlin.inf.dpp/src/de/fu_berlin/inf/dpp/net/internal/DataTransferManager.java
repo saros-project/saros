@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
@@ -35,7 +34,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * This class is responsible for handling all transfers of binary data
  */
 @Component(module = "net")
-public class DataTransferManager implements ConnectionSessionListener {
+public class DataTransferManager implements ConnectionSessionListener,
+    IBytestreamConnectionListener {
 
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
@@ -54,25 +54,19 @@ public class DataTransferManager implements ConnectionSessionListener {
     @Inject
     protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
-    protected Transport[] transports;
+    protected ITransport[] transports;
 
     protected Saros saros;
 
     protected SessionIDObservable sessionID;
 
-    static {
-        SmackConfiguration.setLocalSocks5ProxyPort(-7777);
-    }
-
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
         PreferenceUtils prefUtils) {
         this.sessionID = sessionID;
         this.saros = saros;
-        this.transports = new Transport[] { // 
-        // new JingleTransport(saros),
-        new Socks5Transport(),
-        // new IBBTransport()
-        };
+        this.transports = new ITransport[] { // 
+        // new JingleTransport(saros)
+        new Socks5Transport(), new IBBTransport() };
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -185,22 +179,22 @@ public class DataTransferManager implements ConnectionSessionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
-    protected Map<JID, IConnection> connections = Collections
-        .synchronizedMap(new HashMap<JID, IConnection>());
+    protected Map<JID, IBytestreamConnection> connections = Collections
+        .synchronizedMap(new HashMap<JID, IBytestreamConnection>());
 
     /**
      * This interface is used to define various transport methods (probably only
      * XEP 65 SOCKS5 and XEP 16x Jingle
      */
-    public interface Transport {
+    public interface ITransport {
 
         /**
          * Try to connect to the given user.
          * 
          * @throws IOException
          */
-        public IConnection connect(JID peer, SubMonitor progress)
-            throws IOException;
+        public IBytestreamConnection connect(JID peer, SubMonitor progress)
+            throws IOException, InterruptedException;
 
         public void prepareXMPPConnection(XMPPConnection connection,
             DataTransferManager dtm);
@@ -213,7 +207,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     /**
      * A IConnection is responsible for sending data to a particular user
      */
-    public interface IConnection {
+    public interface IBytestreamConnection {
 
         public JID getPeer();
 
@@ -255,7 +249,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         JID recipient = transferData.recipient;
 
-        IConnection connection = getConnection(recipient, progress.newChild(1));
+        IBytestreamConnection connection = getConnection(recipient, progress
+            .newChild(1));
 
         try {
             StoppWatch watch = new StoppWatch().start();
@@ -275,26 +270,30 @@ public class DataTransferManager implements ConnectionSessionListener {
         } catch (IOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
-                + ":", e); // TODO: e.getCause()
+                + ":", e.getCause());
             throw e;
         }
     }
 
-    public IConnection getConnection(JID recipient, SubMonitor progress)
-        throws IOException {
+    public IBytestreamConnection getConnection(JID recipient,
+        SubMonitor progress) throws IOException, SarosCancellationException {
 
-        IConnection connection = connections.get(recipient);
+        IBytestreamConnection connection = connections.get(recipient);
         if (connection != null)
             return connection;
 
-        return connect(recipient, progress);
+        try {
+            return connect(recipient, progress);
+        } catch (InterruptedException e) {
+            throw new SarosCancellationException("Connecting cancelled");
+        }
     }
 
-    public IConnection connect(JID recipient, SubMonitor progress)
-        throws IOException {
+    public IBytestreamConnection connect(JID recipient, SubMonitor progress)
+        throws IOException, InterruptedException {
 
-        IConnection connection = null;
-        for (Transport transport : transports) {
+        IBytestreamConnection connection = null;
+        for (ITransport transport : transports) {
             try {
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
@@ -318,20 +317,23 @@ public class DataTransferManager implements ConnectionSessionListener {
         return transferModeDispatch;
     }
 
-    public void connectionChanged(JID peer, IConnection connection2) {
+    public synchronized void connectionChanged(JID peer,
+        IBytestreamConnection connection2) {
         connections.put(peer, connection2);
         transferModeDispatch.connectionChanged(peer, connection2);
     }
 
-    public void connectionClosed(JID peer, IConnection connection2) {
+    public synchronized void connectionClosed(JID peer,
+        IBytestreamConnection connection2) {
         if (connection2 == connections.get(peer)) {
             connections.remove(peer);
         }
+        connections.remove(new JID("JURKE@saros"));
         transferModeDispatch.connectionChanged(peer, null);
     }
 
     public NetTransferMode getTransferMode(JID jid) {
-        IConnection connection = connections.get(jid);
+        IBytestreamConnection connection = connections.get(jid);
         if (connection == null)
             return null;
         return connection.getMode();
@@ -374,7 +376,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
 
         public synchronized void connectionChanged(JID jid,
-            IConnection connection) {
+            IBytestreamConnection connection) {
             for (ITransferModeListener listener : listeners) {
                 try {
                     listener.connectionChanged(jid, connection);
@@ -399,7 +401,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
 
-        for (Transport transport : transports) {
+        for (ITransport transport : transports) {
             transport.prepareXMPPConnection(connection, this);
         }
     }
@@ -408,7 +410,9 @@ public class DataTransferManager implements ConnectionSessionListener {
         UNKNOWN("???", "???", false), IBB("IBB", "XEP 47 In-Band Bytestream",
             false), JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), JINGLEUDP(
             "Jingle/UDP", "XEP 166 Jingle (UDP)", true), HANDMADE("Chat",
-            "Chat", false), SOCKS5("SOCKS5", "XEP 65 SOCKS5", true);
+            "Chat", false), SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), SOCKS5_MEDIATED(
+            "SOCKS5 (mediated)", "XEP 65 SOCKS5", true), SOCKS5_DIRECT(
+            "SOCKS5 (direct)", "XEP 65 SOCKS5", true);
 
         String name;
         String xep;
@@ -459,17 +463,18 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     public void disposeConnection() {
 
-        for (Transport transport : transports) {
+        for (ITransport transport : transports) {
             transport.disposeXMPPConnection();
         }
 
         fileTransferQueue.clear();
 
-        List<IConnection> openConnections;
+        List<IBytestreamConnection> openConnections;
         synchronized (connections) {
-            openConnections = new ArrayList<IConnection>(connections.values());
+            openConnections = new ArrayList<IBytestreamConnection>(connections
+                .values());
         }
-        for (IConnection connection : openConnections) {
+        for (IBytestreamConnection connection : openConnections) {
             if (connection != null)
                 connection.close();
         }

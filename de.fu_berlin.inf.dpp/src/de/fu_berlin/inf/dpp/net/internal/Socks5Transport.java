@@ -5,11 +5,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -23,55 +25,75 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 public class Socks5Transport extends BytestreamTransport {
 
-    static final int BIDIRECTIONAL_TEST_INT = 5;
-    static final int TEST_TIMEOUT = 1000;
-
     private static Logger log = Logger.getLogger(Socks5Transport.class);
+    private static final int BIDIRECTIONAL_TEST_INT = 5;
+    private static final int TEST_TIMEOUT = 1000;
+    private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
+    private static final Random randomGenerator = new Random();
 
     protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
 
+    private String getNextResponseSessionID() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(RESPONSE_SESSION_ID_PREFIX);
+        buffer.append(Math.abs(randomGenerator.nextLong()));
+        return buffer.toString();
+    }
+
     @Override
-    protected BytestreamSession acceptRequest(BytestreamRequest request) {
+    protected BinaryChannel acceptRequest(BytestreamRequest request)
+        throws IOException, XMPPException, InterruptedException {
 
-        Socks5BytestreamSession inSession = (Socks5BytestreamSession) super
-            .acceptRequest(request);
-
-        if (inSession == null || inSession.isDirect())
-            return inSession;
-
-        // return if bidirectional
-        if (checkStreamDirection(inSession, true))
-            return inSession;
-
-        // any running connects?
+        Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
+            .accept();
         String peer = request.getFrom();
-        Exchanger<Socks5BytestreamSession> exchanger = runningConnects
-            .get(peer);
 
-        // if so, transmit session to running connect thread and return null
-        if (exchanger != null) {
+        if (inSession == null)
+            return null;
+
+        if (inSession.isDirect())
+            return new BinaryChannel(inSession, NetTransferMode.SOCKS5_DIRECT);
+
+        if (isResponse(request)) {
+
+            // get running connect
+            Exchanger<Socks5BytestreamSession> exchanger = runningConnects
+                .get(peer);
+
+            if (exchanger == null) {
+                log
+                    .error(prefix()
+                        + "Received response for wrapped unidirectional SOCKS5 session without a running connect");
+                return null;
+            }
+
             try {
-                exchanger.exchange(inSession);
+                exchanger.exchange(inSession, TEST_TIMEOUT,
+                    TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 log.debug(prefix()
-                    + "Wrapping bidirectional string was interrupted.");
+                    + "Wrapping bidirectional stream was interrupted.");
+            } catch (TimeoutException e) {
+                log
+                    .error(prefix()
+                        + "Wrapping bidirectional stream timed out in Request! Should have happened.");
             }
+            // don't return the session if it is a response
             return null;
         }
 
-        // else try to establish a new stream to send
+        // only check stream direction if no response
+        if (streamIsBidirectional(inSession, true))
+            return new BinaryChannel(inSession, NetTransferMode.SOCKS5_MEDIATED);
+
         try {
 
-            /*
-             * Use the superclass method because we know already the stream
-             * direction and there is no need to wait for another request
-             */
-            Socks5BytestreamSession outSession = (Socks5BytestreamSession) super
-                .establishSession(peer);
+            Socks5BytestreamSession outSession = (Socks5BytestreamSession) establishResponseSession(peer);
 
             log.debug(prefix() + "wrapped bidirectional session established");
-            return new WrappedBidirectionalSocks5BytestreamSession(inSession,
-                outSession);
+            BytestreamSession session = new WrappedBidirectionalSocks5BytestreamSession(
+                inSession, outSession);
+            return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
 
         } catch (XMPPException e) {
             log
@@ -98,8 +120,9 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     @Override
-    protected BytestreamSession establishSession(String peer)
-        throws XMPPException, IOException, InterruptedException {
+    protected BinaryChannel establishBinaryChannel(String peer,
+        SubMonitor progress) throws XMPPException, IOException,
+        InterruptedException {
 
         // before establishing, we have to put the exchanger to the map
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
@@ -107,15 +130,20 @@ public class Socks5Transport extends BytestreamTransport {
 
         try {
 
-            Socks5BytestreamSession outSession = (Socks5BytestreamSession) super
+            Socks5BytestreamSession outSession = (Socks5BytestreamSession) manager
                 .establishSession(peer);
 
             if (outSession.isDirect())
-                return outSession;
+                return new BinaryChannel(outSession,
+                    NetTransferMode.SOCKS5_DIRECT);
 
             // return if bidirectional
-            if (checkStreamDirection(outSession, false))
-                return outSession;
+            if (streamIsBidirectional(outSession, false))
+                return new BinaryChannel(outSession,
+                    NetTransferMode.SOCKS5_MEDIATED);
+
+            progress
+                .subTask("SOCKS5 stream is unidirectional. Waiting for peer to connect ...");
 
             // else wait for request
             try {
@@ -124,8 +152,10 @@ public class Socks5Transport extends BytestreamTransport {
 
                 log.debug(prefix()
                     + "wrapped bidirectional session established");
-                return new WrappedBidirectionalSocks5BytestreamSession(
+                BytestreamSession session = new WrappedBidirectionalSocks5BytestreamSession(
                     inSession, outSession);
+                return new BinaryChannel(session,
+                    NetTransferMode.SOCKS5_MEDIATED);
 
             } catch (TimeoutException e) {
                 throw new IOException(prefix()
@@ -138,7 +168,7 @@ public class Socks5Transport extends BytestreamTransport {
         }
     }
 
-    protected boolean checkStreamDirection(Socks5BytestreamSession session,
+    protected boolean streamIsBidirectional(Socks5BytestreamSession session,
         boolean sendFirst) {
 
         try {
@@ -190,20 +220,83 @@ public class Socks5Transport extends BytestreamTransport {
 
     @Override
     public BytestreamManager getManager(XMPPConnection connection) {
+        SmackConfiguration
+            .setLocalSocks5ProxyPort(7778 + (int) (Math.random() * 300));
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
         socks5ByteStreamManager.setTargetResponseTimeout(10000);
-        // TODO remove this line
-        SmackConfiguration.setLocalSocks5ProxyEnabled(false);
         return socks5ByteStreamManager;
     }
 
+    protected BytestreamSession establishResponseSession(String peer)
+        throws XMPPException, IOException, InterruptedException {
+        return manager.establishSession(peer.toString(), this
+            .getNextResponseSessionID());
+    }
+
+    protected boolean isResponse(BytestreamRequest request) {
+        return request.getSessionID().startsWith(RESPONSE_SESSION_ID_PREFIX);
+    }
+
     @Override
-    protected NetTransferMode getNetTransferMode() {
+    protected NetTransferMode getDefaultNetTransferMode() {
         return NetTransferMode.SOCKS5;
     }
 
     private String prefix() {
-        return "[" + getNetTransferMode().name() + "] ";
+        return "[" + getDefaultNetTransferMode().name() + "] ";
     }
+
+    protected class WrappedBidirectionalSocks5BytestreamSession implements
+        BytestreamSession {
+
+        protected Socks5BytestreamSession in;
+        protected Socks5BytestreamSession out;
+
+        public WrappedBidirectionalSocks5BytestreamSession(
+            Socks5BytestreamSession in, Socks5BytestreamSession out) {
+            this.in = in;
+            this.out = out;
+
+        }
+
+        public void close() throws IOException {
+            IOException e = null;
+
+            try {
+                in.close();
+            } catch (IOException e1) {
+                e = e1;
+            }
+
+            try {
+                out.close();
+            } catch (IOException e1) {
+                e = e1;
+            }
+
+            if (e != null)
+                throw e;
+        }
+
+        public InputStream getInputStream() throws IOException {
+            return in.getInputStream();
+        }
+
+        public OutputStream getOutputStream() throws IOException {
+            return out.getOutputStream();
+        }
+
+        public int getReadTimeout() throws IOException {
+            return in.getReadTimeout();
+        }
+
+        public void setReadTimeout(int timeout) throws IOException {
+            in.setReadTimeout(timeout);
+            // would this make sense?
+            // out.setReadTimeout(timeout);
+        }
+
+    }
+
 }

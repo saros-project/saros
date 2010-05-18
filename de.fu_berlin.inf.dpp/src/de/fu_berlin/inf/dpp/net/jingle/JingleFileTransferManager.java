@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class JingleFileTransferManager {
 
-    public class FileTransferConnection implements IConnection {
+    public class FileTransferConnection implements IBytestreamConnection {
 
         protected final JID jid;
 
@@ -465,7 +465,7 @@ public class JingleFileTransferManager {
         stateListeners.remove(listener);
     }
 
-    public IConnection connect(JID toJID, SubMonitor progress)
+    public IBytestreamConnection connect(JID toJID, SubMonitor progress)
         throws JingleSessionException, IOException {
         log.debug(Util.prefix(toJID) + "Start Session");
 

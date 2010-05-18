@@ -12,12 +12,12 @@ import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.Transport;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
-public abstract class BytestreamTransport implements Transport {
+public abstract class BytestreamTransport implements ITransport {
 
     private static final Logger log = Logger.getLogger(Socks5Transport.class);
 
@@ -29,19 +29,18 @@ public abstract class BytestreamTransport implements Transport {
      * 
      * @return
      */
-    public IConnection connect(final JID peer, SubMonitor progress)
-        throws IOException {
+    public IBytestreamConnection connect(final JID peer, SubMonitor progress)
+        throws IOException, InterruptedException {
+
+        progress.subTask("Try to initiate bytestream with " + toString());
 
         try {
 
-            BytestreamSession session = establishSession(peer.toString());
-            return new BytestreamConnection(peer, getNetTransferMode(),
-                session, dtm);
+            BinaryChannel channel = establishBinaryChannel(peer.toString(),
+                progress);
+            return new BinaryChannelConnection(peer, channel, dtm);
 
         } catch (XMPPException e) {
-            throw new CausedIOException(e);
-        } catch (InterruptedException e) {
-            log.debug("Interrupted while initiating session:");
             throw new CausedIOException(e);
         }
     }
@@ -61,29 +60,36 @@ public abstract class BytestreamTransport implements Transport {
 
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
-            BytestreamSession session = acceptRequest(request);
-
-            if (session == null)
-                return;
-
-            JID peer = new JID(request.getFrom());
             try {
-                dtm.connectionChanged(peer, new BytestreamConnection(peer,
-                    getNetTransferMode(), session, dtm));
+
+                BinaryChannel channel = acceptRequest(request);
+
+                if (channel == null)
+                    return;
+
+                JID peer = new JID(request.getFrom());
+
+                dtm.connectionChanged(peer, new BinaryChannelConnection(peer,
+                    channel, dtm));
+
+            } catch (XMPPException e) {
+                log.error(
+                    "Socket crashed, no session for request established:", e);
             } catch (IOException e) {
-                log.error("Bytestream session crashed:", e);
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // 
-                }
+                log.error(
+                    "Socket crashed, no session for request established:", e);
+            } catch (InterruptedException e) {
+                log.debug("Interrupted while initiating new session.");
             }
         }
     };
 
-    protected BytestreamSession establishSession(String peer)
-        throws XMPPException, IOException, InterruptedException {
-        return manager.establishSession(peer.toString());
+    protected BinaryChannel establishBinaryChannel(String peer,
+        SubMonitor progress) throws XMPPException, IOException,
+        InterruptedException {
+        BytestreamSession session = manager.establishSession(peer.toString());
+
+        return new BinaryChannel(session, getDefaultNetTransferMode());
     }
 
     /**
@@ -91,17 +97,18 @@ public abstract class BytestreamTransport implements Transport {
      * @param request
      * @return BytestreamSession, null if failed or if answer for bidirectional
      *         connecting (to be overridden in subclasses)
+     * @throws InterruptedException
+     * @throws XMPPException
+     * @throws IOException
      */
-    protected BytestreamSession acceptRequest(BytestreamRequest request) {
-        BytestreamSession session = null;
-        try {
-            session = request.accept();
-        } catch (XMPPException e) {
-            log.error("Socket crashed, no session for request established:", e);
-        } catch (InterruptedException e) {
-            log.debug("Interrupted while initiating new session.");
-        }
-        return session;
+    protected BinaryChannel acceptRequest(BytestreamRequest request)
+        throws XMPPException, InterruptedException, IOException {
+        BinaryChannel channel = null;
+
+        BytestreamSession session = request.accept();
+        channel = new BinaryChannel(session, getDefaultNetTransferMode());
+
+        return channel;
     }
 
     public void prepareXMPPConnection(XMPPConnection connection,
@@ -113,10 +120,10 @@ public abstract class BytestreamTransport implements Transport {
 
     @Override
     public String toString() {
-        return getNetTransferMode().getXEP();
+        return getDefaultNetTransferMode().getXEP();
     }
 
-    abstract protected NetTransferMode getNetTransferMode();
+    abstract protected NetTransferMode getDefaultNetTransferMode();
 
     abstract public BytestreamManager getManager(XMPPConnection connection);
 

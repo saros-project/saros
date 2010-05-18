@@ -8,17 +8,15 @@ import java.net.SocketException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryChannel;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class SocketConnection implements IConnection {
+public class SocketConnection implements IBytestreamConnection {
 
     private static final Logger log = Logger.getLogger(SocketConnection.class);
 
@@ -106,16 +104,6 @@ public class SocketConnection implements IConnection {
         this.binaryChannel = new BinaryChannel(socket, this.mode);
         this.receiveThread = new ReceiverThread(binaryChannel);
         this.receiveThread.start();
-    }
-
-    public SocketConnection(JID peer, NetTransferMode mode,
-        BytestreamSession socket, DataTransferManager dtm) throws IOException {
-        this.socket = null;
-        this.listener = dtm;
-        this.mode = mode;
-        this.peer = peer;
-        this.binaryChannel = new BinaryChannel(socket, this.mode);
-
     }
 
     public boolean isConnected() {

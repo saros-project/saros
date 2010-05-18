@@ -7,32 +7,30 @@ import java.net.SocketException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryChannel;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class BytestreamConnection implements IConnection {
+/**
+ * 
+ */
+public class BinaryChannelConnection implements IBytestreamConnection {
 
     private static final Logger log = Logger
-        .getLogger(BytestreamConnection.class);
+        .getLogger(BinaryChannelConnection.class);
 
-    protected BytestreamSession session;
-    private DataTransferManager listener;
+    private IBytestreamConnectionListener listener;
     private BinaryChannel binaryChannel;
     private ReceiverThread receiveThread;
-
-    private NetTransferMode mode;
 
     private JID peer;
 
     protected String prefix() {
-        return mode.toString() + " " + Util.prefix(peer);
+        return this.getMode().toString() + " " + Util.prefix(peer);
     }
 
     protected class ReceiverThread extends Thread {
@@ -52,9 +50,9 @@ public class BytestreamConnection implements IConnection {
             try {
                 while (!isInterrupted()) {
                     /*
-                     * TODO: ask GUI if user wants to get the data. It should
-                     * return a ProgressMonitor with Util#getRunnableContext(),
-                     * that we can use here.
+                     * TODO: if we implement network view it should return a
+                     * ProgressMonitor with Util#getRunnableContext(), that we
+                     * can use here.
                      */
                     SubMonitor progress = SubMonitor
                         .convert(new NullProgressMonitor());
@@ -97,15 +95,11 @@ public class BytestreamConnection implements IConnection {
         }
     }
 
-    public BytestreamConnection(JID peer, NetTransferMode mode,
-        BytestreamSession session, DataTransferManager listener)
-        throws IOException {
-        this.session = session;
-        this.session.setReadTimeout(0);
+    public BinaryChannelConnection(JID peer, BinaryChannel channel,
+        IBytestreamConnectionListener listener) {
         this.listener = listener;
         this.peer = peer;
-        this.mode = mode;
-        this.binaryChannel = new BinaryChannel(session, this.mode);
+        this.binaryChannel = channel;
         this.receiveThread = new ReceiverThread(binaryChannel);
         this.receiveThread.start();
     }
@@ -115,15 +109,17 @@ public class BytestreamConnection implements IConnection {
     }
 
     public void close() {
-        if (binaryChannel != null) {
-            listener.connectionClosed(getPeer(), this);
-            binaryChannel.dispose();
-            binaryChannel = null;
-        }
+        if (!isConnected())
+            return;
+        listener.connectionClosed(getPeer(), this);
+        binaryChannel.dispose();
+        binaryChannel = null;
     }
 
     public NetTransferMode getMode() {
-        return mode;
+        if (binaryChannel == null)
+            return NetTransferMode.UNKNOWN;
+        return binaryChannel.transferMode;
     }
 
     public JID getPeer() {

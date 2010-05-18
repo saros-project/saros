@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp.net.jingle.protocol;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -15,10 +15,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
+import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class BinaryChannelTransferObject implements IncomingTransferObject {
@@ -37,7 +36,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
     protected AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
 
-    protected BinaryChannelTransferObject(BinaryChannel binaryChannel,
+    public BinaryChannelTransferObject(BinaryChannel binaryChannel,
         TransferDescription transferDescription, int objectid) {
 
         this.binaryChannel = binaryChannel;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.jingle.protocol;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,10 +24,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
+import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -99,7 +98,7 @@ public class BinaryChannel {
     protected Socket socket;
     protected InputStream inputStream;
     protected OutputStream outputStream;
-    private BytestreamSession session;
+    protected BytestreamSession session;
 
     /**
      * NetTransferMode to identify the transport method of the underlying socket
@@ -131,6 +130,7 @@ public class BinaryChannel {
      * 
      * @throws IOException
      */
+    @Deprecated
     public BinaryChannel(Socket socket, NetTransferMode transferMode)
         throws IOException {
         this.socket = socket;
@@ -140,9 +140,14 @@ public class BinaryChannel {
         inputStream = new BufferedInputStream(socket.getInputStream());
     }
 
+    public NetTransferMode getTransferMode() {
+        return transferMode;
+    }
+
     public BinaryChannel(BytestreamSession session, NetTransferMode mode)
         throws IOException {
         this.session = session;
+        this.session.setReadTimeout(0); // keep connection alive
         this.transferMode = mode;
 
         outputStream = new BufferedOutputStream(session.getOutputStream());
@@ -335,10 +340,6 @@ public class BinaryChannel {
             try {
                 while (confirmation == null && isConnected()
                     && !progress.isCanceled()) {
-                    /*
-                     * TODO: will wait forever with unidirecitonal Connections
-                     * (Socks5 with OpenFire proxy)
-                     */
                     confirmation = remoteTransfers.get(objectid).poll(500,
                         TimeUnit.MILLISECONDS);
                 }

@@ -8,14 +8,14 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.Transport;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
-public class JingleTransport implements Transport {
+public class JingleTransport implements ITransport {
 
     private Saros saros;
 
@@ -26,7 +26,7 @@ public class JingleTransport implements Transport {
     @Inject
     protected DiscoveryManager discoveryManager;
 
-    public IConnection connect(JID peer, SubMonitor progress)
+    public IBytestreamConnection connect(JID peer, SubMonitor progress)
         throws IOException {
 
         FileTransferConnection connection = null;
