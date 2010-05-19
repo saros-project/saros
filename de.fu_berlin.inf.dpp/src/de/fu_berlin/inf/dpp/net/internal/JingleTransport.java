@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
@@ -65,6 +66,10 @@ public class JingleTransport implements ITransport {
     @Override
     public String toString() {
         return "Jingle/UDP";
+    }
+
+    public NetTransferMode getDefaultNetTransferMode() {
+        return NetTransferMode.JINGLEUDP;
     }
 
 }

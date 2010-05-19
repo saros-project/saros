@@ -22,6 +22,7 @@ import org.jivesoftware.smackx.socks5bytestream.Socks5BytestreamManager;
 import org.jivesoftware.smackx.socks5bytestream.Socks5BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 public class Socks5Transport extends BytestreamTransport {
 
@@ -51,9 +52,6 @@ public class Socks5Transport extends BytestreamTransport {
         if (inSession == null)
             return null;
 
-        if (inSession.isDirect())
-            return new BinaryChannel(inSession, NetTransferMode.SOCKS5_DIRECT);
-
         if (isResponse(request)) {
 
             // get running connect
@@ -78,9 +76,20 @@ public class Socks5Transport extends BytestreamTransport {
                     .error(prefix()
                         + "Wrapping bidirectional stream timed out in Request! Should have happened.");
             }
-            // don't return the session if it is a response
+            /*
+             * don't return a channel if it is a response (handled by running
+             * connect)
+             */
             return null;
         }
+
+        /*
+         * has to be put afterwards: one peer might have direct connections
+         * enabled and the other not
+         */
+
+        if (inSession.isDirect())
+            return new BinaryChannel(inSession, NetTransferMode.SOCKS5_DIRECT);
 
         // only check stream direction if no response
         if (streamIsBidirectional(inSession, true))
@@ -130,6 +139,9 @@ public class Socks5Transport extends BytestreamTransport {
 
         try {
 
+            log.error("Esteablishing new connection with local proxy: "
+                + SmackConfiguration.isLocalSocks5ProxyEnabled());
+
             Socks5BytestreamSession outSession = (Socks5BytestreamSession) manager
                 .establishSession(peer);
 
@@ -148,7 +160,9 @@ public class Socks5Transport extends BytestreamTransport {
             // else wait for request
             try {
                 Socks5BytestreamSession inSession = exchanger.exchange(null,
-                    TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+                    TEST_TIMEOUT + 10000, TimeUnit.MILLISECONDS);
+
+                // TODO: fix half mediated wrapped sessions
 
                 log.debug(prefix()
                     + "wrapped bidirectional session established");
@@ -158,9 +172,9 @@ public class Socks5Transport extends BytestreamTransport {
                     NetTransferMode.SOCKS5_MEDIATED);
 
             } catch (TimeoutException e) {
-                throw new IOException(prefix()
+                throw new CausedIOException(prefix()
                     + "wrapping a bidirectional session timed out. ("
-                    + TEST_TIMEOUT + "ms)");
+                    + TEST_TIMEOUT + "ms)", e);
             }
 
         } finally {
@@ -220,8 +234,6 @@ public class Socks5Transport extends BytestreamTransport {
 
     @Override
     public BytestreamManager getManager(XMPPConnection connection) {
-        SmackConfiguration
-            .setLocalSocks5ProxyPort(7778 + (int) (Math.random() * 300));
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
         socks5ByteStreamManager.setTargetResponseTimeout(10000);
@@ -239,7 +251,7 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     @Override
-    protected NetTransferMode getDefaultNetTransferMode() {
+    public NetTransferMode getDefaultNetTransferMode() {
         return NetTransferMode.SOCKS5;
     }
 

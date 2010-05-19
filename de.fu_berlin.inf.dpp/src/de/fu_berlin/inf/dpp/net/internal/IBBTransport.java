@@ -14,7 +14,7 @@ public class IBBTransport extends BytestreamTransport {
     }
 
     @Override
-    protected NetTransferMode getDefaultNetTransferMode() {
+    public NetTransferMode getDefaultNetTransferMode() {
         return NetTransferMode.IBB;
     }
 

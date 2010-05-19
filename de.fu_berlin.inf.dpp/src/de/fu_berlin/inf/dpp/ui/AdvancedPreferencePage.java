@@ -34,13 +34,33 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         setDescription("Advanced settings geared toward developers and power users.");
     }
 
+    private void createPortFields() {
+
+        addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
+            "File transfer port (needs reconnect):", getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
+            "Try next ports for file transfer if already bound",
+            getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED,
+            "Disable direct file transfer connections (needs reconnect)",
+            getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
+            "Force file transfer over XMPP network (slow, needs reconnect)",
+            getFieldEditorParent()));
+    }
+
     @Override
     protected void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
             "Skype name:", getFieldEditorParent()));
 
-        addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
-            "File transfer port (needs reconnect):", getFieldEditorParent()));
+        createPortFields();
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.SKIP_SYNC_SELECTABLE,
@@ -49,11 +69,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
             "Show Jabber debug window (needs restart).", getFieldEditorParent()));
-
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-            "Avoid direct file transfer connection (needs session restart)",
-            getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(
             PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,

@@ -101,6 +101,25 @@ public class PreferenceUtils {
             PreferenceConstants.MULTI_DRIVER);
     }
 
+    /**
+     * Returns the port for SOCKS5 file transfer. If
+     * PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER is set, a negative
+     * number is returned (smacks will try next free ports above this number)
+     * 
+     * @return port for smacks configuration (negative if to try out ports
+     *         above)
+     */
+    public int getFileTransferPort() {
+        int port = saros.getPreferenceStore().getInt(
+            PreferenceConstants.FILE_TRANSFER_PORT);
+
+        if (saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER))
+            return -port;
+        else
+            return port;
+    }
+
     public boolean isSkipSyncSelectable() {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.SKIP_SYNC_SELECTABLE);

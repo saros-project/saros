@@ -125,6 +125,10 @@ public class JingleFileTransferManager {
                 throw e;
             }
         }
+
+        public boolean isConnected() {
+            return fileTransferSession.isConnected();
+        }
     }
 
     private static Logger log = Logger

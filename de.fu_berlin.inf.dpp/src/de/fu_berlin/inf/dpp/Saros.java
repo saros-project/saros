@@ -436,6 +436,21 @@ public class Saros extends AbstractUIPlugin {
         return isInitialized;
     }
 
+    protected void setBytestreamConnectionProperties() {
+
+        SmackConfiguration.setLocalSocks5ProxyPort(container.getComponent(
+            PreferenceUtils.class).getFileTransferPort());
+
+        SmackConfiguration.setLocalSocks5ProxyEnabled(!getPreferenceStore()
+            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED));
+
+        // TODO: just pasted from before
+        // This disables Jingle if the user has selected to use XMPP
+        // file transfer exclusively
+        JingleManager.setServiceEnabled(connection, !getPreferenceStore()
+            .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+    }
+
     /**
      * This method is called upon plug-in activation
      */
@@ -465,17 +480,9 @@ public class Saros extends AbstractUIPlugin {
                         .getInstanceFor(connection);
                     sdm.addFeature(Saros.NAMESPACE);
 
-                    // This disables Jingle if the user has selected to use XMPP
-                    // file transfer exclusively
-                    JingleManager.setServiceEnabled(connection,
-                        !getPreferenceStore().getBoolean(
-                            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+                    setBytestreamConnectionProperties();
                 }
             });
-
-        // set local Socks5 proxy port
-        SmackConfiguration.setLocalSocks5ProxyPort(getPreferenceStore().getInt(
-            PreferenceConstants.FILE_TRANSFER_PORT));
 
         setupLoggers();
         log.info("Starting Saros " + sarosVersion + " running:\n"

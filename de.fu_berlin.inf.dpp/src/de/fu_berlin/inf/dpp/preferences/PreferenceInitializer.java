@@ -49,6 +49,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.put(PreferenceConstants.SKYPE_USERNAME, "");
         prefs.putBoolean(PreferenceConstants.DEBUG, false);
         prefs.putInt(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+        prefs.putBoolean(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
+            true);
+        prefs
+            .putBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
         prefs.putBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
         prefs.putInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
         prefs.put(PreferenceConstants.STUN, "stunserver.org");

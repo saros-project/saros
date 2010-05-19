@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
@@ -25,13 +26,15 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.StoppWatch;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This class is responsible for handling all transfers of binary data
+ * This class is responsible for handling all transfers of binary data. It
+ * maintains a map of established connections and tries to reuse them.
  */
 @Component(module = "net")
 public class DataTransferManager implements ConnectionSessionListener,
@@ -54,19 +57,32 @@ public class DataTransferManager implements ConnectionSessionListener,
     @Inject
     protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
-    protected ITransport[] transports;
-
     protected Saros saros;
 
-    protected SessionIDObservable sessionID;
+    protected PreferenceUtils preferenceUtils;
+
+    protected ArrayList<ITransport> transports = null;
+    protected SessionIDObservable sessionID = null;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils prefUtils) {
+        PreferenceUtils preferenceUtils) {
         this.sessionID = sessionID;
         this.saros = saros;
-        this.transports = new ITransport[] { // 
-        // new JingleTransport(saros)
-        new Socks5Transport(), new IBBTransport() };
+        this.preferenceUtils = preferenceUtils;
+        this.initTransports();
+    }
+
+    protected boolean useSocks5() {
+        return !saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+    }
+
+    protected void initTransports() {
+
+        this.transports = new ArrayList<ITransport>();
+        if (useSocks5())
+            transports.add(new Socks5Transport());
+        transports.add(new IBBTransport());
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -202,6 +218,8 @@ public class DataTransferManager implements ConnectionSessionListener,
         public void disposeXMPPConnection();
 
         public String toString();
+
+        public NetTransferMode getDefaultNetTransferMode();
     }
 
     /**
@@ -212,6 +230,8 @@ public class DataTransferManager implements ConnectionSessionListener,
         public JID getPeer();
 
         public void close();
+
+        public boolean isConnected();
 
         /**
          * If this call returns the data has been send successfully, otherwise
@@ -246,6 +266,7 @@ public class DataTransferManager implements ConnectionSessionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
+        log.debug("sending data ... ");
 
         JID recipient = transferData.recipient;
 
@@ -279,10 +300,16 @@ public class DataTransferManager implements ConnectionSessionListener,
         SubMonitor progress) throws IOException, SarosCancellationException {
 
         IBytestreamConnection connection = connections.get(recipient);
-        if (connection != null)
+
+        if (connection != null) {
+            log.debug("Reuse bytestream connection " + connection.getMode());
             return connection;
+        }
 
         try {
+            log.error("Esteablishing new connection with local proxy: "
+                + SmackConfiguration.isLocalSocks5ProxyEnabled());
+
             return connect(recipient, progress);
         } catch (InterruptedException e) {
             throw new SarosCancellationException("Connecting cancelled");
@@ -307,7 +334,7 @@ public class DataTransferManager implements ConnectionSessionListener,
         if (connection == null)
             throw new IOException(Util.prefix(recipient)
                 + "Exhausted all transport options: "
-                + Arrays.toString(transports));
+                + Arrays.toString(transports.toArray()));
         else
             connectionChanged(recipient, connection);
         return connection;
@@ -319,16 +346,18 @@ public class DataTransferManager implements ConnectionSessionListener,
 
     public synchronized void connectionChanged(JID peer,
         IBytestreamConnection connection2) {
+        // TODO: remove this lines?
+        IBytestreamConnection old = connections.get(peer);
+        assert (old == null || !old.isConnected());
+
+        log.debug("Bytestream connection changed " + connection2.getMode());
         connections.put(peer, connection2);
         transferModeDispatch.connectionChanged(peer, connection2);
     }
 
     public synchronized void connectionClosed(JID peer,
         IBytestreamConnection connection2) {
-        if (connection2 == connections.get(peer)) {
-            connections.remove(peer);
-        }
-        connections.remove(new JID("JURKE@saros"));
+        connections.remove(peer);
         transferModeDispatch.connectionChanged(peer, null);
     }
 
@@ -395,15 +424,76 @@ public class DataTransferManager implements ConnectionSessionListener,
     }
 
     /**
-     * Set up Socks5 and Jingle for the given XMPPConnection
+     * Sets up the transports for the given XMPPConnection
      */
     public void prepareConnection(final XMPPConnection connection) {
+        assert (this.connectionIsDisposed());
+
+        log.debug("prepare bytestreams for XMPP connection: "
+            + connection.getConnectionID());
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
+
+        this.updatePreferences();
 
         for (ITransport transport : transports) {
             transport.prepareXMPPConnection(connection, this);
         }
+    }
+
+    protected boolean updateSocks5Support() {
+        if (useSocks5()) {
+            for (ITransport t : transports) {
+                if (t.getDefaultNetTransferMode() == NetTransferMode.SOCKS5) {
+                    return false;
+                }
+
+            }
+            transports.add(0, new Socks5Transport());
+            return true;
+        } else {
+            for (ITransport t : transports) {
+                if (t.getDefaultNetTransferMode() == NetTransferMode.SOCKS5) {
+                    transports.remove(t);
+                    return true;
+                }
+            }
+            return false;
+
+        }
+    }
+
+    protected boolean updateSmackConfiguration(StringBuilder sb) {
+        boolean changed = false;
+
+        int port = preferenceUtils.getFileTransferPort();
+
+        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
+            SmackConfiguration.setLocalSocks5ProxyPort(preferenceUtils
+                .getFileTransferPort());
+            changed = true;
+        }
+
+        boolean socks5proxy = !saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
+
+        if (socks5proxy != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+            SmackConfiguration.setLocalSocks5ProxyEnabled(socks5proxy);
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    protected void updatePreferences() {
+        updateSocks5Support();
+        // done by SessionCreationListener
+        // updateSmackConfiguration(sb);
+
+    }
+
+    public boolean connectionIsDisposed() {
+        return connection == null;
     }
 
     public enum NetTransferMode {

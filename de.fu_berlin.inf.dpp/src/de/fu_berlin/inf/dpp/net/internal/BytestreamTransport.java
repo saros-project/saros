@@ -13,8 +13,8 @@ import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 public abstract class BytestreamTransport implements ITransport {
@@ -123,7 +123,7 @@ public abstract class BytestreamTransport implements ITransport {
         return getDefaultNetTransferMode().getXEP();
     }
 
-    abstract protected NetTransferMode getDefaultNetTransferMode();
+    abstract public NetTransferMode getDefaultNetTransferMode();
 
     abstract public BytestreamManager getManager(XMPPConnection connection);
 
