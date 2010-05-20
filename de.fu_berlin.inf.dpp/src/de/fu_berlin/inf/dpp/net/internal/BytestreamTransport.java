@@ -17,6 +17,9 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
+/*
+ * see {#link de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport} 
+ */
 public abstract class BytestreamTransport implements ITransport {
 
     private static final Logger log = Logger.getLogger(Socks5Transport.class);
@@ -24,10 +27,11 @@ public abstract class BytestreamTransport implements ITransport {
     protected BytestreamManager manager;
     protected DataTransferManager dtm;
 
-    /*
-     * @param peer the JID of the user we'd like to connect
+    /**
+     * @param peer
+     *            the JID of the user we'd like to connect
      * 
-     * @return
+     * @return a new connection to peer
      */
     public IBytestreamConnection connect(final JID peer, SubMonitor progress)
         throws IOException, InterruptedException {
@@ -45,9 +49,6 @@ public abstract class BytestreamTransport implements ITransport {
         }
     }
 
-    /* 
-     * 
-     */
     public void disposeXMPPConnection() {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
@@ -56,6 +57,10 @@ public abstract class BytestreamTransport implements ITransport {
         }
     }
 
+    /**
+     * handles incoming requests and informs the DataTransferManager if a new
+     * connection got established
+     */
     protected BytestreamListener streamListener = new BytestreamListener() {
 
         public void incomingBytestreamRequest(BytestreamRequest request) {
@@ -95,7 +100,7 @@ public abstract class BytestreamTransport implements ITransport {
     /**
      * 
      * @param request
-     * @return BytestreamSession, null if failed or if answer for bidirectional
+     * @return BytestreamSession, null if failed or if answer for unidirectional
      *         connecting (to be overridden in subclasses)
      * @throws InterruptedException
      * @throws XMPPException
@@ -103,10 +108,10 @@ public abstract class BytestreamTransport implements ITransport {
      */
     protected BinaryChannel acceptRequest(BytestreamRequest request)
         throws XMPPException, InterruptedException, IOException {
-        BinaryChannel channel = null;
 
         BytestreamSession session = request.accept();
-        channel = new BinaryChannel(session, getDefaultNetTransferMode());
+        BinaryChannel channel = new BinaryChannel(session,
+            getDefaultNetTransferMode());
 
         return channel;
     }

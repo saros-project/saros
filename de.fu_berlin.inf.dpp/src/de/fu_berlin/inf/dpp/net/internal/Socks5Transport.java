@@ -24,6 +24,11 @@ import org.jivesoftware.smackx.socks5bytestream.Socks5BytestreamSession;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
+/**
+ * Transport class for SOCKS5 In case of unidirectional connections (i.e.
+ * OpenFire) a second connection is established and both are wrapped in a
+ * bidirectional one (see {#link WrappedBidirectionalSocks5BytestreamSession})
+ */
 public class Socks5Transport extends BytestreamTransport {
 
     private static Logger log = Logger.getLogger(Socks5Transport.class);
@@ -84,10 +89,9 @@ public class Socks5Transport extends BytestreamTransport {
         }
 
         /*
-         * has to be put afterwards: one peer might have direct connections
-         * enabled and the other not
+         * if the session is directed has to checked after isResponse: one peer
+         * might have a local SOCKS5 proxy enabled and the other not
          */
-
         if (inSession.isDirect())
             return new BinaryChannel(inSession, NetTransferMode.SOCKS5_DIRECT);
 
@@ -162,7 +166,8 @@ public class Socks5Transport extends BytestreamTransport {
                 Socks5BytestreamSession inSession = exchanger.exchange(null,
                     TEST_TIMEOUT + 10000, TimeUnit.MILLISECONDS);
 
-                // TODO: fix half mediated wrapped sessions
+                // TODO: fix half mediated wrapped sessions (requires smacks API
+                // change)
 
                 log.debug(prefix()
                     + "wrapped bidirectional session established");
@@ -259,6 +264,10 @@ public class Socks5Transport extends BytestreamTransport {
         return "[" + getDefaultNetTransferMode().name() + "] ";
     }
 
+    /**
+     * Wraps two Socks5BytestreamSessions in one, where for the first one, "in",
+     * the InputStream has to work, for the second one, "out", the OutputStream.
+     */
     protected class WrappedBidirectionalSocks5BytestreamSession implements
         BytestreamSession {
 
@@ -305,8 +314,6 @@ public class Socks5Transport extends BytestreamTransport {
 
         public void setReadTimeout(int timeout) throws IOException {
             in.setReadTimeout(timeout);
-            // would this make sense?
-            // out.setReadTimeout(timeout);
         }
 
     }

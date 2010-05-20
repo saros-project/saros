@@ -72,16 +72,16 @@ public class DataTransferManager implements ConnectionSessionListener,
         this.initTransports();
     }
 
-    protected boolean useSocks5() {
-        return !saros.getPreferenceStore().getBoolean(
+    protected boolean fileTranferByChatOnly() {
+        return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 
     protected void initTransports() {
-
         this.transports = new ArrayList<ITransport>();
-        if (useSocks5())
+        if (!fileTranferByChatOnly()) {
             transports.add(new Socks5Transport());
+        }
         transports.add(new IBBTransport());
     }
 
@@ -200,7 +200,7 @@ public class DataTransferManager implements ConnectionSessionListener,
 
     /**
      * This interface is used to define various transport methods (probably only
-     * XEP 65 SOCKS5 and XEP 16x Jingle
+     * XEP 65 SOCKS5, XEP 47 in-band bytestream and XEP 16x Jingle
      */
     public interface ITransport {
 
@@ -321,6 +321,8 @@ public class DataTransferManager implements ConnectionSessionListener,
 
         IBytestreamConnection connection = null;
         for (ITransport transport : transports) {
+            log.debug("Try to establish bytestream using "
+                + transport.getDefaultNetTransferMode());
             try {
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
@@ -441,55 +443,48 @@ public class DataTransferManager implements ConnectionSessionListener,
         }
     }
 
-    protected boolean updateSocks5Support() {
-        if (useSocks5()) {
+    protected void updateSupportedTransports() {
+        if (fileTranferByChatOnly()) {
+            for (ITransport t : transports)
+                if (t.getDefaultNetTransferMode() != NetTransferMode.IBB) {
+                    t.disposeXMPPConnection();
+                    transports.remove(t);
+                }
+        } else {
             for (ITransport t : transports) {
                 if (t.getDefaultNetTransferMode() == NetTransferMode.SOCKS5) {
-                    return false;
+                    return;
                 }
 
             }
             transports.add(0, new Socks5Transport());
-            return true;
-        } else {
-            for (ITransport t : transports) {
-                if (t.getDefaultNetTransferMode() == NetTransferMode.SOCKS5) {
-                    transports.remove(t);
-                    return true;
-                }
-            }
-            return false;
-
         }
     }
 
-    protected boolean updateSmackConfiguration(StringBuilder sb) {
-        boolean changed = false;
-
-        int port = preferenceUtils.getFileTransferPort();
-
-        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
-            SmackConfiguration.setLocalSocks5ProxyPort(preferenceUtils
-                .getFileTransferPort());
-            changed = true;
-        }
-
-        boolean socks5proxy = !saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
-
-        if (socks5proxy != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
-            SmackConfiguration.setLocalSocks5ProxyEnabled(socks5proxy);
-            changed = true;
-        }
-
-        return changed;
-    }
+    // protected boolean updateSmackConfiguration(StringBuilder sb) {
+    // boolean changed = false;
+    //
+    // int port = preferenceUtils.getFileTransferPort();
+    //
+    // if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
+    // SmackConfiguration.setLocalSocks5ProxyPort(preferenceUtils
+    // .getFileTransferPort());
+    // changed = true;
+    // }
+    //
+    // boolean socks5proxy = !saros.getPreferenceStore().getBoolean(
+    // PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
+    //
+    // if (socks5proxy != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+    // SmackConfiguration.setLocalSocks5ProxyEnabled(socks5proxy);
+    // changed = true;
+    // }
+    //
+    // return changed;
+    // }
 
     protected void updatePreferences() {
-        updateSocks5Support();
-        // done by SessionCreationListener
-        // updateSmackConfiguration(sb);
-
+        updateSupportedTransports();
     }
 
     public boolean connectionIsDisposed() {
