@@ -5,7 +5,7 @@
 
 # expects to be called in the Saros project directory
 
-if [ $# == 0 ]
+if [ $# -eq 0 ]
 then
 	echo "Usage: $0 [OPTIONAL ANT ARGS] TARGET [TARGET]..."
 	echo
@@ -30,9 +30,15 @@ VM_ARGS_DEFAULT="-Xms512m -Xmx1024m -XX:MaxPermSize=256m"
 
 export ANT_OPTS
 
+# Building feature requires feature version,
+# assuming it's the same as in the plugin manifest
+PLUGIN_VERSION=`grep Bundle-Version META-INF/MANIFEST.MF | cut -d' ' -f2`
+
 ant\
  -lib $ANT4ECLIPSE_ROOT/libs\
  -lib $ANT4ECLIPSE_ROOT\
  -Dcobertura.dir=$COBERTURA_ROOT\
  -Dant4eclipse.dir=$ANT4ECLIPSE_ROOT\
+ -Dfeature.version=$PLUGIN_VERSION\
  -Declipse.plugin.dir=$ECLIPSE_DIR/plugins $@
+ 
