@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  * towards developers and power users and that are not necessary for normal use.
  * 
  * @author rdjemili
+ * @author jurke
  */
 @Component(module = "prefs")
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
@@ -63,6 +64,10 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         tryNextPorts.setEnabled(!set, ftGroup);
     }
 
+    /**
+     * Adds a group with bytestream connection specific options with listeners
+     * to enable/disable invalid options
+     */
     protected void createPortFields() {
 
         ftGroup = new Group(getFieldEditorParent(), SWT.NONE);

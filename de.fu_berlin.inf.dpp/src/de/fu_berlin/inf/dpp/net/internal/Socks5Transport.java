@@ -25,9 +25,12 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
- * Transport class for SOCKS5 In case of unidirectional connections (i.e.
- * OpenFire) a second connection is established and both are wrapped in a
+ * Transport class for SOCKS5 bytestreams. Mediated connections might be
+ * unidirectional (i.e. OpenFire), in that case a second connection is
+ * established from the peer. If none of them is direct both are wrapped in a
  * bidirectional one (see {#link WrappedBidirectionalSocks5BytestreamSession})
+ * 
+ * @author jurke
  */
 public class Socks5Transport extends BytestreamTransport {
 
@@ -184,6 +187,7 @@ public class Socks5Transport extends BytestreamTransport {
 
             progress
                 .subTask("SOCKS5 stream is unidirectional. Waiting for peer to connect ...");
+            progress.worked(5);
 
             // else wait for request
             try {

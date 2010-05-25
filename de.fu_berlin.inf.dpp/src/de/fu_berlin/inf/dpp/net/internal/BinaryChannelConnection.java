@@ -16,7 +16,10 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
+ * Encapsulates a BinaryChannel to a particular peer
  * 
+ * see {#link
+ * de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection}
  */
 public class BinaryChannelConnection implements IBytestreamConnection {
 

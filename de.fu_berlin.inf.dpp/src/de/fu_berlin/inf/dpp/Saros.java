@@ -466,7 +466,7 @@ public class Saros extends AbstractUIPlugin {
             }
             if (proxyEnabled) {
                 sb.append(" Starting.");
-                Socks5Proxy.getSocks5Proxy().start();
+                proxy.start();
             }
             log.debug(sb);
         }

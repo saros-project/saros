@@ -31,7 +31,7 @@ import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.IBytestreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -63,7 +63,7 @@ public class JingleFileTransferSession extends JingleMediaSession implements
 
     public static final int TIMEOUTSECONDS = 30;
 
-    protected DataTransferManager dataTransferManager;
+    protected IBytestreamConnectionListener connectionListener;
 
     private UDPSelectorProvider udpSelectorProvider;
 
@@ -90,7 +90,7 @@ public class JingleFileTransferSession extends JingleMediaSession implements
      * @param jingleSession
      *            may be null, the existing JingleSession which we are a part
      *            of.
-     * @param dataTransferManager
+     * @param connectionListener
      *            We will notify this dtm if we receive files from the remote
      *            side.
      * @param connectTo
@@ -100,11 +100,11 @@ public class JingleFileTransferSession extends JingleMediaSession implements
     public JingleFileTransferSession(PayloadType payloadType,
         TransportCandidate remote, TransportCandidate local,
         String mediaLocator, JingleSession jingleSession,
-        DataTransferManager dataTransferManager, JID connectTo) {
+        IBytestreamConnectionListener connectionListener, JID connectTo) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
         this.connectTo = connectTo;
-        this.dataTransferManager = dataTransferManager;
+        this.connectionListener = connectionListener;
         this.initialize();
     }
 

@@ -6,6 +6,11 @@ import org.jivesoftware.smackx.ibb.InBandBytestreamManager;
 
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
+/**
+ * Transport class for in-band bytestreams
+ * 
+ * @author jurke
+ */
 public class IBBTransport extends BytestreamTransport {
 
     private static IBBTransport instance = null;

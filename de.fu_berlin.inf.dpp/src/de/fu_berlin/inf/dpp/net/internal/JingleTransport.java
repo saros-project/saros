@@ -34,7 +34,7 @@ public class JingleTransport implements ITransport {
 
     private Saros saros;
     private JingleFileTransferManager manager;
-    private DataTransferManager dtm;
+    private IBytestreamConnectionListener connectionListener;
     private static JingleTransport instance = null;
 
     private JingleTransport(Saros saros) {
@@ -53,7 +53,7 @@ public class JingleTransport implements ITransport {
         progress.subTask("Try to initiate bytestream with " + toString());
         BinaryChannel channel = establishBinaryChannel(peer.toString(),
             progress);
-        return new BinaryChannelConnection(peer, channel, dtm);
+        return new BinaryChannelConnection(peer, channel, connectionListener);
     }
 
     public void disposeXMPPConnection() {
@@ -104,14 +104,15 @@ public class JingleTransport implements ITransport {
     }
 
     public void prepareXMPPConnection(XMPPConnection connection,
-        DataTransferManager dtm) {
-        this.dtm = dtm;
+        IBytestreamConnectionListener listener) {
+        this.connectionListener = listener;
         manager = getManager(connection);
         manager.addIncomingBytestreamListener(streamListener);
     }
 
     public JingleFileTransferManager getManager(XMPPConnection connection) {
-        return JingleFileTransferManager.getManager(saros, connection, dtm);
+        return JingleFileTransferManager.getManager(saros, connection,
+            connectionListener);
     }
 
     @Override

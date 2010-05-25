@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.BinaryChannel;
 import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.IBytestreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -127,7 +127,7 @@ public class JingleFileTransferManager {
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, remoteCandidate, localCandidate, null, jingleSession,
-                dataTransferManager, remoteJID);
+                connectionListener, remoteJID);
 
             connections.get(remoteJID).fileTransferSession = newSession;
 
@@ -147,9 +147,9 @@ public class JingleFileTransferManager {
 
                         e.printStackTrace();
                     }
-                    dataTransferManager.connectionChanged(remoteJID,
+                    connectionListener.connectionChanged(remoteJID,
                         new BinaryChannelConnection(remoteJID, channel,
-                            dataTransferManager));
+                            connectionListener));
                 }
             } else {
                 log.debug("Jingle [" + remoteJID.getName()
@@ -184,15 +184,15 @@ public class JingleFileTransferManager {
 
     protected Saros saros;
 
-    protected DataTransferManager dataTransferManager;
+    protected IBytestreamConnectionListener connectionListener;
 
     public JingleFileTransferManager(Saros saros, XMPPConnection connection,
-        DataTransferManager dataTransferManager) {
+        IBytestreamConnectionListener listener) {
         this.xmppConnection = connection;
         this.saros = saros;
 
         // Add another layer of indirection
-        this.dataTransferManager = dataTransferManager;
+        this.connectionListener = listener;
         log.debug("Starting to initialize jingle file transfer manager.");
         initialize();
         log.debug("Initialized jingle file transfer manager.");
@@ -391,11 +391,13 @@ public class JingleFileTransferManager {
     }
 
     public static JingleFileTransferManager getManager(final Saros saros,
-        final XMPPConnection connection, final DataTransferManager dtm) {
+        final XMPPConnection connection,
+        final IBytestreamConnectionListener listener) {
         jingleManagerTask = new FutureTask<JingleFileTransferManager>(
             new Callable<JingleFileTransferManager>() {
                 public JingleFileTransferManager call() throws Exception {
-                    return new JingleFileTransferManager(saros, connection, dtm);
+                    return new JingleFileTransferManager(saros, connection,
+                        listener);
                 }
             });
 

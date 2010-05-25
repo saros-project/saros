@@ -25,7 +25,7 @@ public abstract class BytestreamTransport implements ITransport {
     private static final Logger log = Logger.getLogger(Socks5Transport.class);
 
     protected BytestreamManager manager;
-    protected DataTransferManager dtm;
+    protected IBytestreamConnectionListener connectionListener;
 
     /**
      * @param peer
@@ -42,24 +42,28 @@ public abstract class BytestreamTransport implements ITransport {
 
             BinaryChannel channel = establishBinaryChannel(peer.toString(),
                 progress);
-            return new BinaryChannelConnection(peer, channel, dtm);
+            return new BinaryChannelConnection(peer, channel,
+                connectionListener);
 
         } catch (XMPPException e) {
             throw new CausedIOException(e);
         }
     }
 
+    /**
+     * Disposes the transport method. Doesn't close running connections (to be
+     * done by DataTransferManager).
+     */
     public void disposeXMPPConnection() {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
-            // socks5ByteStreamManager.disableService();
             manager = null;
         }
     }
 
     /**
-     * handles incoming requests and informs the DataTransferManager if a new
-     * connection got established
+     * Handles incoming requests and informs the IBytestreamConnectionListener
+     * if a new connection got established
      */
     protected BytestreamListener streamListener = new BytestreamListener() {
 
@@ -74,8 +78,9 @@ public abstract class BytestreamTransport implements ITransport {
 
                 JID peer = new JID(request.getFrom());
 
-                dtm.connectionChanged(peer, new BinaryChannelConnection(peer,
-                    channel, dtm));
+                connectionListener.connectionChanged(peer,
+                    new BinaryChannelConnection(peer, channel,
+                        connectionListener));
 
             } catch (XMPPException e) {
                 log.error(
@@ -89,6 +94,16 @@ public abstract class BytestreamTransport implements ITransport {
         }
     };
 
+    /**
+     * Establishes a BinaryChannel to a peer.
+     * 
+     * @param peer
+     * @param progress
+     * @return BinaryChannel to peer
+     * @throws XMPPException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     protected BinaryChannel establishBinaryChannel(String peer,
         SubMonitor progress) throws XMPPException, IOException,
         InterruptedException {
@@ -98,10 +113,13 @@ public abstract class BytestreamTransport implements ITransport {
     }
 
     /**
+     * Handles a BytestreamRequest requests and returns a BinaryChannel. If null
+     * is returned the request is handled in different manner (i.e. see {#link
+     * Socks5Transport})
+     * 
      * 
      * @param request
-     * @return BytestreamSession, null if failed or if answer for unidirectional
-     *         connecting (to be overridden in subclasses)
+     * @return BinaryChannel or null if handled in different manner
      * @throws InterruptedException
      * @throws XMPPException
      * @throws IOException
@@ -117,8 +135,8 @@ public abstract class BytestreamTransport implements ITransport {
     }
 
     public void prepareXMPPConnection(XMPPConnection connection,
-        DataTransferManager dtm) {
-        this.dtm = dtm;
+        IBytestreamConnectionListener listener) {
+        this.connectionListener = listener;
         manager = getManager(connection);
         manager.addIncomingBytestreamListener(streamListener);
     }

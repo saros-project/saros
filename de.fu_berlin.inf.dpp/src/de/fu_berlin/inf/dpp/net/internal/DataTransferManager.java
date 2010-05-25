@@ -25,7 +25,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.StoppWatch;
@@ -34,6 +33,9 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This class is responsible for handling all transfers of binary data. It
  * maintains a map of established connections and tries to reuse them.
+ * 
+ * @author coezbek
+ * @author jurke
  */
 @Component(module = "net")
 public class DataTransferManager implements ConnectionSessionListener,
@@ -69,24 +71,6 @@ public class DataTransferManager implements ConnectionSessionListener,
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
-    }
-
-    protected boolean fileTranferByChatOnly() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
-    }
-
-    protected void initTransports() {
-        this.transports = new ArrayList<ITransport>();
-        if (!fileTranferByChatOnly()) {
-            addPrimaryTransports();
-        }
-        transports.add(IBBTransport.getTransport());
-    }
-
-    protected void addPrimaryTransports() {
-        transports.add(Socks5Transport.getTransport());
-
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -170,32 +154,6 @@ public class DataTransferManager implements ConnectionSessionListener,
         }
     }
 
-    /**
-     * Adds an incoming transfer.
-     * 
-     * @param transferObjectDescription
-     *            An IncomingTransferObject that has the TransferDescription as
-     *            content to provide information of the incoming transfer to
-     *            upper layers.
-     */
-    public void addIncomingTransferObject(
-        final IncomingTransferObject transferObjectDescription) {
-
-        final TransferDescription description = transferObjectDescription
-            .getTransferDescription();
-
-        final IncomingTransferObject transferObjectData = new LoggingTransferObject(
-            transferObjectDescription);
-
-        // ask upper layer to accept
-        dispatchThreadContext.executeAsDispatch(new Runnable() {
-            public void run() {
-                receiver.processIncomingTransferObject(description,
-                    transferObjectData);
-            }
-        });
-    }
-
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
@@ -217,7 +175,7 @@ public class DataTransferManager implements ConnectionSessionListener,
             throws IOException, InterruptedException;
 
         public void prepareXMPPConnection(XMPPConnection connection,
-            DataTransferManager dtm);
+            IBytestreamConnectionListener listener);
 
         public void disposeXMPPConnection();
 
@@ -254,6 +212,32 @@ public class DataTransferManager implements ConnectionSessionListener,
             SubMonitor callback) throws IOException, SarosCancellationException;
 
         public NetTransferMode getMode();
+    }
+
+    /**
+     * Adds an incoming transfer.
+     * 
+     * @param transferObjectDescription
+     *            An IncomingTransferObject that has the TransferDescription as
+     *            content to provide information of the incoming transfer to
+     *            upper layers.
+     */
+    public void addIncomingTransferObject(
+        final IncomingTransferObject transferObjectDescription) {
+
+        final TransferDescription description = transferObjectDescription
+            .getTransferDescription();
+
+        final IncomingTransferObject transferObjectData = new LoggingTransferObject(
+            transferObjectDescription);
+
+        // ask upper layer to accept
+        dispatchThreadContext.executeAsDispatch(new Runnable() {
+            public void run() {
+                receiver.processIncomingTransferObject(description,
+                    transferObjectData);
+            }
+        });
     }
 
     /**
@@ -350,7 +334,7 @@ public class DataTransferManager implements ConnectionSessionListener,
 
     public synchronized void connectionChanged(JID peer,
         IBytestreamConnection connection2) {
-        // TODO: remove this lines?
+        // TODO: remove these lines
         IBytestreamConnection old = connections.get(peer);
         assert (old == null || !old.isConnected());
 
@@ -359,8 +343,7 @@ public class DataTransferManager implements ConnectionSessionListener,
         transferModeDispatch.connectionChanged(peer, connection2);
     }
 
-    public synchronized void connectionClosed(JID peer,
-        IBytestreamConnection connection2) {
+    public void connectionClosed(JID peer, IBytestreamConnection connection2) {
         connections.remove(peer);
         transferModeDispatch.connectionChanged(peer, null);
     }
@@ -445,43 +428,47 @@ public class DataTransferManager implements ConnectionSessionListener,
         }
     }
 
+    /*
+     * On Henning's suggestion, Saros is not the place to implement free
+     * transport negotiation because this is actually part of XMP-protocol: the
+     * smack API would be the place to implement it and there we should put our
+     * effort.
+     */
     protected void updateFileTransferByChatOnly() {
-        if (fileTranferByChatOnly()) {
-            if (!transports.contains(Socks5Transport.getTransport()))
+        if (preferenceUtils.forceFileTranserByChat()) {
+            if (transports.size() == 1)
                 return;
             else {
-                transports.clear();
                 initTransports();
             }
         } else {
-            if (transports.contains(Socks5Transport.getTransport()))
+            if (transports.size() > 1)
                 return;
             else
                 addPrimaryTransports();
         }
     }
 
-    // protected boolean updateSmackConfiguration(StringBuilder sb) {
-    // boolean changed = false;
-    //
-    // int port = preferenceUtils.getFileTransferPort();
-    //
-    // if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
-    // SmackConfiguration.setLocalSocks5ProxyPort(preferenceUtils
-    // .getFileTransferPort());
-    // changed = true;
-    // }
-    //
-    // boolean socks5proxy = !saros.getPreferenceStore().getBoolean(
-    // PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
-    //
-    // if (socks5proxy != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
-    // SmackConfiguration.setLocalSocks5ProxyEnabled(socks5proxy);
-    // changed = true;
-    // }
-    //
-    // return changed;
-    // }
+    /**
+     * Initializes transport methods respective the set property
+     * (PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT only). The last method is
+     * the in-band bytestream. see also addPrimaryTransports()
+     */
+    protected void initTransports() {
+        this.transports = new ArrayList<ITransport>();
+        if (!preferenceUtils.forceFileTranserByChat()) {
+            addPrimaryTransports();
+        }
+        transports.add(IBBTransport.getTransport());
+    }
+
+    /**
+     * Method to add all primary transport methods (except chat). The transports
+     * are tried in order they are inserted here.
+     */
+    protected void addPrimaryTransports() {
+        transports.add(Socks5Transport.getTransport());
+    }
 
     public boolean connectionIsDisposed() {
         return connection == null;
@@ -495,10 +482,9 @@ public class DataTransferManager implements ConnectionSessionListener,
             "SOCKS5 (mediated)", "XEP 65 SOCKS5", true), SOCKS5_DIRECT(
             "SOCKS5 (direct)", "XEP 65 SOCKS5", true);
 
-        String name;
-        String xep;
-
-        boolean p2p;
+        private String name;
+        private String xep;
+        private boolean p2p;
 
         NetTransferMode(String name, String xep, boolean p2p) {
             this.name = name;
