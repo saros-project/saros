@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
@@ -80,9 +79,14 @@ public class DataTransferManager implements ConnectionSessionListener,
     protected void initTransports() {
         this.transports = new ArrayList<ITransport>();
         if (!fileTranferByChatOnly()) {
-            transports.add(new Socks5Transport());
+            addPrimaryTransports();
         }
-        transports.add(new IBBTransport());
+        transports.add(IBBTransport.getTransport());
+    }
+
+    protected void addPrimaryTransports() {
+        transports.add(Socks5Transport.getTransport());
+
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -307,8 +311,6 @@ public class DataTransferManager implements ConnectionSessionListener,
         }
 
         try {
-            log.error("Esteablishing new connection with local proxy: "
-                + SmackConfiguration.isLocalSocks5ProxyEnabled());
 
             return connect(recipient, progress);
         } catch (InterruptedException e) {
@@ -436,28 +438,26 @@ public class DataTransferManager implements ConnectionSessionListener,
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
 
-        this.updatePreferences();
+        this.updateFileTransferByChatOnly();
 
         for (ITransport transport : transports) {
             transport.prepareXMPPConnection(connection, this);
         }
     }
 
-    protected void updateSupportedTransports() {
+    protected void updateFileTransferByChatOnly() {
         if (fileTranferByChatOnly()) {
-            for (ITransport t : transports)
-                if (t.getDefaultNetTransferMode() != NetTransferMode.IBB) {
-                    t.disposeXMPPConnection();
-                    transports.remove(t);
-                }
-        } else {
-            for (ITransport t : transports) {
-                if (t.getDefaultNetTransferMode() == NetTransferMode.SOCKS5) {
-                    return;
-                }
-
+            if (!transports.contains(Socks5Transport.getTransport()))
+                return;
+            else {
+                transports.clear();
+                initTransports();
             }
-            transports.add(0, new Socks5Transport());
+        } else {
+            if (transports.contains(Socks5Transport.getTransport()))
+                return;
+            else
+                addPrimaryTransports();
         }
     }
 
@@ -482,10 +482,6 @@ public class DataTransferManager implements ConnectionSessionListener,
     //
     // return changed;
     // }
-
-    protected void updatePreferences() {
-        updateSupportedTransports();
-    }
 
     public boolean connectionIsDisposed() {
         return connection == null;

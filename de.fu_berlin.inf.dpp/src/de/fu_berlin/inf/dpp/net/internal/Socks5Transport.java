@@ -37,9 +37,21 @@ public class Socks5Transport extends BytestreamTransport {
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
 
+    private static Socks5Transport instance = null;
+
+    private Socks5Transport() {
+        //
+    }
+
+    public static Socks5Transport getTransport() {
+        if (instance == null)
+            instance = new Socks5Transport();
+        return instance;
+    }
+
     protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
 
-    private String getNextResponseSessionID() {
+    protected String getNextResponseSessionID() {
         StringBuilder buffer = new StringBuilder();
         buffer.append(RESPONSE_SESSION_ID_PREFIX);
         buffer.append(Math.abs(randomGenerator.nextLong()));
@@ -103,6 +115,14 @@ public class Socks5Transport extends BytestreamTransport {
 
             Socks5BytestreamSession outSession = (Socks5BytestreamSession) establishResponseSession(peer);
 
+            if (outSession.isDirect()) {
+                log.debug(prefix()
+                    + "no need for wrapping: response connection is direct.");
+                inSession.close();
+                return new BinaryChannel(outSession,
+                    NetTransferMode.SOCKS5_DIRECT);
+            }
+
             log.debug(prefix() + "wrapped bidirectional session established");
             BytestreamSession session = new WrappedBidirectionalSocks5BytestreamSession(
                 inSession, outSession);
@@ -141,10 +161,14 @@ public class Socks5Transport extends BytestreamTransport {
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
         runningConnects.put(peer, exchanger);
 
-        try {
+        log
+            .debug(prefix()
+                + "establishing new connection with local proxy "
+                + (SmackConfiguration.isLocalSocks5ProxyEnabled() ? "enabled (Port "
+                    + SmackConfiguration.getLocalSocks5ProxyPort() + ")."
+                    : "disabled."));
 
-            log.error("Esteablishing new connection with local proxy: "
-                + SmackConfiguration.isLocalSocks5ProxyEnabled());
+        try {
 
             Socks5BytestreamSession outSession = (Socks5BytestreamSession) manager
                 .establishSession(peer);
@@ -166,8 +190,14 @@ public class Socks5Transport extends BytestreamTransport {
                 Socks5BytestreamSession inSession = exchanger.exchange(null,
                     TEST_TIMEOUT + 10000, TimeUnit.MILLISECONDS);
 
-                // TODO: fix half mediated wrapped sessions (requires smacks API
-                // change)
+                if (inSession.isDirect()) {
+                    log
+                        .debug(prefix()
+                            + " no need for wrapping: response connection is direct.");
+                    outSession.close();
+                    return new BinaryChannel(inSession,
+                        NetTransferMode.SOCKS5_DIRECT);
+                }
 
                 log.debug(prefix()
                     + "wrapped bidirectional session established");
@@ -260,7 +290,7 @@ public class Socks5Transport extends BytestreamTransport {
         return NetTransferMode.SOCKS5;
     }
 
-    private String prefix() {
+    protected String prefix() {
         return "[" + getDefaultNetTransferMode().name() + "] ";
     }
 

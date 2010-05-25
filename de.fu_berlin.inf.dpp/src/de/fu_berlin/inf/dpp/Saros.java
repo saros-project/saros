@@ -59,6 +59,7 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.jingle.JingleManager;
+import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -438,11 +439,37 @@ public class Saros extends AbstractUIPlugin {
 
     protected void setBytestreamConnectionProperties() {
 
-        SmackConfiguration.setLocalSocks5ProxyPort(container.getComponent(
-            PreferenceUtils.class).getFileTransferPort());
+        boolean changed = false;
+        int port = container.getComponent(PreferenceUtils.class)
+            .getFileTransferPort();
+        boolean proxyEnabled = !getPreferenceStore().getBoolean(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
 
-        SmackConfiguration.setLocalSocks5ProxyEnabled(!getPreferenceStore()
-            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED));
+        // Note: to make it clean, the proxy gets restarted on port change,too
+        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
+            changed = true;
+            SmackConfiguration.setLocalSocks5ProxyPort(port);
+        }
+
+        if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+            changed = true;
+            SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
+        }
+
+        if (changed) {
+            Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+            StringBuilder sb = new StringBuilder(
+                "Socks5Proxy properties changed.");
+            if (proxy.isRunning()) {
+                proxy.stop();
+                sb.append(" Stopping...");
+            }
+            if (proxyEnabled) {
+                sb.append(" Starting.");
+                Socks5Proxy.getSocks5Proxy().start();
+            }
+            log.debug(sb);
+        }
 
         // TODO: just pasted from before
         // This disables Jingle if the user has selected to use XMPP

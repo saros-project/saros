@@ -1,10 +1,10 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -42,12 +42,17 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     }
 
     private Group ftGroup;
+    private Composite composite;
     private BooleanFieldEditor ftOverXMPP;
     private BooleanFieldEditor proxyDisabled;
     private IntegerFieldEditor ftPort;
     private BooleanFieldEditor tryNextPorts;
 
-    private void updateFiletranferOverXMPP(boolean set) {
+    private void updateFieldEnablement() {
+        updateForceFiletranferOverXMPP(ftOverXMPP.getBooleanValue());
+    }
+
+    private void updateForceFiletranferOverXMPP(boolean set) {
         proxyDisabled.setEnabled(!set, ftGroup);
         set |= proxyDisabled.getBooleanValue();
         updateFileTransferProxyDisabled(set);
@@ -58,9 +63,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         tryNextPorts.setEnabled(!set, ftGroup);
     }
 
-    Composite composite;
-
-    private void createPortFields() {
+    protected void createPortFields() {
 
         ftGroup = new Group(getFieldEditorParent(), SWT.NONE);
         ftGroup.setText("File transfer"); //$NON-NLS-1$
@@ -77,23 +80,12 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             "Force file transfer over XMPP network (slow, needs reconnect)",
             ftGroup);
 
-        ftOverXMPP.setPropertyChangeListener(new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent arg0) {
-                updateFiletranferOverXMPP((Boolean) arg0.getNewValue());
-            }
-        });
-
         proxyDisabled = new BooleanFieldEditor(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED,
             "Disable local file transfer proxy for direct connections (needs reconnect)",
             ftGroup);
 
-        proxyDisabled.setPropertyChangeListener(new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent arg0) {
-                updateFileTransferProxyDisabled((Boolean) arg0.getNewValue());
-            }
-        });
-
+        // note: fix to have two columns for the port field
         composite = new Composite(ftGroup, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
         gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -106,14 +98,20 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             "Try next ports for file transfer if already bound", ftGroup);
 
-        updateFiletranferOverXMPP(getPreferenceStore().getBoolean(
+        updateForceFiletranferOverXMPP(getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
 
         addField(ftOverXMPP);
         addField(proxyDisabled);
         addField(ftPort);
         addField(tryNextPorts);
+    }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        super.propertyChange(arg0);
+        if (arg0.getProperty().equals(FieldEditor.VALUE))
+            updateFieldEnablement();
     }
 
     @Override

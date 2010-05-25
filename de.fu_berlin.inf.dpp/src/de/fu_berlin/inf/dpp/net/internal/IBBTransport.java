@@ -8,6 +8,18 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 public class IBBTransport extends BytestreamTransport {
 
+    private static IBBTransport instance = null;
+
+    private IBBTransport() {
+        //
+    }
+
+    public static IBBTransport getTransport() {
+        if (instance == null)
+            instance = new IBBTransport();
+        return instance;
+    }
+
     @Override
     public BytestreamManager getManager(XMPPConnection connection) {
         return InBandBytestreamManager.getByteStreamManager(connection);
