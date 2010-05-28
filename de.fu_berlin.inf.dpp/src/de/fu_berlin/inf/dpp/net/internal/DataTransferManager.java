@@ -307,7 +307,8 @@ public class DataTransferManager implements ConnectionSessionListener,
 
         IBytestreamConnection connection = null;
         for (ITransport transport : transports) {
-            log.debug("Try to establish bytestream using "
+            log.info("Try to establish a bytestream connection to "
+                + recipient.getBase() + " using "
                 + transport.getDefaultNetTransferMode());
             try {
                 connection = transport.connect(recipient, progress);
@@ -542,8 +543,16 @@ public class DataTransferManager implements ConnectionSessionListener,
                 .values());
         }
         for (IBytestreamConnection connection : openConnections) {
-            if (connection != null)
-                connection.close();
+            if (connection != null) {
+                // TODO switch to trace
+                log.debug("Close " + connection.getMode() + " connection");
+                try {
+                    connection.close();
+                } catch (RuntimeException e) {
+                    log.error("Error while closing " + connection.getMode()
+                        + " connection ", e);
+                }
+            }
         }
 
         if (connections.size() > 0)
@@ -562,6 +571,7 @@ public class DataTransferManager implements ConnectionSessionListener,
 
     public void stopConnection() {
         // TODO The data transfer manager does not support caching yet
+        // log.warn("Error state stops connection without effect");
     }
 
     /**

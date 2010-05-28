@@ -38,14 +38,20 @@ public abstract class BytestreamTransport implements ITransport {
 
         progress.subTask("Try to initiate bytestream with " + toString());
 
+        BinaryChannel channel = null;
+
         try {
 
-            BinaryChannel channel = establishBinaryChannel(peer.toString(),
-                progress);
+            channel = establishBinaryChannel(peer.toString(), progress);
             return new BinaryChannelConnection(peer, channel,
                 connectionListener);
 
         } catch (XMPPException e) {
+            if (e.getMessage().contains("No response from server.")) {
+                // TODO inform user or handle situation
+                log
+                    .warn("Server doesn't seem to offer a SOCKS5 proxy on port 7777");
+            }
             throw new CausedIOException(e);
         }
     }
@@ -69,6 +75,10 @@ public abstract class BytestreamTransport implements ITransport {
 
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
+            log.info("Received request to establish a "
+                + getDefaultNetTransferMode() + " bytestream connection from "
+                + request.getFrom());
+
             try {
 
                 BinaryChannel channel = acceptRequest(request);
@@ -84,7 +94,7 @@ public abstract class BytestreamTransport implements ITransport {
 
             } catch (XMPPException e) {
                 log.error(
-                    "Socket crashed, no session for request established:", e);
+                    "Socket crashed, no session for request established: ", e);
             } catch (IOException e) {
                 log.error(
                     "Socket crashed, no session for request established:", e);

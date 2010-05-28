@@ -29,6 +29,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
     private IBytestreamConnectionListener listener;
     private BinaryChannel binaryChannel;
     private ReceiverThread receiveThread;
+    private SubMonitor progress = null;
 
     private JID peer;
 
@@ -57,8 +58,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
                      * ProgressMonitor with Util#getRunnableContext(), that we
                      * can use here.
                      */
-                    SubMonitor progress = SubMonitor
-                        .convert(new NullProgressMonitor());
+                    progress = SubMonitor.convert(new NullProgressMonitor());
                     progress.beginTask("receive", 100);
 
                     try {
@@ -69,11 +69,12 @@ public class BinaryChannelConnection implements IBytestreamConnection {
 
                     } catch (SarosCancellationException e) {
                         log.info("canceled transfer");
-                        if (!progress.isCanceled())
+                        if (progress != null && !progress.isCanceled())
                             progress.setCanceled(true);
+                        close(); // might be a local cancel
+                        return;
                     } catch (SocketException e) {
-                        log.debug(prefix() + "Connection was closed by me. "
-                            + e.getCause());
+                        log.debug(prefix() + "Connection was closed by me. ");
                         close();
                         return;
                     } catch (EOFException e) {
@@ -81,6 +82,8 @@ public class BinaryChannelConnection implements IBytestreamConnection {
                         close();
                         return;
                     } catch (IOException e) {
+                        if (e.getMessage().contains("Socket already disposed"))
+                            return;
                         log.error(prefix() + "Crashed", e);
                         close();
                         return;
@@ -107,16 +110,18 @@ public class BinaryChannelConnection implements IBytestreamConnection {
         this.receiveThread.start();
     }
 
-    public boolean isConnected() {
+    public synchronized boolean isConnected() {
         return binaryChannel != null && binaryChannel.isConnected();
     }
 
-    public void close() {
+    public synchronized void close() {
         if (!isConnected())
             return;
+        progress.setCanceled(true);
         listener.connectionClosed(getPeer(), this);
         binaryChannel.dispose();
         binaryChannel = null;
+        progress = null;
     }
 
     public NetTransferMode getMode() {

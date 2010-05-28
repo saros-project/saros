@@ -187,7 +187,9 @@ public class BinaryChannel {
                 BinaryPacket packet = BinaryPacket
                     .parseDelimitedFrom(inputStream);
                 if (packet == null) {
-                    throw new EOFException();
+                    if (progress.isCanceled())
+                        throw new LocalCancellationException();
+                    throw new EOFException("No more packets");
                 }
 
                 final int objectid = packet.getObjectid();
@@ -456,7 +458,9 @@ public class BinaryChannel {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         } catch (IOException e) {
-            log.error("Close failed cause:", e);
+            // peer closed already stream already
+            if (!e.getMessage().contains("service-unavailable(503)"))
+                log.error("Close failed cause: " + e.getMessage(), e);
         }
         inputStream = null;
         outputStream = null;

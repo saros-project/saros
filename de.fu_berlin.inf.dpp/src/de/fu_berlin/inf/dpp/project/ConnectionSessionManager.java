@@ -53,21 +53,8 @@ public class ConnectionSessionManager {
 
                     break;
                 case CONNECTING:
+                    break;
                 case DISCONNECTING:
-
-                    // Cannot do anything until the Connection is up/down
-                    break;
-
-                case ERROR:
-
-                    for (ConnectionSessionListener listener : Util
-                        .reverse(listeners)) {
-                        listener.stopConnection();
-                    }
-                    break;
-
-                case NOT_CONNECTED:
-
                     for (ConnectionSessionListener listener : Util
                         .reverse(listeners)) {
                         listener.stopConnection();
@@ -82,6 +69,20 @@ public class ConnectionSessionManager {
                          */
                         listener.disposeConnection();
                     }
+
+                    // Cannot do anything until the Connection is up/down
+                    break;
+
+                case ERROR:
+
+                    for (ConnectionSessionListener listener : Util
+                        .reverse(listeners)) {
+                        listener.stopConnection();
+                    }
+                    break;
+
+                case NOT_CONNECTED:
+
                     break;
                 }
             }
