@@ -39,13 +39,15 @@ public class ConsistencyAction extends Action {
     protected IsInconsistentObservable inconsistentObservable;
 
     public ConsistencyAction(ConsistencyWatchdogClient watchdogClient,
-        SessionManager sessionManager) {
+        SessionManager sessionManager,
+        IsInconsistentObservable inconsistentObservable) {
 
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");
         this.watchdogClient = watchdogClient;
         this.sessionManager = sessionManager;
+        this.inconsistentObservable = inconsistentObservable;
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
