@@ -13,7 +13,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -35,7 +34,6 @@ public class ConsistencyAction extends Action {
 
     protected ConsistencyWatchdogClient watchdogClient;
 
-    @Inject
     protected IsInconsistentObservable inconsistentObservable;
 
     public ConsistencyAction(ConsistencyWatchdogClient watchdogClient,
