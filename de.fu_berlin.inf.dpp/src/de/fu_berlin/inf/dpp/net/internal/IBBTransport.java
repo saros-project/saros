@@ -26,7 +26,7 @@ public class IBBTransport extends BytestreamTransport {
     }
 
     @Override
-    public BytestreamManager getManager(XMPPConnection connection) {
+    protected BytestreamManager getManager(XMPPConnection connection) {
         return InBandBytestreamManager.getByteStreamManager(connection);
     }
 

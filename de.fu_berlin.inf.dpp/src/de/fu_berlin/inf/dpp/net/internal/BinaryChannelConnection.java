@@ -120,7 +120,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
         progress.setCanceled(true);
         listener.connectionClosed(getPeer(), this);
         binaryChannel.dispose();
-        binaryChannel = null;
+        // binaryChannel = null; // encapsulates Mode
         progress = null;
     }
 

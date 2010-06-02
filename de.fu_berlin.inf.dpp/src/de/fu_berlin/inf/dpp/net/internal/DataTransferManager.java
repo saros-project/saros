@@ -419,8 +419,10 @@ public class DataTransferManager implements ConnectionSessionListener,
 
         this.updateFileTransferByChatOnly();
 
-        log.debug("prepare bytestreams for XMPP connection. Used transports: "
-            + transports.toArray());
+        log
+            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
+                + Arrays.toString(transports.toArray()));
+
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
 
@@ -442,11 +444,9 @@ public class DataTransferManager implements ConnectionSessionListener,
             else {
                 initTransports();
             }
-        } else {
-            if (transports.size() > 1)
-                return;
-            else
-                addPrimaryTransports();
+        } else if (transports.size() == 1) {
+            addPrimaryTransports();
+
         }
     }
 
@@ -468,7 +468,7 @@ public class DataTransferManager implements ConnectionSessionListener,
      * are tried in order they are inserted here.
      */
     protected void addPrimaryTransports() {
-        transports.add(Socks5Transport.getTransport());
+        transports.add(0, Socks5Transport.getTransport());
     }
 
     public boolean connectionIsDisposed() {

@@ -130,6 +130,7 @@ public class BinaryChannel {
      * 
      * @throws IOException
      */
+    // TODO: update TestCases, remove Socket variable and this constructor
     @Deprecated
     public BinaryChannel(Socket socket, NetTransferMode transferMode)
         throws IOException {

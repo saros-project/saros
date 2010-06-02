@@ -17,8 +17,8 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
-/*
- * see {#link de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport} 
+/**
+ * Abstract skeleton for different transport methods
  */
 public abstract class BytestreamTransport implements ITransport {
 
@@ -153,6 +153,11 @@ public abstract class BytestreamTransport implements ITransport {
 
     abstract public NetTransferMode getDefaultNetTransferMode();
 
-    abstract public BytestreamManager getManager(XMPPConnection connection);
+    /**
+     * @param connection
+     * @return The configured BytestreamManager for the specialized transport
+     *         method
+     */
+    abstract protected BytestreamManager getManager(XMPPConnection connection);
 
 }

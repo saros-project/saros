@@ -60,7 +60,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     }
 
     private void updateFileTransferProxyDisabled(boolean set) {
-        System.out.println("enabled " + !set);
         ftPort.setEnabled(!set, composite);
         tryNextPorts.setEnabled(!set, ftGroup);
     }
@@ -72,7 +71,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     protected void createPortFields() {
 
         ftGroup = new Group(getFieldEditorParent(), SWT.NONE);
-        ftGroup.setText("File transfer"); //$NON-NLS-1$
+        ftGroup.setText("File transfer (changes require reconnection)"); //$NON-NLS-1$
 
         GridLayout gridLayout = new GridLayout(2, false);
         ftGroup.setLayout(gridLayout);
@@ -83,13 +82,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         ftOverXMPP = new BooleanFieldEditor(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-            "Force file transfer over XMPP network (slow, needs reconnect)",
-            ftGroup);
+            "Force file transfer over XMPP network (slow)", ftGroup);
 
         proxyDisabled = new BooleanFieldEditor(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED,
-            "Disable local file transfer proxy for direct connections (needs reconnect)",
-            ftGroup);
+            "Disable local file transfer proxy for direct connections", ftGroup);
 
         // note: fix to have two columns for the port field
         composite = new Composite(ftGroup, SWT.NONE);
@@ -98,7 +95,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         composite.setLayoutData(gridData);
 
         ftPort = new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
-            "File transfer port (needs reconnect):", composite);
+            "File transfer port:", composite);
 
         tryNextPorts = new BooleanFieldEditor(
             PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
