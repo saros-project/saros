@@ -47,11 +47,6 @@ public abstract class BytestreamTransport implements ITransport {
                 connectionListener);
 
         } catch (XMPPException e) {
-            if (e.getMessage().contains("No response from server.")) {
-                // TODO inform user or handle situation
-                log
-                    .warn("Server doesn't seem to offer a SOCKS5 proxy on port 7777");
-            }
             throw new CausedIOException(e);
         }
     }

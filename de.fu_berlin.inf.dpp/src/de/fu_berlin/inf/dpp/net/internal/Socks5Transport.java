@@ -78,6 +78,8 @@ public class Socks5Transport extends BytestreamTransport {
     protected BinaryChannel acceptRequest(BytestreamRequest request)
         throws IOException, XMPPException, InterruptedException {
 
+        logEstablishSession("request for");
+
         try {
 
             String peer = request.getFrom();
@@ -190,8 +192,9 @@ public class Socks5Transport extends BytestreamTransport {
                 "establishing connection to SOCKS5 proxy failed")) {
                 // TODO inform user or handle situation
                 log
-                    .warn("Server doesn't seem to offer a SOCKS5 proxy on port 7777");
+                    .warn("Not possible to connect to server SOCKS5 proxy on port 7777. Maybe server is not configured correctly.");
             }
+
             throw e;
         }
 
@@ -220,9 +223,10 @@ public class Socks5Transport extends BytestreamTransport {
         return realPort;
     }
 
-    private void logEstablishSession() {
+    private void logEstablishSession(String type) {
         log.debug(prefix()
-            + "establishing new connection with local proxy "
+            + type
+            + " new connection with local proxy "
             + (localSOCKS5ProxyIsRunning() ? "enabled (Port "
                 + getLocalSocks5ProxyPort() + ")."
                 : "disabled. Local Adresses: "
@@ -240,7 +244,7 @@ public class Socks5Transport extends BytestreamTransport {
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
         runningConnects.put(peer, exchanger);
 
-        logEstablishSession();
+        logEstablishSession("establishing");
 
         try {
 
@@ -372,7 +376,7 @@ public class Socks5Transport extends BytestreamTransport {
     protected BytestreamSession establishResponseSession(String peer)
         throws XMPPException, IOException, InterruptedException {
 
-        logEstablishSession();
+        logEstablishSession("establishing response");
 
         return manager.establishSession(peer.toString(), this
             .getNextResponseSessionID());
