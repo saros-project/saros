@@ -417,12 +417,12 @@ public class DataTransferManager implements ConnectionSessionListener,
     public void prepareConnection(final XMPPConnection connection) {
         assert (this.connectionIsDisposed());
 
-        log.debug("prepare bytestreams for XMPP connection: "
-            + connection.getConnectionID());
+        this.updateFileTransferByChatOnly();
+
+        log.debug("prepare bytestreams for XMPP connection. Used transports: "
+            + transports.toArray());
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-
-        this.updateFileTransferByChatOnly();
 
         for (ITransport transport : transports) {
             transport.prepareXMPPConnection(connection, this);

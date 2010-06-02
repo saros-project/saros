@@ -60,6 +60,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     }
 
     private void updateFileTransferProxyDisabled(boolean set) {
+        System.out.println("enabled " + !set);
         ftPort.setEnabled(!set, composite);
         tryNextPorts.setEnabled(!set, ftGroup);
     }
@@ -105,6 +106,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         updateForceFiletranferOverXMPP(getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+        updateFileTransferProxyDisabled(getPreferenceStore().getBoolean(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED));
 
         addField(ftOverXMPP);
         addField(proxyDisabled);
