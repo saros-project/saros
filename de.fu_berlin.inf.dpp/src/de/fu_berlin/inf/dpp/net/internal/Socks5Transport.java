@@ -56,9 +56,7 @@ public class Socks5Transport extends BytestreamTransport {
     private static Socks5Transport instance = null;
 
     private Socks5Transport() {
-        executorService = Executors.newFixedThreadPool(
-            NUMBER_OF_RESPONSE_THREADS, new NamedThreadFactory(
-                "SOCKS5_Establish_response_connection"));
+        //
     }
 
     public static Socks5Transport getTransport() {
@@ -433,6 +431,15 @@ public class Socks5Transport extends BytestreamTransport {
         return NetTransferMode.SOCKS5;
     }
 
+    @Override
+    public void prepareXMPPConnection(XMPPConnection connection,
+        IBytestreamConnectionListener listener) {
+        super.prepareXMPPConnection(connection, listener);
+        executorService = Executors.newFixedThreadPool(
+            NUMBER_OF_RESPONSE_THREADS, new NamedThreadFactory(
+                "SOCKS5_Establish_response_connection"));
+    }
+
     protected String prefix() {
         return "[" + getDefaultNetTransferMode().name() + "] ";
     }
@@ -444,6 +451,7 @@ public class Socks5Transport extends BytestreamTransport {
             log
                 .warn(prefix()
                     + "threads for response connections found that didn't commence yet");
+        executorService = null;
         super.disposeXMPPConnection();
     }
 
