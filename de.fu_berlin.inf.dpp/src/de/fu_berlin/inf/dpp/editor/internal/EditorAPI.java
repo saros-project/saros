@@ -251,7 +251,8 @@ public class EditorAPI implements IEditorAPI {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
-            page.closeEditor(part, true); // Close AND let user decide if saving is necessary
+            page.closeEditor(part, true); // Close AND let user decide if saving
+                                          // is necessary
         }
     }
 
@@ -589,7 +590,7 @@ public class EditorAPI implements IEditorAPI {
                 } else {
                     lockedEditors.add(editorPart);
                     textViewer
-                        .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
+                        .prependVerifyKeyListener(EditorAPI.this.keyVerifier);
 
                     // disable editing and undo-manager
                     SourceViewer sourceViewer = (SourceViewer) textViewer;
