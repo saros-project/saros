@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -194,7 +195,7 @@ public class JoinSessionWizard extends Wizard {
          * and if there are differences between the remote and local project.
          */
         if (namePage.overwriteProjectResources()) {
-            FileList diff;
+            FileListDiff diff;
             try {
                 diff = new FileList(source).diff(process.getRemoteFileList());
             } catch (CoreException e) {
@@ -254,7 +255,7 @@ public class JoinSessionWizard extends Wizard {
     }
 
     public boolean confirmOverwritingProjectResources(final String projectName,
-        final FileList diff) {
+        final FileListDiff diff) {
         try {
             return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {

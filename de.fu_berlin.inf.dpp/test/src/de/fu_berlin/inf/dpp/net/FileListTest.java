@@ -59,9 +59,9 @@ public class FileListTest {
 
     protected FileList threeEntryList;
     protected FileList fourEntryList; // contains one additional entry
-                                      // in respect to threeEntryList
+    // in respect to threeEntryList
     protected FileList modifiedFourEntryList; // contains one modified entry in
-                                              // respect to fourEntryList
+    // respect to fourEntryList
     protected FileList emptyFileList;
 
     @Before
@@ -83,12 +83,12 @@ public class FileListTest {
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
     }
 
-    @Test
-    public void testGetFileUnalteredPaths() {
-        Collection<IPath> paths = threeEntryList.getUnalteredPaths();
-
-        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
-    }
+    // @Test
+    // public void testGetFileUnalteredPaths() {
+    // Collection<IPath> paths = threeEntryList.getUnalteredPaths();
+    //
+    // assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
+    // }
 
     @Test
     public void testDiffGetAddedFilePaths() {

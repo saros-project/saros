@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,6 +36,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,6 +47,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -265,16 +268,17 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
         monitor.beginTask("Synchronizing", 100);
         monitor.subTask("Preparing project for synchronisation...");
-        FileList filesToSynchronize;
+        FileListDiff filesToSynchronize;
         if (skipSync) {
-            filesToSynchronize = new FileList();
+            filesToSynchronize = new FileListDiff();
         } else {
             filesToSynchronize = handleDiff(this.localProject,
                 this.remoteFileList, monitor.newChild(5,
                     SubMonitor.SUPPRESS_ALL_LABELS));
         }
-        filesLeftToSynchronize = filesToSynchronize.getAddedPaths().size()
-            + filesToSynchronize.getAlteredPaths().size();
+        List<IPath> addedPaths = filesToSynchronize.getAddedPaths();
+        List<IPath> alteredPaths = filesToSynchronize.getAlteredPaths();
+        filesLeftToSynchronize = addedPaths.size() + alteredPaths.size();
 
         if (filesLeftToSynchronize < 1) {
             log.debug("Inv" + Util.prefix(peer)
@@ -292,8 +296,17 @@ public class IncomingInvitationProcess extends InvitationProcess {
             .getInvitationCollector(invitationID,
                 FileTransferType.ARCHIVE_TRANSFER);
 
-        transmitter.sendFileList(peer, invitationID, filesToSynchronize,
-            monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
+        // FIXME ndh: Create one list of files from diff.
+        addedPaths.addAll(alteredPaths);
+        IPath r[] = addedPaths.toArray(new IPath[addedPaths.size()]);
+        FileList filesRequested;
+        try {
+            filesRequested = new FileList(r);
+        } catch (CoreException e) {
+            throw new SarosCancellationException();
+        }
+        transmitter.sendFileList(peer, invitationID, filesRequested, monitor
+            .newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
         checkCancellation();
 
@@ -431,7 +444,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
      *         files.
      * @throws LocalCancellationException
      */
-    protected FileList handleDiff(IProject localProject,
+    protected FileListDiff handleDiff(IProject localProject,
         FileList remoteFileList, SubMonitor monitor)
         throws LocalCancellationException {
 
@@ -439,7 +452,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         monitor.beginTask("Preparing local project for incoming files", 100);
         try {
             monitor.subTask("Calculating Diff");
-            FileList diff = new FileList(localProject).diff(remoteFileList);
+            FileListDiff diff = new FileList(localProject).diff(remoteFileList);
             monitor.worked(20);
 
             monitor.subTask("Removing unneeded resources");
