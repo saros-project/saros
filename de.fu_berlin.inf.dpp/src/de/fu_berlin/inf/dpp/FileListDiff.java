@@ -2,10 +2,8 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -14,45 +12,107 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
-/*
- * FIXME ndh: Both the Incoming and OutgoingInvProc send a file list. But Out
- * uses a FileList, Inc uses a Diff. Inc should use the Diff to construct
- * another FileList.
+import de.fu_berlin.inf.dpp.FileList.FileListData;
+
+/**
+ * A diff between two {@link FileList}s.
+ * 
+ * TODO Make this a public static internal class of FileList?
+ * 
+ * @see FileList#diff(FileList)
+ * 
+ * @author ahaferburg
  */
+public class FileListDiff {
+    private FileListDiff() {
+        // Empty but non-public. Only FileList should create FileListDiffs.
+    }
 
-public class FileListDiff
-// extends FileList
-{
-    protected final Map<IPath, Long> added = new HashMap<IPath, Long>();
+    private final List<IPath> added = new ArrayList<IPath>();
 
-    protected final Map<IPath, Long> removed = new HashMap<IPath, Long>();
+    private final List<IPath> removed = new ArrayList<IPath>();
 
-    protected final Map<IPath, Long> altered = new HashMap<IPath, Long>();
+    private final List<IPath> altered = new ArrayList<IPath>();
 
-    protected final Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
+    private final List<IPath> unaltered = new ArrayList<IPath>();
 
+    /**
+     * Returns a new FileListDiff which contains the difference of the two
+     * FileLists.
+     * 
+     * @param base
+     *            The base <code>FileList</code>.
+     * @param target
+     *            The <code>FileList</code> to compare to.
+     * 
+     * @return a new <code>FileListDiff</code> which contains the difference
+     *         information of the two <code>FileList</code>s.
+     * 
+     *         The diff describes the operations needed to get from
+     *         <code>base</code> to <code>target</code>.
+     * @see FileListDiff
+     */
+    public static FileListDiff diff(FileList base, FileList target) {
+        FileListDiff result = new FileListDiff();
+        if (base == null || target == null)
+            return result;
+
+        for (Map.Entry<IPath, FileListData> entry : base.data.entrySet()) {
+            if (!target.data.containsKey(entry.getKey())) {
+                result.removed.add(entry.getKey());
+            }
+        }
+
+        for (Map.Entry<IPath, FileListData> entry : target.data.entrySet()) {
+            if (!base.data.containsKey(entry.getKey())) {
+                result.added.add(entry.getKey());
+            }
+        }
+
+        for (Map.Entry<IPath, FileListData> entry : base.data.entrySet()) {
+            IPath path = entry.getKey();
+            if (target.data.containsKey(path)) {
+
+                if (path.hasTrailingSeparator()) {
+                    result.unaltered.add(path);
+                } else {
+                    long checksum = entry.getValue().checksum;
+                    long otherChecksum = target.data.get(path).checksum;
+
+                    if (checksum == otherChecksum) {
+                        result.unaltered.add(path);
+                    } else {
+                        result.altered.add(path);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * @return The sorted list of paths that were removed.
+     */
     public List<IPath> getRemovedPaths() {
-        return sorted(this.removed.keySet());
+        return sorted(this.removed);
     }
 
     public List<IPath> getUnalteredPaths() {
-        return sorted(this.unaltered.keySet());
+        return sorted(this.unaltered);
     }
 
     public List<IPath> getAddedPaths() {
-        return sorted(this.added.keySet());
+        return sorted(this.added);
     }
 
     public List<IPath> getAlteredPaths() {
-        return sorted(this.altered.keySet());
+        return sorted(this.altered);
     }
 
-    // @Override
-    // not
-    protected List<IPath> sorted(Set<IPath> pathSet) {
-        List<IPath> paths = new ArrayList<IPath>(pathSet);
+    private List<IPath> sorted(List<IPath> paths) {
         Collections.sort(paths, new FileList.PathLengthComparator());
-        return paths;
+        return new ArrayList<IPath>(paths);
     }
 
     /**
@@ -71,9 +131,9 @@ public class FileListDiff
         monitor.beginTask("Adding folders", toCheck.size());
 
         FileListDiff result = new FileListDiff();
-        result.altered.putAll(this.altered);
-        result.removed.putAll(this.removed);
-        result.unaltered.putAll(this.unaltered);
+        result.altered.addAll(this.altered);
+        result.removed.addAll(this.removed);
+        result.unaltered.addAll(this.unaltered);
 
         for (IPath path : toCheck) {
 
@@ -85,7 +145,7 @@ public class FileListDiff
                     continue;
                 }
             } else {
-                result.added.put(path, added.get(path));
+                result.added.add(path);
             }
             monitor.worked(1);
         }
@@ -134,11 +194,10 @@ public class FileListDiff
         }
 
         FileListDiff result = new FileListDiff();
-        result.added.putAll(this.added);
-        result.altered.putAll(this.altered);
+        result.added.addAll(this.added);
+        result.altered.addAll(this.altered);
         // Removed is empty now
-        result.unaltered.putAll(this.unaltered);
-        // result.readResolve();
+        result.unaltered.addAll(this.unaltered);
 
         monitor.done();
 

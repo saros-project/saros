@@ -270,7 +270,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         monitor.subTask("Preparing project for synchronisation...");
         FileListDiff filesToSynchronize;
         if (skipSync) {
-            filesToSynchronize = new FileListDiff();
+            filesToSynchronize = FileListDiff.diff(null, null);
         } else {
             filesToSynchronize = handleDiff(this.localProject,
                 this.remoteFileList, monitor.newChild(5,
@@ -452,7 +452,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         monitor.beginTask("Preparing local project for incoming files", 100);
         try {
             monitor.subTask("Calculating Diff");
-            FileListDiff diff = new FileList(localProject).diff(remoteFileList);
+            FileListDiff diff = FileListDiff.diff(new FileList(localProject),
+                remoteFileList);
             monitor.worked(20);
 
             monitor.subTask("Removing unneeded resources");

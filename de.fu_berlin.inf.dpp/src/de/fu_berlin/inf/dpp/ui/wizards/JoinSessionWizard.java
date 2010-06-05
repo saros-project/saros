@@ -197,7 +197,8 @@ public class JoinSessionWizard extends Wizard {
         if (namePage.overwriteProjectResources()) {
             FileListDiff diff;
             try {
-                diff = new FileList(source).diff(process.getRemoteFileList());
+                diff = FileListDiff.diff(new FileList(source), process
+                    .getRemoteFileList());
             } catch (CoreException e) {
                 MessageDialog.openError(getShell(), "Error computing FileList",
                     "Could not compute local FileList: " + e.getMessage());

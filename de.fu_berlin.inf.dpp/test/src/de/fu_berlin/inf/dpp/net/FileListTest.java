@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 /**
@@ -92,16 +93,16 @@ public class FileListTest {
 
     @Test
     public void testDiffGetAddedFilePaths() {
-        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
-            .getAddedPaths();
+        Collection<IPath> paths = FileListDiff.diff(threeEntryList,
+            fourEntryList).getAddedPaths();
 
         assertPaths(new String[] { "subdir/file2" }, paths);
     }
 
     @Test
     public void testReversedDiffGetAddedFilePaths() {
-        Collection<IPath> paths = fourEntryList.diff(threeEntryList)
-            .getAddedPaths();
+        Collection<IPath> paths = FileListDiff.diff(fourEntryList,
+            threeEntryList).getAddedPaths();
 
         assertPaths(new String[] {}, paths);
     }
@@ -163,14 +164,15 @@ public class FileListTest {
     }
 
     @Test
+    // FIXME ndh: Needs checking.
     public void testDiffGetFilePaths() {
         Collection<IPath> paths = threeEntryList.diff(modifiedFourEntryList)
-            .getPaths();
+            .getAddedPaths();
 
         assertPaths(new String[] { "root1", "root2", "subdir/file2",
             "subdir/file1" }, paths);
 
-        paths = emptyFileList.diff(threeEntryList).getPaths();
+        paths = emptyFileList.diff(threeEntryList).getAddedPaths();
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
         paths = threeEntryList.diff(emptyFileList).getRemovedPaths();
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);

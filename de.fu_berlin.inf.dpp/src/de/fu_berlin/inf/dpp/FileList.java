@@ -47,10 +47,11 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
- * to other file lists. Folders are denoted by a trailing separator.
- * 
+ * to other file lists. Folders are denoted by a trailing separator.<br>
+ * <br>
  * NOTE: As computation of a FileList involves a complete rescan of the project,
  * creating new instances should be avoided.<br>
+ * <br>
  * TODO: This class should be split up to clearly separate between file lists
  * and differences between file lists. Fields like removed, added, etc. do not
  * make sense for plain lists and just add confusion.
@@ -69,13 +70,14 @@ public class FileList {
     protected static XStream xstream;
 
     /**
-     * @invariant Contains all entries from this.added, this.altered, and
-     *            this.unaltered.
+     * Contains all entries.
      * 
      */
-    // * @see #readResolve()
-    // @XStreamOmitField
-    protected Map<IPath, Long> all = new HashMap<IPath, Long>();
+    protected Map<IPath, FileListData> data = new HashMap<IPath, FileListData>();
+
+    static class FileListData {
+        public long checksum;
+    }
 
     public static class PathLengthComparator implements Comparator<IPath>,
         Serializable {
@@ -117,7 +119,7 @@ public class FileList {
      */
     public FileList(IContainer container) throws CoreException {
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), this.all, true);
+        addMembers(container.members(), this.data, true);
         // this.unaltered.putAll(this.all);
     }
 
@@ -130,70 +132,21 @@ public class FileList {
      */
     public FileList(IResource[] resources) throws CoreException {
 
-        addMembers(resources, this.all, true);
+        addMembers(resources, this.data, true);
         // this.unaltered.putAll(this.all);
     }
 
     /**
-     * Returns a new FileList which contains the difference of two FileLists,
-     * consisting of files missing in <code>other</code> but present in
-     * <code>this</code> and files in <code>other</code> which are not present
-     * in <code>this</code>.
+     * Creates a new file list from given paths.
      * 
-     * @param other
-     *            the <code>FileList</code> to compare to.
-     * 
-     * @return a new <code>FileList</code> which contains the difference
-     *         information of the two <code>FileList</code>s:
-     *         <code>result.removed</code> contains paths present in
-     *         <code>this.all</code> but not in <code>other.all</code>.
-     *         <code>result.added</code> contains paths present in
-     *         <code>other.all</code> but not in <code>this.all</code>.
-     *         <code>result.unaltered</code>/<code>results.altered</code>
-     *         contain paths where the checksum is equal to/differs between
-     *         <code>this</code> and <code>other</code>. <code>result.all</code>
-     *         contains all paths from <code>other</code>.
-     * 
-     *         The diff contains the operations which are needed to get from
-     *         <code>this</code> <code>FileList</code> to the <code>other</code>
-     *         <code>FileList</code>.
+     * @param paths
+     *            The paths that should be added to this file list.
+     * @throws CoreException
      */
-    public FileListDiff diff(FileList other) {
-        FileListDiff result = new FileListDiff();
-
-        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-            if (!other.all.containsKey(entry.getKey())) {
-                result.removed.put(entry.getKey(), entry.getValue());
-            }
+    public FileList(IPath[] paths) throws CoreException {
+        for (IPath path : paths) {
+            this.data.put(path, null);
         }
-
-        for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
-            if (!this.all.containsKey(entry.getKey())) {
-                result.added.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-            IPath path = entry.getKey();
-            if (other.all.containsKey(path)) {
-
-                if (path.hasTrailingSeparator()) {
-                    result.unaltered.put(path, null);
-                } else {
-                    long checksum = entry.getValue();
-                    long otherChecksum = other.all.get(path);
-
-                    if (checksum == otherChecksum) {
-                        result.unaltered.put(path, checksum);
-                    } else {
-                        result.altered.put(path, checksum);
-                    }
-                }
-            }
-        }
-
-        // result.all.putAll(other.all);
-        return result;
     }
 
     /**
@@ -218,7 +171,7 @@ public class FileList {
         if (nPaths == 0) { // other is empty
             return 0;
         } else {
-            FileListDiff difference = this.diff(other);
+            FileListDiff difference = FileListDiff.diff(this, other);
             int nUnalteredPaths = difference.getUnalteredPaths().size();
             if (nPaths == nUnalteredPaths) {
                 return 100;
@@ -263,7 +216,7 @@ public class FileList {
      *         sorted by their character length.
      */
     public List<IPath> getPaths() {
-        return sorted(this.all.keySet());
+        return sorted(this.data.keySet());
     }
 
     /**
@@ -287,7 +240,7 @@ public class FileList {
     /**
      * This is called after deserialization by XStream.
      * 
-     * Initializes {@link #all} (which is not sent via XML) to ensure the
+     * Initializes {@link #data} (which is not sent via XML) to ensure the
      * invariant of this class.
      */
     // protected Object readResolve() {
@@ -302,7 +255,7 @@ public class FileList {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((all == null) ? 0 : all.hashCode());
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
         return result;
     }
 
@@ -317,12 +270,12 @@ public class FileList {
         }
 
         FileList other = (FileList) obj;
-        return this.all.equals(other.all);
+        return this.data.equals(other.data);
     }
 
     @Override
     public String toString() {
-        return "FileList(files:" + this.all.size() + ")";
+        return "FileList(files:" + this.data.size() + ")";
     }
 
     protected List<IPath> sorted(Set<IPath> pathSet) {
@@ -331,8 +284,9 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(IResource[] resources, Map<IPath, Long> members,
-        boolean ignoreDerived) throws CoreException {
+    private void addMembers(IResource[] resources,
+        Map<IPath, FileListData> members, boolean ignoreDerived)
+        throws CoreException {
 
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
@@ -346,8 +300,9 @@ public class FileList {
                 }
 
                 try {
-                    members.put(file.getProjectRelativePath(), FileUtil
-                        .checksum(file));
+                    FileListData data = new FileListData();
+                    data.checksum = FileUtil.checksum(file);
+                    members.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
                 }
@@ -366,4 +321,8 @@ public class FileList {
         }
     }
 
+    // FIXME ndh remove/fix tests
+    public FileListDiff diff(FileList other) {
+        return FileListDiff.diff(this, other);
+    }
 }
