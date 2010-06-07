@@ -55,10 +55,10 @@ public class Socks5Transport extends BytestreamTransport {
     private static Logger log = Logger.getLogger(Socks5Transport.class);
     private static final int BIDIRECTIONAL_TEST_INT = 5;
     /*
-     * 1s might not be enough always, especially when local SOCKS5 proxy port is
+     * 3s might not be enough always, especially when local SOCKS5 proxy port is
      * bound by another application
      */
-    private static final int TEST_TIMEOUT = 3000;
+    private static final int TEST_TIMEOUT = 10000;
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
     private static final int NUMBER_OF_RESPONSE_THREADS = 10;
@@ -167,13 +167,19 @@ public class Socks5Transport extends BytestreamTransport {
 
     }
 
+    /**
+     * 
+     * @pre inSession!=null || outSession!=null
+     * 
+     * @param inSession
+     * @param outSession
+     * @param preferInSession
+     * @return
+     * @throws IOException
+     */
     protected BytestreamSession testAndGetMediatedBidirectionalBytestream(
         Socks5BytestreamSession inSession, Socks5BytestreamSession outSession,
         boolean preferInSession) throws IOException {
-
-        if (inSession == null && outSession == null)
-            throw new IOException(prefix()
-                + "Neither connection could be established. ");
 
         String msg = prefix() + "response connection is mediated, "
             + (inSession != null && outSession != null ? "too, " : "");
@@ -291,6 +297,10 @@ public class Socks5Transport extends BytestreamTransport {
                     + "Interrupted while recieving request to establish a new connection");
             return null;
         }
+
+        if (inSession == null && outSession == null)
+            throw new IOException(prefix()
+                + "Neither connection could be established. ");
 
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
