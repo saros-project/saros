@@ -87,14 +87,11 @@ public abstract class BytestreamTransport implements ITransport {
                     new BinaryChannelConnection(peer, channel,
                         connectionListener));
 
-            } catch (XMPPException e) {
-                log.error(
-                    "Socket crashed, no session for request established: ", e);
-            } catch (IOException e) {
-                log.error(
-                    "Socket crashed, no session for request established:", e);
             } catch (InterruptedException e) {
                 log.debug("Interrupted while initiating new session.");
+            } catch (Exception e) {
+                log.error(
+                    "Socket crashed, no session for request established: ", e);
             }
         }
     };
@@ -130,7 +127,7 @@ public abstract class BytestreamTransport implements ITransport {
      * @throws IOException
      */
     protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws XMPPException, InterruptedException, IOException {
+        throws InterruptedException, Exception {
 
         BytestreamSession session = request.accept();
         BinaryChannel channel = new BinaryChannel(session,

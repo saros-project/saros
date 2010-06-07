@@ -90,7 +90,8 @@ public class Socks5Transport extends BytestreamTransport {
      * 
      * @param future
      */
-    protected static void cancelQuietly(Future<Socks5BytestreamSession> future) {
+    protected void cancelQuietly(Future<Socks5BytestreamSession> future) {
+        log.debug(prefix() + "Cancel initiating response connection");
         try {
             if (future.isDone()) {
                 try {
@@ -134,7 +135,8 @@ public class Socks5Transport extends BytestreamTransport {
         throws XMPPException, InterruptedException {
 
         String peer = request.getFrom();
-        logStartSession("recieving response connection from " + peer);
+        log.debug(prefix() + "recieving response connection from " + peer
+            + verboseLocalProxyInfo());
 
         Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
             .accept();
@@ -165,6 +167,51 @@ public class Socks5Transport extends BytestreamTransport {
 
     }
 
+    protected BytestreamSession testAndGetMediatedBidirectionalBytestream(
+        Socks5BytestreamSession inSession, Socks5BytestreamSession outSession,
+        boolean preferInSession) throws IOException {
+
+        if (inSession == null && outSession == null)
+            throw new IOException(prefix()
+                + "Neither connection could be established. ");
+
+        String msg = prefix() + "response connection is mediated, "
+            + (inSession != null && outSession != null ? "too, " : "");
+
+        Socks5BytestreamSession session = preferInSession ? inSession
+            : outSession;
+
+        // if preferable session did not work, try the other
+        if (session == null) {
+            preferInSession = !preferInSession;
+            session = preferInSession ? inSession : outSession;
+        }
+
+        if (streamIsBidirectional(session, preferInSession)) {
+            log
+                .debug(msg
+                    + "but at least the server allows bidirectional connections. (using "
+                    + (preferInSession ? "incoming session"
+                        : "outgoing session") + ")");
+            Util.closeQuietly(preferInSession ? outSession : inSession);
+            return session;
+        }
+
+        if (inSession == null || outSession == null) {
+            Util.closeQuietly(inSession);
+            Util.closeQuietly(outSession);
+            throw new IOException(
+                "Could only establish one unidirectional connection but need two for wrapping.");
+        }
+
+        log
+            .debug(msg
+                + "and the server does not allow bidirectional connections. Wrapped session established.");
+
+        return new WrappedBidirectionalSocks5BytestreamSession(inSession,
+            outSession);
+    }
+
     /**
      * Accepts a Request and returns an established BinaryChannel.
      * 
@@ -185,19 +232,30 @@ public class Socks5Transport extends BytestreamTransport {
      * @throws IOException
      */
     protected BinaryChannel acceptNewRequest(BytestreamRequest request)
-        throws XMPPException, InterruptedException, IOException {
+        throws Exception, InterruptedException {
         String peer = request.getFrom();
-        logStartSession("recieving request from " + peer);
+        log.debug(prefix() + "recieving request from " + peer
+            + verboseLocalProxyInfo());
 
         // start to establish response
         Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(peer);
+        Socks5BytestreamSession inSession = null;
 
-        Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
-            .accept();
+        try {
 
-        if (inSession.isDirect()) {
-            cancelQuietly(responseFuture);
-            return new BinaryChannel(inSession, NetTransferMode.SOCKS5_DIRECT);
+            inSession = (Socks5BytestreamSession) request.accept();
+
+            if (inSession.isDirect()) {
+                cancelQuietly(responseFuture);
+                return new BinaryChannel(inSession,
+                    NetTransferMode.SOCKS5_DIRECT);
+            }
+
+        } catch (Exception e) {
+            log
+                .warn(prefix()
+                    + "Couldn't accept request but still trying to establish a response connection: "
+                    + e.getMessage());
         }
 
         Socks5BytestreamSession outSession = null;
@@ -215,24 +273,6 @@ public class Socks5Transport extends BytestreamTransport {
                     NetTransferMode.SOCKS5_DIRECT);
             }
 
-            String msg = prefix() + "response connection is mediated, too, ";
-
-            if (streamIsBidirectional(inSession, true)) {
-                log
-                    .debug(msg
-                        + "but at least the server allows bidirectional connections.");
-                Util.closeQuietly(outSession);
-                return new BinaryChannel(inSession,
-                    NetTransferMode.SOCKS5_MEDIATED);
-            }
-
-            log
-                .debug(msg
-                    + "and the server does not allow bidirectional connections. Wrapped session established.");
-            BytestreamSession session = new WrappedBidirectionalSocks5BytestreamSession(
-                inSession, outSession);
-            return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
-
         } catch (IOException e) {
             log
                 .error(
@@ -247,8 +287,12 @@ public class Socks5Transport extends BytestreamTransport {
             log
                 .debug(prefix()
                     + "Interrupted while recieving request to establish a new connection");
+            return null;
         }
-        return null;
+
+        BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
+            inSession, outSession, true);
+        return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
     }
 
     /**
@@ -259,7 +303,7 @@ public class Socks5Transport extends BytestreamTransport {
      */
     @Override
     protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws IOException, XMPPException, InterruptedException {
+        throws InterruptedException, Exception {
 
         if (isResponse(request)) {
             handleResponse(request);
@@ -292,15 +336,13 @@ public class Socks5Transport extends BytestreamTransport {
         return realPort;
     }
 
-    private void logStartSession(String introduction) {
-        log.debug(prefix()
-            + introduction
-            + " with local proxy "
+    private String verboseLocalProxyInfo() {
+        return " with local proxy "
             + (localSOCKS5ProxyIsRunning() ? "enabled (Port "
                 + getLocalSocks5ProxyPort() + ")."
                 : "disabled. Local Adresses: "
                     + Socks5Proxy.getSocks5Proxy().getLocalAddresses()
-                        .toString()));
+                        .toString()) + " ";
 
     }
 
@@ -317,7 +359,8 @@ public class Socks5Transport extends BytestreamTransport {
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
         runningConnects.put(peer, exchanger);
 
-        logStartSession("establishing new connection to " + peer);
+        log.debug(prefix() + "establishing new connection to " + peer
+            + verboseLocalProxyInfo());
 
         try {
 
@@ -357,10 +400,12 @@ public class Socks5Transport extends BytestreamTransport {
                 progress.worked(5);
             }
 
+            Socks5BytestreamSession inSession = null;
+
             // else wait for request
             try {
-                Socks5BytestreamSession inSession = exchanger.exchange(null,
-                    TEST_TIMEOUT + 10000, TimeUnit.MILLISECONDS);
+                inSession = exchanger.exchange(null, TEST_TIMEOUT,
+                    TimeUnit.MILLISECONDS);
 
                 if (inSession.isDirect()) {
                     log
@@ -371,32 +416,24 @@ public class Socks5Transport extends BytestreamTransport {
                         NetTransferMode.SOCKS5_DIRECT);
                 }
 
-                String msg = prefix()
-                    + "response connection is mediated, too, ";
-
-                if (streamIsBidirectional(outSession, false)) {
-                    Util.closeQuietly(inSession);
-                    log
-                        .debug(msg
-                            + "but at least the server allows bidirectional connections.");
-                    return new BinaryChannel(outSession,
-                        NetTransferMode.SOCKS5_MEDIATED);
-                }
-
-                log
-                    .debug(msg
-                        + "and the server does not allow bidirectional connections. Wrapped session established.");
-                BytestreamSession session = new WrappedBidirectionalSocks5BytestreamSession(
-                    inSession, outSession);
-                return new BinaryChannel(session,
-                    NetTransferMode.SOCKS5_MEDIATED);
-
             } catch (TimeoutException e) {
                 Util.closeQuietly(outSession);
-                throw new CausedIOException(prefix()
-                    + "waiting for a response session timed out. ("
-                    + TEST_TIMEOUT + "ms)", e);
+                String msg = "waiting for a response session timed out ("
+                    + TEST_TIMEOUT + "ms)";
+                if (exception != null)
+                    throw new CausedIOException(
+                        prefix()
+                            + msg
+                            + " and could not establish a connection from this side, too:",
+                        exception);
+                else
+                    log.debug(msg);
             }
+
+            BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
+                inSession, outSession, false);
+            return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
+
         } finally {
             runningConnects.remove(peer);
         }
@@ -487,7 +524,7 @@ public class Socks5Transport extends BytestreamTransport {
     protected BytestreamSession establishResponseSession(String peer)
         throws XMPPException, IOException, InterruptedException {
 
-        logStartSession("establishing new response connection to " + peer);
+        log.debug(prefix() + "Start to establish new response connection");
 
         return manager.establishSession(peer.toString(), this
             .getNextResponseSessionID());
