@@ -249,6 +249,8 @@ public class Socks5Transport extends BytestreamTransport {
                 cancelQuietly(responseFuture);
                 return new BinaryChannel(inSession,
                     NetTransferMode.SOCKS5_DIRECT);
+            } else {
+                log.debug(prefix() + "incoming connection is mediated.");
             }
 
         } catch (Exception e) {
