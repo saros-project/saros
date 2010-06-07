@@ -54,11 +54,14 @@ public class Socks5Transport extends BytestreamTransport {
 
     private static Logger log = Logger.getLogger(Socks5Transport.class);
     private static final int BIDIRECTIONAL_TEST_INT = 5;
+    private static final int TEST_STREAM_TIMEOUT = 3000;
     /*
      * 3s might not be enough always, especially when local SOCKS5 proxy port is
-     * bound by another application
+     * bound by another application or ubuntu is used.
+     * 
+     * However, must be greater than TEST_STREAM_TIMEOUT anyway
      */
-    private static final int TEST_TIMEOUT = 10000;
+    private static final int WAIT_FOR_RESPONSE_CONNECTION = 10000;
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
     private static final int NUMBER_OF_RESPONSE_THREADS = 10;
@@ -153,7 +156,8 @@ public class Socks5Transport extends BytestreamTransport {
         }
 
         try {
-            exchanger.exchange(inSession, TEST_TIMEOUT, TimeUnit.MILLISECONDS);
+            exchanger.exchange(inSession, WAIT_FOR_RESPONSE_CONNECTION,
+                TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             log.debug(prefix()
                 + "Wrapping bidirectional stream was interrupted.");
@@ -416,8 +420,8 @@ public class Socks5Transport extends BytestreamTransport {
 
             // else wait for request
             try {
-                inSession = exchanger.exchange(null, TEST_TIMEOUT,
-                    TimeUnit.MILLISECONDS);
+                inSession = exchanger.exchange(null,
+                    WAIT_FOR_RESPONSE_CONNECTION, TimeUnit.MILLISECONDS);
 
                 if (inSession.isDirect()) {
                     log
@@ -431,7 +435,7 @@ public class Socks5Transport extends BytestreamTransport {
             } catch (TimeoutException e) {
                 Util.closeQuietly(outSession);
                 String msg = "waiting for a response session timed out ("
-                    + TEST_TIMEOUT + "ms)";
+                    + TEST_STREAM_TIMEOUT + "ms)";
                 if (exception != null)
                     throw new CausedIOException(
                         prefix()
@@ -468,7 +472,7 @@ public class Socks5Transport extends BytestreamTransport {
             InputStream in = session.getInputStream();
             int test = 0;
 
-            session.setReadTimeout(TEST_TIMEOUT);
+            session.setReadTimeout(TEST_STREAM_TIMEOUT);
 
             if (sendFirst) {
                 out.write(BIDIRECTIONAL_TEST_INT);
