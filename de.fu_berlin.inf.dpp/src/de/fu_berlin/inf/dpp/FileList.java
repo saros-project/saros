@@ -38,14 +38,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.team.core.RepositoryProvider;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
-import de.fu_berlin.inf.dpp.vcs.SubversionAdapter;
+import de.fu_berlin.inf.dpp.vcs.SubclipseAdapter;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
@@ -71,17 +70,29 @@ public class FileList {
      */
     protected static XStream xstream;
 
-    /**
-     * Contains all entries.
-     */
+    /** The actual file list data. */
     protected Map<IPath, FileListData> data = new HashMap<IPath, FileListData>();
+    /** Identifies the VCS used. */
+    public String vcsProviderID;
+    /** URL of the repository. */
+    public String vcsRepository;
+
+    public String vcsProjectRoot;
+
+    public String vcsBaseRevision;
 
     static class FileListData {
-        public long checksum; // MD5 checksum of this file.
-        String vcsIdentifier; // Identifies the VCS used.
-        String vcsRepository; // URL of the repository.
-        String vcsRevision; // Identifies the version of this file in the
-        // repository.
+        /** MD5 checksum of this file. */
+        public long checksum;
+        /** Identifies the version of this file in the repository. */
+        String vcsRevision;
+    }
+
+    public String getVCSRevision(IPath path) {
+        FileListData fileListData = data.get(path);
+        if (fileListData == null)
+            return null;
+        return fileListData.vcsRevision;
     }
 
     // TODO ndh Why would this have to be Serializable again?
@@ -125,7 +136,7 @@ public class FileList {
      */
     public FileList(IContainer container) throws CoreException {
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), this.data, true);
+        addMembers(container.members(), true);
     }
 
     /**
@@ -137,7 +148,7 @@ public class FileList {
      */
     public FileList(IResource[] resources) throws CoreException {
 
-        addMembers(resources, this.data, true);
+        addMembers(resources, true);
     }
 
     /**
@@ -274,15 +285,34 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(IResource[] resources,
-        Map<IPath, FileListData> members, boolean ignoreDerived)
+    private void addMembers(IResource[] resources, boolean ignoreDerived)
         throws CoreException {
 
-        SubversionAdapter a = new SubversionAdapter();
+        if (resources.length == 0)
+            return;
+        IProject project = resources[0].getProject();
+        SubclipseAdapter vcs = new SubclipseAdapter();
+        boolean isManagedProject = vcs.isInManagedProject(project);
+        if (isManagedProject) {
+            String providerID = vcs.getProviderID(project);
+            assert providerID != null;
+            String repository = vcs.getRepositoryString(project);
+            assert repository != null;
+            String projectPath = vcs.getProjectPath(project);
+            assert projectPath != null;
+
+            this.vcsProviderID = providerID;
+            this.vcsRepository = repository;
+            this.vcsProjectRoot = projectPath;
+            this.vcsBaseRevision = vcs.getRevisionString(project);
+        }
+
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
                 continue;
             }
+
+            assert project.equals(resource.getProject());
 
             if (resource instanceof IFile) {
                 IFile file = (IFile) resource;
@@ -294,24 +324,10 @@ public class FileList {
                     FileListData data = new FileListData();
                     data.checksum = FileUtil.checksum(file);
 
-                    IProject project = resource.getProject();
-                    boolean underVCS = RepositoryProvider.isShared(project);
-                    if (underVCS) {
-                        RepositoryProvider provider = RepositoryProvider
-                            .getProvider(project);
-                        String vcsIdentifier = provider.getID();
-                        if (vcsIdentifier
-                            .equals("org.tigris.subversion.subclipse.core.svnnature")) {
-                            String repository = a.getRepositoryString(resource);
-                            String revision = a.getRevisionString(resource);
-                            if (repository != null && revision != null) {
-                                data.vcsIdentifier = vcsIdentifier;
-                                data.vcsRepository = repository;
-                                data.vcsRevision = revision;
-                            }
-                        }
-                    }
-                    members.put(file.getProjectRelativePath(), data);
+                    if (isManagedProject)
+                        addVCSInformation(resource, data);
+
+                    this.data.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
                 }
@@ -324,10 +340,37 @@ public class FileList {
                     path = path.addTrailingSeparator();
                 }
 
-                members.put(path, null);
-                addMembers(folder.members(), members, ignoreDerived);
+                FileListData data = null;
+                if (isManagedProject) {
+                    data = new FileListData();
+                    if (!addVCSInformation(resource, data))
+                        data = null;
+                }
+                this.data.put(path, data);
+                addMembers(folder.members(), ignoreDerived);
             }
         }
+    }
+
+    private boolean addVCSInformation(IResource resource, FileListData data) {
+        SubclipseAdapter vcs = new SubclipseAdapter();
+
+        if (!vcs.isInManagedProject(resource))
+            return false;
+        String revision = vcs.getRevisionString(resource);
+        if (revision == null)
+            return false;
+
+        assert this.vcsProviderID != null
+            && this.vcsProviderID.equals(vcs.getProviderID(resource));
+        assert this.vcsRepository != null
+            && this.vcsRepository.equals(vcs.getRepositoryString(resource));
+        // FIXME ndh: Only add vcs information to tell the client that an update
+        // might be necessary, because this file's revision differs from the
+        // project revision.
+        // data.vcsRevision = revision;
+        data.vcsRevision = null;
+        return true;
     }
 
     // FIXME ndh remove/fix tests

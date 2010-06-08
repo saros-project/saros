@@ -139,7 +139,6 @@ public class FileListDiff {
     }
 
     private List<IPath> sorted(List<IPath> paths) {
-        // Collections.sort(paths, new FileList.PathLengthComparator());
         assert issorted(paths);
         return new ArrayList<IPath>(paths);
     }

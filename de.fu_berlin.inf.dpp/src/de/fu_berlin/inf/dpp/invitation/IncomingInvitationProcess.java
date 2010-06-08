@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.vcs.SubclipseAdapter;
 
 /**
  * @author rdjemili
@@ -78,7 +79,6 @@ public class IncomingInvitationProcess extends InvitationProcess {
         .getLogger(IncomingInvitationProcess.class);
     protected FileList remoteFileList;
     protected IProject localProject;
-    protected int filesLeftToSynchronize;
     protected SubMonitor monitor;
     /**
      * The project ID sent to us by the host with this invitation.
@@ -206,7 +206,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
                 ws.setDescription(desc);
             }
             checkCancellation();
-            acceptUnsafe(baseProject, newProjectName, skipSync);
+            acceptUnsafe(baseProject, newProjectName, skipSync, monitor);
         } catch (Exception e) {
             processException(e);
         } finally {
@@ -226,7 +226,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
     }
 
     protected void acceptUnsafe(final IProject baseProject,
-        final String newProjectName, boolean skipSync)
+        final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws SarosCancellationException, IOException {
         // If a base project is given, save it
         if (baseProject != null) {
@@ -239,24 +239,46 @@ public class IncomingInvitationProcess extends InvitationProcess {
             }
         }
 
+        SubclipseAdapter vcs = null;
+        if (this.remoteFileList.vcsProviderID != null) {
+            // Check if this provider is supported.
+            // TODO factory
+            boolean useVCS = false;
+            useVCS = this.remoteFileList.vcsProviderID
+                .equals("org.tigris.subversion.subclipse.core.svnnature");
+            if (useVCS)
+                vcs = new SubclipseAdapter();
+        }
+
         if (newProjectName != null) {
-            try {
-                this.localProject = Util.runSWTSync(new Callable<IProject>() {
-                    public IProject call() throws CoreException,
-                        InterruptedException {
-                        try {
-                            return createNewProject(newProjectName, baseProject);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e.getMessage());
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                throw new LocalCancellationException(e.getMessage(),
-                    CancelOption.NOTIFY_PEER);
+            if (vcs != null) {
+                this.localProject = vcs.checkoutProject(newProjectName,
+                    this.remoteFileList, monitor);
+            } else {
+                try {
+                    this.localProject = Util
+                        .runSWTSync(new Callable<IProject>() {
+                            public IProject call() throws CoreException,
+                                InterruptedException {
+                                try {
+                                    return createNewProject(newProjectName,
+                                        baseProject);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e.getMessage());
+                                }
+                            }
+                        });
+                } catch (Exception e) {
+                    throw new LocalCancellationException(e.getMessage(),
+                        CancelOption.NOTIFY_PEER);
+                }
             }
         } else {
             this.localProject = baseProject;
+            if (vcs != null) {
+                // FIXME ndh Make sure that this project is under version
+                // control
+            }
         }
 
         // TODO joining the session will already send events, which will be
@@ -278,9 +300,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
         }
         List<IPath> addedPaths = filesToSynchronize.getAddedPaths();
         List<IPath> alteredPaths = filesToSynchronize.getAlteredPaths();
-        filesLeftToSynchronize = addedPaths.size() + alteredPaths.size();
+        int numFilesMissing = addedPaths.size() + alteredPaths.size();
 
-        if (filesLeftToSynchronize < 1) {
+        if (numFilesMissing < 1) {
             log.debug("Inv" + Util.prefix(peer)
                 + ": There are no files to synchronize.");
             /**
@@ -296,10 +318,16 @@ public class IncomingInvitationProcess extends InvitationProcess {
             .getInvitationCollector(invitationID,
                 FileTransferType.ARCHIVE_TRANSFER);
 
-        addedPaths.addAll(alteredPaths);
-        FileList filesRequested = new FileList(addedPaths
-            .toArray(new IPath[addedPaths.size()]));
-        transmitter.sendFileList(peer, invitationID, filesRequested, monitor
+        FileList filesMissing;
+        // if (vcs == null) {
+        List<IPath> missingFiles = addedPaths;
+        missingFiles.addAll(alteredPaths);
+        filesMissing = new FileList(missingFiles.toArray(new IPath[missingFiles
+            .size()]));
+        // } else {
+        // filesMissing = new FileList();
+        // }
+        transmitter.sendFileList(peer, invitationID, filesMissing, monitor
             .newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
         checkCancellation();
@@ -381,9 +409,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
-        // TODO Why do some string magic here?
-        final File projectDir = new File(workspaceRoot.getLocation().toString()
-            + File.separator + newProjectName);
+        final File projectDir = new File(
+            workspaceRoot.getLocation().toString(), newProjectName);
 
         if (projectDir.exists()) {
             throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,

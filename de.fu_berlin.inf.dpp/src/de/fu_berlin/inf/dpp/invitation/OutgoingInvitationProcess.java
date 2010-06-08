@@ -368,11 +368,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        // FIXME ndh: This class should only care about *one* list.
         toSend.addAll(remoteFileList.getPaths());
-
-        // toSend.addAll(remoteFileList.getAddedPaths());
-        // toSend.addAll(remoteFileList.getAlteredPaths());
     }
 
     protected void createArchive(SubMonitor subMonitor) throws IOException,
@@ -422,7 +418,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             archive = null;
             SubMonitor archiveMonitor = subMonitor.newChild(25,
                 SubMonitor.SUPPRESS_ALL_LABELS);
-            if (toSend.size() != 0) {
+            if (this.toSend.size() != 0) {
                 /*
                  * FIX #2836964: Prefix string too short
                  * 
