@@ -38,12 +38,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.team.core.RepositoryProvider;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
+import de.fu_berlin.inf.dpp.vcs.SubversionAdapter;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
@@ -71,14 +73,18 @@ public class FileList {
 
     /**
      * Contains all entries.
-     * 
      */
     protected Map<IPath, FileListData> data = new HashMap<IPath, FileListData>();
 
     static class FileListData {
-        public long checksum;
+        public long checksum; // MD5 checksum of this file.
+        String vcsIdentifier; // Identifies the VCS used.
+        String vcsRepository; // URL of the repository.
+        String vcsRevision; // Identifies the version of this file in the
+        // repository.
     }
 
+    // TODO ndh Why would this have to be Serializable again?
     public static class PathLengthComparator implements Comparator<IPath>,
         Serializable {
 
@@ -120,7 +126,6 @@ public class FileList {
     public FileList(IContainer container) throws CoreException {
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
         addMembers(container.members(), this.data, true);
-        // this.unaltered.putAll(this.all);
     }
 
     /**
@@ -133,17 +138,16 @@ public class FileList {
     public FileList(IResource[] resources) throws CoreException {
 
         addMembers(resources, this.data, true);
-        // this.unaltered.putAll(this.all);
     }
 
     /**
-     * Creates a new file list from given paths.
+     * Creates a new file list from given paths. Don't compute checksums and
+     * location information.
      * 
      * @param paths
      *            The paths that should be added to this file list.
-     * @throws CoreException
      */
-    public FileList(IPath[] paths) throws CoreException {
+    public FileList(IPath[] paths) {
         for (IPath path : paths) {
             this.data.put(path, null);
         }
@@ -237,20 +241,6 @@ public class FileList {
         return (FileList) getXStream().fromXML(xml);
     }
 
-    /**
-     * This is called after deserialization by XStream.
-     * 
-     * Initializes {@link #data} (which is not sent via XML) to ensure the
-     * invariant of this class.
-     */
-    // protected Object readResolve() {
-    // this.all = new HashMap<IPath, Long>();
-    // this.all.putAll(added);
-    // this.all.putAll(altered);
-    // this.all.putAll(unaltered);
-    // return this;
-    // }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -288,6 +278,7 @@ public class FileList {
         Map<IPath, FileListData> members, boolean ignoreDerived)
         throws CoreException {
 
+        SubversionAdapter a = new SubversionAdapter();
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
                 continue;
@@ -302,6 +293,24 @@ public class FileList {
                 try {
                     FileListData data = new FileListData();
                     data.checksum = FileUtil.checksum(file);
+
+                    IProject project = resource.getProject();
+                    boolean underVCS = RepositoryProvider.isShared(project);
+                    if (underVCS) {
+                        RepositoryProvider provider = RepositoryProvider
+                            .getProvider(project);
+                        String vcsIdentifier = provider.getID();
+                        if (vcsIdentifier
+                            .equals("org.tigris.subversion.subclipse.core.svnnature")) {
+                            String repository = a.getRepositoryString(resource);
+                            String revision = a.getRevisionString(resource);
+                            if (repository != null && revision != null) {
+                                data.vcsIdentifier = vcsIdentifier;
+                                data.vcsRepository = repository;
+                                data.vcsRevision = revision;
+                            }
+                        }
+                    }
                     members.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);

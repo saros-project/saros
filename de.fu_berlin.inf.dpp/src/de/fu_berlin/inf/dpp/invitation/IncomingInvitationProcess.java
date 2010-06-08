@@ -296,15 +296,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
             .getInvitationCollector(invitationID,
                 FileTransferType.ARCHIVE_TRANSFER);
 
-        // FIXME ndh: Create one list of files from diff.
         addedPaths.addAll(alteredPaths);
-        IPath r[] = addedPaths.toArray(new IPath[addedPaths.size()]);
-        FileList filesRequested;
-        try {
-            filesRequested = new FileList(r);
-        } catch (CoreException e) {
-            throw new SarosCancellationException();
-        }
+        FileList filesRequested = new FileList(addedPaths
+            .toArray(new IPath[addedPaths.size()]));
         transmitter.sendFileList(peer, invitationID, filesRequested, monitor
             .newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
