@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.vcs;
+package de.fu_berlin.inf.dpp.vcs.testing;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;

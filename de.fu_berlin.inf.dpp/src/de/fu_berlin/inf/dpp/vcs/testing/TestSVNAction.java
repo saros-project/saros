@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.vcs;
+package de.fu_berlin.inf.dpp.vcs.testing;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IAction;

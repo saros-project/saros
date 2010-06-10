@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.vcs;
+package de.fu_berlin.inf.dpp.vcs.testing;
 
 import java.io.File;
 import java.io.IOException;

@@ -180,7 +180,7 @@
                <objectClass name="org.eclipse.core.resources.IProject"/>
          </visibility>
          <action
-               class="de.fu_berlin.inf.dpp.vcs.TestSVNProjectAction"
+               class="de.fu_berlin.inf.dpp.vcs.testing.TestSVNProjectAction"
                icon="icons/transmit.png"
                id="Saros.actionX"
                label="Test SVN Project">
@@ -294,14 +294,14 @@
                menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group"
                />
          <action
-               class="de.fu_berlin.inf.dpp.vcs.TestSVNAction"
+               class="de.fu_berlin.inf.dpp.vcs.testing.TestSVNAction"
                icon="icons/vcard_add.png"
                id="de.fu_berlin.inf.dpp.ui.actions.testSVN"
                label="&amp;Test SVN Checkout"
                menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group">
          </action>
          <action
-               class="de.fu_berlin.inf.dpp.vcs.TestSVNAction"
+               class="de.fu_berlin.inf.dpp.vcs.testing.TestSVNAction"
                icon="icons/vcard_add.png"
                id="de.fu_berlin.inf.dpp.ui.actions.testSVN"
                label="&amp;Test SVN create patch"
