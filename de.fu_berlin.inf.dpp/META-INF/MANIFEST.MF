@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.ui,
  org.junit4;resolution:=optional,
  org.eclipse.team.core;bundle-version="3.5.1",
  org.tigris.subversion.subclipse.core;bundle-version="1.6.10";resolution:=optional,
- org.tigris.subversion.subclipse.ui;bundle-version="1.6.10",
+ org.tigris.subversion.subclipse.ui;bundle-version="1.6.10";resolution:=optional,
  org.eclipse.compare;bundle-version="3.5.2",
  org.eclipse.team.ui;bundle-version="3.5.0"
 Bundle-ActivationPolicy: lazy

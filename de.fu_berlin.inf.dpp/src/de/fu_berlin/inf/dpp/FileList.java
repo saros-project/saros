@@ -44,7 +44,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
-import de.fu_berlin.inf.dpp.vcs.SubclipseAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
@@ -291,9 +292,8 @@ public class FileList {
         if (resources.length == 0)
             return;
         IProject project = resources[0].getProject();
-        SubclipseAdapter vcs = new SubclipseAdapter();
-        boolean isManagedProject = vcs.isInManagedProject(project);
-        if (isManagedProject) {
+        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        if (vcs != null) {
             String providerID = vcs.getProviderID(project);
             assert providerID != null;
             String repository = vcs.getRepositoryString(project);
@@ -307,6 +307,7 @@ public class FileList {
             this.vcsBaseRevision = vcs.getRevisionString(project);
         }
 
+        boolean isManagedProject = vcs != null;
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
                 continue;
@@ -325,7 +326,7 @@ public class FileList {
                     data.checksum = FileUtil.checksum(file);
 
                     if (isManagedProject)
-                        addVCSInformation(resource, data);
+                        addVCSInformation(resource, data, vcs);
 
                     this.data.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
@@ -343,7 +344,7 @@ public class FileList {
                 FileListData data = null;
                 if (isManagedProject) {
                     data = new FileListData();
-                    if (!addVCSInformation(resource, data))
+                    if (!addVCSInformation(resource, data, vcs))
                         data = null;
                 }
                 this.data.put(path, data);
@@ -352,11 +353,8 @@ public class FileList {
         }
     }
 
-    private boolean addVCSInformation(IResource resource, FileListData data) {
-        SubclipseAdapter vcs = new SubclipseAdapter();
-
-        if (!vcs.isInManagedProject(resource))
-            return false;
+    private boolean addVCSInformation(IResource resource, FileListData data,
+        VCSAdapter vcs) {
         String revision = vcs.getRevisionString(resource);
         if (revision == null)
             return false;

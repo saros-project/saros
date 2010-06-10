@@ -21,7 +21,9 @@ import de.fu_berlin.inf.dpp.FileList;
 /**
  * @author ahaferburg
  */
-public class SubclipseAdapter {
+class SubclipseAdapter implements VCSAdapter {
+    // TODO Is it safe to assume that this won't change in the future?
+    static final String identifier = "org.tigris.subversion.subclipse.core.svnnature";
     RepositoryProvider provider;
 
     public boolean isInManagedProject(IResource resource) {
@@ -31,9 +33,7 @@ public class SubclipseAdapter {
         if (!underVCS)
             return false;
 
-        // TODO
-        return "org.tigris.subversion.subclipse.core.svnnature"
-            .equals(getProviderID(resource));
+        return identifier.equals(getProviderID(resource));
     }
 
     public String getProviderID(IResource resource) {
@@ -105,7 +105,8 @@ public class SubclipseAdapter {
             ISVNRemoteFolder remote[] = { new RemoteFolder(loc, url,
                 SVNRevision.HEAD) };
             IProject[] local = { SVNWorkspaceRoot.getProject(newProjectName) };
-            // FIXME ndh: Use a CheckoutCommand instead.
+            // FIXME ndh: Use a CheckoutCommand instead. We should not depend on
+            // org.tigris.subversion.subclipse.ui.
             final CheckoutAsProjectOperation checkoutAsProjectOperation = new CheckoutAsProjectOperation(
                 null, remote, local);
             SVNRevision rev = SVNRevision.getRevision(fileList.vcsBaseRevision);
@@ -140,7 +141,6 @@ public class SubclipseAdapter {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        ;
         return null;
     }
 }

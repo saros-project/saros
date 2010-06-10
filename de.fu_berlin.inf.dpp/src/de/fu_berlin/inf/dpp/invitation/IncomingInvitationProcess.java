@@ -66,7 +66,8 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
-import de.fu_berlin.inf.dpp.vcs.SubclipseAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 
 /**
  * @author rdjemili
@@ -239,16 +240,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
             }
         }
 
-        SubclipseAdapter vcs = null;
-        if (this.remoteFileList.vcsProviderID != null) {
-            // Check if this provider is supported.
-            // TODO factory
-            boolean useVCS = false;
-            useVCS = this.remoteFileList.vcsProviderID
-                .equals("org.tigris.subversion.subclipse.core.svnnature");
-            if (useVCS)
-                vcs = new SubclipseAdapter();
-        }
+        VCSAdapter vcs = VCSAdapterFactory
+            .getAdapter(this.remoteFileList.vcsProviderID);
 
         if (newProjectName != null) {
             if (vcs != null) {
