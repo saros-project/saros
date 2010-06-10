@@ -111,6 +111,7 @@ public class RosterTracker implements ConnectionSessionListener {
             // TODO This is too late, we might miss Roster events... reload?
             this.roster.addRosterListener(listener);
 
+            // TODO Inform the listeners about the roster being set to null?
             listener.rosterChanged(this.roster);
         }
     }

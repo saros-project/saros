@@ -75,7 +75,20 @@ public class DiscoveryManager implements Disposable {
                 log.error("presence.getFrom() is null");
                 return;
             }
-            cache.remove(rjid);
+
+            DiscoverInfoWrapper infoWrapper = cache.remove(rjid);
+            if (infoWrapper != null) {
+                if (infoWrapper.isAvailable()) {
+                    log.debug("Clearing cache entry of user " + rjid + ": "
+                        + infoWrapper.item.getChildElementXML(),
+                        new StackTrace());
+                } else {
+                    log
+                        .debug("Clearing cache entry of user "
+                            + rjid
+                            + " but cache entry is empty (a discovery is still running or the last one failed)");
+                }
+            }
         }
 
         protected void clearCache(Collection<String> addresses) {
@@ -103,6 +116,8 @@ public class DiscoveryManager implements Disposable {
 
         public void entriesUpdated(Collection<String> addresses) {
             log.trace("entriesUpdated");
+            // TODO This is called to frequently by smack and invalidates our
+            // beautiful cache!
             clearCache(addresses);
         }
 

@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -77,6 +78,10 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                     boolean incoming, long size, long transmissionMillisecs) {
                     transferEvents.add(new TransferEvent(newMode, incoming,
                         size, transmissionMillisecs));
+                }
+
+                public void connectionChanged(JID jid, IBytestreamConnection connection) {
+                    // do nothing
                 }
             });
     }
