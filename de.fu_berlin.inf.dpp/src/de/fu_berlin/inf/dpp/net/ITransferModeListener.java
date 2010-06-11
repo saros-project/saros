@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net;
 
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 /**
@@ -26,6 +27,16 @@ public interface ITransferModeListener {
      */
     public void transferFinished(JID jid, NetTransferMode newMode,
         boolean incoming, long size, long transmissionMillisecs);
+
+    /**
+     * Method called when the DataTransfer connection changed.
+     * 
+     * @param jid
+     *            the peer for which the connection changed
+     * @param connection
+     *            maybenull if the connection was closed
+     */
+    public void connectionChanged(JID jid, IBytestreamConnection connection);
 
     /**
      * Is called when the transferMode information is reset (probably because

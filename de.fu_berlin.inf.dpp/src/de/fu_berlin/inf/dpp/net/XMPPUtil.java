@@ -41,6 +41,7 @@ public class XMPPUtil {
         collector.cancel();
 
         if (result == null) {
+            // TODO This exception is shown incorrectly to the user!!
             throw new XMPPException("No response from server.");
         } else if (result.getType() == IQ.Type.ERROR) {
             throw new XMPPException(result.getError());

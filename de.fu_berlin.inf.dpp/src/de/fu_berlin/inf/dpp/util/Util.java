@@ -64,6 +64,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -1187,6 +1188,21 @@ public class Util {
             log.error("An internal error ocurred while trying"
                 + " to open the question dialog.");
             return false;
+        }
+    }
+
+    /**
+     * Closes a bytestreamSession without error output.
+     * 
+     * @param stream
+     */
+    public static void closeQuietly(BytestreamSession stream) {
+        if (stream == null)
+            return;
+        try {
+            stream.close();
+        } catch (Exception e) {
+            //
         }
     }
 }
