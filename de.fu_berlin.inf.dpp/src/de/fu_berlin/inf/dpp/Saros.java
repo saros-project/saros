@@ -98,6 +98,7 @@ import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
+import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -386,6 +387,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SendFileAction.SendFileStreamService.class);
         this.container.addComponent(AudioService.class);
         this.container.addComponent(VideoSharingService.class);
+        this.container.addComponent(ArchiveStreamService.class);
 
         /*
          * The following classes are initialized by the re-injector because they

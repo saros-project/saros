@@ -137,6 +137,11 @@ public class PreferenceConstants {
     public static final String PING_PONG = "PINGPONG";
 
     /**
+     * Send project via streaming.
+     */
+    public static final String STREAM_PROJECT = "STREAM_PROJECT";
+
+    /**
      * Preferences for Communication
      */
 

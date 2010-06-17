@@ -164,6 +164,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             "Perform Latency Measurement using Ping Pong Activities",
             getFieldEditorParent()));
 
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.STREAM_PROJECT,
+            "Stream invitation (recommended for large projects that experience errors during invitation)",
+            getFieldEditorParent()));
+
     }
 
     /*

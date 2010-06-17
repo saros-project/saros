@@ -182,13 +182,14 @@ public class XMPPTransmitter implements ITransmitter,
 
     public void sendInvitation(String projectID, JID guest, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart) {
+        DateTime sessionStart, boolean doStream) {
 
         log.trace("Sending invitation to " + Util.prefix(guest)
             + " with description " + description);
 
         InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
-            projectID, description, colorID, versionInfo, sessionStart);
+            projectID, description, colorID, versionInfo, sessionStart,
+            doStream);
 
         sendMessageToUser(guest, invExtProv.create(invInfo));
     }

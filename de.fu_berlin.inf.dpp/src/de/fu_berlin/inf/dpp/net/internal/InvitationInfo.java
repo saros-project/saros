@@ -35,16 +35,18 @@ public class InvitationInfo extends DefaultInvitationInfo {
     public int colorID;
     public VersionInfo versionInfo;
     public DateTime sessionStart;
+    public boolean doStream;
 
     public InvitationInfo(SessionIDObservable sessionID, String invitationID,
         String projectID, String projectDesc, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart) {
+        VersionInfo versionInfo, DateTime sessionStart, boolean doStream) {
         super(sessionID, invitationID);
         this.projectID = projectID;
         this.projectDesc = projectDesc;
         this.colorID = colorID;
         this.versionInfo = versionInfo;
         this.sessionStart = sessionStart;
+        this.doStream = doStream;
     }
 
     public static class InvitationExtensionProvider extends
