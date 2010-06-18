@@ -87,6 +87,21 @@ public class FileList {
         public long checksum;
         /** Identifies the version of this file in the repository. */
         String vcsRevision;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (!(obj instanceof FileListData)) {
+                return false;
+            }
+            FileListData other = (FileListData) obj;
+            return checksum == other.checksum
+                && (vcsRevision == null || vcsRevision
+                    .equals(other.vcsRevision));
+        }
     }
 
     public String getVCSRevision(IPath path) {
@@ -363,16 +378,21 @@ public class FileList {
             && this.vcsProviderID.equals(vcs.getProviderID(resource));
         assert this.vcsRepository != null
             && this.vcsRepository.equals(vcs.getRepositoryString(resource));
-        // FIXME ndh: Only add vcs information to tell the client that an update
+        // TODO ndh: Only add vcs information to tell the client that an update
         // might be necessary, because this file's revision differs from the
         // project revision.
-        // data.vcsRevision = revision;
-        data.vcsRevision = null;
+        data.vcsRevision = revision;
         return true;
     }
 
     // FIXME ndh remove/fix tests
     public FileListDiff diff(FileList other) {
         return FileListDiff.diff(this, other);
+    }
+
+    // TODO ndh error handling
+    public long getChecksum(IPath path) {
+        FileListData fileListData = this.data.get(path);
+        return fileListData != null ? fileListData.checksum : -1;
     }
 }

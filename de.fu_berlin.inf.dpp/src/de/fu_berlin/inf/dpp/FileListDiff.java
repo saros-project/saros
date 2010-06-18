@@ -82,10 +82,10 @@ public class FileListDiff {
                 if (path.hasTrailingSeparator()) {
                     result.unaltered.add(path);
                 } else {
-                    long checksum = entry.getValue().checksum;
-                    long otherChecksum = target.data.get(path).checksum;
+                    FileListData fileData = entry.getValue();
+                    FileListData otherFileData = target.data.get(path);
 
-                    if (checksum == otherChecksum) {
+                    if (fileData.equals(otherFileData)) {
                         result.unaltered.add(path);
                     } else {
                         result.altered.add(path);

@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.vcs;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -22,5 +24,7 @@ public interface VCSAdapter {
         FileList fileList, SubMonitor monitor);
 
     public abstract String getProjectPath(IResource resource);
+
+    public abstract void update(IProject project, IPath path, String targetRevision, IProgressMonitor monitor);
 
 }

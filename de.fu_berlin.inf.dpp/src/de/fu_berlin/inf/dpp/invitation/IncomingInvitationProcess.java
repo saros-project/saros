@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -226,6 +227,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         }
     }
 
+    // TODO ndh split up this method, it's too long
+    @SuppressWarnings("null")
     protected void acceptUnsafe(final IProject baseProject,
         final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws SarosCancellationException, IOException {
@@ -269,39 +272,69 @@ public class IncomingInvitationProcess extends InvitationProcess {
         } else {
             this.localProject = baseProject;
             if (vcs != null) {
-                // FIXME ndh Make sure that this project is under version
+                // TODO ndh Make sure that this project is under version
                 // control
             }
         }
 
         // TODO joining the session will already send events, which will be
         // rejected by our peers, because they don't know us yet (JoinMessage is
-        // send only later)
+        // sent only later)
         sharedProject = sessionManager.joinSession(this.projectName,
             this.localProject, peer, colorID, sessionStart);
         log.debug("Inv" + Util.prefix(peer) + ": Joined the session.");
 
         monitor.beginTask("Synchronizing", 100);
         monitor.subTask("Preparing project for synchronisation...");
-        FileListDiff filesToSynchronize;
+        FileListDiff filesToSynchronize = null;
+        FileList localFileList = null;
         if (skipSync) {
             filesToSynchronize = FileListDiff.diff(null, null);
         } else {
-            filesToSynchronize = handleDiff(this.localProject,
-                this.remoteFileList, monitor.newChild(5,
-                    SubMonitor.SUPPRESS_ALL_LABELS));
+            try {
+                localFileList = new FileList(this.localProject);
+                filesToSynchronize = computeDiff(localFileList,
+                    this.remoteFileList, monitor.newChild(5,
+                        SubMonitor.SUPPRESS_ALL_LABELS));
+            } catch (CoreException e) {
+                e.printStackTrace();
+            }
         }
-        List<IPath> addedPaths = filesToSynchronize.getAddedPaths();
-        List<IPath> alteredPaths = filesToSynchronize.getAlteredPaths();
-        int numFilesMissing = addedPaths.size() + alteredPaths.size();
 
-        if (numFilesMissing < 1) {
+        List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
+        missingFiles.addAll(filesToSynchronize.getAlteredPaths());
+
+        if (missingFiles.isEmpty()) {
             log.debug("Inv" + Util.prefix(peer)
                 + ": There are no files to synchronize.");
             /**
              * We send an empty file list to the host as a notification that we
              * do not need any files.
              */
+        } else {
+            if (vcs != null && localFileList != null) {
+                List<IPath> modifiedPaths = filesToSynchronize
+                    .getAlteredPaths();
+                for (IPath path : modifiedPaths) {
+                    String targetRevision = this.remoteFileList
+                        .getVCSRevision(path);
+                    String currentRevision = localFileList.getVCSRevision(path);
+                    if (currentRevision == null
+                        || currentRevision.equals(targetRevision))
+                        continue;
+
+                    // Ctrl-Shift-F epic fail!
+                    vcs
+                        .update(this.localProject, path, targetRevision,
+                            monitor);
+                    IFile file = this.localProject.getFile(path);
+                    long checksum = FileUtil.checksum(file);
+                    long targetChecksum = this.remoteFileList.getChecksum(path);
+                    if (checksum == targetChecksum)
+                        missingFiles.remove(path);
+                }
+            }
+
         }
 
         log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
@@ -311,15 +344,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
             .getInvitationCollector(invitationID,
                 FileTransferType.ARCHIVE_TRANSFER);
 
-        FileList filesMissing;
-        // if (vcs == null) {
-        List<IPath> missingFiles = addedPaths;
-        missingFiles.addAll(alteredPaths);
-        filesMissing = new FileList(missingFiles.toArray(new IPath[missingFiles
-            .size()]));
-        // } else {
-        // filesMissing = new FileList();
-        // }
+        FileList filesMissing = new FileList(missingFiles
+            .toArray(new IPath[missingFiles.size()]));
         transmitter.sendFileList(peer, invitationID, filesMissing, monitor
             .newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
@@ -447,27 +473,27 @@ public class IncomingInvitationProcess extends InvitationProcess {
     }
 
     /**
-     * Prepares for receiving the missing resources.
+     * Determines the missing resources.
      * 
-     * @param localProject
-     *            the project that is used for the base of the replication.
+     * TODO fix javadoc
+     * 
      * @param remoteFileList
      *            the file list of the remote project.
-     * @return a FileList to request from the host. This list does not contain
-     *         any directories or files to remove, but just added and altered
-     *         files.
+     * @return A modified FileListDiff to request from the host, which does not
+     *         contain any directories or files to remove, but just added and
+     *         altered files.
      * @throws LocalCancellationException
      */
-    protected FileListDiff handleDiff(IProject localProject,
+    protected FileListDiff computeDiff(FileList localFileList,
         FileList remoteFileList, SubMonitor monitor)
         throws LocalCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Handling file list diff...");
+        log.debug("Inv" + Util.prefix(peer) + ": Computing file list diff...");
         monitor.beginTask("Preparing local project for incoming files", 100);
         try {
             monitor.subTask("Calculating Diff");
-            FileListDiff diff = FileListDiff.diff(new FileList(localProject),
-                remoteFileList);
+            FileListDiff diff = FileListDiff
+                .diff(localFileList, remoteFileList);
             monitor.worked(20);
 
             monitor.subTask("Removing unneeded resources");

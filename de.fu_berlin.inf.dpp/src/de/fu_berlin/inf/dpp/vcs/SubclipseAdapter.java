@@ -1,7 +1,11 @@
 package de.fu_berlin.inf.dpp.vcs;
 
+import java.text.ParseException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.tigris.subversion.subclipse.core.ISVNLocalResource;
@@ -9,6 +13,8 @@ import org.tigris.subversion.subclipse.core.ISVNRemoteFolder;
 import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
 import org.tigris.subversion.subclipse.core.ISVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.SVNException;
+import org.tigris.subversion.subclipse.core.SVNTeamProvider;
+import org.tigris.subversion.subclipse.core.commands.UpdateResourcesCommand;
 import org.tigris.subversion.subclipse.core.repo.SVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.resources.RemoteFolder;
 import org.tigris.subversion.subclipse.core.resources.SVNWorkspaceRoot;
@@ -142,5 +148,36 @@ class SubclipseAdapter implements VCSAdapter {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void update(IProject project, IPath path, String targetRevision,
+        IProgressMonitor monitor) {
+        SVNRevision revision;
+        try {
+            revision = SVNRevision.getRevision(targetRevision);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+        IResource resource[] = { project.getFile(path) };
+        SVNWorkspaceRoot root;
+        try {
+            SVNTeamProvider provider = (SVNTeamProvider) RepositoryProvider
+                .getProvider(project);
+            root = provider.getSVNWorkspaceRoot();
+        } catch (Exception e) {
+            // class cast, null pointer
+            e.printStackTrace();
+            return;
+        }
+        UpdateResourcesCommand cmd = new UpdateResourcesCommand(root, resource,
+            revision);
+        cmd.setForce(true);
+        try {
+            cmd.run(monitor);
+        } catch (SVNException e) {
+            e.printStackTrace();
+        }
     }
 }
