@@ -38,24 +38,19 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
- * to other file lists. Folders are denoted by a trailing separator.
- * 
+ * to other file lists. Folders are denoted by a trailing separator.<br>
+ * <br>
  * NOTE: As computation of a FileList involves a complete rescan of the project,
- * creating new instances should be avoided. TODO: This class should be split up
- * to clearly separate between file lists and differences between file lists.
- * Fields like removed, added, etc. do not make sense for plain lists and just
- * add confusion.
+ * creating new instances should be avoided.
  * 
  * @author rdjemili
  */
@@ -71,21 +66,13 @@ public class FileList {
     protected static XStream xstream;
 
     /**
-     * @invariant Contains all entries from this.added, this.altered, and
-     *            this.unaltered.
-     * 
-     * @see #readResolve()
+     * Contains all entries.
      */
-    @XStreamOmitField
-    private Map<IPath, Long> all = new HashMap<IPath, Long>();
+    protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
 
-    private final Map<IPath, Long> added = new HashMap<IPath, Long>();
-
-    private final Map<IPath, Long> removed = new HashMap<IPath, Long>();
-
-    private final Map<IPath, Long> altered = new HashMap<IPath, Long>();
-
-    private final Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
+    static class FileListData {
+        public long checksum;
+    }
 
     public static class PathLengthComparator implements Comparator<IPath>,
         Serializable {
@@ -127,8 +114,7 @@ public class FileList {
      */
     public FileList(IContainer container) throws CoreException {
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), this.all, true);
-        this.unaltered.putAll(this.all);
+        addMembers(container.members(), this.entries, true);
     }
 
     /**
@@ -139,71 +125,19 @@ public class FileList {
      * @throws CoreException
      */
     public FileList(IResource[] resources) throws CoreException {
-
-        addMembers(resources, this.all, true);
-        this.unaltered.putAll(this.all);
+        addMembers(resources, this.entries, true);
     }
 
     /**
-     * Returns a new FileList which contains the difference of two FileLists,
-     * consisting of files missing in <code>other</code> but present in
-     * <code>this</code> and files in <code>other</code> which are not present
-     * in <code>this</code>.
+     * Creates a new file list from the given paths.
      * 
-     * @param other
-     *            the <code>FileList</code> to compare to.
-     * 
-     * @return a new <code>FileList</code> which contains the difference
-     *         information of the two <code>FileList</code>s:
-     *         <code>result.removed</code> contains paths present in
-     *         <code>this.all</code> but not in <code>other.all</code>.
-     *         <code>result.added</code> contains paths present in
-     *         <code>other.all</code> but not in <code>this.all</code>.
-     *         <code>result.unaltered</code>/<code>results.altered</code>
-     *         contain paths where the checksum is equal to/differs between
-     *         <code>this</code> and <code>other</code>. <code>result.all</code>
-     *         contains all paths from <code>other</code>.
-     * 
-     *         The diff contains the operations which are needed to - * get from
-     *         <code>this</code> <code>FileList</code> to the <code>other</code>
-     *         <code>FileList</code>.
+     * @param paths
+     *            The paths that should be added to this file list.
      */
-    public FileList diff(FileList other) {
-        FileList result = new FileList();
-
-        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-            if (!other.all.containsKey(entry.getKey())) {
-                result.removed.put(entry.getKey(), entry.getValue());
-            }
+    public FileList(IPath[] paths) {
+        for (IPath path : paths) {
+            this.entries.put(path, null);
         }
-
-        for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
-            if (!this.all.containsKey(entry.getKey())) {
-                result.added.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-            IPath path = entry.getKey();
-            if (other.all.containsKey(path)) {
-
-                if (path.hasTrailingSeparator()) {
-                    result.unaltered.put(path, null);
-                } else {
-                    long checksum = entry.getValue();
-                    long otherChecksum = other.all.get(path);
-
-                    if (checksum == otherChecksum) {
-                        result.unaltered.put(path, checksum);
-                    } else {
-                        result.altered.put(path, checksum);
-                    }
-                }
-            }
-        }
-
-        result.all.putAll(other.all);
-        return result;
     }
 
     /**
@@ -219,15 +153,16 @@ public class FileList {
      */
     public int computeMatch(FileList other) {
         // calculate "sameness" of ratio of longer list
-        int nPaths = Math.max(getPaths().size(), other.getPaths().size());
+        List<IPath> otherPaths = other.getPaths();
+        int nPaths = Math.max(getPaths().size(), otherPaths.size());
 
-        if (nPaths == 0 && other.getPaths().isEmpty())
+        if (nPaths == 0 && otherPaths.isEmpty())
             return 100; // both are empty -> perfect match
 
         if (nPaths == 0) { // other is empty
             return 0;
         } else {
-            FileList difference = this.diff(other);
+            FileListDiff difference = FileListDiff.diff(this, other);
             int nUnalteredPaths = difference.getUnalteredPaths().size();
             if (nPaths == nUnalteredPaths) {
                 return 100;
@@ -272,23 +207,7 @@ public class FileList {
      *         sorted by their character length.
      */
     public List<IPath> getPaths() {
-        return sorted(this.all.keySet());
-    }
-
-    public List<IPath> getAddedPaths() {
-        return sorted(this.added.keySet());
-    }
-
-    public List<IPath> getRemovedPaths() {
-        return sorted(this.removed.keySet());
-    }
-
-    public List<IPath> getAlteredPaths() {
-        return sorted(this.altered.keySet());
-    }
-
-    public List<IPath> getUnalteredPaths() {
-        return sorted(this.unaltered.keySet());
+        return sorted(this.entries.keySet());
     }
 
     /**
@@ -309,29 +228,11 @@ public class FileList {
         return (FileList) getXStream().fromXML(xml);
     }
 
-    /**
-     * This is called after deserialization by XStream.
-     * 
-     * Initializes {@link #all} (which is not sent via XML) to ensure the
-     * invariant of this class.
-     */
-    private Object readResolve() {
-        this.all = new HashMap<IPath, Long>();
-        this.all.putAll(added);
-        this.all.putAll(altered);
-        this.all.putAll(unaltered);
-        return this;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((added == null) ? 0 : added.hashCode());
-        result = prime * result + ((altered == null) ? 0 : altered.hashCode());
-        result = prime * result + ((removed == null) ? 0 : removed.hashCode());
-        result = prime * result
-            + ((unaltered == null) ? 0 : unaltered.hashCode());
+        result = prime * result + ((entries == null) ? 0 : entries.hashCode());
         return result;
     }
 
@@ -346,25 +247,23 @@ public class FileList {
         }
 
         FileList other = (FileList) obj;
-        return this.added.equals(other.added)
-            && this.removed.equals(other.removed)
-            && this.altered.equals(other.altered)
-            && this.unaltered.equals(other.unaltered);
+        return this.entries.equals(other.entries);
     }
 
     @Override
     public String toString() {
-        return "FileList(files:" + this.all.size() + ")";
+        return "FileList(files:" + this.entries.size() + ")";
     }
 
-    private List<IPath> sorted(Set<IPath> pathSet) {
+    protected List<IPath> sorted(Set<IPath> pathSet) {
         List<IPath> paths = new ArrayList<IPath>(pathSet);
         Collections.sort(paths, new PathLengthComparator());
         return paths;
     }
 
-    private void addMembers(IResource[] resources, Map<IPath, Long> members,
-        boolean ignoreDerived) throws CoreException {
+    private void addMembers(IResource[] resources,
+        Map<IPath, FileListData> members, boolean ignoreDerived)
+        throws CoreException {
 
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
@@ -378,8 +277,9 @@ public class FileList {
                 }
 
                 try {
-                    members.put(file.getProjectRelativePath(), FileUtil
-                        .checksum(file));
+                    FileListData data = new FileListData();
+                    data.checksum = FileUtil.checksum(file);
+                    members.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
                 }
@@ -398,93 +298,8 @@ public class FileList {
         }
     }
 
-    /**
-     * Removes all resources marked as removed in this FileList from the given
-     * project.
-     * 
-     * @param localProject
-     *            the local project were the shared project will be replicated.
-     * @throws CoreException
-     */
-    public FileList removeUnneededResources(IProject localProject,
-        SubMonitor monitor) throws CoreException {
-
-        // TODO don't throw CoreException
-        // TODO check if this triggers the resource listener
-
-        List<IPath> toDelete = this.getRemovedPaths();
-        monitor.beginTask("Removing resources", toDelete.size());
-
-        for (IPath path : toDelete) {
-
-            monitor.subTask("Deleting " + path.lastSegment());
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-
-                if (folder.exists()) {
-                    folder.delete(true, monitor.newChild(1));
-                }
-
-            } else {
-                IFile file = localProject.getFile(path);
-
-                // check if file exists because it might have already been
-                // deleted when deleting its folder
-                if (file.exists()) {
-                    file.delete(true, monitor.newChild(1));
-                }
-            }
-        }
-
-        FileList result = new FileList();
-        result.added.putAll(this.added);
-        result.altered.putAll(this.altered);
-        // Removed is empty now
-        result.unaltered.putAll(this.unaltered);
-        result.readResolve();
-
-        monitor.done();
-
-        return result;
-    }
-
-    /**
-     * Will create all folders contained in this FileList for the given project
-     * and return a FileList which does not contain these folders.
-     * 
-     * Note: All parent folders of any folder contained in the FileList must be
-     * contained as well.
-     * 
-     * @throws CoreException
-     */
-    public FileList addAllFolders(IProject localProject, SubMonitor monitor)
-        throws CoreException {
-
-        List<IPath> toCheck = this.getAddedPaths();
-        monitor.beginTask("Adding folders", toCheck.size());
-
-        FileList result = new FileList();
-        result.altered.putAll(this.altered);
-        result.removed.putAll(this.removed);
-        result.unaltered.putAll(this.unaltered);
-
-        for (IPath path : toCheck) {
-
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-                if (!folder.exists()) {
-                    monitor.subTask("Creating folder " + path.lastSegment());
-                    folder.create(true, true, monitor.newChild(1));
-                    continue;
-                }
-            } else {
-                result.added.put(path, added.get(path));
-            }
-            monitor.worked(1);
-        }
-        result.readResolve();
-
-        monitor.done();
-        return result;
+    // FIXME ndh remove/fix tests
+    public FileListDiff diff(FileList other) {
+        return FileListDiff.diff(this, other);
     }
 }

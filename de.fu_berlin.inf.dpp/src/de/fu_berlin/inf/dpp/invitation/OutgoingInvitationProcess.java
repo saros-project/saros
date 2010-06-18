@@ -147,7 +147,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             sendInvitation(monitor.newChild(1));
 
-            getFileListDiff(monitor.newChild(1));
+            getFileList(monitor.newChild(1));
 
             sendCommunicationInformation(monitor.newChild(1));
 
@@ -201,7 +201,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     }
 
     /**
-     * Send communication information during invitation process
+     * Send communication information (chat preferences) during invitation
+     * process.
      */
     protected void sendCommunicationInformation(SubMonitor subMonitor)
         throws SarosCancellationException {
@@ -213,7 +214,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         comNegotiatingManager.sendComPrefs(peer, subMonitor.newChild(1));
         subMonitor.done();
-
     }
 
     /**
@@ -280,6 +280,14 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         }
     }
 
+    /**
+     * Send an invitation, then wait for the peer to accept and request the file
+     * list.
+     * 
+     * @param subMonitor
+     * @throws SarosCancellationException
+     * @throws IOException
+     */
     protected void sendInvitation(SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
 
@@ -318,7 +326,15 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": File list request has received.");
     }
 
-    protected void getFileListDiff(SubMonitor subMonitor) throws IOException,
+    /**
+     * Create and send the complete file list, then wait for the peer's partial
+     * file list.
+     * 
+     * @param subMonitor
+     * @throws IOException
+     * @throws SarosCancellationException
+     */
+    protected void getFileList(SubMonitor subMonitor) throws IOException,
         SarosCancellationException {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
@@ -368,8 +384,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        toSend.addAll(remoteFileList.getAddedPaths());
-        toSend.addAll(remoteFileList.getAlteredPaths());
+        toSend.addAll(remoteFileList.getPaths());
     }
 
     protected void createArchive(SubMonitor subMonitor) throws IOException,

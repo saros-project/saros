@@ -135,7 +135,7 @@ public class VersionManager {
         /**
          * <Add new version here>
          */
-
+       // Note to Release manager: 10.6.25 isn't compatible to 10.6.11.r2223
         /**
          * Version 10.6.11.r2223
          * 
