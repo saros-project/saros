@@ -135,11 +135,21 @@ public class VersionManager {
         /**
          * <Add new version here>
          */
+
         /**
-         * Version 10.4.14.r2128
+         * Version 10.6.11.r2223
+         * 
+         * We are no longer backwards-compatible because of the changes in the
+         * net refactoring.
          */
-        compatibilityChart.put(new Version("10.5.28.r2173"), Arrays
-            .asList(new Version("10.5.28.r2173")));
+        compatibilityChart.put(new Version("10.6.11.r2223"), Arrays
+            .asList(new Version("10.6.11.r2223")));
+
+        /**
+         * Version 10.5.28.r2173
+         */
+        compatibilityChart.put(new Version("10.5.28.r2173"), Arrays.asList(
+            new Version("10.5.28.r2173"), new Version("10.4.14.r2128")));
 
         /**
          * Version 10.4.14.r2128
