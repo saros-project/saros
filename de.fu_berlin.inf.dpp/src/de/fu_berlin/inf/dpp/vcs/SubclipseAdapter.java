@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.vcs;
 
 import java.text.ParseException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
@@ -151,7 +151,7 @@ class SubclipseAdapter implements VCSAdapter {
     }
 
     @Override
-    public void update(IProject project, IPath path, String targetRevision,
+    public void update(IFile file, String targetRevision,
         IProgressMonitor monitor) {
         SVNRevision revision;
         try {
@@ -160,11 +160,11 @@ class SubclipseAdapter implements VCSAdapter {
             e.printStackTrace();
             return;
         }
-        IResource resource[] = { project.getFile(path) };
+        IResource resource[] = { file };
         SVNWorkspaceRoot root;
         try {
             SVNTeamProvider provider = (SVNTeamProvider) RepositoryProvider
-                .getProvider(project);
+                .getProvider(file.getProject());
             root = provider.getSVNWorkspaceRoot();
         } catch (Exception e) {
             // class cast, null pointer

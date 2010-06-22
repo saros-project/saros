@@ -102,6 +102,12 @@ public class FileList {
                 && (vcsRevision == null || vcsRevision
                     .equals(other.vcsRevision));
         }
+
+        @Override
+        public int hashCode() {
+            // TODO Auto-generated method stub
+            return super.hashCode();
+        }
     }
 
     public String getVCSRevision(IPath path) {
@@ -174,9 +180,11 @@ public class FileList {
      * @param paths
      *            The paths that should be added to this file list.
      */
-    public FileList(IPath[] paths) {
-        for (IPath path : paths) {
-            this.data.put(path, null);
+    public FileList(List<IPath> paths) {
+        if (paths != null) {
+            for (IPath path : paths) {
+                this.data.put(path, null);
+            }
         }
     }
 

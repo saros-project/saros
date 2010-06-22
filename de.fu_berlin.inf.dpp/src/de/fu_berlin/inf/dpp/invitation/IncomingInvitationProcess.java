@@ -227,9 +227,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         }
     }
 
-    // TODO ndh split up this method, it's too long
-    @SuppressWarnings("null")
-    protected void acceptUnsafe(final IProject baseProject,
+    private void acceptUnsafe(final IProject baseProject,
         final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws SarosCancellationException, IOException {
         // If a base project is given, save it
@@ -246,36 +244,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         VCSAdapter vcs = VCSAdapterFactory
             .getAdapter(this.remoteFileList.vcsProviderID);
 
-        if (newProjectName != null) {
-            if (vcs != null) {
-                this.localProject = vcs.checkoutProject(newProjectName,
-                    this.remoteFileList, monitor);
-            } else {
-                try {
-                    this.localProject = Util
-                        .runSWTSync(new Callable<IProject>() {
-                            public IProject call() throws CoreException,
-                                InterruptedException {
-                                try {
-                                    return createNewProject(newProjectName,
-                                        baseProject);
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e.getMessage());
-                                }
-                            }
-                        });
-                } catch (Exception e) {
-                    throw new LocalCancellationException(e.getMessage(),
-                        CancelOption.NOTIFY_PEER);
-                }
-            }
-        } else {
-            this.localProject = baseProject;
-            if (vcs != null) {
-                // TODO ndh Make sure that this project is under version
-                // control
-            }
-        }
+        assignLocalProject(baseProject, newProjectName, vcs, monitor);
 
         // TODO joining the session will already send events, which will be
         // rejected by our peers, because they don't know us yet (JoinMessage is
@@ -284,58 +253,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
             this.localProject, peer, colorID, sessionStart);
         log.debug("Inv" + Util.prefix(peer) + ": Joined the session.");
 
-        monitor.beginTask("Synchronizing", 100);
-        monitor.subTask("Preparing project for synchronisation...");
-        FileListDiff filesToSynchronize = null;
-        FileList localFileList = null;
-        if (skipSync) {
-            filesToSynchronize = FileListDiff.diff(null, null);
-        } else {
-            try {
-                localFileList = new FileList(this.localProject);
-                filesToSynchronize = computeDiff(localFileList,
-                    this.remoteFileList, monitor.newChild(5,
-                        SubMonitor.SUPPRESS_ALL_LABELS));
-            } catch (CoreException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
-        missingFiles.addAll(filesToSynchronize.getAlteredPaths());
-
-        if (missingFiles.isEmpty()) {
-            log.debug("Inv" + Util.prefix(peer)
-                + ": There are no files to synchronize.");
-            /**
-             * We send an empty file list to the host as a notification that we
-             * do not need any files.
-             */
-        } else {
-            if (vcs != null && localFileList != null) {
-                List<IPath> modifiedPaths = filesToSynchronize
-                    .getAlteredPaths();
-                for (IPath path : modifiedPaths) {
-                    String targetRevision = this.remoteFileList
-                        .getVCSRevision(path);
-                    String currentRevision = localFileList.getVCSRevision(path);
-                    if (currentRevision == null
-                        || currentRevision.equals(targetRevision))
-                        continue;
-
-                    // Ctrl-Shift-F epic fail!
-                    vcs
-                        .update(this.localProject, path, targetRevision,
-                            monitor);
-                    IFile file = this.localProject.getFile(path);
-                    long checksum = FileUtil.checksum(file);
-                    long targetChecksum = this.remoteFileList.getChecksum(path);
-                    if (checksum == targetChecksum)
-                        missingFiles.remove(path);
-                }
-            }
-
-        }
+        FileList requiredFiles = computeRequiredFiles(skipSync, vcs, monitor);
 
         log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
         monitor.subTask("Sending file list...");
@@ -343,10 +261,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         SarosPacketCollector archiveCollector = transmitter
             .getInvitationCollector(invitationID,
                 FileTransferType.ARCHIVE_TRANSFER);
-
-        FileList filesMissing = new FileList(missingFiles
-            .toArray(new IPath[missingFiles.size()]));
-        transmitter.sendFileList(peer, invitationID, filesMissing, monitor
+        transmitter.sendFileList(peer, invitationID, requiredFiles, monitor
             .newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
 
         checkCancellation();
@@ -369,6 +284,122 @@ public class IncomingInvitationProcess extends InvitationProcess {
             + ": Archive has been written to disk.");
 
         completeInvitation();
+    }
+
+    /**
+     * Computes the list of files that we're going to request from the host.<br>
+     * If a VCS is used, update files if needed, and remove them from the list
+     * of requested files if that's possible.
+     * 
+     * @param skipSync
+     *            Skip the initial synchronization.
+     * @param vcs
+     *            The VCS adapter of the local project.
+     * @param monitor
+     *            The SubMonitor of the dialog.
+     * @return The list of files that we need from the host.
+     * @throws LocalCancellationException
+     *             If the user requested a cancel.
+     * @throws IOException
+     */
+    private FileList computeRequiredFiles(boolean skipSync, VCSAdapter vcs,
+        SubMonitor monitor) throws LocalCancellationException, IOException {
+        monitor.beginTask("Synchronizing", 100);
+        monitor.subTask("Preparing project for synchronization...");
+
+        if (skipSync) {
+            return new FileList();
+        }
+
+        FileListDiff filesToSynchronize = null;
+        FileList localFileList = null;
+        try {
+            localFileList = new FileList(this.localProject);
+        } catch (CoreException e) {
+            e.printStackTrace();
+            return new FileList();
+        }
+        filesToSynchronize = computeDiff(localFileList, this.remoteFileList,
+            monitor.newChild(5, SubMonitor.SUPPRESS_ALL_LABELS));
+
+        List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
+        missingFiles.addAll(filesToSynchronize.getAlteredPaths());
+        if (missingFiles.isEmpty()) {
+            log.debug("Inv" + Util.prefix(peer)
+                + ": There are no files to synchronize.");
+            /**
+             * We send an empty file list to the host as a notification that we
+             * do not need any files.
+             */
+            return new FileList();
+        }
+
+        if (vcs != null) {
+            // Update files if necessary.
+            List<IPath> modifiedPaths = filesToSynchronize.getAlteredPaths();
+            for (IPath path : modifiedPaths) {
+                String targetRevision = this.remoteFileList
+                    .getVCSRevision(path);
+                String currentRevision = localFileList.getVCSRevision(path);
+                if (currentRevision == null
+                    || currentRevision.equals(targetRevision))
+                    continue;
+
+                IFile file = this.localProject.getFile(path);
+                vcs.update(file, targetRevision, monitor);
+                long updatedChecksum = FileUtil.checksum(file);
+                long targetChecksum = this.remoteFileList.getChecksum(path);
+                if (updatedChecksum == targetChecksum)
+                    missingFiles.remove(path);
+            }
+        }
+        return new FileList(missingFiles);
+    }
+
+    /**
+     * Assign a value to this.localProject.<br>
+     * Use baseProject if it's not null. Otherwise check out from VCS if
+     * possible. Otherwise create a new project.
+     * 
+     * @param baseProject
+     * @param newProjectName
+     * @param vcs
+     * @param monitor
+     * @throws LocalCancellationException
+     */
+    private void assignLocalProject(final IProject baseProject,
+        final String newProjectName, VCSAdapter vcs, SubMonitor monitor)
+        throws LocalCancellationException {
+        if (newProjectName == null) {
+            this.localProject = baseProject;
+            if (vcs != null) {
+                // TODO ndh Make sure that this project is under version
+                // control.
+            }
+            return;
+        }
+
+        if (vcs != null) {
+            this.localProject = vcs.checkoutProject(newProjectName,
+                this.remoteFileList, monitor);
+            return;
+        }
+
+        try {
+            this.localProject = Util.runSWTSync(new Callable<IProject>() {
+                public IProject call() throws CoreException,
+                    InterruptedException {
+                    try {
+                        return createNewProject(newProjectName, baseProject);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            throw new LocalCancellationException(e.getMessage(),
+                CancelOption.NOTIFY_PEER);
+        }
     }
 
     /**
@@ -475,19 +506,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
     /**
      * Determines the missing resources.
      * 
-     * TODO fix javadoc
-     * 
+     * @param localFileList
+     *            The file list of the local project.
      * @param remoteFileList
-     *            the file list of the remote project.
-     * @return A modified FileListDiff to request from the host, which does not
-     *         contain any directories or files to remove, but just added and
-     *         altered files.
+     *            The file list of the remote project.
+     * @param monitor
+     *            The progress monitor of the dialog.
+     * @return A modified FileListDiff which doesn't contain any directories or
+     *         files to remove, but just added and altered files.
      * @throws LocalCancellationException
+     *             If the process is canceled by the user.
      */
     protected FileListDiff computeDiff(FileList localFileList,
         FileList remoteFileList, SubMonitor monitor)
         throws LocalCancellationException {
-
         log.debug("Inv" + Util.prefix(peer) + ": Computing file list diff...");
         monitor.beginTask("Preparing local project for incoming files", 100);
         try {
@@ -514,7 +546,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
     }
 
     /**
-     * Ends the incoming invitation process.
+     * Ends the incoming invitation process. Sends a confirmation to the host
+     * and starts the shared project.
      */
     protected void completeInvitation() {
         log.debug("Inv" + Util.prefix(peer) + ": Completing invitation...");
