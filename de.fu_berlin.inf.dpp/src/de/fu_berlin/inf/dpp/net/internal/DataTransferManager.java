@@ -314,7 +314,8 @@ public class DataTransferManager implements ConnectionSessionListener,
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
                 log.error(Util.prefix(recipient) + "Failed to connect using "
-                    + transport.toString() + ":", e.getCause());
+                    + transport.toString() + ":", e.getCause() == null ? e : e
+                    .getCause());
             }
             if (connection != null)
                 break;

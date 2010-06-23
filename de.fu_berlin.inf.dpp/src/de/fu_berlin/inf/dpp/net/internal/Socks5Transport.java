@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class Socks5Transport extends BytestreamTransport {
 
     private static Logger log = Logger.getLogger(Socks5Transport.class);
-    private static final int BIDIRECTIONAL_TEST_INT = 999;
+    private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
     private static final int TEST_STREAM_TIMEOUT = 3000;
     /*
      * 3s might not be enough always, especially when local SOCKS5 proxy port is
@@ -245,22 +245,21 @@ public class Socks5Transport extends BytestreamTransport {
             session.setReadTimeout(TEST_STREAM_TIMEOUT);
 
             if (sendFirst) {
-                out.write(BIDIRECTIONAL_TEST_INT);
+                out.write(BIDIRECTIONAL_TEST_BYTE);
                 test = in.read();
             } else {
                 test = in.read();
-                out.write(BIDIRECTIONAL_TEST_INT);
+                out.write(BIDIRECTIONAL_TEST_BYTE);
             }
 
-            if (test == BIDIRECTIONAL_TEST_INT) {
+            if (test == BIDIRECTIONAL_TEST_BYTE) {
                 log.trace(prefix() + "stream is bidirectional. ("
                     + (sendFirst ? "sending" : "receiving") + ")");
                 return true;
             } else {
-                log
-                    .error(prefix()
-                        + "stream seems to work but recieved wrong result: "
-                        + test);
+                log.error(prefix()
+                    + "stream can send and receive but got wrong result: "
+                    + test);
                 throw new IOException(
                     "SOCKS5 bytestream connections got mixed up. Try another transport.");
                 /*
@@ -273,16 +272,6 @@ public class Socks5Transport extends BytestreamTransport {
         } catch (SocketTimeoutException ste) {
             // expected if unidirectional stream
         }
-        // TODO remove
-        // catch (IOException e) {
-        // log
-        // .error(
-        // prefix()
-        // +
-        // "stream direction test failed. However, still trying to establish a bidirectional one.",
-        // e);
-        // return false;
-        // }
 
         /*
          * Note: the streams cannot be closed here - even not the unused ones -
