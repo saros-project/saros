@@ -135,7 +135,16 @@ public class VersionManager {
         /**
          * <Add new version here>
          */
-       // Note to Release manager: 10.6.25 isn't compatible to 10.6.11.r2223
+
+        /**
+         * Version 10.6.25.r2236
+         * 
+         * We are no longer backwards-compatible because of the changes in the
+         * net refactoring. 10.6.25 isn't compatible to 10.6.11.r2223
+         */
+        compatibilityChart.put(new Version("10.6.25.r2236"), Arrays
+            .asList(new Version("10.6.25.r2236")));
+
         /**
          * Version 10.6.11.r2223
          * 
