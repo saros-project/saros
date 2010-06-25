@@ -1,138 +1,475 @@
-<?xml version="1.0"?>
-<!--
-Saros build file for automatic plugin builds using ant4eclipse
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="de.fu_berlin.inf.dpp" default="build.jars" basedir=".">
 
-Florian Thiel <florian.thiel@fu-berlin.de>,
-created: 20100217
+	<property name="p2.build.repo" value="file:${buildDirectory}/buildRepo"/>
+	<property name="basews" value="${ws}"/>
+	<property name="baseos" value="${os}"/>
+	<property name="basearch" value="${arch}"/>
+	<property name="basenl" value="${nl}"/>
+	<property name="bundleId" value="de.fu_berlin.inf.dpp"/>
+	<property name="bundleVersion" value="10.6.25.r2236"/>
+	<property name="p2.publishonerror" value="false"/>
 
-use: ant -lib [ANT4ECLIPSE_LIBS]
-         -Declipse.plugin.dir=DIR
-         -Dant4eclipse.dir=DIR
-         -Dcobertura.dir=DIR
-         -Dfeature.version=DIR
-         TARGET
-
-NOTE:
-- requires following properties to be set
-  eclipse.plugin.dir=DIR (path to eclipse plugin libs)
-  cobertura.dir=DIR (cobertura libs)
-  ant4eclipse.dir=DIR (ant4eclipse root)
-  feature.version=VERSION (version # for feature (has to match plugin)
-- you can force the use of a specific JDK by uncommenting
-  the <ant4eclipse:installedJREs> section below
--->
-
-<project name="build.saros" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
-
-	<!-- define ant-contrib macros -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	
-	<!-- define ant4eclipse tasks -->
-	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
-
-	<!-- import the ant4eclipse pde macros -->
-	<import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
-
-	<path id="cobertura.classpath">
-		<fileset dir="${cobertura.dir}">
-			<include name="cobertura.jar" />
-			<include name="lib/**/*.jar" />
+	<!-- Compiler settings. -->
+	<property name="javacFailOnError" value="false"/>
+	<property name="javacDebugInfo" value="on"/>
+	<property name="javacVerbose" value="false"/>
+	<property name="logExtension" value=".log"/>
+	<property name="compilerArg" value=""/>
+	<property name="javacSource" value="1.3"/>
+	<property name="javacTarget" value="1.2"/>
+	<condition property="dir_bootclasspath" value="${java.home}/../Classes">
+		<os family="mac"/>
+	</condition>
+	<property name="dir_bootclasspath" value="${java.home}/lib"/>
+	<path id="path_bootclasspath">
+		<fileset dir="${dir_bootclasspath}">
+			<include name="*.jar"/>
 		</fileset>
 	</path>
+	<property name="bootclasspath" refid="path_bootclasspath"/>
+	<condition property="bundleBootClasspath" value="${J2SE-1.5}"	>
+		<isset property="J2SE-1.5"/>
+	</condition>
+	<condition property="bundleJavacSource" value="1.5"	>
+		<isset property="J2SE-1.5"/>
+	</condition>
+	<condition property="bundleJavacTarget" value="1.5"	>
+		<isset property="J2SE-1.5"/>
+	</condition>
+	<property name="bundleJavacSource" value="${javacSource}"/>
+	<property name="bundleJavacTarget" value="${javacTarget}"/>
+	<property name="bundleBootClasspath" value="${bootclasspath}"/>
 
-	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
-
-	<!-- define the workspace location here -->
-	<property name="workspaceDirectory" value="${basedir}/.." />
-
-	<property name="cobertura.format" value="xml" />
-	<property name="src.dir" value="${basedir}/src" />
-	<property name="build.dir" value="${basedir}/build" />
-	<property name="report.dir" value="${build.dir}/report" />
-	<property name="instrumented.dir" value="${build.dir}/instrumented" />
-	<property name="uninstrumented.dir" value="${build.dir}/uninstrumented" />
-	<property name="cobertura.datafile" value="${report.dir}/cobertura.ser" />
-
-	<!-- define your jdk location here
-		<ant4eclipse:installedJREs>
-			<jre id="jdk16" location="R:/software/jdk/jdk16" />
-		</ant4eclipse:installedJREs>
-	-->
-
-	<!-- (define eclipse.plugin.dir using -D syntax) the target platform
-			  location (can be an Eclipse plugin dir or another set of JARs
-			  satisfying the Saros platform dependencies) -->
-	<ant4eclipse:targetPlatform id="saros.target.platform">
-		<location dir="${eclipse.plugin.dir}" />
-	</ant4eclipse:targetPlatform>
-
-	<!-- acquire access to the project classpath for unit tests -->
-	<ant4eclipse:getJdtClassPath pathId="saros.classpath" workspaceDirectory="${workspaceDirectory}" projectName="Saros" />
-
-	<!-- Targets -->
-	<target name="build">
-		<mkdir dir="${uninstrumented.dir}" />
-		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="Saros" targetplatformid="saros.target.platform" destination="${uninstrumented.dir}" />
+	<target name="init" depends="properties">
+		<condition property="pluginTemp" value="${buildTempFolder}/plugins"		>
+			<isset property="buildTempFolder"/>
+		</condition>
+		<property name="pluginTemp" value="${basedir}"/>
+		<condition property="build.result.folder" value="${pluginTemp}/de.fu_berlin.inf.dpp_10.6.25.r2236"		>
+			<isset property="buildTempFolder"/>
+		</condition>
+		<property name="build.result.folder" value="${basedir}"/>
+		<property name="temp.folder" value="${basedir}/temp.folder"/>
+		<property name="plugin.destination" value="${basedir}"/>
+		<condition property="p2.publish.parts" value="true"		>
+			<istrue value="${p2.gathering}"/>
+		</condition>
+		<property name="compilation.problem.marker" value="${build.result.folder}/compilation.problem"/>
+		<condition property="compilation.problem.marker.exists" value="true"		>
+			<and>
+			<available file="${compilation.problem.marker}"/>
+			<isfalse value="p2.publishonerror"/>
+			</and>
+		</condition>
 	</target>
 
-	<target name="test" depends="build">
-		<delete file="${cobertura.datafile}" />
-		<mkdir dir="${instrumented.dir}" />
-		<cobertura-instrument todir="${instrumented.dir}" datafile="${cobertura.datafile}">
-			<!-- only instrument Saros proper code -->
-			<includeClasses regex="de\.fu_berlin\.inf\.dpp.*" />
-			<!-- exclude classes ending in Test -->
-			<excludeClasses regex=".*Test" />
-			<!-- exclude classes starting with Test -->
-			<excludeClasses regex=".*\.Test.*" />
-			<!-- exclude classes in a test package -->
-			<excludeClasses regex=".*\.test\..*" />
-			<fileset dir="${uninstrumented.dir}/plugins">
-				<include name="de.fu_berlin.inf.dpp_*.jar" />
+	<target name="properties" if="eclipse.running">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+
+	</target>
+
+	<target name="build.update.jar" depends="init" description="Build the plug-in: de.fu_berlin.inf.dpp for an update site.">
+		<delete dir="${temp.folder}"/>
+		<mkdir dir="${temp.folder}"/>
+		<antcall target="build.jars"/>
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<jar destfile="${plugin.destination}/de.fu_berlin.inf.dpp_10.6.25.r2236.jar" basedir="${temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236" filesetmanifest="merge"/>
+		<delete dir="${temp.folder}"/>
+	</target>
+
+	<target name="@dot" depends="init" unless="@dot" description="Create jar: de.fu_berlin.inf.dpp @dot.">
+		<delete dir="${build.result.folder}/@dot"/>
+		<mkdir dir="${build.result.folder}/@dot"/>
+		<path id="@dot.classpath">
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.filesystem_1.2.1.R35x_v20091203-1235.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.filesystem.win32.x86_1.1.0.v20080604-1400.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.200.v20090429-1800/runtime_registry_compatibility.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.200.v20090429-1800"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.registry_3.4.100.v20090520-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.net_1.2.1.r35x_20090812-1200.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.net.win32.x86_1.0.0.I20080909.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.security_1.0.100.v20090520-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.security.win32.x86_1.0.100.v20090520-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui_3.5.2.M20100120-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.runtime.compatibility.auth_3.2.100.v20090413.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.app_1.2.1.R35x_v20091203.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.osgi.services_3.2.0.v20090520-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/javax.servlet_2.5.0.v200806031605.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.swt_3.5.2.v3557f.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.swt.win32.win32.x86_3.5.2.v3557f.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jface_3.5.2.M20100120-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.commands_3.5.0.I20090525-2000.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.workbench_3.5.2.M20100113-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20090429-1800/compatibility.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20090429-1800/e4-workbench.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.workbench.compatibility_3.2.0.I20090429-1800"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/com.ibm.icu_4.0.1.v20090822.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.help_3.4.1.v20090805_35x.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.expressions_3.4.101.R35x_v20100209.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jface.databinding_1.3.1.M20090826-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.databinding.observable_1.2.0.M20090902-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.databinding.property_1.2.0.M20090819-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.databinding_1.2.0.M20090819-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.resources.compatibility_3.4.1.R35x_v20100113-0530.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.resources.win32.x86_3.5.0.v20081020.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ant.core_3.2.101.v20091110_r352.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.variables_3.2.200.v20090521.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.workbench.texteditor_3.5.1.r352_v20100105.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.compare.core_3.5.0.I20090430-0408.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jface.text_3.5.2.r352_v20091118-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.text_3.5.0.v20090513-2000.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.editors_3.5.0.v20090527-2000.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.ide_3.5.2.M20100113-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.win32_3.2.100.v20090429-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.views_3.4.1.M20090826-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.forms_3.4.1.v20090714_35x.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.engine_1.0.102.R35x_v20091117.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.core_1.0.101.R35x_v20090819.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.metadata_1.0.101.R35x_v20100112.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.metadata.repository_1.0.101.R35x_v20090812.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.repository_1.0.1.R35x_v20100105.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf.filetransfer_3.0.0.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf_3.0.0.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf.ssl_1.0.0.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.concurrent_1.0.1.R35x_v20100209.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf.identity_3.0.0.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf.provider.filetransfer_3.0.1.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ecf.provider.filetransfer.ssl_1.0.0.v20090831-1906.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.artifact.repository_1.0.101.R35x_v20090721.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.equinox.p2.jarprocessor_1.0.100.v20090520-1905.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.core.filebuffers_3.5.0.v20090526-2000.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.core_3.5.2.v_981_R35x.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.compiler.apt_1.0.201.R35x_v20090925-1100.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.compiler.tool_1.0.100.v_981_R35x.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.team.core_3.5.1.r35x_20100113-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.ui_3.5.2.r352_v20100106-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.search_3.5.1.r351_v20090708-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ltk.core.refactoring_3.5.0.v20090513-2000.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ltk.ui.refactoring_3.4.101.r352_v20100209.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.navigator_3.4.2.M20100120-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.compare_3.5.2.r35x_20100113-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.team.ui_3.5.0.I20090430-0408.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.navigator.resources_3.4.1.M20090826-0800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.views.properties.tabbed_3.5.0.I20090429-1800.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.debug.core_3.5.1.v20091103_r352.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.debug.ui_3.5.2.v20091028_r352.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.ui.console_3.4.0.v20090513.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.launching_3.5.1.v20100108_r352.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.debug_3.5.0.v20090526/jdi.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.debug_3.5.0.v20090526/jdimodel.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.debug_3.5.0.v20090526/tools.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.eclipse.jdt.core.manipulation_1.3.0.v20090603.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.junit4_4.5.0.v20090824/junit.jar"/>
+			<pathelement path="../../../../bauch/eclipse/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+			<pathelement path="bin/"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/bin/"/>
+			<pathelement path="lib/log4j-1.2.15.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/log4j-1.2.15.jar"/>
+			<pathelement path="lib/smack.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/smack.jar"/>
+			<pathelement path="lib/smackx.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/smackx.jar"/>
+			<pathelement path="lib/smackx-debug.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/smackx-debug.jar"/>
+			<pathelement path="lib/smackx-jingle.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/smackx-jingle.jar"/>
+			<pathelement path="lib/commons-logging.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/commons-logging.jar"/>
+			<pathelement path="lib/picocontainer-2.7.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/picocontainer-2.7.jar"/>
+			<pathelement path="lib/commons-codec-1.3.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/commons-codec-1.3.jar"/>
+			<pathelement path="lib/commons-io-1.4.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/commons-io-1.4.jar"/>
+			<pathelement path="lib/commons-lang-2.4.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/commons-lang-2.4.jar"/>
+			<pathelement path="lib/junit.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/junit.jar"/>
+			<pathelement path="lib/xstream-1.3.1.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/xstream-1.3.1.jar"/>
+			<pathelement path="lib/lw-collection-4.18.8-Java1.5.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/lw-collection-4.18.8-Java1.5.jar"/>
+			<pathelement path="lib/lw-common-4.18.8-Java1.5.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/lw-common-4.18.8-Java1.5.jar"/>
+			<pathelement path="lib/lw-io-4.18.8-Java1.5.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/lw-io-4.18.8-Java1.5.jar"/>
+			<pathelement path="lib/lw-nio-4.18.8-Java1.5.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/lw-nio-4.18.8-Java1.5.jar"/>
+			<pathelement path="lib/lw-rudp-4.18.8-Java1.5.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/lw-rudp-4.18.8-Java1.5.jar"/>
+			<pathelement path="lib/picocontainer-gems-2.7.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/picocontainer-gems-2.7.jar"/>
+			<pathelement path="lib/cglib-nodep-2.1_3.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/cglib-nodep-2.1_3.jar"/>
+			<pathelement path="lib/easymock-2.0.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/easymock-2.0.jar"/>
+			<pathelement path="lib/easymockclassextension-2.0-pre-release.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/easymockclassextension-2.0-pre-release.jar"/>
+			<pathelement path="lib/commons-httpclient-3.1.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/commons-httpclient-3.1.jar"/>
+			<pathelement path="lib/joda-time-1.6.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/joda-time-1.6.jar"/>
+			<pathelement path="lib/protobuf-2.3.0.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/protobuf-2.3.0.jar"/>
+			<pathelement path="lib/google-collect-1.0.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/google-collect-1.0.jar"/>
+			<pathelement path="lib/jspeex-0.9.2.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/jspeex-0.9.2.jar"/>
+			<pathelement path="lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar"/>
+			<pathelement path="lib/logback-classic.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/logback-classic.jar"/>
+			<pathelement path="lib/logback-core.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/logback-core.jar"/>
+			<pathelement path="lib/slf4j-api.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/slf4j-api.jar"/>
+			<pathelement path="lib/xuggle-xuggler.jar"/>
+			<pathelement path="${build.result.folder}/../de.fu_berlin.inf.dpp_10.6.25.r2236/lib/xuggle-xuggler.jar"/>
+		</path>
+		<!-- compile the source code -->
+		<javac destdir="${build.result.folder}/@dot" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}" source="${bundleJavacSource}" target="${bundleJavacTarget}"		>
+			<compilerarg line="${compilerArg}" compiler="${build.compiler}"/>
+			<classpath refid="@dot.classpath" />
+			<src path="src/"			/>
+			<src path="ext-src/"			/>
+			<src path="test/src/"			/>
+			<compilerarg value="@${basedir}/javaCompiler...args" compiler="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+			<compilerarg line="-log '${build.result.folder}/@dot${logExtension}'" compiler="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+		</javac>
+		<antcall target="checkCompilationResults"/>
+		<!-- Copy necessary resources -->
+		<copy todir="${build.result.folder}/@dot" failonerror="true" overwrite="false">
+			<fileset dir="src/">
+				<exclude name="**/*.java"/>
+				<exclude name="**/package.htm*"/>
 			</fileset>
-		</cobertura-instrument>
-
-		<junit fork="yes">
-			<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
-			<!-- add instrumented binaries first -->
-			<classpath>
-				<fileset dir="${instrumented.dir}">
-					<include name="de.fu_berlin.inf.dpp_*.jar" />
-				</fileset>
-			</classpath>
-			<classpath refid="saros.classpath" />
-			<classpath refid="cobertura.classpath" />
-
-			<formatter type="xml" />
-
-			<test name="de.fu_berlin.inf.dpp.AllTestsSuite" todir="${report.dir}" />
-		</junit>
-
-		<!-- srcdir is only used for cyclomatic complexity, you have to exclude tests from instrumentation
-		     if you don't want them included in the report -->
-		<cobertura-report format="${cobertura.format}" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
+			<fileset dir="ext-src/">
+				<exclude name="**/*.java"/>
+				<exclude name="**/package.htm*"/>
+			</fileset>
+			<fileset dir="test/src/">
+				<exclude name="**/*.java"/>
+				<exclude name="**/package.htm*"/>
+			</fileset>
+		</copy>
 	</target>
-	
-	<!-- NOTE: only executes if feature.version is set -->
-	<target name="buildSarosFeature">
-		<if>
-			<isset property="feature.version"/>
-			<then>
-				<mkdir dir="${uninstrumented.dir}" />
-				<buildFeature
-					workspaceDirectory="${workspaceDirectory}"
-					featureId="de.fu_berlin.inf.dpp.feature"
-					featureVersion="${feature.version}"
-					targetplatformid="saros.target.platform"
-					destination="${uninstrumented.dir}" />
-			</then>
-			<else>
-				<echo message="buildSarosFeature called without feature.version being set. Not executing!" />
-			</else>
-		</if>
+
+	<target name="src.zip" depends="init" unless="src.zip">
+		<mkdir dir="${build.result.folder}"/>
+		<antcall target="zip.src.zip"/>
 	</target>
-		
-	<target name="clean">
-		<delete failonerror="false" dir="${build.dir}" />
+	<target name="zip.src.zip">
+		<zip destfile="${build.result.folder}/src.zip" filesonly="false" whenempty="skip" update="false">
+			<fileset dir="src/">
+				<include name="**/*.java"/>
+			</fileset>
+			<fileset dir="ext-src/">
+				<include name="**/*.java"/>
+			</fileset>
+			<fileset dir="test/src/">
+				<include name="**/*.java"/>
+			</fileset>
+		</zip>
 	</target>
+	<target name="copy.src.zip">
+		<copy todir="${source.destination.folder}/" failonerror="true" overwrite="true">
+			<fileset dir="src/">
+				<include name="**/*.java"/>
+			</fileset>
+			<fileset dir="ext-src/">
+				<include name="**/*.java"/>
+			</fileset>
+			<fileset dir="test/src/">
+				<include name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build.jars" depends="init" description="Compile classes and build nested jars for the plug-in: de.fu_berlin.inf.dpp.">
+		<delete file="${compilation.problem.marker}" quiet="true"/>
+		<available property="@dot" file="${build.result.folder}/@dot"/>
+		<antcall target="@dot"/>
+	</target>
+
+	<target name="checkCompilationResults" if="compilation.error.occured">
+		<echo file="${compilation.problem.marker}" message="de.fu_berlin.inf.dpp : compilation.error.occured=${compilation.error.occured}"/>
+	</target>
+
+	<target name="build.sources" depends="init">
+		<available property="src.zip" file="${build.result.folder}/src.zip"/>
+		<antcall target="src.zip"/>
+	</target>
+
+	<target name="publish.bin.parts" depends="init" if="p2.publish.parts" unless="compilation.problem.marker.exists">
+		<mkdir dir="${build.result.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+		<copy todir="${build.result.folder}" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}">
+				<include name="META-INF/MANIFEST.MF"/>
+				<include name="plugin.xml"/>
+				<include name="fragment.xml"/>
+			</fileset>
+		</copy>
+		<antcall target="apitools.generation">
+			<param name="target.folder" value="${build.result.folder}"/>
+			<param name="projectLocation" value="${basedir}"/>
+			<param name="binary.folders" value="${build.result.folder}/@dot;D:\Lin\Space\Saros\Saros/lib/lw-collection-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/google-collect-1.0.jar;D:\Lin\Space\Saros\Saros/lib/commons-io-1.4.jar;D:\Lin\Space\Saros\Saros/bin/;D:\Lin\Space\Saros\Saros/lib/logback-classic.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/lw-nio-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/junit.jar;D:\Lin\Space\Saros\Saros/lib/commons-codec-1.3.jar;D:\Lin\Space\Saros\Saros/lib/protobuf-2.3.0.jar;D:\Lin\Space\Saros\Saros/lib/smack.jar;D:\Lin\Space\Saros\Saros/lib/slf4j-api.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/lw-common-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/commons-httpclient-3.1.jar;D:\Lin\Space\Saros\Saros/lib/picocontainer-2.7.jar;D:\Lin\Space\Saros\Saros/lib/easymockclassextension-2.0-pre-release.jar;D:\Lin\Space\Saros\Saros/lib/xstream-1.3.1.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/smackx.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/xuggle-xuggler.jar;D:\Lin\Space\Saros\Saros/lib/commons-lang-2.4.jar;D:\Lin\Space\Saros\Saros/lib/joda-time-1.6.jar;D:\Lin\Space\Saros\Saros/lib/easymock-2.0.jar;D:\Lin\Space\Saros\Saros/lib/log4j-1.2.15.jar;D:\Lin\Space\Saros\Saros/lib/commons-logging.jar;D:\Lin\Space\Saros\Saros/lib/logback-core.jar;D:\Lin\Space\Saros\Saros/lib/lw-rudp-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/smackx-jingle.jar;D:\Lin\Space\Saros\Saros/lib/smackx-debug.jar;D:\Lin\Space\Saros\Saros/lib/cglib-nodep-2.1_3.jar;D:\Lin\Space\Saros\Saros/lib/lw-io-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/jspeex-0.9.2.jar;D:\Lin\Space\Saros\Saros/lib/picocontainer-gems-2.7.jar"/>
+			<param name="projectName" value="${bundleId}_${bundleVersion}"/>
+		</antcall>
+		<eclipse.gatherBundle 
+		   metadataRepository="${p2.build.repo}"
+		   artifactRepository="${p2.build.repo}"
+		   buildResultFolder="${build.result.folder}"
+		   unpack="false"
+		   baseDirectory="${basedir}"
+		/>
+	</target>
+
+	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+		<copy todir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236" failonerror="true" overwrite="false">
+			<fileset dir="${build.result.folder}/@dot">
+				<include name="**"/>
+			</fileset>
+		</copy>
+		<copy todir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}">
+				<include name="META-INF/"/>
+				<include name="plugin.xml"/>
+				<include name="icons/"/>
+				<include name="bin/"/>
+				<include name="lib/log4j-1.2.15.jar"/>
+				<include name="log4j.properties"/>
+				<include name="src/"/>
+				<include name="plugin.xml"/>
+				<include name="lib/smack.jar"/>
+				<include name="lib/smackx-debug.jar"/>
+				<include name="lib/smackx.jar"/>
+				<include name="LICENSE"/>
+				<include name="log4j.properties"/>
+				<include name="lib/smackx-jingle.jar"/>
+				<include name="lib/commons-logging.jar"/>
+				<include name="readme.html"/>
+				<include name="lib/picocontainer-2.7.jar"/>
+				<include name="lib/commons-codec-1.3.jar"/>
+				<include name="lib/commons-io-1.4.jar"/>
+				<include name="lib/commons-lang-2.4.jar"/>
+				<include name="lib/junit.jar"/>
+				<include name="lib/xstream-1.3.1.jar"/>
+				<include name="lib/lw-collection-4.18.8-Java1.5.jar"/>
+				<include name="lib/lw-common-4.18.8-Java1.5.jar"/>
+				<include name="lib/lw-io-4.18.8-Java1.5.jar"/>
+				<include name="lib/lw-nio-4.18.8-Java1.5.jar"/>
+				<include name="lib/lw-rudp-4.18.8-Java1.5.jar"/>
+				<include name="lib/picocontainer-gems-2.7.jar"/>
+				<include name="lib/cglib-nodep-2.1_3.jar"/>
+				<include name="lib/easymock-2.0.jar"/>
+				<include name="lib/easymockclassextension-2.0-pre-release.jar"/>
+				<include name="lib/commons-httpclient-3.1.jar"/>
+				<include name="lib/joda-time-1.6.jar"/>
+				<include name="lib/protobuf-2.3.0.jar"/>
+				<include name="lib/google-collect-1.0.jar"/>
+				<include name="lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar"/>
+				<include name="lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar"/>
+				<include name="lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar"/>
+				<include name="lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar"/>
+				<include name="lib/logback-classic.jar"/>
+				<include name="lib/logback-core.jar"/>
+				<include name="lib/slf4j-api.jar"/>
+				<include name="lib/xuggle-xuggler.jar"/>
+			</fileset>
+		</copy>
+		<antcall target="apitools.generation">
+			<param name="target.folder" value="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+			<param name="projectLocation" value="${basedir}"/>
+			<param name="binary.folders" value="${build.result.folder}/@dot;D:\Lin\Space\Saros\Saros/lib/lw-collection-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/google-collect-1.0.jar;D:\Lin\Space\Saros\Saros/lib/commons-io-1.4.jar;D:\Lin\Space\Saros\Saros/bin/;D:\Lin\Space\Saros\Saros/lib/logback-classic.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.core_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/lw-nio-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/junit.jar;D:\Lin\Space\Saros\Saros/lib/commons-codec-1.3.jar;D:\Lin\Space\Saros\Saros/lib/protobuf-2.3.0.jar;D:\Lin\Space\Saros\Saros/lib/smack.jar;D:\Lin\Space\Saros\Saros/lib/slf4j-api.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.ui_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/lw-common-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/commons-httpclient-3.1.jar;D:\Lin\Space\Saros\Saros/lib/picocontainer-2.7.jar;D:\Lin\Space\Saros\Saros/lib/easymockclassextension-2.0-pre-release.jar;D:\Lin\Space\Saros\Saros/lib/xstream-1.3.1.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.eclipse.finder_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/smackx.jar;D:\Lin\Space\Saros\Saros/lib/org.eclipse.swtbot.swt.finder_2.0.0.486-dev-e35.jar;D:\Lin\Space\Saros\Saros/lib/xuggle-xuggler.jar;D:\Lin\Space\Saros\Saros/lib/commons-lang-2.4.jar;D:\Lin\Space\Saros\Saros/lib/joda-time-1.6.jar;D:\Lin\Space\Saros\Saros/lib/easymock-2.0.jar;D:\Lin\Space\Saros\Saros/lib/log4j-1.2.15.jar;D:\Lin\Space\Saros\Saros/lib/commons-logging.jar;D:\Lin\Space\Saros\Saros/lib/logback-core.jar;D:\Lin\Space\Saros\Saros/lib/lw-rudp-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/smackx-jingle.jar;D:\Lin\Space\Saros\Saros/lib/smackx-debug.jar;D:\Lin\Space\Saros\Saros/lib/cglib-nodep-2.1_3.jar;D:\Lin\Space\Saros\Saros/lib/lw-io-4.18.8-Java1.5.jar;D:\Lin\Space\Saros\Saros/lib/jspeex-0.9.2.jar;D:\Lin\Space\Saros\Saros/lib/picocontainer-gems-2.7.jar"/>
+			<param name="projectName" value="${bundleId}_${bundleVersion}"/>
+		</antcall>
+	</target>
+
+	<target name="build.zips" depends="init">
+	</target>
+
+	<target name="gather.sources" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+		<copy file="${build.result.folder}/src.zip" todir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236" failonerror="false" overwrite="false"/>
+		<antcall target="copy.src.includes">
+			<param name="source.destination.folder" value="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+		</antcall>
+	</target>
+
+	<target name="gather.individual.sources" depends="init">
+		<antcall target="copy.src.zip">
+			<param name="source.destination.folder" value="${destination.temp.folder}"/>
+		</antcall>
+		<antcall target="copy.src.includes">
+			<param name="source.destination.folder" value="${destination.temp.folder}"/>
+		</antcall>
+	</target>
+
+	<target name="copy.src.includes" depends="init">
+	</target>
+
+	<target name="gather.logs" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236"/>
+		<copy todir="${destination.temp.folder}/de.fu_berlin.inf.dpp_10.6.25.r2236" failonerror="false" overwrite="false">
+			<fileset dir="${build.result.folder}">
+				<include name="@dot${logExtension}"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean" depends="init" description="Clean the plug-in: de.fu_berlin.inf.dpp of all the zips, jars and logs created.">
+		<delete dir="${build.result.folder}/@dot"/>
+		<delete file="${build.result.folder}/src.zip"/>
+		<delete file="${plugin.destination}/de.fu_berlin.inf.dpp_10.6.25.r2236.jar"/>
+		<delete file="${plugin.destination}/de.fu_berlin.inf.dpp_10.6.25.r2236.zip"/>
+		<delete dir="${temp.folder}"/>
+		<delete file="${compilation.problem.marker}" quiet="true"/>
+	</target>
+
+	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
+		<eclipse.convertPath fileSystemPath="D:/Lin/Space/Saros/Saros" property="resourcePath"/>
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite"/>
+	</target>
+
+	<target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the plug-in: de.fu_berlin.inf.dpp.">
+		<delete dir="${temp.folder}"/>
+		<mkdir dir="${temp.folder}"/>
+		<antcall target="build.jars"/>
+		<antcall target="build.sources"/>
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<antcall target="gather.sources">
+			<param name="destination.temp.folder" value="${temp.folder}/"/>
+		</antcall>
+		<delete>
+			<fileset dir="${temp.folder}">
+				<include name="**/*.bin${logExtension}"/>
+			</fileset>
+		</delete>
+		<zip destfile="${plugin.destination}/de.fu_berlin.inf.dpp_10.6.25.r2236.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<delete dir="${temp.folder}"/>
+	</target>
+
+	<target name="apitools.generation" if="generateAPIDescription">
+		<apitooling.apigeneration  projectName="${projectName}" project="${projectLocation}" binary="${binary.folders}" target="${target.folder}"		/>
+	</target>
+
 </project>
