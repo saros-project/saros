@@ -6,7 +6,13 @@ package de.fu_berlin.inf.dpp.net;
 import java.util.EnumSet;
 
 public enum ConnectionState {
-
+    // . . . . . /--------------------------------\
+    // . . . . . | . . . . . . . . . . . . . . .. |
+    // . . . . . v . . . . . . . . . . . . . . .. |
+    // o-> NOT_CONNECTED ----> CONNECTING <---> ERROR
+    // . . . . . ^ . . . . . . . . | . . . . . .. ^
+    // . . . . . | . . . . . . . . v . . . . . .. |
+    // . . DISCONNECTING <---- CONNECTED ---------/
     /**
      * Saros not connected to a XMPP Server
      * 

@@ -24,7 +24,15 @@ public class ConnectionSessionManager {
     @Inject
     ConnectionSessionListener[] listeners;
 
-    ConnectionState currentState = ConnectionState.NOT_CONNECTED;
+    private ConnectionState currentState = ConnectionState.NOT_CONNECTED;
+    /**
+     * Flag indicating that we're allowed to call disposeConnection().<br>
+     * We only want to call disposeConnection() in state NOT_CONNECTED. If we
+     * get there from DISCONNECTING, everything is fine, but if we get there
+     * from ERROR, we need to know if ever were in the CONNECTED state before
+     * the ERROR occurred. That's why we need this flag.
+     */
+    private boolean disposable = false;
 
     public ConnectionSessionManager(Saros saros) {
         saros.addListener(new IConnectionListener() {
@@ -38,55 +46,54 @@ public class ConnectionSessionManager {
                         + currentState.getAllowedFollowState(),
                         new StackTrace());
                 }
+                ConnectionState previousState = currentState;
                 currentState = newState;
 
                 switch (newState) {
-                case CONNECTED:
+                case CONNECTING:
+                    break;
 
+                case CONNECTED:
                     for (ConnectionSessionListener listener : listeners) {
                         listener.prepareConnection(connection);
                     }
-
                     for (ConnectionSessionListener listener : listeners) {
                         listener.startConnection();
                     }
+                    disposable = false;
+                    break;
 
-                    break;
-                case CONNECTING:
-                    break;
                 case DISCONNECTING:
                     for (ConnectionSessionListener listener : Util
                         .reverse(listeners)) {
                         listener.stopConnection();
                     }
-
-                    for (ConnectionSessionListener listener : Util
-                        .reverse(listeners)) {
-                        /*
-                         * TODO SS This ConnectionSessionManager violates the
-                         * contract of the ConnectionSessionListener (dispose
-                         * was called twice!)
-                         */
-                        listener.disposeConnection();
-                    }
-
-                    // Cannot do anything until the Connection is up/down
-                    break;
-
-                case ERROR:
-
-                    for (ConnectionSessionListener listener : Util
-                        .reverse(listeners)) {
-                        listener.stopConnection();
-                    }
+                    disposable = true;
                     break;
 
                 case NOT_CONNECTED:
+                    if (disposable) {
+                        for (ConnectionSessionListener listener : Util
+                            .reverse(listeners)) {
+                            listener.disposeConnection();
+                        }
+                        disposable = false;
+                    }
+                    break;
 
+                case ERROR:
+                    // We can only get here from CONNECTED and CONNECTING. If we
+                    // get here from CONNECTING, we shouldn't do anything.
+                    if (previousState == ConnectionState.CONNECTED) {
+                        for (ConnectionSessionListener listener : Util
+                            .reverse(listeners)) {
+                            listener.stopConnection();
+                        }
+                        disposable = true;
+                    }
                     break;
                 }
             }
         });
     }
-
 }
