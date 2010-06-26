@@ -149,6 +149,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         colors.put("logging", "yellow");
         colors.put("consistency", "green");
         colors.put("ui", "gold1");
+        colors.put("undo", "gold1");
         colors.put("action", "gold1");
         colors.put("prefs", "blueviolet");
         colors.put("integration", "deeppink");
@@ -288,7 +289,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
             }
             Component c = u.getAnnotation(Component.class);
             if (c == null) {
-                log.warn("Injected component with no @Component annotation: "
+                log.debug("Injected component with no @Component annotation: "
                     + u.getSimpleName());
                 return Component.DEFAULT_MODULE;
             } else {

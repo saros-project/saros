@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * executed.
  * 
  */
-@Component(module = "Core")
+@Component(module = "core")
 public class DispatchThreadContext {
 
     private static final Logger log = Logger
