@@ -25,14 +25,6 @@ public class ConnectionSessionManager {
     ConnectionSessionListener[] listeners;
 
     private ConnectionState currentState = ConnectionState.NOT_CONNECTED;
-    /**
-     * Flag indicating that we're allowed to call disposeConnection().<br>
-     * We only want to call disposeConnection() in state NOT_CONNECTED. If we
-     * get there from DISCONNECTING, everything is fine, but if we get there
-     * from ERROR, we need to know if ever were in the CONNECTED state before
-     * the ERROR occurred. That's why we need this flag.
-     */
-    private boolean disposable = false;
 
     public ConnectionSessionManager(Saros saros) {
         saros.addListener(new IConnectionListener() {
@@ -60,7 +52,6 @@ public class ConnectionSessionManager {
                     for (ConnectionSessionListener listener : listeners) {
                         listener.startConnection();
                     }
-                    disposable = false;
                     break;
 
                 case DISCONNECTING:
@@ -68,17 +59,13 @@ public class ConnectionSessionManager {
                         .reverse(listeners)) {
                         listener.stopConnection();
                     }
-                    disposable = true;
+                    for (ConnectionSessionListener listener : Util
+                        .reverse(listeners)) {
+                        listener.disposeConnection();
+                    }
                     break;
 
                 case NOT_CONNECTED:
-                    if (disposable) {
-                        for (ConnectionSessionListener listener : Util
-                            .reverse(listeners)) {
-                            listener.disposeConnection();
-                        }
-                        disposable = false;
-                    }
                     break;
 
                 case ERROR:
@@ -89,7 +76,10 @@ public class ConnectionSessionManager {
                             .reverse(listeners)) {
                             listener.stopConnection();
                         }
-                        disposable = true;
+                        for (ConnectionSessionListener listener : Util
+                            .reverse(listeners)) {
+                            listener.disposeConnection();
+                        }
                     }
                     break;
                 }
