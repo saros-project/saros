@@ -275,7 +275,7 @@ public class DataTransferManager implements ConnectionSessionListener,
             transferModeDispatch.transferFinished(recipient, connection
                 .getMode(), false, input.length, watch.getTime());
         } catch (SarosCancellationException e) {
-            throw e; // Rethrow to circumvent the Exception catch below
+            throw e; // Rethrow to circumvrent the Exception catch below
         } catch (IOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
@@ -477,12 +477,14 @@ public class DataTransferManager implements ConnectionSessionListener,
     }
 
     public enum NetTransferMode {
-        UNKNOWN("???", "???", false), IBB("IBB", "XEP 47 In-Band Bytestream",
-            false), JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), JINGLEUDP(
-            "Jingle/UDP", "XEP 166 Jingle (UDP)", true), HANDMADE("Chat",
-            "Chat", false), SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), SOCKS5_MEDIATED(
-            "SOCKS5 (mediated)", "XEP 65 SOCKS5", true), SOCKS5_DIRECT(
-            "SOCKS5 (direct)", "XEP 65 SOCKS5", true);
+        UNKNOWN("???", "???", false), //
+        IBB("IBB", "XEP 47 In-Band Bytestream", false), //
+        JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), //
+        JINGLEUDP("Jingle/UDP", "XEP 166 Jingle (UDP)", true), // 
+        HANDMADE("Chat", "Chat", false), //
+        SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), //
+        SOCKS5_MEDIATED("SOCKS5 (mediated)", "XEP 65 SOCKS5", true), //
+        SOCKS5_DIRECT("SOCKS5 (direct)", "XEP 65 SOCKS5", true);//
 
         private String name;
         private String xep;
