@@ -112,6 +112,8 @@ public class ChatView extends ViewPart implements IConnectionListener,
 
     };
 
+    protected IRosterListener rosterListener;
+
     protected class ChatSessionRosterListener implements IRosterListener {
         public void changed(final Collection<String> addresses) {
             Util.runSafeSWTSync(log, new Runnable() {
@@ -164,10 +166,9 @@ public class ChatView extends ViewPart implements IConnectionListener,
         Saros.reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
-        IRosterListener rosterListener = new ChatSessionRosterListener();
+        rosterListener = new ChatSessionRosterListener();
         rosterTracker.addRosterListener(rosterListener);
-        log.debug("RosterListener added!");
-        log.debug("SessionListener added!");
+        log.debug("RosterListener and SessionListener added.");
 
         if (sessionManager.getSharedProject() == null) {
             sessionStarted = false;
@@ -179,6 +180,16 @@ public class ChatView extends ViewPart implements IConnectionListener,
                 chatUsers.put(saros.getMyJID(), "You");
         }
 
+    }
+
+    @Override
+    public void dispose() {
+        messagingManager.removeChatListener(this);
+        sessionManager.removeSessionListener(sessionListener);
+        rosterTracker.removeRosterListener(rosterListener);
+        saros.removeListener(this);
+        log.debug("ChatListener, RosterListener, SessionListener and "
+            + "ConnectionListener removed.");
     }
 
     @Override
@@ -196,8 +207,8 @@ public class ChatView extends ViewPart implements IConnectionListener,
         this.viewer.getTextWidget();
 
         this.inputText = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-        this.inputText
-            .setText("To Join the chat please use the connect button. (You have to be in a shared project session)");
+        this.inputText.setText("To Join the chat please use the connect "
+            + "button. (You have to be in a shared project session)");
         this.inputText.setEditable(false);
 
         sash.setWeights(ChatView.WEIGHTS);

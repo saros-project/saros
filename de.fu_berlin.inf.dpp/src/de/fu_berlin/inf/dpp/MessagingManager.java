@@ -418,6 +418,13 @@ public class MessagingManager implements PacketListener, MessageListener,
         this.chatListeners.add(listener);
     }
 
+    /**
+     * Removes the chat listener.
+     */
+    public void removeChatListener(IChatListener listener) {
+        this.chatListeners.remove(listener);
+    }
+
     // TODO CJ Rework needed
     public void invitationReceived(Connection conn, String room,
         String inviter, String reason, String password, Message message) {
