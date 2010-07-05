@@ -5,6 +5,7 @@ import java.text.ParseException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
@@ -124,14 +125,15 @@ class SubclipseAdapter implements VCSAdapter {
             e.printStackTrace();
         }
 
-        // FIXME ndh: Iterate over files, update to different revision.
-        // for (IPath path : fileList.getPaths()) {
-        // if (fileList.getVCSRevision(path) == null)
-        // continue;
-        // SVNWorkspaceRoot root = null;
-        // UpdateResourcesCommand update = new UpdateResourcesCommand(root,
-        // resources, revision);
-        // }
+        // TODO Should we really be the ones doing this?
+        try {
+            if (result != null)
+                result.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         return result;
     }
 
@@ -173,10 +175,15 @@ class SubclipseAdapter implements VCSAdapter {
         }
         UpdateResourcesCommand cmd = new UpdateResourcesCommand(root, resource,
             revision);
-        cmd.setForce(true);
         try {
             cmd.run(monitor);
         } catch (SVNException e) {
+            e.printStackTrace();
+        }
+        try {
+            file.refreshLocal(IResource.DEPTH_ZERO, null);
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

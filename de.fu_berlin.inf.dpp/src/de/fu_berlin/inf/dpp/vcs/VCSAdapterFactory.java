@@ -17,6 +17,8 @@ public class VCSAdapterFactory {
      * @see RepositoryProvider#getID()
      */
     public static VCSAdapter getAdapter(String identifier) {
+        if (identifier == null)
+            return null;
         try {
             if (identifier.equals(SubclipseAdapter.identifier)) {
                 return new SubclipseAdapter();
