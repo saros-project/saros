@@ -185,8 +185,8 @@ public class SessionView extends ViewPart {
                     return -1;
                 if (user2.isHost())
                     return +1;
-                return user1.getJID().toString().toLowerCase().compareTo(
-                    user2.getJID().toString().toLowerCase());
+                return user1.getJID().toString().toLowerCase()
+                    .compareTo(user2.getJID().toString().toLowerCase());
             }
         };
 
@@ -386,8 +386,10 @@ public class SessionView extends ViewPart {
         sessionManager.removeSessionListener(sessionListener);
         rosterTracker.removeRosterListener(rosterListener);
 
-        // Stop container
+        // Stop container and remove it from its parent.
         container.dispose();
+        // Unfortunately, child.getParent is immutable, so we have to ask Saros.
+        saros.removeChildContainer(container.getDelegate());
 
         super.dispose();
     }
