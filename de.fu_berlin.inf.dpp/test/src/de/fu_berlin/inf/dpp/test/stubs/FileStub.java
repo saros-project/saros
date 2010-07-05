@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFileState;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceProxy;
@@ -482,8 +483,12 @@ public class FileStub implements IFile {
     }
 
     public void setDerived(boolean isDerived) throws CoreException {
-        derived = isDerived;
+        setDerived(isDerived, null);
+    }
 
+    public void setDerived(boolean isDerived, IProgressMonitor monitor)
+        throws CoreException {
+        derived = isDerived;
     }
 
     public void setHidden(boolean isHidden) throws CoreException {
@@ -558,6 +563,14 @@ public class FileStub implements IFile {
 
     public boolean isTeamPrivateMember(int options) {
         throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public IPathVariableManager getPathVariableManager() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public boolean isVirtual() {
+        return false;
     }
 
 }
