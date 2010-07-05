@@ -260,23 +260,30 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         Compatibility comp = null;
 
-        if (versionInfo != null)
+        if (versionInfo != null) {
             comp = versionInfo.compatibility;
 
-        if (comp == VersionManager.Compatibility.OK) {
-            log.debug("Inv" + Util.prefix(peer)
-                + ": Saros versions are compatible, proceeding...");
-            this.versionInfo = versionInfo;
+            if (comp == VersionManager.Compatibility.OK) {
+                log.debug("Inv" + Util.prefix(peer)
+                    + ": Saros versions are compatible, proceeding...");
+                this.versionInfo = versionInfo;
+            } else {
+                log.debug("Inv" + Util.prefix(peer)
+                    + ": Saros versions are not compatible.");
+                if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
+                    versionManager.getVersion()))
+                    this.versionInfo = versionInfo;
+                else {
+                    localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
+                    throw new LocalCancellationException();
+                }
+            }
         } else {
             log.debug("Inv" + Util.prefix(peer)
-                + ": Saros versions are not compatible.");
-            if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
-                versionManager.getVersion()))
-                this.versionInfo = versionInfo;
-            else {
+                + ": Unable to obtain peer's version information.");
+            if (!InvitationWizard.confirmUnknownVersion(peer, versionManager
+                .getVersion()))
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new LocalCancellationException();
-            }
         }
     }
 
