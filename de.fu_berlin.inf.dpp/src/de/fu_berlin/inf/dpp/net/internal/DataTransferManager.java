@@ -18,6 +18,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -26,7 +28,6 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.StoppWatch;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -38,7 +39,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author jurke
  */
 @Component(module = "net")
-public class DataTransferManager implements ConnectionSessionListener,
+public class DataTransferManager implements IConnectionListener,
     IBytestreamConnectionListener {
 
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
@@ -71,6 +72,7 @@ public class DataTransferManager implements ConnectionSessionListener,
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
+        saros.addListener(this);
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -412,26 +414,6 @@ public class DataTransferManager implements ConnectionSessionListener,
         // }
     }
 
-    /**
-     * Sets up the transports for the given XMPPConnection
-     */
-    public void prepareConnection(final XMPPConnection connection) {
-        assert (this.connectionIsDisposed());
-
-        this.updateFileTransferByChatOnly();
-
-        log
-            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
-                + Arrays.toString(transports.toArray()));
-
-        this.connection = connection;
-        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-
-        for (ITransport transport : transports) {
-            transport.prepareXMPPConnection(connection, this);
-        }
-    }
-
     /*
      * On Henning's suggestion, Saros is not the place to implement free
      * transport negotiation because this is actually part of XMP-protocol: the
@@ -532,7 +514,27 @@ public class DataTransferManager implements ConnectionSessionListener,
         ERROR
     }
 
-    public void disposeConnection() {
+    /**
+     * Sets up the transports for the given XMPPConnection
+     */
+    protected void prepareConnection(final XMPPConnection connection) {
+        assert (this.connectionIsDisposed());
+
+        this.updateFileTransferByChatOnly();
+
+        log
+            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
+                + Arrays.toString(transports.toArray()));
+
+        this.connection = connection;
+        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
+
+        for (ITransport transport : transports) {
+            transport.prepareXMPPConnection(connection, this);
+        }
+    }
+
+    protected void disposeConnection() {
 
         for (ITransport transport : transports) {
             transport.disposeXMPPConnection();
@@ -568,13 +570,12 @@ public class DataTransferManager implements ConnectionSessionListener,
         connection = null;
     }
 
-    public void startConnection() {
-        // TODO The data transfer manager does not support caching yet
-    }
-
-    public void stopConnection() {
-        // TODO The data transfer manager does not support caching yet
-        // log.warn("Error state stops connection without effect");
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED)
+            prepareConnection(connection);
+        else if (!connectionIsDisposed())
+            disposeConnection();
     }
 
     /**

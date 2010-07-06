@@ -140,7 +140,6 @@ import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
 import de.fu_berlin.inf.dpp.project.PingPongCentral;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -296,7 +295,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(DispatchThreadContext.class);
 
         // Core Managers
-        this.container.addComponent(ConnectionSessionManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
         this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(DataTransferManager.class);

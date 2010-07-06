@@ -65,6 +65,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -84,7 +86,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
@@ -99,8 +100,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * provides convenience functions for sending messages.
  */
 @Component(module = "net")
-public class XMPPTransmitter implements ITransmitter,
-    ConnectionSessionListener, IXMPPTransmitter {
+public class XMPPTransmitter implements ITransmitter, IConnectionListener,
+    IXMPPTransmitter {
 
     private static Logger log = Logger.getLogger(XMPPTransmitter.class);
 
@@ -122,7 +123,6 @@ public class XMPPTransmitter implements ITransmitter,
     @Inject
     protected XMPPReceiver receiver;
 
-    @Inject
     protected Saros saros;
 
     @Inject
@@ -170,10 +170,11 @@ public class XMPPTransmitter implements ITransmitter,
     protected DataTransferManager dataManager;
 
     public XMPPTransmitter(SessionIDObservable sessionID,
-        DataTransferManager dataManager) {
-
+        DataTransferManager dataManager, Saros saros) {
+        saros.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
+        this.saros = saros;
     }
 
     /********************************************************************************
@@ -606,7 +607,7 @@ public class XMPPTransmitter implements ITransmitter,
     public void sendRemainingFiles() {
 
         log.warn("Sending remaining files is not implemented!");
-        //        
+        //
         // if (this.fileTransferQueue.size() > 0) {
         // // sendNextFile();
         // }
@@ -840,22 +841,7 @@ public class XMPPTransmitter implements ITransmitter,
         });
     }
 
-    public void disposeConnection() {
-        if (connection == null) {
-            log.error("Contract violation: "
-                + "ConnectionSessionListener.disposeConnection()"
-                + " is called twice");
-            return;
-        }
-        sendAsyncExecutor.shutdownNow();
-        chats.clear();
-        processes.clear();
-        messageTransferQueue.clear();
-        chatmanager = null;
-        connection = null;
-    }
-
-    public void prepareConnection(final XMPPConnection connection) {
+    protected void prepareConnection(final XMPPConnection connection) {
 
         // Create Containers
         this.chats = new HashMap<JID, Chat>();
@@ -902,11 +888,24 @@ public class XMPPTransmitter implements ITransmitter,
         }, null);
     }
 
-    public void startConnection() {
-        // TODO start sending only now, queue otherwise
+    protected void disposeConnection() {
+        if (connection == null) {
+            log.error("disposeConnection() called twice.");
+            return;
+        }
+        sendAsyncExecutor.shutdownNow();
+        chats.clear();
+        processes.clear();
+        messageTransferQueue.clear();
+        chatmanager = null;
+        connection = null;
     }
 
-    public void stopConnection() {
-        // TODO stop sending, but queue rather
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED)
+            prepareConnection(connection);
+        else if (this.connection != null)
+            disposeConnection();
     }
 }

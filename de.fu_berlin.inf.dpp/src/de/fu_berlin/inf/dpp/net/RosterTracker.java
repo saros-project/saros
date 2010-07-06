@@ -9,8 +9,8 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * whether the connection is changed.
  */
 @Component(module = "net")
-public class RosterTracker implements ConnectionSessionListener {
+public class RosterTracker implements IConnectionListener {
 
     static final Logger log = Logger.getLogger(RosterTracker.class.getName());
 
@@ -28,6 +28,10 @@ public class RosterTracker implements ConnectionSessionListener {
     protected Roster roster;
 
     protected DispatchingRosterListener listener = new DispatchingRosterListener();
+
+    public RosterTracker(Saros saros) {
+        saros.addListener(this);
+    }
 
     /**
      * Adds a listener to this roster. The listener will be fired anytime one or
@@ -51,50 +55,23 @@ public class RosterTracker implements ConnectionSessionListener {
         listener.remove(rosterListener);
     }
 
-    public void disposeConnection() {
-        if (this.connection == null) {
-            log.warn("DisposeConnection called without "
-                + "previous call to prepare");
-            return;
-        }
+    protected void prepareConnection(XMPPConnection connection) {
+        this.connection = connection;
+        setRoster(this.connection.getRoster());
+    }
+
+    protected void disposeConnection() {
+        setRoster(null);
         this.connection = null;
     }
 
-    public void prepareConnection(XMPPConnection connection) {
-        if (this.connection != null) {
-            log.warn("PrepareConnection called without "
-                + "previous call to dispose");
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED) {
+            prepareConnection(connection);
+        } else if (this.connection != null) {
+            disposeConnection();
         }
-
-        this.connection = connection;
-    }
-
-    public void startConnection() {
-
-        if (this.connection == null) {
-            log.error("StartConnection called without "
-                + "previous call to prepare");
-            return;
-        }
-        if (this.roster != null) {
-            log.warn("StartConnection called without previous call to stop");
-            stopConnection();
-        }
-
-        setRoster(this.connection.getRoster());
-
-    }
-
-    public void stopConnection() {
-        if (this.connection == null) {
-            log.warn("StopConnection called without previous call to prepare");
-        }
-        if (this.roster == null) {
-            log.warn("StopConnection called without previous call to start");
-            return;
-        }
-
-        setRoster(null);
     }
 
     protected void setRoster(Roster newRoster) {

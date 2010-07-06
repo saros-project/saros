@@ -12,10 +12,12 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -34,7 +36,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  */
 @Component(module = "net")
-public class SubscriptionListener implements ConnectionSessionListener {
+public class SubscriptionListener implements IConnectionListener {
 
     private static Logger log = Logger.getLogger(SubscriptionListener.class);
 
@@ -75,6 +77,10 @@ public class SubscriptionListener implements ConnectionSessionListener {
                 processPresence(presence);
             }
         });
+
+    public SubscriptionListener(Saros saros) {
+        saros.addListener(this);
+    }
 
     public void processPresence(Presence presence) {
         String userName = Util.prefix(new JID(presence.getFrom()));
@@ -177,24 +183,22 @@ public class SubscriptionListener implements ConnectionSessionListener {
         });
     }
 
-    public void disposeConnection() {
-        if (connection != null) {
-            connection.removePacketListener(packetListener);
-            connection = null;
-        }
-    }
-
     public void prepareConnection(XMPPConnection connection) {
         this.connection = connection;
         connection.addPacketListener(packetListener, new PacketTypeFilter(
             Presence.class));
     }
 
-    public void startConnection() {
-        // ignore
+    public void disposeConnection() {
+        connection.removePacketListener(packetListener);
+        connection = null;
     }
 
-    public void stopConnection() {
-        // ignore
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED)
+            prepareConnection(connection);
+        else if (this.connection != null)
+            disposeConnection();
     }
 }
