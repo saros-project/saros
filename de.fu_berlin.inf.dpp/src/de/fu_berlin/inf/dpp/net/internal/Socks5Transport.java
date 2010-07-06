@@ -54,7 +54,7 @@ public class Socks5Transport extends BytestreamTransport {
 
     private static Logger log = Logger.getLogger(Socks5Transport.class);
     private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
-    private static final int TEST_STREAM_TIMEOUT = 3000;
+    private static final int TEST_STREAM_TIMEOUT = 2000;
     /*
      * 3s might not be enough always, especially when local SOCKS5 proxy port is
      * bound by another application or Ubuntu is used.
@@ -64,6 +64,7 @@ public class Socks5Transport extends BytestreamTransport {
      * However, should be greater than TEST_STREAM_TIMEOUT always
      */
     private static final int WAIT_FOR_RESPONSE_CONNECTION = TEST_STREAM_TIMEOUT + 7000;
+    private static final int TARGET_RESPONSE_TIMEOUT = WAIT_FOR_RESPONSE_CONNECTION + 1000;
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
     private static final int NUMBER_OF_RESPONSE_THREADS = 10;
@@ -111,26 +112,34 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     /**
-     * Closes the session if done and cancels a future without error output.
+     * Starts a new thread that waits until the connection is established to
+     * close it correctly.
      * 
      * @param future
      */
-    protected void cancelQuietly(Future<Socks5BytestreamSession> future) {
-        log.debug(prefix() + "Cancel to initiate response connection");
-        // TODO check whether SMACK allows this interruption
-        // else we have to wait in an extra thread to close the stream properly
-        try {
-            if (future.isDone()) {
+    protected void waitToCloseResponse(
+        final Future<Socks5BytestreamSession> future) {
+        log.debug(prefix()
+            + "cancelling response connection as it is not needed");
+
+        Thread waitToCloseResponse = new Thread(
+            "close_unneeded_response_connection") {
+
+            @Override
+            public void run() {
                 try {
                     Util.closeQuietly(future.get());
-                } catch (Exception e) {
-                    //
+                } catch (InterruptedException e) {
+                    // nothing to do here
+                } catch (ExecutionException e) {
+                    log
+                        .debug(prefix()
+                            + "Exception while waiting to close unneeded connection: "
+                            + e.getMessage());
                 }
             }
-            future.cancel(true);
-        } catch (Exception e) {
-            //
-        }
+        };
+        waitToCloseResponse.start();
     }
 
     protected boolean localSOCKS5ProxyIsRunning() {
@@ -270,7 +279,18 @@ public class Socks5Transport extends BytestreamTransport {
             }
 
         } catch (SocketTimeoutException ste) {
-            // expected if unidirectional stream
+            /*
+             * At least we have to wait TEST_STREAM_TIMEOUT to cause a timeout
+             * on the peer side, too.
+             * 
+             * Else the first package might be read and the above error occurs
+             * (test != BIDIRECTIONAL_TEST_BYTE).
+             */
+            try {
+                Thread.sleep(TEST_STREAM_TIMEOUT);
+            } catch (InterruptedException e) {
+                // nothing to do here
+            }
         }
 
         /*
@@ -368,7 +388,7 @@ public class Socks5Transport extends BytestreamTransport {
             inSession = (Socks5BytestreamSession) request.accept();
 
             if (inSession.isDirect()) {
-                cancelQuietly(responseFuture);
+                waitToCloseResponse(responseFuture);
                 return new BinaryChannel(inSession,
                     NetTransferMode.SOCKS5_DIRECT);
             } else {
@@ -407,11 +427,6 @@ public class Socks5Transport extends BytestreamTransport {
             log.error(
                 "An error occured while establishing a response connection ", e
                     .getCause());
-        } catch (InterruptedException e) {
-            log
-                .debug(prefix()
-                    + "Interrupted while recieving request to establish a new connection");
-            return null;
         }
 
         if (inSession == null && outSession == null)
@@ -555,7 +570,8 @@ public class Socks5Transport extends BytestreamTransport {
     protected BytestreamManager getManager(XMPPConnection connection) {
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
-        socks5ByteStreamManager.setTargetResponseTimeout(10000);
+        socks5ByteStreamManager
+            .setTargetResponseTimeout(TARGET_RESPONSE_TIMEOUT);
         return socks5ByteStreamManager;
     }
 
