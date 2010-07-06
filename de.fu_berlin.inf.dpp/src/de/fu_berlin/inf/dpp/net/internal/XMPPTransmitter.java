@@ -91,6 +91,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -183,14 +184,15 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     public void sendInvitation(String projectID, JID guest, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream) {
+        DateTime sessionStart, boolean doStream,
+        CommunicationPreferences comPrefs) {
 
         log.trace("Sending invitation to " + Util.prefix(guest)
             + " with description " + description);
 
         InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
             projectID, description, colorID, versionInfo, sessionStart,
-            doStream);
+            doStream, comPrefs);
 
         sendMessageToUser(guest, invExtProv.create(invInfo));
     }
@@ -289,7 +291,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         SarosPacketCollector collector, long timeout, boolean forceWait)
         throws LocalCancellationException, IOException {
 
-        if (connection == null || !connection.isConnected())
+        if (isConnectionInvalid())
             return null;
 
         try {
@@ -334,7 +336,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         List<User> fromUsers, SubMonitor monitor)
         throws LocalCancellationException {
 
-        if (connection == null || !connection.isConnected())
+        if (isConnectionInvalid())
             return false;
 
         ArrayList<JID> fromUserJIDs = new ArrayList<JID>();
@@ -715,7 +717,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
         T payload, long timeout) {
-        if (connection == null || !connection.isConnected())
+        if (isConnectionInvalid())
             return null;
 
         // Request the version from a remote user
@@ -749,7 +751,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     protected void sendMessageWithoutQueueing(JID jid, Message message)
         throws IOException {
 
-        if (!this.connection.isConnected()) {
+        if (isConnectionInvalid()) {
             throw new IOException("Connection is not open");
         }
 
@@ -759,6 +761,16 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         } catch (XMPPException e) {
             throw new CausedIOException("Failed to send message", e);
         }
+    }
+
+    /**
+     * Determines if the connection can be used. Helper method for error
+     * handling.
+     * 
+     * @return false if the connection can be used, true otherwise.
+     */
+    protected boolean isConnectionInvalid() {
+        return connection == null || !connection.isConnected();
     }
 
     private void putIncomingChat(JID jid, String thread) {

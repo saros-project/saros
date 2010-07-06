@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -106,11 +107,12 @@ public interface ISessionManager {
      *            invitations.
      * @param colorID
      *            the assigned color id for the invited participant.
+     * @param comPrefs TODO
      */
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID, boolean doStream);
+        String invitationID, boolean doStream, CommunicationPreferences comPrefs);
 
     /*
      * @see IConnectionListener

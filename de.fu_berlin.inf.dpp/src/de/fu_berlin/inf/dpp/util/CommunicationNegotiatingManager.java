@@ -3,18 +3,11 @@ package de.fu_berlin.inf.dpp.util;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -46,8 +39,6 @@ public class CommunicationNegotiatingManager {
 
     protected XMPPTransmitter transmitter;
 
-    protected XMPPReceiver receiver;
-
     protected IPreferenceStore prefs;
 
     protected SessionIDObservable sessionID;
@@ -64,61 +55,16 @@ public class CommunicationNegotiatingManager {
         "sarosComPrefs", CommunicationPreferences.class);
 
     public CommunicationNegotiatingManager(final Saros saros,
-        final XMPPReceiver receiver, XMPPTransmitter transmitter,
-        SessionIDObservable sessionID,
+        XMPPTransmitter transmitter, SessionIDObservable sessionID,
         final SharedProjectObservable sharedProjectObservable) {
 
         this.saros = saros;
         this.transmitter = transmitter;
-        this.receiver = receiver;
         this.sessionID = sessionID;
         this.sharedProjectObservable = sharedProjectObservable;
 
         randomPassword = new Random().nextInt() + "";
         log.debug("Generated Chat room password: " + randomPassword);
-
-        receiver.addPacketListener(new PacketListener() {
-
-            public void processPacket(Packet packet) {
-
-                log.debug("CommunciationInfo Packet arrived");
-
-                @SuppressWarnings("unchecked")
-                XStreamIQPacket<CommunicationPreferences> iq = (XStreamIQPacket<CommunicationPreferences>) packet;
-
-                if (iq.getType() != IQ.Type.GET)
-                    return;
-
-                log.debug("Got ComPrefs from " + iq.getFrom());
-                log.debug("session host: "
-                    + sharedProjectObservable.getValue().getHost().getJID()
-                        .toString());
-                if (sharedProjectObservable.getValue().getHost().getJID()
-                    .toString().equals(iq.getFrom())) {
-                    CommunicationPreferences remotePrefs = iq.getPayload();
-                    setSessionPrefs(remotePrefs);
-                }
-
-            }
-        }, communicationProvider.getIQFilter());
-    }
-
-    /**
-     * Send Chat settings to new invited user
-     * 
-     * @param targetJID
-     *            the JID of the new invited user
-     */
-    public void sendComPrefs(JID targetJID, SubMonitor monitor) {
-        monitor.beginTask("Collecting and sending Chat information...", 100);
-        log.debug("CommunicationInfo will be send");
-        loadComPrefs();
-        monitor.worked(25);
-        transmitter.sendQuery(targetJID, communicationProvider, getOwnPrefs(),
-            3000);
-        monitor.worked(75);
-        monitor.done();
-        log.debug("CommunicationInfo sent");
     }
 
     /**
@@ -127,8 +73,11 @@ public class CommunicationNegotiatingManager {
      * @param remoteComPrefs
      *            received communication settings
      */
-    protected void setSessionPrefs(CommunicationPreferences remoteComPrefs) {
-        log.debug("Got hosts Communication Config.");
+    public void setSessionPrefs(CommunicationPreferences remoteComPrefs) {
+        log.debug("Got hosts Communication Config: server "
+            + remoteComPrefs.chatserver + " room " + remoteComPrefs.chatroom
+            + " pw " + remoteComPrefs.password);
+
         sessionPrefs = remoteComPrefs;
     }
 
@@ -164,6 +113,8 @@ public class CommunicationNegotiatingManager {
      *         generated)
      */
     public CommunicationPreferences getOwnPrefs() {
+        if (comPrefs == null)
+            loadComPrefs();
         return comPrefs;
     }
 

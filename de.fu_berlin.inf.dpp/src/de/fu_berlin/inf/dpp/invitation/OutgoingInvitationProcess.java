@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -149,8 +150,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             getFileList(monitor.newChild(1));
 
-            sendCommunicationInformation(monitor.newChild(1));
-
             if (!doStream) {
                 createArchive(monitor.newChild(3));
                 sendArchive(monitor.newChild(90));
@@ -198,22 +197,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             }
             monitor.done();
         }
-    }
-
-    /**
-     * Send communication information (chat preferences) during invitation
-     * process.
-     */
-    protected void sendCommunicationInformation(SubMonitor subMonitor)
-        throws SarosCancellationException {
-
-        log.debug("Inv" + Util.prefix(peer) + ": Sending Chat Information...");
-        subMonitor.beginTask("Sending Chat Information...", 1);
-
-        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
-
-        comNegotiatingManager.sendComPrefs(peer, subMonitor.newChild(1));
-        subMonitor.done();
     }
 
     /**
@@ -318,9 +301,10 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         SarosPacketCollector fileListRequestCollector = transmitter
             .getFileListRequestCollector(invitationID);
 
+        CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
         transmitter.sendInvitation(sharedProject.getProjectMapper().getID(
             this.project), peer, description, colorID, hostVersionInfo,
-            invitationID, sharedProject.getSessionStart(), doStream);
+            invitationID, sharedProject.getSessionStart(), doStream, comPrefs);
 
         subMonitor.worked(25);
         subMonitor
