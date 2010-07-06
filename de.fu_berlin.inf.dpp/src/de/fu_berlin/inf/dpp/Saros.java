@@ -120,7 +120,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
@@ -304,7 +303,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(FeedbackManager.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(LocalPresenceTracker.class);
-        this.container.addComponent(MultiUserChatManager.class);
+        // this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
         this.container.addComponent(PingPongCentral.class);
         this.container.addComponent(PreferenceManager.class);
