@@ -69,7 +69,7 @@ public class InvitationWizardUserSelection extends WizardPage {
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;
         this.invitationProcesses = invitationProcesses;
-        setTitle("Pariticipant selection");
+        setTitle("Participant selection");
         setDescription("Select the users you would like to invite");
     }
 
@@ -306,7 +306,9 @@ public class InvitationWizardUserSelection extends WizardPage {
     protected void refreshUserList() {
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                userListViewer.refresh();
+                if (!getControl().isDisposed()) {
+                    userListViewer.refresh();
+                }
             }
         });
     }
