@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -20,9 +23,11 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
@@ -67,12 +72,58 @@ public class DataTransferManager implements IConnectionListener,
     protected SessionIDObservable sessionID = null;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils preferenceUtils) {
+        PreferenceUtils preferenceUtils, RosterTracker rosterTracker) {
         this.sessionID = sessionID;
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
+        addRosterListener(rosterTracker);
         saros.addListener(this);
+    }
+
+    /**
+     * Adds a RosterListener to the tracker to remove connections when peer gets
+     * unavailable.
+     * 
+     * Else IBB connections would remain if no leave package is send.
+     * 
+     * @param rosterTracker
+     */
+    protected void addRosterListener(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(new IRosterListener() {
+
+            public void entriesAdded(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void entriesDeleted(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void entriesUpdated(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void presenceChanged(Presence presence) {
+
+                if (!presence.isAvailable())
+                    for (JID jid : connections.keySet()) {
+                        if (jid.toString().equals(presence.getFrom())) {
+                            IBytestreamConnection c = connections.remove(jid);
+                            log
+                                .debug(jid.getBase()
+                                    + " is not available anymore. Bytestream connection closed.");
+                            c.close();
+                        }
+                    }
+            }
+
+            public void rosterChanged(Roster roster) {
+                // nothing to do here
+            }
+
+        });
+
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {

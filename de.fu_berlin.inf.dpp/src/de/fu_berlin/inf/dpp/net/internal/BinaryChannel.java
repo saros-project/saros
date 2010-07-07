@@ -56,6 +56,13 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class BinaryChannel {
 
+    /**
+     * Known error codes that do not need any special debug or error output
+     */
+    public static String[] ACCEPTED_ERROR_CODES_ON_CLOSURE = {
+        "service-unavailable(503)" /* peer closed stream already (SOCKS5) */,
+        "recipient-unavailable(404)" /* peer is offline (IBB) */};
+
     private static final Logger log = Logger.getLogger(BinaryChannel.class);
 
     /**
@@ -165,7 +172,7 @@ public class BinaryChannel {
      * @nonreentrant This method is not reentrant! Use only with a single
      *               thread!
      * 
-     * @throws SarosCancellationException
+     * @throws LocalCancellationException
      *             If waiting was canceled using the supplied progress.
      * @throws IOException
      *             If the associated socket broke, while reading or if the
@@ -174,7 +181,7 @@ public class BinaryChannel {
      *             If the data sent from the other side could not be decoded.
      */
     public IncomingTransferObject receiveIncomingTransferObject(
-        SubMonitor progress) throws SarosCancellationException, IOException,
+        SubMonitor progress) throws LocalCancellationException, IOException,
         ClassNotFoundException {
 
         try {
@@ -448,6 +455,20 @@ public class BinaryChannel {
     }
 
     /**
+     * See {{@link #ACCEPTED_ERROR_CODES_ON_CLOSURE}
+     * 
+     * @param e
+     * @return whether the error should be logged
+     */
+    protected boolean isAcceptedOnClosure(IOException e) {
+        for (String s : ACCEPTED_ERROR_CODES_ON_CLOSURE) {
+            if (e.getMessage().contains(s))
+                return true;
+        }
+        return false;
+    }
+
+    /**
      * Shutdown the entire connection represented by this BinaryChannel. It
      * closes the Socket, the ObjectInputStream and the ObjectOutputStream.
      */
@@ -460,9 +481,8 @@ public class BinaryChannel {
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
         } catch (IOException e) {
-            // peer closed already stream already
-            if (!e.getMessage().contains("service-unavailable(503)"))
-                log.error("Close failed cause: " + e.getMessage(), e);
+            if (!isAcceptedOnClosure(e))
+                log.debug("Close failed cause: " + e.getMessage(), e);
         }
         inputStream = null;
         outputStream = null;
