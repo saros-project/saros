@@ -100,6 +100,13 @@ public class RosterView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(RosterView.class);
 
+    public static final Image groupImage = SarosUI.getImage("icons/group.png");
+    public static final Image personImage = SarosUI.getImage("icons/user.png");
+    public static final Image personAwayImage = SarosUI
+        .getImage("icons/clock.png");
+    public static final Image personOfflineImage = new Image(Display
+        .getDefault(), personImage, SWT.IMAGE_DISABLE);
+
     protected TreeViewer viewer;
 
     protected Composite composite;
@@ -270,13 +277,6 @@ public class RosterView extends ViewPart {
      * A contact item for a single user.
      */
     protected class ContactItem implements TreeItem {
-        private final Image personImage = SarosUI.getImage("icons/user.png");
-
-        private final Image personAwayImage = SarosUI
-            .getImage("icons/clock.png");
-
-        private final Image personOfflineImage = new Image(
-            Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
 
         protected final String jid;
 
@@ -392,7 +392,6 @@ public class RosterView extends ViewPart {
      * and unfiled contacts.
      */
     protected abstract class AbstractGroupItem implements TreeItem {
-        private final Image groupImage = SarosUI.getImage("icons/group.png");
 
         /**
          * @return <code>null</code> because groups do not have a {@link JID}.
@@ -655,6 +654,11 @@ public class RosterView extends ViewPart {
             transferModeListener);
 
         rosterTracker.removeRosterListener(rosterListener);
+
+        /*
+         * personImage.dispose(); personAwayImage.dispose();
+         * personOfflineImage.dispose();
+         */
     }
 
     /**

@@ -100,6 +100,13 @@ public class SessionView extends ViewPart {
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
 
+    public static final Image awayImage = SarosUI.getImage("icons/clock.png");
+    public static final Image userImage = SarosUI.getImage("icons/user.png");
+    public static final Image driverImage = SarosUI
+        .getImage("icons/user_edit.png");
+    public static final Image observerImage = SarosUI
+        .getImage("icons/user_observer.png");
+
     protected IRosterListener rosterListener;
 
     /**
@@ -185,8 +192,8 @@ public class SessionView extends ViewPart {
                     return -1;
                 if (user2.isHost())
                     return +1;
-                return user1.getJID().toString().toLowerCase()
-                    .compareTo(user2.getJID().toString().toLowerCase());
+                return user1.getJID().toString().toLowerCase().compareTo(
+                    user2.getJID().toString().toLowerCase());
             }
         };
 
@@ -252,12 +259,6 @@ public class SessionView extends ViewPart {
     protected class SessionLabelProvider extends LabelProvider implements
         ITableLabelProvider, ITableColorProvider, ITableFontProvider {
 
-        private final Image awayImage = SarosUI.getImage("icons/clock.png");
-        private final Image userImage = SarosUI.getImage("icons/user.png");
-        private final Image driverImage = SarosUI
-            .getImage("icons/user_edit.png");
-        private final Image observerImage = SarosUI
-            .getImage("icons/user_observer.png");
         private Font boldFont = null;
 
         public String getColumnText(Object obj, int index) {
@@ -390,6 +391,11 @@ public class SessionView extends ViewPart {
         container.dispose();
         // Unfortunately, child.getParent is immutable, so we have to ask Saros.
         saros.removeChildContainer(container.getDelegate());
+
+        awayImage.dispose();
+        userImage.dispose();
+        driverImage.dispose();
+        observerImage.dispose();
 
         super.dispose();
     }
