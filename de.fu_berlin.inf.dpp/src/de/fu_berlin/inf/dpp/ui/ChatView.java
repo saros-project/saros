@@ -1,10 +1,14 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import java.awt.Toolkit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.TextEvent;
@@ -35,6 +39,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -73,6 +78,12 @@ public class ChatView extends ViewPart {
     protected boolean sessionStarted = false;
 
     protected Map<JID, String> chatUsers = new HashMap<JID, String>();
+
+    protected Action beepAction;
+
+    protected IPreferenceStore prefStore;
+
+    protected final String SELF_REFERENCE = "You";
 
     protected IRosterListener rosterListener = new IRosterListener() {
         public void update(final Collection<String> addresses) {
@@ -131,18 +142,17 @@ public class ChatView extends ViewPart {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     String prefix;
-                    {
-                        int prefixPos = sender.indexOf('/') + 1;
-                        DateTime dt = new DateTime();
-                        DateTimeFormatter fmt = DateTimeFormat
-                            .forPattern("HH:mm");
-                        String time = fmt.print(dt);
-                        String senderAddress = sender.substring(prefixPos,
-                            sender.length());
-                        String humanReadableSender = getHumanReadableSender(senderAddress);
-                        prefix = String.format("[ %s (%s)]: ",
-                            humanReadableSender, time);
-                    }
+
+                    int prefixPos = sender.indexOf('/') + 1;
+                    DateTime dt = new DateTime();
+                    DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                    String time = fmt.print(dt);
+                    String senderAddress = sender.substring(prefixPos, sender
+                        .length());
+                    String humanReadableSender = getHumanReadableSender(senderAddress);
+                    prefix = String.format("[%s (%s)]: ", humanReadableSender,
+                        time);
+
                     String m = message.startsWith("\n") ? message.substring(1)
                         : message;
                     String message = m + "\n";
@@ -152,13 +162,17 @@ public class ChatView extends ViewPart {
                         textWidget.append(prefix);
                         textWidget.append(message);
                     }
+
+                    if (prefStore.getBoolean(PreferenceConstants.BEEP_UPON_IM)
+                        && !humanReadableSender.equals(SELF_REFERENCE))
+                        Toolkit.getDefaultToolkit().beep();
                 }
             });
         }
 
         public void chatJoined() {
             if (!chatUsers.containsKey(saros.getMyJID()))
-                chatUsers.put(saros.getMyJID(), "You");
+                chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
 
             ISharedProject sharedProject = sessionManager.getSharedProject();
             if (sharedProject != null) {
@@ -196,10 +210,10 @@ public class ChatView extends ViewPart {
         if (sessionManager.getSharedProject() == null) {
             log.debug("session started");
             if (!chatUsers.containsKey(saros.getMyJID()))
-                chatUsers.put(saros.getMyJID(), "You");
+                chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
 
         }
-
+        this.prefStore = saros.getPreferenceStore();
     }
 
     @Override
@@ -262,6 +276,39 @@ public class ChatView extends ViewPart {
                 messagingManager.addChatListener(chatListener);
             }
         });
+
+        this.beepAction = new Action("Toggle beep") {
+
+            @Override
+            public void run() {
+                boolean newBeepValue = prefStore
+                    .getBoolean(PreferenceConstants.BEEP_UPON_IM) ? false
+                    : true;
+
+                prefStore.setValue(PreferenceConstants.BEEP_UPON_IM,
+                    newBeepValue);
+
+                if (newBeepValue == true)
+                    this.setImageDescriptor(SarosUI
+                        .getImageDescriptor("/icons/speaker_on.png"));
+                else
+                    this.setImageDescriptor(SarosUI
+                        .getImageDescriptor("/icons/speaker_off.png"));
+
+            }
+        };
+
+        if (prefStore.getBoolean(PreferenceConstants.BEEP_UPON_IM)) {
+            this.beepAction.setImageDescriptor(SarosUI
+                .getImageDescriptor("/icons/speaker_on.png"));
+        } else {
+            this.beepAction.setImageDescriptor(SarosUI
+                .getImageDescriptor("/icons/speaker_off.png"));
+        }
+
+        IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+        mgr.add(this.beepAction);
+
     }
 
     @Override

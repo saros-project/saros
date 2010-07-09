@@ -35,6 +35,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     protected StringFieldEditor chatserver;
     protected StringFieldEditor chatroom;
     protected BooleanFieldEditor userDefinedChatroomPassword;
+    protected BooleanFieldEditor beepUponIM;
     protected StringFieldEditor chatroomPassword;
     protected StringFieldEditor audioQuality;
     protected BooleanFieldEditor audio_vbr;
@@ -71,6 +72,11 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         userDefinedChatroomPassword = new BooleanFieldEditor(
             PreferenceConstants.USER_DEFINED_CHATROOM_PASSWORD,
             "Chatroom password", parent);
+
+        beepUponIM = new BooleanFieldEditor(PreferenceConstants.BEEP_UPON_IM,
+            "Beep when receiving a chat message", parent);
+
+        beepUponIM.setEnabled(true, parent);
 
         chatroomPassword = new StringFieldEditor(
             PreferenceConstants.CHATROOM_PASSWORD, "Chatroom Password:", parent);
@@ -113,6 +119,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         addField(chatroom);
         addField(userDefinedChatroomPassword);
         addField(chatroomPassword);
+        addField(beepUponIM);
         addField(audioQuality);
         addField(audioSamplerate);
         addField(audio_vbr);

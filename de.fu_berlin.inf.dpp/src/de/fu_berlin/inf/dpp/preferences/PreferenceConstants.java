@@ -167,6 +167,9 @@ public class PreferenceConstants {
     /** The checkbox preference for the chatroom password **/
     public static final String USER_DEFINED_CHATROOM_PASSWORD = "USER_DEFINED_CHATROOM_PASSWORD";
 
+    /** Beep when receiving an IM **/
+    public static final String BEEP_UPON_IM = "BEEP_UPON_IM";
+
     /** Audio quality level (1-10, 10 is best) **/
     public static final String AUDIO_QUALITY_LEVEL = "AUDIO_QUALITY_LEVEL";
 
