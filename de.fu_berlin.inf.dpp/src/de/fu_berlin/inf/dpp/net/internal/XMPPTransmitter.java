@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -513,9 +514,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
                         + " are used on both sides!", e);
             }
         }
+        String msg = "Sent (" + String.format("%03d", timedActivities.size())
+            + ") " + Util.prefix(recipient) + timedActivities;
 
-        log.debug("Sent (" + String.format("%03d", timedActivities.size())
-            + ") " + Util.prefix(recipient) + timedActivities);
+        // only log on debug level if there is more than a checksum
+        if (LoggingUtils.containsChecksumsOnly(timedActivities))
+            log.trace(msg);
+        else
+            log.debug(msg);
     }
 
     /**
