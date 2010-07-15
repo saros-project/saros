@@ -270,7 +270,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 activitiesBuffer.add(activity);
             }
 
-            return delta.getKind() != IResourceDelta.NO_CHANGE;
+            boolean visitChildren = delta.getKind() != IResourceDelta.NO_CHANGE;
+            return visitChildren;
         }
 
         protected IResourceActivity handleFolderDelta(IResourceDelta delta) {
@@ -495,7 +496,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         try {
-            switch (event.getType()) {
+            int type = event.getType();
+            switch (type) {
 
             case IResourceChangeEvent.PRE_BUILD:
             case IResourceChangeEvent.POST_BUILD:

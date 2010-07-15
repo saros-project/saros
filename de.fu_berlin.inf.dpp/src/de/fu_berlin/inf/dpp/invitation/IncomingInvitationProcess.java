@@ -319,8 +319,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
             e.printStackTrace();
             return new FileList();
         }
+        SubMonitor childMonitor = monitor.newChild(5, SubMonitor.SUPPRESS_ALL_LABELS);
         filesToSynchronize = computeDiff(localFileList, this.remoteFileList,
-            monitor.newChild(5, SubMonitor.SUPPRESS_ALL_LABELS));
+            childMonitor);
 
         List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());

@@ -54,9 +54,6 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
  * NOTE: As computation of a FileList involves a complete rescan of the project,
  * creating new instances should be avoided.<br>
  * <br>
- * TODO: This class should be split up to clearly separate between file lists
- * and differences between file lists. Fields like removed, added, etc. do not
- * make sense for plain lists and just add confusion.
  * 
  * @author rdjemili
  */
@@ -107,6 +104,11 @@ public class FileList {
         public int hashCode() {
             // TODO Auto-generated method stub
             return super.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "FLD> " + checksum + " " + vcsRevision;
         }
     }
 
