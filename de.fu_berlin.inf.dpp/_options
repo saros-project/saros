@@ -1,0 +1,4 @@
+org.eclipse.ui/debug=true
+org.eclipse.ui/trace/graphics=true
+org.eclipse.ui/debug/swtdebugglobal=true
+
