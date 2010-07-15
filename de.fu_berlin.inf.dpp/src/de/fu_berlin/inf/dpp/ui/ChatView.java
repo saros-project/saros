@@ -15,6 +15,7 @@ import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -159,8 +160,17 @@ public class ChatView extends ViewPart {
                     SourceViewer viewer2 = ChatView.this.viewer;
                     StyledText textWidget = viewer2.getTextWidget();
                     if (textWidget != null) {
+                        // Make the prefix bold to separate individual messages
+                        // better
+                        StyleRange prefixStyle = new StyleRange();
+                        prefixStyle.start = textWidget.getText().length();
+                        prefixStyle.length = prefix.length() - 1;
+                        prefixStyle.fontStyle = SWT.BOLD;
+
                         textWidget.append(prefix);
                         textWidget.append(message);
+
+                        textWidget.setStyleRange(prefixStyle);
                     }
 
                     if (prefStore.getBoolean(PreferenceConstants.BEEP_UPON_IM)
@@ -246,6 +256,7 @@ public class ChatView extends ViewPart {
                 case SWT.KEYPAD_CR:
                     if (e.stateMask == 0) {
                         String text = ChatView.this.inputText.getText();
+                        text = text.trim();
                         ChatView.this.inputText.setText("");
 
                         if (!text.equals("")
