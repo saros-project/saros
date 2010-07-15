@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -348,7 +349,7 @@ public class BinaryChannel {
                 }
             } catch (InterruptedException e) {
                 log.error("Code not designed to be interrupted", e);
-                throw new IOException(
+                throw new CausedIOException(
                     "Binary Channel received unexpected exception while waiting for confirmation package",
                     e);
             }

@@ -63,27 +63,27 @@ public class FileListDiff {
         if (base == null || target == null)
             return result;
 
-        for (Map.Entry<IPath, FileListData> entry : base.data.entrySet()) {
-            if (!target.data.containsKey(entry.getKey())) {
+        for (Map.Entry<IPath, FileListData> entry : base.entries.entrySet()) {
+            if (!target.entries.containsKey(entry.getKey())) {
                 result.removed.add(entry.getKey());
             }
         }
 
-        for (Map.Entry<IPath, FileListData> entry : target.data.entrySet()) {
-            if (!base.data.containsKey(entry.getKey())) {
+        for (Map.Entry<IPath, FileListData> entry : target.entries.entrySet()) {
+            if (!base.entries.containsKey(entry.getKey())) {
                 result.added.add(entry.getKey());
             }
         }
 
-        for (Map.Entry<IPath, FileListData> entry : base.data.entrySet()) {
+        for (Map.Entry<IPath, FileListData> entry : base.entries.entrySet()) {
             IPath path = entry.getKey();
-            if (target.data.containsKey(path)) {
+            if (target.entries.containsKey(path)) {
 
                 if (path.hasTrailingSeparator()) {
                     result.unaltered.add(path);
                 } else {
                     FileListData fileData = entry.getValue();
-                    FileListData otherFileData = target.data.get(path);
+                    FileListData otherFileData = target.entries.get(path);
 
                     if (fileData.equals(otherFileData)) {
                         result.unaltered.add(path);

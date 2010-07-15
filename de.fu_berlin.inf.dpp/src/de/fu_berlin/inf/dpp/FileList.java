@@ -69,7 +69,7 @@ public class FileList {
     protected static XStream xstream;
 
     /** The actual file list data. */
-    protected Map<IPath, FileListData> data = new HashMap<IPath, FileListData>();
+    protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
     /** Identifies the VCS used. */
     public String vcsProviderID;
     /** URL of the repository. */
@@ -113,7 +113,7 @@ public class FileList {
     }
 
     public String getVCSRevision(IPath path) {
-        FileListData fileListData = data.get(path);
+        FileListData fileListData = entries.get(path);
         if (fileListData == null)
             return null;
         return fileListData.vcsRevision;
@@ -185,7 +185,7 @@ public class FileList {
     public FileList(List<IPath> paths) {
         if (paths != null) {
             for (IPath path : paths) {
-                this.data.put(path, null);
+                this.entries.put(path, null);
             }
         }
     }
@@ -257,7 +257,7 @@ public class FileList {
      *         sorted by their character length.
      */
     public List<IPath> getPaths() {
-        return sorted(this.data.keySet());
+        return sorted(this.entries.keySet());
     }
 
     /**
@@ -282,7 +282,7 @@ public class FileList {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((entries == null) ? 0 : entries.hashCode());
         return result;
     }
 
@@ -297,12 +297,12 @@ public class FileList {
         }
 
         FileList other = (FileList) obj;
-        return this.data.equals(other.data);
+        return this.entries.equals(other.entries);
     }
 
     @Override
     public String toString() {
-        return "FileList(files:" + this.data.size() + ")";
+        return "FileList(files:" + this.entries.size() + ")";
     }
 
     protected List<IPath> sorted(Set<IPath> pathSet) {
@@ -353,7 +353,7 @@ public class FileList {
                     if (isManagedProject)
                         addVCSInformation(resource, data, vcs);
 
-                    this.data.put(file.getProjectRelativePath(), data);
+                    this.entries.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
                 }
@@ -372,7 +372,7 @@ public class FileList {
                     if (!addVCSInformation(resource, data, vcs))
                         data = null;
                 }
-                this.data.put(path, data);
+                this.entries.put(path, data);
                 addMembers(folder.members(), ignoreDerived);
             }
         }
@@ -402,7 +402,7 @@ public class FileList {
 
     // TODO ndh error handling
     public long getChecksum(IPath path) {
-        FileListData fileListData = this.data.get(path);
+        FileListData fileListData = this.entries.get(path);
         return fileListData != null ? fileListData.checksum : -1;
     }
 }

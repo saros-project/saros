@@ -327,8 +327,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     }
 
     /**
-     * Create and send complete file list, then wait for the peer's partial file
-     * list.
+     * Create and send the complete file list, then wait for the peer's partial
+     * file list.
      * 
      * @param subMonitor
      * @throws IOException
@@ -434,7 +434,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             archive = null;
             SubMonitor archiveMonitor = subMonitor.newChild(25,
                 SubMonitor.SUPPRESS_ALL_LABELS);
-            if (this.toSend.size() != 0) {
+            if (toSend.size() != 0) {
                 /*
                  * FIX #2836964: Prefix string too short
                  * 
