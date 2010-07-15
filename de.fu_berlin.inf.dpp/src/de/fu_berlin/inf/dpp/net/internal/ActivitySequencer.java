@@ -38,6 +38,8 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
+import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
@@ -583,9 +585,10 @@ public class ActivitySequencer {
         incomingQueues.add(nextActivity);
 
         if (!started) {
-            log.debug("Received activityDataObject but "
-                + "ActivitySequencer has not yet been started: "
-                + nextActivity);
+            log
+                .debug("Received activityDataObject but "
+                    + "ActivitySequencer has not yet been started: "
+                    + nextActivity);
             return;
         }
 
@@ -696,6 +699,9 @@ public class ActivitySequencer {
                 ViewportActivityDataObject viewActivity = (ViewportActivityDataObject) activityDataObject;
                 viewport.remove(viewActivity.getEditor());
                 viewport.put(viewActivity.getEditor(), viewActivity);
+            } else if (activityDataObject instanceof FolderActivityDataObject) {
+                FolderActivityDataObject folderEdit = (FolderActivityDataObject) activityDataObject;
+                foldRecursiveDelete(result, folderEdit);
             } else {
                 result.add(activityDataObject);
             }
@@ -714,6 +720,42 @@ public class ActivitySequencer {
         assert !result.contains(null);
 
         return result;
+    }
+
+    private static void foldRecursiveDelete(List<IActivityDataObject> result,
+        FolderActivityDataObject folderEdit) {
+
+        if (folderEdit.getType() != Type.Removed) {
+            result.add(folderEdit);
+            return;
+        }
+
+        int i = result.size() - 1;
+        boolean dropNew = false;
+
+        while (i >= 0 && !dropNew) {
+            FolderActivityDataObject curr = null;
+
+            if (result.get(i) instanceof FolderActivityDataObject)
+                curr = (FolderActivityDataObject) result.get(i);
+            else {
+                i--;
+                continue;
+            }
+
+            if (curr.isChildOf(folderEdit))
+                result.remove(i);
+
+            else if (curr.getPath().equals(folderEdit.getPath())) {
+                result.remove(i);
+                dropNew = true;
+            }
+
+            i--;
+        }
+
+        if (!dropNew)
+            result.add(folderEdit);
     }
 
     private static TextEditActivityDataObject joinTextEdits(

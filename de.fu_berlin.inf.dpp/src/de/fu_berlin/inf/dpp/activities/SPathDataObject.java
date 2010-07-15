@@ -56,6 +56,24 @@ public class SPathDataObject {
         return new SPath(project, path);
     }
 
+    /**
+     * Returns the IPath associated with this SPath.
+     * 
+     * @return The IPath associated with this SPath.
+     */
+    public IPath getIPath() {
+        return path;
+    }
+
+    /**
+     * Returns the project ID of the associated SPath.
+     * 
+     * @return The project ID of the associated SPath.
+     */
+    public String getProjectID() {
+        return projectID;
+    }
+
     @Override
     public String toString() {
         return "SPathDataObject [editorType=" + editorType + ", path="
