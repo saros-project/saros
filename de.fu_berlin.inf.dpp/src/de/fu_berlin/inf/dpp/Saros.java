@@ -43,6 +43,9 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.DeviceData;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Connection;
@@ -75,6 +78,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
+import sleak.Sleak;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
@@ -256,7 +260,6 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
-
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
         assert (dotMonitor = new DotGraphMonitor()) != null;
 
@@ -489,6 +492,22 @@ public class Saros extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
 
         super.start(context);
+        
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                Display currentDisplay = Display.getCurrent();
+                if (currentDisplay == null) {
+                    DeviceData data = new DeviceData();
+                    data.tracking = true;
+                    currentDisplay = new Display(data);
+                } else if (!Device.DEBUG) {
+                    return;
+                }
+                Sleak sleak = new Sleak();
+                sleak.open();
+
+            }
+        });
 
         sarosVersion = Util.getBundleVersion(getBundle(), "Unknown Version");
 
