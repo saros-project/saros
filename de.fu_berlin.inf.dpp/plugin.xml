@@ -297,14 +297,7 @@
                class="de.fu_berlin.inf.dpp.vcs.testing.TestSVNAction"
                icon="icons/vcard_add.png"
                id="de.fu_berlin.inf.dpp.ui.actions.testSVN"
-               label="&amp;Test SVN Checkout"
-               menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group">
-         </action>
-         <action
-               class="de.fu_berlin.inf.dpp.vcs.testing.TestSVNAction"
-               icon="icons/vcard_add.png"
-               id="de.fu_berlin.inf.dpp.ui.actions.testSVN"
-               label="&amp;Test SVN create patch"
+               label="&amp;Test SVN"
                menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group">
          </action>
       </actionSet>
