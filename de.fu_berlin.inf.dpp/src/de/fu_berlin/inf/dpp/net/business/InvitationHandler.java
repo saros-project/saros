@@ -74,7 +74,8 @@ public class InvitationHandler {
                         new JID(packet.getFrom()), sessionID,
                         invInfo.projectID, invInfo.projectDesc,
                         invInfo.colorID, invInfo.versionInfo,
-                        invInfo.sessionStart, sarosUI, invitationID);
+                        invInfo.sessionStart, sarosUI, invitationID,
+                        invInfo.doStream);
                 } else {
                     transmitter.sendMessageToUser(new JID(packet.getFrom()),
                         cancelInviteExtension.create(sessionID,

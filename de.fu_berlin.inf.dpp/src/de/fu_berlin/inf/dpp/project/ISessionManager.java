@@ -110,7 +110,7 @@ public interface ISessionManager {
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID);
+        String invitationID, boolean doStream);
 
     /*
      * @see IConnectionListener

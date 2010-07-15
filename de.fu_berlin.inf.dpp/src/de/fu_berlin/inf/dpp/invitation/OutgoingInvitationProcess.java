@@ -20,15 +20,22 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -47,6 +54,8 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.StreamService;
+import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -101,13 +110,16 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected SarosCancellationException cancellationCause;
     protected SarosPacketCollector invitationCompleteCollector;
 
+    // Should the archive be sent using a StreamSession?
+    protected boolean doStream = false;
+
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
         ISharedProject sharedProject, List<IResource> partialProjectResources,
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
         DiscoveryManager discoveryManager,
-        CommunicationNegotiatingManager comNegotiatingManager) {
+        CommunicationNegotiatingManager comNegotiatingManager, boolean doStream) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
 
@@ -118,6 +130,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         this.discoveryManager = discoveryManager;
         this.comNegotiatingManager = comNegotiatingManager;
         this.project = project;
+        this.doStream = doStream;
     }
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
@@ -138,9 +151,12 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             sendCommunicationInformation(monitor.newChild(1));
 
-            createArchive(monitor.newChild(3));
-
-            sendArchive(monitor.newChild(90));
+            if (!doStream) {
+                createArchive(monitor.newChild(3));
+                sendArchive(monitor.newChild(90));
+            } else {
+                streamArchive(monitor.newChild(93));
+            }
 
             completeInvitation(monitor.newChild(3));
         } catch (LocalCancellationException e) {
@@ -297,7 +313,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         transmitter.sendInvitation(sharedProject.getProjectMapper().getID(
             this.project), peer, description, colorID, hostVersionInfo,
-            invitationID, sharedProject.getSessionStart());
+            invitationID, sharedProject.getSessionStart(), doStream);
 
         subMonitor.worked(25);
         subMonitor
@@ -464,6 +480,156 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             archive, subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
+    protected void streamArchive(SubMonitor subMonitor)
+        throws SarosCancellationException {
+
+        checkCancellation(CancelOption.NOTIFY_PEER);
+
+        subMonitor.setWorkRemaining(100);
+        subMonitor.setTaskName("Creating archive...");
+
+        /*
+         * STOP users
+         * 
+         * TODO: stop all users. If we stop users which are currently joining,
+         * it can cause a deadlock, because the StopManager does not answer if
+         * someone is already stopped.
+         */
+        Collection<User> usersToStop = new ArrayList<User>();
+        for (User user : sharedProject.getParticipants()) {
+            if (user.isInvitationComplete())
+                usersToStop.add(user);
+        }
+        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+            + usersToStop);
+        // TODO: startHandles outside of sync block?
+        List<StartHandle> startHandles;
+        synchronized (sharedProject) {
+            startHandles = stopManager.stop(usersToStop,
+                "Synchronizing invitation", subMonitor.newChild(25,
+                    SubMonitor.SUPPRESS_ALL_LABELS));
+        }
+
+        try {
+            // TODO: Ask the user whether to save the resources, but only if
+            // they have changed. How to ask Eclipse whether there are resource
+            // changes?
+            // if (outInvitationUI.confirmProjectSave(peer))
+            EditorAPI.saveProject(this.project, false);
+            // else
+            // throw new LocalCancellationException();
+
+            User newUser = null;
+            synchronized (sharedProject) {
+                newUser = new User(sharedProject, peer, colorID);
+                this.sharedProject.addUser(newUser);
+                log.debug(Util.prefix(peer) + " added to project, colorID: "
+                    + colorID);
+                synchronizeUserList();
+            }
+
+            // if (toSend.size() != 0) {
+
+            streamSession = streamServiceManager.createSession(
+                archiveStreamService, newUser, new Integer(toSend.size()),
+                sessionListener);
+
+            streamSession.setListener(sessionListener);
+
+            subMonitor.setTaskName("Streaming archive...");
+
+            performFileStream(archiveStreamService, streamSession, subMonitor
+                .newChild(75));
+            // }
+
+        } catch (Exception e) {
+            log.error("Error while executing archive stream: ", e);
+        } finally {
+            // START all users
+            for (StartHandle startHandle : startHandles) {
+                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
+                    + Util.prefix(startHandle.getUser().getJID()));
+                startHandle.start();
+            }
+        }
+    }
+
+    private void performFileStream(StreamService streamService,
+        final StreamSession session, SubMonitor subMonitor)
+        throws SarosCancellationException {
+
+        OutputStream output = session.getOutputStream(0);
+        ZipOutputStream zout = new ZipOutputStream(output);
+        int worked = 0;
+        int lastWorked = 0;
+        int filesSent = 0;
+        double increment = 0.0;
+
+        if (toSend.size() >= 1) {
+            increment = (double) 100 / toSend.size();
+            subMonitor.beginTask("Streaming files...", 100);
+        } else {
+            subMonitor.worked(100);
+        }
+
+        try {
+            for (IPath path : toSend) {
+                IFile file = this.project.getFile(path);
+                String absPath = file.getLocation().toPortableString();
+
+                byte[] buffer = new byte[streamService.getChunkSize()[0]];
+                InputStream input = new FileInputStream(absPath);
+
+                ZipEntry ze = new ZipEntry(path.toPortableString());
+                zout.putNextEntry(ze);
+
+                int numRead = 0;
+                while ((numRead = input.read(buffer)) > 0) {
+                    zout.write(buffer, 0, numRead);
+                }
+                input.close();
+                zout.flush();
+                zout.closeEntry();
+
+                // Progress monitor
+                worked = (int) Math.round(increment * filesSent);
+
+                if ((worked - lastWorked) > 0) {
+                    subMonitor.worked((worked - lastWorked));
+                    lastWorked = worked;
+                }
+
+                filesSent++;
+
+                checkCancellation(CancelOption.NOTIFY_PEER);
+            }
+
+        } catch (IOException e) {
+            error = true;
+            log.error("Error while sending file: ", e);
+            localCancel(
+                "An I/O problem occurred while the project's files were being sent: \""
+                    + e.getMessage() + "\" The invitation was cancelled.",
+                CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (SarosCancellationException e) {
+            log.debug("Invitation process was cancelled.");
+        } catch (Exception e) {
+            log.error("Unknown exception: ", e);
+        } finally {
+            try {
+                if (filesSent >= 1)
+                    zout.finish();
+            } catch (IOException e) {
+                log
+                    .warn("IOException occurred when finishing the ZipOutputStream.");
+            }
+            IOUtils.closeQuietly(output);
+            IOUtils.closeQuietly(zout);
+        }
+        subMonitor.done();
+    }
+
     protected void completeInvitation(SubMonitor subMonitor)
         throws IOException, SarosCancellationException {
 
@@ -471,6 +637,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Waiting for invitation complete confirmation...");
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Waiting for peer to complete invitation...");
+
+        invitationCompleteCollector = transmitter
+            .getInvitationCompleteCollector(invitationID);
 
         transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50,
             SubMonitor.SUPPRESS_ALL_LABELS), invitationCompleteCollector);

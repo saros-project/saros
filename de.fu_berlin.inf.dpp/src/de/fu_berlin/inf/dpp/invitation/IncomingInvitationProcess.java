@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -57,6 +61,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -64,6 +69,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -92,6 +98,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
     protected DateTime sessionStart;
     protected ISharedProject sharedProject;
     protected String invitationID;
+    protected Saros saros;
+
+    protected boolean doStream = false;
 
     /**
      * {@link VersionInfo#compatibility} applies to our client and
@@ -106,7 +115,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
-        DateTime sessionStart, SarosUI sarosUI, String invitationID) {
+        DateTime sessionStart, SarosUI sarosUI, String invitationID,
+        Saros saros, boolean doStream) {
 
         super(transmitter, from, description, colorID, invitationProcesses);
 
@@ -116,6 +126,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;
         this.invitationID = invitationID;
+        this.saros = saros;
+        this.doStream = doStream;
     }
 
     protected VersionInfo determineVersion(VersionInfo remoteVersionInfo) {
@@ -266,24 +278,107 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
         checkCancellation();
 
-        monitor.subTask("Receiving archive...");
+        if (doStream) {
+            acceptStream();
+        } else {
+            monitor.subTask("Receiving archive...");
 
-        InputStream archiveStream = transmitter.receiveArchive(
-            archiveCollector, monitor.newChild(90,
-                SubMonitor.SUPPRESS_ALL_LABELS), true);
+            InputStream archiveStream = transmitter.receiveArchive(
+                archiveCollector, monitor.newChild(90,
+                    SubMonitor.SUPPRESS_ALL_LABELS), true);
 
-        log.debug("Inv" + Util.prefix(peer) + ": Archive received.");
-        checkCancellation();
+            log.debug("Inv" + Util.prefix(peer) + ": Archive received.");
+            checkCancellation();
 
-        monitor.subTask("Extracting archive...");
+            monitor.subTask("Extracting archive...");
 
-        writeArchive(archiveStream, localProject, monitor.newChild(5,
-            SubMonitor.SUPPRESS_ALL_LABELS));
+            writeArchive(archiveStream, localProject, monitor.newChild(5,
+                SubMonitor.SUPPRESS_ALL_LABELS));
 
-        log.debug("Inv" + Util.prefix(peer)
-            + ": Archive has been written to disk.");
+            log.debug("Inv" + Util.prefix(peer)
+                + ": Archive has been written to disk.");
+        }
 
         completeInvitation();
+    }
+
+    private void acceptStream() throws SarosCancellationException {
+        try {
+            archiveStreamService.startLock.lock();
+            archiveStreamService.sessionReceived.await();
+        } catch (InterruptedException e) {
+            log.debug("Method interrupted waiting for archive stream lock.");
+        } finally {
+            archiveStreamService.startLock.unlock();
+        }
+
+        StreamSession newSession = archiveStreamService.streamSession;
+        int numOfFiles = archiveStreamService.getFileNum();
+        IFile currentFile = null;
+
+        int worked = 0;
+        int lastWorked = 0;
+        int filesReceived = 0;
+        double increment = 0.0;
+
+        InputStream in = newSession.getInputStream(0);
+        ZipInputStream zin = new ZipInputStream(in);
+        try {
+            ZipEntry ze = null;
+            monitor.beginTask("Receiving project files...", 100);
+
+            if (numOfFiles >= 1)
+                increment = (double) 100 / numOfFiles;
+            else
+                monitor.worked(100);
+
+            while ((ze = zin.getNextEntry()) != null) {
+                currentFile = this.localProject.getFile(ze.getName());
+                monitor.setTaskName("Receiving " + ze.getName());
+
+                if (currentFile.exists()) {
+                    log.debug(currentFile
+                        + " already exists on invitee. Replacing this file.");
+                    currentFile.delete(true, null);
+                }
+
+                currentFile.create(new UncloseableInputStream(zin), true, null);
+
+                worked = (int) Math.round(increment * filesReceived);
+
+                if ((worked - lastWorked) > 0) {
+                    monitor.worked((worked - lastWorked));
+                    lastWorked = worked;
+                }
+
+                filesReceived++;
+
+                checkCancellation();
+            }
+
+        } catch (SarosCancellationException e) {
+            log.debug("Invitation process was cancelled.");
+        } catch (CoreException e) {
+            log.error("Exception while creating file. Message: ", e);
+            localCancel(
+                "A problem occurred while the project's files were being received: \""
+                    + e.getMessage() + "\" The invitation was cancelled.",
+                CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (EOFException e) {
+            log.error("Error while receiving files: " + e.getMessage());
+            localCancel(
+                "A problem occured when receiving the project files. It is possible that the files were corrupted in transit.\n\nPlease attempt invitation again.",
+                CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (Exception e) {
+            log.error("Unknown exception: ", e);
+        } finally {
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(zin);
+            newSession.stopSession();
+        }
+
     }
 
     /**

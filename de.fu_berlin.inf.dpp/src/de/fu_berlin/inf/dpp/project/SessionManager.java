@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
@@ -64,6 +65,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -132,6 +134,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     protected List<IResource> partialProjectResources;
 
+    /**
+     * Should invitations send the project archive via StreamSession?
+     */
+    protected IPreferenceStore prefStore;
+    protected boolean doStreamingInvitation = false;
+
     public SessionManager(Saros saros) {
         this.saros = saros;
         saros.addListener(this);
@@ -149,6 +157,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
         this.partialProjectResources = partialProjectResources;
+
+        this.prefStore = saros.getPreferenceStore();
+        this.doStreamingInvitation = prefStore
+            .getBoolean(PreferenceConstants.STREAM_PROJECT);
 
         SharedProject sharedProject = new SharedProject(saros,
             this.transmitter, this.transferManager, dispatchThreadContext,
@@ -260,14 +272,14 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID) {
+        String invitationID, boolean doStream) {
 
         this.sessionID.setValue(sessionID);
 
         final IncomingInvitationProcess process = new IncomingInvitationProcess(
             this, this.transmitter, from, projectName, description, colorID,
             invitationProcesses, versionManager, versionInfo, sessionStart,
-            sarosUI, invitationID);
+            sarosUI, invitationID, saros, doStream);
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
@@ -345,11 +357,14 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         // TODO We want to invite to all projects!!
         IProject toInviteTo = project.getProjects().iterator().next();
 
+        doStreamingInvitation = prefStore
+            .getBoolean(PreferenceConstants.STREAM_PROJECT);
+
         OutgoingInvitationProcess result = new OutgoingInvitationProcess(
             transmitter, toInvite, project, partialProjectResources,
             toInviteTo, description, project.getFreeColor(),
             invitationProcesses, versionManager, stopManager, discoveryManager,
-            comNegotiatingManager);
+            comNegotiatingManager, doStreamingInvitation);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
