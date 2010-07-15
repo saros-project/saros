@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -67,11 +68,11 @@ public class BinaryChannelConnection implements IBytestreamConnection {
 
                         listener.addIncomingTransferObject(transferObject);
 
-                    } catch (SarosCancellationException e) {
-                        log.info("canceled transfer");
+                    } catch (LocalCancellationException e) {
+                        log.info("Connection was closed by me. ");
                         if (progress != null && !progress.isCanceled())
                             progress.setCanceled(true);
-                        close(); // might be a local cancel
+                        close();
                         return;
                     } catch (SocketException e) {
                         log.debug(prefix() + "Connection was closed by me. ");

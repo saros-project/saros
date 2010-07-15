@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -36,10 +37,12 @@ public class InvitationInfo extends DefaultInvitationInfo {
     public VersionInfo versionInfo;
     public DateTime sessionStart;
     public boolean doStream;
+    public CommunicationPreferences comPrefs;
 
     public InvitationInfo(SessionIDObservable sessionID, String invitationID,
         String projectID, String projectDesc, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, boolean doStream) {
+        VersionInfo versionInfo, DateTime sessionStart, boolean doStream,
+        CommunicationPreferences comPrefs) {
         super(sessionID, invitationID);
         this.projectID = projectID;
         this.projectDesc = projectDesc;
@@ -47,6 +50,7 @@ public class InvitationInfo extends DefaultInvitationInfo {
         this.versionInfo = versionInfo;
         this.sessionStart = sessionStart;
         this.doStream = doStream;
+        this.comPrefs = comPrefs;
     }
 
     public static class InvitationExtensionProvider extends

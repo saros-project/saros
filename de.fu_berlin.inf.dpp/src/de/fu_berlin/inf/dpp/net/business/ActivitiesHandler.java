@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * Handler for all {@link TimedActivities}
@@ -175,8 +176,15 @@ public class ActivitiesHandler {
                 + timedActivities);
             return;
         } else {
-            log.debug("Rcvd (" + String.format("%03d", timedActivities.size())
-                + ") " + Util.prefix(fromJID) + ": " + timedActivities);
+            String msg = "Rcvd ("
+                + String.format("%03d", timedActivities.size()) + ") "
+                + Util.prefix(fromJID) + ": " + timedActivities;
+
+            // only log on debug level if there is more than a checksum
+            if (LoggingUtils.containsChecksumsOnly(timedActivities))
+                log.trace(msg);
+            else
+                log.debug(msg);
         }
 
         for (TimedActivityDataObject timedActivity : timedActivities) {

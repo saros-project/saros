@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -149,8 +150,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             getFileList(monitor.newChild(1));
 
-            sendCommunicationInformation(monitor.newChild(1));
-
             if (!doStream) {
                 createArchive(monitor.newChild(3));
                 sendArchive(monitor.newChild(90));
@@ -201,22 +200,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     }
 
     /**
-     * Send communication information (chat preferences) during invitation
-     * process.
-     */
-    protected void sendCommunicationInformation(SubMonitor subMonitor)
-        throws SarosCancellationException {
-
-        log.debug("Inv" + Util.prefix(peer) + ": Sending Chat Information...");
-        subMonitor.beginTask("Sending Chat Information...", 1);
-
-        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
-
-        comNegotiatingManager.sendComPrefs(peer, subMonitor.newChild(1));
-        subMonitor.done();
-    }
-
-    /**
      * Check whether the peer's client has Saros support.
      */
     protected void checkAvailability(SubMonitor subMonitor)
@@ -260,23 +243,30 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         Compatibility comp = null;
 
-        if (versionInfo != null)
+        if (versionInfo != null) {
             comp = versionInfo.compatibility;
 
-        if (comp == VersionManager.Compatibility.OK) {
-            log.debug("Inv" + Util.prefix(peer)
-                + ": Saros versions are compatible, proceeding...");
-            this.versionInfo = versionInfo;
+            if (comp == VersionManager.Compatibility.OK) {
+                log.debug("Inv" + Util.prefix(peer)
+                    + ": Saros versions are compatible, proceeding...");
+                this.versionInfo = versionInfo;
+            } else {
+                log.debug("Inv" + Util.prefix(peer)
+                    + ": Saros versions are not compatible.");
+                if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
+                    versionManager.getVersion()))
+                    this.versionInfo = versionInfo;
+                else {
+                    localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
+                    throw new LocalCancellationException();
+                }
+            }
         } else {
             log.debug("Inv" + Util.prefix(peer)
-                + ": Saros versions are not compatible.");
-            if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
-                versionManager.getVersion()))
-                this.versionInfo = versionInfo;
-            else {
+                + ": Unable to obtain peer's version information.");
+            if (!InvitationWizard.confirmUnknownVersion(peer, versionManager
+                .getVersion()))
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new LocalCancellationException();
-            }
         }
     }
 
@@ -311,9 +301,10 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         SarosPacketCollector fileListRequestCollector = transmitter
             .getFileListRequestCollector(invitationID);
 
+        CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
         transmitter.sendInvitation(sharedProject.getProjectMapper().getID(
             this.project), peer, description, colorID, hostVersionInfo,
-            invitationID, sharedProject.getSessionStart(), doStream);
+            invitationID, sharedProject.getSessionStart(), doStream, comPrefs);
 
         subMonitor.worked(25);
         subMonitor

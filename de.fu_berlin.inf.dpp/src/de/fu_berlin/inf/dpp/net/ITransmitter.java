@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -69,10 +70,11 @@ public interface ITransmitter {
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
+     * @param comPrefs TODO
      */
     public void sendInvitation(String projectID, JID jid, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream);
+        DateTime sessionStart, boolean doStream, CommunicationPreferences comPrefs);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation

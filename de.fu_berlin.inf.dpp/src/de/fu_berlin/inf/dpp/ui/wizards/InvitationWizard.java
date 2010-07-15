@@ -179,6 +179,29 @@ public class InvitationWizard extends Wizard {
         }
     }
 
+    public static boolean confirmUnknownVersion(JID peer, Version localVersion) {
+        final String title = "Unable to determine Saros compatibility with "
+            + peer.getBase();
+        final String message = "Saros was unable to check the version number of your peer "
+            + peer.getBase()
+            + ", so it is possible that you are running incompatible versions of Saros. Please "
+            + "ensure that your peer is running the same version of Saros as you. (Your version is "
+            + localVersion.toString() + ".)\n\nDo you wish to proceed?";
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openQuestion(getAShell(), title,
+                        message);
+                }
+            });
+        } catch (Exception e) {
+            log.error(
+                "An error ocurred while trying to open the confirm dialog.", e);
+            return false;
+        }
+    }
+
     public static boolean confirmProjectSave(JID peer) {
         final String title = "Save All Resources";
         final String message = "Some resources have been modified.\n"

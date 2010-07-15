@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import java.awt.Toolkit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,12 +8,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -22,8 +25,6 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -34,40 +35,31 @@ import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
-import de.fu_berlin.inf.dpp.MessagingManager.MultiChatSession;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * ChatView
+ * Saros' Chat View.
  * 
  * @author ologa
- * @author ?
+ * @author ahaferburg
  */
 @Component(module = "ui")
-public class ChatView extends ViewPart implements IConnectionListener,
-    IChatListener {
+public class ChatView extends ViewPart {
 
     private static Logger log = Logger.getLogger(ChatView.class);
 
+    /** Text input field. */
     protected Text inputText;
 
-    protected MultiChatSession session;
-
+    /** Displays the chat. */
     protected SourceViewer viewer;
-
-    protected boolean joined = false;
-
-    protected Action connectAction;
 
     private static final int[] WEIGHTS = { 75, 25 };
 
@@ -78,45 +70,25 @@ public class ChatView extends ViewPart implements IConnectionListener,
     protected Saros saros;
 
     @Inject
-    protected SessionManager sessionManager;
+    protected RosterTracker rosterTracker;
 
     @Inject
-    protected RosterTracker rosterTracker;
+    protected SessionManager sessionManager;
 
     protected boolean sessionStarted = false;
 
     protected Map<JID, String> chatUsers = new HashMap<JID, String>();
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
-        @Override
-        public void sessionEnded(ISharedProject session) {
-            log.debug("Session ended! Chat closed!");
-            sessionStarted = false;
-            ChatView.this.session = null;
-            connectionStateChanged(saros.getConnection(), saros
-                .getConnectionState());
+    protected Action beepAction;
 
-        }
+    protected IPreferenceStore prefStore;
 
-        @Override
-        public void sessionStarted(ISharedProject session) {
+    protected final String SELF_REFERENCE = "You";
 
-            log.debug("Session started!");
-            sessionStarted = true;
-            connectionStateChanged(saros.getConnection(), saros
-                .getConnectionState());
-            if (!chatUsers.containsKey(saros.getMyJID()))
-                chatUsers.put(saros.getMyJID(), "You");
-
-        }
-
-    };
-
-    protected class ChatSessionRosterListener implements IRosterListener {
-        public void changed(final Collection<String> addresses) {
+    protected IRosterListener rosterListener = new IRosterListener() {
+        public void update(final Collection<String> addresses) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-
                     ISharedProject sharedProject = sessionManager
                         .getSharedProject();
                     if (sharedProject == null)
@@ -133,7 +105,6 @@ public class ChatView extends ViewPart implements IConnectionListener,
                             continue;
 
                         updateHumanReadableName(user);
-
                     }
                 }
             });
@@ -144,7 +115,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
         }
 
         public void entriesUpdated(Collection<String> addresses) {
-            changed(addresses);
+            update(addresses);
         }
 
         public void entriesDeleted(Collection<String> addresses) {
@@ -152,33 +123,97 @@ public class ChatView extends ViewPart implements IConnectionListener,
         }
 
         public void entriesAdded(Collection<String> addresses) {
-            changed(addresses);
+            update(addresses);
         }
 
         public void rosterChanged(Roster roster) {
             // not needed
         }
-    }
+    };
+
+    protected IChatListener chatListener = new IChatListener() {
+        /**
+         * Print messages to TextWidget
+         * 
+         */
+        public void chatMessageAdded(final String sender, final String message) {
+            ChatView.log.debug("Received Message from " + sender + ": "
+                + message);
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    String prefix;
+
+                    int prefixPos = sender.indexOf('/') + 1;
+                    DateTime dt = new DateTime();
+                    DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                    String time = fmt.print(dt);
+                    String senderAddress = sender.substring(prefixPos, sender
+                        .length());
+                    String humanReadableSender = getHumanReadableSender(senderAddress);
+                    prefix = String.format("[%s (%s)]: ", humanReadableSender,
+                        time);
+
+                    String m = message.startsWith("\n") ? message.substring(1)
+                        : message;
+                    String message = m + "\n";
+                    SourceViewer viewer2 = ChatView.this.viewer;
+                    StyledText textWidget = viewer2.getTextWidget();
+                    if (textWidget != null) {
+                        textWidget.append(prefix);
+                        textWidget.append(message);
+                    }
+
+                    if (prefStore.getBoolean(PreferenceConstants.BEEP_UPON_IM)
+                        && !humanReadableSender.equals(SELF_REFERENCE))
+                        Toolkit.getDefaultToolkit().beep();
+                }
+            });
+        }
+
+        public void chatJoined() {
+            if (!chatUsers.containsKey(saros.getMyJID()))
+                chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
+
+            ISharedProject sharedProject = sessionManager.getSharedProject();
+            if (sharedProject != null) {
+                for (User user : sharedProject.getParticipants()) {
+                    if (!user.isLocal())
+                        updateHumanReadableName(user);
+                }
+            }
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    inputText.setText("");
+                    inputText.setEditable(true);
+                }
+            });
+        }
+
+        public void chatLeft() {
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    inputText.setText("You have left the chat. To re-enter "
+                        + "the chat please join a Saros session.");
+                    inputText.setEditable(false);
+                }
+            });
+        }
+    };
 
     public ChatView() {
         Saros.reinject(this);
 
-        sessionManager.addSessionListener(sessionListener);
-        IRosterListener rosterListener = new ChatSessionRosterListener();
         rosterTracker.addRosterListener(rosterListener);
         log.debug("RosterListener added!");
         log.debug("SessionListener added!");
 
         if (sessionManager.getSharedProject() == null) {
-            sessionStarted = false;
-            log.debug("no session started");
-        } else {
-            sessionStarted = true;
             log.debug("session started");
             if (!chatUsers.containsKey(saros.getMyJID()))
-                chatUsers.put(saros.getMyJID(), "You");
-        }
+                chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
 
+        }
+        this.prefStore = saros.getPreferenceStore();
     }
 
     @Override
@@ -195,9 +230,10 @@ public class ChatView extends ViewPart implements IConnectionListener,
         this.viewer.setDocument(new Document());
         this.viewer.getTextWidget();
 
-        this.inputText = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-        this.inputText
-            .setText("To Join the chat please use the connect button. (You have to be in a shared project session)");
+        this.inputText = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL
+            | SWT.WRAP);
+        this.inputText.setText("To use the chat please "
+            + "join a shared project session.");
         this.inputText.setEditable(false);
 
         sash.setWeights(ChatView.WEIGHTS);
@@ -212,7 +248,8 @@ public class ChatView extends ViewPart implements IConnectionListener,
                         String text = ChatView.this.inputText.getText();
                         ChatView.this.inputText.setText("");
 
-                        if (!text.equals("")) {
+                        if (!text.equals("")
+                            && messagingManager.getSession() != null) {
                             messagingManager.getSession().sendMessage(text);
                         }
                     }
@@ -224,7 +261,6 @@ public class ChatView extends ViewPart implements IConnectionListener,
         this.viewer.addTextListener(new ITextListener() {
 
             public void textChanged(TextEvent event) {
-
                 // scrolls down, so the last line is visible
                 int lines = ChatView.this.viewer.getDocument()
                     .getNumberOfLines();
@@ -232,64 +268,56 @@ public class ChatView extends ViewPart implements IConnectionListener,
             }
         });
 
-        this.connectAction = new Action("Connect/DisConnect") {
+        // Register the chat listener.
+        // Run a possible join() in a separate thread to prevent the opening of
+        // this view from blocking the SWT thread.
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                messagingManager.addChatListener(chatListener);
+            }
+        });
+
+        this.beepAction = new Action("Toggle beep") {
 
             @Override
             public void run() {
+                boolean newBeepValue = prefStore
+                    .getBoolean(PreferenceConstants.BEEP_UPON_IM) ? false
+                    : true;
 
-                if (ChatView.this.joined) {
-                    ChatView.this.session.sendMessage("is leaving the chat...");
-                    ChatView.this.inputText
-                        .setText("You have left the chat. To re-enter the chat please use the connect button.");
-                    messagingManager.disconnectMultiUserChat();
-                    ChatView.this.session = null;
-                    ChatView.this.inputText.setEditable(false);
+                prefStore.setValue(PreferenceConstants.BEEP_UPON_IM,
+                    newBeepValue);
 
-                    ChatView.this.joined = false;
-                    ChatView.this.connectAction.setImageDescriptor(SarosUI
-                        .getImageDescriptor("/icons/disconnect.png"));
-                } else {
-                    try {
-                        messagingManager.connectMultiUserChat();
-                        ChatView.this.joined = true;
-                        ChatView.this.viewer.setDocument(new Document());
-                        ChatView.this.inputText.setEditable(true);
-                        ChatView.this.inputText.setText("");
-                        ChatView.this.connectAction.setImageDescriptor(SarosUI
-                            .getImageDescriptor("/icons/connect.png"));
-                        ChatView.this.session = messagingManager.getSession();
-                        ChatView.this.session
-                            .sendMessage("has joined the chat");
-                    } catch (XMPPException e) {
-                        ChatView.this.viewer.getDocument().set(
-                            "Error: Couldn't connect - " + e);
-                    }
-                }
+                if (newBeepValue == true)
+                    this.setImageDescriptor(SarosUI
+                        .getImageDescriptor("/icons/speaker_on.png"));
+                else
+                    this.setImageDescriptor(SarosUI
+                        .getImageDescriptor("/icons/speaker_off.png"));
+
             }
         };
 
-        if (this.joined) {
-            this.connectAction.setImageDescriptor(SarosUI
-                .getImageDescriptor("/icons/connect.png"));
+        if (prefStore.getBoolean(PreferenceConstants.BEEP_UPON_IM)) {
+            this.beepAction.setImageDescriptor(SarosUI
+                .getImageDescriptor("/icons/speaker_on.png"));
         } else {
-            this.connectAction.setImageDescriptor(SarosUI
-                .getImageDescriptor("/icons/disconnect.png"));
+            this.beepAction.setImageDescriptor(SarosUI
+                .getImageDescriptor("/icons/speaker_off.png"));
         }
 
-        if (saros.isConnected() && sessionStarted == true) {
-            this.connectAction.setEnabled(true);
-        } else {
-            this.connectAction.setEnabled(false);
-        }
         IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-        mgr.add(this.connectAction);
+        mgr.add(this.beepAction);
 
-        // register ChatView as chat listener
+    }
 
-        messagingManager.addChatListener(this);
+    @Override
+    public void dispose() {
+        rosterTracker.removeRosterListener(rosterListener);
+        messagingManager.removeChatListener(chatListener);
+        log.debug("RosterListener and IChatListener removed.");
 
-        // register as connection listener
-        saros.addListener(this);
+        super.dispose();
     }
 
     @Override
@@ -298,52 +326,12 @@ public class ChatView extends ViewPart implements IConnectionListener,
     }
 
     /**
-     * If connection or session closed, disable the connect / disconnect button
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-        ConnectionState newState) {
-        if (newState == ConnectionState.CONNECTED && sessionStarted == true) {
-            this.connectAction.setEnabled(true);
-        } else if (newState == ConnectionState.NOT_CONNECTED
-            || sessionStarted == false
-            || newState == ConnectionState.DISCONNECTING
-            || newState == ConnectionState.CONNECTING) {
-            log.debug("Session closed!");
-            this.connectAction.setEnabled(false);
-        }
-    }
-
-    /**
-     * Print messages to TextWidget
-     * 
-     */
-    public void chatMessageAdded(final String sender, final String message) {
-        ChatView.log.debug("Received Message from " + sender + ": " + message);
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                int prefixPos = sender.indexOf('/') + 1;
-                String m = message.startsWith("\n") ? message.substring(1)
-                    : message;
-                DateTime dt = new DateTime();
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
-                String time = fmt.print(dt);
-                String prefix = "["
-                    + getHumanReadableSender(sender.substring(prefixPos, sender
-                        .length())) + " (" + time + ")]: ";
-                String message = m + "\n";
-                ChatView.this.viewer.getTextWidget().append(prefix);
-                ChatView.this.viewer.getTextWidget().append(message);
-            }
-        });
-    }
-
-    /**
      * 
      * @param sender
      *            Sender JID as String
      * @return Nickname of the user or "You" if its the local user
      */
-    public String getHumanReadableSender(String sender) {
+    protected String getHumanReadableSender(String sender) {
 
         JID senderJID = new JID(sender);
         if (chatUsers.containsKey(senderJID)) {
@@ -355,13 +343,15 @@ public class ChatView extends ViewPart implements IConnectionListener,
         }
     }
 
-    public void updateHumanReadableName(User user) {
+    protected void updateHumanReadableName(User user) {
+        JID jid = user.getJID();
+        String nickName = Util.getNickname(saros, jid);
+        if (nickName == null)
+            nickName = user.getHumanReadableName();
+        chatUsers.put(jid, nickName);
 
-        chatUsers.remove(user.getJID());
-        chatUsers.put(user.getJID(), user.getHumanReadableName());
-
-        log.debug("New ChatUser added / updated to ChatUser Collection: "
-            + user.getJID() + " - " + user.getHumanReadableName());
+        log.debug("New ChatUser added / updated to ChatUser Collection: " + jid
+            + " - " + nickName);
     }
 
 }

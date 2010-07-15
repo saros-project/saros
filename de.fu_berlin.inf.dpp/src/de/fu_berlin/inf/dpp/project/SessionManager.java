@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -214,8 +215,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 new StackTrace());
         }
 
-        if (!stopSharedProjectLock.tryLock())
+        if (!stopSharedProjectLock.tryLock()) {
+            log.debug("stopSharedProject() couldn't acquire "
+                + "stopSharedProjectLock.");
             return;
+        }
 
         try {
             SharedProject project = currentlySharedProject.getValue();
@@ -225,6 +229,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             }
 
             this.transmitter.sendLeaveMessage(project);
+            log.debug("Leave message sent.");
 
             try {
                 project.stop();
@@ -272,7 +277,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID, boolean doStream) {
+        String invitationID, boolean doStream, CommunicationPreferences comPrefs) {
 
         this.sessionID.setValue(sessionID);
 
@@ -280,6 +285,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             this, this.transmitter, from, projectName, description, colorID,
             invitationProcesses, versionManager, versionInfo, sessionStart,
             sarosUI, invitationID, saros, doStream);
+        comNegotiatingManager.setSessionPrefs(comPrefs);
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {

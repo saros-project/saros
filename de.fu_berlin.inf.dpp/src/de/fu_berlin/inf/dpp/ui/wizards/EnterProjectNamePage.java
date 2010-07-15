@@ -106,19 +106,34 @@ class EnterProjectNamePage extends WizardPage {
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/jingle_connection.png"));
             break;
+        case SOCKS5_MEDIATED:
+            if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
+                setDescription("Attention: only a mediated file transfer connection with SOCKS5 protocol is available.\n"
+                    + "Suggestions: Update an existing project or copy resources from another project.");
+            else
+                setDescription("Attention: direct file transfer connections with SOCKS5 protocol are deactivated.\n"
+                    + "To activate uncheck 'Disable local file transfer proxy for direct connections'.");
+            setImageDescriptor(SarosUI
+                .getImageDescriptor("icons/ibb_connection.png"));
+            break;
+        case SOCKS5:
+        case SOCKS5_DIRECT:
+            setDescription("Direct file transfer connection with SOCKS5 protocol available.\nThis means that sharing a project from scratch will be fast.");
+            setImageDescriptor(SarosUI
+                .getImageDescriptor("icons/jingle_connection.png"));
+            break;
         case UNKNOWN:
         case HANDMADE:
         case IBB:
         default:
-
             if (preferenceUtils.forceFileTranserByChat()) {
-                setDescription("Attention: P2P connection with Jingle is deactivated. Using IBB instead!"
+                setDescription("Attention: Direct file transfer connections are deactivated. Using IBB instead!"
                     + '\n'
-                    + "To activate Jingle uncheck 'Avoid direct file transfer connection' in Saros preferences.");
+                    + "To activate uncheck 'Force file transfer over XMPP network' in Saros preferences.");
             } else {
-                setDescription("Attention: No P2P connection with Jingle available! Using IBB instead!"
+                setDescription("Attention: No direct file transfer connection available! Using IBB instead!"
                     + '\n'
-                    + "Suggestion: Update an existing project or copy resources from another project.");
+                    + "Suggestions: Update an existing project or copy resources from another project.");
             }
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/ibb_connection.png"));

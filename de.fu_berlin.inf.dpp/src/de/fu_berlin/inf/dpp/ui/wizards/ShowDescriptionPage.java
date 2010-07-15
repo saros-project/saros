@@ -50,9 +50,6 @@ class ShowDescriptionPage extends WizardPage {
             break;
 
         case OK:
-            setMessage("Your Saros version " + manager.getVersion().toString()
-                + " is compatible with your peer's one " + remoteSarosVersion,
-                INFORMATION);
             break;
 
         case TOO_OLD:

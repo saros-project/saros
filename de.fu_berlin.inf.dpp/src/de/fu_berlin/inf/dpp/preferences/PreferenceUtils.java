@@ -187,4 +187,9 @@ public class PreferenceUtils {
             PreferenceConstants.AUDIO_ENABLE_DTX);
     }
 
+    public boolean isLocalSOCKS5ProxyEnabled() {
+        return !saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
+    }
+
 }

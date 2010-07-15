@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,21 +13,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -38,7 +44,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author jurke
  */
 @Component(module = "net")
-public class DataTransferManager implements ConnectionSessionListener,
+public class DataTransferManager implements IConnectionListener,
     IBytestreamConnectionListener {
 
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
@@ -66,11 +72,58 @@ public class DataTransferManager implements ConnectionSessionListener,
     protected SessionIDObservable sessionID = null;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils preferenceUtils) {
+        PreferenceUtils preferenceUtils, RosterTracker rosterTracker) {
         this.sessionID = sessionID;
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
+        addRosterListener(rosterTracker);
+        saros.addListener(this);
+    }
+
+    /**
+     * Adds a RosterListener to the tracker to remove connections when peer gets
+     * unavailable.
+     * 
+     * Else IBB connections would remain if no leave package is send.
+     * 
+     * @param rosterTracker
+     */
+    protected void addRosterListener(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(new IRosterListener() {
+
+            public void entriesAdded(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void entriesDeleted(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void entriesUpdated(Collection<String> addresses) {
+                // nothing to do here
+            }
+
+            public void presenceChanged(Presence presence) {
+
+                if (!presence.isAvailable())
+                    for (JID jid : connections.keySet()) {
+                        if (jid.toString().equals(presence.getFrom())) {
+                            IBytestreamConnection c = connections.remove(jid);
+                            log
+                                .debug(jid.getBase()
+                                    + " is not available anymore. Bytestream connection closed.");
+                            c.close();
+                        }
+                    }
+            }
+
+            public void rosterChanged(Roster roster) {
+                // nothing to do here
+            }
+
+        });
+
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -275,7 +328,7 @@ public class DataTransferManager implements ConnectionSessionListener,
             transferModeDispatch.transferFinished(recipient, connection
                 .getMode(), false, input.length, watch.getTime());
         } catch (SarosCancellationException e) {
-            throw e; // Rethrow to circumvent the Exception catch below
+            throw e; // Rethrow to circumvrent the Exception catch below
         } catch (IOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
@@ -314,7 +367,8 @@ public class DataTransferManager implements ConnectionSessionListener,
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
                 log.error(Util.prefix(recipient) + "Failed to connect using "
-                    + transport.toString() + ":", e.getCause());
+                    + transport.toString() + ":", e.getCause() == null ? e : e
+                    .getCause());
             }
             if (connection != null)
                 break;
@@ -411,26 +465,6 @@ public class DataTransferManager implements ConnectionSessionListener,
         // }
     }
 
-    /**
-     * Sets up the transports for the given XMPPConnection
-     */
-    public void prepareConnection(final XMPPConnection connection) {
-        assert (this.connectionIsDisposed());
-
-        this.updateFileTransferByChatOnly();
-
-        log
-            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
-                + Arrays.toString(transports.toArray()));
-
-        this.connection = connection;
-        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-
-        for (ITransport transport : transports) {
-            transport.prepareXMPPConnection(connection, this);
-        }
-    }
-
     /*
      * On Henning's suggestion, Saros is not the place to implement free
      * transport negotiation because this is actually part of XMP-protocol: the
@@ -476,12 +510,14 @@ public class DataTransferManager implements ConnectionSessionListener,
     }
 
     public enum NetTransferMode {
-        UNKNOWN("???", "???", false), IBB("IBB", "XEP 47 In-Band Bytestream",
-            false), JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), JINGLEUDP(
-            "Jingle/UDP", "XEP 166 Jingle (UDP)", true), HANDMADE("Chat",
-            "Chat", false), SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), SOCKS5_MEDIATED(
-            "SOCKS5 (mediated)", "XEP 65 SOCKS5", true), SOCKS5_DIRECT(
-            "SOCKS5 (direct)", "XEP 65 SOCKS5", true);
+        UNKNOWN("???", "???", false), //
+        IBB("IBB", "XEP 47 In-Band Bytestream", false), //
+        JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), //
+        JINGLEUDP("Jingle/UDP", "XEP 166 Jingle (UDP)", true), // 
+        HANDMADE("Chat", "Chat", false), //
+        SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), //
+        SOCKS5_MEDIATED("SOCKS5 (mediated)", "XEP 65 SOCKS5", true), //
+        SOCKS5_DIRECT("SOCKS5 (direct)", "XEP 65 SOCKS5", true);//
 
         private String name;
         private String xep;
@@ -529,7 +565,27 @@ public class DataTransferManager implements ConnectionSessionListener,
         ERROR
     }
 
-    public void disposeConnection() {
+    /**
+     * Sets up the transports for the given XMPPConnection
+     */
+    protected void prepareConnection(final XMPPConnection connection) {
+        assert (this.connectionIsDisposed());
+
+        this.updateFileTransferByChatOnly();
+
+        log
+            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
+                + Arrays.toString(transports.toArray()));
+
+        this.connection = connection;
+        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
+
+        for (ITransport transport : transports) {
+            transport.prepareXMPPConnection(connection, this);
+        }
+    }
+
+    protected void disposeConnection() {
 
         for (ITransport transport : transports) {
             transport.disposeXMPPConnection();
@@ -565,13 +621,12 @@ public class DataTransferManager implements ConnectionSessionListener,
         connection = null;
     }
 
-    public void startConnection() {
-        // TODO The data transfer manager does not support caching yet
-    }
-
-    public void stopConnection() {
-        // TODO The data transfer manager does not support caching yet
-        // log.warn("Error state stops connection without effect");
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED)
+            prepareConnection(connection);
+        else if (!connectionIsDisposed())
+            disposeConnection();
     }
 
     /**
