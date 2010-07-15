@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
-import de.fu_berlin.inf.dpp.util.StoppWatch;
+import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -262,7 +262,7 @@ public class DataTransferManager implements ConnectionSessionListener,
             .newChild(1));
 
         try {
-            StoppWatch watch = new StoppWatch().start();
+            StopWatch watch = new StopWatch().start();
 
             if (transferData.compressInDataTransferManager()) {
                 input = Util.deflate(input, progress.newChild(15));

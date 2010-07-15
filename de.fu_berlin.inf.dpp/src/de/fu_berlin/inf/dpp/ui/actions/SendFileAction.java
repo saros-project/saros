@@ -64,7 +64,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.StoppWatch;
+import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.StreamJob;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -308,7 +308,7 @@ public class SendFileAction extends Action {
             long sendBytes = 0;
             monitor.worked(1);
 
-            StoppWatch watch = new StoppWatch();
+            StopWatch watch = new StopWatch();
             watch.start();
             try {
                 while ((numRead = fileInputStream.read(buffer)) > 0
@@ -455,7 +455,7 @@ public class SendFileAction extends Action {
             InputStream in = session.getInputStream(0);
             byte[] buffer = new byte[session.getService().getChunkSize()[0]];
 
-            StoppWatch watch = new StoppWatch();
+            StopWatch watch = new StopWatch();
             watch.start();
             try {
                 int readBytes;

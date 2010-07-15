@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
-import de.fu_berlin.inf.dpp.util.StoppWatch;
+import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -194,7 +194,7 @@ public class ConnectionTestManager {
             PacketCollector collector = connection
                 .createPacketCollector(new PacketIDFilter(id));
 
-            StoppWatch watch = new StoppWatch().start();
+            StopWatch watch = new StopWatch().start();
 
             try {
                 try {
