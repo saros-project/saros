@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.core.source_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration.source_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.library_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.library.source_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.text_1.1.0.v20090501071000.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.text.source_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/logback-classic.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/logback-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-api.jar"/>
