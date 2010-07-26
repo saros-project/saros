@@ -122,7 +122,10 @@ public class Musician {
     public void initRmi() throws RemoteException, NotBoundException,
         AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
+        System.out.println(registry.list());
+        log.info("lin test");
         bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
+
         state = (ISarosState) registry.lookup("state");
     }
 
