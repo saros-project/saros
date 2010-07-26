@@ -69,8 +69,8 @@ public class FileZipper {
         IProject project, SubMonitor progress) throws IOException,
         SarosCancellationException {
 
-        StoppWatch stoppWatch = new StoppWatch();
-        stoppWatch.start();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
         progress.beginTask("Creating Archive", files.size());
 
@@ -109,9 +109,9 @@ public class FileZipper {
         if (calculateChecksum && cos != null) {
             FileZipper.log.debug("Checksum: " + cos.getChecksum().getValue());
         }
-        stoppWatch.stop();
+        stopWatch.stop();
 
-        log.debug(String.format("Created project archive %s at %s", stoppWatch
+        log.debug(String.format("Created project archive %s at %s", stopWatch
             .throughput(archive.length()), archive.getAbsolutePath()));
 
         progress.done();
