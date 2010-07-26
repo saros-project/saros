@@ -397,6 +397,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
         } catch (SarosCancellationException e) {
             log.debug("Invitation process was cancelled.");
+            localCancel("An invitee cancelled the invitation.",
+                CancelOption.NOTIFY_PEER);
+            executeCancellation();
         } catch (CoreException e) {
             log.error("Exception while creating file. Message: ", e);
             localCancel(
