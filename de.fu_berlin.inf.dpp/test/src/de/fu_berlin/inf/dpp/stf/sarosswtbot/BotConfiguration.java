@@ -39,7 +39,7 @@ public class BotConfiguration {
     private final static String JID_BOB_VM = ("testuser2@saros-con.imp.fu-berlin.de");
     private final static String PASSWORD_BOB_VM = "test";
     private final static String HOST_BOB_VM = "192.168.66.72";
-    private final static int PORT_BOB_VM = 12347;
+    private final static int PORT_BOB_VM = 1099;
     private final static String JID_CARL_VM = ("unconfigured");
     private final static String PASSWORD_CARL_VM = "unconfigured";
     private final static String HOST_CARL_VM = "unconfigured";
