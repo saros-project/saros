@@ -482,7 +482,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (vcs != null) {
             this.localProject = vcs.checkoutProject(newProjectName,
                 this.remoteFileList, monitor);
-            return;
+            if (this.localProject != null)
+                return;
         }
 
         try {
