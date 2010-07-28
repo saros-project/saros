@@ -40,11 +40,14 @@ public interface ISessionManager {
      * 
      * @param project
      *            the local Eclipse project which should become shared.
+     * @param useVersionControl
+     *            true iff this session uses Version Control, see
+     *            {@link ISharedProject#useVersionControl()}.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(IProject project, List<IResource> resources)
-        throws XMPPException;
+    public void startSession(IProject project, List<IResource> resources,
+        boolean useVersionControl) throws XMPPException;
 
     /**
      * Creates a shared project for a session hosted remotely. The returned
@@ -107,7 +110,8 @@ public interface ISessionManager {
      *            invitations.
      * @param colorID
      *            the assigned color id for the invited participant.
-     * @param comPrefs TODO
+     * @param comPrefs
+     *            TODO
      */
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,

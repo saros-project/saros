@@ -13,7 +13,11 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.jdt.core;resolution:=optional,
  org.eclipse.jdt.ui;resolution:=optional,
- org.junit4;resolution:=optional
+ org.junit4;resolution:=optional,
+ org.eclipse.team.core;bundle-version="3.5.1",
+ org.eclipse.team.ui;bundle-version="3.5.0",
+ org.tigris.subversion.subclipse.core;bundle-version="1.6.12";resolution:=optional,
+ org.tigris.subversion.subclipse.ui;bundle-version="1.6.12";resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: bin/,
  lib/log4j-1.2.15.jar,

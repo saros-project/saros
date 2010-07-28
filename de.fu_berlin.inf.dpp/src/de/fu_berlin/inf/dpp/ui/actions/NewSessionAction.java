@@ -26,7 +26,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Start to share a project (a "session").
+ * Start to share a project (a "session"), but without support for version
+ * control.
  * 
  * This action is created by Eclipse!
  * 
@@ -35,8 +36,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "action")
 public class NewSessionAction extends GeneralNewSessionAction {
 
-    private static final Logger log = Logger.getLogger(NewSessionAction.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(NewSessionAction.class.getName());
 
     /**
      * @review runSafe OK
@@ -44,7 +45,7 @@ public class NewSessionAction extends GeneralNewSessionAction {
     public void run(IAction action) {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runNewSession(null);
+                runNewSession(null, false);
             }
         });
     }

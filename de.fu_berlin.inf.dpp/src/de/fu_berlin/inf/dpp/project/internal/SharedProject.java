@@ -100,6 +100,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected SarosProjectMapper projectMapper = new SarosProjectMapper();
 
+    protected final boolean useVersionControl;
+
     protected Blockable stopManagerListener = new Blockable() {
 
         public void unblock() {
@@ -133,7 +135,7 @@ public class SharedProject implements ISharedProject, Disposable {
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, String projectID,
         IProject project, StopManager stopManager, JID myJID, int myColorID,
-        DateTime sessionStart) {
+        DateTime sessionStart, boolean useVersionControl) {
 
         assert transmitter != null;
         assert myJID != null;
@@ -148,6 +150,7 @@ public class SharedProject implements ISharedProject, Disposable {
         this.localUser = new User(this, myJID, myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager, threadContext);
+        this.useVersionControl = useVersionControl;
 
         stopManager.addBlockable(stopManagerListener);
     }
@@ -158,10 +161,12 @@ public class SharedProject implements ISharedProject, Disposable {
     public SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, IProject project, JID myID,
-        StopManager stopManager, DateTime sessionStart) {
+        StopManager stopManager, DateTime sessionStart,
+        boolean useVersionControl) {
 
         this(saros, transmitter, transferManager, threadContext, project
-            .getName(), project, stopManager, myID, 0, sessionStart);
+            .getName(), project, stopManager, myID, 0, sessionStart,
+            useVersionControl);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
@@ -185,7 +190,7 @@ public class SharedProject implements ISharedProject, Disposable {
         StopManager stopManager, DateTime sessionStart) {
 
         this(saros, transmitter, transferManager, threadContext, projectID,
-            project, stopManager, myID, myColorID, sessionStart);
+            project, stopManager, myID, myColorID, sessionStart, true);
 
         this.host = new User(this, hostID, 0);
         this.host.invitationCompleted();
@@ -589,8 +594,8 @@ public class SharedProject implements ISharedProject, Disposable {
     private List<IActivity> convert(
         List<IActivityDataObject> activityDataObjects) {
 
-        List<IActivity> result = new ArrayList<IActivity>(activityDataObjects
-            .size());
+        List<IActivity> result = new ArrayList<IActivity>(
+            activityDataObjects.size());
 
         for (IActivityDataObject dataObject : activityDataObjects) {
             try {
@@ -640,8 +645,8 @@ public class SharedProject implements ISharedProject, Disposable {
             throw new IllegalArgumentException();
 
         try {
-            activitySequencer.sendActivity(toWhom, activity
-                .getActivityDataObject(this));
+            activitySequencer.sendActivity(toWhom,
+                activity.getActivityDataObject(this));
         } catch (IllegalArgumentException e) {
             log.warn("Could not convert Activity to DataObject: ", e);
         }
@@ -669,5 +674,9 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public SarosProjectMapper getProjectMapper() {
         return projectMapper;
+    }
+
+    public boolean useVersionControl() {
+        return this.useVersionControl;
     }
 }
