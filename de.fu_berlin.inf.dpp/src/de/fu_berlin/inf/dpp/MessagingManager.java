@@ -286,8 +286,9 @@ public class MessagingManager implements IConnectionListener,
             String user = connection.getUser();
             if (muc == null) {
                 muc = initMUC(connection, user);
+            } else {
+                muc.join(user, getRoomPassword());
             }
-            muc.join(user, getRoomPassword());
         }
 
     }
@@ -360,7 +361,6 @@ public class MessagingManager implements IConnectionListener,
      * Notifies all chat listeners of a new message.
      */
     private void chatMessageAdded(final Message message) {
-        // notify chat listener
         log.debug("Notifying Listeners.");
         for (IChatListener l : chatListeners) {
             l.chatMessageAdded(message.getFrom(), message.getBody());
