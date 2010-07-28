@@ -40,6 +40,7 @@ import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -176,8 +177,8 @@ public class MessagingManager implements IConnectionListener,
                 muc.sendMessage(msg);
             } catch (Exception e1) {
                 e1.printStackTrace();
-                addChatLine("error", "Couldn't send message ("
-                    + e1.getMessage() + ")");
+                addChatLine("error",
+                    "Couldn't send message (" + e1.getMessage() + ")");
             }
         }
 
@@ -201,7 +202,7 @@ public class MessagingManager implements IConnectionListener,
          * @param user
          * @throws XMPPException
          */
-        private MultiUserChat initMUC(Connection connection, String user)
+        private void initMUC(Connection connection, String user)
             throws XMPPException {
 
             CommunicationPreferences comPrefs = getComPrefs();
@@ -268,7 +269,8 @@ public class MessagingManager implements IConnectionListener,
 
             log.debug("MUC joined. Server: " + comPrefs.chatserver + " Room: "
                 + comPrefs.chatroom + " Password " + comPrefs.password);
-            return muc;
+
+            this.muc = muc;
         }
 
         public void disconnect() {
@@ -277,18 +279,13 @@ public class MessagingManager implements IConnectionListener,
                 session.sendMessage("left the chat.");
                 muc.leave();
             }
-            if (!currentConnection.isConnected())
-                muc = null;
+            muc = null;
         }
 
         public void connect() throws XMPPException {
             XMPPConnection connection = saros.getConnection();
             String user = connection.getUser();
-            if (muc == null) {
-                muc = initMUC(connection, user);
-            } else {
-                muc.join(user, getRoomPassword());
-            }
+            initMUC(connection, user);
         }
 
     }
