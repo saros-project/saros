@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,15 +18,16 @@ import de.fu_berlin.inf.dpp.FileList.FileListData;
 /**
  * A diff between two {@link FileList}s.
  * 
- * TODO Make this a public static internal class of FileList?
- * 
  * @see FileList#diff(FileList)
  * 
  * @author ahaferburg
  */
 public class FileListDiff {
-    private FileListDiff() {
-        // Empty but non-public. Only FileList should create FileListDiffs.
+    // TODO Make this a public static internal class of FileList?
+
+    protected FileListDiff() {
+        // Empty but non-public. Only FileListDiff#diff should create
+        // FileListDiffs.
     }
 
     private final List<IPath> added = new ArrayList<IPath>();
@@ -37,8 +39,16 @@ public class FileListDiff {
     private final List<IPath> unaltered = new ArrayList<IPath>();
 
     /**
-     * Returns a new FileListDiff which contains the difference of the two
-     * FileLists.
+     * Returns a new <code>FileListDiff</code> which contains the difference of
+     * the two <code>FileList</code>s.<br>
+     * <br>
+     * The diff describes the operations needed to transform <code>base</code>
+     * into <code>target</code>. For example, the result's
+     * <code>getAddedPaths()</code> returns the list of files that are present
+     * in <code>target</code>, but not in <code>base</code>.<br>
+     * <br>
+     * If either of the two parameters is <code>null</code>, the result is an
+     * empty diff.
      * 
      * @param base
      *            The base <code>FileList</code>.
@@ -47,10 +57,6 @@ public class FileListDiff {
      * 
      * @return a new <code>FileListDiff</code> which contains the difference
      *         information of the two <code>FileList</code>s.
-     * 
-     *         The diff describes the operations needed to get from
-     *         <code>base</code> to <code>target</code>.
-     * @see FileListDiff
      */
     public static FileListDiff diff(FileList base, FileList target) {
         FileListDiff result = new FileListDiff();
@@ -76,10 +82,10 @@ public class FileListDiff {
                 if (path.hasTrailingSeparator()) {
                     result.unaltered.add(path);
                 } else {
-                    long checksum = entry.getValue().checksum;
-                    long otherChecksum = target.entries.get(path).checksum;
+                    FileListData fileData = entry.getValue();
+                    FileListData otherFileData = target.entries.get(path);
 
-                    if (checksum == otherChecksum) {
+                    if (fileData.equals(otherFileData)) {
                         result.unaltered.add(path);
                     } else {
                         result.altered.add(path);
@@ -87,6 +93,12 @@ public class FileListDiff {
                 }
             }
         }
+
+        FileList.PathLengthComparator pathLengthComparator = new FileList.PathLengthComparator();
+        Collections.sort(result.added, pathLengthComparator);
+        Collections.sort(result.removed, pathLengthComparator);
+        Collections.sort(result.unaltered, pathLengthComparator);
+        Collections.sort(result.altered, pathLengthComparator);
 
         return result;
     }
@@ -110,8 +122,24 @@ public class FileListDiff {
         return sorted(this.altered);
     }
 
+    private boolean issorted(List<IPath> paths) {
+        FileList.PathLengthComparator pathLengthComparator = new FileList.PathLengthComparator();
+        Iterator<IPath> it = paths.iterator();
+        if (!it.hasNext())
+            return true;
+        IPath prev = it.next();
+        IPath current;
+        while (it.hasNext()) {
+            current = it.next();
+            if (pathLengthComparator.compare(prev, current) > 0)
+                return false;
+            prev = current;
+        }
+        return true;
+    }
+
     private List<IPath> sorted(List<IPath> paths) {
-        Collections.sort(paths, new FileList.PathLengthComparator());
+        assert issorted(paths);
         return new ArrayList<IPath>(paths);
     }
 

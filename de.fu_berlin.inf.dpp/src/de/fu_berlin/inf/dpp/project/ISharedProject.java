@@ -352,4 +352,12 @@ public interface ISharedProject extends IActivityListener {
      */
     public SarosProjectMapper getProjectMapper();
 
+    /**
+     * Returns true if this session uses VCS support. Clients are required to
+     * have all the necessary plugins (e.g. Subclipse if it's an SVN project),
+     * otherwise they won't be able to participate in the session.
+     * 
+     * @return true iff this session uses Version Control.
+     */
+    public boolean useVersionControl();
 }

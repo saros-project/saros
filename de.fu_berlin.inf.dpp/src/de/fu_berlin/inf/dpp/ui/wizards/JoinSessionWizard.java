@@ -197,8 +197,8 @@ public class JoinSessionWizard extends Wizard {
         if (namePage.overwriteProjectResources()) {
             FileListDiff diff;
             try {
-                diff = FileListDiff.diff(new FileList(source), process
-                    .getRemoteFileList());
+                diff = FileListDiff.diff(new FileList(source),
+                    process.getRemoteFileList());
             } catch (CoreException e) {
                 MessageDialog.openError(getShell(), "Error computing FileList",
                     "Could not compute local FileList: " + e.getMessage());
@@ -271,10 +271,8 @@ public class JoinSessionWizard extends Wizard {
                     String PID = Saros.SAROS;
                     MultiStatus info = new MultiStatus(PID, 1, message, null);
                     for (IPath path : diff.getRemovedPaths()) {
-                        info
-                            .add(new Status(IStatus.WARNING, PID, 1,
-                                "File will be removed: " + path.toOSString(),
-                                null));
+                        info.add(new Status(IStatus.WARNING, PID, 1,
+                            "File will be removed: " + path.toOSString(), null));
                     }
                     for (IPath path : diff.getAlteredPaths()) {
                         info.add(new Status(IStatus.WARNING, PID, 1,

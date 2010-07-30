@@ -154,27 +154,34 @@
       <objectContribution
             adaptable="true"
             id="de.fu_berlin.inf.dpp.ui.popupmenu"
-            objectClass="org.eclipse.core.resources.IResource">
+            objectClass="org.eclipse.core.resources.IResource"
+            sibling_order="&lt;action&#x0A;               class=&quot;de.fu_berlin.inf.dpp.ui.actions.NewSessionAction&quot;&#x0A;               icon=&quot;icons/transmit.png&quot;&#x0A;               id=&quot;Saros.action1&quot;&#x0A;               label=&quot;Share project...&quot;&gt;&#x0A;         &lt;/action&gt;">
          <menu
                id="Saros.menu1"
                label="Saros.menu1"/>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.AddToSessionAction"
+               icon="icons/transmit.png"
+               id="Saros.action4"
+               label="Add to session (experimental)...">
+         </action>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.PartialNewSessionAction"
+               icon="icons/transmit.png"
+               id="Saros.action3"
+               label="Share project partially (experimental)...">
+         </action>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.NewSessionActionWithVCS"
+               icon="icons/transmit.png"
+               id="Saros.action2"
+               label="Share project with VCS support...">
+         </action>
          <action
                class="de.fu_berlin.inf.dpp.ui.actions.NewSessionAction"
                icon="icons/transmit.png"
                id="Saros.action1"
                label="Share project...">
-         </action>
-         <action
-               class="de.fu_berlin.inf.dpp.ui.actions.PartialNewSessionAction"
-               icon="icons/transmit.png"
-               id="Saros.action2"
-               label="Share project partially (experimental)...">
-         </action>
-         <action
-               class="de.fu_berlin.inf.dpp.ui.actions.AddToSessionAction"
-               icon="icons/transmit.png"
-               id="Saros.action2"
-               label="Add to session (experimental)...">
          </action>
          <visibility>
                <objectClass name="org.eclipse.core.resources.IProject"/>
@@ -280,6 +287,12 @@
                label="Saros">
             <separator name="de.fu_berlin.inf.dpp.menu.group"/>
          </menu>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.OpenPreferencesAction"
+               id="de.fu_berlin.inf.dpp.ui.actions.openPreferences"
+               label="&amp;Preferences"
+               menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group">
+         </action>
          <action
                class="de.fu_berlin.inf.dpp.ui.actions.NewAccountAction"
                icon="icons/vcard_add.png"

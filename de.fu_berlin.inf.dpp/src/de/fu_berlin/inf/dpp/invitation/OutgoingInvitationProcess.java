@@ -63,10 +63,10 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -90,7 +90,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected IProject project;
 
     protected List<IResource> partialProjectResources;
-    protected FileList remoteFileList;
     protected File archive;
     /**
      * A {@link VersionInfo} object with ultimate {@link Compatibility}
@@ -264,8 +263,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         } else {
             log.debug("Inv" + Util.prefix(peer)
                 + ": Unable to obtain peer's version information.");
-            if (!InvitationWizard.confirmUnknownVersion(peer, versionManager
-                .getVersion()))
+            if (!InvitationWizard.confirmUnknownVersion(peer,
+                versionManager.getVersion()))
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
         }
     }
@@ -302,17 +301,18 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             .getFileListRequestCollector(invitationID);
 
         CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
-        transmitter.sendInvitation(sharedProject.getProjectMapper().getID(
-            this.project), peer, description, colorID, hostVersionInfo,
-            invitationID, sharedProject.getSessionStart(), doStream, comPrefs);
+        transmitter.sendInvitation(
+            sharedProject.getProjectMapper().getID(this.project), peer,
+            description, colorID, hostVersionInfo, invitationID,
+            sharedProject.getSessionStart(), doStream, comPrefs);
 
         subMonitor.worked(25);
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
 
         transmitter.receiveFileListRequest(fileListRequestCollector,
-            invitationID, subMonitor.newChild(75,
-                SubMonitor.SUPPRESS_ALL_LABELS));
+            invitationID,
+            subMonitor.newChild(75, SubMonitor.SUPPRESS_ALL_LABELS));
         log.debug("Inv" + Util.prefix(peer)
             + ": File list request has received.");
     }
@@ -346,13 +346,15 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Waiting for remote file list...");
 
         subMonitor.setTaskName("Creating file list...");
+        boolean useVersionControl = sharedProject.useVersionControl();
         FileList localFileList;
         try {
             if (partialProjectResources != null) {
-                localFileList = new FileList(partialProjectResources
-                    .toArray(new IResource[partialProjectResources.size()]));
+                IResource[] resourceArray = partialProjectResources
+                    .toArray(new IResource[partialProjectResources.size()]);
+                localFileList = new FileList(resourceArray, useVersionControl);
             } else {
-                localFileList = new FileList(project);
+                localFileList = new FileList(project, useVersionControl);
             }
 
         } catch (CoreException e) {
@@ -362,14 +364,21 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
         subMonitor.setTaskName("Sending file list...");
-        transmitter.sendFileList(peer, invitationID, localFileList, subMonitor
-            .newChild(50, SubMonitor.SUPPRESS_ALL_LABELS));
-        subMonitor.setTaskName("Waiting for the peer's file list...");
+        transmitter.sendFileList(peer, invitationID, localFileList,
+            subMonitor.newChild(50, SubMonitor.SUPPRESS_ALL_LABELS));
+
+        if (localFileList.getVcsProviderID() != null) {
+            // The shared project is under version control.
+            subMonitor.setTaskName("Waiting for the peer to check out the "
+                + "project...");
+        } else {
+            subMonitor.setTaskName("Waiting for the peer's file list...");
+        }
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        remoteFileList = transmitter.receiveFileList(fileListCollector,
-            subMonitor, true);
+        FileList remoteFileList = transmitter.receiveFileList(
+            fileListCollector, subMonitor, true);
         log.debug("Inv" + Util.prefix(peer)
             + ": Remote file list has been received.");
 
@@ -405,8 +414,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         List<StartHandle> startHandles;
         synchronized (sharedProject) {
             startHandles = stopManager.stop(usersToStop,
-                "Synchronizing invitation", subMonitor.newChild(25,
-                    SubMonitor.SUPPRESS_ALL_LABELS));
+                "Synchronizing invitation",
+                subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
         }
 
         try {
@@ -497,8 +506,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         List<StartHandle> startHandles;
         synchronized (sharedProject) {
             startHandles = stopManager.stop(usersToStop,
-                "Synchronizing invitation", subMonitor.newChild(25,
-                    SubMonitor.SUPPRESS_ALL_LABELS));
+                "Synchronizing invitation",
+                subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
         }
 
         try {
@@ -529,8 +538,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             subMonitor.setTaskName("Streaming archive...");
 
-            performFileStream(archiveStreamService, streamSession, subMonitor
-                .newChild(75));
+            performFileStream(archiveStreamService, streamSession,
+                subMonitor.newChild(75));
             // }
 
         } catch (Exception e) {
@@ -612,8 +621,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                 if (filesSent >= 1)
                     zout.finish();
             } catch (IOException e) {
-                log
-                    .warn("IOException occurred when finishing the ZipOutputStream.");
+                log.warn("IOException occurred when finishing the ZipOutputStream.");
             }
             IOUtils.closeQuietly(output);
             IOUtils.closeQuietly(zout);
@@ -632,8 +640,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         invitationCompleteCollector = transmitter
             .getInvitationCompleteCollector(invitationID);
 
-        transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50,
-            SubMonitor.SUPPRESS_ALL_LABELS), invitationCompleteCollector);
+        transmitter.receiveInvitationCompleteConfirmation(
+            monitor.newChild(50, SubMonitor.SUPPRESS_ALL_LABELS),
+            invitationCompleteCollector);
         log.debug("Inv" + Util.prefix(peer)
             + ": Notifying participants that the invitation is complete.");
 
@@ -659,8 +668,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             .getUserListConfirmationCollector();
 
         for (User user : sharedProject.getRemoteUsers()) {
-            transmitter.sendUserList(user.getJID(), invitationID, sharedProject
-                .getParticipants());
+            transmitter.sendUserList(user.getJID(), invitationID,
+                sharedProject.getParticipants());
         }
 
         log.debug("Inv" + Util.prefix(peer)

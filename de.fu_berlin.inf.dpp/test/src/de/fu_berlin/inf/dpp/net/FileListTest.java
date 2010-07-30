@@ -43,6 +43,9 @@ import de.fu_berlin.inf.dpp.test.stubs.FileStub;
  * 
  * TODO [TEST] Add Testcases for derived files florianthiel: What are
  * "derived files" in this context?
+ * 
+ * FIXME FileList now uses IResource.getProject(), which isn't implemented yet
+ * by FileStub, so any test
  */
 public class FileListTest {
 
@@ -68,11 +71,11 @@ public class FileListTest {
     @Before
     public void setUp() throws Exception {
         threeEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
-            fileInSubDir1 });
+            fileInSubDir1 }, false);
         fourEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
-            fileInSubDir1, fileInSubDir2 });
+            fileInSubDir1, fileInSubDir2 }, false);
         modifiedFourEntryList = new FileList(new IFile[] { fileInRoot1,
-            fileInRoot2, fileInSubDir1changed, fileInSubDir2 });
+            fileInRoot2, fileInSubDir1changed, fileInSubDir2 }, false);
 
         emptyFileList = new FileList();
     }
@@ -169,8 +172,7 @@ public class FileListTest {
         Collection<IPath> paths = threeEntryList.diff(modifiedFourEntryList)
             .getAddedPaths();
 
-        assertPaths(new String[] { "root1", "root2", "subdir/file2",
-            "subdir/file1" }, paths);
+        assertPaths(new String[] { "subdir/file2" }, paths);
 
         paths = emptyFileList.diff(threeEntryList).getAddedPaths();
         assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
@@ -191,7 +193,7 @@ public class FileListTest {
 
     @Test
     public void testEquals() throws CoreException {
-        FileList sameFileList = new FileList(threeFileArray);
+        FileList sameFileList = new FileList(threeFileArray, false);
         assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 
@@ -208,8 +210,8 @@ public class FileListTest {
     private void assertPaths(String[] expected, Collection<IPath> actual) {
         for (int i = 0; i < expected.length; i++) {
             Path path = new Path(expected[i]);
-            assertTrue("Expected " + path + " to appear in: " + actual, actual
-                .contains(path));
+            assertTrue("Expected " + path + " to appear in: " + actual,
+                actual.contains(path));
         }
 
         assertEquals("Expected: '" + expected.toString() + "' actual: '"

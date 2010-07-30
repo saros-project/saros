@@ -21,10 +21,8 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.window.Window;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.ui.PartialProjectSelectionDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -35,24 +33,19 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  */
 @Component(module = "action")
-public class PartialNewSessionAction extends GeneralNewSessionAction {
+public class NewSessionActionWithVCS extends GeneralNewSessionAction {
 
-    private static final Logger log = Logger
-        .getLogger(PartialNewSessionAction.class.getName());
+    private static final Logger log = Logger.getLogger(NewSessionActionWithVCS.class
+        .getName());
 
     /**
      * @review runSafe OK
      */
     public void run(IAction action) {
-        final PartialProjectSelectionDialog dialog = new PartialProjectSelectionDialog(
-            null, this.selectedProject);
-
-        if (dialog.open() == Window.OK) {
-            Util.runSafeSync(log, new Runnable() {
-                public void run() {
-                    runNewSession(dialog.getSelectedResources(), true);
-                }
-            });
-        }
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runNewSession(null, true);
+            }
+        });
     }
 }

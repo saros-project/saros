@@ -44,10 +44,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
+import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
 
 /**
- * A FileList is a list of resources - files and folders - which can be compared
- * to other file lists. Folders are denoted by a trailing separator.<br>
+ * A FileList is a list of resources - files and folders - which belong to the
+ * same {@link IProject}. FileLists can be compared to other FileLists. Folders
+ * are denoted by a trailing separator.<br>
  * <br>
  * NOTE: As computation of a FileList involves a complete rescan of the project,
  * creating new instances should be avoided.
@@ -65,18 +69,59 @@ public class FileList {
      */
     protected static XStream xstream;
 
-    /**
-     * Contains all entries.
-     */
+    protected final boolean useVersionControl;
+
+    /** The actual file list data. */
     protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
+    /** Identifies the VCS used. */
+    protected String vcsProviderID;
+    /** VCS internal information. */
+    protected VCSProjectInformation vcsProjectInformation;
 
     static class FileListData {
+        /** Checksum of this file. */
         public long checksum;
+        /** Identifies the version of this file in the repository. */
+        String vcsRevision;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (!(obj instanceof FileListData)) {
+                return false;
+            }
+            FileListData other = (FileListData) obj;
+            return checksum == other.checksum
+                && (vcsRevision == null || vcsRevision
+                    .equals(other.vcsRevision));
+        }
+
+        @Override
+        public int hashCode() {
+            // TODO Auto-generated method stub
+            return super.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "FLD> " + checksum + " " + vcsRevision;
+        }
+    }
+
+    public String getVCSRevision(IPath path) {
+        FileListData fileListData = entries.get(path);
+        if (fileListData == null)
+            return null;
+        return fileListData.vcsRevision;
     }
 
     public static class PathLengthComparator implements Comparator<IPath>,
         Serializable {
-
+        // Serializable so that e.g. a TreeMap sorted by PathLengthComparator
+        // remains serializable.
         private static final long serialVersionUID = 8656330038498525163L;
 
         /**
@@ -93,51 +138,78 @@ public class FileList {
      * Creates an empty file list.
      */
     public FileList() {
-        // do nothing
+        this(true);
+    }
+
+    /**
+     * Creates an empty file list.
+     * 
+     * @param useVersionControl
+     *            If false, the FileList won't include version control
+     *            information.
+     */
+    public FileList(boolean useVersionControl) {
+        this.useVersionControl = useVersionControl;
     }
 
     /**
      * Creates a new file list from the file tree in given container.
      * 
      * @param container
-     *            the resource container that should be represented by the new
+     *            The resource container that should be represented by the new
      *            file list.
+     * @param useVersionControl
+     *            If false, the FileList won't include version control
+     *            information.
      * @throws CoreException
-     *             exception that might happen while fetching the files from the
+     *             Exception that might happen while fetching the files from the
      *             given container.
-     * 
-     *             TODO 6 - Not all users of FileList need the checksums, so we
-     *             should not always calculate them.
      * 
      *             TODO 4 - Use ProgressMonitors to keep track of the creation
      *             of a FileList
      */
-    public FileList(IContainer container) throws CoreException {
+    public FileList(IContainer container, boolean useVersionControl)
+        throws CoreException {
+        this(useVersionControl);
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), this.entries, true);
+        addMembers(container.members());
     }
 
     /**
      * Creates a new file list from given resources.
      * 
      * @param resources
-     *            the resources that should be added to this file list.
+     *            The resources that should be added to this file list.
+     * @param useVersionControl
+     *            If false, the FileList won't include version control
+     *            information.
+     * 
      * @throws CoreException
      */
-    public FileList(IResource[] resources) throws CoreException {
-        addMembers(resources, this.entries, true);
+    public FileList(IResource[] resources, boolean useVersionControl)
+        throws CoreException {
+        this(useVersionControl);
+        addMembers(resources);
     }
 
     /**
-     * Creates a new file list from the given paths.
+     * Creates a new file list from given paths. Doesn't compute checksums or
+     * location information.
      * 
      * @param paths
      *            The paths that should be added to this file list.
      */
-    public FileList(IPath[] paths) {
-        for (IPath path : paths) {
-            this.entries.put(path, null);
+    public FileList(List<IPath> paths) {
+        this(false);
+        if (paths != null) {
+            for (IPath path : paths) {
+                this.entries.put(path, null);
+            }
         }
+    }
+
+    public FileList(IProject source) throws CoreException {
+        this(source, true);
     }
 
     /**
@@ -185,7 +257,7 @@ public class FileList {
      */
     public int computeMatch(IProject project) {
         try {
-            return this.computeMatch(new FileList(project));
+            return this.computeMatch(new FileList(project, useVersionControl));
         } catch (CoreException e) {
             log.error("Failed to generate FileList for match computation", e);
         }
@@ -261,14 +333,30 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(IResource[] resources,
-        Map<IPath, FileListData> members, boolean ignoreDerived)
-        throws CoreException {
+    private void addMembers(IResource[] resources) throws CoreException {
+        if (resources.length == 0)
+            return;
+        IProject project = null;
+        VCSAdapter vcs = null;
+        if (useVersionControl) {
+            project = resources[0].getProject();
+            vcs = VCSAdapterFactory.getAdapter(project);
+            if (vcs != null) {
+                String providerID = vcs.getProviderID(project);
 
+                this.vcsProviderID = providerID;
+                this.vcsProjectInformation = vcs.getProjectInformation(project);
+            }
+        }
+
+        final boolean isManagedProject = vcs != null;
         for (IResource resource : resources) {
-            if (ignoreDerived && resource.isDerived()) {
+            if (resource.isDerived()) {
                 continue;
             }
+
+            assert !useVersionControl
+                || (project != null && project.equals(resource.getProject()));
 
             if (resource instanceof IFile) {
                 IFile file = (IFile) resource;
@@ -279,7 +367,11 @@ public class FileList {
                 try {
                     FileListData data = new FileListData();
                     data.checksum = FileUtil.checksum(file);
-                    members.put(file.getProjectRelativePath(), data);
+
+                    if (isManagedProject)
+                        addVCSInformation(resource, data, vcs);
+
+                    this.entries.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
                 }
@@ -292,14 +384,47 @@ public class FileList {
                     path = path.addTrailingSeparator();
                 }
 
-                members.put(path, null);
-                addMembers(folder.members(), members, ignoreDerived);
+                FileListData data = null;
+                if (isManagedProject) {
+                    data = new FileListData();
+                    if (!addVCSInformation(resource, data, vcs))
+                        data = null;
+                }
+                this.entries.put(path, data);
+                addMembers(folder.members());
             }
         }
+    }
+
+    private boolean addVCSInformation(IResource resource, FileListData data,
+        VCSAdapter vcs) {
+        String revision = vcs.getRevisionString(resource);
+        if (revision == null)
+            return false;
+
+        // TODO ndh: Only add vcs information to tell the client that an update
+        // might be necessary, because this file's revision differs from the
+        // project revision.
+        data.vcsRevision = revision;
+        return true;
     }
 
     // FIXME ndh remove/fix tests
     public FileListDiff diff(FileList other) {
         return FileListDiff.diff(this, other);
+    }
+
+    // TODO ndh error handling
+    public long getChecksum(IPath path) {
+        FileListData fileListData = this.entries.get(path);
+        return fileListData != null ? fileListData.checksum : -1;
+    }
+
+    public String getVcsProviderID() {
+        return vcsProviderID;
+    }
+
+    public VCSProjectInformation getProjectInformation() {
+        return vcsProjectInformation;
     }
 }

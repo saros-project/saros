@@ -38,6 +38,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -63,9 +64,16 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
         Saros.reinject(this);
     }
 
-    public void runNewSession(List<IResource> resource) {
+    /**
+     * @param useVersionControl
+     *            true iff this session uses Version Control, see
+     *            {@link ISharedProject#useVersionControl()}.
+     */
+    public void runNewSession(List<IResource> resource,
+        boolean useVersionControl) {
         try {
-            sessionManager.startSession(this.selectedProject, resource);
+            sessionManager.startSession(this.selectedProject, resource,
+                useVersionControl);
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
