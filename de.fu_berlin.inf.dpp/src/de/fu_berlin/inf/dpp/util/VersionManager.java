@@ -133,8 +133,13 @@ public class VersionManager {
      */
     static {
         /**
-         * <Add new version here>
+         * Version 10.7.30.r2310
+         * 
+         * CommunicationPreferences are now sent and received as part of the
+         * InvitationInfo.
          */
+        compatibilityChart.put(new Version("10.7.30.r2310"),
+            Arrays.asList(new Version("10.7.30.r2310")));
 
         /**
          * Version 10.6.25.r2236
@@ -142,8 +147,8 @@ public class VersionManager {
          * We are no longer backwards-compatible because of the changes in the
          * net refactoring. 10.6.25 isn't compatible to 10.6.11.r2223
          */
-        compatibilityChart.put(new Version("10.6.25.r2236"), Arrays
-            .asList(new Version("10.6.25.r2236")));
+        compatibilityChart.put(new Version("10.6.25.r2236"),
+            Arrays.asList(new Version("10.6.25.r2236")));
 
         /**
          * Version 10.6.11.r2223
@@ -151,8 +156,8 @@ public class VersionManager {
          * We are no longer backwards-compatible because of the changes in the
          * net refactoring.
          */
-        compatibilityChart.put(new Version("10.6.11.r2223"), Arrays
-            .asList(new Version("10.6.11.r2223")));
+        compatibilityChart.put(new Version("10.6.11.r2223"),
+            Arrays.asList(new Version("10.6.11.r2223")));
 
         /**
          * Version 10.5.28.r2173
@@ -163,43 +168,43 @@ public class VersionManager {
         /**
          * Version 10.4.14.r2128
          */
-        compatibilityChart.put(new Version("10.4.14.r2128"), Arrays
-            .asList(new Version("10.4.14.r2128")));
+        compatibilityChart.put(new Version("10.4.14.r2128"),
+            Arrays.asList(new Version("10.4.14.r2128")));
 
         /**
          * Version 10.3.26.r2105
          */
-        compatibilityChart.put(new Version("10.3.26.r2105"), Arrays
-            .asList(new Version("10.3.26.r2105")));
+        compatibilityChart.put(new Version("10.3.26.r2105"),
+            Arrays.asList(new Version("10.3.26.r2105")));
         /**
          * Version 10.2.26.r2037
          */
-        compatibilityChart.put(new Version("10.2.26.r2037"), Arrays
-            .asList(new Version("10.2.26.r2037")));
+        compatibilityChart.put(new Version("10.2.26.r2037"),
+            Arrays.asList(new Version("10.2.26.r2037")));
 
         /**
          * Version 10.1.29.r1970
          */
-        compatibilityChart.put(new Version("10.1.29.r1970"), Arrays
-            .asList(new Version("10.1.29.r1970")));
+        compatibilityChart.put(new Version("10.1.29.r1970"),
+            Arrays.asList(new Version("10.1.29.r1970")));
 
         /**
          * Version 9.12.04.r1862
          */
-        compatibilityChart.put(new Version("9.12.4.r1878"), Arrays
-            .asList(new Version("9.12.4.r1878")));
+        compatibilityChart.put(new Version("9.12.4.r1878"),
+            Arrays.asList(new Version("9.12.4.r1878")));
 
         /**
          * Version 9.10.30.r1833
          */
-        compatibilityChart.put(new Version("9.10.30.r1833"), Arrays
-            .asList(new Version("9.10.30.r1833")));
+        compatibilityChart.put(new Version("9.10.30.r1833"),
+            Arrays.asList(new Version("9.10.30.r1833")));
 
         /**
          * Version 9.10.30.DEVEL
          */
-        compatibilityChart.put(new Version("9.10.30.DEVEL"), Arrays
-            .asList(new Version("9.10.30.DEVEL")));
+        compatibilityChart.put(new Version("9.10.30.DEVEL"),
+            Arrays.asList(new Version("9.10.30.DEVEL")));
 
         /**
          * Version 9.10.2.r1803
@@ -207,8 +212,8 @@ public class VersionManager {
          * We are not backward compatible because of changes in the invitation
          * process.
          */
-        compatibilityChart.put(new Version("9.10.2.r1803"), Arrays
-            .asList(new Version("9.10.2.r1803")));
+        compatibilityChart.put(new Version("9.10.2.r1803"),
+            Arrays.asList(new Version("9.10.2.r1803")));
 
         /**
          * Version 9.10.2.DEVEL
@@ -229,8 +234,8 @@ public class VersionManager {
          * No longer compatible with 9.8.21 since r.1665 changed compression of
          * Activities
          */
-        compatibilityChart.put(new Version("9.9.11.DEVEL"), Arrays
-            .asList(new Version("9.9.11.DEVEL")));
+        compatibilityChart.put(new Version("9.9.11.DEVEL"),
+            Arrays.asList(new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.8.21.r1660
@@ -244,8 +249,8 @@ public class VersionManager {
          * No longer compatible with 9.7.31 since r.1576 changed serialization
          * of Activities
          */
-        compatibilityChart.put(new Version("9.8.21.DEVEL"), Arrays
-            .asList(new Version("9.8.21.DEVEL")));
+        compatibilityChart.put(new Version("9.8.21.DEVEL"),
+            Arrays.asList(new Version("9.8.21.DEVEL")));
     }
 
     /**
