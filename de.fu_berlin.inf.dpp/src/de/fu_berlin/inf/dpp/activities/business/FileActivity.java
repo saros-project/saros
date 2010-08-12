@@ -23,7 +23,12 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     public static enum Type {
-        Created, Removed, Moved
+        /** The file was created or modified, but the path stayed the same. */
+        Created,
+        /** The file was deleted. */
+        Removed,
+        /** The path of the file changed. The content might have changed, too. */
+        Moved
     }
 
     protected final Type type;
@@ -244,8 +249,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     public IActivityDataObject getActivityDataObject(ISharedProject project) {
-        return new FileActivityDataObject(source.getJID(), type, newPath
-            .toSPathDataObject(project), (oldPath != null ? oldPath
-            .toSPathDataObject(project) : null), data, purpose);
+        return new FileActivityDataObject(source.getJID(), type,
+            newPath.toSPathDataObject(project),
+            (oldPath != null ? oldPath.toSPathDataObject(project) : null),
+            data, purpose);
     }
 }
