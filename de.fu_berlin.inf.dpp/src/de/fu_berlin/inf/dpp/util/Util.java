@@ -407,18 +407,25 @@ public class Util {
         }
         final Logger logToUse = log;
 
-        /*
-         * TODO Use the stack frame from the call to wrapSafe to provide better
-         * information who created this runnable
-         */
+        StackTrace tmp = null;
+        // Assign tmp = new StackTrace() iff assertions are enabled.
+        assert (tmp = new StackTrace()) != null;
+        final StackTrace stackTrace = tmp;
         return new Runnable() {
+            @SuppressWarnings("null")
             public void run() {
                 try {
                     runnable.run();
                 } catch (RuntimeException e) {
                     logToUse.error("Internal Error:", e);
+                    if (stackTrace != null) {
+                        logToUse.error("Original caller:", stackTrace);
+                    }
                 } catch (Error e) {
                     logToUse.error("Internal Fatal Error:", e);
+                    if (stackTrace != null) {
+                        logToUse.error("Original caller:", stackTrace);
+                    }
 
                     // Re-throw errors (such as an OutOfMemoryError)
                     throw e;
