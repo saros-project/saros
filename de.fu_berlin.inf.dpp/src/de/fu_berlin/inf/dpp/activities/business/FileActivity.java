@@ -44,7 +44,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * This method will make a snapshot copy of the file at this point in time.
      * 
      * @param path
-     *            the path of the file to copy the data from
+     *            The path of the file to copy the data from.
+     * @throws IOException
+     *             If an error occurs while reading the file.
      */
     public static FileActivity created(User source, SPath path, Purpose purpose)
         throws IOException {

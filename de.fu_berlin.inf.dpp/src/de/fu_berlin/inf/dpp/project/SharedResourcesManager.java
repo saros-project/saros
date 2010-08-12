@@ -48,10 +48,10 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -297,14 +297,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
             switch (kind) {
             case IResourceDelta.CHANGED:
-                log.debug("Resource " + resource.getName() + " changed");
+                if (!isContentChange(delta))
+                    return null;
 
-                /*
-                 * FIXME If a CHANGED event happens and it was not triggered by
-                 * the user or us saving the file, then we must think about what
-                 * we want to do
-                 */
-                return null;
+                return createdUnlessOpen(resource);
 
             case IResourceDelta.ADDED:
 
@@ -325,9 +321,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
                         if (sharedProject.isShared(oldProject)) {
                             // Moving inside the shared project
                             try {
-                                return FileActivity.moved(sharedProject
-                                    .getLocalUser(), new SPath(newProject,
-                                    newPath.removeFirstSegments(1)),
+                                return FileActivity.moved(
+                                    sharedProject.getLocalUser(),
+                                    new SPath(newProject, newPath
+                                        .removeFirstSegments(1)),
                                     new SPath(oldProject, oldPath
                                         .removeFirstSegments(1)),
                                     isContentChange(delta));
@@ -344,30 +341,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
                         }
                     } else {
                         // Moving away!
-                        return FileActivity.removed(sharedProject
-                            .getLocalUser(), new SPath(resource),
+                        return FileActivity.removed(
+                            sharedProject.getLocalUser(), new SPath(resource),
                             Purpose.ACTIVITY);
                     }
                 }
 
                 // usual files adding procedure
 
-                // ignore opened files because otherwise we might send
-                // CHANGED
-                // events for files that are also handled by the editor
-                // manager.
-                if (editorManager.isOpened(new SPath(resource))) {
-                    // TODO Think about if this is needed...
-                    return null;
-                }
-                try {
-                    return FileActivity.created(sharedProject.getLocalUser(),
-                        new SPath(resource), Purpose.ACTIVITY);
-                } catch (IOException e) {
-                    log.warn("Resource could not be read for sending to peers:"
-                        + resource.getLocation(), e);
-                }
-                return null;
+                return createdUnlessOpen(resource);
 
             case IResourceDelta.REMOVED:
                 if (isMoved(delta)) {
@@ -392,6 +374,33 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     new SPath(resource), Purpose.ACTIVITY);
 
             default:
+                return null;
+            }
+        }
+
+        /**
+         * Returns a new FileActivity.created if the file is not currently in
+         * any open editor. We ignore opened files because otherwise we might
+         * send CHANGED events for files that are also handled by the editor
+         * manager.<br>
+         * If an error occurs while reading the file, this method returns null.
+         * 
+         * @param resource
+         * @return
+         */
+        private IResourceActivity createdUnlessOpen(IResource resource) {
+            SPath spath = new SPath(resource);
+            if (editorManager.isOpened(spath)) {
+                return null;
+            }
+
+            log.debug("Resource " + resource.getName() + " changed");
+            try {
+                return FileActivity.created(sharedProject.getLocalUser(),
+                    spath, Purpose.ACTIVITY);
+            } catch (IOException e) {
+                log.warn("Resource could not be read for sending to peers:"
+                    + resource.getLocation(), e);
                 return null;
             }
         }
@@ -611,8 +620,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             log.info("Received consistency file: " + activity);
 
             if (log.isInfoEnabled() && (activity.getContents() != null)) {
-                Util.logDiff(log, activity.getSource().getJID(), path, activity
-                    .getContents(), file);
+                Util.logDiff(log, activity.getSource().getJID(), path,
+                    activity.getContents(), file);
             }
         }
 
@@ -621,8 +630,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             // TODO should be reported to the user
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
-                FileUtil.writeFile(new ByteArrayInputStream(activity
-                    .getContents()), file, monitor);
+                FileUtil.writeFile(
+                    new ByteArrayInputStream(activity.getContents()), file,
+                    monitor);
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
@@ -646,8 +656,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 SubMonitor monitor = SubMonitor
                     .convert(new NullProgressMonitor());
                 try {
-                    FileUtil.writeFile(new ByteArrayInputStream(activity
-                        .getContents()), file, monitor);
+                    FileUtil.writeFile(
+                        new ByteArrayInputStream(activity.getContents()), file,
+                        monitor);
                 } catch (Exception e) {
                     log.error("Could not write file: " + file);
                 }
