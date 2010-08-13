@@ -60,7 +60,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
@@ -122,8 +122,8 @@ public class SendFileAction extends Action {
     }
 
     protected void updateEnablement() {
-        ISharedProject project = sessionManager.getSharedProject();
-        User local = project == null ? null : project.getLocalUser();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        User local = sarosSession == null ? null : sarosSession.getLocalUser();
         setEnabled(selectedUser != null && local != null
             && !local.equals(selectedUser));
     }

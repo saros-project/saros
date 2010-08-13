@@ -24,26 +24,26 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
- * instance for the use in a Saros SharedProject session.
+ * instance for the use in a Saros session.
  * 
- * A user object always has the following immutable characteristics: S/he
- * belongs to a single SharedProject instance, has a final color, and unchanging
+ * A user object always has the following immutable characteristics: He/she
+ * belongs to a single ISarosSession, has a final color, and fixed
  * JID.
  * 
- * There is one user who is a host, all others are clients.
+ * There is one user who is the host, all others are clients.
  * 
  * There is one local user representing the person in front of the current
  * eclipse instance, all others are remote users.
  * 
  * The public and mutable properties are the role (Driver/Observer), time since
  * going off-line, connection state, away information and whether this user is
- * still joining or already part of the Session.
+ * still joining or already part of the session.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
@@ -59,7 +59,7 @@ public class User {
         DRIVER, OBSERVER
     }
 
-    protected final ISharedProject sharedProject;
+    protected final ISarosSession sarosSession;
 
     protected final JID jid;
 
@@ -85,10 +85,10 @@ public class User {
 
     protected UserRole role = UserRole.OBSERVER;
 
-    public User(ISharedProject sharedProject, JID jid, int colorID) {
-        if (sharedProject == null || jid == null)
+    public User(ISarosSession sarosSession, JID jid, int colorID) {
+        if (sarosSession == null || jid == null)
             throw new IllegalArgumentException();
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.jid = jid;
         this.colorID = colorID;
     }
@@ -140,8 +140,8 @@ public class User {
         return this.role == UserRole.OBSERVER;
     }
 
-    public boolean isInSharedProject() {
-        return sharedProject.getUser(getJID()) != null;
+    public boolean isInSarosSession() {
+        return sarosSession.getUser(getJID()) != null;
     }
 
     @Override
@@ -233,10 +233,10 @@ public class User {
     }
 
     /**
-     * Gets the ISharedProject to which this user belongs.
+     * Gets the ISarosSession to which this user belongs.
      */
-    public ISharedProject getSharedProject() {
-        return sharedProject;
+    public ISarosSession getSarosSession() {
+        return sarosSession;
     }
 
     /**
@@ -245,7 +245,7 @@ public class User {
      * Eclipse instances.
      */
     public boolean isLocal() {
-        return this.equals(sharedProject.getLocalUser());
+        return this.equals(sarosSession.getLocalUser());
     }
 
     /**
@@ -256,11 +256,11 @@ public class User {
     }
 
     /**
-     * Returns true if this user is the one that initiated the SharedProject
+     * Returns true if this user is the one that initiated the SarosSession
      * session and thus is responsible for synchronization, role management,
      */
     public boolean isHost() {
-        return this.equals(sharedProject.getHost());
+        return this.equals(sarosSession.getHost());
     }
 
     /**
@@ -287,7 +287,7 @@ public class User {
          * TODO This should use a subscription based mechanism or cache the
          * nick, to prevent this being called too many times
          */
-        String nickName = Util.getNickname(getSharedProject().getSaros(),
+        String nickName = Util.getNickname(getSarosSession().getSaros(),
             getJID());
         String jidBase = getJID().getBase();
 

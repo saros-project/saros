@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
@@ -100,8 +100,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
             + ",new role:" + this.getRole() + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new RoleActivity(sharedProject.getUser(source), sharedProject
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new RoleActivity(sarosSession.getUser(source), sarosSession
             .getUser(affectedUser), role);
     }
 }

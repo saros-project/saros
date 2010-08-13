@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.project;
 import de.fu_berlin.inf.dpp.User;
 
 /**
- * Listens for events that can happen inside a SharedProject session. For
+ * Listens for events that can happen inside a SarosSession session. For
  * life-cycle events like starts and ends of shared projects use the
  * {@link ISessionListener}.
  * 

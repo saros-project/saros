@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.editor;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -43,11 +43,11 @@ public class RemoteDriverManager {
     // stores files (identified by their path) connected by at least one driver
     protected Set<SPath> connectedDriverFiles = new HashSet<SPath>();
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
-    public RemoteDriverManager(final ISharedProject sharedProject) {
-        this.sharedProject = sharedProject;
-        this.sharedProject.addListener(sharedProjectListener);
+    public RemoteDriverManager(final ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
+        this.sarosSession.addListener(sharedProjectListener);
     }
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
@@ -118,7 +118,7 @@ public class RemoteDriverManager {
     }
 
     public void dispose() {
-        sharedProject.removeListener(sharedProjectListener);
+        sarosSession.removeListener(sharedProjectListener);
 
         for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
             entry.getValue().clear();

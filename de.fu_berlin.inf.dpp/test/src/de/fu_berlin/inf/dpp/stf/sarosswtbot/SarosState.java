@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -46,9 +46,9 @@ public class SarosState implements ISarosState {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISharedProject project = sessionManager.getSharedProject();
-                User user = project.getUser(jid);
-                result &= project.getDrivers().contains(user);
+                ISarosSession sarosSession = sessionManager.getSarosSession();
+                User user = sarosSession.getUser(jid);
+                result &= sarosSession.getDrivers().contains(user);
             } catch (Exception e) {
                 return false;
             }
@@ -60,9 +60,9 @@ public class SarosState implements ISarosState {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISharedProject project = sessionManager.getSharedProject();
-                User user = project.getUser(jid);
-                result &= project.getObservers().contains(user);
+                ISarosSession sarosSession = sessionManager.getSarosSession();
+                User user = sarosSession.getUser(jid);
+                result &= sarosSession.getObservers().contains(user);
             } catch (Exception e) {
                 return false;
             }
@@ -74,9 +74,9 @@ public class SarosState implements ISarosState {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISharedProject project = sessionManager.getSharedProject();
-                result &= project.getParticipants().contains(
-                    project.getUser(jid));
+                ISarosSession sarosSession = sessionManager.getSarosSession();
+                result &= sarosSession.getParticipants().contains(
+                    sarosSession.getUser(jid));
             } catch (Exception e) {
                 return false;
             }
@@ -106,11 +106,11 @@ public class SarosState implements ISarosState {
     }
 
     public boolean isDriver(JID jid) throws RemoteException {
-        ISharedProject project = sessionManager.getSharedProject();
-        User user = project.getUser(jid);
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        User user = sarosSession.getUser(jid);
         log.debug("isDriver(" + jid.toString() + ") == "
-            + project.getDrivers().contains(user));
-        return project.getDrivers().contains(user);
+            + sarosSession.getDrivers().contains(user));
+        return sarosSession.getDrivers().contains(user);
     }
 
     public boolean isIncomingConnectionIBB(JID destJid) throws RemoteException {
@@ -137,11 +137,11 @@ public class SarosState implements ISarosState {
     }
 
     public boolean isObserver(JID jid) throws RemoteException {
-        ISharedProject project = sessionManager.getSharedProject();
-        User user = project.getUser(jid);
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        User user = sarosSession.getUser(jid);
         log.debug("isObserver(" + jid.toString() + ") == "
-            + project.getObservers().contains(user));
-        return project.getObservers().contains(user);
+            + sarosSession.getObservers().contains(user));
+        return sarosSession.getObservers().contains(user);
     }
 
     public boolean isOutgoingConnectionIBB(JID destJid) throws RemoteException {
@@ -169,10 +169,10 @@ public class SarosState implements ISarosState {
 
     public boolean isParticipant(JID jid) throws RemoteException {
         try {
-            ISharedProject project = sessionManager.getSharedProject();
+            ISarosSession sarosSession = sessionManager.getSarosSession();
             log.debug("isParticipant(" + jid.toString() + ") == "
-                + project.getParticipants().contains(project.getUser(jid)));
-            return project.getParticipants().contains(project.getUser(jid));
+                + sarosSession.getParticipants().contains(sarosSession.getUser(jid)));
+            return sarosSession.getParticipants().contains(sarosSession.getUser(jid));
         } catch (Exception e) {
             return false;
         }

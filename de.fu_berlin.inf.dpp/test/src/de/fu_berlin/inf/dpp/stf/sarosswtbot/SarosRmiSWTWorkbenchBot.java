@@ -21,7 +21,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 
 /**
@@ -191,8 +191,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void addToSharedProject(String invitee) throws RemoteException {
         setFocusOnViewByTitle("Shared Project Session");
-        delegate.viewByTitle("Shared Project Session").toolbarButton(
-            "Open invitation interface").click();
+        delegate.viewByTitle("Shared Project Session")
+            .toolbarButton("Open invitation interface").click();
         selectCheckBoxInvitation(invitee);
     }
 
@@ -318,8 +318,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void leaveSession() throws RemoteException {
         setFocusOnViewByTitle("Shared Project Session");
-        delegate.viewByTitle("Shared Project Session").toolbarButton(
-            "Leave the session").click();
+        delegate.viewByTitle("Shared Project Session")
+            .toolbarButton("Leave the session").click();
     }
 
     /**
@@ -374,7 +374,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     /**
-     * Create a {@link SharedProject} using context menu off the given project
+     * Create a {@link ISarosSession} using context menu off the given project
      * on package explorer view.
      */
     public void shareProject(String projectName) throws RemoteException {

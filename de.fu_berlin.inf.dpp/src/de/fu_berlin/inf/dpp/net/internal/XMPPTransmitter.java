@@ -70,9 +70,9 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
@@ -84,14 +84,13 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
+import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
@@ -131,7 +130,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     protected SessionIDObservable sessionID;
 
     @Inject
-    protected SharedProjectObservable sharedProject;
+    protected SarosSessionObservable sarosSessionObservable;
 
     @Inject
     protected LeaveExtension leaveExtension;
@@ -215,8 +214,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     public void sendFileListRequest(JID to, String invitationID) {
         log.trace("Sending request for FileList to " + Util.prefix(to));
-        sendMessageToUser(to, fileListRequestExtProv
-            .create(new DefaultInvitationInfo(sessionID, invitationID)));
+        sendMessageToUser(to,
+            fileListRequestExtProv.create(new DefaultInvitationInfo(sessionID,
+                invitationID)));
     }
 
     public FileList receiveFileList(SarosPacketCollector collector,
@@ -321,8 +321,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     public void sendUserListConfirmation(JID to) {
         log.trace("Sending userListConfirmation to " + Util.prefix(to));
-        sendMessageToProjectUser(to, userListConfExtProv
-            .create(new DefaultSessionInfo(sessionID)));
+        sendMessageToProjectUser(to,
+            userListConfExtProv.create(new DefaultSessionInfo(sessionID)));
     }
 
     public SarosPacketCollector getUserListConfirmationCollector() {
@@ -390,8 +390,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     }
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
-        sendMessageToProjectUser(to, invCompleteExtProv
-            .create(new DefaultInvitationInfo(sessionID, invitationID)));
+        sendMessageToProjectUser(to,
+            invCompleteExtProv.create(new DefaultInvitationInfo(sessionID,
+                invitationID)));
     }
 
     /********************************************************************************
@@ -411,8 +412,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             + Util.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
-        sendMessageToUser(user, cancelInviteExtension.create(sessionID
-            .getValue(), errorMsg));
+        sendMessageToUser(user,
+            cancelInviteExtension.create(sessionID.getValue(), errorMsg));
     }
 
     // TODO: Remove this method.
@@ -422,7 +423,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         dataManager.awaitJingleManager(peer);
     }
 
-    public void sendRequestForActivity(ISharedProject sharedProject,
+    public void sendRequestForActivity(ISarosSession sarosSession,
         Map<JID, Integer> expectedSequenceNumbers, boolean andup) {
 
         // TODO this method is currently not used. Probably they interfere with
@@ -439,8 +440,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             log.info("Requesting old activityDataObject (sequence number="
                 + expectedSequenceNumber + "," + andup + ") from "
                 + Util.prefix(recipient));
-            sendMessageToProjectUser(recipient, requestActivityExtension
-                .create(expectedSequenceNumber, andup));
+            sendMessageToProjectUser(recipient,
+                requestActivityExtension.create(expectedSequenceNumber, andup));
         }
     }
 
@@ -449,8 +450,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
      * 
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
-    public void sendLeaveMessage(ISharedProject sharedProject) {
-        sendMessageToAll(sharedProject, leaveExtension.create());
+    public void sendLeaveMessage(ISarosSession sarosSession) {
+        sendMessageToAll(sarosSession, leaveExtension.create());
     }
 
     /**
@@ -492,19 +493,18 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             try {
                 String user = connection.getUser();
                 if (user == null) {
-                    log
-                        .warn("Local user is not logged in to the connection, yet.");
+                    log.warn("Local user is not logged in to the connection, yet.");
                     return;
                 }
                 TransferDescription transferData = TransferDescription
                     .createActivityTransferDescription(recipient,
                         new JID(user), sID);
 
-                dataManager.sendData(transferData, data, SubMonitor
-                    .convert(new NullProgressMonitor()));
+                dataManager.sendData(transferData, data,
+                    SubMonitor.convert(new NullProgressMonitor()));
             } catch (IOException e) {
-                log
-                    .error("Failed to sent activityDataObjects ("
+                log.error(
+                    "Failed to sent activityDataObjects ("
                         + Util.formatByte(data.length) + "): "
                         + timedActivities, e);
                 return;
@@ -567,8 +567,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         progress.beginTask("Sending " + path.lastSegment(), 100);
 
         TransferDescription transfer = TransferDescription
-            .createFileTransferDescription(to, new JID(user), path, sessionID
-                .getValue());
+            .createFileTransferDescription(to, new JID(user), path,
+                sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
         if (!f.isFile())
@@ -637,14 +637,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     /**
      * Convenience method for sending the given {@link PacketExtension} to all
-     * participants of the given {@link SharedProject}.
+     * participants of the given {@link ISarosSession}.
      */
-    protected void sendMessageToAll(ISharedProject sharedProject,
+    protected void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
         JID myJID = saros.getMyJID();
 
-        for (User participant : sharedProject.getParticipants()) {
+        for (User participant : sarosSession.getParticipants()) {
 
             if (participant.getJID().equals(myJID))
                 continue;
@@ -691,7 +691,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
      */
     protected void sendMessageToProjectUser(JID jid, Message message) {
 
-        User participant = sharedProject.getValue().getUser(jid);
+        User participant = sarosSessionObservable.getValue().getUser(jid);
         if (participant == null) {
             log.warn("User not in session:" + Util.prefix(jid));
             return;
@@ -705,7 +705,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             // remove participant if he/she is offline too long
             if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
                 log.info("Removing offline user from session...");
-                sharedProject.getValue().removeUser(participant);
+                sarosSessionObservable.getValue().removeUser(participant);
             } else {
                 queueMessage(jid, message);
                 log.info("User known as offline - Message queued!");
@@ -849,8 +849,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
                 try {
                     // To test if asynchronously arriving file transfers work:
                     // Thread.sleep(10000);
-                    dataManager.sendData(transfer, content, progress
-                        .newChild(100));
+                    dataManager.sendData(transfer, content,
+                        progress.newChild(100));
                     callback.fileSent(path);
                 } catch (Exception e) {
                     callback.fileTransferFailed(path, e);

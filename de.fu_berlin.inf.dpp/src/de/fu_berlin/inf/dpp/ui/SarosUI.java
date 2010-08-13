@@ -284,7 +284,7 @@ public class SarosUI {
                         progress.beginTask("Performing role change",
                             IProgressMonitor.UNKNOWN);
 
-                        sessionManager.getSharedProject().initiateRoleChange(
+                        sessionManager.getSarosSession().initiateRoleChange(
                             user, newRole, progress);
 
                     } catch (CancellationException e) {

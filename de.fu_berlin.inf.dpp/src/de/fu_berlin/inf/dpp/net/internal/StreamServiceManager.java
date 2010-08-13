@@ -66,20 +66,19 @@ import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.exceptions.StreamServiceNotValidException;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamMetaPacketData.StreamClose;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.Stream;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionOutputStream;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -128,7 +127,7 @@ public class StreamServiceManager implements Startable {
     @Inject
     protected SessionIDObservable sarosSessionID;
 
-    protected SharedProjectObservable sharedProjectObservable;
+    protected SarosSessionObservable sarosSessionObservable;
 
     protected IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider;
 
@@ -194,14 +193,14 @@ public class StreamServiceManager implements Startable {
     public StreamServiceManager(
         XMPPReceiver xmppReceiver,
         DataTransferManager dataTransferManager,
-        SharedProjectObservable sharedProjectObservable,
+        SarosSessionObservable sarosSessionObservable,
         Saros saros,
         SessionManager sessionManager,
         List<StreamService> streamServices,
         IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider) {
 
         this.dataTransferManager = dataTransferManager;
-        this.sharedProjectObservable = sharedProjectObservable;
+        this.sarosSessionObservable = sarosSessionObservable;
         this.saros = saros;
         this.sessionManager = sessionManager;
         this.incomingTransferObjectExtensionProvider = incomingTransferObjectExtensionProvider;
@@ -237,8 +236,7 @@ public class StreamServiceManager implements Startable {
         sender = new PacketSender();
         Util.runSafeAsync("StreamServiceManagers-senderThread", log, sender);
         receiver = new PacketReceiver();
-        Util
-            .runSafeAsync("StreamServiceManagers-receiverThread", log, receiver);
+        Util.runSafeAsync("StreamServiceManagers-receiverThread", log, receiver);
         stopSessionExecutor = Executors.newScheduledThreadPool(5,
             new NamedThreadFactory("StreamSessionStopper-"));
 
@@ -310,15 +308,15 @@ public class StreamServiceManager implements Startable {
 
     /**
      * Register {@link SharedProjectListener}, {@link ConnectionListener},
-     * {@link SessionListener} to react on project stopped and user gone
+     * {@link SessionListener}.
      */
     protected void registerListeners() {
         final ISharedProjectListener sharedProjectListener = new SharedProjectListener();
-        // re-add the listener when shared project changes
-        sharedProjectObservable
-            .addAndNotify(new ValueChangeListener<SharedProject>() {
+        // re-add the listener when the session changes
+        sarosSessionObservable
+            .addAndNotify(new ValueChangeListener<ISarosSession>() {
 
-                public void setValue(SharedProject newValue) {
+                public void setValue(ISarosSession newValue) {
                     if (newValue != null)
                         newValue.addListener(sharedProjectListener);
                 }
@@ -399,8 +397,8 @@ public class StreamServiceManager implements Startable {
             .getTransferDescription();
 
         if (sender != null)
-            sender.sendPacket(transferDescription, StreamMetaPacketData.STOP
-                .getIdentifier(), null);
+            sender.sendPacket(transferDescription,
+                StreamMetaPacketData.STOP.getIdentifier(), null);
 
         Runnable stopThread = Util.wrapSafe(log, new SessionKiller(session));
 
@@ -540,13 +538,14 @@ public class StreamServiceManager implements Startable {
         initiations.put(streamPath, initiation);
         // send negotiation
         TransferDescription transferDescription = TransferDescription
-            .createStreamMetaTransferDescription(user.getJID(), saros
-                .getMyJID(), streamPath.toString(), sarosSessionID.getValue());
+            .createStreamMetaTransferDescription(user.getJID(),
+                saros.getMyJID(), streamPath.toString(),
+                sarosSessionID.getValue());
 
         if (sender != null)
-            sender.sendPacket(transferDescription, StreamMetaPacketData.INIT
-                .serializeInto(initiationDescription), SubMonitor
-                .convert(new NullProgressMonitor()));
+            sender.sendPacket(transferDescription,
+                StreamMetaPacketData.INIT.serializeInto(initiationDescription),
+                SubMonitor.convert(new NullProgressMonitor()));
         else
             throw new ConnectionException();
 
@@ -1151,6 +1150,7 @@ public class StreamServiceManager implements Startable {
          *            for which no data should be send anymore
          */
         protected void removeData(StreamSession session) {
+            assert session != null;
             if (blockedSessions.contains(session))
                 return;
 
@@ -1233,10 +1233,10 @@ public class StreamServiceManager implements Startable {
                         return null;
 
                     TransferDescription transferDescription = TransferDescription
-                        .createStreamDataTransferDescription(stream
-                            .getSession().remoteJID, saros.getMyJID(),
-                            sarosSessionID.getValue(), stream.getStreamPath(
-                                data.length).toString());
+                        .createStreamDataTransferDescription(
+                            stream.getSession().remoteJID, saros.getMyJID(),
+                            sarosSessionID.getValue(),
+                            stream.getStreamPath(data.length).toString());
 
                     try {
                         return new StreamPacket(transferDescription, data,
@@ -1342,9 +1342,8 @@ public class StreamServiceManager implements Startable {
                 StreamSession session = sessions.get(packet.getStreamPath());
 
                 if (session == null) {
-                    log
-                        .error("Received packet for an unknown session. Path is "
-                            + packet.getStreamPath());
+                    log.error("Received packet for an unknown session. Path is "
+                        + packet.getStreamPath());
                     try {
                         packet.reject();
                     } catch (IOException e) {
@@ -1412,9 +1411,8 @@ public class StreamServiceManager implements Startable {
                 final StreamService service = registeredServices
                     .get(streamPath.serviceName);
                 if (service == null) {
-                    log
-                        .error("Received inititation request for unknown service: "
-                            + streamPath.serviceName);
+                    log.error("Received inititation request for unknown service: "
+                        + streamPath.serviceName);
                     return;
                 }
 
@@ -1427,14 +1425,13 @@ public class StreamServiceManager implements Startable {
                     return;
                 }
 
-                SharedProject sharedProject = sharedProjectObservable
-                    .getValue();
-                if (sharedProject == null) {
+                ISarosSession sarosSession = sarosSessionObservable.getValue();
+                if (sarosSession == null) {
                     log.warn("Not in a shared project, discarding packet!");
                     return;
                 }
 
-                final User from = sharedProject
+                final User from = sarosSession
                     .getUser(transferDescription.sender);
                 if (from == null) {
                     log.warn("User left, discarding packet!");
@@ -1458,15 +1455,13 @@ public class StreamServiceManager implements Startable {
                         }
 
                         if (startSession) {
-                            log
-                                .debug("Service accepted, try to create session");
+                            log.debug("Service accepted, try to create session");
 
                             final StreamSession newSession;
                             synchronized (sessions) {
                                 if (sessions.containsKey(streamPath)) {
-                                    log
-                                        .warn("Session already created, received INIT twice: "
-                                            + streamPath);
+                                    log.warn("Session already created, received INIT twice: "
+                                        + streamPath);
                                     return;
                                 }
                                 newSession = new StreamSession(
@@ -1478,11 +1473,10 @@ public class StreamServiceManager implements Startable {
                             }
 
                             if (sender != null) {
-                                sender
-                                    .sendPacket(newSession
-                                        .getTransferDescription(),
-                                        StreamMetaPacketData.ACCEPT
-                                            .getIdentifier(), null);
+                                sender.sendPacket(
+                                    newSession.getTransferDescription(),
+                                    StreamMetaPacketData.ACCEPT.getIdentifier(),
+                                    null);
                                 log.debug("Accept-packet send.");
                                 sessions.put(streamPath, newSession);
                             } else
@@ -1497,19 +1491,18 @@ public class StreamServiceManager implements Startable {
                                     }
                                 }));
                         } else {
-                            log
-                                .debug("Session rejected, will send reject-packet.");
+                            log.debug("Session rejected, will send reject-packet.");
 
                             if (sender != null) {
-                                sender
-                                    .sendPacket(TransferDescription
+                                sender.sendPacket(
+                                    TransferDescription
                                         .createStreamMetaTransferDescription(
                                             transferDescription.sender,
                                             transferDescription.recipient,
                                             streamPath.toString(),
                                             sarosSessionID.getValue()),
-                                        StreamMetaPacketData.REJECT
-                                            .getIdentifier(), null);
+                                    StreamMetaPacketData.REJECT.getIdentifier(),
+                                    null);
 
                                 log.debug("Reject-packet send.");
                             }
@@ -1554,9 +1547,8 @@ public class StreamServiceManager implements Startable {
                 }
 
                 if (session.receiverStopped) {
-                    log
-                        .warn("Receiver stopped already, received another STOPPED "
-                            + session);
+                    log.warn("Receiver stopped already, received another STOPPED "
+                        + session);
                     return;
                 }
 
@@ -1571,8 +1563,7 @@ public class StreamServiceManager implements Startable {
                 initiation = initiations.remove(streamPath);
 
                 if (initiation == null) {
-                    log
-                        .warn("Received REJECT/ACCEPT packet I have no initiation for!");
+                    log.warn("Received REJECT/ACCEPT packet I have no initiation for!");
                     return;
                 }
                 if (metaPacket == StreamMetaPacketData.REJECT)
@@ -1606,16 +1597,15 @@ public class StreamServiceManager implements Startable {
                 }
 
                 Stream toClose = (Stream) (closeDesc.senderInputstreamClosed ? session
-                    .getOutputStream(closeDesc.streamID)
-                    : session.getInputStream(closeDesc.streamID));
+                    .getOutputStream(closeDesc.streamID) : session
+                    .getInputStream(closeDesc.streamID));
 
                 toClose.closedByRemote();
 
                 break;
             default:
-                log
-                    .error("Please implement case for this unknown metapacket with identifier "
-                        + Byte.valueOf(data[0]));
+                log.error("Please implement case for this unknown metapacket with identifier "
+                    + Byte.valueOf(data[0]));
 
             }
 
@@ -1841,8 +1831,8 @@ public class StreamServiceManager implements Startable {
 
             TransferDescription transferDescription = payload
                 .getTransferDescription();
-            if (!Util.equals(transferDescription.sessionID, sarosSessionID
-                .getValue()))
+            if (!Util.equals(transferDescription.sessionID,
+                sarosSessionID.getValue()))
                 return false;
 
             return ObjectUtils.equals(transferDescription.type,
@@ -1894,12 +1884,12 @@ public class StreamServiceManager implements Startable {
             // NOP
         }
 
-        public void sessionEnded(ISharedProject sharedProject) {
-            StreamServiceManager.this.stop();
+        public void sessionStarted(ISarosSession newSarosSession) {
+            StreamServiceManager.this.start();
         }
 
-        public void sessionStarted(ISharedProject sharedProject) {
-            StreamServiceManager.this.start();
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            StreamServiceManager.this.stop();
         }
 
     }

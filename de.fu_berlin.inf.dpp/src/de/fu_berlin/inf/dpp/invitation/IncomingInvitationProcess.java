@@ -64,7 +64,7 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
@@ -96,7 +96,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
     protected JoinSessionWizard inInvitationUI;
     protected VersionManager versionManager;
     protected DateTime sessionStart;
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
     protected String invitationID;
     protected Saros saros;
 
@@ -261,7 +261,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         // TODO joining the session will already send events, which will be
         // rejected by our peers, because they don't know us yet (JoinMessage is
         // sent only later)
-        sharedProject = sessionManager.joinSession(this.projectName,
+        sarosSession = sessionManager.joinSession(this.projectName,
             this.localProject, peer, colorID, sessionStart);
         log.debug("Inv" + Util.prefix(peer) + ": Joined the session.");
 
@@ -652,7 +652,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
      */
     protected void completeInvitation() {
         log.debug("Inv" + Util.prefix(peer) + ": Completing invitation...");
-        sharedProject.userInvitationCompleted(sharedProject.getLocalUser());
+        sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
         log.debug("Inv" + Util.prefix(peer)
             + ": isInvitationComplete has been set to true.");
 
@@ -668,7 +668,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
         invitationProcesses.removeInvitationProcess(this);
 
-        sharedProject.start();
+        sarosSession.start();
 
         monitor.done();
         log.debug("Inv" + Util.prefix(peer)
@@ -802,9 +802,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
                 cancellationCause);
         }
 
-        sessionManager.stopSharedProject();
+        sessionManager.stopSarosSession();
         /*
-         * If the sharedProject is null, stopSharedProject() does not clear the
+         * If the sarosSession is null, stopSharedProject() does not clear the
          * sessionID, so we have to do this manually.
          */
         sessionManager.clearSessionID();

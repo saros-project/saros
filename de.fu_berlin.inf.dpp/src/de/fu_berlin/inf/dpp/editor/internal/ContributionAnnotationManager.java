@@ -14,7 +14,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class keeps a history of added {@link ContributionAnnotation}s and
@@ -42,12 +42,12 @@ public class ContributionAnnotationManager {
         }
     }
 
-    ISharedProject project;
+    ISarosSession sarosSession;
 
-    public ContributionAnnotationManager(ISharedProject project) {
-        this.project = project;
+    public ContributionAnnotationManager(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
         sharedProjectListener = new SharedProjectListener();
-        project.addListener(sharedProjectListener);
+        sarosSession.addListener(sharedProjectListener);
     }
 
     /**
@@ -140,7 +140,7 @@ public class ContributionAnnotationManager {
     }
 
     public void dispose() {
-        this.project.removeListener(sharedProjectListener);
+        this.sarosSession.removeListener(sharedProjectListener);
         sourceToHistory.clear();
     }
 

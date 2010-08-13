@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A checksum activityDataObject is used to communicate checksums from the host
@@ -139,8 +139,8 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
         return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new ChecksumActivity(sharedProject.getUser(source), path
-            .toSPath(sharedProject), hash, length, jupiterTimestamp);
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new ChecksumActivity(sarosSession.getUser(source), path
+            .toSPath(sarosSession), hash, length, jupiterTimestamp);
     }
 }

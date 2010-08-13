@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosProjectMapper;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -59,12 +59,12 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * TODO Review if SharedProject, ConcurrentDocumentManager, ActivitySequencer
+ * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer
  * all honor start() and stop() semantics.
  */
-public class SharedProject implements ISharedProject, Disposable {
+public class SarosSession implements ISarosSession, Disposable {
 
-    private static final Logger log = Logger.getLogger(SharedProject.class);
+    private static final Logger log = Logger.getLogger(SarosSession.class);
 
     public static final int MAX_USERCOLORS = 5;
 
@@ -131,7 +131,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Common constructor code for host and client side.
      */
-    protected SharedProject(Saros saros, ITransmitter transmitter,
+    protected SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, String projectID,
         IProject project, StopManager stopManager, JID myJID, int myColorID,
@@ -156,9 +156,9 @@ public class SharedProject implements ISharedProject, Disposable {
     }
 
     /**
-     * Constructor called for SharedProject of the host
+     * Constructor called for SarosSession of the host
      */
-    public SharedProject(Saros saros, ITransmitter transmitter,
+    public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, IProject project, JID myID,
         StopManager stopManager, DateTime sessionStart,
@@ -183,7 +183,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Constructor of client
      */
-    public SharedProject(Saros saros, ITransmitter transmitter,
+    public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, String projectID,
         IProject project, JID myID, JID hostID, int myColorID,
@@ -355,7 +355,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /*
      * (non-Javadoc)
      * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public boolean isHost() {
         return this.localUser.isHost();
@@ -384,13 +384,13 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void addUser(User user) {
 
-        assert user.getSharedProject().equals(this);
+        assert user.getSarosSession().equals(this);
 
         JID jid = user.getJID();
 
         if (participants.putIfAbsent(jid, user) != null) {
             log.error("User " + Util.prefix(jid)
-                + " added twice to SharedProject", new StackTrace());
+                + " added twice to SarosSession", new StackTrace());
             throw new IllegalArgumentException();
         }
 
@@ -421,7 +421,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /*
      * (non-Javadoc)
      * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public void addListener(ISharedProjectListener listener) {
         listenerDispatch.add(listener);
@@ -430,7 +430,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /*
      * (non-Javadoc)
      * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public void removeListener(ISharedProjectListener listener) {
         listenerDispatch.remove(listener);
@@ -439,7 +439,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /*
      * (non-Javadoc)
      * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public Set<IProject> getProjects() {
         return this.projectMapper.getProjects();
@@ -496,7 +496,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
         if (jid.isBareJID()) {
             throw new IllegalArgumentException(
-                "JIDs used for the SharedProject should always be resource qualified: "
+                "JIDs used for the SarosSession should always be resource qualified: "
                     + Util.prefix(jid));
         }
 
@@ -511,7 +511,7 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Given a JID (with resource or not), will return the resource qualified
      * JID associated with this user or null if no user for the given JID exists
-     * in this SharedProject.
+     * in this SarosSession.
      */
     public JID getResourceQualifiedJID(JID jid) {
 
@@ -601,7 +601,7 @@ public class SharedProject implements ISharedProject, Disposable {
             try {
                 result.add(dataObject.getActivity(this));
             } catch (IllegalArgumentException e) {
-                log.warn("DataObject could not be attached to SharedProject: "
+                log.warn("DataObject could not be attached to SarosSession: "
                     + dataObject, e);
             }
         }

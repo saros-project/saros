@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -56,12 +56,12 @@ public class LeaveSessionAction extends Action {
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
-            public void sessionStarted(ISharedProject sharedProject) {
+            public void sessionStarted(ISarosSession newSarosSession) {
                 updateEnablement();
             }
 
             @Override
-            public void sessionEnded(ISharedProject sharedProject) {
+            public void sessionEnded(ISarosSession oldSarosSession) {
                 updateEnablement();
             }
         });
@@ -79,17 +79,17 @@ public class LeaveSessionAction extends Action {
             return;
         }
 
-        ISharedProject sharedProject = sessionManager.getSharedProject();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        if (sharedProject == null) {
-            log.warn("ISharedProject does no longer exist!");
+        if (sarosSession == null) {
+            log.warn("ISarosSession does no longer exist!");
             return;
         }
 
         boolean reallyLeave;
 
-        if (sharedProject.isHost()) {
-            if (sharedProject.getParticipants().size() == 1) {
+        if (sarosSession.isHost()) {
+            if (sarosSession.getParticipants().size() == 1) {
                 // Do not ask when host is alone...
                 reallyLeave = true;
             } else {
@@ -117,14 +117,14 @@ public class LeaveSessionAction extends Action {
 
     protected void runLeaveSession() {
         try {
-            sessionManager.stopSharedProject();
+            sessionManager.stopSarosSession();
         } catch (Exception e) {
             log.error("Session could not be left: ", e);
         }
     }
 
     protected void updateEnablement() {
-        setEnabled(sessionManager.getSharedProject() != null);
+        setEnabled(sessionManager.getSarosSession() != null);
     }
 
 }

@@ -47,9 +47,9 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -75,7 +75,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     public final ImageDescriptor passiveDescriptor = SarosUI
         .getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected Set<Object> decoratedElements;
 
@@ -96,24 +96,23 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
-            project.addListener(projectListener);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
+            newSarosSession.addListener(projectListener);
 
             if (!decoratedElements.isEmpty()) {
-                log
-                    .warn("Set of files to decorate not empty on session start. "
-                        + decoratedElements.toString());
+                log.warn("Set of files to decorate not empty on session start. "
+                    + decoratedElements.toString());
                 // update remaining files
                 updateDecoratorsAsync(decoratedElements.toArray());
             }
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            assert sharedProject == project;
-            sharedProject = null;
-            project.removeListener(projectListener);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            assert sarosSession == oldSarosSession;
+            sarosSession = null;
+            oldSarosSession.removeListener(projectListener);
             // Update all
             updateDecoratorsAsync(decoratedElements.toArray());
         }
@@ -134,7 +133,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 }
 
                 IFile newFile = null;
-                if (path != null && sharedProject != null) {
+                if (path != null && sarosSession != null) {
                     newFile = path.getFile();
                     if (newFile.exists() && !newFile.equals(oldActiveEditor)) {
                         paths.add(newFile);
@@ -151,7 +150,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         @Override
         public void editorRemoved(User user, SPath path) {
             try {
-                if (path != null && sharedProject != null) {
+                if (path != null && sarosSession != null) {
                     IFile newFile = path.getFile();
                     IFile oldActiveEditor = oldActiveEditors.get(user);
                     if (newFile.exists()) {
@@ -203,13 +202,13 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         sessionManager.addSessionListener(sessionListener);
 
         editorManager.addSharedEditorListener(editorListener);
-        if (sessionManager.getSharedProject() != null) {
-            sessionListener.sessionStarted(sessionManager.getSharedProject());
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
     }
 
     protected void updateDecorations(User user) {
-        if (sharedProject == null)
+        if (sarosSession == null)
             return;
 
         List<IFile> files = new ArrayList<IFile>();
@@ -232,7 +231,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     private boolean decorateInternal(Object element, IDecoration decoration) {
         try {
-            if (this.sharedProject == null)
+            if (this.sarosSession == null)
                 return false;
 
             // Enablement in the Plugin.xml ensures that we only get IFiles
@@ -240,7 +239,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 return false;
 
             IFile file = (IFile) element;
-            if (!this.sharedProject.isShared(file.getProject()))
+            if (!this.sarosSession.isShared(file.getProject()))
                 return false;
 
             IPath iPath = file.getProjectRelativePath();
@@ -292,7 +291,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         sessionManager.removeSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
         // TODO clean up better
-        this.sharedProject = null;
+        this.sarosSession = null;
     }
 
     public boolean isLabelProperty(Object element, String property) {

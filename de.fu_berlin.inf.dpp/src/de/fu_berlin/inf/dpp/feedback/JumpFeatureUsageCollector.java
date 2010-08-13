@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -82,12 +82,12 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         // nothing to be done
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         // nothing to be done
     }
 

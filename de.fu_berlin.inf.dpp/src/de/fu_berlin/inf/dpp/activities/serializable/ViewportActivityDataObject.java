@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("viewportActivity")
 public class ViewportActivityDataObject extends AbstractActivityDataObject {
@@ -101,8 +101,8 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new ViewportActivity(sharedProject.getUser(source), topIndex,
-            bottomIndex, path.toSPath(sharedProject));
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new ViewportActivity(sarosSession.getUser(source), topIndex,
+            bottomIndex, path.toSPath(sarosSession));
     }
 }

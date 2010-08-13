@@ -30,14 +30,14 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -79,13 +79,13 @@ public class PacketExtensionUtils {
 
     /**
      * @return A PacketFilter that only accepts Packets if there is currently a
-     *         SharedProject
+     *         SarosSession
      */
     public static PacketFilter getInSessionFilter(
         final SessionManager sessionManager) {
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
-                return sessionManager.getSharedProject() != null;
+                return sessionManager.getSarosSession() != null;
             }
         };
     }
@@ -98,11 +98,11 @@ public class PacketExtensionUtils {
         final SessionManager sessionManager) {
         return new PacketFilter() {
             public boolean accept(Packet packet) {
-                ISharedProject project = sessionManager.getSharedProject();
+                ISarosSession sarosSession = sessionManager.getSarosSession();
 
-                return project != null
-                    && project.getHost().getJID().equals(
-                        new JID(packet.getFrom()));
+                return sarosSession != null
+                    && sarosSession.getHost().getJID()
+                        .equals(new JID(packet.getFrom()));
             }
         };
     }
@@ -158,8 +158,8 @@ public class PacketExtensionUtils {
 
                 TransferDescription transferDescription = payload
                     .getTransferDescription();
-                if (!Util.equals(transferDescription.sessionID, sessionID
-                    .getValue()))
+                if (!Util.equals(transferDescription.sessionID,
+                    sessionID.getValue()))
                     return false;
 
                 if (!ObjectUtils.equals(transferDescription.invitationID,

@@ -5,8 +5,8 @@ import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -22,12 +22,12 @@ public class OpenInviteInterface extends Action {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
-            setEnabled(sharedProject.isHost());
+        public void sessionStarted(ISarosSession newSarosSession) {
+            setEnabled(newSarosSession.isHost());
         }
 
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             setEnabled(false);
         }
     };
@@ -44,8 +44,8 @@ public class OpenInviteInterface extends Action {
         sessionManager.addSessionListener(sessionListener);
 
         // Needed when the Interface is created during a session
-        ISharedProject project = sessionManager.getSharedProject();
-        setEnabled((project != null) && project.isHost());
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        setEnabled((sarosSession != null) && sarosSession.isHost());
     }
 
     /**

@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.Pair;
@@ -80,7 +80,8 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                         size, transmissionMillisecs));
                 }
 
-                public void connectionChanged(JID jid, IBytestreamConnection connection) {
+                public void connectionChanged(JID jid,
+                    IBytestreamConnection connection) {
                     // do nothing
                 }
             });
@@ -118,12 +119,12 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         // Do nothing
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         // Do nothing
     }
 }

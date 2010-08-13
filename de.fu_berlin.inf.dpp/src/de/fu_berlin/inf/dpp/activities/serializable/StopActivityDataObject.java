@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
@@ -166,9 +166,9 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
         return sb.toString();
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new StopActivity(sharedProject.getUser(source), sharedProject
-            .getUser(initiator), sharedProject.getUser(user), type, state,
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new StopActivity(sarosSession.getUser(source), sarosSession
+            .getUser(initiator), sarosSession.getUser(user), type, state,
             stopActivityID);
     }
 }

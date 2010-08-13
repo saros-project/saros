@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -52,9 +52,9 @@ public class FollowModeAction extends Action implements Disposable {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
+        public void sessionStarted(ISarosSession newSarosSession) {
 
-            sharedProject.addListener(roleChangeListener);
+            newSarosSession.addListener(roleChangeListener);
             updateEnablement();
 
             /*
@@ -96,8 +96,8 @@ public class FollowModeAction extends Action implements Disposable {
         }
 
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
-            sharedProject.removeListener(roleChangeListener);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            oldSarosSession.removeListener(roleChangeListener);
             updateEnablement();
         }
     };
@@ -162,13 +162,13 @@ public class FollowModeAction extends Action implements Disposable {
      * this is a toggeling method, otherwise a random driver is returned.
      */
     protected User getNewToFollow() {
-        ISharedProject project = sessionManager.getSharedProject();
-        assert project != null;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        assert sarosSession != null;
 
         if (editorManager.isFollowing()) {
             return null;
         } else {
-            for (User user : project.getParticipants()) {
+            for (User user : sarosSession.getParticipants()) {
                 if (user.isRemote() && user.isDriver()) {
                     return user;
                 }
@@ -183,9 +183,9 @@ public class FollowModeAction extends Action implements Disposable {
      * <code>false</code> otherwise.
      */
     protected boolean canFollow() {
-        ISharedProject project = sessionManager.getSharedProject();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        if (project == null)
+        if (sarosSession == null)
             return false;
 
         if (editorManager.isFollowing()) {
@@ -195,7 +195,7 @@ public class FollowModeAction extends Action implements Disposable {
         }
 
         int driverCount = 0;
-        for (User user : project.getParticipants()) {
+        for (User user : sarosSession.getParticipants()) {
             if (user.isRemote() && user.isDriver())
                 driverCount++;
         }

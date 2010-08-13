@@ -82,7 +82,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     protected boolean pause = false;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected List<IActivityListener> listeners = new LinkedList<IActivityListener>();
 
@@ -239,9 +239,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         public boolean visit(IResourceDelta delta) {
 
-            assert sharedProject != null;
+            assert sarosSession != null;
 
-            if (!sharedProject.isDriver()) {
+            if (!sarosSession.isDriver()) {
                 return false;
             }
 
@@ -250,7 +250,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return true;
             }
 
-            if (!sharedProject.isShared(resource.getProject()))
+            if (!sarosSession.isShared(resource.getProject()))
                 return false;
 
             if (resource.isDerived()) {
@@ -278,12 +278,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
 
-                return new FolderActivity(sharedProject.getLocalUser(),
+                return new FolderActivity(sarosSession.getLocalUser(),
                     FolderActivity.Type.Created, new SPath(resource));
 
             case IResourceDelta.REMOVED:
 
-                return new FolderActivity(sharedProject.getLocalUser(),
+                return new FolderActivity(sarosSession.getLocalUser(),
                     FolderActivity.Type.Removed, new SPath(resource));
 
             default:
@@ -317,12 +317,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     IProject newProject = root.getProject(newPath.segment(0));
                     IProject oldProject = root.getProject(oldPath.segment(0));
 
-                    if (sharedProject.isShared(newProject)) {
-                        if (sharedProject.isShared(oldProject)) {
+                    if (sarosSession.isShared(newProject)) {
+                        if (sarosSession.isShared(oldProject)) {
                             // Moving inside the shared project
                             try {
                                 return FileActivity.moved(
-                                    sharedProject.getLocalUser(),
+                                    sarosSession.getLocalUser(),
                                     new SPath(newProject, newPath
                                         .removeFirstSegments(1)),
                                     new SPath(oldProject, oldPath
@@ -342,7 +342,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     } else {
                         // Moving away!
                         return FileActivity.removed(
-                            sharedProject.getLocalUser(), new SPath(resource),
+                            sarosSession.getLocalUser(), new SPath(resource),
                             Purpose.ACTIVITY);
                     }
                 }
@@ -362,7 +362,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
                     IProject newProject = root.getProject(newPath.segment(0));
 
-                    if (sharedProject.isShared(newProject)) {
+                    if (sarosSession.isShared(newProject)) {
                         // Ignore "REMOVED" while moving into shared project
                         return null;
                     }
@@ -370,7 +370,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     // others to delete! Fall-through...
                 }
 
-                return FileActivity.removed(sharedProject.getLocalUser(),
+                return FileActivity.removed(sarosSession.getLocalUser(),
                     new SPath(resource), Purpose.ACTIVITY);
 
             default:
@@ -396,8 +396,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
             log.debug("Resource " + resource.getName() + " changed");
             try {
-                return FileActivity.created(sharedProject.getLocalUser(),
-                    spath, Purpose.ACTIVITY);
+                return FileActivity.created(sarosSession.getLocalUser(), spath,
+                    Purpose.ACTIVITY);
             } catch (IOException e) {
                 log.warn("Resource could not be read for sending to peers:"
                     + resource.getLocation(), e);
@@ -443,21 +443,21 @@ public class SharedResourcesManager implements IResourceChangeListener,
     public ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
-            sharedProject.addActivityProvider(SharedResourcesManager.this);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
+            sarosSession.addActivityProvider(SharedResourcesManager.this);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
                 SharedResourcesManager.this);
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             ResourcesPlugin.getWorkspace().removeResourceChangeListener(
                 SharedResourcesManager.this);
 
-            assert sharedProject == project;
-            sharedProject.removeActivityProvider(SharedResourcesManager.this);
-            sharedProject = null;
+            assert sarosSession == oldSarosSession;
+            sarosSession.removeActivityProvider(SharedResourcesManager.this);
+            sarosSession = null;
         }
     };
 
@@ -608,7 +608,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     protected void exec(FileActivity activity) throws CoreException {
 
-        if (this.sharedProject == null) {
+        if (this.sarosSession == null) {
             log.warn("Project has ended for FileActivity " + activity);
             return;
         }
@@ -668,7 +668,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (activity.isRecovery()) {
 
             // The file contents has been replaced, now reset Jupiter
-            this.sharedProject.getConcurrentDocumentClient().reset(path);
+            this.sarosSession.getConcurrentDocumentClient().reset(path);
 
             this.consistencyWatchdogClient.performCheck(path);
         }

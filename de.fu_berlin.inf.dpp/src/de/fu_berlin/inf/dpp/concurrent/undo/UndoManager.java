@@ -53,8 +53,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -93,7 +93,7 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     protected SessionManager sessionManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected InclusionTransformation transformation = new GOTOInclusionTransformation();
 
@@ -263,21 +263,21 @@ public class UndoManager implements Disposable, IActivityProvider {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             undoHistory.clear();
-            project.addActivityProvider(UndoManager.this);
+            newSarosSession.addActivityProvider(UndoManager.this);
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
-            sharedProject = project;
+            UndoManager.this.sarosSession = newSarosSession;
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            project.removeActivityProvider(UndoManager.this);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            oldSarosSession.removeActivityProvider(UndoManager.this);
             undoHistory.clear();
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);
-            sharedProject = null;
+            UndoManager.this.sarosSession = null;
             currentLocalCompositeOperation = null;
             currentLocalAtomicOperation = null;
         }
@@ -363,10 +363,9 @@ public class UndoManager implements Disposable, IActivityProvider {
             } else {
                 if (!textEditActivityDataObject.getEditor().equals(
                     currentActiveEditor)) {
-                    log
-                        .error("Editor of the local TextEditActivity is not the current "
-                            + "active editor. Possibly the current active editor is not"
-                            + " up to date.");
+                    log.error("Editor of the local TextEditActivity is not the current "
+                        + "active editor. Possibly the current active editor is not"
+                        + " up to date.");
                     return;
                 }
                 updateCurrentLocalAtomicOperation(operation);
@@ -485,8 +484,8 @@ public class UndoManager implements Disposable, IActivityProvider {
         for (EditorHistoryEntry entry : undoHistory
             .entriesToLatestRedoable(editor)) {
 
-            redoOperation = transformation.transform(redoOperation, entry
-                .getOperation(), Boolean.TRUE);
+            redoOperation = transformation.transform(redoOperation,
+                entry.getOperation(), Boolean.TRUE);
         }
         undoHistory.replaceType(editor, lastUndo, Type.REDOABLE, Type.REMOTE);
         // it is not relevant any more, so it is set remote
@@ -508,8 +507,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivity activity : op.toTextEdit(editor, sharedProject
-            .getLocalUser())) {
+        for (TextEditActivity activity : op.toTextEdit(editor,
+            sarosSession.getLocalUser())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -519,8 +518,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivity activity : op.toTextEdit(editor, sharedProject
-            .getLocalUser())) {
+        for (TextEditActivity activity : op.toTextEdit(editor,
+            sarosSession.getLocalUser())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -580,8 +579,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             for (ITextOperation textOp : textOps) {
                 try {
                     if (textOp instanceof DeleteOperation)
-                        doc.replace(textOp.getPosition(), textOp
-                            .getTextLength(), "");
+                        doc.replace(textOp.getPosition(),
+                            textOp.getTextLength(), "");
                     if (textOp instanceof InsertOperation)
                         doc.replace(textOp.getPosition(), 0, textOp.getText());
                 } catch (BadLocationException e) {
@@ -633,8 +632,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         if (currentLocalCompositeOperation == null)
             return;
         if (currentActiveEditor == null) {
-            log
-                .warn("Cannot store current local operation. Current active editor is unknown");
+            log.warn("Cannot store current local operation. Current active editor is unknown");
             return;
         }
         undoHistory.add(currentActiveEditor, Type.LOCAL,

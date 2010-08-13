@@ -48,7 +48,7 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        setEnabled(sessionManager.getSharedProject() != null
+        setEnabled(sessionManager.getSarosSession() != null
             && getSelectedUser() != null);
     }
 

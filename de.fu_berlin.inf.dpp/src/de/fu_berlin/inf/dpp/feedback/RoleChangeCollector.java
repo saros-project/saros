@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
@@ -93,8 +93,8 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
                 e1 = e2;
             }
             // the last role lasted until now
-            processSingleRoleChange(e1.getKey(), System.currentTimeMillis(), e1
-                .getValue(), ++count);
+            processSingleRoleChange(e1.getKey(), System.currentTimeMillis(),
+                e1.getValue(), ++count);
 
             assert count == roles.size();
         } else {
@@ -131,8 +131,7 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
         long diffTime = getDiffTime(start, end);
 
         data.setRole(count, role.toString().toLowerCase());
-        data
-            .setRoleDuration(count, StatisticManager.getTimeInMinutes(diffTime));
+        data.setRoleDuration(count, StatisticManager.getTimeInMinutes(diffTime));
 
         // add diffTime depending on the role to the right accumulator
         if (role.equals(UserRole.OBSERVER)) {
@@ -162,16 +161,16 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         sessionStart = System.currentTimeMillis();
 
-        project.addListener(projectListener);
-        roles.put(sessionStart, project.getLocalUser().getUserRole());
+        sarosSession.addListener(projectListener);
+        roles.put(sessionStart, sarosSession.getLocalUser().getUserRole());
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
-        project.removeListener(projectListener);
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
+        sarosSession.removeListener(projectListener);
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
     }
 

@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
@@ -196,8 +196,8 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
         return null;
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new TextEditActivity(sharedProject.getUser(source), offset,
-            text, replacedText, editor.toSPath(sharedProject));
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new TextEditActivity(sarosSession.getUser(source), offset,
+            text, replacedText, editor.toSPath(sarosSession));
     }
 }

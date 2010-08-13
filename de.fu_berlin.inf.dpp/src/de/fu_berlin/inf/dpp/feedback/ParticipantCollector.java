@@ -3,15 +3,15 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -132,15 +132,15 @@ public class ParticipantCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
-        project.addListener(projectListener);
+    protected void doOnSessionStart(ISarosSession sarosSession) {
+        sarosSession.addListener(projectListener);
 
         sessionStart = System.currentTimeMillis();
         timeOfLastEvent = sessionStart;
 
         // add all users to the set and store the number of participants
-        users.addAll(project.getParticipants());
-        currentNumberOfParticipants = project.getParticipants().size();
+        users.addAll(sarosSession.getParticipants());
+        currentNumberOfParticipants = sarosSession.getParticipants().size();
 
         handleUserEvent(currentNumberOfParticipants);
 
@@ -149,8 +149,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
-        project.removeListener(projectListener);
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
+        sarosSession.removeListener(projectListener);
 
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
         handleUserEvent(currentNumberOfParticipants);

@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A JupiterClient manages Jupiter client docs for a single user with several
@@ -17,10 +17,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  */
 public class JupiterClient {
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
-    public JupiterClient(ISharedProject project) {
-        this.sharedProject = project;
+    public JupiterClient(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
     }
 
     /**
@@ -69,7 +69,7 @@ public class JupiterClient {
 
         SPath path = textEdit.getEditor();
         return get(path).generateJupiterActivity(textEdit.toOperation(),
-            sharedProject.getLocalUser(), path);
+            sarosSession.getLocalUser(), path);
     }
 
     /**

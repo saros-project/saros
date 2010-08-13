@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -111,9 +111,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
                 if (user == null) {
                     log.trace(String.format("Follow Mode was deactivated"));
                 } else {
-                    log
-                        .trace(String
-                            .format("Now following %s ", user.getJID()));
+                    log.trace(String.format("Now following %s ", user.getJID()));
                 }
             }
 
@@ -121,8 +119,8 @@ public class FollowModeCollector extends AbstractStatisticCollector {
              * when followModeChanged was fired, create a new followModeToggle
              * event
              */
-            FollowModeToggleEvent event = new FollowModeToggleEvent(System
-                .currentTimeMillis(), followModeEnabled);
+            FollowModeToggleEvent event = new FollowModeToggleEvent(
+                System.currentTimeMillis(), followModeEnabled);
             /*
              * store the event in an array list
              */
@@ -215,13 +213,13 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         // get starting time of session
         sessionStart = System.currentTimeMillis();
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         // get the time the session ended
         sessionEnd = System.currentTimeMillis();
     }

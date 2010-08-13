@@ -40,13 +40,12 @@ import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
@@ -54,7 +53,7 @@ import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPr
 /**
  * MessagingManager manages the multi user chat (MUC). It's responsible for
  * creating and maintaining the connection to the chat room. <br>
- * Add a {@link IChatListener} to get notified of chat events.
+ * Add a {@link MessagingManager.IChatListener} to get notified of chat events.
  * 
  * @author rdjemili
  * @author ahaferburg
@@ -62,6 +61,17 @@ import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPr
 @Component(module = "net")
 public class MessagingManager implements IConnectionListener,
     InvitationListener {
+
+    /**
+     * Listener for incoming chat messages.
+     */
+    public interface IChatListener {
+        public void chatMessageAdded(String sender, String message);
+
+        public void chatJoined();
+
+        public void chatLeft();
+    }
 
     private static final Logger log = Logger.getLogger(MessagingManager.class);
 
@@ -97,13 +107,13 @@ public class MessagingManager implements IConnectionListener,
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionEnded(ISharedProject session) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             sessionStarted = false;
             checkChatState();
         }
 
         @Override
-        public void sessionStarted(ISharedProject session) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             sessionStarted = true;
             checkChatState();
         }
@@ -290,17 +300,6 @@ public class MessagingManager implements IConnectionListener,
 
     }
 
-    /**
-     * Listener for incoming chat messages.
-     */
-    public interface IChatListener {
-        public void chatMessageAdded(String sender, String message);
-
-        public void chatJoined();
-
-        public void chatLeft();
-    }
-
     public MessagingManager(Saros saros, SessionManager sessionManager) {
         log.setLevel(Level.DEBUG);
         saros.addListener(this);
@@ -394,10 +393,10 @@ public class MessagingManager implements IConnectionListener,
     }
 
     protected CommunicationPreferences getComPrefs() {
-        ISharedProject sharedProject = sessionManager.getSharedProject();
-        if (sharedProject == null)
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
             return null;
-        if (sharedProject.isHost()) {
+        if (sarosSession.isHost()) {
             return comNegotiatingManager.getOwnPrefs();
         } else {
             return comNegotiatingManager.getSessionPrefs();

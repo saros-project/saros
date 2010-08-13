@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -68,9 +68,9 @@ public class RequestForActivityHandler {
         public void requestForResendingActivitiesReceived(JID fromJID,
             int sequenceNumber, boolean andUp) {
 
-            ISharedProject sharedProject = sessionManager.getSharedProject();
+            ISarosSession sarosSession = sessionManager.getSarosSession();
 
-            if (sharedProject.getUser(fromJID) == null) {
+            if (sarosSession.getUser(fromJID) == null) {
                 log
                     .warn("Received Request for activityDataObject from user which"
                         + " is not part of our shared project session: "
@@ -78,7 +78,7 @@ public class RequestForActivityHandler {
                 return;
             }
 
-            List<TimedActivityDataObject> activities = sharedProject
+            List<TimedActivityDataObject> activities = sarosSession
                 .getSequencer().getActivityHistory(fromJID, sequenceNumber,
                     andUp);
 

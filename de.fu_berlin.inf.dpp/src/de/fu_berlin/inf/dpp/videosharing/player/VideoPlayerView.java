@@ -72,11 +72,11 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
-import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity;
-import de.fu_berlin.inf.dpp.videosharing.activities.MouseWheeledVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity.Button;
+import de.fu_berlin.inf.dpp.videosharing.activities.MouseWheeledVideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
 

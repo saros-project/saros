@@ -25,7 +25,7 @@ import org.joda.time.Duration;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -78,13 +78,13 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         localSessionEnd = new DateTime();
-        isHost = project.getLocalUser().isHost();
+        isHost = sarosSession.getLocalUser().isHost();
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         currentSessionID = sessionID.getValue();
         localSessionStart = new DateTime();
     }

@@ -10,7 +10,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -47,9 +47,9 @@ public class DirtyStateListener implements IElementStateListener {
             return;
 
         final IFile file = ((FileEditorInput) element).getFile();
-        final ISharedProject sharedProject = editorManager.sharedProject;
+        final ISarosSession sarosSession = editorManager.sarosSession;
 
-        if (sharedProject == null || !sharedProject.isShared(file.getProject())) {
+        if (sarosSession == null || !sarosSession.isShared(file.getProject())) {
             return;
         }
 

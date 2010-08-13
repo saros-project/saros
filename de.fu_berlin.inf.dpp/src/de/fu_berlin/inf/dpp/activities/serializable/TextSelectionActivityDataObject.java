@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivityDataObject extends AbstractActivityDataObject {
@@ -102,8 +102,8 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
             + this.editor + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new TextSelectionActivity(sharedProject.getUser(source), offset,
-            length, editor.toSPath(sharedProject));
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new TextSelectionActivity(sarosSession.getUser(source), offset,
+            length, editor.toSPath(sarosSession));
     }
 }

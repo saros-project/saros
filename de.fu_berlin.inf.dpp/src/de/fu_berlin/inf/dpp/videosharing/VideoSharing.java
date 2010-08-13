@@ -43,15 +43,15 @@ import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
-import de.fu_berlin.inf.dpp.videosharing.activities.SessionVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.SessionVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.DecoderInitializationException;
@@ -89,7 +89,7 @@ public class VideoSharing {
     @Inject
     protected SarosUI sarosUI;
     @Inject
-    protected SharedProjectObservable sharedProjectObservable;
+    protected SarosSessionObservable sarosSessionObservable;
 
     protected Saros saros;
     protected IPreferenceStore preferences;
@@ -198,7 +198,7 @@ public class VideoSharing {
             connectionFactory = new ConnectionFactory(streamSession,
                 Mode.CLIENT);
             videoSharingSessionObservable.setValue(new VideoSharingSession(
-                streamSession, connectionFactory, sharedProjectObservable
+                streamSession, connectionFactory, sarosSessionObservable
                     .getValue().getUser(streamSession.getRemoteJID())));
         } catch (IOException e) {
             log.error("Could not create session: ", e);

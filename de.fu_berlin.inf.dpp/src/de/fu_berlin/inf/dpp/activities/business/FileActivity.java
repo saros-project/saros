@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class FileActivity extends AbstractActivity implements IResourceActivity {
 
@@ -250,10 +250,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return Purpose.RECOVERY.equals(purpose);
     }
 
-    public IActivityDataObject getActivityDataObject(ISharedProject project) {
-        return new FileActivityDataObject(source.getJID(), type,
-            newPath.toSPathDataObject(project),
-            (oldPath != null ? oldPath.toSPathDataObject(project) : null),
-            data, purpose);
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+        return new FileActivityDataObject(source.getJID(), type, newPath
+            .toSPathDataObject(sarosSession), (oldPath != null ? oldPath
+            .toSPathDataObject(sarosSession) : null), data, purpose);
     }
 }

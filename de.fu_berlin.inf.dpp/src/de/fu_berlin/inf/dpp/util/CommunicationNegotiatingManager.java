@@ -8,8 +8,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
@@ -47,7 +47,7 @@ public class CommunicationNegotiatingManager {
 
     protected CommunicationPreferences comPrefs;
 
-    protected SharedProjectObservable sharedProjectObservable;
+    protected SarosSessionObservable sarosSessionObservable;
 
     protected String randomPassword;
 
@@ -56,12 +56,12 @@ public class CommunicationNegotiatingManager {
 
     public CommunicationNegotiatingManager(final Saros saros,
         XMPPTransmitter transmitter, SessionIDObservable sessionID,
-        final SharedProjectObservable sharedProjectObservable) {
+        final SarosSessionObservable sarosSessionObservable) {
 
         this.saros = saros;
         this.transmitter = transmitter;
         this.sessionID = sessionID;
-        this.sharedProjectObservable = sharedProjectObservable;
+        this.sarosSessionObservable = sarosSessionObservable;
 
         randomPassword = new Random().nextInt() + "";
         log.debug("Generated Chat room password: " + randomPassword);

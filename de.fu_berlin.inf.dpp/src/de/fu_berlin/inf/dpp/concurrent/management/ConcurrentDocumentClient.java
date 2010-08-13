@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject.QueueItem;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -39,7 +39,7 @@ public class ConcurrentDocumentClient implements Disposable {
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentClient.class);
 
-    protected final ISharedProject sharedProject;
+    protected final ISarosSession sarosSession;
 
     protected final JupiterClient jupiterClient;
 
@@ -47,17 +47,17 @@ public class ConcurrentDocumentClient implements Disposable {
 
     protected final ISharedProjectListener projectListener;
 
-    public ConcurrentDocumentClient(ISharedProject sharedProject) {
+    public ConcurrentDocumentClient(ISarosSession sarosSession) {
 
-        this.sharedProject = sharedProject;
-        this.host = sharedProject.getHost();
-        this.jupiterClient = new JupiterClient(sharedProject);
+        this.sarosSession = sarosSession;
+        this.host = sarosSession.getHost();
+        this.jupiterClient = new JupiterClient(sarosSession);
         this.projectListener = new ClientSideProjectListener();
-        sharedProject.addListener(projectListener);
+        sarosSession.addListener(projectListener);
     }
 
     public void dispose() {
-        sharedProject.removeListener(projectListener);
+        sarosSession.removeListener(projectListener);
     }
 
     /**
@@ -71,7 +71,7 @@ public class ConcurrentDocumentClient implements Disposable {
         public void roleChanged(User user) {
 
             // Host always keeps his client docs
-            if (sharedProject.isHost())
+            if (sarosSession.isHost())
                 return;
 
             // Clear clientdocs
@@ -110,8 +110,8 @@ public class ConcurrentDocumentClient implements Disposable {
              * because they are not notified by
              * receiveJupiterActivityHostSide(...).
              */
-            if (sharedProject.isHost()) {
-                result.add(new QueueItem(sharedProject.getRemoteObservers(),
+            if (sarosSession.isHost()) {
+                result.add(new QueueItem(sarosSession.getRemoteObservers(),
                     activityDataObject));
             }
         } else if (activityDataObject instanceof ChecksumActivity) {
@@ -120,18 +120,18 @@ public class ConcurrentDocumentClient implements Disposable {
             /**
              * Only the host can generate Checksums
              */
-            assert sharedProject.isHost();
+            assert sarosSession.isHost();
 
             // Send Jupiter specific checksum to ConcurrentDocumentServer
             result.add(new QueueItem(host, jupiterClient
                 .withTimestamp(checksumActivityDataObject)));
 
             // Send general checksum to all observers
-            result.add(new QueueItem(sharedProject.getRemoteObservers(),
+            result.add(new QueueItem(sarosSession.getRemoteObservers(),
                 checksumActivityDataObject));
 
         } else {
-            result.add(new QueueItem(sharedProject.getRemoteUsers(),
+            result.add(new QueueItem(sarosSession.getRemoteUsers(),
                 activityDataObject));
         }
         return result;
@@ -155,7 +155,7 @@ public class ConcurrentDocumentClient implements Disposable {
 
         assert Util.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
 
-        TransformationResult result = new TransformationResult(sharedProject
+        TransformationResult result = new TransformationResult(sarosSession
             .getLocalUser());
 
         for (IActivity activityDataObject : activityDataObjects) {
@@ -166,7 +166,7 @@ public class ConcurrentDocumentClient implements Disposable {
                     result
                         .addAll(receiveActivity((JupiterActivity) activityDataObject));
                 } else if (activityDataObject instanceof ChecksumActivity
-                    && sharedProject.isDriver()) {
+                    && sarosSession.isDriver()) {
                     result
                         .addAll(receiveChecksum((ChecksumActivity) activityDataObject));
                 } else {
@@ -186,7 +186,7 @@ public class ConcurrentDocumentClient implements Disposable {
      */
     protected TransformationResult receiveChecksum(ChecksumActivity activity) {
 
-        TransformationResult result = new TransformationResult(sharedProject
+        TransformationResult result = new TransformationResult(sarosSession
             .getLocalUser());
 
         try {
@@ -215,7 +215,7 @@ public class ConcurrentDocumentClient implements Disposable {
     protected TransformationResult receiveActivity(
         JupiterActivity jupiterActivity) {
 
-        TransformationResult result = new TransformationResult(sharedProject
+        TransformationResult result = new TransformationResult(sarosSession
             .getLocalUser());
 
         Operation op;
@@ -235,8 +235,8 @@ public class ConcurrentDocumentClient implements Disposable {
         }
 
         // Send text edits to all observers
-        if (sharedProject.isHost()) {
-            List<User> observers = sharedProject.getObservers();
+        if (sarosSession.isHost()) {
+            List<User> observers = sarosSession.getObservers();
             observers.remove(host);
             for (IActivity activity : result.executeLocally) {
                 result.add(new QueueItem(observers, activity));

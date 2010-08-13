@@ -32,11 +32,10 @@ import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -58,9 +57,9 @@ public class StopManager implements IActivityProvider, Disposable {
     protected ObservableValue<Boolean> blocked = new ObservableValue<Boolean>(
         false);
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
-    SharedProjectObservable sharedProjectObservable;
+    SarosSessionObservable sarosSessionObservable;
 
     /**
      * Maps a User to a List of his StartHandles. Never touch this directly, use
@@ -87,27 +86,27 @@ public class StopManager implements IActivityProvider, Disposable {
     protected Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
 
-    protected ValueChangeListener<SharedProject> sharedProjectObserver = new ValueChangeListener<SharedProject>() {
-        public void setValue(SharedProject newSharedProject) {
+    protected ValueChangeListener<ISarosSession> sharedProjectObserver = new ValueChangeListener<ISarosSession>() {
+        public void setValue(ISarosSession newSharedProject) {
 
-            if (newSharedProject == sharedProject)
+            if (newSharedProject == sarosSession)
                 return;
 
             // session ended, start all local start handles
-            if (newSharedProject == null && sharedProject != null) {
-                for (StartHandle startHandle : getStartHandles(sharedProject
+            if (newSharedProject == null && sarosSession != null) {
+                for (StartHandle startHandle : getStartHandles(sarosSession
                     .getLocalUser())) {
                     startHandle.start();
                 }
                 lockProject(false);
             }
 
-            if (sharedProject != null) {
-                sharedProject.removeActivityProvider(StopManager.this);
+            if (sarosSession != null) {
+                sarosSession.removeActivityProvider(StopManager.this);
                 reset();
             }
 
-            sharedProject = newSharedProject;
+            sarosSession = newSharedProject;
 
             if (newSharedProject != null) {
                 newSharedProject.addActivityProvider(StopManager.this);
@@ -115,23 +114,22 @@ public class StopManager implements IActivityProvider, Disposable {
         }
     };
 
-    public StopManager(SharedProjectObservable observable) {
+    public StopManager(SarosSessionObservable sarosSessionObservable) {
 
-        this.sharedProjectObservable = observable;
-        observable.add(sharedProjectObserver);
+        this.sarosSessionObservable = sarosSessionObservable;
+        sarosSessionObservable.add(sharedProjectObserver);
     }
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
-
         @Override
         public void receive(final StopActivity stopActivity) {
 
-            if (sharedProject == null)
+            if (sarosSession == null)
                 throw new IllegalStateException(
                     "Cannot receive StopActivities without a shared project");
 
             User user = stopActivity.getRecipient();
-            if (!user.isInSharedProject() || user.isRemote())
+            if (!user.isInSarosSession() || user.isRemote())
                 throw new IllegalArgumentException(
                     "Received StopActivity which is not for the local user");
 
@@ -148,7 +146,7 @@ public class StopManager implements IActivityProvider, Disposable {
                         public void run() {
                             lockProject(true);
                             fireActivity(stopActivity
-                                .generateAcknowledgment(sharedProject
+                                .generateAcknowledgment(sarosSession
                                     .getLocalUser()));
                         }
                     });
@@ -182,7 +180,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     executeUnlock(generateStartHandle(stopActivity));
                     // sends an acknowledgment
                     fireActivity(stopActivity
-                        .generateAcknowledgment(sharedProject.getLocalUser()));
+                        .generateAcknowledgment(sarosSession.getLocalUser()));
                     return;
                 }
 
@@ -241,8 +239,8 @@ public class StopManager implements IActivityProvider, Disposable {
             Util.runSafeAsync(log, new Runnable() {
                 public void run() {
                     try {
-                        StartHandle startHandle = stop(user, cause, SubMonitor
-                            .convert(new NullProgressMonitor()));
+                        StartHandle startHandle = stop(user, cause,
+                            SubMonitor.convert(new NullProgressMonitor()));
                         // FIXME Race Condition: startHandle was not added yet
                         // in case of cancellation
                         resultingHandles.add(startHandle);
@@ -253,8 +251,7 @@ public class StopManager implements IActivityProvider, Disposable {
                         log.debug("User canceled the Stopping");
                         monitor.setCanceled(true);
                     } catch (InterruptedException e) {
-                        log
-                            .debug("Canceling because of an InterruptedException");
+                        log.debug("Canceling because of an InterruptedException");
                         monitor.setCanceled(true);
                     }
                 }
@@ -265,14 +262,12 @@ public class StopManager implements IActivityProvider, Disposable {
                 // waiting for all startHandles
                 doneSignal.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                log
-                    .error("Stopping was interrupted. Not all users could successfully be stopped.");
+                log.error("Stopping was interrupted. Not all users could successfully be stopped.");
             }
         }
         if (monitor.isCanceled()) {
             // Restart the already stopped users
-            log
-                .debug("Monitor was canceled. Restarting already stopped users.");
+            log.debug("Monitor was canceled. Restarting already stopped users.");
             for (StartHandle startHandle : resultingHandles)
                 startHandle.start();
             throw new CancellationException();
@@ -306,12 +301,12 @@ public class StopManager implements IActivityProvider, Disposable {
     public StartHandle stop(User user, String cause, final SubMonitor progress)
         throws CancellationException, InterruptedException {
 
-        if (sharedProject == null)
+        if (sarosSession == null)
             throw new IllegalStateException(
                 "Stop cannot be called without a shared project");
 
         // Creating StopActivity for asking user to stop
-        User localUser = sharedProject.getLocalUser();
+        User localUser = sarosSession.getLocalUser();
         final StopActivity stopActivity = new StopActivity(localUser,
             localUser, user, Type.LOCKREQUEST, State.INITIATED,
             new SimpleDateFormat("HHmmssSS").format(new Date())
@@ -406,7 +401,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 + " couldn't be removed because it doesn't exist any more.");
         }
 
-        int remainingHandles = getStartHandles(sharedProject.getLocalUser())
+        int remainingHandles = getStartHandles(sarosSession.getLocalUser())
             .size();
         if (remainingHandles > 0) {
             log.debug(remainingHandles + " startHandles remaining.");
@@ -427,7 +422,7 @@ public class StopManager implements IActivityProvider, Disposable {
      *            the startHandle whose start() initiated the unlocking
      */
     public void initiateUnlock(StartHandle handle) {
-        if (sharedProject == null)
+        if (sarosSession == null)
             throw new IllegalStateException(
                 "Cannot initiate unlock without a shared project");
 
@@ -439,9 +434,10 @@ public class StopManager implements IActivityProvider, Disposable {
 
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
-        final StopActivity activity = new StopActivity(sharedProject
-            .getLocalUser(), sharedProject.getLocalUser(), handle.getUser(),
-            Type.UNLOCKREQUEST, State.INITIATED, handle.getHandleID());
+        final StopActivity activity = new StopActivity(
+            sarosSession.getLocalUser(), sarosSession.getLocalUser(),
+            handle.getUser(), Type.UNLOCKREQUEST, State.INITIATED,
+            handle.getHandleID());
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -474,11 +470,11 @@ public class StopManager implements IActivityProvider, Disposable {
     public void fireActivity(StopActivity stopActivity) {
 
         User recipient = stopActivity.getRecipient();
-        if (!recipient.isInSharedProject())
+        if (!recipient.isInSarosSession())
             throw new IllegalArgumentException("StopActivity contains"
                 + " recipient which already left: " + stopActivity);
 
-        sharedProject.sendActivity(recipient, stopActivity);
+        sarosSession.sendActivity(recipient, stopActivity);
     }
 
     /**
@@ -524,7 +520,7 @@ public class StopManager implements IActivityProvider, Disposable {
     }
 
     public void dispose() {
-        sharedProjectObservable.remove(sharedProjectObserver);
+        sarosSessionObservable.remove(sharedProjectObserver);
     }
 
     protected void reset() {

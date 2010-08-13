@@ -16,7 +16,7 @@ limitations under the License.
 
 package de.fu_berlin.inf.dpp.videosharing.encode.tools;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 
 /**

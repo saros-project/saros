@@ -13,11 +13,11 @@ public abstract class AbstractSessionListener implements ISessionListener {
         // do nothing
     }
 
-    public void sessionEnded(ISharedProject oldSharedProject) {
+    public void sessionEnded(ISarosSession oldSarosSession) {
         // do nothing
     }
 
-    public void sessionStarted(ISharedProject newSharedProject) {
+    public void sessionStarted(ISarosSession newSarosSession) {
         // do nothing
     }
 }

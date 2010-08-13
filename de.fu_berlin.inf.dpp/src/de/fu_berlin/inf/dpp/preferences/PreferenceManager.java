@@ -9,14 +9,14 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator.IRestorePoint;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * The Preference Manager is responsible for
  * 
  * a.) changing dangerous preferences on the host or client before a
- * SharedProject session is started
+ * SarosSession session is started
  * 
  * b.) restoring the preference after the end of the session
  * 
@@ -44,11 +44,11 @@ public class PreferenceManager {
         sessionManager.addSessionListener(new AbstractSessionListener() {
 
             @Override
-            public void sessionStarted(ISharedProject session) {
+            public void sessionStarted(ISarosSession newSarosSession) {
 
                 // TODO The user should be told that we are changing options...
-                for (IProject project : session.getProjects()) {
-                    if (session.isHost()) {
+                for (IProject project : newSarosSession.getProjects()) {
+                    if (newSarosSession.isHost()) {
                         for (IPreferenceManipulator manipulator : manipulators) {
                             if (manipulator.isDangerousForHost()
                                 && manipulator.isEnabled(project)) {
@@ -67,7 +67,7 @@ public class PreferenceManager {
             }
 
             @Override
-            public void sessionEnded(ISharedProject session) {
+            public void sessionEnded(ISarosSession oldSarosSession) {
                 // TODO we should monitor the preferences for changes during the
                 // session
                 for (IRestorePoint restorePoint : restorePoints) {

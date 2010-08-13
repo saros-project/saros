@@ -18,13 +18,13 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
-import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
@@ -90,8 +90,8 @@ public class VoIPAction extends Action {
         if (selectedUser == null)
             return false;
 
-        ISharedProject project = sessionManager.getSharedProject();
-        if (project == null)
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
             return false;
 
         return !selectedUser.isLocal();

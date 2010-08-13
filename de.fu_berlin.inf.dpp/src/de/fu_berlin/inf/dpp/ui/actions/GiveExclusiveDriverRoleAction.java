@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -41,16 +41,17 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
-            sharedProject.removeListener(projectListener);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            newSarosSession.addListener(projectListener);
             updateEnablement();
         }
 
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
-            sharedProject.addListener(projectListener);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            oldSarosSession.removeListener(projectListener);
             updateEnablement();
         }
+
     };
 
     public GiveExclusiveDriverRoleAction(SessionManager sessionManager,
@@ -80,10 +81,10 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
     public void runGiveExclusiveDriver() {
 
-        ISharedProject project = sessionManager.getSharedProject();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
 
         // set all participants other than the selected to observer
-        for (User user : project.getParticipants()) {
+        for (User user : sarosSession.getParticipants()) {
             if ((user.isDriver() && !user.equals(this.selectedUser))) {
                 sarosUI.performRoleChange(user, UserRole.OBSERVER);
             }
@@ -112,15 +113,16 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
             return false;
 
         // Not in a shared project
-        ISharedProject project = sessionManager.getSharedProject();
-        if (project == null)
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
             return false;
 
         // Only the host can use this action
-        if (!project.isHost())
+        if (!sarosSession.isHost())
             return false;
 
         // Only enable if the user is observer or there is more than one driver
-        return this.selectedUser.isObserver() || !project.isExclusiveDriver();
+        return this.selectedUser.isObserver()
+            || !sarosSession.isExclusiveDriver();
     }
 }

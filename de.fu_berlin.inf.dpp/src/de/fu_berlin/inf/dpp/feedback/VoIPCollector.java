@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.communication.audio.AbstractAudioServiceListener;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.IAudioServiceListener;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -153,8 +153,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
          * call to getPercentage to store percentage of time spent in VoIP
          * sessions in respect to the total session time.
          */
-        data
-            .setVoIPPercentage(getPercentage(timeInVoIPSession, sessionDuration));
+        data.setVoIPPercentage(getPercentage(timeInVoIPSession, sessionDuration));
 
         /*
          * store the total number of established VoIP sessions in session data.
@@ -190,13 +189,13 @@ public class VoIPCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         // get starting time of session
         sessionStart = System.currentTimeMillis();
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         // get the time the session ended
         sessionEnd = System.currentTimeMillis();
     }

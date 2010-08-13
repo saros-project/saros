@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -31,13 +31,13 @@ public abstract class AbstractStatisticCollector {
      */
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject project) {
-            doOnSessionStart(project);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            doOnSessionStart(newSarosSession);
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            doOnSessionEnd(project);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            doOnSessionEnd(oldSarosSession);
             notifyCollectionCompleted();
             clearPreviousData();
         }
@@ -106,18 +106,18 @@ public abstract class AbstractStatisticCollector {
 
     /**
      * Clients can add their code here that should be executed on session start. <br>
-     * doOnSessionStart(ISharedProject) and
-     * {@link #doOnSessionEnd(ISharedProject)} are guaranteed to be called in
+     * doOnSessionStart(ISarosSession) and
+     * {@link #doOnSessionEnd(ISarosSession)} are guaranteed to be called in
      * matching pairs with the same project.
      */
-    protected abstract void doOnSessionStart(ISharedProject project);
+    protected abstract void doOnSessionStart(ISarosSession sarosSession);
 
     /**
      * Clients can add their code here that should be executed on session end. <br>
-     * {@link #doOnSessionStart(ISharedProject)} and
-     * doOnSessionEnd(ISharedProject) are guaranteed to be called in matching
+     * {@link #doOnSessionStart(ISarosSession)} and
+     * doOnSessionEnd(ISarosSession) are guaranteed to be called in matching
      * pairs with the same project.
      */
-    protected abstract void doOnSessionEnd(ISharedProject project);
+    protected abstract void doOnSessionEnd(ISarosSession sarosSession);
 
 }

@@ -15,8 +15,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
@@ -31,7 +31,7 @@ public class RoleManager implements IActivityProvider {
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    private ISharedProject sharedProject;
+    private ISarosSession sarosSession;
 
     private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
@@ -74,18 +74,18 @@ public class RoleManager implements IActivityProvider {
     public final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
-            sharedProject.addListener(sharedProjectListener);
-            sharedProject.addActivityProvider(RoleManager.this);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
+            sarosSession.addListener(sharedProjectListener);
+            sarosSession.addActivityProvider(RoleManager.this);
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            assert sharedProject == project;
-            sharedProject.removeListener(sharedProjectListener);
-            sharedProject.removeActivityProvider(RoleManager.this);
-            sharedProject = null;
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            assert sarosSession == oldSarosSession;
+            sarosSession.removeListener(sharedProjectListener);
+            sarosSession.removeActivityProvider(RoleManager.this);
+            sarosSession = null;
         }
     };
 
@@ -116,12 +116,12 @@ public class RoleManager implements IActivityProvider {
         if (activity instanceof RoleActivity) {
             RoleActivity roleActivity = (RoleActivity) activity;
             User user = roleActivity.getAffectedUser();
-            if (!user.isInSharedProject()) {
+            if (!user.isInSarosSession()) {
                 throw new IllegalArgumentException("User " + user
                     + " is not a participant in this shared project");
             }
             UserRole role = roleActivity.getRole();
-            this.sharedProject.setUserRole(user, role);
+            this.sarosSession.setUserRole(user, role);
         }
     }
 }

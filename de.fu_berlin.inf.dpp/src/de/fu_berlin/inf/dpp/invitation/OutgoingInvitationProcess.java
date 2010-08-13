@@ -58,7 +58,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
@@ -82,7 +82,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
     protected final static Random INVITATION_RAND = new Random();
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     /**
      * This OutgoingInvitation is about the following IProject
@@ -114,7 +114,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected boolean doStream = false;
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-        ISharedProject sharedProject, List<IResource> partialProjectResources,
+        ISarosSession sarosSession, List<IResource> partialProjectResources,
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
@@ -123,7 +123,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         super(transmitter, to, description, colorID, invitationProcesses);
 
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.partialProjectResources = partialProjectResources;
         this.versionManager = versionManager;
         this.stopManager = stopManager;
@@ -302,9 +302,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
         transmitter.sendInvitation(
-            sharedProject.getProjectMapper().getID(this.project), peer,
+            sarosSession.getProjectMapper().getID(this.project), peer,
             description, colorID, hostVersionInfo, invitationID,
-            sharedProject.getSessionStart(), doStream, comPrefs);
+            sarosSession.getSessionStart(), doStream, comPrefs);
 
         subMonitor.worked(25);
         subMonitor
@@ -346,7 +346,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Waiting for remote file list...");
 
         subMonitor.setTaskName("Creating file list...");
-        boolean useVersionControl = sharedProject.useVersionControl();
+        boolean useVersionControl = sarosSession.useVersionControl();
         FileList localFileList;
         try {
             if (partialProjectResources != null) {
@@ -404,7 +404,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
          * someone is already stopped.
          */
         Collection<User> usersToStop = new ArrayList<User>();
-        for (User user : sharedProject.getParticipants()) {
+        for (User user : sarosSession.getParticipants()) {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
@@ -412,7 +412,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
-        synchronized (sharedProject) {
+        synchronized (sarosSession) {
             startHandles = stopManager.stop(usersToStop,
                 "Synchronizing invitation",
                 subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
@@ -447,9 +447,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             }
             archiveMonitor.done();
 
-            synchronized (sharedProject) {
-                User newUser = new User(sharedProject, peer, colorID);
-                this.sharedProject.addUser(newUser);
+            synchronized (sarosSession) {
+                User newUser = new User(sarosSession, peer, colorID);
+                this.sarosSession.addUser(newUser);
                 log.debug(Util.prefix(peer) + " added to project, colorID: "
                     + colorID);
                 synchronizeUserList();
@@ -496,7 +496,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
          * someone is already stopped.
          */
         Collection<User> usersToStop = new ArrayList<User>();
-        for (User user : sharedProject.getParticipants()) {
+        for (User user : sarosSession.getParticipants()) {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
@@ -504,7 +504,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
-        synchronized (sharedProject) {
+        synchronized (sarosSession) {
             startHandles = stopManager.stop(usersToStop,
                 "Synchronizing invitation",
                 subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
@@ -520,9 +520,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // throw new LocalCancellationException();
 
             User newUser = null;
-            synchronized (sharedProject) {
-                newUser = new User(sharedProject, peer, colorID);
-                this.sharedProject.addUser(newUser);
+            synchronized (sarosSession) {
+                newUser = new User(sarosSession, peer, colorID);
+                this.sarosSession.addUser(newUser);
                 log.debug(Util.prefix(peer) + " added to project, colorID: "
                     + colorID);
                 synchronizeUserList();
@@ -647,8 +647,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Notifying participants that the invitation is complete.");
 
         subMonitor.setTaskName("Completing invitation...");
-        synchronized (sharedProject) {
-            sharedProject.userInvitationCompleted(sharedProject.getUser(peer));
+        synchronized (sarosSession) {
+            sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             synchronizeUserList();
         }
         subMonitor.setTaskName("Invitation has completed successfully.");
@@ -662,20 +662,20 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
-            + sharedProject.getParticipants());
+            + sarosSession.getParticipants());
 
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();
 
-        for (User user : sharedProject.getRemoteUsers()) {
+        for (User user : sarosSession.getRemoteUsers()) {
             transmitter.sendUserList(user.getJID(), invitationID,
-                sharedProject.getParticipants());
+                sarosSession.getParticipants());
         }
 
         log.debug("Inv" + Util.prefix(peer)
             + ": Waiting for user list confirmations...");
         transmitter.receiveUserListConfirmation(userListConfirmationCollector,
-            sharedProject.getRemoteUsers(), monitor);
+            sarosSession.getRemoteUsers(), monitor);
         log.debug("Inv" + Util.prefix(peer)
             + ": All user list confirmations have arrived.");
     }
@@ -805,7 +805,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                 cancellationCause);
             monitor.setTaskName("Invitation failed.");
         }
-        sharedProject.returnColor(this.colorID);
+        sarosSession.returnColor(this.colorID);
         invitationProcesses.removeInvitationProcess(this);
         throw cancellationCause;
     }

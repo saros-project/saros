@@ -4,7 +4,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
- * Observable containing the ID of the SharedProject in which the local user is
+ * Observable containing the ID of the SarosSession in which the local user is
  * currently participating or is currently joining (during an invitation).
  * 
  * If not in an invitation or shared project session the value of this

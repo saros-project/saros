@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A {@link ProgressActivityDataObject} is used for communicating
@@ -48,9 +48,9 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
             + ",action:" + action + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
+    public IActivity getActivity(ISarosSession sarosSession) {
 
-        User user = sharedProject.getUser(source);
+        User user = sarosSession.getUser(source);
         if (user == null)
             throw new IllegalArgumentException("User is not in shared project");
 

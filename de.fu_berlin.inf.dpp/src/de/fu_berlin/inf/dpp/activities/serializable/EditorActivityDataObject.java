@@ -26,10 +26,10 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A text load activityDataObject activates a new resource. If the path is
@@ -112,8 +112,8 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
             + (this.path != null ? this.path : "no path") + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new EditorActivity(sharedProject.getUser(source), type,
-            (path != null ? path.toSPath(sharedProject) : null));
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new EditorActivity(sarosSession.getUser(source), type,
+            (path != null ? path.toSPath(sarosSession) : null));
     }
 }

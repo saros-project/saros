@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class ViewportActivity extends AbstractActivity {
 
@@ -100,8 +100,8 @@ public class ViewportActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject(ISharedProject project) {
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ViewportActivityDataObject(source.getJID(), topIndex,
-            bottomIndex, path.toSPathDataObject(project));
+            bottomIndex, path.toSPathDataObject(sarosSession));
     }
 }

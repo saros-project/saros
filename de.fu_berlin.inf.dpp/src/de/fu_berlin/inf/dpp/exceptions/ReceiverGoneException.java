@@ -19,11 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.exceptions;
 
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 /**
  * Streaming operation can not be performed because the remote side left the
- * {@link SharedProject}.
+ * Saros session.
  */
 public class ReceiverGoneException extends StreamException {
     private static final long serialVersionUID = -1412124068087348413L;

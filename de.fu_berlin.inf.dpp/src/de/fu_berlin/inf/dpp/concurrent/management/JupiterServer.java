@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A JupiterServer manages Jupiter server instances for a number of users AND
@@ -27,10 +27,10 @@ public class JupiterServer {
      */
     protected HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
 
-    private ISharedProject project;
+    private ISarosSession sarosSession;
 
-    public JupiterServer(ISharedProject project) {
-        this.project = project;
+    public JupiterServer(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
     }
 
     public synchronized void removePath(SPath path) {
@@ -63,10 +63,10 @@ public class JupiterServer {
             docServer = new JupiterDocumentServer(path);
 
             // Create new local host document client
-            docServer.addProxyClient(project.getHost().getJID());
+            docServer.addProxyClient(sarosSession.getHost().getJID());
 
             // Add all drivers
-            for (User driver : project.getDrivers()) {
+            for (User driver : sarosSession.getDrivers()) {
                 docServer.addProxyClient(driver.getJID());
             }
 

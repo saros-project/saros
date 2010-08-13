@@ -39,8 +39,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
@@ -85,7 +85,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     @Inject
     protected RemoteProgressManager remoteProgressManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
 
@@ -106,32 +106,31 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         };
 
         @Override
-        public void sessionEnded(ISharedProject oldSharedProject) {
-
-            oldSharedProject
-                .removeActivityProvider(ConsistencyWatchdogClient.this);
-            oldSharedProject.removeListener(sharedProjectListener);
-
-            latestChecksums.clear();
-            pathsWithWrongChecksums.clear();
-
+        public void sessionStarted(ISarosSession newSarosSession) {
             synchronized (this) {
-                sharedProject = null;
-            }
-        }
-
-        @Override
-        public void sessionStarted(ISharedProject newSharedProject) {
-            synchronized (this) {
-                sharedProject = newSharedProject;
+                sarosSession = newSarosSession;
             }
 
             pathsWithWrongChecksums.clear();
             inconsistencyToResolve.setValue(false);
 
-            newSharedProject
-                .addActivityProvider(ConsistencyWatchdogClient.this);
-            newSharedProject.addListener(sharedProjectListener);
+            newSarosSession.addActivityProvider(ConsistencyWatchdogClient.this);
+            newSarosSession.addListener(sharedProjectListener);
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession oldSarosSession) {
+
+            oldSarosSession
+                .removeActivityProvider(ConsistencyWatchdogClient.this);
+            oldSarosSession.removeListener(sharedProjectListener);
+
+            latestChecksums.clear();
+            pathsWithWrongChecksums.clear();
+
+            synchronized (this) {
+                sarosSession = null;
+            }
         }
     };
 
@@ -251,16 +250,14 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      */
     public void runRecovery(SubMonitor monitor) {
 
-        ISharedProject project;
+        ISarosSession session;
         synchronized (this) {
-            /*
-             * Keep a local copy, since the shareProject might end, while we
-             * doing this
-             */
-            project = sharedProject;
+            // Keep a local copy, since the session might end while we're doing
+            // this.
+            session = sarosSession;
         }
 
-        if (project.isHost())
+        if (session.isHost())
             throw new IllegalStateException("Can only be called on the client");
 
         if (!lock.tryLock()) {
@@ -301,20 +298,20 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             if (cancelRecovery.get())
                 return;
 
-            monitor.beginTask("Consistency recovery", pathsOfHandledFiles
-                .size());
+            monitor.beginTask("Consistency recovery",
+                pathsOfHandledFiles.size());
             final IProgressMonitor remoteProgress = remoteProgressManager
-                .createRemoteProgress(project, project.getRemoteUsers());
+                .createRemoteProgress(session, session.getRemoteUsers());
             recoveryID = getNextRecoveryID();
 
             filesRemaining.set(pathsOfHandledFiles.size());
 
             remoteProgress.beginTask("Consistency recovery for user "
-                + project.getLocalUser().getJID().getBase(), filesRemaining
-                .get());
+                + session.getLocalUser().getJID().getBase(),
+                filesRemaining.get());
 
-            project.sendActivity(project.getHost(), new ChecksumErrorActivity(
-                project.getLocalUser(), pathsOfHandledFiles, recoveryID));
+            session.sendActivity(session.getHost(), new ChecksumErrorActivity(
+                session.getLocalUser(), pathsOfHandledFiles, recoveryID));
 
             try {
                 // block until all inconsistencies are resolved
@@ -323,7 +320,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 while ((filesRemainingCurrently = filesRemaining.get()) > 0) {
 
                     if (cancelRecovery.get() || monitor.isCanceled()
-                        || sharedProject == null)
+                        || sarosSession == null)
                         return;
 
                     if (filesRemainingCurrently < filesRemainingBefore) {
@@ -436,7 +433,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      */
     public boolean performCheck(SPath path) {
 
-        if (sharedProject == null) {
+        if (sarosSession == null) {
             log.warn("Session already ended. Cannot perform consistency check",
                 new StackTrace());
             return false;
@@ -453,8 +450,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected synchronized void performCheck(ChecksumActivity checksumActivity) {
 
-        if (sharedProject.isDriver()
-            && !sharedProject.getConcurrentDocumentClient().isCurrent(
+        if (sarosSession.isDriver()
+            && !sarosSession.getConcurrentDocumentClient().isCurrent(
                 checksumActivity))
             return;
 

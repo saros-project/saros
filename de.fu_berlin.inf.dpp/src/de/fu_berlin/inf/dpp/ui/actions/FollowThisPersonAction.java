@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -37,12 +37,12 @@ public class FollowThisPersonAction extends SelectionProviderAction {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             update();
         }
 
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             update();
         }
     };
@@ -103,7 +103,7 @@ public class FollowThisPersonAction extends SelectionProviderAction {
      * <code>false</code> otherwise.
      */
     protected boolean canFollow() {
-        ISharedProject project = sessionManager.getSharedProject();
+        ISarosSession project = sessionManager.getSarosSession();
 
         if (project == null || selectedUser == null)
             return false;

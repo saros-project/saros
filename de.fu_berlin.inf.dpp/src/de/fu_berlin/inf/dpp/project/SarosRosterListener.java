@@ -16,8 +16,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -42,9 +41,9 @@ public class SarosRosterListener {
 
         public void presenceChanged(Presence presence) {
 
-            SharedProject project = currentlySharedProject.getValue();
+            ISarosSession sarosSession = sarosSessionObservable.getValue();
 
-            if (project == null)
+            if (sarosSession == null)
                 return;
 
             JID presenceJID = new JID(presence.getFrom());
@@ -53,7 +52,7 @@ public class SarosRosterListener {
             if (presenceJID.isBareJID()) {
                 // Check if there is a user in this project using the user name
                 // part of the JID
-                presenceJID = project.getResourceQualifiedJID(presenceJID);
+                presenceJID = sarosSession.getResourceQualifiedJID(presenceJID);
 
                 // No such user in the project
                 if (presenceJID == null)
@@ -64,7 +63,7 @@ public class SarosRosterListener {
             assert presenceJID.isResourceQualifiedJID();
 
             // Get the user (if any)
-            User user = project.getUser(presenceJID);
+            User user = sarosSession.getUser(presenceJID);
             if (user == null)
                 return; // PresenceJID does not identify a user in the project
 
@@ -100,7 +99,7 @@ public class SarosRosterListener {
     }
 
     @Inject
-    protected SharedProjectObservable currentlySharedProject;
+    protected SarosSessionObservable sarosSessionObservable;
 
     @Inject
     protected RosterTracker rosterTracker;

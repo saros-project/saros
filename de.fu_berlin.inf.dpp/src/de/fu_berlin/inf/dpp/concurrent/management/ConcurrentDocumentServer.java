@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject.QueueItem;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -39,7 +39,7 @@ public class ConcurrentDocumentServer implements Disposable {
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentServer.class);
 
-    protected final ISharedProject sharedProject;
+    protected final ISarosSession sarosSession;
 
     protected JupiterServer server;
 
@@ -50,21 +50,21 @@ public class ConcurrentDocumentServer implements Disposable {
 
     protected final ISharedProjectListener projectListener;
 
-    public ConcurrentDocumentServer(ISharedProject sharedProject) {
+    public ConcurrentDocumentServer(ISarosSession sarosSession) {
 
-        if (!sharedProject.isHost())
+        if (!sarosSession.isHost())
             throw new IllegalStateException();
 
-        this.sharedProject = sharedProject;
-        this.host = sharedProject.getHost();
+        this.sarosSession = sarosSession;
+        this.host = sarosSession.getHost();
 
-        this.server = new JupiterServer(sharedProject);
+        this.server = new JupiterServer(sarosSession);
         this.projectListener = new HostSideProjectListener();
-        this.sharedProject.addListener(projectListener);
+        this.sarosSession.addListener(projectListener);
     }
 
     public void dispose() {
-        sharedProject.removeListener(projectListener);
+        sarosSession.removeListener(projectListener);
     }
 
     /**
@@ -119,11 +119,11 @@ public class ConcurrentDocumentServer implements Disposable {
     public TransformationResult transformIncoming(
         List<IActivity> activityDataObjects) {
 
-        assert sharedProject.isHost() : "CDS.transformIncoming may not be called on the Client!!";
+        assert sarosSession.isHost() : "CDS.transformIncoming may not be called on the Client!!";
 
         assert !Util.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
 
-        TransformationResult result = new TransformationResult(sharedProject
+        TransformationResult result = new TransformationResult(sarosSession
             .getLocalUser());
 
         for (IActivity activityDataObject : activityDataObjects) {
@@ -167,7 +167,7 @@ public class ConcurrentDocumentServer implements Disposable {
         for (Entry<JID, JupiterActivity> entry : outgoing.entrySet()) {
 
             JID jid = entry.getKey();
-            User to = sharedProject.getUser(jid);
+            User to = sarosSession.getUser(jid);
 
             if (to == null) {
                 log.error("Unknown user in transformation result: "
@@ -193,7 +193,7 @@ public class ConcurrentDocumentServer implements Disposable {
      */
     public synchronized void reset(JID jid, SPath path) {
 
-        assert sharedProject.isHost();
+        assert sarosSession.isHost();
 
         log.debug("Resetting jupiter server for " + Util.prefix(jid) + ": "
             + path.toString());
@@ -220,7 +220,7 @@ public class ConcurrentDocumentServer implements Disposable {
         for (Entry<JID, ChecksumActivity> entry : outgoing.entrySet()) {
 
             JID jid = entry.getKey();
-            User to = sharedProject.getUser(jid);
+            User to = sarosSession.getUser(jid);
 
             if (to == null) {
                 log.error("Unknown user in transformation result: "

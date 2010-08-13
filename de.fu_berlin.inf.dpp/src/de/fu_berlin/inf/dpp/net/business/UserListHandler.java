@@ -9,13 +9,13 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.UserListEntry;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -63,11 +63,11 @@ public class UserListHandler {
                     return;
                 }
 
-                ISharedProject sharedProject = sessionManager
-                    .getSharedProject();
-                assert sharedProject != null;
+                ISarosSession sarosSession = sessionManager
+                    .getSarosSession();
+                assert sarosSession != null;
 
-                User fromUser = sharedProject.getUser(fromJID);
+                User fromUser = sarosSession.getUser(fromJID);
 
                 if (fromUser == null || !fromUser.isHost()) {
                     log.error("Received UserList from user which "
@@ -81,11 +81,11 @@ public class UserListHandler {
                 for (UserListEntry userEntry : userListInfo.userList) {
 
                     // Check if we already know this user
-                    User user = sharedProject.getUser(userEntry.jid);
+                    User user = sarosSession.getUser(userEntry.jid);
 
                     if (user == null) {
                         // This user is not part of our project
-                        newUser = new User(sharedProject, userEntry.jid,
+                        newUser = new User(sarosSession, userEntry.jid,
                             userEntry.colorID);
                         newUser.setUserRole(userEntry.userRole);
                         if (userEntry.invitationComplete)
@@ -93,7 +93,7 @@ public class UserListHandler {
 
                         // Add him and send him a message, and tell him our
                         // colour
-                        sharedProject.addUser(newUser);
+                        sarosSession.addUser(newUser);
                     } else {
                         // User already exists
 
@@ -110,7 +110,7 @@ public class UserListHandler {
                         // Update invitation status
                         if (userEntry.invitationComplete
                             && !user.isInvitationComplete()) {
-                            sharedProject.userInvitationCompleted(user);
+                            sarosSession.userInvitationCompleted(user);
                         }
                     }
                 }

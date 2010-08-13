@@ -27,8 +27,8 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -46,7 +46,7 @@ public class RemoteProgressManager {
 
     protected SessionManager sessionManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected HashMap<String, RemoteProgress> progressDialogs = new HashMap<String, RemoteProgress>();
 
@@ -147,8 +147,8 @@ public class RemoteProgressManager {
                 case UPDATE:
                     String taskName = nextActivity.getTaskName();
                     if (firstTime) {
-                        subMonitor.beginTask(taskName, nextActivity
-                            .getWorkTotal());
+                        subMonitor.beginTask(taskName,
+                            nextActivity.getWorkTotal());
                         firstTime = false;
                     } else {
                         if (taskName != null)
@@ -176,8 +176,8 @@ public class RemoteProgressManager {
             String progressID = progressActivity.getProgressID();
             RemoteProgress progress = progressDialogs.get(progressID);
             if (progress == null) {
-                progress = new RemoteProgress(progressID, progressActivity
-                    .getSource());
+                progress = new RemoteProgress(progressID,
+                    progressActivity.getSource());
                 progressDialogs.put(progressID, progress);
             }
             progress.receive(progressActivity);
@@ -204,24 +204,24 @@ public class RemoteProgressManager {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionEnded(ISharedProject newSharedProject) {
+        public void sessionStarted(ISarosSession newSharedProject) {
+            sarosSession = newSharedProject;
 
-            newSharedProject.removeActivityProvider(activityProvider);
-            newSharedProject.removeListener(sharedProjectListener);
+            newSharedProject.addActivityProvider(activityProvider);
+            newSharedProject.addListener(sharedProjectListener);
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession oldSarosSession) {
+
+            oldSarosSession.removeActivityProvider(activityProvider);
+            oldSarosSession.removeListener(sharedProjectListener);
             for (RemoteProgress progress : progressDialogs.values()) {
                 progress.close();
             }
             progressDialogs.clear();
 
-            sharedProject = null;
-        }
-
-        @Override
-        public void sessionStarted(ISharedProject newSharedProject) {
-            sharedProject = newSharedProject;
-
-            newSharedProject.addActivityProvider(activityProvider);
-            newSharedProject.addListener(sharedProjectListener);
+            sarosSession = null;
         }
     };
 
@@ -254,13 +254,13 @@ public class RemoteProgressManager {
      * your commands to the remote party.
      * 
      */
-    public IProgressMonitor createRemoteProgress(final ISharedProject project,
-        final List<User> recipients) {
+    public IProgressMonitor createRemoteProgress(
+        final ISarosSession sarosSession, final List<User> recipients) {
         return new IProgressMonitor() {
 
             protected String progressID = getNextProgressID();
 
-            protected User localUser = project.getLocalUser();
+            protected User localUser = sarosSession.getLocalUser();
 
             int worked = 0;
 
@@ -268,13 +268,13 @@ public class RemoteProgressManager {
 
             public void beginTask(String name, int totalWorked) {
                 this.totalWorked = totalWorked;
-                project.sendActivity(recipients, new ProgressActivity(
+                sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
             public void done() {
-                project.sendActivity(recipients, new ProgressActivity(
+                sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, 0, null, ProgressAction.DONE));
             }
 
@@ -293,13 +293,13 @@ public class RemoteProgressManager {
             }
 
             public void setTaskName(String name) {
-                project.sendActivity(recipients, new ProgressActivity(
+                sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
             public void subTask(String name) {
-                project.sendActivity(recipients, new ProgressActivity(
+                sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
@@ -310,7 +310,7 @@ public class RemoteProgressManager {
                     log.warn("Worked (" + worked
                         + ")is greater than totalWork (" + totalWorked
                         + "). Forgot to call beginTask?", new StackTrace());
-                project.sendActivity(recipients, new ProgressActivity(
+                sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));
             }

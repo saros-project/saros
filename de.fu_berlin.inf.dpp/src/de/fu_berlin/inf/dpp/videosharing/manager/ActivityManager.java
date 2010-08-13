@@ -29,8 +29,8 @@ import org.picocontainer.Disposable;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
-import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 

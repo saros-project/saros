@@ -132,8 +132,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -336,7 +336,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(SessionIDObservable.class);
-        this.container.addComponent(SharedProjectObservable.class);
+        this.container.addComponent(SarosSessionObservable.class);
         this.container.addComponent(VoIPSessionObservable.class);
 
         // Handlers
@@ -1243,9 +1243,9 @@ public class Saros extends AbstractUIPlugin {
 
                     Map<JID, Integer> expectedSequenceNumbers = Collections
                         .emptyMap();
-                    if (sessionManager.getSharedProject() != null) {
+                    if (sessionManager.getSarosSession() != null) {
                         expectedSequenceNumbers = sessionManager
-                            .getSharedProject().getSequencer()
+                            .getSarosSession().getSequencer()
                             .getExpectedSequenceNumbers();
                     }
 

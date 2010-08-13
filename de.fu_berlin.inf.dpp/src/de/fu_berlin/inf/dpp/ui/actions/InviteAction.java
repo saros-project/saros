@@ -33,11 +33,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -55,12 +55,12 @@ public class InviteAction extends SelectionProviderAction {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             updateEnablement();
         }
 
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             updateEnablement();
         }
     };
@@ -95,7 +95,7 @@ public class InviteAction extends SelectionProviderAction {
             public void run() {
                 sessionManager.invite(getSelected(),
                     "You have been invited to a Saros session by "
-                        + sessionManager.getSharedProject().getHost().getJID()
+                        + sessionManager.getSarosSession().getHost().getJID()
                             .getBase());
             }
         });
@@ -133,11 +133,12 @@ public class InviteAction extends SelectionProviderAction {
 
     public boolean canInviteSelected() {
 
-        ISharedProject project = sessionManager.getSharedProject();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
 
         List<JID> selected = getSelected();
 
-        if (project == null || !project.isHost() || selected.isEmpty()) {
+        if (sarosSession == null || !sarosSession.isHost()
+            || selected.isEmpty()) {
             return false;
         }
 
@@ -149,7 +150,7 @@ public class InviteAction extends SelectionProviderAction {
             // ...to have saros
             // ...not currently in a invitation
             if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
-                || project.getResourceQualifiedJID(jid) != null
+                || sarosSession.getResourceQualifiedJID(jid) != null
                 || !discoManager.isSarosSupported(jid)
                 || invitationProcesses.getInvitationProcess(jid) != null)
                 return false;

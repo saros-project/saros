@@ -33,7 +33,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     private static final Logger log = Logger.getLogger(PingPongCentral.class);
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected SessionManager sessionManager;
 
@@ -141,23 +141,23 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionEnded(ISharedProject newSharedProject) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
 
-            newSharedProject.removeActivityProvider(PingPongCentral.this);
+            oldSarosSession.removeActivityProvider(PingPongCentral.this);
 
             pingPongHandle.cancel(true);
-            sharedProject = null;
+            sarosSession = null;
 
             log.info(PingPongCentral.this.toString());
         }
 
         @Override
-        public void sessionStarted(ISharedProject newSharedProject) {
-            sharedProject = newSharedProject;
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
 
             stats.clear();
 
-            newSharedProject.addActivityProvider(PingPongCentral.this);
+            newSarosSession.addActivityProvider(PingPongCentral.this);
 
             pingPongHandle = scheduler.scheduleAtFixedRate(new Runnable() {
                 public void run() {
@@ -219,8 +219,8 @@ public class PingPongCentral extends AbstractActivityProvider {
                 stats.get(sender).add(pingPongActivity);
             } else {
                 // This is the ping from another user
-                sharedProject.sendActivity(initiator, pingPongActivity
-                    .createPong(sharedProject.getLocalUser()));
+                sarosSession.sendActivity(initiator,
+                    pingPongActivity.createPong(sarosSession.getLocalUser()));
             }
         }
     };
@@ -235,17 +235,17 @@ public class PingPongCentral extends AbstractActivityProvider {
      */
     protected synchronized void sendPings() {
 
-        if (sharedProject == null)
+        if (sarosSession == null)
             return;
 
-        List<User> remoteUsers = sharedProject.getRemoteUsers();
+        List<User> remoteUsers = sarosSession.getRemoteUsers();
 
         for (User remoteUser : remoteUsers) {
 
             stats.get(remoteUser).pingsSent++;
 
-            sharedProject.sendActivity(remoteUser, PingPongActivity
-                .create(sharedProject.getLocalUser()));
+            sarosSession.sendActivity(remoteUser,
+                PingPongActivity.create(sarosSession.getLocalUser()));
 
         }
     }

@@ -21,7 +21,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * An interface for all things that occur in a shared project session such as
@@ -70,6 +70,6 @@ public interface IActivity {
      *         {@link IActivity} to peers.
      */
     public IActivityDataObject getActivityDataObject(
-        ISharedProject sharedProject);
+        ISarosSession sarosSession);
 
 }

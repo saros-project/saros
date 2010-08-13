@@ -5,10 +5,10 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("folderActivity")
 public class FolderActivityDataObject extends AbstractActivityDataObject
@@ -91,8 +91,8 @@ public class FolderActivityDataObject extends AbstractActivityDataObject
             + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new FolderActivity(sharedProject.getUser(source), type, path
-            .toSPath(sharedProject));
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new FolderActivity(sarosSession.getUser(source), type, path
+            .toSPath(sarosSession));
     }
 }

@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PingPongActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * TODO No XStream annotations. How does this look like when serialized!?
@@ -58,8 +58,8 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new PingPongActivity(sharedProject.getUser(source),
-            sharedProject.getUser(initiator), departureTime);
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new PingPongActivity(sarosSession.getUser(source),
+            sarosSession.getUser(initiator), departureTime);
     }
 }

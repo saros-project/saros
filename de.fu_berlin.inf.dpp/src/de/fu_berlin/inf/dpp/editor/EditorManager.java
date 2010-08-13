@@ -61,12 +61,12 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
@@ -83,8 +83,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -130,7 +130,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected RemoteDriverManager remoteDriverManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
@@ -220,7 +220,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         public void roleChanged(final User user) {
 
             // Make sure we have the up-to-date facts about ourself
-            isDriver = sharedProject.isDriver();
+            isDriver = sarosSession.isDriver();
 
             // Lock / unlock editors
             if (user.isLocal()) {
@@ -246,7 +246,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                         } else {
                             // Find another driver to follow...
                             boolean foundUser = false;
-                            for (User aUser : sharedProject.getParticipants()) {
+                            for (User aUser : sarosSession.getParticipants()) {
                                 if (aUser.isDriver() && aUser.isRemote()) {
                                     setFollowing(aUser);
                                     foundUser = true;
@@ -275,20 +275,20 @@ public class EditorManager implements IActivityProvider, Disposable {
             // Let the new user know where we are
             List<User> recipient = Collections.singletonList(user);
 
-            User localUser = sharedProject.getLocalUser();
+            User localUser = sarosSession.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
-                sharedProject.sendActivity(recipient, new EditorActivity(
+                sarosSession.sendActivity(recipient, new EditorActivity(
                     localUser, Type.Activated, path));
             }
 
             if (locallyActiveEditor == null)
                 return;
 
-            sharedProject.sendActivity(recipient, new EditorActivity(localUser,
+            sarosSession.sendActivity(recipient, new EditorActivity(localUser,
                 Type.Activated, locallyActiveEditor));
 
             if (localViewport != null) {
-                sharedProject.sendActivity(recipient, new ViewportActivity(
+                sarosSession.sendActivity(recipient, new ViewportActivity(
                     localUser, localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
@@ -299,7 +299,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                sharedProject.sendActivity(recipient,
+                sarosSession.sendActivity(recipient,
                     new TextSelectionActivity(localUser, offset, length,
                         locallyActiveEditor));
             } else {
@@ -329,19 +329,19 @@ public class EditorManager implements IActivityProvider, Disposable {
         protected RevertBufferListener buffListener;
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
 
             assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
-            isDriver = sharedProject.isDriver();
-            sharedProject.addListener(sharedProjectListener);
+            isDriver = sarosSession.isDriver();
+            sarosSession.addListener(sharedProjectListener);
 
-            sharedProject.addActivityProvider(EditorManager.this);
+            sarosSession.addActivityProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
-                project);
-            remoteEditorManager = new RemoteEditorManager(sharedProject);
-            remoteDriverManager = new RemoteDriverManager(sharedProject);
+                newSarosSession);
+            remoteEditorManager = new RemoteEditorManager(sarosSession);
+            remoteDriverManager = new RemoteDriverManager(sarosSession);
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -370,15 +370,15 @@ public class EditorManager implements IActivityProvider, Disposable {
                     // register bufferManager and initialize user's role in
                     // session
                     buffListener = new RevertBufferListener(EditorManager.this,
-                        sharedProject, fileReplacementInProgressObservable);
+                        sarosSession, fileReplacementInProgressObservable);
                 }
             });
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
 
-            assert sharedProject == project;
+            assert sarosSession == oldSarosSession;
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -395,17 +395,17 @@ public class EditorManager implements IActivityProvider, Disposable {
                         }
                     });
 
-                    editorPool.removeAllEditors(sharedProject);
+                    editorPool.removeAllEditors(sarosSession);
 
                     dirtyStateListener.unregisterAll();
 
-                    sharedProject.removeListener(sharedProjectListener);
-                    sharedProject.removeActivityProvider(EditorManager.this);
+                    sarosSession.removeListener(sharedProjectListener);
+                    sarosSession.removeActivityProvider(EditorManager.this);
 
                     if (buffListener != null)
                         buffListener.dispose();
 
-                    sharedProject = null;
+                    sarosSession = null;
                     lastEditTimes.clear();
                     lastRemoteEditTimes.clear();
                     contributionAnnotationManager.dispose();
@@ -544,9 +544,9 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (path != null)
             this.locallyOpenEditors.add(path);
 
-        editorListener.activeEditorChanged(sharedProject.getLocalUser(), path);
+        editorListener.activeEditorChanged(sarosSession.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
+        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Activated, path));
 
     }
@@ -572,7 +572,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void generateViewport(IEditorPart part, ILineRange viewport) {
 
-        if (this.sharedProject == null) {
+        if (this.sarosSession == null) {
             log.warn("SharedEditorListener not correctly unregistered!");
             return;
         }
@@ -586,7 +586,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(sharedProject.getLocalUser(),
+        fireActivity(new ViewportActivity(sarosSession.getLocalUser(),
             viewport, path));
 
         editorListener.viewportGenerated(part, viewport, path);
@@ -619,7 +619,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        fireActivity(new TextSelectionActivity(sharedProject.getLocalUser(),
+        fireActivity(new TextSelectionActivity(sarosSession.getLocalUser(),
             offset, length, path));
     }
 
@@ -645,7 +645,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
-        if (sharedProject == null) {
+        if (sarosSession == null) {
             log.error("Shared Project has ended, but text edits"
                 + " are received from local user.");
             return;
@@ -686,7 +686,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             replacedText = sb.toString();
         }
 
-        TextEditActivity textEdit = new TextEditActivity(sharedProject
+        TextEditActivity textEdit = new TextEditActivity(sarosSession
             .getLocalUser(), offset, text, replacedText, path);
 
         if (!this.isDriver) {
@@ -707,7 +707,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListener.textEditRecieved(sharedProject.getLocalUser(), path,
+        editorListener.textEditRecieved(sarosSession.getLocalUser(), path,
             text, replacedText, offset);
 
         /*
@@ -739,7 +739,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         assert Util.isSWT();
 
         User sender = activity.getSource();
-        if (!sender.isInSharedProject()) {
+        if (!sender.isInSarosSession()) {
             log.warn("Trying to execute activityDataObject for unknown user: "
                 + activity);
             return;
@@ -1020,7 +1020,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             // Pretend as if the editor was closed locally (but use the old part
             // before the move happened) and then simulate it being opened again
-            SPath path = editorPool.getCurrentPath(editor, sharedProject);
+            SPath path = editorPool.getCurrentPath(editor, sarosSession);
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
@@ -1065,16 +1065,16 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
 
-        this.editorPool.remove(editorPart, sharedProject);
+        this.editorPool.remove(editorPart, sarosSession);
 
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);
 
         this.locallyOpenEditors.remove(path);
 
-        editorListener.editorRemoved(sharedProject.getLocalUser(), path);
+        editorListener.editorRemoved(sarosSession.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
+        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Closed, path));
 
         /**
@@ -1121,7 +1121,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Since a null editor does not support either, this method returns false.
      */
     protected boolean isSharedEditor(IEditorPart editorPart) {
-        if (sharedProject == null)
+        if (sarosSession == null)
             return false;
 
         if (EditorAPI.getViewer(editorPart) == null)
@@ -1132,7 +1132,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (resource == null)
             return false;
 
-        return this.sharedProject.isShared(resource.getProject());
+        return this.sarosSession.isShared(resource.getProject());
     }
 
     /**
@@ -1407,7 +1407,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         // What is the reason of this?
 
         editorListener.driverEditorSaved(path, false);
-        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
+        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Saved, path));
     }
 
@@ -1535,7 +1535,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void setFollowing(User userToFollow) {
 
         assert userToFollow == null
-            || !userToFollow.equals(sharedProject.getLocalUser()) : "Local user cannot follow himself!";
+            || !userToFollow.equals(sarosSession.getLocalUser()) : "Local user cannot follow himself!";
 
         this.userToFollow = userToFollow;
 
@@ -1589,7 +1589,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         });
 
-        for (User user : sharedProject.getParticipants()) {
+        for (User user : sarosSession.getParticipants()) {
 
             if (user.isLocal()) {
                 continue;
@@ -1718,7 +1718,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
-        editorPool.setDriverEnabled(!lock && sharedProject.isDriver());
+        editorPool.setDriverEnabled(!lock && sarosSession.isDriver());
     }
 
     public void dispose() {
@@ -1751,7 +1751,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         // TODO Check if we are in the shared project!!
 
-        User localUser = sharedProject.getLocalUser();
+        User localUser = sarosSession.getLocalUser();
         int offset = 0;
 
         /**

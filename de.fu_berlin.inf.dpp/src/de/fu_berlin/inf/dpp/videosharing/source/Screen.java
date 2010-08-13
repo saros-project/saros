@@ -41,8 +41,8 @@ import com.thoughtworks.xstream.InitializationException;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
-import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 
 /**
  * Responsible for taking screenshots.

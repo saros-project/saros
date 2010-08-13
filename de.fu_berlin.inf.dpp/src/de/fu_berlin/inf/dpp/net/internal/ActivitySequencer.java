@@ -26,10 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * are sent and received in the right order.
  * 
  * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
- * push all responsibility up a layer into the SharedProject
+ * push all responsibility up a layer into the SarosSession
  * 
  * @author rdjemili
  * @author coezbek
@@ -430,7 +430,7 @@ public class ActivitySequencer {
 
     protected Timer flushTimer;
 
-    protected final ISharedProject sharedProject;
+    protected final ISarosSession sarosSession;
 
     protected final ITransmitter transmitter;
 
@@ -440,16 +440,16 @@ public class ActivitySequencer {
 
     protected final DispatchThreadContext dispatchThread;
 
-    public ActivitySequencer(ISharedProject sharedProject,
+    public ActivitySequencer(ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
         DispatchThreadContext threadContext) {
 
         this.dispatchThread = threadContext;
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.transmitter = transmitter;
         this.transferManager = transferManager;
 
-        this.localJID = sharedProject.getLocalUser().getJID();
+        this.localJID = sarosSession.getLocalUser().getJID();
     }
 
     /**
@@ -604,7 +604,7 @@ public class ActivitySequencer {
             .removeActivities()) {
             activityDataObjects.add(timedActivity.getActivity());
         }
-        sharedProject.exec(activityDataObjects);
+        sarosSession.exec(activityDataObjects);
     }
 
     /**
@@ -621,7 +621,7 @@ public class ActivitySequencer {
             if (user.isLocal()) {
                 dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
-                        sharedProject.exec(Collections
+                        sarosSession.exec(Collections
                             .singletonList(activityDataObject));
                     }
                 });

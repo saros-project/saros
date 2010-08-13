@@ -7,7 +7,7 @@ import org.picocontainer.annotations.Nullable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * "Stupid" Data Object for transmitting an SPath. Serialized using XStream.
@@ -41,16 +41,16 @@ public class SPathDataObject {
     }
 
     /**
-     * Attach this SPathDataObject to the given ISharedProject. This will map
+     * Attach this SPathDataObject to the given ISarosSession. This will map
      * projectIDs of the SPathDataObject to actual IProjects.
      */
-    public SPath toSPath(ISharedProject sharedProject) {
+    public SPath toSPath(ISarosSession sarosSession) {
 
-        IProject project = sharedProject.getProjectMapper().getProject(
+        IProject project = sarosSession.getProjectMapper().getProject(
             projectID);
         if (project == null)
             throw new IllegalArgumentException(
-                "SPathDataObject cannot be connected to SharedProject because its ID is unknown: "
+                "SPathDataObject cannot be connected to SarosSession because its ID is unknown: "
                     + projectID);
 
         return new SPath(project, path);

@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.project;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 
 /**
- * A listener for SharedProject life-cycle related events.
+ * A listener for SarosSession life-cycle related events.
  * 
  * @author rdjemili
  */
@@ -31,22 +31,21 @@ public interface ISessionListener {
     /**
      * Is fired when a new session started.
      * 
-     * @param newSharedProject
-     *            the shared project that has been created. Is never
-     *            <code>null</code>.
+     * @param newSarosSession
+     *            the session that has been created. Is never <code>null</code>.
      * 
      */
-    public void sessionStarted(ISharedProject newSharedProject);
+    public void sessionStarted(ISarosSession newSarosSession);
 
     /**
      * Is fired when a session ended. Reasons for this can be that the session
      * was closed or that the user left by himself.
      * 
-     * @param oldSharedProject
-     *            the shared project that has just been left. Is never
+     * @param oldSarosSession
+     *            the session that has just been left. Is never
      *            <code>null</code>.
      */
-    public void sessionEnded(ISharedProject oldSharedProject);
+    public void sessionEnded(ISarosSession oldSarosSession);
 
     /**
      * Is fired when the local user is invited to a session.

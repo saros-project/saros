@@ -42,9 +42,9 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -70,11 +70,13 @@ public interface ITransmitter {
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
-     * @param comPrefs TODO
+     * @param comPrefs
+     *            TODO
      */
     public void sendInvitation(String projectID, JID jid, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream, CommunicationPreferences comPrefs);
+        DateTime sessionStart, boolean doStream,
+        CommunicationPreferences comPrefs);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -287,8 +289,8 @@ public interface ITransmitter {
      * TODO SS MR Dependency Violation - ITransmitter should not need a shared
      * project
      * 
-     * @param sharedProject
-     *            the shared project
+     * @param sarosSession
+     *            the Saros session
      * @param requestedSequenceNumbers
      *            a map containing the sequence number to be requested as a
      *            value and the user to request them from as key
@@ -297,20 +299,20 @@ public interface ITransmitter {
      *            requested too, false if only the activityDataObject with the
      *            requestedSequenceNumber is requested
      */
-    public void sendRequestForActivity(ISharedProject sharedProject,
+    public void sendRequestForActivity(ISarosSession sarosSession,
         Map<JID, Integer> requestedSequenceNumbers, boolean andUp);
 
     /* ---------- etc --------- */
 
     /**
-     * Sends a leave message to the participants of given shared project. See
+     * Sends a leave message to the participants of given Saros session. See
      * {@link InvitationProcess} for more information when this is supposed be
      * sent.
      * 
-     * @param sharedProject
-     *            the shared project that this join message refers to.
+     * @param sarosSession
+     *            the Saros session that this join message refers to.
      */
-    public void sendLeaveMessage(ISharedProject sharedProject);
+    public void sendLeaveMessage(ISarosSession sarosSession);
 
     /**
      * Sends given list of TimedActivities to the given recipient.

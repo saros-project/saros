@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A Checksum Error is an notification send to the host and peers by a user, who
@@ -65,13 +65,13 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
         this.recoveryID = recoveryID;
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
+    public IActivity getActivity(ISarosSession sarosSession) {
         ArrayList<SPath> sPaths = new ArrayList<SPath>();
         if (this.paths != null)
             for (SPathDataObject path : this.paths) {
-                sPaths.add(path.toSPath(sharedProject));
+                sPaths.add(path.toSPath(sarosSession));
             }
-        return new ChecksumErrorActivity(sharedProject.getUser(getSource()),
+        return new ChecksumErrorActivity(sarosSession.getUser(getSource()),
             sPaths, recoveryID);
     }
 

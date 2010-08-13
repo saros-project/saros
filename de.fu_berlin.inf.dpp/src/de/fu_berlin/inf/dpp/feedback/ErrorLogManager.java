@@ -20,8 +20,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 
@@ -52,13 +52,13 @@ public class ErrorLogManager extends AbstractFeedbackManager {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject session) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             // save the id of the just started session
             currentSessionID = sessionID.getValue();
         }
 
         @Override
-        public void sessionEnded(ISharedProject session) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             if (isErrorLogSubmissionAllowed())
                 submitErrorLog();
         }
@@ -256,7 +256,10 @@ public class ErrorLogManager extends AbstractFeedbackManager {
          */
         final String logNameExtended = FilenameUtils.getBaseName(errorLog
             .getName())
-            + "_" + statisticManager.getUserID() + "_" + currentSessionID;
+            + "_"
+            + statisticManager.getUserID()
+            + "_"
+            + currentSessionID;
 
         new Job("Uploading Error Log...") {
 

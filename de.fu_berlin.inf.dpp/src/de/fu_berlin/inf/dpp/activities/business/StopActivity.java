@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A StopActivity is used for signaling to a user that he should be stopped or
@@ -166,7 +166,7 @@ public class StopActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject(ISharedProject project) {
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new StopActivityDataObject(source.getJID(), initiator.getJID(),
             user.getJID(), type, state, stopActivityID);
     }

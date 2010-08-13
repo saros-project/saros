@@ -16,7 +16,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -42,7 +42,7 @@ public class SharedModelProvider extends ModelProvider {
         SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
 
     /** the currently running shared project */
-    private ISharedProject sharedProject;
+    private ISarosSession sarosSession;
 
     /**
      * Check each resource delta whether it is in a shared project. If we are
@@ -60,7 +60,7 @@ public class SharedModelProvider extends ModelProvider {
         public boolean visit(IResourceDelta delta) throws CoreException {
 
             // We already check this in validateChange
-            assert SharedModelProvider.this.sharedProject != null;
+            assert SharedModelProvider.this.sarosSession != null;
 
             IResource resource = delta.getResource();
 
@@ -69,7 +69,7 @@ public class SharedModelProvider extends ModelProvider {
                 return true;
             }
 
-            if (!sharedProject.isShared(resource.getProject()))
+            if (!sarosSession.isShared(resource.getProject()))
                 return false;
 
             if ((resource instanceof IFile) || (resource instanceof IFolder)) {
@@ -91,17 +91,17 @@ public class SharedModelProvider extends ModelProvider {
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
-            public void sessionStarted(ISharedProject project) {
-                sharedProject = project;
+            public void sessionStarted(ISarosSession newSarosSession) {
+                sarosSession = newSarosSession;
             }
 
             @Override
-            public void sessionEnded(ISharedProject project) {
-                assert sharedProject == project;
-                sharedProject = null;
+            public void sessionEnded(ISarosSession oldSarosSession) {
+                assert sarosSession == oldSarosSession;
+                sarosSession = null;
             }
         });
-        this.sharedProject = sessionManager.getSharedProject();
+        this.sarosSession = sessionManager.getSarosSession();
     }
 
     @Override
@@ -109,10 +109,10 @@ public class SharedModelProvider extends ModelProvider {
 
         // If we are currently not sharing a project, we don't have to prevent
         // any file operations
-        if (this.sharedProject == null)
+        if (this.sarosSession == null)
             return Status.OK_STATUS;
 
-        if (this.sharedProject.isExclusiveDriver())
+        if (this.sarosSession.isExclusiveDriver())
             return Status.OK_STATUS;
 
         ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
@@ -123,10 +123,10 @@ public class SharedModelProvider extends ModelProvider {
             log.error("Could not run visitor: ", e);
         }
 
-        if (!sharedProject.isDriver() && visitor.isAffectingSharedProjectFiles) {
+        if (!sarosSession.isDriver() && visitor.isAffectingSharedProjectFiles) {
             return SharedModelProvider.ERROR_STATUS;
         }
-        if (!sharedProject.isExclusiveDriver()
+        if (!sarosSession.isExclusiveDriver()
             && visitor.isAffectingSharedProjectFiles) {
             return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
         }

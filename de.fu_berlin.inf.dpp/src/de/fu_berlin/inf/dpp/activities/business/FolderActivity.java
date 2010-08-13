@@ -4,7 +4,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class FolderActivity extends AbstractActivity implements
     IResourceActivity {
@@ -79,9 +79,9 @@ public class FolderActivity extends AbstractActivity implements
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject(ISharedProject project) {
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new FolderActivityDataObject(source.getJID(), type, path
-            .toSPathDataObject(project));
+            .toSPathDataObject(sarosSession));
     }
 
 }

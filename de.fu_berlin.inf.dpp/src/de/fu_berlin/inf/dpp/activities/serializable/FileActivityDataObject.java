@@ -7,11 +7,11 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("fileActivity")
 public class FileActivityDataObject extends AbstractActivityDataObject
@@ -149,9 +149,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         return Purpose.RECOVERY.equals(purpose);
     }
 
-    public IActivity getActivity(ISharedProject sharedProject) {
-        return new FileActivity(sharedProject.getUser(source), type, newPath
-            .toSPath(sharedProject), (oldPath != null ? oldPath
-            .toSPath(sharedProject) : null), data, purpose);
+    public IActivity getActivity(ISarosSession sarosSession) {
+        return new FileActivity(sarosSession.getUser(source), type, newPath
+            .toSPath(sarosSession), (oldPath != null ? oldPath
+            .toSPath(sarosSession) : null), data, purpose);
     }
 }

@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class InvitationWizardUserSelection extends WizardPage {
@@ -48,7 +48,7 @@ public class InvitationWizardUserSelection extends WizardPage {
     protected Saros saros;
     protected Roster roster;
     protected RosterTracker rosterTracker;
-    protected SharedProject sharedProject;
+    protected ISarosSession sarosSession;
     protected IRosterListener rosterListener;
     protected DiscoveryManager discoveryManager;
     protected InvitationProcessObservable invitationProcesses;
@@ -59,13 +59,13 @@ public class InvitationWizardUserSelection extends WizardPage {
     protected ISelectionChangedListener userSelectionChangedListener;
 
     protected InvitationWizardUserSelection(Saros saros,
-        SharedProject sharedProject, RosterTracker rosterTracker,
+        ISarosSession sarosSession, RosterTracker rosterTracker,
         DiscoveryManager discoveryManager,
         InvitationProcessObservable invitationProcesses) {
         super("Select users to invite");
         this.saros = saros;
         this.roster = saros.getRoster();
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;
         this.invitationProcesses = invitationProcesses;
@@ -85,7 +85,7 @@ public class InvitationWizardUserSelection extends WizardPage {
         projectName
             .setLayoutData(new GridData(SWT.FILL, SWT.LEFT, false, false));
         StringBuilder sb = new StringBuilder();
-        for (IProject project : sharedProject.getProjects()) {
+        for (IProject project : sarosSession.getProjects()) {
             if (sb.length() > 0)
                 sb.append(", ");
             sb.append(project.getName());
@@ -246,7 +246,7 @@ public class InvitationWizardUserSelection extends WizardPage {
 
             RosterEntry rosterEntry = (RosterEntry) element;
             JID jid = new JID(rosterEntry.getUser());
-            if (sharedProject.getResourceQualifiedJID(jid) != null)
+            if (sarosSession.getResourceQualifiedJID(jid) != null)
                 return false;
             if (invitationProcesses.getInvitationProcess(jid) != null)
                 return false;

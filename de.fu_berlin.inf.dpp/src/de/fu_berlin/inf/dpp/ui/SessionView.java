@@ -68,8 +68,8 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
@@ -90,7 +90,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
 /**
- * View responsible for showing who is in a SharedProject session using which
+ * View responsible for showing who is in a SarosSession session using which
  * color, who is being followed, and provide actions for changing roles and
  * follow mode.
  */
@@ -119,16 +119,16 @@ public class SessionView extends ViewPart {
         public void changed(final Collection<String> addresses) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    if (sharedProject == null)
+                    if (sarosSession == null)
                         return;
 
                     for (String address : addresses) {
-                        JID jid = sharedProject
-                            .getResourceQualifiedJID(new JID(address));
+                        JID jid = sarosSession.getResourceQualifiedJID(new JID(
+                            address));
                         if (jid == null)
                             continue;
 
-                        User user = sharedProject.getUser(jid);
+                        User user = sarosSession.getUser(jid);
                         if (user == null)
                             continue;
 
@@ -172,7 +172,7 @@ public class SessionView extends ViewPart {
 
     protected TableViewer viewer;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected class SessionContentProvider implements
         IStructuredContentProvider, ISharedProjectListener {
@@ -192,22 +192,22 @@ public class SessionView extends ViewPart {
                     return -1;
                 if (user2.isHost())
                     return +1;
-                return user1.getJID().toString().toLowerCase().compareTo(
-                    user2.getJID().toString().toLowerCase());
+                return user1.getJID().toString().toLowerCase()
+                    .compareTo(user2.getJID().toString().toLowerCase());
             }
         };
 
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 
             if (oldInput != null) {
-                ISharedProject oldProject = (ISharedProject) oldInput;
-                oldProject.removeListener(this);
+                ISarosSession oldSarosSession = (ISarosSession) oldInput;
+                oldSarosSession.removeListener(this);
             }
 
-            SessionView.this.sharedProject = (ISharedProject) newInput;
+            SessionView.this.sarosSession = (ISarosSession) newInput;
 
-            if (SessionView.this.sharedProject != null) {
-                SessionView.this.sharedProject.addListener(this);
+            if (SessionView.this.sarosSession != null) {
+                SessionView.this.sarosSession.addListener(this);
             }
 
             this.tableViewer = (TableViewer) v;
@@ -217,10 +217,10 @@ public class SessionView extends ViewPart {
         }
 
         public Object[] getElements(Object parent) {
-            if (sharedProject == null)
+            if (sarosSession == null)
                 return new Object[] {};
 
-            User[] participants = sharedProject.getParticipants().toArray(
+            User[] participants = sarosSession.getParticipants().toArray(
                 new User[] {});
             Arrays.sort(participants, alphabeticalUserComparator);
 
@@ -469,8 +469,8 @@ public class SessionView extends ViewPart {
 
         // Add Session Listener
         sessionManager.addSessionListener(sessionListener);
-        if (sessionManager.getSharedProject() != null) {
-            this.viewer.setInput(sessionManager.getSharedProject());
+        if (sessionManager.getSarosSession() != null) {
+            this.viewer.setInput(sessionManager.getSarosSession());
         }
 
         updateEnablement();
@@ -490,29 +490,29 @@ public class SessionView extends ViewPart {
      * Needs to be called from the UI thread.
      */
     private void updateEnablement() {
-        this.viewer.getControl().setEnabled(this.sharedProject != null);
+        this.viewer.getControl().setEnabled(this.sarosSession != null);
     }
 
     public final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(final ISharedProject project) {
+        public void sessionStarted(final ISarosSession newSarosSession) {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    viewer.setInput(project);
+                    viewer.setInput(newSarosSession);
                 }
             });
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            assert sharedProject == project;
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            assert sarosSession == oldSarosSession;
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     viewer.setInput(null);
                 }
             });
-            sharedProject = null;
+            sarosSession = null;
         }
     };
 

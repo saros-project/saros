@@ -33,15 +33,15 @@ import org.joda.time.format.DateTimeFormatter;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
+import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -90,18 +90,18 @@ public class ChatView extends ViewPart {
         public void update(final Collection<String> addresses) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    ISharedProject sharedProject = sessionManager
-                        .getSharedProject();
-                    if (sharedProject == null)
+                    ISarosSession sarosSession = sessionManager
+                        .getSarosSession();
+                    if (sarosSession == null)
                         return;
 
                     for (String address : addresses) {
-                        JID jid = sharedProject
+                        JID jid = sarosSession
                             .getResourceQualifiedJID(new JID(address));
                         if (jid == null)
                             continue;
 
-                        User user = sharedProject.getUser(jid);
+                        User user = sarosSession.getUser(jid);
                         if (user == null)
                             continue;
 
@@ -184,9 +184,9 @@ public class ChatView extends ViewPart {
             if (!chatUsers.containsKey(saros.getMyJID()))
                 chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
 
-            ISharedProject sharedProject = sessionManager.getSharedProject();
-            if (sharedProject != null) {
-                for (User user : sharedProject.getParticipants()) {
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            if (sarosSession != null) {
+                for (User user : sarosSession.getParticipants()) {
                     if (!user.isLocal())
                         updateHumanReadableName(user);
                 }
@@ -217,7 +217,7 @@ public class ChatView extends ViewPart {
         log.debug("RosterListener added!");
         log.debug("SessionListener added!");
 
-        if (sessionManager.getSharedProject() == null) {
+        if (sessionManager.getSarosSession() == null) {
             log.debug("session started");
             if (!chatUsers.containsKey(saros.getMyJID()))
                 chatUsers.put(saros.getMyJID(), SELF_REFERENCE);

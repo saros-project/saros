@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
@@ -25,7 +25,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     private static final Logger log = Logger
         .getLogger(SharedDocumentProvider.class.getName());
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     @Inject
     protected SessionManager sessionManager;
@@ -35,25 +35,25 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
-            isDriver = sharedProject.isDriver();
-            sharedProject.addListener(sharedProjectListener);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
+            isDriver = sarosSession.isDriver();
+            sarosSession.addListener(sharedProjectListener);
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            assert sharedProject == project;
-            sharedProject.removeListener(sharedProjectListener);
-            sharedProject = null;
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            assert sarosSession == oldSarosSession;
+            sarosSession.removeListener(sharedProjectListener);
+            sarosSession = null;
         }
     };
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user) {
-            if (sharedProject != null) {
-                isDriver = sharedProject.isDriver();
+            if (sarosSession != null) {
+                isDriver = sarosSession.isDriver();
             } else {
                 log.warn("Internal error: Shared project null in roleChanged!");
             }
@@ -63,8 +63,8 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     public SharedDocumentProvider(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
 
-        if (sessionManager.getSharedProject() != null) {
-            sessionListener.sessionStarted(sessionManager.getSharedProject());
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
         sessionManager.addSessionListener(sessionListener);
     }
@@ -79,8 +79,8 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
         Saros.reinject(this);
 
-        if (sessionManager.getSharedProject() != null) {
-            sessionListener.sessionStarted(sessionManager.getSharedProject());
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
         sessionManager.addSessionListener(sessionListener);
     }
@@ -111,11 +111,11 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     private boolean isInSharedProject(Object element) {
 
-        if (sharedProject == null)
+        if (sarosSession == null)
             return false;
 
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
 
-        return sharedProject.isShared(fileEditorInput.getFile().getProject());
+        return sarosSession.isShared(fileEditorInput.getFile().getProject());
     }
 }

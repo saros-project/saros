@@ -25,9 +25,9 @@ import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -36,8 +36,8 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -63,7 +63,7 @@ public class ConsistencyWatchdogHandler {
 
     protected SessionManager sessionManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
@@ -80,19 +80,18 @@ public class ConsistencyWatchdogHandler {
     };
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
-
         @Override
-        public void sessionEnded(ISharedProject newSharedProject) {
-            if (sharedProject.isHost())
-                newSharedProject.removeActivityProvider(activityProvider);
-            sharedProject = null;
+        public void sessionStarted(ISarosSession newSharedProject) {
+            sarosSession = newSharedProject;
+            if (sarosSession.isHost())
+                newSharedProject.addActivityProvider(activityProvider);
         }
 
         @Override
-        public void sessionStarted(ISharedProject newSharedProject) {
-            sharedProject = newSharedProject;
-            if (sharedProject.isHost())
-                newSharedProject.addActivityProvider(activityProvider);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            if (sarosSession.isHost())
+                oldSarosSession.removeActivityProvider(activityProvider);
+            sarosSession = null;
         }
     };
 
@@ -140,16 +139,15 @@ public class ConsistencyWatchdogHandler {
                         try {
                             dialog.run(true, true, new IRunnableWithProgress() {
                                 public void run(IProgressMonitor monitor) {
-                                    runRecovery(checksumError, SubMonitor
-                                        .convert(monitor));
+                                    runRecovery(checksumError,
+                                        SubMonitor.convert(monitor));
                                 }
                             });
                         } catch (InvocationTargetException e) {
                             try {
                                 throw e.getCause();
                             } catch (CancellationException c) {
-                                log
-                                    .info("Recovery was cancelled by local user");
+                                log.info("Recovery was cancelled by local user");
                             } catch (Throwable t) {
                                 log.error("Internal Error: ", t);
                             }
@@ -171,7 +169,7 @@ public class ConsistencyWatchdogHandler {
         progress.beginTask("Performing recovery", 1200);
         try {
 
-            startHandles = stopManager.stop(sharedProject.getParticipants(),
+            startHandles = stopManager.stop(sarosSession.getParticipants(),
                 "Consistency recovery", progress.newChild(200));
 
             progress.subTask("Sending files to client...");
@@ -216,7 +214,7 @@ public class ConsistencyWatchdogHandler {
     protected void recoverFiles(ChecksumErrorActivity checksumError,
         SubMonitor progress) {
 
-        ISharedProject sharedProject = this.sharedProject;
+        ISarosSession sarosSession = this.sarosSession;
 
         progress
             .beginTask("Sending files", checksumError.getPaths().size() + 1);
@@ -225,13 +223,13 @@ public class ConsistencyWatchdogHandler {
             for (SPath path : checksumError.getPaths()) {
                 progress.subTask("Recovering file: "
                     + path.getProjectRelativePath().lastSegment());
-                recoverFile(checksumError.getSource(), sharedProject, path,
+                recoverFile(checksumError.getSource(), sarosSession, path,
                     progress.newChild(1));
             }
 
             // Tell the user that we sent all files
-            sharedProject.sendActivity(checksumError.getSource(),
-                new ChecksumErrorActivity(sharedProject.getLocalUser(), null,
+            sarosSession.sendActivity(checksumError.getSource(),
+                new ChecksumErrorActivity(sarosSession.getLocalUser(), null,
                     checksumError.getRecoveryID()));
         } finally {
             progress.done();
@@ -242,7 +240,7 @@ public class ConsistencyWatchdogHandler {
      * Recover a single file for the given user (that is either send the file or
      * tell the user to remove it).
      */
-    protected void recoverFile(User from, final ISharedProject sharedProject,
+    protected void recoverFile(User from, final ISarosSession sarosSession,
         final SPath path, SubMonitor progress) {
 
         progress.beginTask("Handling file: " + path.toString(), 10);
@@ -261,17 +259,17 @@ public class ConsistencyWatchdogHandler {
         progress.worked(1);
 
         // Reset jupiter
-        sharedProject.getConcurrentDocumentServer().reset(from.getJID(), path);
+        sarosSession.getConcurrentDocumentServer().reset(from.getJID(), path);
 
         progress.worked(1);
-        final User user = sharedProject.getLocalUser();
+        final User user = sarosSession.getLocalUser();
 
         if (file.exists()) {
 
             try {
                 // Send the file to client
-                sharedProject.sendActivity(from, FileActivity.created(user,
-                    path, Purpose.RECOVERY));
+                sarosSession.sendActivity(from,
+                    FileActivity.created(user, path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -287,7 +285,7 @@ public class ConsistencyWatchdogHandler {
                     checksum.update();
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            sharedProject.activityCreated(new ChecksumActivity(
+                            sarosSession.activityCreated(new ChecksumActivity(
                                 user, path, checksum.getHash(), checksum
                                     .getLength()));
                         }
@@ -306,12 +304,12 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            sharedProject.sendActivity(from, FileActivity.removed(user, path,
-                Purpose.RECOVERY));
+            sarosSession.sendActivity(from,
+                FileActivity.removed(user, path, Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    sharedProject.activityCreated(ChecksumActivity.missing(
-                        user, path));
+                    sarosSession.activityCreated(ChecksumActivity.missing(user,
+                        path));
                 }
             });
 

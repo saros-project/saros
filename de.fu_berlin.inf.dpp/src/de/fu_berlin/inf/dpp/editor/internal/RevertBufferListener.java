@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * The SharedEditorFileBufferListener listens for changes of buffers relating to
@@ -34,16 +34,16 @@ public class RevertBufferListener {
 
     protected EditorManager editorManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected FileReplacementInProgressObservable fileReplacementInProgress;
 
     public RevertBufferListener(EditorManager editorManager,
-        ISharedProject sharedProject,
+        ISarosSession sarosSession,
         FileReplacementInProgressObservable fileReplacementInProgress) {
 
         this.editorManager = editorManager;
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.fileReplacementInProgress = fileReplacementInProgress;
 
         FileBuffers.getTextFileBufferManager().addFileBufferListener(
@@ -68,7 +68,7 @@ public class RevertBufferListener {
                 if (fileReplacementInProgress.isReplacementInProgress())
                     return;
 
-                if (!sharedProject.isDriver()) {
+                if (!sarosSession.isDriver()) {
                     // TODO Trigger consistency recovery/check
                     log.warn("Observer reverted must cause inconsistencies");
                     return;
@@ -93,7 +93,7 @@ public class RevertBufferListener {
                     return;
 
                 // Is the revert in a shared IProject?
-                if (!sharedProject.isShared(fileResource.getProject()))
+                if (!sarosSession.isShared(fileResource.getProject()))
                     return;
 
                 SPath path = new SPath(fileResource);

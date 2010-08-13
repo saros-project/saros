@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This is used to check the state of {@link Saros} from the inside. Use this
@@ -90,19 +90,19 @@ public interface ISarosState extends Remote {
 
     /**
      * Returns true if the given {@link JID} is a participant of our
-     * {@link SharedProject}.
+     * {@link ISarosSession}.
      */
     public boolean isParticipant(JID jid) throws RemoteException;
 
     /**
      * Returns true if the given {@link JID} is a driver in this
-     * {@link SharedProject}.
+     * {@link ISarosSession}.
      */
     public boolean isDriver(JID jid) throws RemoteException;
 
     /**
      * Returns true if the given {@link JID} is a observer in this
-     * {@link SharedProject}.
+     * {@link ISarosSession}.
      */
     public boolean isObserver(JID jid) throws RemoteException;
 

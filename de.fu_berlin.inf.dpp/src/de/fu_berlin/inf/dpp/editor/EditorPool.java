@@ -20,7 +20,7 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -138,7 +138,7 @@ class EditorPool {
             .currentTimeMillis());
     }
 
-    public SPath getCurrentPath(IEditorPart editorPart, ISharedProject project) {
+    public SPath getCurrentPath(IEditorPart editorPart, ISarosSession sarosSession) {
 
         IEditorInput input = editorInputMap.get(editorPart);
         if (input == null) {
@@ -154,9 +154,9 @@ class EditorPool {
             return null;
         }
 
-        if (!project.isShared(file.getProject())) {
+        if (!sarosSession.isShared(file.getProject())) {
             log.warn("File is from incorrect project: " + file.getProject()
-                + " should be " + project + ": " + file, new StackTrace());
+                + " should be " + sarosSession + ": " + file, new StackTrace());
         }
 
         IPath path = file.getProjectRelativePath();
@@ -184,7 +184,7 @@ class EditorPool {
      * @return {@link IPath} of the Editor that was removed from the Pool, or
      *         <code>null</code> on error.
      */
-    public IPath remove(IEditorPart editorPart, ISharedProject project) {
+    public IPath remove(IEditorPart editorPart, ISarosSession sarosSession) {
 
         log.trace("EditorPool.remove " + editorPart + "invoked");
 
@@ -202,9 +202,9 @@ class EditorPool {
             return null;
         }
 
-        if (!project.isShared(file.getProject())) {
+        if (!sarosSession.isShared(file.getProject())) {
             log.warn("File is from incorrect project: " + file.getProject()
-                + " should be " + project + ": " + file, new StackTrace());
+                + " should be " + sarosSession + ": " + file, new StackTrace());
         }
 
         IPath path = file.getProjectRelativePath();
@@ -285,12 +285,12 @@ class EditorPool {
     /**
      * Removes all {@link IEditorPart} from the EditorPool.
      */
-    public void removeAllEditors(ISharedProject project) {
+    public void removeAllEditors(ISarosSession sarosSession) {
 
         log.trace("EditorPool.removeAllEditors invoked");
 
         for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
-            remove(part, project);
+            remove(part, sarosSession);
         }
 
         assert getAllEditors().size() == 0;

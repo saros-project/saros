@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
@@ -226,18 +226,17 @@ public class SelectionCollector extends AbstractStatisticCollector {
 
         data.setTotalOberserverSelectionCount((observerSelectionEvents.size()));
         data.setGestureCount(numberOfGestures);
-        data
-            .setWitnessedObserverSelections(numberOfWitnessedObserverSelections);
+        data.setWitnessedObserverSelections(numberOfWitnessedObserverSelections);
 
     }
 
     @Override
-    protected void doOnSessionEnd(ISharedProject project) {
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
         // nothing to do here
     }
 
     @Override
-    protected void doOnSessionStart(ISharedProject project) {
+    protected void doOnSessionStart(ISarosSession sarosSession) {
         // nothing to do here
     }
 

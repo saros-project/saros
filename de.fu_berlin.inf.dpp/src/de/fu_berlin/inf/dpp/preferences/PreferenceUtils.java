@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.Mixer;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.Mixer;
 
 import org.xiph.speex.spi.SpeexEncoding;
 

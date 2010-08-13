@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -49,32 +49,32 @@ public class ConsistencyAction extends Action {
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
-            public void sessionStarted(ISharedProject session) {
-                setSharedProject(session);
+            public void sessionStarted(ISarosSession newSarosSession) {
+                setSharedProject(newSarosSession);
             }
 
             @Override
-            public void sessionEnded(ISharedProject session) {
+            public void sessionEnded(ISarosSession oldSarosSession) {
                 setSharedProject(null);
             }
         });
 
-        setSharedProject(sessionManager.getSharedProject());
+        setSharedProject(sessionManager.getSarosSession());
     }
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
-    private void setSharedProject(ISharedProject newSharedProject) {
+    private void setSharedProject(ISarosSession newSharedProject) {
 
         // Unregister from previous project
-        if (sharedProject != null) {
+        if (sarosSession != null) {
             inconsistentObservable.remove(isConsistencyListener);
         }
 
-        sharedProject = newSharedProject;
+        sarosSession = newSharedProject;
 
         // Register to new project
-        if (sharedProject != null) {
+        if (sarosSession != null) {
             inconsistentObservable.addAndNotify(isConsistencyListener);
         } else {
             setEnabled(false);
@@ -85,7 +85,7 @@ public class ConsistencyAction extends Action {
 
         public void setValue(Boolean newValue) {
 
-            if (sharedProject.isHost() && newValue == true) {
+            if (sarosSession.isHost() && newValue == true) {
                 log.warn("No inconsistency should ever be reported"
                     + " to the host");
                 return;

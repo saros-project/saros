@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
@@ -35,7 +35,7 @@ public class RemoteEditorManager {
 
     protected Map<User, RemoteEditorState> editorStates = new HashMap<User, RemoteEditorState>();
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     /**
      * One editor of one user
@@ -244,8 +244,8 @@ public class RemoteEditorManager {
         }
     }
 
-    public RemoteEditorManager(ISharedProject sharedProject) {
-        this.sharedProject = sharedProject;
+    public RemoteEditorManager(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
     }
 
     public RemoteEditorState getEditorState(User user) {

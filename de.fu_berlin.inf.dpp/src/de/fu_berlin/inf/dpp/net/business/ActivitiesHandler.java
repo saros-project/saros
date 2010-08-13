@@ -19,17 +19,17 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
@@ -44,7 +44,7 @@ public class ActivitiesHandler {
         .getName());
 
     @Inject
-    protected SharedProjectObservable sharedProject;
+    protected SarosSessionObservable sarosSessionObservable;
 
     @Inject
     protected DispatchThreadContext dispatchThread;
@@ -168,9 +168,9 @@ public class ActivitiesHandler {
     public void receiveActivities(JID fromJID,
         List<TimedActivityDataObject> timedActivities) {
 
-        final ISharedProject project = sharedProject.getValue();
+        final ISarosSession session = sarosSessionObservable.getValue();
 
-        if (project == null || project.getUser(fromJID) == null) {
+        if (session == null || session.getUser(fromJID) == null) {
             log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
                 + ") " + Util.prefix(fromJID) + " but User is no participant: "
                 + timedActivities);
@@ -203,7 +203,7 @@ public class ActivitiesHandler {
                 // Ask sequencer to execute or queue until missing
                 // activityDataObjects
                 // arrive
-                project.getSequencer().exec(timedActivity);
+                session.getSequencer().exec(timedActivity);
             } catch (Exception e) {
                 log.error("Internal error", e);
             }

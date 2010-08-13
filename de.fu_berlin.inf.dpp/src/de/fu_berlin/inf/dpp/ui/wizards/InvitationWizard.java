@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -27,7 +27,7 @@ public class InvitationWizard extends Wizard {
 
     private static final Logger log = Logger.getLogger(InvitationWizard.class);
     protected Saros saros;
-    protected SharedProject sharedProject;
+    protected ISarosSession sarosSession;
     protected RosterTracker rosterTracker;
     protected DiscoveryManager discoveryManager;
     protected InvitationWizardUserSelection userSelection;
@@ -35,12 +35,12 @@ public class InvitationWizard extends Wizard {
     protected VersionManager versionManager;
     protected InvitationProcessObservable invitationProcesses;
 
-    public InvitationWizard(Saros saros, SharedProject sharedProject,
+    public InvitationWizard(Saros saros, ISarosSession sarosSession,
         RosterTracker rosterTracker, DiscoveryManager discoveryManager,
         SessionManager sessionManager, VersionManager versionManager,
         InvitationProcessObservable invitationProcesses) {
         this.saros = saros;
-        this.sharedProject = sharedProject;
+        this.sarosSession = sarosSession;
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;
         this.sessionManager = sessionManager;
@@ -64,14 +64,14 @@ public class InvitationWizard extends Wizard {
         for (JID user : usersToInvite) {
             sessionManager.invite(user,
                 "You have been invited to a Saros session by "
-                    + sharedProject.getHost().getJID().getBase());
+                    + sarosSession.getHost().getJID().getBase());
         }
         return true;
     }
 
     @Override
     public void addPages() {
-        userSelection = new InvitationWizardUserSelection(saros, sharedProject,
+        userSelection = new InvitationWizardUserSelection(saros, sarosSession,
             rosterTracker, discoveryManager, invitationProcesses);
         addPage(userSelection);
     }

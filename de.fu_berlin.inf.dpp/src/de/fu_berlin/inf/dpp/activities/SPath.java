@@ -6,7 +6,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * Objects of this class point to a document in the *workspace*, possibly with
@@ -68,9 +68,9 @@ public class SPath {
     /**
      * Turns this SPath into an SPathDataObject representing it globally.
      */
-    public SPathDataObject toSPathDataObject(ISharedProject sharedProject) {
+    public SPathDataObject toSPathDataObject(ISarosSession sarosSession) {
 
-        String id = sharedProject.getProjectMapper().getID(project);
+        String id = sarosSession.getProjectMapper().getID(project);
         if (id == null)
             throw new IllegalArgumentException(
                 "Trying to send a SPath which refers to a file in project which is not shared: "

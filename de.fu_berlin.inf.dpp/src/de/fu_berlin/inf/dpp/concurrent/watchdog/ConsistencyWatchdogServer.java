@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -68,7 +68,7 @@ public class ConsistencyWatchdogServer extends Job {
 
     protected SessionManager sessionManager;
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     public ConsistencyWatchdogServer(SessionManager sessionManager) {
         super("ConsistencyWatchdog");
@@ -77,10 +77,10 @@ public class ConsistencyWatchdogServer extends Job {
 
         this.sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
-            public void sessionStarted(ISharedProject newSharedProject) {
+            public void sessionStarted(ISarosSession newSarosSession) {
 
-                if (newSharedProject.isHost()) {
-                    sharedProject = newSharedProject;
+                if (newSarosSession.isHost()) {
+                    sarosSession = newSarosSession;
                     log.debug("Starting consistency watchdog");
                     setSystem(true);
                     setPriority(Job.SHORT);
@@ -89,12 +89,12 @@ public class ConsistencyWatchdogServer extends Job {
             }
 
             @Override
-            public void sessionEnded(ISharedProject session) {
+            public void sessionEnded(ISarosSession oldSarosSession) {
 
-                if (sharedProject != null) {
+                if (sarosSession != null) {
                     // Cancel Job
                     cancel();
-                    sharedProject = null;
+                    sarosSession = null;
 
                     // Unregister from all documents
                     for (DocumentChecksum document : docsChecksums.values()) {
@@ -119,10 +119,10 @@ public class ConsistencyWatchdogServer extends Job {
     }
 
     protected IStatus runUnsafe(IProgressMonitor monitor) {
-        if (sessionManager.getSharedProject() == null)
+        if (sessionManager.getSarosSession() == null)
             return Status.OK_STATUS;
 
-        assert sharedProject.isHost() : "This job is intended to be run on host side!";
+        assert sarosSession.isHost() : "This job is intended to be run on host side!";
 
         // If connection is closed, checking does not make sense...
         if (saros.getConnectionState() != ConnectionState.CONNECTED) {
@@ -228,10 +228,10 @@ public class ConsistencyWatchdogServer extends Job {
 
                     // Sent an checksum to everybody
                     ChecksumActivity checksumActivity = new ChecksumActivity(
-                        sharedProject.getLocalUser(), checksum.getPath(),
+                        sarosSession.getLocalUser(), checksum.getPath(),
                         checksum.getHash(), checksum.getLength());
 
-                    sharedProject.activityCreated(checksumActivity);
+                    sarosSession.activityCreated(checksumActivity);
 
                 } finally {
                     if (provider != null) {

@@ -36,7 +36,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -74,10 +74,10 @@ public class AddToSessionAction implements IObjectActionDelegate {
         this.selectedProject = getProject(selection);
 
         action.setEnabled(saros.isConnected()
-            && sessionManager.getSharedProject() != null
+            && sessionManager.getSarosSession() != null
             && (this.selectedProject != null)
             && this.selectedProject.isAccessible()
-            && !sessionManager.getSharedProject()
+            && !sessionManager.getSarosSession()
                 .isShared(this.selectedProject));
     }
 
@@ -94,10 +94,10 @@ public class AddToSessionAction implements IObjectActionDelegate {
     }
 
     protected void runSafe() {
-        final ISharedProject project = sessionManager.getSharedProject();
+        final ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        if (project.isHost()) {
-            project.getProjectMapper().addMapping(
+        if (sarosSession.isHost()) {
+            sarosSession.getProjectMapper().addMapping(
                 this.selectedProject.getName(), this.selectedProject);
 
             log.info("Added mapping for project: "
@@ -116,7 +116,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
                         if (newText == null || newText.trim().length() == 0) {
                             return "Saros needs the name of the project on the host side!";
                         } else {
-                            if (project.getProjectMapper().getProject(newText) != null)
+                            if (sarosSession.getProjectMapper().getProject(newText) != null)
                                 return "Project Name is already used to share a project!";
                         }
                         // Okay...
@@ -125,7 +125,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
                 });
 
             if (dialog.open() == Window.OK) {
-                project.getProjectMapper().addMapping(dialog.getValue(),
+                sarosSession.getProjectMapper().addMapping(dialog.getValue(),
                     this.selectedProject);
                 log.info("Added mapping for project: "
                     + this.selectedProject.getName() + " using ID: "

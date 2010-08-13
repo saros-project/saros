@@ -12,7 +12,6 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -23,26 +22,26 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * 
  * The (I)SessionManager is responsible for providing a link between the
  * basically static world managed by PicoContainer where every class has just a
- * singleton instance which never changes and the {@link SharedProject} which
+ * singleton instance which never changes and the {@link ISarosSession} which
  * can change many times during the course of the plug-in life-cycle.
  */
 @Component(module = "net")
 public interface ISessionManager {
 
     /**
-     * @return the active SharedProject object or <code>null</code> if there is
-     *         no active project.
+     * @return the active SarosSession object or <code>null</code> if there is
+     *         no active session.
      */
-    public ISharedProject getSharedProject();
+    public ISarosSession getSarosSession();
 
     /**
-     * Starts a new shared project with the local user as only participant.
+     * Starts a new Saros session with the local user as only participant.
      * 
      * @param project
      *            the local Eclipse project which should become shared.
      * @param useVersionControl
      *            true iff this session uses Version Control, see
-     *            {@link ISharedProject#useVersionControl()}.
+     *            {@link ISarosSession#useVersionControl()}.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
@@ -50,8 +49,8 @@ public interface ISessionManager {
         boolean useVersionControl) throws XMPPException;
 
     /**
-     * Creates a shared project for a session hosted remotely. The returned
-     * project is NOT started!
+     * Creates a Saros session for a shared project hosted remotely. The
+     * returned session is NOT started!
      * 
      * @param projectID
      *            the ID to use when sending activities. This ID is set by the
@@ -60,22 +59,22 @@ public interface ISessionManager {
      *            the local Eclipse project which should be used to replicate
      *            the remote shared project.
      * @param host
-     *            the host of the remotely shared project.
+     *            the host of the session.
      * @param myColorID
      *            Color ID of the local user
      * 
-     * @return the shared project.
+     * @return the new Saros session.
      */
-    public ISharedProject joinSession(String projectID, IProject project,
+    public ISarosSession joinSession(String projectID, IProject project,
         JID host, int myColorID, DateTime sessionStart);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
      * will close the session for everybody.
      * 
-     * Has no effect if there is no currently shared project.
+     * Has no effect if there is no open session.
      */
-    public void stopSharedProject();
+    public void stopSarosSession();
 
     /**
      * Sets the sessionID to <code>NOT_IN_SESSION</code>

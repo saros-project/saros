@@ -34,8 +34,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -56,23 +56,23 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     public static final ImageDescriptor projectDescriptor = SarosUI
         .getImageDescriptor("icons/bullet_feed.png"); // NON-NLS-1
 
-    protected ISharedProject sharedProject;
+    protected ISarosSession sarosSession;
 
     protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject project) {
-            sharedProject = project;
-            updateDecoratorsAsync(project.getProjects().toArray());
+        public void sessionStarted(ISarosSession newSarosSession) {
+            sarosSession = newSarosSession;
+            updateDecoratorsAsync(newSarosSession.getProjects().toArray());
         }
 
         @Override
-        public void sessionEnded(ISharedProject project) {
-            assert sharedProject == project;
-            sharedProject = null;
-            updateDecoratorsAsync(project.getProjects().toArray());
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            assert sarosSession == oldSarosSession;
+            sarosSession = null;
+            updateDecoratorsAsync(oldSarosSession.getProjects().toArray());
         }
     };
 
@@ -85,21 +85,21 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
         sessionManager.addSessionListener(sessionListener);
 
-        if (sessionManager.getSharedProject() != null) {
-            sessionListener.sessionStarted(sessionManager.getSharedProject());
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
     }
 
     public void decorate(Object element, IDecoration decoration) {
 
-        if (this.sharedProject == null) {
+        if (this.sarosSession == null) {
             return;
         }
 
         // Enablement in the Plugin.xml ensures that we only get IProjects
 
         if (element instanceof IProject) {
-            if (!this.sharedProject.isShared((IProject) element))
+            if (!this.sarosSession.isShared((IProject) element))
                 return;
 
             decoration.addOverlay(SharedProjectDecorator.projectDescriptor,

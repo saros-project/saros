@@ -345,10 +345,9 @@ public class FileStub implements IFile {
 
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Map getPersistentProperties() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     public String getPersistentProperty(QualifiedName key) throws CoreException {

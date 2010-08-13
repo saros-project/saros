@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -53,15 +53,15 @@ public class LeaveHandler {
         @Override
         public void leaveReceived(JID fromJID) {
 
-            final ISharedProject project = sessionManager.getSharedProject();
+            final ISarosSession sarosSession = sessionManager.getSarosSession();
 
-            if (project == null) {
+            if (sarosSession == null) {
                 log.warn("Received leave message but shared"
                     + " project has already ended: " + fromJID);
                 return;
             }
 
-            final User user = project.getUser(fromJID);
+            final User user = sarosSession.getUser(fromJID);
             if (user == null) {
                 log.warn("Received leave message from user which"
                     + " is not part of our shared project session: " + fromJID);
@@ -72,7 +72,7 @@ public class LeaveHandler {
             // RaceConditions can occur when two users leave a the "same" time
 
             if (user.isHost()) {
-                sessionManager.stopSharedProject();
+                sessionManager.stopSarosSession();
 
                 WarningMessageDialog.showWarningMessage("Closing the Session",
                     "Closing the session because the host left.");
@@ -81,7 +81,7 @@ public class LeaveHandler {
                 Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         // FIXME see above...
-                        project.removeUser(user);
+                        sarosSession.removeUser(user);
                     }
                 });
             }

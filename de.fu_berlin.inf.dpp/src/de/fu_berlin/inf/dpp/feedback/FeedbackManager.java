@@ -18,8 +18,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackDialog;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -60,12 +60,12 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject session) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             startTime = new Date();
         }
 
         @Override
-        public void sessionEnded(ISharedProject session) {
+        public void sessionEnded(ISarosSession oldSarosSession) {
             sessionTime = (new Date().getTime() - startTime.getTime()) / 1000;
             log.info(String.format("Session lasted %s min %s s",
                 sessionTime / 60, sessionTime % 60));
@@ -307,8 +307,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
         if (!Util.openExternalBrowser(SURVEY_URL)) {
             browserType = BROWSER_INT;
 
-            if (!Util.openInternalBrowser(SURVEY_URL, Messages
-                .getString("feedback.dialog.title"))) {
+            if (!Util.openInternalBrowser(SURVEY_URL,
+                Messages.getString("feedback.dialog.title"))) {
                 browserType = BROWSER_NONE;
                 // last resort: present a link to the survey
                 // TODO user should be able to copy&paste the link easily

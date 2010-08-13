@@ -40,15 +40,15 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 
 /**
- * Shared projects are the central concept of this plugin. They are associated
- * with usual Eclipse projects and make them available for synchronous/real-time
- * collaboration.
+ * A SarosSession consists of one or more shared projects, which are the central
+ * concept of this plugin. They are associated with Eclipse projects and make
+ * them available for synchronous/real-time collaboration.
  * 
  * TODO Is this interface really necessary?
  * 
  * @author rdjemili
  */
-public interface ISharedProject extends IActivityListener {
+public interface ISarosSession extends IActivityListener {
 
     /**
      * @return a collection of all participants of the shared project. This
@@ -105,7 +105,7 @@ public interface ISharedProject extends IActivityListener {
     public boolean isDriver();
 
     /**
-     * The host is the person that initiated this SharedProject and holds all
+     * The host is the person that initiated this SarosSession and holds all
      * original files.
      * 
      * @immutable This method will always return the same value for a session
@@ -195,7 +195,7 @@ public interface ISharedProject extends IActivityListener {
     /**
      * Given a JID (with resource or not), will return the resource qualified
      * JID associated with a User in this project or null if no user for the
-     * given JID exists in this SharedProject.
+     * given JID exists in this SarosSession.
      */
     public JID getResourceQualifiedJID(JID jid);
 
@@ -234,7 +234,7 @@ public interface ISharedProject extends IActivityListener {
     public ITransmitter getTransmitter();
 
     /**
-     * The Saros Plugin this SharedProject is running in.
+     * The Saros Plugin this SarosSession is running in.
      */
     public Saros getSaros();
 
@@ -336,7 +336,7 @@ public interface ISharedProject extends IActivityListener {
     public List<User> getRemoteObservers();
 
     /**
-     * Returns the DateTime at which this SharedProject was started on the host.
+     * Returns the DateTime at which this SarosSession was started on the host.
      */
     public DateTime getSessionStart();
 

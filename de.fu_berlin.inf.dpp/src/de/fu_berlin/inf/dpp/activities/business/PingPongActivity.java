@@ -6,7 +6,7 @@ import org.joda.time.Duration;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class PingPongActivity extends AbstractActivity {
 
@@ -57,7 +57,7 @@ public class PingPongActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
-    public IActivityDataObject getActivityDataObject(ISharedProject project) {
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new PingPongActivityDataObject(source.getJID(), initiator
             .getJID(), departureTime);
     }

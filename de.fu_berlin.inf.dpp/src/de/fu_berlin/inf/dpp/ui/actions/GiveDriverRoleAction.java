@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -40,16 +40,17 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
-            sharedProject.removeListener(projectListener);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            newSarosSession.addListener(projectListener);
             updateEnablement();
         }
 
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
-            sharedProject.addListener(projectListener);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            oldSarosSession.removeListener(projectListener);
             updateEnablement();
         }
+
     };
 
     @Inject
@@ -86,7 +87,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     }
 
     protected void updateEnablement() {
-        ISharedProject project = sessionManager.getSharedProject();
+        ISarosSession project = sessionManager.getSarosSession();
 
         boolean enabled = ((project != null) && (this.selectedUser != null)
             && project.isHost() && this.selectedUser.isObserver());

@@ -28,8 +28,8 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -64,14 +64,14 @@ public class RemoveAllDriverRoleAction extends Action {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject sharedProject) {
-            sharedProject.addListener(sharedProjectListener);
+        public void sessionStarted(ISarosSession newSarosSession) {
+            newSarosSession.addListener(sharedProjectListener);
             updateEnablement();
         }
 
         @Override
-        public void sessionEnded(ISharedProject sharedProject) {
-            sharedProject.removeListener(sharedProjectListener);
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            oldSarosSession.removeListener(sharedProjectListener);
             updateEnablement();
         }
     };
@@ -104,8 +104,8 @@ public class RemoveAllDriverRoleAction extends Action {
 
     public void runRemoveAllDrivers() {
 
-        ISharedProject project = sessionManager.getSharedProject();
-        for (User user : project.getParticipants()) {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        for (User user : sarosSession.getParticipants()) {
             if (user.isDriver()) {
                 sarosUI.performRoleChange(user, UserRole.OBSERVER);
             }
@@ -114,7 +114,7 @@ public class RemoveAllDriverRoleAction extends Action {
     }
 
     protected void updateEnablement() {
-        ISharedProject project = sessionManager.getSharedProject();
-        setEnabled((project != null && project.isHost()));
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        setEnabled((sarosSession != null && sarosSession.isHost()));
     }
 }

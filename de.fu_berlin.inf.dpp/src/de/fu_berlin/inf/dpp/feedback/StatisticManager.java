@@ -21,8 +21,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -55,7 +55,7 @@ public class StatisticManager extends AbstractFeedbackManager {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject session) {
+        public void sessionStarted(ISarosSession newSarosSession) {
             statistic = new SessionStatistic();
             activeCollectors = Collections
                 .synchronizedSet(new HashSet<AbstractStatisticCollector>(
@@ -377,8 +377,8 @@ public class StatisticManager extends AbstractFeedbackManager {
         } else {
             log.info(String.format("Statistic was "
                 + "gathered and saved to %s, but the "
-                + "submission is forbidden by the user.", file
-                .getAbsolutePath()));
+                + "submission is forbidden by the user.",
+                file.getAbsolutePath()));
         }
     }
 
@@ -397,8 +397,8 @@ public class StatisticManager extends AbstractFeedbackManager {
             @Override
             public IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadStatisticFile(file, SubMonitor
-                        .convert(monitor));
+                    FileSubmitter.uploadStatisticFile(file,
+                        SubMonitor.convert(monitor));
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
