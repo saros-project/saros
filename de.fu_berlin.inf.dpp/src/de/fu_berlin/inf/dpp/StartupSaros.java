@@ -66,7 +66,6 @@ public class StartupSaros implements IStartup {
     }
 
     public void earlyStartup() {
-
         String currentVersion = saros.getVersion();
         String lastVersion = saros.getConfigPrefs().get(
             PreferenceConstants.SAROS_VERSION, "unknown");
@@ -110,8 +109,17 @@ public class StartupSaros implements IStartup {
 
                 try {
                     bot.init("Bot", port);
-                    bot.exportState(new SarosState(saros, sessionManager,
-                        dataTransferManager), "state");
+                    /*
+                     * sometimes when connecting to a server i'm getting error:
+                     * java.rmi.NoSuchObjectException:no Such object in table.
+                     * This happens when the remote object the stub refers to
+                     * has been DGC'd and GC's locally. My solution is keeping a
+                     * static references "classVariable" to the object in the
+                     * object in the server JVM.
+                     */
+                    SarosState.classVariable = new SarosState(saros,
+                        sessionManager, dataTransferManager);
+                    bot.exportState(SarosState.classVariable, "state");
                     bot.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);
