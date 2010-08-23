@@ -64,6 +64,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void openViewByName(String category, String nodeName)
         throws RemoteException;
 
+    public boolean openViewByNameNew(String category, String nodeName)
+        throws RemoteException;
+
     /**
      * Clicks {@link SWTBotButton} with the given buttonText in a pop up window
      * ({@link SWTBotShell}) with given title.
@@ -370,4 +373,20 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      */
     public String test() throws RemoteException;
 
+    /**
+     * Lin
+     */
+    public void activeMusician() throws RemoteException;
+
+    public void waitForConnect() throws RemoteException;
+
+    public boolean isPerspectiveOpen(String title) throws RemoteException;
+
+    public void openPerspectiveByName(String nodeName) throws RemoteException;
+
+    public void typeInTextInClass(String contents, String projectName,
+        String packageName, String className) throws RemoteException;
+
+    public void openFile(String projectName, String packageName,
+        String className) throws RemoteException;
 }

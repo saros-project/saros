@@ -16,18 +16,28 @@ import de.fu_berlin.inf.dpp.Saros;
  * On the bottom you will find the used configurations which is used by STF.
  */
 public class BotConfiguration {
-    public final static boolean DEVELOPMODE = false;
+    public final static boolean DEVELOPMODE = true;
 
     /**
      * Directory for temporary files for saving screen captures.
      */
-    public final static transient String TEMPDIR = System
-        .getProperty("java.io.tmpdir");
+    // public final static transient String TEMPDIR = System
+    // .getProperty("java.io.tmpdir");
 
+    // public final static transient String TEMPDIR =
+    // "D:\\Lin\\Space\\Saros_10.07.30\\screenshot";
+
+    public final static transient String SCREENSHOTDIR = "screenshot";
     /** A small Java Project */
     public final static String PROJECTNAME = "Foo_Saros";
     public final static String CLASSNAME = "MyClass";
     public final static String PACKAGENAME = "my.pkg";
+    public final static String CONTENTPATH = "test-files/" + CLASSNAME
+        + ".java";
+
+    public final static String NAME_ROSTER_VIEW = "ROSTER";
+    public final static String NAME_SESSION_VIEW = "Shared Project Session";
+    public final static String NAME_CHAT_VIEW = "Chat View";
 
     /**
      * VM test accounts
@@ -67,26 +77,20 @@ public class BotConfiguration {
     /**
      * Local test accounts
      */
-    // private final static String JID_ALICE_LOCAL = ("alice_fu@jabber.org/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
-
-    private final static String JID_ALICE_LOCAL = ("lin@saros-con.imp.fu-berlin.de/");
+    private final static String JID_ALICE_LOCAL = ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
     private final static String PASSWORD_ALICE_LOCAL = "lin";
-
     private final static String HOST_ALICE_LOCAL = "localhost";
     private final static int PORT_ALICE_LOCAL = 12345;
-    // private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.org/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
-    private final static String JID_BOB_LOCAL = ("lin2@saros-con.imp.fu-berlin.de");
+
+    private final static String JID_BOB_LOCAL = ("lin2@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
     private final static String PASSWORD_BOB_LOCAL = "lin2";
     private final static String HOST_BOB_LOCAL = "localhost";
     private final static int PORT_BOB_LOCAL = 12346;
-    private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.org/" + Saros.RESOURCE);
-    private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
+
+    private final static String JID_CARL_LOCAL = ("carl_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_CARL_LOCAL = "carl";
     private final static String HOST_CARL_LOCAL = "localhost";
-    private final static int PORT_CARL_LOCAL = 1099;
+    private final static int PORT_CARL_LOCAL = 12347;
 
     /**
      * test accounts

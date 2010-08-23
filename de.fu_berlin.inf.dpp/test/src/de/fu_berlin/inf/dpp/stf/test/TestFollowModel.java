@@ -1,12 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +12,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 
-public class TestShareProject {
+public class TestFollowModel {
     // bots
     protected Musician inviter;
     protected Musician invitee;
@@ -47,16 +45,16 @@ public class TestShareProject {
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
-    @After
-    public void cleanupInvitee() throws RemoteException {
-        invitee.xmppDisconnect();
-        invitee.removeProject(BotConfiguration.PROJECTNAME);
-    }
-
-    @After
-    public void cleanupInviter() throws RemoteException {
-        inviter.xmppDisconnect();
-    }
+    // @After
+    // public void cleanupInvitee() throws RemoteException {
+    // invitee.xmppDisconnect();
+    // invitee.removeProject(BotConfiguration.PROJECTNAME);
+    // }
+    //
+    // @After
+    // public void cleanupInviter() throws RemoteException {
+    // inviter.xmppDisconnect();
+    // }
 
     @Test
     public void testShareProject() throws RemoteException {
@@ -66,35 +64,17 @@ public class TestShareProject {
         inviter.shareProject(invitee, BotConfiguration.PROJECTNAME);
         invitee.waitOnWindowByTitle("Session Invitation");
         invitee.ackProject(inviter, BotConfiguration.PROJECTNAME);
-
-        invitee.captureScreenshot(invitee.getPathToScreenShot()
-            + "/invitee_in_sharedproject.png");
-        inviter.captureScreenshot(inviter.getPathToScreenShot()
-            + "/inviter_in_sharedproject.png");
+        invitee.openFile(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         inviter.typeInTextInClass(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
-        invitee.openFile(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        invitee.sleep(750);
 
+        invitee.followDriver(inviter);
         invitee.sleep(2000);
-        assertTrue(invitee.isParticipant());
-        assertTrue(invitee.isObserver());
-        assertTrue(invitee.isParticipant(inviter));
-        assertTrue(invitee.isDriver(inviter));
-
-        assertTrue(inviter.isParticipant());
-        assertTrue(inviter.isDriver());
-        assertTrue(inviter.isParticipant(invitee));
-        assertTrue(inviter.isObserver(invitee));
-
-        invitee.leave(true);
-        invitee.sleep(2000);
-        assertFalse(invitee.isParticipant());
-        inviter.leave(false);
-        invitee.sleep(2000);
-        assertFalse(inviter.isParticipant());
+        assertTrue(invitee.isInFollowMode(inviter));
     }
 }

@@ -25,6 +25,11 @@ public class TestHandleContacts {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         respondent.initRmi();
+        respondent.activeMusican();
+
+        if (respondent.isViewOpen("Welcome"))
+            respondent.closeViewByTitle("Welcome");
+
         respondent.openSarosViews();
         respondent.xmppConnect();
     }
@@ -35,6 +40,11 @@ public class TestHandleContacts {
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         questioner.initRmi();
+        questioner.activeMusican();
+
+        if (questioner.isViewOpen("Welcome"))
+            questioner.closeViewByTitle("Welcome");
+
         questioner.openSarosViews();
         questioner.xmppConnect();
     }
@@ -51,15 +61,20 @@ public class TestHandleContacts {
 
     @Test
     public void testAddAndRemoveContact() throws RemoteException {
+        questioner.waitForConnect();
+        respondent.waitForConnect();
         questioner.removeContact(respondent);
+        questioner.sleep(750);
         respondent.clickButtonOnPopup("Removal of subscription", "OK");
-        questioner.clickButtonOnPopup("Removal of subscription", "OK");
+        respondent.sleep(750);
         assertFalse(questioner.hasContact(respondent));
         assertFalse(respondent.hasContact(questioner));
 
         questioner.addContact(respondent);
+        questioner.sleep(750);
         respondent.ackContact(questioner);
         questioner.ackContact(respondent);
+        questioner.sleep(2000);
         assertTrue(questioner.hasContact(respondent));
         assertTrue(respondent.hasContact(questioner));
     }

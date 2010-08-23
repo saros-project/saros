@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.swtbot;
 
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
+
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -11,15 +13,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+
+import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.conditions.SarosSWTBotPreferences;
 
 /**
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
@@ -29,7 +42,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     private static final transient Logger log = Logger
         .getLogger(RmiSWTWorkbenchBot.class);
 
-    private static final boolean SCREENSHOTS = false;
+    private static final boolean SCREENSHOTS = true;
 
     protected static transient SWTWorkbenchBot delegate;
 
@@ -42,6 +55,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /** RMI exported remote usable SWTWorkbenchBot replacement */
     public IRmiSWTWorkbenchBot stub;
+
+    public static String WHICHOS = System.getProperty("os.name");
+
+    public final static String MAC = "Mac OS X";
+    public final static String WINDOW = "WINDOW";
 
     /** RmiSWTWorkbenchBot is a singleton */
     public static RmiSWTWorkbenchBot getInstance() {
@@ -168,11 +186,37 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             delegate.sleep(750);
             delegate.textWithLabel("Name:").setText(className);
             delegate.sleep(750);
+            implementsInterface("java.lang.Runnable");
+            delegate.checkBox("Inherited abstract methods").click();
+            delegate.sleep(750);
             delegate.button("Finish").click();
-            delegate.sleep(5000);
+            delegate.sleep(750);
+
+            SWTBotEclipseEditor editor = delegate.editorByTitle(
+                className + ".java").toTextEditor();
+            delegate.cTabItem(className + ".java").activate();
+            delegate.sleep(750);
+            editor.navigateTo(2, 0);
+            editor.quickfix("Add unimplemented methods");
+            editor.save();
+            delegate.sleep(750);
         } catch (WidgetNotFoundException e) {
             log.error("error creating new Java Class", e);
         }
+    }
+
+    private void implementsInterface(String interfaceClass)
+        throws WidgetNotFoundException {
+        delegate.button("Add...").click();
+        delegate.sleep(750);
+        delegate.shell("Implemented Interfaces Selection").activate();
+        delegate.sleep(750);
+        delegate.textWithLabel("Choose interfaces:").setText(interfaceClass);
+        delegate.sleep(750);
+        delegate.waitUntil(Conditions.tableHasRows(delegate.table(), 1));
+        delegate.button("OK").click();
+        delegate.sleep(750);
+        delegate.shell("New Java Class").activate();
     }
 
     public void newJavaProject() {
@@ -234,7 +278,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void openViewByName(String category, String nodeName) {
-        delegate.sleep(750);
+
+        // delegate.sleep(750);
         delegate.menu("Window").menu("Show View").menu("Other...").click();
         delegate.sleep(750);
         SWTBotText text = delegate.text("type filter text");
@@ -244,11 +289,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.sleep(750);
         treeitem.getNode(nodeName).select();
         delegate.sleep(750);
-        if (delegate.button(1).isEnabled())
-            delegate.button(1).click(); // OK
+        if (delegate.button("OK").isEnabled())
+            delegate.button("OK").click(); // OK
         else
             throw new RuntimeException("OK button was not enabled");
         delegate.sleep(750);
+
     }
 
     /**
@@ -256,21 +302,51 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * Explorer.
      */
     public void removeProject(String projectName) {
-        SWTBotView view = delegate.viewByTitle("Package Explorer");
-        delegate.sleep(250);
-        SWTBotTree tree = view.bot().tree().select(projectName);
-        SWTBotTreeItem item = tree.getTreeItem(projectName).select();
-        SWTBotMenu menu = item.contextMenu("Delete");
-        delegate.sleep(250);
-        menu.click();
+        // SWTBotView view = delegate.viewByTitle("Package Explorer");
+        //
+        // delegate.sleep(250);
+        // SWTBotTree tree =
+        // delegate.viewByTitle("Package Explorer").bot().tree();
+        //
+        // SWTBotTreeItem item = tree.getTreeItem(projectName).select();
+        // SWTBotMenu menu = item.contextMenu("Delete");
+        // delegate.sleep(250);
+        // menu.click();
         // delegate.shell("Delete Resources").activate();
-        delegate.checkBox().select();
-        delegate.sleep(250);
+        // delegate.checkBox().select();
+        // delegate.sleep(250);
+        // delegate.button("OK").click();
+
+        SWTBotView packageExplorerView = delegate
+            .viewByTitle("Package Explorer");
+        packageExplorerView.show();
+        Composite packageExplorerComposite = (Composite) packageExplorerView
+            .getWidget();
+        Tree swtTree = delegate.widget(WidgetMatcherFactory
+            .widgetOfType(Tree.class), packageExplorerComposite);
+
+        SWTBotTree tree1 = new SWTBotTree(swtTree);
+
+        tree1.select(projectName);
+
+        delegate.menu("Edit").menu("Delete").click();
+
+        // the project deletion confirmation dialog
+        SWTBotShell shell = delegate.shell("Delete Resources");
+        shell.activate();
+        delegate.checkBox("Delete project contents on disk (cannot be undone)")
+            .select();
         delegate.button("OK").click();
+        delegate.waitUntil(shellCloses(shell));
     }
 
     /*********************** low-level RMI exported Methods *******************/
 
+    /**
+     * i think, the method delegate.activeShell() return currently active shell.
+     * if it does not exist such a shell, other deacitve shell wouldn't be
+     * active.
+     */
     public void activeShell() {
         delegate.activeShell();
     }
@@ -375,6 +451,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isViewOpen(String title) {
         try {
             return delegate.viewByTitle(title) != null;
+
         } catch (WidgetNotFoundException e) {
             return false;
         }
@@ -428,5 +505,164 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public String test() {
         return "TEST";
+    }
+
+    public boolean openViewByNameNew(String category, String nodeName)
+        throws RemoteException {
+        try {
+            delegate.waitUntil(Conditions.shellIsActive("test"));
+            delegate.sleep(750);
+            delegate.menu("Window").menu("Show View").menu("Other...").click();
+            delegate.sleep(750);
+            SWTBotText text = delegate.text("type filter text");
+            text.setText(nodeName);
+            delegate.sleep(750);
+            SWTBotTreeItem treeitem = delegate.tree(0).getTreeItem(category);
+            delegate.sleep(750);
+            treeitem.getNode(nodeName).select();
+            delegate.sleep(750);
+            if (WHICHOS.equals(MAC)) {
+                if (delegate.button(1).isEnabled())
+                    delegate.button(1).click(); // OK
+                else
+                    throw new RuntimeException("OK button was not enabled");
+            } else {
+                if (delegate.button(0).isEnabled())
+                    delegate.button(0).click(); // OK
+                else
+                    throw new RuntimeException("OK button was not enabled");
+            }
+
+            delegate.sleep(750);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Lin
+     */
+    public void activeMusician() {
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells) {
+            log.debug(shell.getText());
+        }
+        if (shells != null) {
+            if (!shells[0].isActive()) {
+                shells[0].activate();
+                delegate.sleep(750);
+            }
+
+        } else {
+            if (shells == null) {
+                log
+                    .warn("There are no shell!"
+                        + "At the beginning with a test we need to at first run one or more saros instance with the test run-configuration. "
+                        + "Please look at the test, start the accordingly saros-instances and try again.");
+            } else
+                log
+                    .warn("There are more than one shell! Before testing you need only to start the needed saros-instances. rest thing would be done by the test."
+                        + "At the beginning with the test we should active the shell (saros instance, which would be getestet). otherweise some of Test may be"
+                        + "successfully performed, because 'delegate' can not find the suitable topmenu. deactive application in OS Mac hide also his topmenu.");
+        }
+    }
+
+    public void waitForConnect() {
+        waitUntil(SarosConditions.isConnect(delegate));
+    }
+
+    private void waitUntil(ICondition condition) throws TimeoutException {
+        delegate.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
+    }
+
+    public boolean isPerspectiveOpen(String title) {
+        try {
+            return delegate.perspectiveByLabel(title).isActive();
+            // return delegate.activePerspective().getLabel().equals(title);
+            // return true;
+
+        } catch (WidgetNotFoundException e) {
+            log.warn("perspective '" + title + "' doesn't exist!");
+            return false;
+        }
+
+    }
+
+    public void openPerspectiveByName(String nodeName) {
+
+        delegate.menu("Window").menu("Open Perspective").menu("Other...")
+            .click();
+        delegate.sleep(750);
+        SWTBotShell openPerspectiveShell = delegate.shell("Open Perspective");
+
+        openPerspectiveShell.activate();
+        delegate.sleep(750);
+        delegate.table().select(nodeName);
+        delegate.sleep(750);
+        if (delegate.button("OK").isEnabled())
+            delegate.button("OK").click();
+        else
+            throw new RuntimeException("OK button was not enabled");
+        delegate.sleep(750);
+    }
+
+    public void typeInTextInClass(String contents, String projectName,
+        String packageName, String className) throws RemoteException {
+        SWTBotEditor editor;
+        try {
+            editor = delegate.editorByTitle(className + ".java");
+        } catch (WidgetNotFoundException e) {
+            openFile(projectName, packageName, className);
+            editor = delegate.editorByTitle(className + ".java");
+        }
+        SWTBotEclipseEditor e = editor.toTextEditor();
+        delegate.cTabItem(className + ".java").activate();
+
+        // Keyboard keyboard = KeyboardFactory.getDefaultKeyboard(e.getWidget(),
+        // null);
+        //
+        // e.navigateTo(7, 0);
+        // e.setFocus();
+        // keyboard.typeText("HelloWorldssdfffffffffffffffffffffffffffffffff");
+        // delegate.sleep(2000);
+        // // e.autoCompleteProposal("sys", "sysout - print to standard out");
+        // //
+        // // e.navigateTo(3, 0);
+        // // e.autoCompleteProposal("main", "main - main method");
+        // //
+        // // e.typeText("new Thread (new HelloWorld ());");
+        // if (true)
+        // return;
+        // e.notifyKeyboardEvent(SWT.CTRL, '2');
+        // e.notifyKeyboardEvent(SWT.NONE, 'L');
+        // e.notifyKeyboardEvent(SWT.NONE, '\n');
+        //
+        // e.typeText("\n");
+        // e.typeText("thread.start();\n");
+        // e.typeText("thread.join();");
+        // e.quickfix("Add throws declaration");
+        // e.notifyKeyboardEvent(SWT.NONE, (char) 27);
+        // e.notifyKeyboardEvent(SWT.NONE, '\n');
+        //
+        // e.notifyKeyboardEvent(SWT.CTRL, 's');
+        //
+        // e.notifyKeyboardEvent(SWT.ALT | SWT.SHIFT, 'x');
+        // e.notifyKeyboardEvent(SWT.NONE, 'j');
+
+        e.setText(contents);
+        e.save();
+    }
+
+    public void openFile(String projectName, String packageName,
+        String className) throws RemoteException {
+        SWTBotView view = delegate.viewByTitle("Package Explorer");
+        delegate.sleep(250);
+        SWTBotTree tree = delegate.viewByTitle("Package Explorer").bot().tree();
+        SWTBotTreeItem item = tree.expandNode(projectName).expandNode("src")
+            .expandNode(packageName).expandNode(className + ".java");
+        log.debug("editorName: " + item.getText());
+        item.select().contextMenu("Open").click();
+        delegate.sleep(750);
     }
 }

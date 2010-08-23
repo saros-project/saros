@@ -50,13 +50,14 @@ public class Musician {
     public void activateShell() {
         try {
             bot.activeShell();
+
         } catch (RemoteException e) {
             log.error("Could not activate Shell", e);
         }
     }
 
     public void addContact(Musician respondent) throws RemoteException {
-        bot.addNewContact(respondent.getPlainJid());
+        bot.addNewContact(respondent.jid.getBase());
     }
 
     /**
@@ -73,8 +74,10 @@ public class Musician {
     public void closeViewByTitle(String title) {
         try {
             bot.closeViewByTitle(title);
+            bot.sleep(750);
         } catch (RemoteException e) {
-            log.error("View with title '" + title + "' could not be closed", e);
+            log.error("View with title '" + title + "' could not be closed",
+             e);
         }
     }
 
@@ -191,6 +194,11 @@ public class Musician {
         openView("Roster", "Saros", "Roster");
     }
 
+    public void openChatView() throws RemoteException {
+        openView("Chat View", "Saros", "Chat View");
+
+    }
+
     /**
      * Convenient method for opening all views that are needed for tests. The
      * titles of the views are: "Roster","Shared Project Session" and
@@ -201,7 +209,7 @@ public class Musician {
     public void openSarosViews() throws RemoteException {
         openView("Roster", "Saros", "Roster");
         openView("Shared Project Session", "Saros", "Saros Session");
-        openView("Package Explorer", "Java", "Package Explorer");
+        // openView("Package Explorer", "Java", "Package Explorer");
     }
 
     public void openSessionView() throws RemoteException {
@@ -223,13 +231,20 @@ public class Musician {
      */
     public void openView(String viewTitle, String inode, String leaf)
         throws RemoteException {
-        if (!bot.isViewOpen(viewTitle))
+        if (!bot.isViewOpen(viewTitle)) {
             bot.openViewByName(inode, leaf);
+        }
+
+    }
+
+    public String doTest() throws RemoteException {
+        return bot.test();
     }
 
     public void removeContact(Musician contact) throws RemoteException {
-        if (bot.isContactInRosterView(contact.getPlainJid())) {
-            bot.removeContact(contact.getPlainJid());
+        bot.sleep(2000);
+        if (bot.isContactInRosterView(contact.jid.getBase())) {
+            bot.removeContact(contact.jid.getBase());
         }
     }
 
@@ -240,6 +255,7 @@ public class Musician {
     public void setFocusOnViewByTitle(String title) {
         try {
             bot.setFocusOnViewByTitle(title);
+            bot.sleep(750);
         } catch (RemoteException e) {
             log.error(
                 "Could not set focus on View with title '" + title + "'.", e);
@@ -295,8 +311,15 @@ public class Musician {
             bot.xmppConnect();
 
         if (bot.isConfigShellPoppedUp()) {
-            bot.doSarosConfiguration(getXmppServer(), getPlainJid(), password);
+            bot.doSarosConfiguration(getXmppServer(), jid.getName(), password);
         }
+    }
+
+    public boolean isConnect() throws RemoteException {
+        if (bot.isConnectedByXmppGuiCheck())
+            return true;
+        else
+            return false;
     }
 
     public void xmppDisconnect() throws RemoteException {
@@ -313,5 +336,51 @@ public class Musician {
             // ignore if no window popped up
         }
 
+    }
+
+    /**
+     * Lin
+     */
+    public void activeMusican() throws RemoteException {
+        // if (System.getProperty("os.name", "Unknown OS").equals("Mac OS X"))
+        bot.activeMusician();
+    }
+
+    public void waitForConnect() throws RemoteException {
+        bot.waitForConnect();
+    }
+
+    public boolean isPerspectiveOpen(String title) throws RemoteException {
+        return bot.isPerspectiveOpen(title);
+    }
+
+    public void openPerspective(String nodeName) throws RemoteException {
+        if (!bot.isPerspectiveOpen(nodeName)) {
+            bot.openPerspectiveByName(nodeName);
+        }
+    }
+
+    public void typeInTextInClass(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException {
+        String contents = state.getContents(contentPath);
+        bot.typeInTextInClass(contents, projectName, packageName, className);
+    }
+
+    public void openFile(String projectName, String packageName,
+        String className) throws RemoteException {
+        bot.openFile(projectName, packageName, className);
+    }
+
+    public void followDriver(Musician driver) throws RemoteException {
+        bot.followDriver(driver.jid.getBase());
+    }
+
+    public boolean isInFollowMode(Musician driver) throws RemoteException {
+        return bot.isInFollowMode(driver.jid.getBase());
+
+    }
+
+    public String getPathToScreenShot() throws RemoteException {
+        return state.getPathToScreenShot();
     }
 }

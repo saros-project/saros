@@ -90,19 +90,19 @@ public interface ISarosState extends Remote {
 
     /**
      * Returns true if the given {@link JID} is a participant of our
-     * {@link ISarosSession}.
+     * {@link SharedProject}.
      */
     public boolean isParticipant(JID jid) throws RemoteException;
 
     /**
      * Returns true if the given {@link JID} is a driver in this
-     * {@link ISarosSession}.
+     * {@link SharedProject}.
      */
     public boolean isDriver(JID jid) throws RemoteException;
 
     /**
      * Returns true if the given {@link JID} is a observer in this
-     * {@link ISarosSession}.
+     * {@link SharedProject}.
      */
     public boolean isObserver(JID jid) throws RemoteException;
 
@@ -124,4 +124,9 @@ public interface ISarosState extends Remote {
 
     public boolean hasContact(JID jid) throws RemoteException;
 
+    public ISarosSession getProject() throws RemoteException;
+
+    public String getContents(String path) throws RemoteException;
+
+    public String getPathToScreenShot() throws RemoteException;
 }

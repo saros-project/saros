@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.limewire.collection.Tuple;
+import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -24,6 +26,8 @@ public class SarosState implements ISarosState {
 
     private transient static final Logger log = Logger
         .getLogger(SarosState.class);
+
+    public static SarosState classVariable;
 
     public SarosState() {
         // Default constructor needed for RMI
@@ -170,12 +174,31 @@ public class SarosState implements ISarosState {
     public boolean isParticipant(JID jid) throws RemoteException {
         try {
             ISarosSession sarosSession = sessionManager.getSarosSession();
-            log.debug("isParticipant(" + jid.toString() + ") == "
-                + sarosSession.getParticipants().contains(sarosSession.getUser(jid)));
-            return sarosSession.getParticipants().contains(sarosSession.getUser(jid));
+            log.debug("isParticipant("
+                + jid.toString()
+                + ") == "
+                + sarosSession.getParticipants().contains(
+                    sarosSession.getUser(jid)));
+            return sarosSession.getParticipants().contains(
+                sarosSession.getUser(jid));
         } catch (Exception e) {
             return false;
         }
     }
 
+    public ISarosSession getProject() throws RemoteException {
+        return sessionManager.getSarosSession();
+    }
+
+    public String getContents(String path) throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        String contents = FileUtils.read(bundle.getEntry(path));
+        return contents;
+    }
+
+    public String getPathToScreenShot() throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        return bundle.getLocation().substring(16)
+            + BotConfiguration.SCREENSHOTDIR;
+    }
 }

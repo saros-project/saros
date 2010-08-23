@@ -28,12 +28,20 @@ public class RmiTest {
 
     @Before
     public void configureBot() throws RemoteException, NotBoundException {
-
         bot = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         bot.initRmi();
+
+        bot.activeMusican();
+
+        if (bot.isViewOpen("Welcome"))
+            bot.closeViewByTitle("Welcome");
+
+        bot.openPerspective("Java");
+
         bot.setFocusOnViewByTitle("Package Explorer");
+
         if (bot.isViewOpen("Roster"))
             bot.closeViewByTitle("Roster");
     }
@@ -45,10 +53,8 @@ public class RmiTest {
 
     @Test
     public void testWindows() throws RemoteException {
-
         assertFalse(bot.isViewOpen("Roster"));
         bot.openRosterView();
         assertTrue(bot.isViewOpen("Roster"));
-        log.debug("complete");
     }
 }

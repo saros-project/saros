@@ -28,6 +28,7 @@ public class TestShareProject3Users {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         invitee1.initRmi();
+        invitee1.activeMusican();
         invitee1.openSarosViews();
         invitee1.xmppConnect();
     }
@@ -38,6 +39,7 @@ public class TestShareProject3Users {
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         invitee2.initRmi();
+        invitee2.activeMusican();
         invitee2.openSarosViews();
         invitee2.xmppConnect();
     }
@@ -47,8 +49,8 @@ public class TestShareProject3Users {
         inviter = new Musician(new JID(BotConfiguration.JID_CARL),
             BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
             BotConfiguration.PORT_CARL);
-
         inviter.initRmi();
+        inviter.activeMusican();
         inviter.openSarosViews();
         inviter.xmppConnect();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
@@ -58,12 +60,14 @@ public class TestShareProject3Users {
     @After
     public void cleanupInvitee1() throws RemoteException {
         invitee1.xmppDisconnect();
+        invitee1.setFocusOnViewByTitle("Package Explorer");
         invitee1.removeProject(BotConfiguration.PROJECTNAME);
     }
 
     @After
     public void cleanupInvitee2() throws RemoteException {
         invitee2.xmppDisconnect();
+        invitee2.setFocusOnViewByTitle("Package Explorer");
         invitee2.removeProject(BotConfiguration.PROJECTNAME);
     }
 
@@ -74,6 +78,9 @@ public class TestShareProject3Users {
 
     @Test
     public void testShareProjectParallel() throws RemoteException {
+        invitee1.waitForConnect();
+        invitee2.waitForConnect();
+        inviter.waitForConnect();
         List<Musician> musicians = new LinkedList<Musician>();
         musicians.add(invitee1);
         musicians.add(invitee2);
@@ -105,12 +112,15 @@ public class TestShareProject3Users {
         assertTrue(inviter.isObserver(invitee2));
 
         invitee1.leave(true);
+        invitee1.sleep(2000);
         assertFalse(invitee1.isParticipant());
-        invitee2.sleep(500); // balloon window
+
         invitee2.leave(true);
+        invitee2.sleep(2000); // balloon window
         assertFalse(invitee2.isParticipant());
-        inviter.sleep(500);
+
         inviter.leave(false);
+        inviter.sleep(2000);
         assertFalse(inviter.isParticipant());
     }
 }
