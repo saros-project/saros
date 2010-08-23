@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * On the bottom you will find the used configurations which is used by STF.
  */
 public class BotConfiguration {
-    public final static boolean DEVELOPMODE = true;
+    public final static boolean DEVELOPMODE = false;
 
     /**
      * Directory for temporary files for saving screen captures.
