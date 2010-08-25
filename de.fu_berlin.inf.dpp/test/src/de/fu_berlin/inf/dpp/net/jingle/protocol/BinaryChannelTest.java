@@ -520,8 +520,9 @@ public class BinaryChannelTest {
     }
 
     /**
-     * Test for checking whether Shutdown works as intended. It does not because
-     * there is a TODO in the BinaryChannel
+     * Test for checking whether Shutdown works as intended. This test is
+     * currently expected to fail because of the todo in
+     * {@link BinaryChannel#receiveIncomingTransferObject(SubMonitor)}.
      */
     @Test
     public void testShutdown() throws Throwable {

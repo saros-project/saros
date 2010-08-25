@@ -85,19 +85,19 @@ public class XMPPConnectionTest {
 
     /**
      * DNS name that is different from the actual XMPP service name should fail
-     * connections and connecting should trigger IllegalState
+     * connections and connecting should trigger an UnknownHostException.
      */
     @Test(timeout = 3000)
     public void testXMPPConnectionStringServerName() {
         XMPPConnection connection = new XMPPConnection(
             Constants.INF_XMPP_SERVER_SHORTNAME);
         try {
+            // At this point, connecting should not be possible due to unknown
+            // host, and the connection state should be "not connected".
             connection.connect();
-            // at this point, connecting should not be possible due to illegal
-            // state and the connection state must be "not connected"
         } catch (XMPPException e) {
             if (e.getWrappedThrowable() == null
-                || !(e.getWrappedThrowable() instanceof IllegalStateException))
+                || !(e.getWrappedThrowable() instanceof UnknownHostException))
                 fail();
         }
         assertFalse(connection.isConnected());
@@ -114,8 +114,8 @@ public class XMPPConnectionTest {
 
     @Test(timeout = 3000)
     public void testGetServiceName() {
-        assertEquals(Constants.INF_XMPP_SERVICE_NAME, connectionLookedUp
-            .getServiceName());
+        assertEquals(Constants.INF_XMPP_SERVICE_NAME,
+            connectionLookedUp.getServiceName());
     }
 
     @Test(timeout = 3000)
