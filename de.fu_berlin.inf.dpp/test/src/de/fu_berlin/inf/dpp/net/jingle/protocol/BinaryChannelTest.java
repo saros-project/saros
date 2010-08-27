@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +32,13 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 /**
+ * TODO Should be changed to use ByteStreamSession instead of BinaryChannel.
+ * 
  * @author coezbek
  */
 public class BinaryChannelTest {
 
+    private static final int PORT = 4278;
     /**
      * Field used exclusive by getTestArray to memoize the created TestArrays
      */
@@ -78,11 +82,15 @@ public class BinaryChannelTest {
 
         while (true) {
             try {
+                SubMonitor progress = SubMonitor
+                    .convert(new NullProgressMonitor());
+                if (!channel.isConnected())
+                    return;
                 IncomingTransferObject ito = channel
-                    .receiveIncomingTransferObject(SubMonitor
-                        .convert(new NullProgressMonitor()));
+                    .receiveIncomingTransferObject(progress);
 
                 queue.add(ito);
+
             } catch (EOFException e) {
                 return;
             }
@@ -126,7 +134,7 @@ public class BinaryChannelTest {
         serverMainLoop.start();
 
         // Connect to the server
-        Socket clientSocket = new Socket("localhost", 4278);
+        Socket clientSocket = new Socket("localhost", PORT);
         final BinaryChannel clientChannel = new BinaryChannel(clientSocket,
             NetTransferMode.JINGLETCP);
 
@@ -208,7 +216,7 @@ public class BinaryChannelTest {
     @Test
     public void testBinaryChannelBiDi() throws Throwable {
 
-        final ServerSocket server = new ServerSocket(4278);
+        final ServerSocket server = new ServerSocket(PORT);
 
         final BlockingQueue<IncomingTransferObject> serverQueue = new LinkedBlockingQueue<IncomingTransferObject>();
         final BlockingQueue<IncomingTransferObject> clientQueue = new LinkedBlockingQueue<IncomingTransferObject>();
@@ -257,7 +265,7 @@ public class BinaryChannelTest {
         });
         serverThread.start();
 
-        Socket clientSocket = new Socket("localhost", 4278);
+        Socket clientSocket = new Socket("localhost", PORT);
 
         final BinaryChannel clientChannel = new BinaryChannel(clientSocket,
             NetTransferMode.JINGLETCP);
@@ -356,13 +364,11 @@ public class BinaryChannelTest {
 
     /**
      * Test two people sending at the same time.
-     * 
-     * Currently crashing because testShutdown fails.
      */
-    @Test
+    @Test(timeout = 90000)
     public void testBinaryChannelMultiSend() throws Throwable {
 
-        final ServerSocket server = new ServerSocket(4278);
+        final ServerSocket server = new ServerSocket(PORT);
 
         final BlockingQueue<IncomingTransferObject> serverQueue = new LinkedBlockingQueue<IncomingTransferObject>();
         final BlockingQueue<IncomingTransferObject> clientQueue = new LinkedBlockingQueue<IncomingTransferObject>();
@@ -390,7 +396,7 @@ public class BinaryChannelTest {
             });
         serverMainLoop.start();
 
-        Socket clientSocket = new Socket("localhost", 4278);
+        Socket clientSocket = new Socket("localhost", PORT);
 
         final BinaryChannel clientChannel = new BinaryChannel(clientSocket,
             NetTransferMode.JINGLETCP);
@@ -486,16 +492,21 @@ public class BinaryChannelTest {
 
         try {
             while (clientSendThread1.isAlive() || clientSendThread2.isAlive()
-                || clientSendThread2.isAlive() || serverReceiveThread.isAlive()) {
+                || serverReceiveThread.isAlive()) {
 
                 Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
                 if (t != null)
                     throw t;
             }
         } finally {
-            clientChannel.dispose();
+            // Close the server socket to crash the serverMainLoop, then wait
+            // for the clientMainLoop to terminate because of it. TODO: Close
+            // the server thread properly.
             serverSocket[0].close();
+            clientMainLoop.join();
+
             clientSocket.close();
+            clientChannel.dispose();
             server.close();
         }
         Throwable t = failureQueue.poll();
@@ -520,13 +531,14 @@ public class BinaryChannelTest {
     }
 
     /**
-     * Test for checking whether Shutdown works as intended. It does not because
-     * there is a TODO in the BinaryChannel
+     * Test for checking whether Shutdown works as intended. This test is
+     * currently expected to fail because of the todo in
+     * {@link BinaryChannel#receiveIncomingTransferObject(SubMonitor)}.
      */
     @Test
     public void testShutdown() throws Throwable {
 
-        final ServerSocket server = new ServerSocket(4278);
+        final ServerSocket server = new ServerSocket(PORT);
 
         final BlockingQueue<IncomingTransferObject> serverQueue = new LinkedBlockingQueue<IncomingTransferObject>();
         final BlockingQueue<IncomingTransferObject> clientQueue = new LinkedBlockingQueue<IncomingTransferObject>();
@@ -543,7 +555,7 @@ public class BinaryChannelTest {
         serverMainLoop.start();
 
         // Connect to the server
-        Socket clientSocket = new Socket("localhost", 4278);
+        Socket clientSocket = new Socket("localhost", PORT);
         final BinaryChannel clientChannel = new BinaryChannel(clientSocket,
             NetTransferMode.JINGLETCP);
 
@@ -569,25 +581,27 @@ public class BinaryChannelTest {
                 throw t;
         }
 
-        assertTrue(clientChannel.isConnected());
-        assertTrue(serverChannel.get().isConnected());
+        try {
+            assertTrue(clientChannel.isConnected());
+            assertTrue(serverChannel.get().isConnected());
 
-        // Now shutdown channel from client side
-        clientChannel.dispose();
+            // Now shutdown channel from client side
+            clientChannel.dispose();
 
-        while (clientMainLoop.isAlive() || serverMainLoop.isAlive()) {
-            Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
-            if (t != null)
-                throw t;
+            while (clientMainLoop.isAlive() || serverMainLoop.isAlive()) {
+                Throwable t = failureQueue.poll(100, TimeUnit.MILLISECONDS);
+                if (t != null)
+                    throw t;
+            }
+
+            assertFalse(clientChannel.isConnected());
+            assertFalse(serverChannel.get().isConnected());
+        } finally {
+            serverSocket.get().close();
+            server.close();
+            clientMainLoop.join();
+            clientSocket.close();
         }
-
-        assertFalse(clientChannel.isConnected());
-        assertFalse(serverChannel.get().isConnected());
-
-        serverSocket.get().close();
-        server.close();
-        clientSocket.close();
-
         // No exceptions should still be pending at this point
         Throwable t = failureQueue.poll();
         if (t != null)
@@ -629,6 +643,7 @@ public class BinaryChannelTest {
                 public void run() {
                     try {
                         runBinaryChannelLoop(clientQueue, clientChannel);
+                    } catch (SocketException e) {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

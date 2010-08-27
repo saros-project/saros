@@ -324,8 +324,8 @@ public class BinaryChannel {
         transferDescription.objectid = objectid;
 
         byte[] descData = null;
-        descData = Util.deflate(transferDescription.toByteArray(), progress
-            .newChild(1));
+        descData = Util.deflate(transferDescription.toByteArray(),
+            progress.newChild(1));
         if (descData == null) {
             log.error(
                 "Failed to deflate bytes of a Base64 encoded TransferDescription String:"
@@ -418,8 +418,8 @@ public class BinaryChannel {
             }
 
             size = Math.min(data.length - offset, CHUNKSIZE);
-            send(buildPacket(type, idx - 1, objectid, ByteString.copyFrom(data,
-                offset, size)));
+            send(buildPacket(type, idx - 1, objectid,
+                ByteString.copyFrom(data, offset, size)));
             offset += size;
             progress.worked(1);
         }
@@ -476,7 +476,7 @@ public class BinaryChannel {
         try {
             if (session != null)
                 session.close();
-            if (socket != null && socket.isClosed())
+            if (socket != null && !socket.isClosed())
                 socket.close();
             IOUtils.closeQuietly(inputStream);
             IOUtils.closeQuietly(outputStream);
@@ -504,9 +504,10 @@ public class BinaryChannel {
      * max 30 bytes so that the BinaryPacket can be printed using toString().
      */
     public static BinaryPacket trimForLogging(BinaryPacket binaryPacket) {
-
-        return BinaryPacket.newBuilder(binaryPacket).setData(
-            ByteString.copyFrom(binaryPacket.getData().toByteArray(), 0, Math
-                .min(30, binaryPacket.getData().size()))).build();
+        int offset = 0;
+        int size = Math.min(30, binaryPacket.getData().size());
+        byte[] bytes = binaryPacket.getData().toByteArray();
+        ByteString data = ByteString.copyFrom(bytes, offset, size);
+        return BinaryPacket.newBuilder(binaryPacket).setData(data).build();
     }
 }
