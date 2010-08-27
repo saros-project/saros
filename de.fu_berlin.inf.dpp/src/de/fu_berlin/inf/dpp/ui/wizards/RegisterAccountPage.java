@@ -42,7 +42,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     private static final Logger log = Logger
         .getLogger(RegisterAccountPage.class.getName());
 
-    public static final String LIST_OF_XMPP_SERVERS = "https://www.saros-project.org/w/SE/DPP#PublicServers";
+    public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/#PublicServers";
 
     protected Text serverText;
 
