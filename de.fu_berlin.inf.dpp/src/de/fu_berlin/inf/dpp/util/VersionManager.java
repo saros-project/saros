@@ -138,6 +138,15 @@ public class VersionManager {
          * CommunicationPreferences are now sent and received as part of the
          * InvitationInfo.
          */
+        compatibilityChart.put(new Version("10.8.27.r2333"), Arrays.asList(
+            new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
+
+        /**
+         * Version 10.7.30.r2310
+         * 
+         * CommunicationPreferences are now sent and received as part of the
+         * InvitationInfo.
+         */
         compatibilityChart.put(new Version("10.7.30.r2310"),
             Arrays.asList(new Version("10.7.30.r2310")));
 

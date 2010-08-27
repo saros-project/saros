@@ -31,12 +31,6 @@
             id="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
             name="Remote Screen"
             restorable="true"/>
-	 <!--<view
-            category="Saros"
-            class="de.fu_berlin.inf.dpp.ui.NetworkView"
-            icon="icons/connect.png"
-            id="de.fu_berlin.inf.dpp.ui.NetworkViewView"
-            name="Network Monitor"/>-->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
