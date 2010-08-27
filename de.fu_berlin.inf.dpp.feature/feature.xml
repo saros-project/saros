@@ -2,7 +2,7 @@
 <feature
       id="de.fu_berlin.inf.dpp.feature"
       label="Saros Feature"
-      version="10.7.30.r2310">
+      version="10.8.27.r2333">
 
    <description>
       Distributed Pair Programming for Eclipse.
@@ -370,7 +370,7 @@ Public License instead of this License.
          id="de.fu_berlin.inf.dpp"
          download-size="0"
          install-size="0"
-         version="10.7.30.r2310"
+         version="10.8.27.r2333"
          unpack="false"/>
 
 </feature>
