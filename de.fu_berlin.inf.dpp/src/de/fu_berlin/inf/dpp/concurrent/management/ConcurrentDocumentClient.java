@@ -100,6 +100,8 @@ public class ConcurrentDocumentClient implements Disposable {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
+        final List<User> remObservers = sarosSession.getRemoteObservers();
+
         if (activityDataObject instanceof TextEditActivity) {
             TextEditActivity textEdit = (TextEditActivity) activityDataObject;
 
@@ -110,9 +112,8 @@ public class ConcurrentDocumentClient implements Disposable {
              * because they are not notified by
              * receiveJupiterActivityHostSide(...).
              */
-            if (sarosSession.isHost()) {
-                result.add(new QueueItem(sarosSession.getRemoteObservers(),
-                    activityDataObject));
+            if (sarosSession.isHost() && remObservers.size() > 0) {
+                result.add(new QueueItem(remObservers, activityDataObject));
             }
         } else if (activityDataObject instanceof ChecksumActivity) {
             ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activityDataObject;
@@ -126,10 +127,10 @@ public class ConcurrentDocumentClient implements Disposable {
             result.add(new QueueItem(host, jupiterClient
                 .withTimestamp(checksumActivityDataObject)));
 
-            // Send general checksum to all observers
-            result.add(new QueueItem(sarosSession.getRemoteObservers(),
-                checksumActivityDataObject));
-
+            if (remObservers.size() > 0)
+                // Send general checksum to all observers
+                result.add(new QueueItem(remObservers,
+                    checksumActivityDataObject));
         } else {
             result.add(new QueueItem(sarosSession.getRemoteUsers(),
                 activityDataObject));

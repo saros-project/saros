@@ -1195,7 +1195,7 @@ public class Saros extends AbstractUIPlugin {
         try {
             log = Logger.getLogger("de.fu_berlin.inf.dpp");
             PropertyConfigurator.configureAndWatch("log4j.properties",
-                60 * 1000);
+                3 * 1000);
         } catch (SecurityException e) {
             System.err.println("Could not start logging:");
             e.printStackTrace();

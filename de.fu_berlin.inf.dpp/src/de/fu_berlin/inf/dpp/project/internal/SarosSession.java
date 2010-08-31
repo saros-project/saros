@@ -119,6 +119,9 @@ public class SarosSession implements ISarosSession, Disposable {
         public final IActivity activity;
 
         public QueueItem(List<User> recipients, IActivity activity) {
+            if (recipients.size() == 0)
+                log.fatal("Empty list of recipients in constructor",
+                    new StackTrace());
             this.recipients = recipients;
             this.activity = activity;
         }
@@ -555,10 +558,8 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void exec(List<IActivityDataObject> activityDataObjects) {
-
         // Convert me
         List<IActivity> activities = convert(activityDataObjects);
-
         if (isHost()) {
             TransformationResult transformed = concurrentDocumentServer
                 .transformIncoming(activities);

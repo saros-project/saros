@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -118,10 +119,13 @@ public class ActivitySequencer {
         /** This {@link ActivityQueue} is for this user. */
         protected final JID jid;
 
-        /** Sequence number this user sends next. */
+        /** Next sequence number for sending to this user. */
         protected int nextSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
-        /** Sequence number expected from the next activityDataObject. */
+        /**
+         * Sequence number expected from the next activityDataObject received
+         * from this user.
+         */
         protected int expectedSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
         /**
@@ -149,8 +153,9 @@ public class ActivitySequencer {
         }
 
         /**
-         * Create a {@link TimedActivityDataObject} and add it to the history of
-         * created activityDataObjects.
+         * Owner(user) of ActivitySequencer.this creates a
+         * {@link TimedActivityDataObject} and add it to the history of created
+         * activityDataObjects of this receipient.
          */
         public TimedActivityDataObject createTimedActivity(
             IActivityDataObject activityDataObject) {
@@ -162,7 +167,8 @@ public class ActivitySequencer {
         }
 
         /**
-         * Add a received activityDataObject to the priority queue.
+         * Add a received activityDataObject to the priority queue of the sender
+         * maintained by the recipient.
          */
         public void add(TimedActivityDataObject activity) {
 
@@ -283,6 +289,7 @@ public class ActivitySequencer {
                     + ((skipCount == 1) ? "" : " to "
                         + (firstQueuedSequenceNumber - 1)) + " from " + jid);
                 expectedSequenceNumber = firstQueuedSequenceNumber;
+                // TODO: Umut: Why do we need to recompute this here?
                 updateOldestLocalTimestamp();
             }
         }
@@ -398,6 +405,11 @@ public class ActivitySequencer {
             LinkedList<TimedActivityDataObject> result = new LinkedList<TimedActivityDataObject>();
             for (TimedActivityDataObject activity : getActivityQueue(user).history) {
                 if (activity.getSequenceNumber() >= fromSequenceNumber) {
+                    // TODO Umut: What does andUp mean? "And upper"? For this
+                    // the List must be ascending ordered
+                    // Does it mean: Stop after first matching of ">=" --->
+                    // least >= sequence number bigger or equal the
+                    // fromSequenceNumber
                     result.add(activity);
                     if (!andUp) {
                         break;
@@ -489,6 +501,7 @@ public class ActivitySequencer {
 
                 List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
+
                 outgoingQueue.drainTo(activities);
 
                 Map<User, List<IActivityDataObject>> toSend = AutoHashMap
@@ -612,7 +625,20 @@ public class ActivitySequencer {
      */
     public void sendActivity(List<User> recipients,
         final IActivityDataObject activityDataObject) {
-
+        if (log.isDebugEnabled()) {
+            // if (activityDataObject instanceof JupiterActivityDataObject) {
+            {
+                int c = recipients.size();
+                StringBuilder s = new StringBuilder();
+                String str = activityDataObject.getSource().getName();
+                for (User u : recipients) {
+                    s.append(u + ",");
+                }
+                log.debug(localJID.getName() + " sendet für " + str
+                    + " vom Typ " + activityDataObject.getClass() + " an " + c
+                    + ": " + s);
+            }
+        }
         /**
          * Short cut all messages directed at local user
          */
@@ -630,6 +656,10 @@ public class ActivitySequencer {
             }
         }
 
+        if (toSendViaNetwork.isEmpty()) {
+            log.trace(null, new StackTrace());
+            return;
+        }
         this.outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
             activityDataObject));
     }

@@ -29,6 +29,10 @@ public class TransformationResult {
                 toSendViaNetwork.add(user);
             }
         }
+
+        if (toSendViaNetwork.isEmpty())
+            return;
+
         this.sendToPeers
             .add(new QueueItem(toSendViaNetwork, queueItem.activity));
     }
