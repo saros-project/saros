@@ -94,16 +94,16 @@ public class ConcurrentDocumentClient implements Disposable {
      * @host and @client This is called whenever activityDataObjects are created
      *       LOCALLY both on the client and on the host
      */
-    public List<QueueItem> transformOutgoing(IActivity activityDataObject) {
+    public List<QueueItem> transformOutgoing(IActivity activity) {
 
         assert Util.isSWT() : "CDC.transformOutgoing must be called on the SWT Thread";
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
         final List<User> remObservers = sarosSession.getRemoteObservers();
-
-        if (activityDataObject instanceof TextEditActivity) {
-            TextEditActivity textEdit = (TextEditActivity) activityDataObject;
+        final List<User> remoteUsers = sarosSession.getRemoteUsers();
+        if (activity instanceof TextEditActivity) {
+            TextEditActivity textEdit = (TextEditActivity) activity;
 
             result.add(new QueueItem(host, jupiterClient.generate(textEdit)));
 
@@ -113,10 +113,10 @@ public class ConcurrentDocumentClient implements Disposable {
              * receiveJupiterActivityHostSide(...).
              */
             if (sarosSession.isHost() && remObservers.size() > 0) {
-                result.add(new QueueItem(remObservers, activityDataObject));
+                result.add(new QueueItem(remObservers, activity));
             }
-        } else if (activityDataObject instanceof ChecksumActivity) {
-            ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activityDataObject;
+        } else if (activity instanceof ChecksumActivity) {
+            ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activity;
 
             /**
              * Only the host can generate Checksums
@@ -132,8 +132,8 @@ public class ConcurrentDocumentClient implements Disposable {
                 result.add(new QueueItem(remObservers,
                     checksumActivityDataObject));
         } else {
-            result.add(new QueueItem(sarosSession.getRemoteUsers(),
-                activityDataObject));
+            if (remoteUsers.size() > 0)
+                result.add(new QueueItem(remoteUsers, activity));
         }
         return result;
     }
