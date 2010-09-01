@@ -245,9 +245,9 @@ public class FileList {
     }
 
     /**
-     * Calculate an approximation of how equal <code>this</code>
-     * <code>FileList</code> is to <code>project</code>. NOTE: This is a
-     * long-running method linear to size of the length of the two file lists.
+     * Calculate an approximation of how equal this <code>FileList</code> is to
+     * <code>project</code>. NOTE: This is a long-running method linear to size
+     * of the length of the two file lists.
      * 
      * @param project
      * @return Percentage of "sameness" of <code>this</code> and

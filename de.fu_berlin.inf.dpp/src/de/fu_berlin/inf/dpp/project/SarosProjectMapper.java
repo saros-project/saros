@@ -9,7 +9,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
- * Class responsible for mapping global project ids to local IProjects
+ * Class responsible for mapping global project IDs to local IProjects.
+ * 
+ * These IDs are used to identify shared projects across the network, even when
+ * the local names of a shared project are different. Since only the host is
+ * able to share projects, the ID is determined by the host.
  */
 public class SarosProjectMapper {
 
