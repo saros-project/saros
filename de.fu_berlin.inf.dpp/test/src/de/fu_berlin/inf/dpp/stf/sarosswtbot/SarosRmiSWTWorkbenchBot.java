@@ -21,6 +21,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 
 /**
@@ -481,7 +482,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         return null;
     }
 
-    public void followDriver(String driverJID) throws RemoteException {
+    public void follow(String participantJID, String sufix)
+        throws RemoteException {
         if (!isSharedSessionViewOpen())
             addSarosSessionView();
         setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
@@ -489,20 +491,21 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             SWTBotTable table = delegate.viewByTitle(
                 BotConfiguration.NAME_SESSION_VIEW).bot().table();
             if (table != null) {
-                SWTBotTableItem item = table.getTableItem(driverJID
-                    + " (Driver)");
-
+                SWTBotTableItem item = table.getTableItem(participantJID
+                    + sufix);
+                delegate.sleep(750);
                 SWTBotMenu menu = item.contextMenu("Follow this user");
                 delegate.sleep(750);
                 menu.click();
                 delegate.sleep(750);
             }
         } catch (WidgetNotFoundException e) {
-            log.warn("Driver not found: " + driverJID, e);
+            log.warn("Driver not found: " + participantJID, e);
         }
     }
 
-    public boolean isInFollowMode(String driverJID) throws RemoteException {
+    public boolean isInFollowMode(String participantJID, String sufix)
+        throws RemoteException {
         if (!isSharedSessionViewOpen())
             addSarosSessionView();
         setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
@@ -510,16 +513,17 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             SWTBotTable table = delegate.viewByTitle(
                 BotConfiguration.NAME_SESSION_VIEW).bot().table();
             if (table != null) {
-                SWTBotTableItem item = table.getTableItem(driverJID
-                    + " (Driver)");
+                SWTBotTableItem item;
 
+                item = table.getTableItem(participantJID + sufix);
+                log.error("item: " + item.getText());
                 SWTBotMenu menu = item.contextMenu("Stop following this user");
                 if (menu != null)
                     return true;
             }
             return false;
         } catch (WidgetNotFoundException e) {
-            log.warn("Driver not found: " + driverJID, e);
+            log.warn("Driver not found: " + participantJID, e);
             return false;
         }
     }

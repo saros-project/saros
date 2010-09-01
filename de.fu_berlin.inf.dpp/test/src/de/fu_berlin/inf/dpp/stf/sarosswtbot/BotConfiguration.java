@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * On the bottom you will find the used configurations which is used by STF.
  */
 public class BotConfiguration {
-    public final static boolean DEVELOPMODE = false;
+    public final static boolean DEVELOPMODE = true;
 
     /**
      * Directory for temporary files for saving screen captures.
@@ -31,6 +31,7 @@ public class BotConfiguration {
     /** A small Java Project */
     public final static String PROJECTNAME = "Foo_Saros";
     public final static String CLASSNAME = "MyClass";
+    public final static String CLASSNAME2 = "MyClass2";
     public final static String PACKAGENAME = "my.pkg";
     public final static String CONTENTPATH = "test-files/" + CLASSNAME
         + ".java";

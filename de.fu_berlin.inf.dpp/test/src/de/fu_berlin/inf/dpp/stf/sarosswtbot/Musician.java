@@ -76,8 +76,7 @@ public class Musician {
             bot.closeViewByTitle(title);
             bot.sleep(750);
         } catch (RemoteException e) {
-            log.error("View with title '" + title + "' could not be closed",
-             e);
+            log.error("View with title '" + title + "' could not be closed", e);
         }
     }
 
@@ -89,6 +88,12 @@ public class Musician {
             bot.newJavaClass(projectName, packageName, className);
             bot.sleep(750);
         }
+    }
+
+    public void createJavaClassInProject(String projectName,
+        String packageName, String className) throws RemoteException {
+        bot.newJavaClass(projectName, packageName, className);
+        bot.sleep(750);
     }
 
     public String getName() {
@@ -136,7 +141,7 @@ public class Musician {
      */
     public boolean isConnectedByXMPP() {
         try {
-            return state.isConnectedByXMPP() && bot.isConnectedByXmppGuiCheck();
+        	return state.isConnectedByXMPP() && bot.isConnectedByXmppGuiCheck();
         } catch (RemoteException e) {
             log.error("Failed to get the xmpp connection state.", e);
         }
@@ -209,7 +214,7 @@ public class Musician {
     public void openSarosViews() throws RemoteException {
         openView("Roster", "Saros", "Roster");
         openView("Shared Project Session", "Saros", "Saros Session");
-        // openView("Package Explorer", "Java", "Package Explorer");
+        openView("Package Explorer", "Java", "Package Explorer");
     }
 
     public void openSessionView() throws RemoteException {
@@ -371,16 +376,31 @@ public class Musician {
         bot.openFile(projectName, packageName, className);
     }
 
-    public void followDriver(Musician driver) throws RemoteException {
-        bot.followDriver(driver.jid.getBase());
+    public void follow(Musician participant) throws RemoteException {
+        if (participant.isDriver())
+            bot.follow(participant.jid.getBase(), " (Driver)");
+        else
+            bot.follow(participant.jid.getBase(), "");
     }
 
-    public boolean isInFollowMode(Musician driver) throws RemoteException {
-        return bot.isInFollowMode(driver.jid.getBase());
+    public boolean isInFollowMode(Musician participant) throws RemoteException {
+        if (participant.isDriver()) {
+            return bot.isInFollowMode(participant.jid.getBase(), " (Driver)");
+        } else {
+            return bot.isInFollowMode(participant.jid.getBase(), "");
+        }
 
     }
 
     public String getPathToScreenShot() throws RemoteException {
         return state.getPathToScreenShot();
+    }
+
+    public boolean isEditorActive(String className) throws RemoteException {
+        return bot.isEditorActive(className);
+    }
+
+    public void activeEditor(String className) throws RemoteException {
+        bot.activeEditor(className);
     }
 }

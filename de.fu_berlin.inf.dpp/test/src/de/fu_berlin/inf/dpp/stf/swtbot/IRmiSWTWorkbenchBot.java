@@ -389,4 +389,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void openFile(String projectName, String packageName,
         String className) throws RemoteException;
+
+    public boolean isEditorActive(String className) throws RemoteException;
+
+    public void activeEditor(String className) throws RemoteException;
 }

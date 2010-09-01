@@ -90,7 +90,10 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean xmppDisconnect() throws RemoteException;
 
-    public void followDriver(String driverJID) throws RemoteException;
+    public void follow(String participantJID, String sufix)
+        throws RemoteException;
 
-    public boolean isInFollowMode(String driverJID) throws RemoteException;
+    public boolean isInFollowMode(String participantJID, String sufix)
+        throws RemoteException;
+
 }

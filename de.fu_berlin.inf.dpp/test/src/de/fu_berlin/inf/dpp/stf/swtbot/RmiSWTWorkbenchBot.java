@@ -564,7 +564,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 log
                     .warn("There are more than one shell! Before testing you need only to start the needed saros-instances. rest thing would be done by the test."
                         + "At the beginning with the test we should active the shell (saros instance, which would be getestet). otherweise some of Test may be"
-                        + "successfully performed, because 'delegate' can not find the suitable topmenu. deactive application in OS Mac hide also his topmenu.");
+                        + " not successfully performed, because 'delegate' can not find the suitable topmenu. deactive application in OS Mac hide also his topmenu.");
         }
     }
 
@@ -579,7 +579,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isPerspectiveOpen(String title) {
         try {
             return delegate.perspectiveByLabel(title).isActive();
-            // return delegate.activePerspective().getLabel().equals(title);
+            //return delegate.activePerspective().getLabel().equals(title);
             // return true;
 
         } catch (WidgetNotFoundException e) {
@@ -589,7 +589,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
-    public void openPerspectiveByName(String nodeName) {
+    public void openPerspectiveByName(String nodeName) throws RemoteException {
 
         delegate.menu("Window").menu("Open Perspective").menu("Other...")
             .click();
@@ -664,5 +664,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         log.debug("editorName: " + item.getText());
         item.select().contextMenu("Open").click();
         delegate.sleep(750);
+    }
+
+    public boolean isEditorActive(String className) {
+        try {
+            SWTBotEditor editor = delegate.editorByTitle(className + ".java");
+            return editor.isActive();
+            // return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public void activeEditor(String className) throws RemoteException {
+        delegate.cTabItem(className + ".java").activate();
     }
 }
