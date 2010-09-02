@@ -52,6 +52,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosProjectMapper;
+import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -59,8 +60,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer
- * all honor start() and stop() semantics.
+ * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
+ * honor start() and stop() semantics.
  */
 public class SarosSession implements ISarosSession, Disposable {
 
@@ -113,6 +114,8 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     };
 
+    protected SharedProject sharedProject;
+
     public static class QueueItem {
 
         public final List<User> recipients;
@@ -154,6 +157,8 @@ public class SarosSession implements ISarosSession, Disposable {
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager, threadContext);
         this.useVersionControl = useVersionControl;
+
+        this.sharedProject = new SharedProject(project, this);
 
         stopManager.addBlockable(stopManagerListener);
     }
@@ -679,5 +684,9 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public boolean useVersionControl() {
         return this.useVersionControl;
+    }
+
+    public SharedProject getSharedProject(IProject project) {
+        return sharedProject;
     }
 }

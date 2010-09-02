@@ -360,4 +360,10 @@ public interface ISarosSession extends IActivityListener {
      * @return true iff this session uses Version Control.
      */
     public boolean useVersionControl();
+
+    /**
+     * Returns the {@link SharedProject} associated with the {@link IProject}
+     * <code>project</code>.
+     */
+    public SharedProject getSharedProject(IProject project);
 }

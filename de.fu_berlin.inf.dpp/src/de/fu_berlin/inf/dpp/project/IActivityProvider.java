@@ -6,10 +6,8 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
  * Every activityDataObject provider is responsible for one or more
  * activityDataObject types.
  * 
- * It can...
- * 
- * ...cause an activityDataObject to be executed locally (exec)
- * 
+ * It can...<br>
+ * ...cause an activityDataObject to be executed locally (exec)<br>
  * ...report an activityDataObject to the registered listeners
  * {@link IActivityListener#activityCreated(IActivity)}
  * 

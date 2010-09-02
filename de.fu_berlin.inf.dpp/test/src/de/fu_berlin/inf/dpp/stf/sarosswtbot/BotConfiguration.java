@@ -10,13 +10,16 @@ import de.fu_berlin.inf.dpp.Saros;
  * localhost:
  * 
  * <pre>
- * -Xmx512m -ea -XX:MaxPermSize=128m -Djava.rmi.server.codebase=file:$WORKSPACE/Saros/bin -Djava.security.manager -Djava.security.policy=file:/Users/sszuecs/Documents/eclipse_workspace_35/Saros_rmiswtbot/bin/all.policy -Dde.fu_berlin.inf.dpp.testmode=12345 -Djava.rmi.server.hostname=localhost
+ * -Xmx512m -ea -XX:MaxPermSize=128m -Djava.rmi.server.codebase=file:$WORKSPACE/Saros/bin \
+ * -Djava.security.manager \
+ * -Djava.security.policy=file:/Users/sszuecs/Documents/eclipse_workspace_35/Saros_rmiswtbot/bin/all.policy \
+ * -Dde.fu_berlin.inf.dpp.testmode=12345 -Djava.rmi.server.hostname=localhost
  * </pre>
  * 
  * On the bottom you will find the used configurations which is used by STF.
  */
 public class BotConfiguration {
-    public final static boolean DEVELOPMODE = false;
+    public final static boolean DEVELOPMODE = true;
 
     /**
      * Directory for temporary files for saving screen captures.
