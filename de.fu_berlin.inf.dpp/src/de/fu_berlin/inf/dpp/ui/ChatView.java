@@ -34,6 +34,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
+import de.fu_berlin.inf.dpp.MessagingManager.SessionProvider;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -251,23 +252,19 @@ public class ChatView extends ViewPart {
         this.inputText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.keyCode) {
-                case SWT.CR:
-                case SWT.KEYPAD_CR:
-                    if (e.stateMask == 0) {
-                        e.doit = false; // Don't append the '\n'.
+                if (!(e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR))
+                    return;
+                if (e.stateMask != 0)
+                    return;
+                e.doit = false; // Don't append the '\n'.
 
-                        String text = ChatView.this.inputText.getText();
-                        text = text.trim();
-                        ChatView.this.inputText.setText("");
+                String text = ChatView.this.inputText.getText();
+                text = text.trim();
+                ChatView.this.inputText.setText("");
 
-                        if (!text.equals("")
-                            && messagingManager.getSession() != null) {
-                            messagingManager.getSession().sendMessage(text);
-                        }
-
-                    }
-                    break;
+                SessionProvider session = messagingManager.getSession();
+                if (!text.equals("") && session != null) {
+                    session.sendMessage(text);
                 }
             }
         });
