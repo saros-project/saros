@@ -192,7 +192,12 @@ public class SarosState implements ISarosState {
 
     public String getContents(String path) throws RemoteException {
         Bundle bundle = saros.getBundle();
-        String contents = FileUtils.read(bundle.getEntry(path));
+        String contents;
+        try {
+            contents = FileUtils.read(bundle.getEntry(path));
+        } catch (NullPointerException e) {
+            throw new RuntimeException("Could not open " + path);
+        }
         return contents;
     }
 

@@ -77,6 +77,7 @@ public class TestShareProject3Users {
     }
 
     @Test
+    // FIXME Fails when carl starts in Resource perspective
     public void testShareProjectParallel() throws RemoteException {
         invitee1.waitForConnect();
         invitee2.waitForConnect();

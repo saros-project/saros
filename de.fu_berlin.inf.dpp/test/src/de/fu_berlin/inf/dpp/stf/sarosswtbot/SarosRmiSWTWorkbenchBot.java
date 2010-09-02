@@ -21,6 +21,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 
 /**
@@ -199,8 +200,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void addToSharedProject(String invitee) throws RemoteException {
         setFocusOnViewByTitle("Shared Project Session");
-        delegate.viewByTitle("Shared Project Session").toolbarButton(
-            "Open invitation interface").click();
+        delegate.viewByTitle("Shared Project Session")
+            .toolbarButton("Open invitation interface").click();
         selectCheckBoxInvitation(invitee);
     }
 
@@ -256,7 +257,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public boolean isContactInRosterView(String contact) throws RemoteException {
         if (!isRosterViewOpen())
-            addSarosSessionView();
+            addSarosRosterView();
         if (!isConnectedByXmppGuiCheck())
             xmppConnect();
         setFocusOnViewByTitle("Roster");
@@ -332,8 +333,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void leaveSession() throws RemoteException {
         setFocusOnViewByTitle("Shared Project Session");
-        delegate.viewByTitle("Shared Project Session").toolbarButton(
-            "Leave the session").click();
+        delegate.viewByTitle("Shared Project Session")
+            .toolbarButton("Leave the session").click();
     }
 
     /**
@@ -486,8 +487,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             addSarosSessionView();
         setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
         try {
-            SWTBotTable table = delegate.viewByTitle(
-                BotConfiguration.NAME_SESSION_VIEW).bot().table();
+            SWTBotTable table = delegate
+                .viewByTitle(BotConfiguration.NAME_SESSION_VIEW).bot().table();
             if (table != null) {
                 SWTBotTableItem item = table.getTableItem(driverJID
                     + " (Driver)");
@@ -507,8 +508,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             addSarosSessionView();
         setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
         try {
-            SWTBotTable table = delegate.viewByTitle(
-                BotConfiguration.NAME_SESSION_VIEW).bot().table();
+            SWTBotTable table = delegate
+                .viewByTitle(BotConfiguration.NAME_SESSION_VIEW).bot().table();
             if (table != null) {
                 SWTBotTableItem item = table.getTableItem(driverJID
                     + " (Driver)");

@@ -139,7 +139,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void confirmWindow(String title, String buttonText)
         throws RemoteException {
-        activateShellByText(title);
+        try {
+            activateShellByText(title);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not find shell with title "
+                + title);
+        }
         clickButton(buttonText);
     }
 
@@ -196,8 +201,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 className + ".java").toTextEditor();
             delegate.cTabItem(className + ".java").activate();
             delegate.sleep(750);
-            editor.navigateTo(2, 0);
-            editor.quickfix("Add unimplemented methods");
+            editor.navigateTo(2, 14);
+            // editor.quickfix("Add unimplemented methods");
+            try {
+                editor.quickfix(0);
+            } catch (Exception e) {
+                log.debug("", e);
+            }
+            editor.quickfix(0);
+            delegate.sleep(750);
             editor.save();
             delegate.sleep(750);
         } catch (WidgetNotFoundException e) {
@@ -224,10 +236,18 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         newJavaProject("Foo-" + rand.toString().substring(3, 10));
     }
 
+    public SWTBotMenu menu(String name) {
+        try {
+            return delegate.menu(name);
+        } catch (WidgetNotFoundException e) {
+            throw new RuntimeException("Widget " + name + " not found");
+        }
+    }
+
     public void newJavaProject(String project) {
         SWTBotMenu menu;
         try {
-            menu = delegate.menu("File").menu("New").menu("Java Project");
+            menu = menu("File").menu("New").menu("Java Project");
             delegate.sleep(750);
             menu.click();
         } catch (WidgetNotFoundException e) {
@@ -322,8 +342,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         packageExplorerView.show();
         Composite packageExplorerComposite = (Composite) packageExplorerView
             .getWidget();
-        Tree swtTree = delegate.widget(WidgetMatcherFactory
-            .widgetOfType(Tree.class), packageExplorerComposite);
+        Tree swtTree = delegate.widget(
+            WidgetMatcherFactory.widgetOfType(Tree.class),
+            packageExplorerComposite);
 
         SWTBotTree tree1 = new SWTBotTree(swtTree);
 
@@ -556,15 +577,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
         } else {
             if (shells == null) {
-                log
-                    .warn("There are no shell!"
-                        + "At the beginning with a test we need to at first run one or more saros instance with the test run-configuration. "
-                        + "Please look at the test, start the accordingly saros-instances and try again.");
+                log.warn("There are no shell!"
+                    + "At the beginning with a test we need to at first run one or more saros instance with the test run-configuration. "
+                    + "Please look at the test, start the accordingly saros-instances and try again.");
             } else
-                log
-                    .warn("There are more than one shell! Before testing you need only to start the needed saros-instances. rest thing would be done by the test."
-                        + "At the beginning with the test we should active the shell (saros instance, which would be getestet). otherweise some of Test may be"
-                        + "successfully performed, because 'delegate' can not find the suitable topmenu. deactive application in OS Mac hide also his topmenu.");
+                log.warn("There are more than one shell! Before testing you need only to start the needed saros-instances. rest thing would be done by the test."
+                    + "At the beginning with the test we should active the shell (saros instance, which would be getestet). otherweise some of Test may be"
+                    + "successfully performed, because 'delegate' can not find the suitable topmenu. deactive application in OS Mac hide also his topmenu.");
         }
     }
 

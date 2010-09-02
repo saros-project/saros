@@ -5,9 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,8 +25,6 @@ public class TestBasicSarosElements {
             BotConfiguration.PORT_ALICE);
         bot.initRmi();
 
-        bot.activeMusican();
-
         if (bot.isViewOpen("Welcome"))
             bot.closeViewByTitle("Welcome");
 
@@ -40,34 +36,12 @@ public class TestBasicSarosElements {
     @AfterClass
     public static void afterClass() {
         try {
+            if (!bot.isRosterViewOpen())
+                bot.openRosterView();
             if (bot.isConnectedByXMPP())
                 bot.xmppDisconnect();
         } catch (RemoteException e) {
             // ignore
-        }
-    }
-
-    @Before
-    public void xmppConnect() {
-        try {
-            if (!bot.isRosterViewOpen())
-                bot.openRosterView();
-            if (!bot.isConnectedByXMPP()) {
-                bot.xmppConnect();
-                bot.waitForConnect();
-            }
-        } catch (RemoteException e) {
-            // ignore cleanup
-        }
-    }
-
-    @After
-    public void xmppDisconnect() {
-        try {
-            if (bot.isConnectedByXMPP())
-                bot.xmppDisconnect();
-        } catch (RemoteException e) {
-            // ignore cleanup
         }
     }
 
@@ -93,22 +67,29 @@ public class TestBasicSarosElements {
 
     @Test
     public void testXmppConnect() throws RemoteException {
+        if (!bot.isRosterViewOpen())
+            bot.openRosterView();
         if (bot.isConnectedByXMPP())
             bot.xmppDisconnect();
+
+        assertEquals(false, bot.isConnectedByXMPP());
+
         bot.xmppConnect();
-        bot
-            .captureScreenshot(bot.getPathToScreenShot()
-                + "/xmpp_connected.png");
+        bot.captureScreenshot(bot.getPathToScreenShot() + "/xmpp_connected.png");
         bot.waitForConnect();
         assertEquals(true, bot.isConnectedByXMPP());
     }
 
     @Test
     public void testXmppDisconnect() throws RemoteException {
+        if (!bot.isRosterViewOpen())
+            bot.openRosterView();
         if (!bot.isConnectedByXMPP()) {
             bot.xmppConnect();
             bot.waitForConnect();
         }
+
+        assertEquals(true, bot.isConnectedByXMPP());
 
         bot.xmppDisconnect();
         bot.sleep(2000);
