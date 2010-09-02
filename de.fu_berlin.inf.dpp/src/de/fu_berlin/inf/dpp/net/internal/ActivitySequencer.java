@@ -598,10 +598,8 @@ public class ActivitySequencer {
         incomingQueues.add(nextActivity);
 
         if (!started) {
-            log
-                .debug("Received activityDataObject but "
-                    + "ActivitySequencer has not yet been started: "
-                    + nextActivity);
+            log.debug("Received activityDataObject but "
+                + "ActivitySequencer has not yet been started: " + nextActivity);
             return;
         }
 
@@ -625,20 +623,20 @@ public class ActivitySequencer {
      */
     public void sendActivity(List<User> recipients,
         final IActivityDataObject activityDataObject) {
-        if (log.isDebugEnabled()) {
-            // if (activityDataObject instanceof JupiterActivityDataObject) {
-            {
-                int c = recipients.size();
-                StringBuilder s = new StringBuilder();
-                String str = activityDataObject.getSource().getName();
-                for (User u : recipients) {
-                    s.append(u + ",");
-                }
-                log.debug(localJID.getName() + " sendet für " + str
-                    + " vom Typ " + activityDataObject.getClass() + " an " + c
-                    + ": " + s);
-            }
-        }
+        // if (log.isDebugEnabled()) {
+        // // if (activityDataObject instanceof JupiterActivityDataObject) {
+        // {
+        // int c = recipients.size();
+        // StringBuilder s = new StringBuilder();
+        // String str = activityDataObject.getSource().getName();
+        // for (User u : recipients) {
+        // s.append(u + ",");
+        // }
+        // log.debug(localJID.getName() + " sendet für " + str
+        // + " vom Typ " + activityDataObject.getClass() + " an " + c
+        // + ": " + s);
+        // }
+        // }
         /**
          * Short cut all messages directed at local user
          */
@@ -803,11 +801,12 @@ public class ActivitySequencer {
                 && (textEdit.getOffset() == lastTextEdit.getOffset()
                     + lastTextEdit.getText().length())) {
                 result.remove(lastTextEdit);
-                textEdit = new TextEditActivityDataObject(lastTextEdit
-                    .getSource(), lastTextEdit.getOffset(), lastTextEdit
-                    .getText()
-                    + textEdit.getText(), lastTextEdit.getReplacedText()
-                    + textEdit.getReplacedText(), lastTextEdit.getEditor());
+                textEdit = new TextEditActivityDataObject(
+                    lastTextEdit.getSource(),
+                    lastTextEdit.getOffset(),
+                    lastTextEdit.getText() + textEdit.getText(),
+                    lastTextEdit.getReplacedText() + textEdit.getReplacedText(),
+                    lastTextEdit.getEditor());
             }
         }
 

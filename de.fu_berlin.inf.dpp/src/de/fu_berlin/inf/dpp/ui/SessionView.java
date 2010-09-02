@@ -132,7 +132,11 @@ public class SessionView extends ViewPart {
                         if (user == null)
                             continue;
 
-                        viewer.refresh(user);
+                        try {
+                            viewer.refresh(user);
+                        } catch (IllegalArgumentException e) {
+                            log.error("viewer.refresh(" + user.toString() + ")");
+                        }
                     }
                 }
             });
