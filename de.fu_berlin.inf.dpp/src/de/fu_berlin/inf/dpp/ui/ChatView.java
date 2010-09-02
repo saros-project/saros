@@ -96,8 +96,8 @@ public class ChatView extends ViewPart {
                         return;
 
                     for (String address : addresses) {
-                        JID jid = sarosSession
-                            .getResourceQualifiedJID(new JID(address));
+                        JID jid = sarosSession.getResourceQualifiedJID(new JID(
+                            address));
                         if (jid == null)
                             continue;
 
@@ -148,8 +148,8 @@ public class ChatView extends ViewPart {
                     DateTime dt = new DateTime();
                     DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
                     String time = fmt.print(dt);
-                    String senderAddress = sender.substring(prefixPos, sender
-                        .length());
+                    String senderAddress = sender.substring(prefixPos,
+                        sender.length());
                     String humanReadableSender = getHumanReadableSender(senderAddress);
                     prefix = String.format("[%s (%s)]: ", humanReadableSender,
                         time);
@@ -255,6 +255,8 @@ public class ChatView extends ViewPart {
                 case SWT.CR:
                 case SWT.KEYPAD_CR:
                     if (e.stateMask == 0) {
+                        e.doit = false; // Don't append the '\n'.
+
                         String text = ChatView.this.inputText.getText();
                         text = text.trim();
                         ChatView.this.inputText.setText("");
@@ -263,6 +265,7 @@ public class ChatView extends ViewPart {
                             && messagingManager.getSession() != null) {
                             messagingManager.getSession().sendMessage(text);
                         }
+
                     }
                     break;
                 }
