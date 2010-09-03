@@ -196,6 +196,16 @@ public class JoinSessionWizard extends Wizard {
          */
         if (namePage.overwriteProjectResources()) {
             FileListDiff diff;
+
+            if (!source.isOpen()) {
+                try {
+                    source.open(null);
+                } catch (CoreException e1) {
+                    log.debug("An error occur while opening the source file",
+                        e1);
+                }
+            }
+
             try {
                 diff = FileListDiff.diff(new FileList(source),
                     process.getRemoteFileList());
