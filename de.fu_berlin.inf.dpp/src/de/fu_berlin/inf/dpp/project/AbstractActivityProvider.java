@@ -15,7 +15,7 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         }
     }
 
-    public abstract void exec(IActivity activityDataObject);
+    public abstract void exec(IActivity activity);
 
     public void removeActivityListener(IActivityListener listener) {
         this.activityListeners.remove(listener);
