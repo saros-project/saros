@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -65,12 +66,28 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "core")
 public class SharedResourcesManager implements IResourceChangeListener,
     IActivityProvider, Disposable {
+    /*
+     * haferburg: We're really only interested in
+     * IResourceChangeEvent.POST_CHANGE events. I don't know why other events
+     * were tracked, so I removed them.
+     * 
+     * We're definitely not interested in PRE_REFRESH, refreshes are only
+     * interesting when they result in an actual change, in which case we will
+     * receive a POST_CHANGE event anyways.
+     * 
+     * We also don't need PRE_CLOSE, since we'll get a POST_CHANGE anyways and
+     * also have to test project.isOpen().
+     * 
+     * TODO We might want to add PRE_DELETE if the user deletes our shared
+     * project though.
+     */
+    static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
     static Logger log = Logger
         .getLogger(SharedResourcesManager.class.getName());
 
     /**
-     * While paused the SharedResourcesManager doesn't fire activityDataObjects
+     * While paused the SharedResourcesManager doesn't fire activities
      */
     protected boolean pause = false;
 
@@ -123,7 +140,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             sarosSession = newSarosSession;
             sarosSession.addActivityProvider(SharedResourcesManager.this);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                SharedResourcesManager.this);
+                SharedResourcesManager.this, INTERESTING_EVENTS);
         }
 
         @Override
@@ -179,45 +196,62 @@ public class SharedResourcesManager implements IResourceChangeListener,
             return;
         }
 
-        try {
-            switch (event.getType()) {
-
-            case IResourceChangeEvent.PRE_BUILD:
-            case IResourceChangeEvent.POST_BUILD:
-            case IResourceChangeEvent.POST_CHANGE:
-
-                IResourceDelta delta = event.getDelta();
-                log.trace(".resourceChanged() - Delta will be processed");
-                if (delta != null) {
-                    assert delta.getResource() instanceof IWorkspaceRoot;
-                    IResourceDelta[] projects = delta.getAffectedChildren();
-                    for (IResourceDelta projectDelta : projects) {
-                        ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(
-                            this);
-                        projectDelta.accept(visitor);
-                        visitor.finish();
-                    }
-                } else
-                    log.error("Unexpected empty delta in "
-                        + "SharedResourcesManager: " + event);
-                break;
-            case IResourceChangeEvent.PRE_CLOSE:
-            case IResourceChangeEvent.PRE_DELETE:
-            case IResourceChangeEvent.PRE_REFRESH:
-
-                // TODO We should handle these as well (at least if the user
-                // deletes / refreshes our shared project)
-                break;
-
-            default:
-                // Because additional events might be added in the future
-                log.error("Unhandled case in in SharedResourcesManager: "
-                    + event);
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+            try {
+                // Creations, deletions, modifications of files and folders.
+                handlePostChange(event);
+            } catch (Exception e) {
+                log.error("Couldn't handle resource change.", e);
             }
-
-        } catch (Exception e) {
-            log.error("Couldn't handle resource change.", e);
+        } else {
+            log.error("Unhandled event type in in SharedResourcesManager: "
+                + event);
         }
+    }
+
+    protected void handlePostChange(IResourceChangeEvent event)
+        throws CoreException {
+        assert sarosSession != null;
+
+        if (!sarosSession.isDriver()) {
+            return;
+        }
+
+        IResourceDelta delta = event.getDelta();
+        log.trace(".resourceChanged() - Delta will be processed");
+        if (delta != null) {
+            assert delta.getResource() instanceof IWorkspaceRoot;
+            IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+            for (IResourceDelta projectDelta : projectDeltas) {
+                IResource resource = projectDelta.getResource();
+                assert resource instanceof IProject;
+                IProject project = (IProject) resource;
+                if (!sarosSession.isShared(project))
+                    continue;
+                SharedProject sharedProject = sarosSession
+                    .getSharedProject(project);
+                boolean isProjectOpen = project.isOpen();
+                if (sharedProject.isOpen() != isProjectOpen) {
+                    sharedProject.setOpen(isProjectOpen);
+                    if (isProjectOpen) {
+                        // Since the project was just opened, we're going to get
+                        // a notification that each file in the project was just
+                        // added.
+                        // TODO: Check if any of the files actually were
+                        // modified, but skip all others.
+                        continue;
+                    } else {
+                        continue;
+                    }
+                }
+                ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(this,
+                    sharedProject);
+                projectDelta.accept(visitor);
+                visitor.finish();
+            }
+        } else
+            log.error("Unexpected empty delta in " + "SharedResourcesManager: "
+                + event);
     }
 
     protected void logPauseWarning(IResourceChangeEvent event) {

@@ -3,6 +3,9 @@ package de.fu_berlin.inf.dpp.project;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
@@ -10,11 +13,23 @@ import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
 public class SharedProject {
     // private static final Logger log = Logger.getLogger(SharedProject.class);
 
-    ISarosSession sarosSession;
+    protected ISarosSession sarosSession;
 
-    IProject project;
+    protected IProject project;
 
-    private VCSProjectInformation projectInformation;
+    private boolean open;
+
+    protected VCSProjectInformation projectInformation;
+
+    protected VCSAdapter vcs;
+
+    AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
+
+        @Override
+        public void exec(IActivity activity) {
+            // TODO
+        }
+    };
 
     public SharedProject(IProject project, ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
@@ -26,7 +41,7 @@ public class SharedProject {
     }
 
     protected void initializeVCSInformation() {
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        vcs = VCSAdapterFactory.getAdapter(project);
         if (vcs == null)
             return;
         projectInformation = vcs.getProjectInformation(project);
@@ -45,8 +60,21 @@ public class SharedProject {
             String newPath = newProjectInformation.projectPath;
             if (!path.equals(newPath)) {
                 // Switch
+                SPath spath = new SPath(resource);
+                IActivity activity = VCSActivity.switch_(
+                    sarosSession.getLocalUser(), spath,
+                    newProjectInformation.projectPath, "HEAD");
+                activityProvider.fireActivity(activity);
+                projectInformation.projectPath = newPath;
             }
-            projectInformation = newProjectInformation;
         }
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean isOpen() {
+        return open;
     }
 }
