@@ -194,7 +194,8 @@ public class JoinSessionWizard extends Wizard {
          * are supposed to be overwritten based on the synchronization options
          * and if there are differences between the remote and local project.
          */
-        if (namePage.overwriteProjectResources()) {
+        if (namePage.overwriteProjectResources()
+            && !preferenceUtils.isAutoReuseExisting()) {
             FileListDiff diff;
             try {
                 diff = FileListDiff.diff(new FileList(source),
