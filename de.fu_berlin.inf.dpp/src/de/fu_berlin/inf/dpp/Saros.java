@@ -699,6 +699,18 @@ public class Saros extends AbstractUIPlugin {
                 disconnect();
             }
 
+            /**
+             * Infinite connecting state: when
+             *               providing an empty server address and connecting
+             *               via Roster view.
+             */
+
+            while (prefStore.getString(PreferenceConstants.SERVER).equals("")) {
+                boolean ok = Util.showConfigurationWizard(true, false);
+                if (!ok)
+                    return;
+            }
+
             setConnectionState(ConnectionState.CONNECTING, null);
             this.connection = new XMPPConnection(getConnectionConfiguration());
 
@@ -748,9 +760,25 @@ public class Saros extends AbstractUIPlugin {
                     cause.getMessage(), failSilently);
             } else if (cause instanceof UnknownHostException) {
                 log.info("Unknown host: " + cause);
-                Util.popUpFailureMessage("Error Connecting",
-                    "Error Connecting to XMPP server: " + cause.getMessage(),
+
+                /**
+                 * Only an error message was
+                 *               displayed: if a server was unreachable. Now,
+                 *               the connection preferences will pop up if the
+                 *               user decides to.
+                 */
+
+                boolean ok = Util.popUpYesNoQuestion("Error Connecting",
+                    "Error Connecting to XMPP server: '" + server
+                        + "'.\n\nDo you want to use other parameters?",
                     failSilently);
+
+                if (ok) {
+                    ok = Util.showConfigurationWizard(true, false);
+                    if (ok)
+                        connect(failSilently);
+                }
+
             } else {
                 log.info("xmpp: " + cause.getMessage(), cause);
 
