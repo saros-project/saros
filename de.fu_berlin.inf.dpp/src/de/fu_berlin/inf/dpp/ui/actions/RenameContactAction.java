@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.SelectionProviderAction;
@@ -92,6 +93,9 @@ public class RenameContactAction extends SelectionProviderAction {
             String newName = dialog.getValue();
             entry.setName(newName.length() == 0 ? null : newName);
         }
+
+        TreeViewer parent = (TreeViewer) getSelectionProvider();
+        parent.refresh(true);
     }
 
     protected RosterEntry getSelectedForRename(IStructuredSelection selection) {
