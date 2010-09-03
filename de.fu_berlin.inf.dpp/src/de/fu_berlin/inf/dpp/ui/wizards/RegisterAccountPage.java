@@ -105,7 +105,6 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.serverText = new Text(root, SWT.BORDER);
         this.serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
-        this.serverText.setText("jabber.org");
 
         Label userLabel = new Label(root, SWT.NONE);
         userLabel.setText("Username");
@@ -300,8 +299,11 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
     public void setInitialValues() {
         IPreferenceStore preferences = saros.getPreferenceStore();
-        this.serverText.setText(preferences
-            .getDefaultString(PreferenceConstants.SERVER));
+        String serverText = preferences.getString(PreferenceConstants.SERVER);
+        String usernameText = preferences
+            .getString(PreferenceConstants.USERNAME);
+        this.serverText.setText(serverText);
+        this.userText.setText(usernameText);
         if (this.showPrefButton) {
             this.prefButton.setSelection(!preferenceUtils.hasUserName());
         }
