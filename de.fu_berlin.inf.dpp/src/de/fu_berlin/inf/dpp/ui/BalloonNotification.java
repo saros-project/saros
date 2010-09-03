@@ -44,6 +44,8 @@ public class BalloonNotification {
         }
 
         Shell parentShell = (pControl != null ? pControl.getShell() : null);
+        parentShell.forceActive();
+
         final BalloonWindow window = new BalloonWindow(parentShell, SWT.ON_TOP
             | SWT.TOOL | SWT.CLOSE | SWT.TITLE);
 
@@ -67,7 +69,9 @@ public class BalloonNotification {
         // Runnable that will close the window after time has been expired
         window.getShell().getDisplay().timerExec(pTimeout,
             Util.wrapSafe(log, new Runnable() {
+
                 public void run() {
+                    window.getShell().forceActive();
                     window.close();
                 }
             }));
