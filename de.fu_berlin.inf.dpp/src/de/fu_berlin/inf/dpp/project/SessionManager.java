@@ -165,8 +165,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
 
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, project, myJID,
-            stopManager, new DateTime(), useVersionControl);
+            this.transferManager, dispatchThreadContext, myJID, stopManager,
+            new DateTime(), useVersionControl);
+        sarosSession.addSharedProject(project, project.getName());
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -187,8 +188,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         JID host, int colorID, DateTime sessionStart) {
 
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, projectID, project,
-            saros.getMyJID(), host, colorID, stopManager, sessionStart);
+            this.transferManager, dispatchThreadContext, saros.getMyJID(),
+            host, colorID, stopManager, sessionStart);
+        sarosSession.addSharedProject(project, projectID);
         this.sarosSessionObservable.setValue(sarosSession);
 
         for (ISessionListener listener : this.listeners) {

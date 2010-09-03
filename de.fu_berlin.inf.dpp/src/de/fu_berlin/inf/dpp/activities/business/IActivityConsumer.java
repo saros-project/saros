@@ -37,4 +37,6 @@ public interface IActivityConsumer {
     boolean consume(ChecksumErrorActivity checksumErrorActivity);
 
     boolean consume(ProgressActivity progressActivity);
+
+    boolean consume(VCSActivity vcsActivity);
 }

@@ -73,6 +73,11 @@ public class AbstractActivityConsumer implements IActivityConsumer {
         return false;
     }
 
+    public boolean consume(VCSActivity activity) {
+        // empty implementation
+        return false;
+    }
+
     /**
      * Utility method for converting a IActivityConsumer into an
      * IActivityReceiver (the result from the calls to consume are ignored)
@@ -130,6 +135,10 @@ public class AbstractActivityConsumer implements IActivityConsumer {
 
             public void receive(ProgressActivity progressActivity) {
                 consumer.consume(progressActivity);
+            }
+
+            public void receive(VCSActivity activity) {
+                consumer.consume(activity);
             }
         };
     }

@@ -139,16 +139,15 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     protected SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, String projectID,
-        IProject project, StopManager stopManager, JID myJID, int myColorID,
-        DateTime sessionStart, boolean useVersionControl) {
+        DispatchThreadContext threadContext, StopManager stopManager,
+        JID myJID, int myColorID, DateTime sessionStart,
+        boolean useVersionControl) {
 
         assert transmitter != null;
         assert myJID != null;
 
         this.saros = saros;
         this.transmitter = transmitter;
-        this.projectMapper.addMapping(projectID, project);
         this.transferManager = transferManager;
         this.stopManager = stopManager;
         this.sessionStart = sessionStart;
@@ -158,8 +157,6 @@ public class SarosSession implements ISarosSession, Disposable {
             transferManager, threadContext);
         this.useVersionControl = useVersionControl;
 
-        this.sharedProject = new SharedProject(project, this);
-
         stopManager.addBlockable(stopManagerListener);
     }
 
@@ -168,13 +165,11 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, IProject project, JID myID,
-        StopManager stopManager, DateTime sessionStart,
-        boolean useVersionControl) {
+        DispatchThreadContext threadContext, JID myID, StopManager stopManager,
+        DateTime sessionStart, boolean useVersionControl) {
 
-        this(saros, transmitter, transferManager, threadContext, project
-            .getName(), project, stopManager, myID, 0, sessionStart,
-            useVersionControl);
+        this(saros, transmitter, transferManager, threadContext, stopManager,
+            myID, 0, sessionStart, useVersionControl);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
@@ -193,12 +188,11 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, String projectID,
-        IProject project, JID myID, JID hostID, int myColorID,
-        StopManager stopManager, DateTime sessionStart) {
+        DispatchThreadContext threadContext, JID myID, JID hostID,
+        int myColorID, StopManager stopManager, DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, projectID,
-            project, stopManager, myID, myColorID, sessionStart, true);
+        this(saros, transmitter, transferManager, threadContext, stopManager,
+            myID, myColorID, sessionStart, true);
 
         this.host = new User(this, hostID, 0);
         this.host.invitationCompleted();
@@ -208,6 +202,11 @@ public class SarosSession implements ISarosSession, Disposable {
         this.participants.put(myID, localUser);
 
         this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
+    }
+
+    public void addSharedProject(IProject project, String projectID) {
+        this.projectMapper.addMapping(projectID, project);
+        this.sharedProject = new SharedProject(project, this);
     }
 
     public Collection<User> getParticipants() {

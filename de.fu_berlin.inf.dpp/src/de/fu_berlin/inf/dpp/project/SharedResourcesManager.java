@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -44,6 +45,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -52,6 +54,8 @@ import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -65,12 +69,28 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "core")
 public class SharedResourcesManager implements IResourceChangeListener,
     IActivityProvider, Disposable {
+    /*
+     * haferburg: We're really only interested in
+     * IResourceChangeEvent.POST_CHANGE events. I don't know why other events
+     * were tracked, so I removed them.
+     * 
+     * We're definitely not interested in PRE_REFRESH, refreshes are only
+     * interesting when they result in an actual change, in which case we will
+     * receive a POST_CHANGE event anyways.
+     * 
+     * We also don't need PRE_CLOSE, since we'll get a POST_CHANGE anyways and
+     * also have to test project.isOpen().
+     * 
+     * TODO We might want to add PRE_DELETE if the user deletes our shared
+     * project though.
+     */
+    static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
     static Logger log = Logger
         .getLogger(SharedResourcesManager.class.getName());
 
     /**
-     * While paused the SharedResourcesManager doesn't fire activityDataObjects
+     * While paused the SharedResourcesManager doesn't fire activities
      */
     protected boolean pause = false;
 
@@ -123,7 +143,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             sarosSession = newSarosSession;
             sarosSession.addActivityProvider(SharedResourcesManager.this);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                SharedResourcesManager.this);
+                SharedResourcesManager.this, INTERESTING_EVENTS);
         }
 
         @Override
@@ -170,63 +190,81 @@ public class SharedResourcesManager implements IResourceChangeListener,
          * changes
          */
         if (pause) {
-            /*
-             * TODO This warning is misleading! The consistency recovery process
-             * might cause IResourceChangeEvents (which do not need to be
-             * replicated)
-             */
             logPauseWarning(event);
             return;
         }
 
-        try {
-            switch (event.getType()) {
-
-            case IResourceChangeEvent.PRE_BUILD:
-            case IResourceChangeEvent.POST_BUILD:
-            case IResourceChangeEvent.POST_CHANGE:
-
-                IResourceDelta delta = event.getDelta();
-                log.trace(".resourceChanged() - Delta will be processed");
-                if (delta != null) {
-                    assert delta.getResource() instanceof IWorkspaceRoot;
-                    IResourceDelta[] projects = delta.getAffectedChildren();
-                    for (IResourceDelta projectDelta : projects) {
-                        ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(
-                            this);
-                        projectDelta.accept(visitor);
-                        visitor.finish();
-                    }
-                } else
-                    log.error("Unexpected empty delta in "
-                        + "SharedResourcesManager: " + event);
-                break;
-            case IResourceChangeEvent.PRE_CLOSE:
-            case IResourceChangeEvent.PRE_DELETE:
-            case IResourceChangeEvent.PRE_REFRESH:
-
-                // TODO We should handle these as well (at least if the user
-                // deletes / refreshes our shared project)
-                break;
-
-            default:
-                // Because additional events might be added in the future
-                log.error("Unhandled case in in SharedResourcesManager: "
-                    + event);
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+            try {
+                // Creations, deletions, modifications of files and folders.
+                handlePostChange(event);
+            } catch (Exception e) {
+                log.error("Couldn't handle resource change.", e);
             }
-
-        } catch (Exception e) {
-            log.error("Couldn't handle resource change.", e);
+        } else {
+            log.error("Unhandled event type in in SharedResourcesManager: "
+                + event);
         }
     }
 
+    protected void handlePostChange(IResourceChangeEvent event)
+        throws CoreException {
+        assert sarosSession != null;
+
+        if (!sarosSession.isDriver()) {
+            return;
+        }
+
+        IResourceDelta delta = event.getDelta();
+        log.trace(".resourceChanged() - Delta will be processed");
+        if (delta == null) {
+            log.error("Unexpected empty delta in " + "SharedResourcesManager: "
+                + event);
+            return;
+        }
+        assert delta.getResource() instanceof IWorkspaceRoot;
+
+        // Iterate over all projects.
+        IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+        for (IResourceDelta projectDelta : projectDeltas) {
+            IResource resource = projectDelta.getResource();
+            assert resource instanceof IProject;
+            IProject project = (IProject) resource;
+            if (!sarosSession.isShared(project))
+                continue;
+
+            SharedProject sharedProject = sarosSession
+                .getSharedProject(project);
+            boolean isProjectOpen = project.isOpen();
+            if (sharedProject.isOpen() != isProjectOpen) {
+                sharedProject.setOpen(isProjectOpen);
+                if (isProjectOpen) {
+                    // Since the project was just opened, we're going to get
+                    // a notification that each file in the project was just
+                    // added.
+                    // TODO: Check if any of the files actually were
+                    // modified, but skip all others.
+                    continue;
+                } else {
+                    // The project was just closed.
+                    // TODO: What do we do here?
+                }
+            }
+            if (!isProjectOpen)
+                continue;
+            ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(this,
+                sharedProject);
+            projectDelta.accept(visitor);
+            visitor.finish();
+        }
+    }
+
+    /*
+     * TODO This warning is misleading! The consistency recovery process might
+     * cause IResourceChangeEvents (which do not need to be replicated)
+     */
     protected void logPauseWarning(IResourceChangeEvent event) {
-
-        switch (event.getType()) {
-
-        case IResourceChangeEvent.PRE_BUILD:
-        case IResourceChangeEvent.POST_BUILD:
-        case IResourceChangeEvent.POST_CHANGE:
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
 
             IResourceDelta delta = event.getDelta();
             if (delta == null) {
@@ -244,46 +282,73 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return;
             }
             log.warn("Resource changed while paused:\n" + visitor.toString());
-            break;
-        case IResourceChangeEvent.PRE_CLOSE:
-        case IResourceChangeEvent.PRE_DELETE:
-        case IResourceChangeEvent.PRE_REFRESH:
-
-            IResource resource = event.getResource();
-            if (resource != null) {
-                log.warn("Resource changed while paused: "
-                    + event.getResource().getFullPath().toPortableString());
-            } else {
-                log.warn("ResourceChange occurred while paused with no resource given");
-            }
-            break;
-        default:
-            // Because additional events might be added in the future
-            log.error("Unhandled case in in SharedResourcesManager: " + event);
+        } else {
+            log.error("Unexpected event type in in logPauseWarning: " + event);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void exec(IActivity activityDataObject) {
+    public void exec(IActivity activity) {
 
-        if (!(activityDataObject instanceof FileActivity || activityDataObject instanceof FolderActivity))
+        if (!(activity instanceof FileActivity
+            || activity instanceof FolderActivity || activity instanceof VCSActivity))
             return;
 
         try {
             fileReplacementInProgressObservable.startReplacement();
 
-            if (activityDataObject instanceof FileActivity) {
-                exec((FileActivity) activityDataObject);
-            } else if (activityDataObject instanceof FolderActivity) {
-                exec((FolderActivity) activityDataObject);
+            if (activity instanceof FileActivity) {
+                exec((FileActivity) activity);
+            } else if (activity instanceof FolderActivity) {
+                exec((FolderActivity) activity);
+            } else if (activity instanceof VCSActivity) {
+                exec((VCSActivity) activity);
             }
 
         } catch (CoreException e) {
-            log.error("Failed to execute resource activityDataObject.", e);
+            log.error("Failed to execute resource activity.", e);
         } finally {
             fileReplacementInProgressObservable.replacementDone();
+        }
+    }
+
+    protected void exec(VCSActivity activity) {
+        IProject project = activity.getPath().getProject();
+        IPath path = activity.getPath().getProjectRelativePath();
+        String url = activity.getURL();
+        String revision = activity.getRevision();
+        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        if (vcs == null) {
+            log.error("Could not execute VCS activity.");
+            return;
+        }
+        if (activity.getType() == VCSActivity.Type.Switch) {
+            IResource resource = null;
+            {
+                try {
+                    resource = project.getFolder(path);
+                } catch (Exception e) {
+                    log.debug("", e);
+                }
+                if (resource == null) {
+                    try {
+                        resource = project.getFile(path);
+                    } catch (Exception e) {
+                        log.debug("", e);
+                    }
+                }
+                if (resource == null) {
+                    // TODO find a safer way...
+                    resource = project;
+
+                }
+            }
+            vcs.switch_(resource, url, revision, null);
+            activity.getRevision();
+        } else {
+            log.error("VCS activity type not implemented yet.");
         }
     }
 

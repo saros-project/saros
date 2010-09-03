@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.vcs;
 
+import java.net.MalformedURLException;
 import java.text.ParseException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -15,6 +17,7 @@ import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
 import org.tigris.subversion.subclipse.core.ISVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.SVNException;
 import org.tigris.subversion.subclipse.core.SVNTeamProvider;
+import org.tigris.subversion.subclipse.core.commands.SwitchToUrlCommand;
 import org.tigris.subversion.subclipse.core.commands.UpdateResourcesCommand;
 import org.tigris.subversion.subclipse.core.repo.SVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.resources.RemoteFolder;
@@ -31,6 +34,8 @@ import de.fu_berlin.inf.dpp.FileList;
  * @author ahaferburg
  */
 class SubclipseAdapter implements VCSAdapter {
+    private static final Logger log = Logger.getLogger(SubclipseAdapter.class);
+
     // TODO Is it safe to assume that this won't change in the future?
     static final String identifier = "org.tigris.subversion.subclipse.core.svnnature";
     RepositoryProvider provider;
@@ -195,5 +200,42 @@ class SubclipseAdapter implements VCSAdapter {
         info.projectPath = getProjectPath(project);
         info.baseRevision = getRevisionString(project);
         return info;
+    }
+
+    public void switch_(IResource resource, String url, String revisionString,
+        IProgressMonitor monitor) {
+        if (resource == null)
+            return;
+        SVNRevision revision;
+        try {
+            revision = SVNRevision.getRevision(revisionString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+        SVNWorkspaceRoot root;
+        try {
+            SVNTeamProvider provider = (SVNTeamProvider) RepositoryProvider
+                .getProvider(resource.getProject());
+            root = provider.getSVNWorkspaceRoot();
+        } catch (Exception e) {
+            // class cast, null pointer
+            e.printStackTrace();
+            return;
+        }
+        SVNUrl svnURL;
+        try {
+            svnURL = new SVNUrl(url);
+        } catch (MalformedURLException e1) {
+            log.debug("", e1);
+            return;
+        }
+        SwitchToUrlCommand cmd = new SwitchToUrlCommand(root, resource, svnURL,
+            revision);
+        try {
+            cmd.run(monitor);
+        } catch (SVNException e) {
+            e.printStackTrace();
+        }
     }
 }

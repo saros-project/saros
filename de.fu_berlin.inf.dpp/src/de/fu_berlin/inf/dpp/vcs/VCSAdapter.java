@@ -47,8 +47,7 @@ public interface VCSAdapter {
 
     /**
      * @param resource
-     * @return The path relative to the repository of the project containing
-     *         this resource as a String, or null.
+     * @return The path of the resource relative to the repository, or null.
      */
     public String getProjectPath(IResource resource);
 
@@ -72,6 +71,14 @@ public interface VCSAdapter {
      * @param monitor
      */
     public void update(IFile file, String targetRevision,
+        IProgressMonitor monitor);
+
+    /**
+     * Switches the resource to the specified URL and revision.
+     * 
+     * @param monitor
+     */
+    public void switch_(IResource resource, String url, String revision,
         IProgressMonitor monitor);
 
     /**

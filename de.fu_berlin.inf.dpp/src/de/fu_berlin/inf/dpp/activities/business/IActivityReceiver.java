@@ -37,4 +37,6 @@ public interface IActivityReceiver {
     void receive(ChecksumErrorActivity checksumErrorActivity);
 
     void receive(ProgressActivity progressActivity);
+
+    void receive(VCSActivity activity);
 }
