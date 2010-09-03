@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -25,98 +23,52 @@ import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Listens for resource changes in shared project and fires activityDataObjects.
+ * Visits the resource changes in a shared project.
  */
 class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     /**
+     * TODO
+     */
+    protected SharedResourcesManager sharedResourcesManager;
+    protected SharedProject sharedProject;
+
+    /**
+     * TODO
      * 
-     */
-    private SharedResourcesManager sharedResourcesManager;
-
-    /**
      * @param sharedResourcesManager
+     * @param sharedProject
      */
-    ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager) {
+    ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
+        SharedProject sharedProject) {
         this.sharedResourcesManager = sharedResourcesManager;
+        this.sharedProject = sharedProject;
     }
 
-    // stores activityDataObjects that happen while one change event
-    protected List<IResourceActivity> activitiesBuffer = new ArrayList<IResourceActivity>();
+    /** Stores activities to be sent due to one change event. */
+    protected List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
 
     /**
-     * Compares the number of segments of the IPaths of the given Activities.
-     * The longer path is 'bigger'.
+     * Orders activities in buffer.<br>
+     * We want to execute any moves before deleting a folder.
+     * 
+     * haferburg: Sorting is not necessary, because they already are somewhat
+     * sorted. All we need to do is make sure that folders are created first and
+     * deleted last. The sorting stuff was introduced with 1742 (1688).
      */
-    protected class PathLengthComparator implements
-        Comparator<IResourceActivity> {
-
-        public int compare(IResourceActivity a1, IResourceActivity a2) {
-            int a1sc = a1.getPath().getProjectRelativePath().segmentCount();
-            int a2sc = a2.getPath().getProjectRelativePath().segmentCount();
-
-            return a1sc - a2sc;
-        }
-
-    }
-
-    /**
-     * Compares the number of segments of the IPaths of the given Activities.
-     * The shorter path is 'bigger'.
-     */
-    protected class ReversePathLengthComparator implements
-        Comparator<IResourceActivity> {
-
-        PathLengthComparator pathLengthComparator = new PathLengthComparator();
-
-        public int compare(IResourceActivity a1, IResourceActivity a2) {
-            return -pathLengthComparator.compare(a1, a2);
-        }
-    }
-
-    /**
-     * Orders activityDataObjects in the buffer and fires them. To be run before
-     * change event ends.
-     */
-    public void finish() {
-        for (IActivity activityDataObject : getOrderedActivities())
-            fireActivity(activityDataObject);
-    }
-
-    /**
-     * Orders activityDataObjects in buffer. Most importantly we want to execute
-     * any file moves before deleting a folder.
-     */
-    // why do we need these sorting shenanigans?
     protected List<IResourceActivity> getOrderedActivities() {
-        // TODO Use a comparator which includes all this as a sorting rule
-
-        List<IResourceActivity> fileCreateActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> fileMoveActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> fileRemoveActivities = new ArrayList<IResourceActivity>();
-
+        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
         List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
         List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
 
-        List<IResourceActivity> orderedList;
-
         /**
-         * split all activityDataObjects in activityDataObjects buffer in groups
-         * ({File,Folder} * {Create, Move, Delete})
+         * Split all pendingActivities.
          */
-        for (IResourceActivity activity : activitiesBuffer) {
+        for (IResourceActivity activity : pendingActivities) {
             FolderActivity.Type tFolder;
-            FileActivity.Type tFile;
 
             if (activity instanceof FileActivity) {
-                tFile = ((FileActivity) activity).getType();
-                if (tFile == FileActivity.Type.Created)
-                    fileCreateActivities.add(activity);
-                else if (tFile == FileActivity.Type.Moved)
-                    fileMoveActivities.add(activity);
-                else if (tFile == FileActivity.Type.Removed)
-                    fileRemoveActivities.add(activity);
-
+                fileActivities.add(activity);
             }
             if (activity instanceof FolderActivity) {
                 tFolder = ((FolderActivity) activity).getType();
@@ -128,50 +80,33 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             }
         }
 
-        PathLengthComparator pathLengthComparator = new PathLengthComparator();
-        // ReversePathLengthComparator iplc = new ReversePathLengthComparator();
+        // Add activities to the result.
+        List<IResourceActivity> result = folderCreateActivities;
+        result.addAll(fileActivities);
+        result.addAll(folderRemoveActivities);
 
-        // Sorts Activities by their length
-        Collections.sort(fileCreateActivities, pathLengthComparator);
-        Collections.sort(fileMoveActivities, pathLengthComparator);
-        // Collections.sort(fileRemoveActivities, iplc);
-        Collections.sort(folderCreateActivities, pathLengthComparator);
-        // Collections.sort(folderRemoveActivities, iplc);
-
-        orderedList = new ArrayList<IResourceActivity>();
-
-        // add activityDataObjects to the result
-        orderedList.addAll(folderCreateActivities);
-        orderedList.addAll(fileMoveActivities);
-        orderedList.addAll(fileCreateActivities);
-        orderedList.addAll(fileRemoveActivities);
-        orderedList.addAll(folderRemoveActivities);
-
-        return orderedList;
+        return result;
     }
 
     public boolean visit(IResourceDelta delta) {
-
-        assert this.sharedResourcesManager.sarosSession != null;
-
-        ISarosSession sarosSession = sharedResourcesManager.sarosSession;
-        if (!sarosSession.isDriver()) {
-            return false;
-        }
-
         IResource resource = delta.getResource();
-        if (resource instanceof IProject)
-            return sarosSession.isShared((IProject) resource);
-
         if (resource.isDerived()) {
             return false;
         }
 
+        boolean isProject = resource instanceof IProject;
+        if (isProject) {
+            IProject project = (IProject) resource;
+            if (!project.isOpen())
+                return false;
+        }
         if (resource instanceof IFile) {
             handleFileDelta(delta);
             return true;
-        } else if (resource instanceof IFolder)
-            return handleFolderDelta(delta);
+        } else {
+            if (resource instanceof IFolder || isProject)
+                return handleFolderDelta(delta);
+        }
 
         assert false;
         return true;
@@ -183,12 +118,12 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         switch (kind) {
         case IResourceDelta.ADDED:
             addActivity(new FolderActivity(
-                this.sharedResourcesManager.sarosSession.getLocalUser(),
+                sharedResourcesManager.sarosSession.getLocalUser(),
                 FolderActivity.Type.Created, new SPath(resource)));
             return true;
         case IResourceDelta.REMOVED:
             addActivity(new FolderActivity(
-                this.sharedResourcesManager.sarosSession.getLocalUser(),
+                sharedResourcesManager.sarosSession.getLocalUser(),
                 FolderActivity.Type.Removed, new SPath(resource)));
             // We don't want visit the children if this folder was removed. The
             // only interesting case is that a child file was moved out of this
@@ -225,14 +160,13 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 IProject newProject = root.getProject(newPath.segment(0));
                 IProject oldProject = root.getProject(oldPath.segment(0));
 
-                if (this.sharedResourcesManager.sarosSession
-                    .isShared(newProject)) {
-                    if (this.sharedResourcesManager.sarosSession
+                if (sharedResourcesManager.sarosSession.isShared(newProject)) {
+                    if (sharedResourcesManager.sarosSession
                         .isShared(oldProject)) {
                         // Moving inside the shared project
                         try {
                             addActivity(FileActivity.moved(
-                                this.sharedResourcesManager.sarosSession
+                                sharedResourcesManager.sarosSession
                                     .getLocalUser(),
                                 new SPath(newProject, newPath
                                     .removeFirstSegments(1)),
@@ -254,10 +188,9 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                     }
                 } else {
                     // Moving away!
-                    addActivity(FileActivity
-                        .removed(this.sharedResourcesManager.sarosSession
-                            .getLocalUser(), new SPath(resource),
-                            Purpose.ACTIVITY));
+                    addActivity(FileActivity.removed(
+                        sharedResourcesManager.sarosSession.getLocalUser(),
+                        new SPath(resource), Purpose.ACTIVITY));
                     return;
                 }
             }
@@ -277,8 +210,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
                 IProject newProject = root.getProject(newPath.segment(0));
 
-                if (this.sharedResourcesManager.sarosSession
-                    .isShared(newProject)) {
+                if (sharedResourcesManager.sarosSession.isShared(newProject)) {
                     // Ignore "REMOVED" while moving into shared project
                     return;
                 }
@@ -287,8 +219,8 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             }
 
             addActivity(FileActivity.removed(
-                this.sharedResourcesManager.sarosSession.getLocalUser(),
-                new SPath(resource), Purpose.ACTIVITY));
+                sharedResourcesManager.sarosSession.getLocalUser(), new SPath(
+                    resource), Purpose.ACTIVITY));
             return;
 
         default:
@@ -297,7 +229,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     protected void addActivity(IResourceActivity activity) {
-        activitiesBuffer.add(activity);
+        pendingActivities.add(activity);
     }
 
     /**
@@ -311,7 +243,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
      */
     private IResourceActivity createdUnlessOpen(IResource resource) {
         SPath spath = new SPath(resource);
-        if (this.sharedResourcesManager.editorManager.isOpened(spath)) {
+        if (sharedResourcesManager.editorManager.isOpened(spath)) {
             return null;
         }
 
@@ -319,7 +251,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             + " changed");
         try {
             return FileActivity.created(
-                this.sharedResourcesManager.sarosSession.getLocalUser(), spath,
+                sharedResourcesManager.sarosSession.getLocalUser(), spath,
                 Purpose.ACTIVITY);
         } catch (IOException e) {
             SharedResourcesManager.log.warn(
@@ -353,6 +285,16 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     }
 
+    /**
+     * Fires the ordered activities. To be run before change event ends.
+     */
+    // TODO Move to SRM :(
+    public void finish() {
+        for (IActivity activityDataObject : getOrderedActivities())
+            fireActivity(activityDataObject);
+    }
+
+    // TODO Move to SRM :(
     protected void fireActivity(final IActivity activityDataObject) {
         Util.runSafeSWTSync(SharedResourcesManager.log, new Runnable() {
             public void run() {
