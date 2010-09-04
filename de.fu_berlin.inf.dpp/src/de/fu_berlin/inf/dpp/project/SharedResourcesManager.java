@@ -83,8 +83,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * We also don't need PRE_CLOSE, since we'll get a POST_CHANGE anyways and
      * also have to test project.isOpen().
      * 
-     * TODO We might want to add PRE_DELETE if the user deletes our shared
-     * project though.
+     * We might want to add PRE_DELETE if the user deletes our shared project
+     * though.
      */
     static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
@@ -238,15 +238,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
             if (sharedProject.isOpen() != isProjectOpen) {
                 sharedProject.setOpen(isProjectOpen);
                 if (isProjectOpen) {
-                    // Since the project was just opened, we're going to get
+                    // Since the project was just opened, we would get
                     // a notification that each file in the project was just
-                    // added.
-                    // TODO: Check if any of the files actually were
-                    // modified, but skip all others.
+                    // added, so we're simply going to ignore this delta. Any
+                    // resources that were modified externally would be
+                    // out-of-sync anyways, so when the user refreshes them we'll
+                    // get notified.
                     continue;
                 } else {
-                    // The project was just closed.
-                    // TODO: What do we do here?
+                    // The project was just closed, what do we do here?
                 }
             }
             if (!isProjectOpen)
@@ -267,12 +267,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     /*
-     * TODO This warning is misleading! The consistency recovery process might
-     * cause IResourceChangeEvents (which do not need to be replicated)
+     * coezbek: This warning is misleading! The consistency recovery process
+     * might cause IResourceChangeEvents (which do not need to be replicated)
+     * [Added in branches/10.2.26.r2028, the commit message claims "Improved
+     * logging of ResourceChanges while paused".]
      * 
      * haferburg: When is this even called? We don't get here while this class
      * executes any activity. We can only get here when pause is true, but not
-     * fileReplacementInProgressObservable.
+     * fileReplacementInProgressObservable. Also, why add a misleading warning
+     * in the first place??
      */
     protected void logPauseWarning(IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {

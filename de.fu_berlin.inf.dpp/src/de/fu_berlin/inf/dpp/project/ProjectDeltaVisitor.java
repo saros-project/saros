@@ -116,6 +116,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
         switch (kind) {
         case IResourceDelta.CHANGED:
+            // The file's timestamp changed.
             if (!isContentChange(delta))
                 return;
 
@@ -124,47 +125,34 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
         case IResourceDelta.ADDED:
 
-            // is this an "ADD" while moving/renaming a file?
+            // Was this file moved or renamed?
             if (isMovedFrom(delta)) {
 
-                IPath newPath = resource.getFullPath();
                 // Adds have getMovedFrom set:
                 IPath oldPath = delta.getMovedFromPath();
-
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-
-                IProject newProject = root.getProject(newPath.segment(0));
                 IProject oldProject = root.getProject(oldPath.segment(0));
 
-                if (sarosSession.isShared(newProject)) {
-                    if (sarosSession.isShared(oldProject)) {
-                        // Moving inside the shared project
-                        try {
-                            addActivity(FileActivity.moved(
-                                getUser(),
-                                new SPath(newProject, newPath
-                                    .removeFirstSegments(1)),
-                                new SPath(oldProject, oldPath
-                                    .removeFirstSegments(1)),
-                                isContentChange(delta)));
-                            return;
-                        } catch (IOException e) {
-                            SharedResourcesManager.log
-                                .warn("Resource could not be read for"
-                                    + " sending to peers:"
-                                    + resource.getLocation());
-                        }
-                    } else {
-                        // Moving a file into the shared project
-                        // -> Treat like an add!
-
-                        // Fall-through
+                if (sarosSession.isShared(oldProject)) {
+                    // Moving inside the shared project
+                    try {
+                        addActivity(FileActivity.moved(
+                            getUser(),
+                            new SPath(resource),
+                            new SPath(oldProject, oldPath
+                                .removeFirstSegments(1)),
+                            isContentChange(delta)));
+                        return;
+                    } catch (IOException e) {
+                        SharedResourcesManager.log
+                            .warn("Resource could not be read for"
+                                + " sending to peers:" + resource.getLocation());
                     }
                 } else {
-                    // Moving away!
-                    addActivity(FileActivity.removed(getUser(), new SPath(
-                        resource), Purpose.ACTIVITY));
-                    return;
+                    // Moving a file into the shared project
+                    // -> Treat like an add!
+
+                    // Fall-through
                 }
             }
 
@@ -231,9 +219,8 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     /**
-     * It analyzes the given IResourceDelta and returns true if the
-     * "Moved"-flags are set.
-     * */
+     * Returns true if the "Moved"-flags are set.
+     */
     protected boolean isMoved(IResourceDelta delta) {
         return (isMovedFrom(delta) || isMovedTo(delta));
     }
@@ -247,7 +234,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     /**
-     * Indicates content change of a resource while checking its delta.
+     * Returns true if the CONTENT flag is set.
      */
     protected boolean isContentChange(IResourceDelta delta) {
         return ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
