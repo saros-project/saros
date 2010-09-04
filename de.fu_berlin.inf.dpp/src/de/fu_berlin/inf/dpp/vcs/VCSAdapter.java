@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.vcs;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -66,11 +65,12 @@ public interface VCSAdapter {
     /**
      * Updates the file to the specified revision.
      * 
-     * @param file
+     * @param resource
      * @param targetRevision
      * @param monitor
+     *            must not be null.
      */
-    public void update(IFile file, String targetRevision,
+    public void update(IResource resource, String targetRevision,
         IProgressMonitor monitor);
 
     /**
@@ -82,10 +82,10 @@ public interface VCSAdapter {
         IProgressMonitor monitor);
 
     /**
-     * Creates project specific VCS information.
+     * Creates VCS specific information for the resource.
      * 
-     * @param project
+     * @param resource
      * @return
      */
-    public VCSProjectInformation getProjectInformation(IProject project);
+    public VCSResourceInformation getResourceInformation(IResource resource);
 }

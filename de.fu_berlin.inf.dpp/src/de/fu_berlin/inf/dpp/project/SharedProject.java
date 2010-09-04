@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IProject;
 
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
-import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 public class SharedProject {
     // private static final Logger log = Logger.getLogger(SharedProject.class);
@@ -13,16 +13,19 @@ public class SharedProject {
 
     protected IProject project;
 
-    private boolean open;
+    protected boolean open;
 
-    public String vcsUrl;
+    protected String vcsUrl;
 
-    private VCSAdapter vcs;
+    protected VCSAdapter vcs;
+
+    protected String vcsRevision;
 
     public SharedProject(IProject project, ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
         this.project = project;
 
+        open = project.isOpen();
         boolean host = sarosSession.isHost();
         boolean useVersionControl = sarosSession.useVersionControl();
         if (host && useVersionControl) {
@@ -34,10 +37,42 @@ public class SharedProject {
         vcs = VCSAdapterFactory.getAdapter(project);
         if (vcs == null)
             return;
-        VCSProjectInformation projectInformation = vcs
-            .getProjectInformation(project);
-        vcsUrl = projectInformation.repositoryURL
-            + projectInformation.projectPath;
+        VCSResourceInformation info = vcs.getResourceInformation(project);
+        vcsUrl = info.repositoryRoot + info.path;
+        vcsRevision = info.revision;
+    }
+
+    /**
+     * Updates the VCS URL.
+     * 
+     * @return true if the value was changed.
+     */
+    public boolean updateVcsUrl(String newValue) {
+        if (newValue == null) {
+            if (vcsUrl == null)
+                return false;
+            vcsUrl = null;
+            return true;
+        }
+        if (newValue.equals(vcsUrl)) {
+            return false;
+        }
+        vcsUrl = newValue;
+        return true;
+    }
+
+    public boolean updateRevision(String newValue) {
+        if (newValue == null) {
+            if (vcsRevision == null)
+                return false;
+            vcsRevision = null;
+            return true;
+        }
+        if (newValue.equals(vcsRevision)) {
+            return false;
+        }
+        vcsRevision = newValue;
+        return true;
     }
 
     public void setOpen(boolean open) {

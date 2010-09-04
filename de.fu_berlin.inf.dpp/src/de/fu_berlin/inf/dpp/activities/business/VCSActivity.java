@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.eclipse.core.resources.IResource;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -10,26 +12,27 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * Activity for VCS operations like Switch.
  */
 public class VCSActivity extends AbstractActivity implements IResourceActivity {
-    /**
-     * Supported arguments<br>
-     * Switch: <br>
-     * path: Specifies the path of the local resource. <br>
-     * url: Specifies the path of the target resource in the repo. <br>
-     * revision: Specifies the revision of the target resource.
-     */
 
     public enum Type {
+        /**
+         * Supported arguments:<br>
+         * path: The path of the resource in the working directory. <br>
+         * url: The path of the target resource in the repo. <br>
+         * revision: The revision of the target resource.
+         */
         Switch,
+        /**
+         * Supported arguments:<br>
+         * path: The path of the resource in the working directory. <br>
+         * revision: The revision of the target resource.
+         */
+        Update,
     }
 
     protected Type type;
     protected String url;
     protected SPath path;
     protected String revision;
-
-    public VCSActivity(User source) {
-        super(source);
-    }
 
     public VCSActivity(Type type, User source, SPath path, String url,
         String revision) {
@@ -53,8 +56,17 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             path.toSPathDataObject(sarosSession), revision);
     }
 
-    public static VCSActivity switch_(User source, SPath path, String url,
-        String revision) {
+    public static VCSActivity update(ISarosSession sarosSession,
+        IResource resource, String revision) {
+        User source = sarosSession.getLocalUser();
+        SPath path = new SPath(resource);
+        return new VCSActivity(Type.Update, source, path, null, revision);
+    }
+
+    public static VCSActivity switch_(ISarosSession sarosSession,
+        IResource resource, String url, String revision) {
+        User source = sarosSession.getLocalUser();
+        SPath path = new SPath(resource);
         return new VCSActivity(Type.Switch, source, path, url, revision);
     }
 

@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
-import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * A FileList is a list of resources - files and folders - which belong to the
@@ -76,7 +76,7 @@ public class FileList {
     /** Identifies the VCS used. */
     protected String vcsProviderID;
     /** VCS internal information. */
-    protected VCSProjectInformation vcsProjectInformation;
+    protected VCSResourceInformation vcsProjectInformation;
 
     static class FileListData {
         /** Checksum of this file. */
@@ -345,7 +345,7 @@ public class FileList {
                 String providerID = vcs.getProviderID(project);
 
                 this.vcsProviderID = providerID;
-                this.vcsProjectInformation = vcs.getProjectInformation(project);
+                this.vcsProjectInformation = vcs.getResourceInformation(project);
             }
         }
 
@@ -424,7 +424,7 @@ public class FileList {
         return vcsProviderID;
     }
 
-    public VCSProjectInformation getProjectInformation() {
+    public VCSResourceInformation getProjectInformation() {
         return vcsProjectInformation;
     }
 }

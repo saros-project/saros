@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -242,8 +243,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     // a notification that each file in the project was just
                     // added, so we're simply going to ignore this delta. Any
                     // resources that were modified externally would be
-                    // out-of-sync anyways, so when the user refreshes them we'll
-                    // get notified.
+                    // out-of-sync anyways, so when the user refreshes them
+                    // we'll get notified.
                     continue;
                 } else {
                     // The project was just closed, what do we do here?
@@ -252,7 +253,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             if (!isProjectOpen)
                 continue;
             ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(this,
-                sharedProject);
+                sarosSession, sharedProject);
             try {
                 projectDelta.accept(visitor);
             } catch (CoreException e) {
@@ -329,8 +330,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     protected void exec(VCSActivity activity) {
-        IProject project = activity.getPath().getProject();
-        IPath path = activity.getPath().getProjectRelativePath();
+        SPath path = activity.getPath();
+        IResource resource = path.getResource();
+        IProject project = path.getProject();
         String url = activity.getURL();
         String revision = activity.getRevision();
         VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
@@ -338,29 +340,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
             log.error("Could not execute VCS activity.");
             return;
         }
-        if (activity.getType() == VCSActivity.Type.Switch) {
-            IResource resource = null;
-            {
-                try {
-                    resource = project.getFolder(path);
-                } catch (Exception e) {
-                    log.debug("", e);
-                }
-                if (resource == null) {
-                    try {
-                        resource = project.getFile(path);
-                    } catch (Exception e) {
-                        log.debug("", e);
-                    }
-                }
-                if (resource == null) {
-                    // TODO find a safer way...
-                    resource = project;
-
-                }
-            }
+        Type activityType = activity.getType();
+        if (activityType == VCSActivity.Type.Switch) {
             vcs.switch_(resource, url, revision, null);
-            activity.getRevision();
+        } else if (activityType == VCSActivity.Type.Update) {
+            vcs.update(resource, revision, new NullProgressMonitor());
         } else {
             log.error("VCS activity type not implemented yet.");
         }

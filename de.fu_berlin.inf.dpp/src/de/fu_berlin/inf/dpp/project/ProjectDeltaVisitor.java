@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * Visits the resource changes in a shared project.
@@ -31,14 +31,15 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     protected SharedResourcesManager sharedResourcesManager;
     protected ISarosSession sarosSession;
+
     /** The project visited. */
     protected SharedProject sharedProject;
 
     ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
-        SharedProject sharedProject) {
+        ISarosSession sarosSession, SharedProject sharedProject) {
         this.sharedResourcesManager = sharedResourcesManager;
         this.sharedProject = sharedProject;
-        this.sarosSession = sharedResourcesManager.sarosSession;
+        this.sarosSession = sarosSession;
     }
 
     /** Stores activities to be sent due to one change event. */
@@ -58,17 +59,21 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
             VCSAdapter vcs = sharedProject.getVCSAdapter();
             if (vcs != null) {
-                VCSProjectInformation test = vcs.getProjectInformation(project);
-                String url = test.repositoryURL + test.projectPath;
+                VCSResourceInformation test = vcs
+                    .getResourceInformation(project);
+                String url = test.repositoryRoot + test.path;
 
-                String oldUrl = sharedProject.vcsUrl;
-
-                if (!url.equals(oldUrl)) {
+                if (sharedProject.updateVcsUrl(url)) {
                     // Switch
-                    SPath spath = new SPath(resource);
-                    User user = getUser();
-                    addActivity(VCSActivity.switch_(user, spath, url, "HEAD"));
-                    sharedProject.vcsUrl = url;
+                    addActivity(VCSActivity.switch_(sarosSession, resource,
+                        url, test.revision));
+                    return false;
+                }
+
+                if (sharedProject.updateRevision(test.revision)) {
+                    // Update
+                    addActivity(VCSActivity.update(sarosSession, resource,
+                        test.revision));
                     return false;
                 }
             }
@@ -106,10 +111,6 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         }
     }
 
-    protected User getUser() {
-        return sarosSession.getLocalUser();
-    }
-
     protected void handleFileDelta(IResourceDelta delta) {
         IResource resource = delta.getResource();
         int kind = delta.getKind();
@@ -130,8 +131,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
                 // Adds have getMovedFrom set:
                 IPath oldPath = delta.getMovedFromPath();
-                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                IProject oldProject = root.getProject(oldPath.segment(0));
+                IProject oldProject = ProjectDeltaVisitor.getProject(oldPath);
 
                 if (sarosSession.isShared(oldProject)) {
                     // Moving inside the shared project
@@ -166,10 +166,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
                 // REMOVED deltas have MovedTo set
                 IPath newPath = delta.getMovedToPath();
-
-                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-
-                IProject newProject = root.getProject(newPath.segment(0));
+                IProject newProject = ProjectDeltaVisitor.getProject(newPath);
 
                 if (sarosSession.isShared(newProject)) {
                     // Ignore "REMOVED" while moving into shared project
@@ -186,6 +183,16 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         default:
             return;
         }
+    }
+
+    protected User getUser() {
+        return sarosSession.getLocalUser();
+    }
+
+    protected static IProject getProject(IPath newPath) {
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IProject newProject = root.getProject(newPath.segment(0));
+        return newProject;
     }
 
     protected void addActivity(IResourceActivity activity) {

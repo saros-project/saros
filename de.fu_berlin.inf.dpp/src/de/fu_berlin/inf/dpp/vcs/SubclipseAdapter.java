@@ -4,13 +4,13 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
+import org.tigris.subversion.subclipse.core.ISVNCoreConstants;
 import org.tigris.subversion.subclipse.core.ISVNLocalResource;
 import org.tigris.subversion.subclipse.core.ISVNRemoteFolder;
 import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
@@ -110,11 +110,11 @@ class SubclipseAdapter implements VCSAdapter {
         ISVNRepositoryLocation loc;
         IProject result = null;
         try {
-            VCSProjectInformation info = fileList.getProjectInformation();
-            loc = SVNRepositoryLocation.fromString(info.repositoryURL);
+            VCSResourceInformation info = fileList.getProjectInformation();
+            loc = SVNRepositoryLocation.fromString(info.repositoryRoot);
             // TODO Is there an API to construct the URL? (cleaner way than
             // String concatenation)
-            SVNUrl url = new SVNUrl(info.repositoryURL + info.projectPath);
+            SVNUrl url = new SVNUrl(info.repositoryRoot + info.path);
 
             ISVNRemoteFolder remote[] = { new RemoteFolder(loc, url,
                 SVNRevision.HEAD) };
@@ -123,7 +123,7 @@ class SubclipseAdapter implements VCSAdapter {
             // org.tigris.subversion.subclipse.ui.
             final CheckoutAsProjectOperation checkoutAsProjectOperation = new CheckoutAsProjectOperation(
                 null, remote, local);
-            SVNRevision rev = SVNRevision.getRevision(info.baseRevision);
+            SVNRevision rev = SVNRevision.getRevision(info.revision);
             checkoutAsProjectOperation.setSvnRevision(rev);
             checkoutAsProjectOperation.run(monitor);
             result = local[0];
@@ -159,7 +159,7 @@ class SubclipseAdapter implements VCSAdapter {
         return null;
     }
 
-    public void update(IFile file, String targetRevision,
+    public void update(IResource resource, String targetRevision,
         IProgressMonitor monitor) {
         SVNRevision revision;
         try {
@@ -168,37 +168,38 @@ class SubclipseAdapter implements VCSAdapter {
             e.printStackTrace();
             return;
         }
-        IResource resource[] = { file };
         SVNWorkspaceRoot root;
         try {
             SVNTeamProvider provider = (SVNTeamProvider) RepositoryProvider
-                .getProvider(file.getProject());
+                .getProvider(resource.getProject());
             root = provider.getSVNWorkspaceRoot();
         } catch (Exception e) {
             // class cast, null pointer
             e.printStackTrace();
             return;
         }
-        UpdateResourcesCommand cmd = new UpdateResourcesCommand(root, resource,
-            revision);
+        IResource resources[] = { resource };
+        UpdateResourcesCommand cmd = new UpdateResourcesCommand(root,
+            resources, revision);
+        cmd.setDepth(ISVNCoreConstants.DEPTH_INFINITY);
         try {
             cmd.run(monitor);
         } catch (SVNException e) {
             e.printStackTrace();
         }
         try {
-            file.refreshLocal(IResource.DEPTH_ZERO, null);
+            resource.refreshLocal(IResource.DEPTH_ZERO, null);
         } catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public VCSProjectInformation getProjectInformation(IProject project) {
-        VCSProjectInformation info = new VCSProjectInformation();
-        info.repositoryURL = getRepositoryString(project);
-        info.projectPath = getProjectPath(project);
-        info.baseRevision = getRevisionString(project);
+    public VCSResourceInformation getResourceInformation(IResource resource) {
+        VCSResourceInformation info = new VCSResourceInformation();
+        info.repositoryRoot = getRepositoryString(resource);
+        info.path = getProjectPath(resource);
+        info.revision = getRevisionString(resource);
         return info;
     }
 

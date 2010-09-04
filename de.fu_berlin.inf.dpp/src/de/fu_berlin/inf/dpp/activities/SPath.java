@@ -163,6 +163,10 @@ public class SPath {
         return project.getFile(projectRelativePath);
     }
 
+    public IResource getResource() {
+        return project.findMember(projectRelativePath);
+    }
+
     /**
      * Returns the project in which the referenced resource or editor is
      * located.
