@@ -19,10 +19,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
-import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
 
@@ -31,69 +29,20 @@ import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
  */
 class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
-    /**
-     * TODO
-     */
     protected SharedResourcesManager sharedResourcesManager;
+    protected ISarosSession sarosSession;
+    /** The project visited. */
     protected SharedProject sharedProject;
 
-    /**
-     * TODO
-     * 
-     * @param sharedResourcesManager
-     * @param sharedProject
-     */
     ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
         SharedProject sharedProject) {
         this.sharedResourcesManager = sharedResourcesManager;
         this.sharedProject = sharedProject;
+        this.sarosSession = sharedResourcesManager.sarosSession;
     }
 
     /** Stores activities to be sent due to one change event. */
     protected List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
-
-    /**
-     * Orders activities in buffer.<br>
-     * We want to execute any moves before deleting, and after creating folders.
-     * 
-     * haferburg: Sorting is not necessary, because they are already sorted
-     * enough (activity on parent comes before activity on child). All we need
-     * to do is make sure that folders are created first and deleted last. The
-     * sorting stuff was introduced with 1742 (1688).
-     */
-    protected List<IResourceActivity> getOrderedActivities() {
-        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
-
-        /**
-         * Split all pendingActivities.
-         */
-        for (IResourceActivity activity : pendingActivities) {
-            FolderActivity.Type tFolder;
-
-            if (activity instanceof FileActivity) {
-                fileActivities.add(activity);
-            } else if (activity instanceof FolderActivity) {
-                tFolder = ((FolderActivity) activity).getType();
-                if (tFolder == FolderActivity.Type.Created)
-                    folderCreateActivities.add(activity);
-                else if (tFolder == FolderActivity.Type.Removed)
-                    folderRemoveActivities.add(activity);
-            } else {
-                otherActivities.add(activity);
-            }
-        }
-
-        // Add activities to the result.
-        List<IResourceActivity> result = folderCreateActivities;
-        result.addAll(fileActivities);
-        result.addAll(folderRemoveActivities);
-        result.addAll(otherActivities);
-
-        return result;
-    }
 
     public boolean visit(IResourceDelta delta) {
         IResource resource = delta.getResource();
@@ -158,7 +107,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     protected User getUser() {
-        return sharedResourcesManager.sarosSession.getLocalUser();
+        return sarosSession.getLocalUser();
     }
 
     protected void handleFileDelta(IResourceDelta delta) {
@@ -187,9 +136,8 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 IProject newProject = root.getProject(newPath.segment(0));
                 IProject oldProject = root.getProject(oldPath.segment(0));
 
-                if (sharedResourcesManager.sarosSession.isShared(newProject)) {
-                    if (sharedResourcesManager.sarosSession
-                        .isShared(oldProject)) {
+                if (sarosSession.isShared(newProject)) {
+                    if (sarosSession.isShared(oldProject)) {
                         // Moving inside the shared project
                         try {
                             addActivity(FileActivity.moved(
@@ -235,7 +183,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
                 IProject newProject = root.getProject(newPath.segment(0));
 
-                if (sharedResourcesManager.sarosSession.isShared(newProject)) {
+                if (sarosSession.isShared(newProject)) {
                     // Ignore "REMOVED" while moving into shared project
                     return;
                 }
@@ -306,23 +254,4 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     }
 
-    /**
-     * Fires the ordered activities. To be run before change event ends.
-     */
-    // TODO Move to SRM :(
-    public void finish() {
-        for (IActivity activityDataObject : getOrderedActivities())
-            fireActivity(activityDataObject);
-    }
-
-    // TODO Move to SRM :(
-    protected void fireActivity(final IActivity activityDataObject) {
-        Util.runSafeSWTSync(SharedResourcesManager.log, new Runnable() {
-            public void run() {
-                for (IActivityListener listener : ProjectDeltaVisitor.this.sharedResourcesManager.listeners) {
-                    listener.activityCreated(activityDataObject);
-                }
-            }
-        });
-    }
 }

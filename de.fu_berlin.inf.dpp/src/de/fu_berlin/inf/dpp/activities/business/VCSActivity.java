@@ -6,6 +6,9 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
+/**
+ * Activity for VCS operations like Switch.
+ */
 public class VCSActivity extends AbstractActivity implements IResourceActivity {
     /**
      * Supported arguments<br>
@@ -15,15 +18,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
      * revision: Specifies the revision of the target resource.
      */
 
-    // TODO
-    private Type type;
-    private String url;
-    private SPath path;
-    private String revision;
-
     public enum Type {
         Switch,
     }
+
+    protected Type type;
+    protected String url;
+    protected SPath path;
+    protected String revision;
 
     public VCSActivity(User source) {
         super(source);

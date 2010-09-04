@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +46,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -195,20 +197,16 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-            try {
-                // Creations, deletions, modifications of files and folders.
-                handlePostChange(event);
-            } catch (Exception e) {
-                log.error("Couldn't handle resource change.", e);
-            }
+            // Creations, deletions, modifications of files and folders.
+            handlePostChange(event);
+
         } else {
             log.error("Unhandled event type in in SharedResourcesManager: "
                 + event);
         }
     }
 
-    protected void handlePostChange(IResourceChangeEvent event)
-        throws CoreException {
+    protected void handlePostChange(IResourceChangeEvent event) {
         assert sarosSession != null;
 
         if (!sarosSession.isDriver()) {
@@ -226,6 +224,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         // Iterate over all projects.
         IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+        List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
         for (IResourceDelta projectDelta : projectDeltas) {
             IResource resource = projectDelta.getResource();
             assert resource instanceof IProject;
@@ -254,14 +253,26 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 continue;
             ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(this,
                 sharedProject);
-            projectDelta.accept(visitor);
-            visitor.finish();
+            try {
+                projectDelta.accept(visitor);
+            } catch (CoreException e) {
+                // The Eclipse documentation doesn't specify when CoreExceptions
+                // can occur.
+                log.debug("ProjectDeltaVisitor of project " + project.getName()
+                    + " failed for some reason.", e);
+            }
+            pendingActivities.addAll(visitor.pendingActivities);
         }
+        orderAndFire(pendingActivities);
     }
 
     /*
      * TODO This warning is misleading! The consistency recovery process might
      * cause IResourceChangeEvents (which do not need to be replicated)
+     * 
+     * haferburg: When is this even called? We don't get here while this class
+     * executes any activity. We can only get here when pause is true, but not
+     * fileReplacementInProgressObservable.
      */
     protected void logPauseWarning(IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -441,5 +452,67 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
+    }
+
+    /**
+     * Returns the pending activities in the order: folder creations, file
+     * activities, folder removals, then everything else.
+     * 
+     * haferburg: Sorting is not necessary, because activities are already
+     * sorted enough (activity on parent comes before activity on child). All we
+     * need to do is make sure that folders are created first and deleted last.
+     * The sorting stuff was introduced with 1742 (1688).
+     */
+    protected List<IResourceActivity> getOrderedActivities(
+        List<IResourceActivity> pendingActivities) {
+        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
+
+        /**
+         * Split all pendingActivities.
+         */
+        for (IResourceActivity activity : pendingActivities) {
+            FolderActivity.Type tFolder;
+
+            if (activity instanceof FileActivity) {
+                fileActivities.add(activity);
+            } else if (activity instanceof FolderActivity) {
+                tFolder = ((FolderActivity) activity).getType();
+                if (tFolder == FolderActivity.Type.Created)
+                    folderCreateActivities.add(activity);
+                else if (tFolder == FolderActivity.Type.Removed)
+                    folderRemoveActivities.add(activity);
+            } else {
+                otherActivities.add(activity);
+            }
+        }
+
+        // Add activities to the result.
+        List<IResourceActivity> result = folderCreateActivities;
+        result.addAll(fileActivities);
+        result.addAll(folderRemoveActivities);
+        result.addAll(otherActivities);
+
+        return result;
+    }
+
+    /**
+     * Fires the ordered activities. To be run before change event ends.
+     */
+    public void orderAndFire(List<IResourceActivity> pendingActivities) {
+        for (IActivity activityDataObject : getOrderedActivities(pendingActivities))
+            fireActivity(activityDataObject);
+    }
+
+    protected void fireActivity(final IActivity activityDataObject) {
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                for (IActivityListener listener : listeners) {
+                    listener.activityCreated(activityDataObject);
+                }
+            }
+        });
     }
 }
