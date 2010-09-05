@@ -7,21 +7,52 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 public class SharedProject {
+    static class UpdatableValue<E> {
+        private E value;
+
+        UpdatableValue(E value) {
+            this.value = value;
+        }
+
+        public boolean update(E newValue) {
+            if (newValue == null) {
+                if (value == null)
+                    return false;
+                value = null;
+                return true;
+            }
+            if (newValue.equals(value)) {
+                return false;
+            }
+            value = newValue;
+            return true;
+        }
+
+        public E value() {
+            return value;
+        }
+    }
+
     // private static final Logger log = Logger.getLogger(SharedProject.class);
 
-    protected ISarosSession sarosSession;
+    protected final ISarosSession sarosSession;
 
-    protected IProject project;
+    protected final IProject project;
 
     protected boolean open;
 
-    protected String vcsUrl;
+    protected UpdatableValue<VCSAdapter> vcs;
 
-    protected VCSAdapter vcs;
+    protected UpdatableValue<String> vcsUrl;
 
-    protected String vcsRevision;
+    protected UpdatableValue<String> vcsRevision;
+
+    // protected String vcsRevision;
 
     public SharedProject(IProject project, ISarosSession sarosSession) {
+        assert sarosSession != null;
+        assert project != null;
+
         this.sarosSession = sarosSession;
         this.project = project;
 
@@ -34,32 +65,22 @@ public class SharedProject {
     }
 
     protected void initializeVCSInformation() {
-        vcs = VCSAdapterFactory.getAdapter(project);
+        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        this.vcs = new UpdatableValue<VCSAdapter>(vcs);
         if (vcs == null)
             return;
         VCSResourceInformation info = vcs.getResourceInformation(project);
-        vcsUrl = info.repositoryRoot + info.path;
-        vcsRevision = info.revision;
+        vcsUrl = new UpdatableValue<String>(info.repositoryRoot + info.path);
+        vcsRevision = new UpdatableValue<String>(info.revision);
     }
 
-    // FIXME ndh Find a clever way to abstract these updateX methods
     /**
      * Updates the VCS.
      * 
      * @return true if the value was changed.
      */
     public boolean updateVcs(VCSAdapter newValue) {
-        if (newValue == null) {
-            if (vcs == null)
-                return false;
-            vcs = null;
-            return true;
-        }
-        if (newValue.equals(vcs)) {
-            return false;
-        }
-        vcs = newValue;
-        return true;
+        return vcs.update(newValue);
     }
 
     /**
@@ -68,31 +89,11 @@ public class SharedProject {
      * @return true if the value was changed.
      */
     public boolean updateVcsUrl(String newValue) {
-        if (newValue == null) {
-            if (vcsUrl == null)
-                return false;
-            vcsUrl = null;
-            return true;
-        }
-        if (newValue.equals(vcsUrl)) {
-            return false;
-        }
-        vcsUrl = newValue;
-        return true;
+        return vcsUrl.update(newValue);
     }
 
     public boolean updateRevision(String newValue) {
-        if (newValue == null) {
-            if (vcsRevision == null)
-                return false;
-            vcsRevision = null;
-            return true;
-        }
-        if (newValue.equals(vcsRevision)) {
-            return false;
-        }
-        vcsRevision = newValue;
-        return true;
+        return vcsRevision.update(newValue);
     }
 
     public void setOpen(boolean open) {
@@ -103,11 +104,12 @@ public class SharedProject {
         return open;
     }
 
-    public void setVCSAdapter(VCSAdapter vcs) {
-        this.vcs = vcs;
+    public VCSAdapter getVCSAdapter() {
+        return vcs.value();
     }
 
-    public VCSAdapter getVCSAdapter() {
-        return vcs;
+    // TODO find a less stupid name ._.
+    public boolean isRepresentationOf(IProject project) {
+        return this.project.equals(project);
     }
 }
