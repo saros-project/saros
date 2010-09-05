@@ -20,6 +20,7 @@ import org.tigris.subversion.subclipse.core.ISVNRemoteFolder;
 import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
 import org.tigris.subversion.subclipse.core.ISVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.SVNException;
+import org.tigris.subversion.subclipse.core.SVNProviderPlugin;
 import org.tigris.subversion.subclipse.core.SVNTeamProvider;
 import org.tigris.subversion.subclipse.core.commands.SwitchToUrlCommand;
 import org.tigris.subversion.subclipse.core.commands.UpdateResourcesCommand;
@@ -82,6 +83,8 @@ class SubclipseAdapter implements VCSAdapter {
             .getSVNResourceFor(resource);
         SVNRevision revision;
         try {
+            if (!svnResource.isManaged())
+                return null;
             revision = svnResource.getRevision();
         } catch (SVNException e) {
             e.printStackTrace();
@@ -253,11 +256,13 @@ class SubclipseAdapter implements VCSAdapter {
     }
 
     public void connect(IProject project, String url) {
-        // cf org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard
+        // cf
+        // org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard#performFinish()
         if (hasLocalCache(project)) {
             // FIXME ndh We need to check first if the remote folder is the
             // right one. Even if we were connected to a repo before, it might
-            // not be the one in the URL.
+            // not be the one in the URL. If it isn't, purge the local folder
+            // first, then share the project.
             try {
                 SVNWorkspaceRoot.setSharing(project, null);
             } catch (TeamException e) {
@@ -265,15 +270,18 @@ class SubclipseAdapter implements VCSAdapter {
                 // counter-part in hasSVNFolder().
             }
         } else {
-            throw new NotImplementedException("TODO");
-            // SVNWorkspaceRoot.shareProject(location, project,
-            // getRemoteDirectoryName(), finishPage.getComment(),
-            // createDirectory,
-            // new SubProgressMonitor(monitor, 50));
-            // location =
-            // https://svn.mi.fu-berlin.de/agse/students/haferburg/test
-            // remoteDirName = "."
-            // comment = "Initial import"...
+            try {
+                ISVNRepositoryLocation location = SVNProviderPlugin.getPlugin()
+                    .getRepositories().getRepository(url);
+                SVNWorkspaceRoot.shareProject(location, project, ".",
+                    "not used", false, null);
+            } catch (SVNException e) {
+                log.debug("", e);
+                throw new NotImplementedException("Repository not known");
+            } catch (TeamException e) {
+                // We can't get here, all TeamExceptions are wrapped in
+                // SVNExceptions.
+            }
         }
     }
 
