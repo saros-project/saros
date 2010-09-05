@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -22,13 +23,15 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * Visits the resource changes in a shared project.
  */
 class ProjectDeltaVisitor implements IResourceDeltaVisitor {
-
+    private static final Logger log = Logger
+        .getLogger(ProjectDeltaVisitor.class);
     protected SharedResourcesManager sharedResourcesManager;
     protected ISarosSession sarosSession;
 
@@ -57,23 +60,63 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             if (!project.isOpen())
                 return false;
 
-            VCSAdapter vcs = sharedProject.getVCSAdapter();
+            VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+            VCSAdapter oldVcs = sharedProject.getVCSAdapter();
+            if (sharedProject.updateVcs(vcs)) {
+                if (vcs == null) {
+                    // Disconnect
+                    boolean deleteContent = oldVcs == null
+                        || !oldVcs.hasLocalCache(project);
+                    VCSActivity activity = VCSActivity.disconnect(sarosSession,
+                        project, deleteContent);
+                    addActivity(activity);
+                    sharedProject.updateRevision(null);
+                    sharedProject.updateVcsUrl(null);
+                } else {
+                    // Connect
+                    VCSResourceInformation info;
+                    // FIXME ndh Remove try/catch
+                    try {
+                        info = vcs.getResourceInformation(project);
+                        if (info.repositoryRoot == null || info.path == null) {
+                            // For some reason, Subclipse returns null values
+                            // here. Wait for the next time we get here.
+                            sharedProject.updateVcs(null);
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        log.error("Fix getResourceInformation plx", e);
+                        return false;
+                    }
+
+                    String url = info.repositoryRoot + info.path;
+                    VCSActivity activity = VCSActivity.connect(sarosSession,
+                        project, url, vcs.getProviderID(project));
+                    addActivity(activity);
+                    sharedProject.updateVcsUrl(url);
+                    sharedProject.updateRevision(info.revision);
+
+                    log.debug("Connect to SVN");
+                }
+                return false;
+            }
+
             if (vcs != null) {
-                VCSResourceInformation test = vcs
+                VCSResourceInformation info = vcs
                     .getResourceInformation(project);
-                String url = test.repositoryRoot + test.path;
+                String url = info.repositoryRoot + info.path;
 
                 if (sharedProject.updateVcsUrl(url)) {
                     // Switch
                     addActivity(VCSActivity.switch_(sarosSession, resource,
-                        url, test.revision));
+                        url, info.revision));
                     return false;
                 }
 
-                if (sharedProject.updateRevision(test.revision)) {
+                if (sharedProject.updateRevision(info.revision)) {
                     // Update
                     addActivity(VCSActivity.update(sarosSession, resource,
-                        test.revision));
+                        info.revision));
                     return false;
                 }
             }

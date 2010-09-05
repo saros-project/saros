@@ -36,8 +36,8 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        SPath sPath = path.toSPath(sarosSession);
-        User user = sarosSession.getUser(source);
+        SPath sPath = path == null ? null : path.toSPath(sarosSession);
+        User user = sarosSession == null ? null : sarosSession.getUser(source);
         return new VCSActivity(type, user, sPath, url, revision);
     }
 

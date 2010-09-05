@@ -330,21 +330,32 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     protected void exec(VCSActivity activity) {
+        Type activityType = activity.getType();
         SPath path = activity.getPath();
         IResource resource = path.getResource();
         IProject project = path.getProject();
         String url = activity.getURL();
         String revision = activity.getRevision();
+
+        if (activityType == VCSActivity.Type.Connect) {
+            // Connect is special since we don't know which VCSAdapter to use.
+            VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
+            vcs.connect(project, url);
+            log.error("VCS activity type not implemented yet.");
+            return;
+        }
+
         VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
         if (vcs == null) {
             log.error("Could not execute VCS activity.");
             return;
         }
-        Type activityType = activity.getType();
         if (activityType == VCSActivity.Type.Switch) {
             vcs.switch_(resource, url, revision, null);
         } else if (activityType == VCSActivity.Type.Update) {
             vcs.update(resource, revision, new NullProgressMonitor());
+        } else if (activityType == VCSActivity.Type.Disconnect) {
+            vcs.disconnect(project, revision != null);
         } else {
             log.error("VCS activity type not implemented yet.");
         }

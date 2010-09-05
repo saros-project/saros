@@ -3,14 +3,18 @@ package de.fu_berlin.inf.dpp.vcs;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.TeamException;
 import org.tigris.subversion.subclipse.core.ISVNCoreConstants;
+import org.tigris.subversion.subclipse.core.ISVNLocalFolder;
 import org.tigris.subversion.subclipse.core.ISVNLocalResource;
 import org.tigris.subversion.subclipse.core.ISVNRemoteFolder;
 import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
@@ -20,6 +24,7 @@ import org.tigris.subversion.subclipse.core.SVNTeamProvider;
 import org.tigris.subversion.subclipse.core.commands.SwitchToUrlCommand;
 import org.tigris.subversion.subclipse.core.commands.UpdateResourcesCommand;
 import org.tigris.subversion.subclipse.core.repo.SVNRepositoryLocation;
+import org.tigris.subversion.subclipse.core.resources.LocalResourceStatus;
 import org.tigris.subversion.subclipse.core.resources.RemoteFolder;
 import org.tigris.subversion.subclipse.core.resources.SVNWorkspaceRoot;
 import org.tigris.subversion.subclipse.ui.operations.CheckoutAsProjectOperation;
@@ -96,7 +101,12 @@ class SubclipseAdapter implements VCSAdapter {
             .getSVNResourceFor(resource);
         try {
             ISVNRemoteResource baseResource = svnResource.getBaseResource();
-            String result = baseResource.getRepository().toString();
+            if (baseResource == null)
+                return null;
+            ISVNRepositoryLocation repository = baseResource.getRepository();
+            if (repository == null)
+                return null;
+            String result = repository.toString();
             return result;
         } catch (SVNException e) {
             // TODO Auto-generated catch block
@@ -150,6 +160,8 @@ class SubclipseAdapter implements VCSAdapter {
 
         try {
             ISVNRemoteResource baseResource = svnResource.getBaseResource();
+            if (baseResource == null)
+                return null;
             String result = baseResource.getRepositoryRelativePath();
             return result;
         } catch (SVNException e) {
@@ -238,5 +250,77 @@ class SubclipseAdapter implements VCSAdapter {
         } catch (SVNException e) {
             e.printStackTrace();
         }
+    }
+
+    public void connect(IProject project, String url) {
+        // cf org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard
+        if (hasLocalCache(project)) {
+            // FIXME ndh We need to check first if the remote folder is the
+            // right one. Even if we were connected to a repo before, it might
+            // not be the one in the URL.
+            try {
+                SVNWorkspaceRoot.setSharing(project, null);
+            } catch (TeamException e) {
+                // We should never get here since we check for a remote
+                // counter-part in hasSVNFolder().
+            }
+        } else {
+            throw new NotImplementedException("TODO");
+            // SVNWorkspaceRoot.shareProject(location, project,
+            // getRemoteDirectoryName(), finishPage.getComment(),
+            // createDirectory,
+            // new SubProgressMonitor(monitor, 50));
+            // location =
+            // https://svn.mi.fu-berlin.de/agse/students/haferburg/test
+            // remoteDirName = "."
+            // comment = "Initial import"...
+        }
+    }
+
+    public boolean hasLocalCache(IProject project) {
+        // cf org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard
+        boolean isSVNFolder = false;
+        try {
+            LocalResourceStatus projectStatus = SVNWorkspaceRoot
+                .peekResourceStatusFor(project);
+            isSVNFolder = (projectStatus != null) && projectStatus.hasRemote();
+        } catch (final SVNException e) {
+            // TODO When would this happen? Subclipse wraps any
+            // SVNClientException with SVNException.
+            log.error("Something went wrong, but it's undocumented", e);
+        }
+        return isSVNFolder;
+    }
+
+    public void disconnect(IProject project, boolean deleteContent) {
+        // cf org.tigris.subversion.subclipse.ui.actions.UnmanageAction
+        try {
+            ISVNLocalFolder folder = SVNWorkspaceRoot.getSVNFolderFor(project);
+            try {
+                if (deleteContent) {
+                    folder.unmanage(new NullProgressMonitor());
+                }
+            } catch (SVNException e) {
+                // TODO When would this happen? Subclipse wraps any
+                // CoreException with SVNException.
+                log.error("Something went wrong, but it's undocumented", e);
+            } finally {
+                // We want to remove the nature even if the unmanage operation
+                // fails
+                RepositoryProvider.unmap(project);
+            }
+        } catch (TeamException e) {
+            log.error("The project " + project.getName() + " wasn't managed.",
+                e);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj.getClass() != this.getClass())
+            return false;
+        return true;
     }
 }

@@ -88,4 +88,27 @@ public interface VCSAdapter {
      * @return
      */
     public VCSResourceInformation getResourceInformation(IResource resource);
+
+    /**
+     * Connects the project to the repository specified by the url.
+     * 
+     * @param project
+     * @param url
+     */
+    public void connect(IProject project, String url);
+
+    /**
+     * Disconnects the project from the repository.
+     * 
+     * @param project
+     * @param deleteContent
+     */
+    public void disconnect(IProject project, boolean deleteContent);
+
+    /**
+     * Returns true if there is a folder like e.g. SVN's .svn for the project.
+     * Such a folder might exists even when the project is not currently
+     * connected to the Team provider.
+     */
+    public boolean hasLocalCache(IProject project);
 }

@@ -215,13 +215,11 @@ public class ChatView extends ViewPart {
 
         rosterTracker.addRosterListener(rosterListener);
         log.debug("RosterListener added!");
-        log.debug("SessionListener added!");
 
-        if (sessionManager.getSarosSession() == null) {
+        if (sessionManager.getSarosSession() != null) {
             log.debug("session started");
             if (!chatUsers.containsKey(saros.getMyJID()))
                 chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
-
         }
         this.prefStore = saros.getPreferenceStore();
     }

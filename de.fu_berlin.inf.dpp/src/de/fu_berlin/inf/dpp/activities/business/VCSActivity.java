@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -14,6 +16,19 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     public enum Type {
+        /**
+         * Supported arguments:<br>
+         * path: The path of the project to be connected. <br>
+         * url: The repository. <br>
+         * revision: The provider ID.
+         */
+        Connect,
+        /**
+         * path: The path of the project to be disconnected. <br>
+         * Supported arguments:<br>
+         * revision: If !=null, delete contents.
+         */
+        Disconnect,
         /**
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
@@ -32,7 +47,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     protected Type type;
     protected String url;
     protected SPath path;
-    protected String revision;
+    protected String revision; // FIXME ndh rename
 
     public VCSActivity(Type type, User source, SPath path, String url,
         String revision) {
@@ -52,8 +67,25 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+        SPathDataObject sPathDataObject = path == null ? null : path
+            .toSPathDataObject(sarosSession);
         return new VCSActivityDataObject(source.getJID(), getType(), url,
-            path.toSPathDataObject(sarosSession), revision);
+            sPathDataObject, revision);
+    }
+
+    public static VCSActivity connect(ISarosSession sarosSession,
+        IProject project, String url, String providerID) {
+        User source = sarosSession.getLocalUser();
+        SPath path = new SPath(project);
+        return new VCSActivity(Type.Connect, source, path, url, providerID);
+    }
+
+    public static VCSActivity disconnect(ISarosSession sarosSession,
+        IProject project, boolean deleteContents) {
+        User source = sarosSession.getLocalUser();
+        SPath path = new SPath(project);
+        String revision = deleteContents ? "" : null;
+        return new VCSActivity(Type.Disconnect, source, path, null, revision);
     }
 
     public static VCSActivity update(ISarosSession sarosSession,

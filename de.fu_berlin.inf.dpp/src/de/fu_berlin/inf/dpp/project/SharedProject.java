@@ -42,6 +42,26 @@ public class SharedProject {
         vcsRevision = info.revision;
     }
 
+    // FIXME ndh Find a clever way to abstract these updateX methods
+    /**
+     * Updates the VCS.
+     * 
+     * @return true if the value was changed.
+     */
+    public boolean updateVcs(VCSAdapter newValue) {
+        if (newValue == null) {
+            if (vcs == null)
+                return false;
+            vcs = null;
+            return true;
+        }
+        if (newValue.equals(vcs)) {
+            return false;
+        }
+        vcs = newValue;
+        return true;
+    }
+
     /**
      * Updates the VCS URL.
      * 
