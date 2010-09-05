@@ -21,7 +21,6 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,7 +47,6 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
-import de.fu_berlin.inf.dpp.activities.business.VCSActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -63,15 +61,13 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in an text editor. It creates and executes file and folder
- * activities.
- * 
- * @author rdjemili
- * 
+ * entering text in an text editor. It creates and executes file, folder, and
+ * VCS activities.
  */
 @Component(module = "core")
-public class SharedResourcesManager implements IResourceChangeListener,
-    IActivityProvider, Disposable {
+public class SharedResourcesManager extends AbstractActivityProvider implements
+    IResourceChangeListener, Disposable {
+    /** The {@link IResourceChangeEvent}s we're going to register for. */
     /*
      * haferburg: We're really only interested in
      * IResourceChangeEvent.POST_CHANGE events. I don't know why other events
@@ -81,8 +77,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * interesting when they result in an actual change, in which case we will
      * receive a POST_CHANGE event anyways.
      * 
-     * We also don't need PRE_CLOSE, since we'll get a POST_CHANGE anyways and
-     * also have to test project.isOpen().
+     * We also don't need PRE_CLOSE, since we'll also get a POST_CHANGE and
+     * still have to test project.isOpen().
      * 
      * We might want to add PRE_DELETE if the user deletes our shared project
      * though.
@@ -93,13 +89,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
         .getLogger(SharedResourcesManager.class.getName());
 
     /**
-     * While paused the SharedResourcesManager doesn't fire activities
+     * If the StopManager has paused the project, the SharedResourcesManager
+     * doesn't react to resource changes.
      */
     protected boolean pause = false;
 
     protected ISarosSession sarosSession;
-
-    protected List<IActivityListener> listeners = new LinkedList<IActivityListener>();
 
     protected StopManager stopManager;
 
@@ -120,14 +115,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
     protected ConsistencyWatchdogClient consistencyWatchdogClient;
 
     protected ISessionManager sessionManager;
-
-    public SharedResourcesManager(ISessionManager sessionManager,
-        StopManager stopManager) {
-        this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
-        this.stopManager = stopManager;
-        this.stopManager.addBlockable(stopManagerListener);
-    }
 
     protected Blockable stopManagerListener = new Blockable() {
         public void unblock() {
@@ -160,24 +147,16 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     };
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void addActivityListener(IActivityListener listener) {
-        if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
-        }
+    public SharedResourcesManager(ISessionManager sessionManager,
+        StopManager stopManager) {
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSessionListener(sessionListener);
+        this.stopManager = stopManager;
+        this.stopManager.addBlockable(stopManagerListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void removeActivityListener(IActivityListener listener) {
-        this.listeners.remove(listener);
+    public void dispose() {
+        stopManager.removeBlockable(stopManagerListener);
     }
 
     /**
@@ -188,10 +167,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
-        /*
-         * If the StopManager has paused the project do not react to resource
-         * changes
-         */
         if (pause) {
             logPauseWarning(event);
             return;
@@ -200,7 +175,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
             // Creations, deletions, modifications of files and folders.
             handlePostChange(event);
-
         } else {
             log.error("Unhandled event type in in SharedResourcesManager: "
                 + event);
@@ -267,6 +241,64 @@ public class SharedResourcesManager implements IResourceChangeListener,
         orderAndFire(pendingActivities);
     }
 
+    /**
+     * Fires the ordered activities. To be run before change event ends.
+     */
+    protected void orderAndFire(List<IResourceActivity> pendingActivities) {
+        final List<IResourceActivity> orderedActivities = getOrderedActivities(pendingActivities);
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                for (final IActivity activityDataObject : orderedActivities) {
+                    fireActivity(activityDataObject);
+                }
+            }
+        });
+    }
+
+    /**
+     * Returns the activities in the order: folder creations, file activities,
+     * folder removals, then everything else.
+     * 
+     * haferburg: Sorting is not necessary, because activities are already
+     * sorted enough (activity on parent comes before activity on child). All we
+     * need to do is make sure that folders are created first and deleted last.
+     * The sorting stuff was introduced with 1742 (1688).
+     */
+    protected List<IResourceActivity> getOrderedActivities(
+        List<IResourceActivity> activities) {
+        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
+
+        /**
+         * Split all pendingActivities.
+         */
+        for (IResourceActivity activity : activities) {
+
+            if (activity instanceof FileActivity) {
+                fileActivities.add(activity);
+            } else if (activity instanceof FolderActivity) {
+                FolderActivity.Type tFolder = ((FolderActivity) activity)
+                    .getType();
+                if (tFolder == FolderActivity.Type.Created)
+                    folderCreateActivities.add(activity);
+                else if (tFolder == FolderActivity.Type.Removed)
+                    folderRemoveActivities.add(activity);
+            } else {
+                otherActivities.add(activity);
+            }
+        }
+
+        // Add activities to the result.
+        List<IResourceActivity> result = folderCreateActivities;
+        result.addAll(fileActivities);
+        result.addAll(folderRemoveActivities);
+        result.addAll(otherActivities);
+
+        return result;
+    }
+
     /*
      * coezbek: This warning is misleading! The consistency recovery process
      * might cause IResourceChangeEvents (which do not need to be replicated)
@@ -302,9 +334,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void exec(IActivity activity) {
 
         if (!(activity instanceof FileActivity
@@ -329,39 +359,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    protected void exec(VCSActivity activity) {
-        Type activityType = activity.getType();
-        SPath path = activity.getPath();
-        IResource resource = path.getResource();
-        IProject project = path.getProject();
-        String url = activity.getURL();
-        String directory = activity.getDirectory();
-        String revision = activity.getRevision();
-
-        if (activityType == VCSActivity.Type.Connect) {
-            // Connect is special since the project doesn't have a VCSAdapter
-            // yet.
-            VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
-            vcs.connect(project, url, directory);
-            return;
-        }
-
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
-        if (vcs == null) {
-            log.error("Could not execute VCS activity.");
-            return;
-        }
-        if (activityType == VCSActivity.Type.Switch) {
-            vcs.switch_(resource, url, revision, null);
-        } else if (activityType == VCSActivity.Type.Update) {
-            vcs.update(resource, revision, new NullProgressMonitor());
-        } else if (activityType == VCSActivity.Type.Disconnect) {
-            vcs.disconnect(project, revision != null);
-        } else {
-            log.error("VCS activity type not implemented yet.");
-        }
-    }
-
     protected void exec(FileActivity activity) throws CoreException {
 
         if (this.sarosSession == null) {
@@ -382,8 +379,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         // Create or remove file
-        if (activity.getType() == FileActivity.Type.Created) {
-            // TODO should be reported to the user
+        FileActivity.Type type = activity.getType();
+        if (type == FileActivity.Type.Created) {
+            // TODO The progress should be reported to the user.
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
                 FileUtil.writeFile(
@@ -392,9 +390,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
-        } else if (activity.getType() == FileActivity.Type.Removed) {
+        } else if (type == FileActivity.Type.Removed) {
             FileUtil.delete(file);
-        } else if (activity.getType() == FileActivity.Type.Moved) {
+        } else if (type == FileActivity.Type.Moved) {
 
             IPath newFilePath = activity.getPath().getFile().getFullPath();
 
@@ -449,69 +447,36 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     }
 
-    public void dispose() {
-        stopManager.removeBlockable(stopManagerListener);
-    }
+    protected void exec(VCSActivity activity) {
+        VCSActivity.Type activityType = activity.getType();
+        SPath path = activity.getPath();
+        IResource resource = path.getResource();
+        IProject project = path.getProject();
+        String url = activity.getURL();
+        String directory = activity.getDirectory();
+        String revision = activity.getRevision();
 
-    /**
-     * Returns the pending activities in the order: folder creations, file
-     * activities, folder removals, then everything else.
-     * 
-     * haferburg: Sorting is not necessary, because activities are already
-     * sorted enough (activity on parent comes before activity on child). All we
-     * need to do is make sure that folders are created first and deleted last.
-     * The sorting stuff was introduced with 1742 (1688).
-     */
-    protected List<IResourceActivity> getOrderedActivities(
-        List<IResourceActivity> pendingActivities) {
-        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
-
-        /**
-         * Split all pendingActivities.
-         */
-        for (IResourceActivity activity : pendingActivities) {
-            FolderActivity.Type tFolder;
-
-            if (activity instanceof FileActivity) {
-                fileActivities.add(activity);
-            } else if (activity instanceof FolderActivity) {
-                tFolder = ((FolderActivity) activity).getType();
-                if (tFolder == FolderActivity.Type.Created)
-                    folderCreateActivities.add(activity);
-                else if (tFolder == FolderActivity.Type.Removed)
-                    folderRemoveActivities.add(activity);
-            } else {
-                otherActivities.add(activity);
-            }
+        if (activityType == VCSActivity.Type.Connect) {
+            // Connect is special since the project doesn't have a VCSAdapter
+            // yet.
+            VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
+            vcs.connect(project, url, directory);
+            return;
         }
 
-        // Add activities to the result.
-        List<IResourceActivity> result = folderCreateActivities;
-        result.addAll(fileActivities);
-        result.addAll(folderRemoveActivities);
-        result.addAll(otherActivities);
-
-        return result;
-    }
-
-    /**
-     * Fires the ordered activities. To be run before change event ends.
-     */
-    public void orderAndFire(List<IResourceActivity> pendingActivities) {
-        for (IActivity activityDataObject : getOrderedActivities(pendingActivities))
-            fireActivity(activityDataObject);
-    }
-
-    protected void fireActivity(final IActivity activityDataObject) {
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                for (IActivityListener listener : listeners) {
-                    listener.activityCreated(activityDataObject);
-                }
-            }
-        });
+        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        if (vcs == null) {
+            log.error("Could not execute VCS activity.");
+            return;
+        }
+        if (activityType == VCSActivity.Type.Switch) {
+            vcs.switch_(resource, url, revision, null);
+        } else if (activityType == VCSActivity.Type.Update) {
+            vcs.update(resource, revision, new NullProgressMonitor());
+        } else if (activityType == VCSActivity.Type.Disconnect) {
+            vcs.disconnect(project, revision != null);
+        } else {
+            log.error("VCS activity type not implemented yet.");
+        }
     }
 }
