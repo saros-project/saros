@@ -236,17 +236,27 @@ public class MessagingManager implements IConnectionListener,
             // Create a MultiUserChat using an XMPPConnection for a room
             MultiUserChat muc = new MultiUserChat(connection, host);
 
-            boolean createdRoom = false;
+            // try to join to room
+            boolean joined = false;
             try {
-                // Create the room
-                muc.create(user);
-                createdRoom = true;
+                muc.join(user, comPrefs.password);
+                joined = true;
             } catch (XMPPException e) {
                 log.debug(e);
             }
 
-            // try to join to room
-            muc.join(user, comPrefs.password);
+            boolean createdRoom = false;
+            if (!joined) {
+                try {
+                    // Create the room
+                    muc.create(user);
+                    createdRoom = true;
+                    // try to join to room
+                    muc.join(user, comPrefs.password);
+                } catch (XMPPException e) {
+                    log.debug(e);
+                }
+            }
 
             if (createdRoom) {
                 try {
@@ -417,7 +427,7 @@ public class MessagingManager implements IConnectionListener,
      * This method calls connectMultiUserChat() or disconnectMultiUserChat(),
      * but only if that's possible and necessary.
      */
-    private void checkChatState() {
+    private synchronized void checkChatState() {
         if (chatJoined) {
             if (!sessionStarted || chatListeners.isEmpty()
                 || currentConnection == null
