@@ -20,7 +20,6 @@ import org.tigris.subversion.subclipse.core.ISVNRemoteFolder;
 import org.tigris.subversion.subclipse.core.ISVNRemoteResource;
 import org.tigris.subversion.subclipse.core.ISVNRepositoryLocation;
 import org.tigris.subversion.subclipse.core.SVNException;
-import org.tigris.subversion.subclipse.core.SVNProviderPlugin;
 import org.tigris.subversion.subclipse.core.SVNTeamProvider;
 import org.tigris.subversion.subclipse.core.commands.SwitchToUrlCommand;
 import org.tigris.subversion.subclipse.core.commands.UpdateResourcesCommand;
@@ -271,16 +270,19 @@ class SubclipseAdapter implements VCSAdapter {
             }
         } else {
             try {
-                ISVNRepositoryLocation location = SVNProviderPlugin.getPlugin()
-                    .getRepositories().getRepository(url);
+                ISVNRepositoryLocation location = SVNRepositoryLocation
+                    .fromString(url);
                 SVNWorkspaceRoot.shareProject(location, project, ".",
                     "not used", false, null);
+                project.refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch (SVNException e) {
                 log.debug("", e);
                 throw new NotImplementedException("Repository not known");
             } catch (TeamException e) {
                 // We can't get here, all TeamExceptions are wrapped in
                 // SVNExceptions.
+            } catch (CoreException e) {
+                log.debug("Error refreshing project", e);
             }
         }
     }
@@ -306,12 +308,16 @@ class SubclipseAdapter implements VCSAdapter {
             ISVNLocalFolder folder = SVNWorkspaceRoot.getSVNFolderFor(project);
             try {
                 if (deleteContent) {
-                    folder.unmanage(new NullProgressMonitor());
+                    NullProgressMonitor monitor = new NullProgressMonitor();
+                    folder.unmanage(monitor);
+                    project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
                 }
             } catch (SVNException e) {
                 // TODO When would this happen? Subclipse wraps any
                 // CoreException with SVNException.
                 log.error("Something went wrong, but it's undocumented", e);
+            } catch (CoreException e) {
+                log.debug("Error refreshing project", e);
             } finally {
                 // We want to remove the nature even if the unmanage operation
                 // fails

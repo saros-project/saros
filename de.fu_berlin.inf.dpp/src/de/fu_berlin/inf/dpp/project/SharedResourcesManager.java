@@ -338,10 +338,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
         String revision = activity.getRevision();
 
         if (activityType == VCSActivity.Type.Connect) {
-            // Connect is special since we don't know which VCSAdapter to use.
+            // Connect is special since the project doesn't have a VCSAdapter
+            // yet.
             VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
             vcs.connect(project, url);
-            log.error("VCS activity type not implemented yet.");
             return;
         }
 
