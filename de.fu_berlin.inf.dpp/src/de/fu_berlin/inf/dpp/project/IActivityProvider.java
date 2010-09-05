@@ -15,6 +15,8 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
  * , which in turn will register the ISarosSession to the provider. This way,
  * the provider can fire activities for a Saros session by calling
  * activityCreated().
+ * 
+ * @see AbstractActivityProvider
  */
 public interface IActivityProvider {
 
