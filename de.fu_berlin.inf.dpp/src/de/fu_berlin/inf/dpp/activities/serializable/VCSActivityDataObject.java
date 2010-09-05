@@ -18,6 +18,7 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
 
     protected String revision;
     protected String url;
+    protected String directory;
     protected SPathDataObject path;
     @XStreamAsAttribute
     protected Type type;
@@ -27,10 +28,11 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
     }
 
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
-        SPathDataObject path, String revision) {
+        SPathDataObject path, String directory, String revision) {
         super(source);
         this.type = type;
         this.url = url;
+        this.directory = directory;
         this.path = path;
         this.revision = revision;
     }
@@ -38,7 +40,7 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
     public IActivity getActivity(ISarosSession sarosSession) {
         SPath sPath = path == null ? null : path.toSPath(sarosSession);
         User user = sarosSession == null ? null : sarosSession.getUser(source);
-        return new VCSActivity(type, user, sPath, url, revision);
+        return new VCSActivity(type, user, sPath, url, directory, revision);
     }
 
     public SPathDataObject getPath() {

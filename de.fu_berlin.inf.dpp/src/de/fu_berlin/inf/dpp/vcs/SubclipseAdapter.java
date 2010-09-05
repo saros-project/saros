@@ -254,7 +254,7 @@ class SubclipseAdapter implements VCSAdapter {
         }
     }
 
-    public void connect(IProject project, String url) {
+    public void connect(IProject project, String url, String directory) {
         // cf
         // org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard#performFinish()
         if (hasLocalCache(project)) {
@@ -272,15 +272,16 @@ class SubclipseAdapter implements VCSAdapter {
             try {
                 ISVNRepositoryLocation location = SVNRepositoryLocation
                     .fromString(url);
-                SVNWorkspaceRoot.shareProject(location, project, ".",
+                SVNWorkspaceRoot.shareProject(location, project, directory,
                     "not used", false, null);
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch (SVNException e) {
                 log.debug("", e);
                 throw new NotImplementedException("Repository not known");
             } catch (TeamException e) {
-                // We can't get here, all TeamExceptions are wrapped in
+                // We can't get here, TeamExceptions are wrapped in
                 // SVNExceptions.
+                assert false;
             } catch (CoreException e) {
                 log.debug("Error refreshing project", e);
             }

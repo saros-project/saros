@@ -20,22 +20,26 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
          * Supported arguments:<br>
          * path: The path of the project to be connected. <br>
          * url: The repository. <br>
+         * directory: The path of the target dir relative to the repo URL. <br>
          * revision: The provider ID.
          */
         Connect,
+
         /**
          * path: The path of the project to be disconnected. <br>
          * Supported arguments:<br>
          * revision: If !=null, delete contents.
          */
         Disconnect,
+
         /**
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
-         * url: The path of the target resource in the repo. <br>
+         * url: The URL of the target resource in the repo. <br>
          * revision: The revision of the target resource.
          */
         Switch,
+
         /**
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
@@ -46,15 +50,17 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     protected Type type;
     protected String url;
+    protected String directory;
     protected SPath path;
     protected String revision; // FIXME ndh rename
 
     public VCSActivity(Type type, User source, SPath path, String url,
-        String revision) {
+        String directory, String revision) {
         super(source);
         this.type = type;
         this.path = path;
         this.url = url;
+        this.directory = directory;
         this.revision = revision;
     }
 
@@ -70,14 +76,15 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         SPathDataObject sPathDataObject = path == null ? null : path
             .toSPathDataObject(sarosSession);
         return new VCSActivityDataObject(source.getJID(), getType(), url,
-            sPathDataObject, revision);
+            sPathDataObject, directory, revision);
     }
 
     public static VCSActivity connect(ISarosSession sarosSession,
-        IProject project, String url, String providerID) {
+        IProject project, String url, String directory, String providerID) {
         User source = sarosSession.getLocalUser();
         SPath path = new SPath(project);
-        return new VCSActivity(Type.Connect, source, path, url, providerID);
+        return new VCSActivity(Type.Connect, source, path, url, directory,
+            providerID);
     }
 
     public static VCSActivity disconnect(ISarosSession sarosSession,
@@ -85,21 +92,22 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         User source = sarosSession.getLocalUser();
         SPath path = new SPath(project);
         String revision = deleteContents ? "" : null;
-        return new VCSActivity(Type.Disconnect, source, path, null, revision);
+        return new VCSActivity(Type.Disconnect, source, path, null, null,
+            revision);
     }
 
     public static VCSActivity update(ISarosSession sarosSession,
         IResource resource, String revision) {
         User source = sarosSession.getLocalUser();
         SPath path = new SPath(resource);
-        return new VCSActivity(Type.Update, source, path, null, revision);
+        return new VCSActivity(Type.Update, source, path, null, null, revision);
     }
 
     public static VCSActivity switch_(ISarosSession sarosSession,
         IResource resource, String url, String revision) {
         User source = sarosSession.getLocalUser();
         SPath path = new SPath(resource);
-        return new VCSActivity(Type.Switch, source, path, url, revision);
+        return new VCSActivity(Type.Switch, source, path, url, null, revision);
     }
 
     public SPath getPath() {
@@ -120,6 +128,10 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     public String getURL() {
         return url;
+    }
+
+    public String getDirectory() {
+        return directory;
     }
 
 }

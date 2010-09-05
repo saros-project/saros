@@ -335,13 +335,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
         IResource resource = path.getResource();
         IProject project = path.getProject();
         String url = activity.getURL();
+        String directory = activity.getDirectory();
         String revision = activity.getRevision();
 
         if (activityType == VCSActivity.Type.Connect) {
             // Connect is special since the project doesn't have a VCSAdapter
             // yet.
             VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
-            vcs.connect(project, url);
+            vcs.connect(project, url, directory);
             return;
         }
 

@@ -89,10 +89,11 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                         return false;
                     }
 
-                    String url = info.repositoryRoot + info.path;
                     VCSActivity activity = VCSActivity.connect(sarosSession,
-                        project, url, vcs.getProviderID(project));
+                        project, info.repositoryRoot, info.path,
+                        vcs.getProviderID(project));
                     addActivity(activity);
+                    String url = info.repositoryRoot + info.path;
                     sharedProject.updateVcsUrl(url);
                     sharedProject.updateRevision(info.revision);
 

@@ -94,8 +94,9 @@ public interface VCSAdapter {
      * 
      * @param project
      * @param url
+     * @param directory 
      */
-    public void connect(IProject project, String url);
+    public void connect(IProject project, String url, String directory);
 
     /**
      * Disconnects the project from the repository.
