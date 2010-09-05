@@ -90,13 +90,14 @@ public interface VCSAdapter {
     public VCSResourceInformation getResourceInformation(IResource resource);
 
     /**
-     * Connects the project to the repository specified by the url.
+     * Connects the project to the directory in the repository.
      * 
      * @param project
-     * @param url
-     * @param directory 
+     * @param repositoryRoot
+     * @param directory
      */
-    public void connect(IProject project, String url, String directory);
+    public void connect(IProject project, String repositoryRoot,
+        String directory);
 
     /**
      * Disconnects the project from the repository.

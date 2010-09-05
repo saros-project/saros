@@ -254,14 +254,17 @@ class SubclipseAdapter implements VCSAdapter {
         }
     }
 
-    public void connect(IProject project, String url, String directory) {
+    public void connect(IProject project, String repositoryRoot,
+        String directory) {
         // cf
         // org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard#performFinish()
         if (hasLocalCache(project)) {
-            // FIXME ndh We need to check first if the remote folder is the
-            // right one. Even if we were connected to a repo before, it might
-            // not be the one in the URL. If it isn't, purge the local folder
-            // first, then share the project.
+            /*
+             * FIXME ndh We need to check first if the remote folder is the
+             * right one. Even if the project was connected to a repo before, it
+             * might not be the one we want now. If it isn't, purge the local
+             * folder first, then share the project.
+             */
             try {
                 SVNWorkspaceRoot.setSharing(project, null);
             } catch (TeamException e) {
@@ -271,7 +274,7 @@ class SubclipseAdapter implements VCSAdapter {
         } else {
             try {
                 ISVNRepositoryLocation location = SVNRepositoryLocation
-                    .fromString(url);
+                    .fromString(repositoryRoot);
                 SVNWorkspaceRoot.shareProject(location, project, directory,
                     "not used", false, null);
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);

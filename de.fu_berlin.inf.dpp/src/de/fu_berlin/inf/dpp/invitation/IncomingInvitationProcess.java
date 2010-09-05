@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * @author rdjemili
@@ -473,8 +474,11 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (newProjectName == null) {
             this.localProject = baseProject;
             if (vcs != null) {
-                // TODO ndh Make sure that this project is under version
-                // control.
+                if (!vcs.isManaged(localProject)) {
+                    VCSResourceInformation info = remoteFileList
+                        .getProjectInformation();
+                    vcs.connect(localProject, info.repositoryRoot, info.path);
+                }
             }
             return;
         }

@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * Activity for VCS operations like Switch.
+ * Activity for VCS operations like Switch, Update.
  */
 public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
@@ -19,8 +19,9 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         /**
          * Supported arguments:<br>
          * path: The path of the project to be connected. <br>
-         * url: The repository. <br>
-         * directory: The path of the target dir relative to the repo URL. <br>
+         * url: The repository root URL. <br>
+         * directory: The path of the target dir relative to the repository
+         * root. <br>
          * revision: The provider ID.
          */
         Connect,
