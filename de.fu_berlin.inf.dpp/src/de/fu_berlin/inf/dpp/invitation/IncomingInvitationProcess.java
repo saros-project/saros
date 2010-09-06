@@ -477,7 +477,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
                 if (!vcs.isManaged(localProject)) {
                     VCSResourceInformation info = remoteFileList
                         .getProjectInformation();
-                    vcs.connect(localProject, info.repositoryRoot, info.path);
+                    vcs.connect(localProject, info.repositoryRoot, info.path,
+                        monitor);
                 }
             }
             return;

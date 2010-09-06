@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +36,12 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
@@ -50,6 +55,7 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -448,35 +454,55 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     protected void exec(VCSActivity activity) {
-        VCSActivity.Type activityType = activity.getType();
+        final VCSActivity.Type activityType = activity.getType();
         SPath path = activity.getPath();
-        IResource resource = path.getResource();
-        IProject project = path.getProject();
-        String url = activity.getURL();
-        String directory = activity.getDirectory();
-        String revision = activity.getRevision();
+        final IResource resource = path.getResource();
+        final IProject project = path.getProject();
+        final String url = activity.getURL();
+        final String directory = activity.getDirectory();
+        final String revision = activity.getRevision();
 
-        if (activityType == VCSActivity.Type.Connect) {
-            // Connect is special since the project doesn't have a VCSAdapter
-            // yet.
-            VCSAdapter vcs = VCSAdapterFactory.getAdapter(revision);
-            vcs.connect(project, url, directory);
-            return;
-        }
-
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        // Connect is special since the project doesn't have a VCSAdapter
+        // yet.
+        final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapterFactory
+            .getAdapter(revision) : VCSAdapterFactory.getAdapter(project);
         if (vcs == null) {
             log.error("Could not execute VCS activity.");
             return;
         }
-        if (activityType == VCSActivity.Type.Switch) {
-            vcs.switch_(resource, url, revision, null);
-        } else if (activityType == VCSActivity.Type.Update) {
-            vcs.update(resource, revision, new NullProgressMonitor());
-        } else if (activityType == VCSActivity.Type.Disconnect) {
-            vcs.disconnect(project, revision != null);
-        } else {
-            log.error("VCS activity type not implemented yet.");
+
+        try {
+            // TODO Should these operations run in an IWorkspaceRunnable?
+            Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
+            ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(
+                shell);
+            progressMonitorDialog.open();
+            Shell pmdShell = progressMonitorDialog.getShell();
+            pmdShell.setText("Saros running VCS operation");
+            progressMonitorDialog.run(false, false,
+                new IRunnableWithProgress() {
+                    public void run(IProgressMonitor progress)
+
+                    throws InvocationTargetException, InterruptedException {
+                        if (activityType == VCSActivity.Type.Connect) {
+                            vcs.connect(project, url, directory, progress);
+                        } else if (activityType == VCSActivity.Type.Disconnect) {
+                            vcs.disconnect(project, revision != null, progress);
+                        } else if (activityType == VCSActivity.Type.Switch) {
+                            vcs.switch_(resource, url, revision, progress);
+                        } else if (activityType == VCSActivity.Type.Update) {
+                            vcs.update(resource, revision, progress);
+                        } else {
+                            log.error("VCS activity type not implemented yet.");
+                        }
+                    }
+
+                });
+            pmdShell.dispose();
+        } catch (InvocationTargetException e) {
+            assert false; // TODO We can't get here, right?
+        } catch (InterruptedException e) {
+            assert false; // We can't get here
         }
     }
 }

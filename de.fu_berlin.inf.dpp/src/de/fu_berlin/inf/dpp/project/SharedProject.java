@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import org.eclipse.core.resources.IProject;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
@@ -33,8 +34,6 @@ public class SharedProject {
         }
     }
 
-    // private static final Logger log = Logger.getLogger(SharedProject.class);
-
     protected final ISarosSession sarosSession;
 
     protected final IProject project;
@@ -47,7 +46,13 @@ public class SharedProject {
 
     protected UpdatableValue<String> vcsRevision;
 
-    // protected String vcsRevision;
+    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        @Override
+        public void roleChanged(User user) {
+            if (sarosSession.isDriver())
+                initializeVCSInformation();
+        }
+    };
 
     public SharedProject(IProject project, ISarosSession sarosSession) {
         assert sarosSession != null;
@@ -57,10 +62,11 @@ public class SharedProject {
         this.project = project;
 
         open = project.isOpen();
-        boolean host = sarosSession.isHost();
         boolean useVersionControl = sarosSession.useVersionControl();
-        if (host && useVersionControl) {
-            initializeVCSInformation();
+        if (useVersionControl) {
+            sarosSession.addListener(sharedProjectListener);
+            if (sarosSession.isDriver())
+                initializeVCSInformation();
         }
     }
 

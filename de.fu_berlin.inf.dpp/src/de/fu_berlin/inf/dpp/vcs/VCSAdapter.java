@@ -95,17 +95,22 @@ public interface VCSAdapter {
      * @param project
      * @param repositoryRoot
      * @param directory
+     * @param progress
+     *            may be null.
      */
     public void connect(IProject project, String repositoryRoot,
-        String directory);
+        String directory, IProgressMonitor progress);
 
     /**
      * Disconnects the project from the repository.
      * 
      * @param project
      * @param deleteContent
+     * @param progress
+     *            may be null.
      */
-    public void disconnect(IProject project, boolean deleteContent);
+    public void disconnect(IProject project, boolean deleteContent,
+        IProgressMonitor progress);
 
     /**
      * Returns true if there is a folder like e.g. SVN's .svn for the project.
