@@ -171,8 +171,8 @@ public class FileUtil {
 
                 zip.closeEntry();
             }
-            log.debug(String.format("Unpacked archive in %d s", (System
-                .currentTimeMillis() - startTime) / 1000));
+            log.debug(String.format("Unpacked archive in %d s",
+                (System.currentTimeMillis() - startTime) / 1000));
 
         } catch (IOException e) {
             log.error("Failed to unpack archive", e);
@@ -350,8 +350,8 @@ public class FileUtil {
      */
     public static void setReadOnly(final IProject project,
         final boolean readonly) {
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
-            .getShell());
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+            EditorAPI.getShell());
         try {
             dialog.run(true, false, new IRunnableWithProgress() {
                 public void run(final IProgressMonitor monitor) {
@@ -399,10 +399,13 @@ public class FileUtil {
             return;
         }
 
-        setReadOnly(resource, false);
-
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor monitor) throws CoreException {
+                if (!resource.exists())
+                    return;
+
+                setReadOnly(resource, false);
+
                 resource.delete(false, monitor);
 
                 if (monitor.isCanceled()) {
