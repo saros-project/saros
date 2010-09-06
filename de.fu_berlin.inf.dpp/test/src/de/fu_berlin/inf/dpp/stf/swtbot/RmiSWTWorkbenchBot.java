@@ -176,7 +176,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         try {
             delegate.menu("File").menu("New").menu("Class").click();
             delegate.sleep(750);
-
             delegate.shell("New Java Class").activate();
             delegate.sleep(750);
             delegate.textWithLabel("Source folder:").setText(
@@ -186,7 +185,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             delegate.sleep(750);
             delegate.textWithLabel("Name:").setText(className);
             delegate.sleep(750);
-            implementsInterface("java.lang.Runnable");
+            // implementsInterface("java.lang.Runnable");
             delegate.checkBox("Inherited abstract methods").click();
             delegate.sleep(750);
             delegate.button("Finish").click();
@@ -196,10 +195,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 className + ".java").toTextEditor();
             delegate.cTabItem(className + ".java").activate();
             delegate.sleep(750);
-            editor.navigateTo(2, 0);
-            editor.quickfix("Add unimplemented methods");
-            editor.save();
-            delegate.sleep(750);
+            // editor.navigateTo(2, 0);
+            // editor.quickfix("Add unimplemented methods");
+            // editor.save();
+            // delegate.sleep(750);
         } catch (WidgetNotFoundException e) {
             log.error("error creating new Java Class", e);
         }
@@ -579,7 +578,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isPerspectiveOpen(String title) {
         try {
             return delegate.perspectiveByLabel(title).isActive();
-            //return delegate.activePerspective().getLabel().equals(title);
+            // return delegate.activePerspective().getLabel().equals(title);
             // return true;
 
         } catch (WidgetNotFoundException e) {

@@ -25,9 +25,9 @@ public class TestFollowMode {
             BotConfiguration.PORT_ALICE);
         invitee.initRmi();
         invitee.activeMusican();
-
-        invitee.openSarosViews();
         invitee.openPerspective("Java");
+        invitee.openSarosViews();
+
         invitee.xmppConnect();
     }
 
@@ -38,9 +38,9 @@ public class TestFollowMode {
             BotConfiguration.PORT_BOB);
         inviter.initRmi();
         inviter.activeMusican();
-
-        inviter.openSarosViews();
         inviter.openPerspective("Java");
+        inviter.openSarosViews();
+
         inviter.xmppConnect();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);

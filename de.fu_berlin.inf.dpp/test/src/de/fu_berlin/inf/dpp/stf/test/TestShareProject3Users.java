@@ -29,6 +29,7 @@ public class TestShareProject3Users {
             BotConfiguration.PORT_ALICE);
         invitee1.initRmi();
         invitee1.activeMusican();
+        invitee1.openPerspective("Java");
         invitee1.openSarosViews();
         invitee1.xmppConnect();
     }
@@ -40,6 +41,7 @@ public class TestShareProject3Users {
             BotConfiguration.PORT_BOB);
         invitee2.initRmi();
         invitee2.activeMusican();
+        invitee2.openPerspective("Java");
         invitee2.openSarosViews();
         invitee2.xmppConnect();
     }
@@ -51,6 +53,7 @@ public class TestShareProject3Users {
             BotConfiguration.PORT_CARL);
         inviter.initRmi();
         inviter.activeMusican();
+        inviter.openPerspective("Java");
         inviter.openSarosViews();
         inviter.xmppConnect();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
