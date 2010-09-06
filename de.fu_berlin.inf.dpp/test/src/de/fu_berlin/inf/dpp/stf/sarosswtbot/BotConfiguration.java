@@ -33,8 +33,7 @@ public class BotConfiguration {
     public final static String CLASSNAME = "MyClass";
     public final static String CLASSNAME2 = "MyClass2";
     public final static String PACKAGENAME = "my.pkg";
-    public final static String CONTENTPATH = "test-files/" + CLASSNAME
-        + ".java";
+    public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
 
     public final static String NAME_ROSTER_VIEW = "ROSTER";
     public final static String NAME_SESSION_VIEW = "Shared Project Session";
