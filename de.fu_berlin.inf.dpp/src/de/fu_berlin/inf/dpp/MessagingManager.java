@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * MessagingManager manages the multi user chat (MUC). It's responsible for
@@ -115,7 +116,16 @@ public class MessagingManager implements IConnectionListener,
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sessionStarted = true;
-            checkChatState();
+            // If the [possibly user specified] chat server is unreachable,
+            // checkChatState() will block, causing a ~5s delay when using the
+            // "Share project" command.
+            // TODO Should we always run "join chat" in the background?
+            Util.runSafeAsync("SarosJoinChat", log, new Runnable() {
+                public void run() {
+                    checkChatState();
+                }
+            });
+
         }
     };
 
@@ -226,17 +236,27 @@ public class MessagingManager implements IConnectionListener,
             // Create a MultiUserChat using an XMPPConnection for a room
             MultiUserChat muc = new MultiUserChat(connection, host);
 
-            boolean createdRoom = false;
+            // try to join to room
+            boolean joined = false;
             try {
-                // Create the room
-                muc.create(user);
-                createdRoom = true;
+                muc.join(user, comPrefs.password);
+                joined = true;
             } catch (XMPPException e) {
                 log.debug(e);
             }
 
-            // try to join to room
-            muc.join(user, comPrefs.password);
+            boolean createdRoom = false;
+            if (!joined) {
+                try {
+                    // Create the room
+                    muc.create(user);
+                    createdRoom = true;
+                    // try to join to room
+                    muc.join(user, comPrefs.password);
+                } catch (XMPPException e) {
+                    log.debug(e);
+                }
+            }
 
             if (createdRoom) {
                 try {
