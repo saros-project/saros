@@ -546,10 +546,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
         byte[] content = xml.getBytes("UTF-8");
 
-        /*
-         * TODO [MR] Not portable because String#getBytes() uses the platform's
-         * default encoding.
-         */
         dataManager.sendData(data, content, progress.newChild(100));
 
         progress.done();
