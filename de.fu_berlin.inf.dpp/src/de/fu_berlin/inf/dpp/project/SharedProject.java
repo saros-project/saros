@@ -7,7 +7,23 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
+/**
+ * A SharedProject stores the state of a project (and its resources) shared in a
+ * Saros session.<br>
+ * <br>
+ * We only want to send out activities if a value changes. To detect changes, we
+ * must compare the current value to the one we previously saw. This class is
+ * responsible for storing the project specific values we want to track.<br>
+ * <br>
+ * TODO Add the ability to track information on every file/folder in the
+ * project.<br>
+ * TODO Rename to SharedProjectState?
+ */
 public class SharedProject {
+    /**
+     * A value of type E with a convenient update method to check if the value
+     * was changed.
+     */
     static class UpdatableValue<E> {
         private E value;
 
@@ -15,6 +31,7 @@ public class SharedProject {
             this.value = value;
         }
 
+        /** Updates the value, and returns true if the value changed. */
         public boolean update(E newValue) {
             if (newValue == null) {
                 if (value == null)
@@ -38,7 +55,8 @@ public class SharedProject {
 
     protected final IProject project;
 
-    protected boolean open;
+    /* Stored state values: */
+    protected UpdatableValue<Boolean> projectIsOpen;
 
     protected UpdatableValue<VCSAdapter> vcs;
 
@@ -61,7 +79,7 @@ public class SharedProject {
         this.sarosSession = sarosSession;
         this.project = project;
 
-        open = project.isOpen();
+        projectIsOpen = new UpdatableValue<Boolean>(project.isOpen());
         boolean useVersionControl = sarosSession.useVersionControl();
         if (useVersionControl) {
             sarosSession.addListener(sharedProjectListener);
@@ -80,42 +98,37 @@ public class SharedProject {
         vcsRevision = new UpdatableValue<String>(info.revision);
     }
 
-    /**
-     * Updates the VCS.
-     * 
-     * @return true if the value was changed.
-     */
+    /** Updates the current VCSAdapter, and returns true if the value changed. */
     public boolean updateVcs(VCSAdapter newValue) {
         return vcs.update(newValue);
     }
 
-    /**
-     * Updates the VCS URL.
-     * 
-     * @return true if the value was changed.
-     */
+    /** Updates the current VCS URL, and returns true if the value changed. */
     public boolean updateVcsUrl(String newValue) {
         return vcsUrl.update(newValue);
     }
 
+    /** Updates the current VCS revision, and returns true if the value changed. */
     public boolean updateRevision(String newValue) {
         return vcsRevision.update(newValue);
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
-
-    public boolean isOpen() {
-        return open;
+    /**
+     * Updates if the project is currently open, and returns true if the value
+     * changed.
+     */
+    public boolean updateProjectIsOpen(boolean newValue) {
+        return projectIsOpen.update(newValue);
     }
 
     public VCSAdapter getVCSAdapter() {
         return vcs.value();
     }
 
-    // TODO find a less stupid name ._.
-    public boolean isRepresentationOf(IProject project) {
+    /**
+     * Returns true if this SharedProject tracks the state of the project.
+     */
+    public boolean belongsTo(IProject project) {
         return this.project.equals(project);
     }
 }

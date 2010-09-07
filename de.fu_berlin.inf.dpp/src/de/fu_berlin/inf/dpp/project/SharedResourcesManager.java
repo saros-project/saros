@@ -216,8 +216,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             SharedProject sharedProject = sarosSession
                 .getSharedProject(project);
             boolean isProjectOpen = project.isOpen();
-            if (sharedProject.isOpen() != isProjectOpen) {
-                sharedProject.setOpen(isProjectOpen);
+            if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
                 if (isProjectOpen) {
                     // Since the project was just opened, we would get
                     // a notification that each file in the project was just

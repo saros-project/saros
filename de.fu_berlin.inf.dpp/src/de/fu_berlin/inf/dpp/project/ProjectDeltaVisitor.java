@@ -146,9 +146,9 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         case IResourceDelta.REMOVED:
             addActivity(new FolderActivity(getUser(),
                 FolderActivity.Type.Removed, new SPath(resource)));
-            // We don't want visit the children if this folder was removed. The
-            // only interesting case is that a file was moved out of this or a
-            // child folder, but we're still going to visit the move target.
+            // We don't want to visit the children if this folder was removed.
+            // The only interesting case is that a file was moved out of this or
+            // a child folder, but we're still going to visit the move target.
             return false;
         default:
             return kind != IResourceDelta.NO_CHANGE;

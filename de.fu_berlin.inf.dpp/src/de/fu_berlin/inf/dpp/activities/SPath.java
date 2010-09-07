@@ -152,7 +152,7 @@ public class SPath {
     }
 
     /**
-     * Will return the IFile represented by this SPath.
+     * Returns the IFile represented by this SPath.
      * 
      * @return the IFile contained in the associated IProject for the given
      *         project relative path
@@ -163,6 +163,9 @@ public class SPath {
         return project.getFile(projectRelativePath);
     }
 
+    /**
+     * Returns the IResource represented by this SPath.
+     */
     public IResource getResource() {
         return project.findMember(projectRelativePath);
     }
