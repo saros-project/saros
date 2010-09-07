@@ -682,8 +682,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             replacedText = sb.toString();
         }
 
-        TextEditActivity textEdit = new TextEditActivity(sarosSession
-            .getLocalUser(), offset, text, replacedText, path);
+        TextEditActivity textEdit = new TextEditActivity(
+            sarosSession.getLocalUser(), offset, text, replacedText, path);
 
         if (!this.isDriver) {
             /**
@@ -824,8 +824,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setSelection(editorPart, textSelection, user, user
-                .equals(getFollowedUser()));
+            this.editorAPI.setSelection(editorPart, textSelection, user,
+                user.equals(getFollowedUser()));
         }
 
         /*
@@ -1166,8 +1166,9 @@ public class EditorManager implements IActivityProvider, Disposable {
         try {
             provider.connect(input);
         } catch (CoreException e) {
-            log.error("Could not connect document provider for file: "
-                + file.toString(), e);
+            log.error(
+                "Could not connect document provider for file: "
+                    + file.toString(), e);
             // TODO Trigger a consistency recovery
             return;
         }
@@ -1188,11 +1189,9 @@ public class EditorManager implements IActivityProvider, Disposable {
                 try {
                     is = doc.get(offset, replacedText.length());
                     if (!is.equals(replacedText)) {
-                        log
-                            .error("replaceText should be '"
-                                + StringEscapeUtils.escapeJava(replacedText)
-                                + "' is '" + StringEscapeUtils.escapeJava(is)
-                                + "'");
+                        log.error("replaceText should be '"
+                            + StringEscapeUtils.escapeJava(replacedText)
+                            + "' is '" + StringEscapeUtils.escapeJava(is) + "'");
                     }
                 } catch (BadLocationException e) {
                     // Ignore, because this is going to fail again just below
@@ -1206,9 +1205,9 @@ public class EditorManager implements IActivityProvider, Disposable {
                 log.error(String.format(
                     "Could not apply TextEdit at %d-%d of document "
                         + "with length %d.\nWas supposed to replace"
-                        + " '%s' with '%s'.", offset, offset
-                        + replacedText.length(), doc.getLength(), replacedText,
-                    text));
+                        + " '%s' with '%s'.", offset,
+                    offset + replacedText.length(), doc.getLength(),
+                    replacedText, text));
                 return;
             }
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
@@ -1224,8 +1223,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                 }
             }
             IAnnotationModel model = provider.getAnnotationModel(input);
-            contributionAnnotationManager.insertAnnotation(model, offset, text
-                .length(), source);
+            contributionAnnotationManager.insertAnnotation(model, offset,
+                text.length(), source);
         } finally {
             provider.disconnect(input);
         }
@@ -1462,9 +1461,9 @@ public class EditorManager implements IActivityProvider, Disposable {
         // Remove collected annotations.
         if (model instanceof IAnnotationModelExtension) {
             IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
-            extension.replaceAnnotations(annotations
-                .toArray(new Annotation[annotations.size()]), Collections
-                .emptyMap());
+            extension.replaceAnnotations(
+                annotations.toArray(new Annotation[annotations.size()]),
+                Collections.emptyMap());
         } else {
             if (!errorPrinted) {
                 log.error("AnnotationModel does not "
@@ -1678,13 +1677,10 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
-     * TODO Review and document the purpose of this
-     * 
      * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
      * This method analyzes the file extension of the {@link IFile} associated
      * with the given {@link IEditorInput}. Depending on the file extension it
      * returns file-types responsible {@link IDocumentProvider}.
-     * 
      * 
      * @param input
      *            the {@link IEditorInput} for which {@link IDocumentProvider}
