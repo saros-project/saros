@@ -172,6 +172,10 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return this.newPath;
     }
 
+    /**
+     * Returns the old/source path in case this activityDataObject represents a
+     * moving of files.
+     */
     public SPath getOldPath() {
         return this.oldPath;
     }
@@ -251,8 +255,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new FileActivityDataObject(source.getJID(), type, newPath
-            .toSPathDataObject(sarosSession), (oldPath != null ? oldPath
-            .toSPathDataObject(sarosSession) : null), data, purpose);
+        return new FileActivityDataObject(source.getJID(), type,
+            newPath.toSPathDataObject(sarosSession),
+            (oldPath != null ? oldPath.toSPathDataObject(sarosSession) : null),
+            data, purpose);
     }
 }

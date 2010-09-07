@@ -14,10 +14,4 @@ public interface IResourceActivity extends IActivity {
      */
     public SPath getPath();
 
-    /**
-     * Returns the old/source path in case this activityDataObject represents a
-     * moving of files.
-     */
-    public SPath getOldPath();
-
 }

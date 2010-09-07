@@ -115,10 +115,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         return path;
     }
 
-    public SPath getOldPath() {
-        return null;
-    }
-
     public Type getType() {
         return type;
     }
