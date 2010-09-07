@@ -71,10 +71,13 @@ import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
+ * TODO There needs to be a clear separation of concerns between sharing a
+ * project and inviting someone to a session. Sharing a project should be
+ * possible in an existing session.
+ * 
  * @author rdjemili
  * @author sotitas
  */
-
 public class OutgoingInvitationProcess extends InvitationProcess {
 
     private final static Logger log = Logger
@@ -447,13 +450,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             }
             archiveMonitor.done();
 
-            synchronized (sarosSession) {
-                User newUser = new User(sarosSession, peer, colorID);
-                this.sarosSession.addUser(newUser);
-                log.debug(Util.prefix(peer) + " added to project, colorID: "
-                    + colorID);
-                synchronizeUserList();
-            }
+            addUserToSession();
+
             subMonitor.worked(25);
         } finally {
             // START all users
@@ -519,14 +517,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // else
             // throw new LocalCancellationException();
 
-            User newUser = null;
-            synchronized (sarosSession) {
-                newUser = new User(sarosSession, peer, colorID);
-                this.sarosSession.addUser(newUser);
-                log.debug(Util.prefix(peer) + " added to project, colorID: "
-                    + colorID);
-                synchronizeUserList();
-            }
+            User newUser = addUserToSession();
 
             // if (toSend.size() != 0) {
 
@@ -551,6 +542,21 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                     + Util.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
+        }
+    }
+
+    /**
+     * Adds the invited user to the current SarosSession.<br>
+     */
+    // TODO move to SarosSession.
+    protected User addUserToSession() throws SarosCancellationException {
+        synchronized (sarosSession) {
+            User newUser = new User(sarosSession, peer, colorID);
+            this.sarosSession.addUser(newUser);
+            log.debug(Util.prefix(peer) + " added to project, colorID: "
+                + colorID);
+            synchronizeUserList();
+            return newUser;
         }
     }
 
@@ -658,18 +664,19 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             + ": Invitation has completed successfully.");
     }
 
+    // FIXME What is this method for? Why is it not in SarosSession?
     protected void synchronizeUserList() throws SarosCancellationException {
         checkCancellation(CancelOption.NOTIFY_PEER);
 
+        Collection<User> participants = sarosSession.getParticipants();
         log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
-            + sarosSession.getParticipants());
+            + participants);
 
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();
 
         for (User user : sarosSession.getRemoteUsers()) {
-            transmitter.sendUserList(user.getJID(), invitationID,
-                sarosSession.getParticipants());
+            transmitter.sendUserList(user.getJID(), invitationID, participants);
         }
 
         log.debug("Inv" + Util.prefix(peer)
