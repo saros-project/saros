@@ -61,12 +61,12 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
@@ -118,11 +118,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected static Logger log = Logger.getLogger(EditorManager.class
         .getName());
-
-    protected static Logger wpLog = log;
-    /*
-     * Logger.getLogger(EditorManager.class .getName());
-     */
 
     protected SharedEditorListenerDispatch editorListener = new SharedEditorListenerDispatch();
 
@@ -301,9 +296,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                sarosSession.sendActivity(recipient,
-                    new TextSelectionActivity(localUser, offset, length,
-                        locallyActiveEditor));
+                sarosSession.sendActivity(recipient, new TextSelectionActivity(
+                    localUser, offset, length, locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -438,7 +432,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     public EditorManager(Saros saros, SessionManager sessionManager,
         StopManager stopManager) {
 
-        wpLog.trace("EditorManager initialised");
+        log.trace("EditorManager initialised");
 
         this.saros = saros;
 
@@ -470,7 +464,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        wpLog.trace(".connect(" + file.getProjectRelativePath().toOSString()
+        log.trace(".connect(" + file.getProjectRelativePath().toOSString()
             + ") invoked");
 
         if (!isConnected(file)) {
@@ -488,7 +482,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     public void disconnect(IFile file) {
 
-        wpLog.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
+        log.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
             + ") invoked");
 
         if (!isConnected(file)) {
@@ -757,7 +751,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execTextEdit(TextEditActivity textEdit) {
 
-        wpLog.trace("EditorManager.execTextEdit invoked");
+        log.trace("EditorManager.execTextEdit invoked");
 
         SPath path = textEdit.getEditor();
         IFile file = path.getFile();
@@ -812,7 +806,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execTextSelection(TextSelectionActivity selection) {
 
-        wpLog.trace("EditorManager.execTextSelection invoked");
+        log.trace("EditorManager.execTextSelection invoked");
 
         SPath path = selection.getEditor();
 
@@ -843,7 +837,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execViewport(ViewportActivity viewport) {
 
-        wpLog.trace("EditorManager.execViewport invoked");
+        log.trace("EditorManager.execViewport invoked");
 
         User user = viewport.getSource();
         boolean following = user.equals(getFollowedUser());
@@ -892,7 +886,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execActivated(User user, SPath path) {
 
-        wpLog.trace("EditorManager.execActivated invoked");
+        log.trace("EditorManager.execActivated invoked");
 
         editorListener.activeEditorChanged(user, path);
 
@@ -904,7 +898,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execClosed(User user, SPath path) {
 
-        wpLog.trace("EditorManager.execClosed invoked");
+        log.trace("EditorManager.execClosed invoked");
 
         editorListener.editorRemoved(user, path);
 
@@ -920,7 +914,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partOpened(IEditorPart editorPart) {
 
-        wpLog.trace(".partOpened invoked");
+        log.trace(".partOpened invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -961,7 +955,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partActivated(IEditorPart editorPart) {
 
-        wpLog.trace(".partActiveted invoked");
+        log.trace(".partActiveted invoked");
 
         // First check for last editor being closed (which is a null editorPart)
         if (editorPart == null) {
@@ -1044,7 +1038,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partClosed(IEditorPart editorPart) {
 
-        wpLog.trace("EditorManager.partClosed invoked");
+        log.trace("EditorManager.partClosed invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -1310,7 +1304,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         IFile file = path.getFile();
 
-        wpLog.trace("EditorManager.saveText (" + file.getName() + ") invoked");
+        log.trace("EditorManager.saveText (" + file.getName() + ") invoked");
 
         if (!file.exists()) {
             log.warn("File not found for saving: " + path.toString(),
@@ -1328,12 +1322,12 @@ public class EditorManager implements IActivityProvider, Disposable {
              * This happens when a file which is already saved is saved again by
              * a remote user
              */
-            wpLog.debug(".saveText File " + file.getName()
+            log.debug(".saveText File " + file.getName()
                 + " does not need to be saved");
             return;
         }
 
-        wpLog.trace(".saveText File " + file.getName() + " will be saved");
+        log.trace(".saveText File " + file.getName() + " will be saved");
 
         try {
             provider.connect(input);
@@ -1351,7 +1345,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             if (model != null)
                 model.connect(doc);
 
-            wpLog.trace("EditorManager.saveText Annotations on the IDocument "
+            log.trace("EditorManager.saveText Annotations on the IDocument "
                 + "are set");
 
             dirtyStateListener.enabled = false;
@@ -1384,7 +1378,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             if (model != null)
                 model.disconnect(doc);
 
-            wpLog.trace("EditorManager.saveText File " + file.getName()
+            log.trace("EditorManager.saveText File " + file.getName()
                 + " will be reseted");
 
         } finally {
@@ -1401,7 +1395,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void sendEditorActivitySaved(SPath path) {
 
-        wpLog.trace("EditorManager.sendEditorActivitySaved started for "
+        log.trace("EditorManager.sendEditorActivitySaved started for "
             + path.toString());
 
         // TODO technically we should mark the file as saved in the
@@ -1748,8 +1742,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void triggerRevert(SPath path, String newContent, String oldContent) {
 
-        wpLog.trace(".triggerRevert invoked");
-        wpLog.trace(".triggerRevert File: " + path.toString());
+        log.trace(".triggerRevert invoked");
+        log.trace(".triggerRevert File: " + path.toString());
 
         // TODO Check if we are in the shared project!!
 

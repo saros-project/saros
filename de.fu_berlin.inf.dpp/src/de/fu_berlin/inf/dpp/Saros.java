@@ -166,6 +166,8 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
  */
 @Component(module = "core")
 public class Saros extends AbstractUIPlugin {
+    private static final int REFRESH_SECONDS = 3;
+
     /**
      * The single instance of the Saros plugin.
      */
@@ -1223,7 +1225,7 @@ public class Saros extends AbstractUIPlugin {
         try {
             log = Logger.getLogger("de.fu_berlin.inf.dpp");
             PropertyConfigurator.configureAndWatch("log4j.properties",
-                3 * 1000);
+                REFRESH_SECONDS * 1000);
         } catch (SecurityException e) {
             System.err.println("Could not start logging:");
             e.printStackTrace();
