@@ -139,7 +139,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void confirmWindow(String title, String buttonText)
         throws RemoteException {
-        activateShellByText(title);
+        try {
+            activateShellByText(title);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not find shell with title "
+                + title);
+        }
         clickButton(buttonText);
     }
 
@@ -223,10 +228,18 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         newJavaProject("Foo-" + rand.toString().substring(3, 10));
     }
 
+    public SWTBotMenu menu(String name) {
+        try {
+            return delegate.menu(name);
+        } catch (WidgetNotFoundException e) {
+            throw new RuntimeException("Widget " + name + " not found");
+        }
+    }
+
     public void newJavaProject(String project) {
         SWTBotMenu menu;
         try {
-            menu = delegate.menu("File").menu("New").menu("Java Project");
+            menu = menu("File").menu("New").menu("Java Project");
             delegate.sleep(750);
             menu.click();
         } catch (WidgetNotFoundException e) {

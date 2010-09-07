@@ -120,7 +120,8 @@ public class Musician {
 
     public boolean hasContact(Musician respondent) {
         try {
-            return state.hasContact(respondent.jid);
+            return state.hasContact(respondent.jid)
+                && bot.isContactInRosterView(respondent.jid.getBase());
         } catch (RemoteException e) {
             log.error("Failed to check if the contact was found", e);
         }
@@ -130,7 +131,12 @@ public class Musician {
     public void initRmi() throws RemoteException, NotBoundException,
         AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
-        bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
+        try {
+            bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
+        } catch (java.rmi.ConnectException e) {
+            throw new RuntimeException("Could not connect to RMI of bot " + jid
+                + ", did you start the Eclipse instance?");
+        }
 
         state = (ISarosState) registry.lookup("state");
     }
@@ -248,9 +254,7 @@ public class Musician {
 
     public void removeContact(Musician contact) throws RemoteException {
         bot.sleep(2000);
-        if (bot.isContactInRosterView(contact.jid.getBase())) {
-            bot.removeContact(contact.jid.getBase());
-        }
+        bot.removeContact(contact.jid.getBase());
     }
 
     public void removeProject(String projectname) throws RemoteException {
