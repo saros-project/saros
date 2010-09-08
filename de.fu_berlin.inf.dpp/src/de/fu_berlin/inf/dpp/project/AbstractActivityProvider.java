@@ -15,15 +15,15 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         }
     }
 
-    public abstract void exec(IActivity activityDataObject);
+    public abstract void exec(IActivity activity);
 
     public void removeActivityListener(IActivityListener listener) {
         this.activityListeners.remove(listener);
     }
 
-    public void fireActivity(IActivity activityDataObject) {
+    public void fireActivity(IActivity activity) {
         for (IActivityListener activityListener : activityListeners) {
-            activityListener.activityCreated(activityDataObject);
+            activityListener.activityCreated(activity);
         }
     }
 
