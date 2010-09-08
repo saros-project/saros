@@ -44,14 +44,14 @@ public interface IActivity {
     public User getSource();
 
     /**
-     * The activity will call the receive method of the given receiver with the
-     * actual type of this IActivity and return whether the receiver consumed
+     * The activity will call the consume method of the given consumer with the
+     * actual type of this IActivity and return whether the consumer consumed
      * the message.
      * 
      * For instance if dispatch is called on a FolderActivity it will call
      * {@link IActivityConsumer#consume(FolderActivity)}
      * 
-     * @return <code>true</code> if the receiver consumed this activity,
+     * @return <code>true</code> if the consumer consumed this activity,
      *         otherwise <code>false</code>.
      */
     public boolean dispatch(IActivityConsumer consumer);
@@ -69,7 +69,6 @@ public interface IActivity {
      * @return a "stupid" IActivityDataObject which can be used to send this
      *         {@link IActivity} to peers.
      */
-    public IActivityDataObject getActivityDataObject(
-        ISarosSession sarosSession);
+    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession);
 
 }
