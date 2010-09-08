@@ -80,13 +80,11 @@ public class DiscoveryManager implements Disposable {
             if (infoWrapper != null) {
                 if (infoWrapper.isAvailable()) {
                     log.debug("Clearing cache entry of user " + rjid + ": "
-                        + infoWrapper.item.getChildElementXML(),
-                        new StackTrace());
+                        + infoWrapper.item.getChildElementXML());
                 } else {
-                    log
-                        .debug("Clearing cache entry of user "
-                            + rjid
-                            + " but cache entry is empty (a discovery is still running or the last one failed)");
+                    log.debug("Clearing cache entry of user " + rjid
+                        + " but cache entry is empty (a discovery is "
+                        + "still running or the last one failed)");
                 }
             }
         }
@@ -380,9 +378,9 @@ public class DiscoveryManager implements Disposable {
             return sdm.discoverInfo(recipient.toString());
         } catch (XMPPException e) {
 
-            log.warn("Service Discovery failed on recipient "
-                + recipient.toString() + " server:"
-                + saros.getConnection().getHost() + ":", e);
+            log.warn(
+                "Service Discovery failed on recipient " + recipient.toString()
+                    + " server:" + saros.getConnection().getHost() + ":", e);
             return null;
         }
     }
