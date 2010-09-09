@@ -21,6 +21,8 @@ public class TestHandleContacts {
 
     @Before
     public void configureRespondent() throws RemoteException, NotBoundException {
+        // TODO Make sure that both have each other added as contacts.
+
         respondent = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
@@ -47,6 +49,7 @@ public class TestHandleContacts {
 
         questioner.openSarosViews();
         questioner.xmppConnect();
+
     }
 
     @After
@@ -60,14 +63,19 @@ public class TestHandleContacts {
     }
 
     @Test
+    // TODO This test fails if a contact was renamed.
     public void testAddAndRemoveContact() throws RemoteException {
         questioner.waitForConnect();
         respondent.waitForConnect();
+        assertTrue(questioner.hasContact(respondent));
+        assertTrue(respondent.hasContact(questioner));
+
         questioner.removeContact(respondent);
         questioner.sleep(750);
+        assertFalse(questioner.hasContact(respondent));
+
         respondent.clickButtonOnPopup("Removal of subscription", "OK");
         respondent.sleep(750);
-        assertFalse(questioner.hasContact(respondent));
         assertFalse(respondent.hasContact(questioner));
 
         questioner.addContact(respondent);
