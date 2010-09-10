@@ -468,6 +468,10 @@ public class SarosSession implements ISarosSession, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
+    public boolean isStopped() {
+        return stopped;
+    }
+
     /**
      * Stops the associated activityDataObject sequencer.
      * 

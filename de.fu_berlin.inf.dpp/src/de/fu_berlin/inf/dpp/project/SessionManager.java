@@ -233,13 +233,14 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
             this.transmitter.sendLeaveMessage(sarosSession);
             log.debug("Leave message sent.");
-
-            try {
-                sarosSession.stop();
-                sarosSession.dispose();
-            } catch (RuntimeException e) {
-                log.error("Error stopping project: ", e);
+            if (!sarosSession.isStopped()) {
+                try {
+                    sarosSession.stop();
+                } catch (RuntimeException e) {
+                    log.error("Error stopping project: ", e);
+                }
             }
+            sarosSession.dispose();
 
             this.sarosSessionObservable.setValue(null);
 
