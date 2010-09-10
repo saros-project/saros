@@ -102,11 +102,10 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 return false;
             }
 
-            if (vcs != null) {
+            if (vcs != null && isSync(delta)) {
                 VCSResourceInformation info = vcs
                     .getResourceInformation(project);
                 String url = info.repositoryRoot + info.path;
-
                 if (sharedProject.updateVcsUrl(url)) {
                     // Switch
                     addActivity(VCSActivity.switch_(sarosSession, resource,
@@ -282,6 +281,10 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     protected boolean isMovedTo(IResourceDelta delta) {
         return ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0);
+    }
+
+    protected boolean isSync(IResourceDelta delta) {
+        return ((delta.getFlags() & IResourceDelta.SYNC) != 0);
     }
 
     /**
