@@ -131,4 +131,20 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         return directory;
     }
 
+    @Override
+    public String toString() {
+        String result = "VCSActivity(type=" + type;
+        if (type == Type.Disconnect)
+            result += ", deleteContents=" + (revision != null);
+        else {
+            result += ", path=" + path;
+            if (type == Type.Connect || type == Type.Switch)
+                result += ", url=" + url;
+            if (type == Type.Connect)
+                result += ", directory=" + directory;
+            result += ", revision=" + revision;
+        }
+        result += ")";
+        return result;
+    }
 }
