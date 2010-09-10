@@ -413,7 +413,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
         try {
-            localFileList = new FileList(this.localProject);
+            localFileList = new FileList(this.localProject, vcs != null);
         } catch (CoreException e) {
             e.printStackTrace();
             return new FileList();
