@@ -97,10 +97,11 @@ public class ActivitySequencer {
     protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
     /**
-     * A priority queue for timed activityDataObjects.
-     * 
-     * TODO "Timestamps" are treated more like consecutive sequence numbers, so
-     * may be all names and documentation should be changed to reflect this.
+     * A priority queue for timed activityDataObjects. Fore each remote user
+     * there is one ActivityQueue, in which received events from those are
+     * stored. TODO "Timestamps" are treated more like consecutive sequence
+     * numbers, so may be all names and documentation should be changed to
+     * reflect this.
      */
     protected class ActivityQueue {
 
@@ -116,10 +117,13 @@ public class ActivitySequencer {
          */
         protected static final int FIRST_SEQUENCE_NUMBER = 0;
 
-        /** This {@link ActivityQueue} is for this user. */
+        /**
+         * This {@link ActivityQueue} is for received activities from this
+         * remote-user.
+         */
         protected final JID jid;
 
-        /** Next sequence number for sending to this user. */
+        /** The next sequence number we're going to send to this user. */
         protected int nextSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
         /**
@@ -153,10 +157,10 @@ public class ActivitySequencer {
         }
 
         /**
-         * Owner(user) of ActivitySequencer.this creates a
-         * {@link TimedActivityDataObject} and add it to the history of created
-         * activityDataObjects of this receipient.
-         */
+         * Create a {@link TimedActivityDataObject} to send to the user
+         * corresponding to this ActivityQueue and add it to the history of
+         * created activityDataObjects.
+         **/
         public TimedActivityDataObject createTimedActivity(
             IActivityDataObject activityDataObject) {
 
@@ -405,11 +409,6 @@ public class ActivitySequencer {
             LinkedList<TimedActivityDataObject> result = new LinkedList<TimedActivityDataObject>();
             for (TimedActivityDataObject activity : getActivityQueue(user).history) {
                 if (activity.getSequenceNumber() >= fromSequenceNumber) {
-                    // TODO Umut: What does andUp mean? "And upper"? For this
-                    // the List must be ascending ordered
-                    // Does it mean: Stop after first matching of ">=" --->
-                    // least >= sequence number bigger or equal the
-                    // fromSequenceNumber
                     result.add(activity);
                     if (!andUp) {
                         break;
@@ -623,20 +622,6 @@ public class ActivitySequencer {
      */
     public void sendActivity(List<User> recipients,
         final IActivityDataObject activityDataObject) {
-        // if (log.isDebugEnabled()) {
-        // // if (activityDataObject instanceof JupiterActivityDataObject) {
-        // {
-        // int c = recipients.size();
-        // StringBuilder s = new StringBuilder();
-        // String str = activityDataObject.getSource().getName();
-        // for (User u : recipients) {
-        // s.append(u + ",");
-        // }
-        // log.debug(localJID.getName() + " sendet für " + str
-        // + " vom Typ " + activityDataObject.getClass() + " an " + c
-        // + ": " + s);
-        // }
-        // }
         /**
          * Short cut all messages directed at local user
          */
