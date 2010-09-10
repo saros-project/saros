@@ -70,6 +70,11 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
  * entering text in an text editor. It creates and executes file, folder, and
  * VCS activities.
  */
+/*
+ * For a good introduction to Eclipse's resource change notification mechanisms
+ * see
+ * http://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
+ */
 @Component(module = "core")
 public class SharedResourcesManager extends AbstractActivityProvider implements
     IResourceChangeListener, Disposable {
@@ -91,8 +96,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      */
     static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
-    static Logger log = Logger
-        .getLogger(SharedResourcesManager.class.getName());
+    static Logger log = Logger.getLogger(SharedResourcesManager.class);
 
     /**
      * If the StopManager has paused the project, the SharedResourcesManager
@@ -201,6 +205,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 + event);
             return;
         }
+
+        if (log.isTraceEnabled())
+            log.trace("handlePostChange\n" + deltaToString(delta));
+
         assert delta.getResource() instanceof IWorkspaceRoot;
 
         // Iterate over all projects.
@@ -253,8 +261,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         final List<IResourceActivity> orderedActivities = getOrderedActivities(pendingActivities);
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                for (final IActivity activityDataObject : orderedActivities) {
-                    fireActivity(activityDataObject);
+                for (final IActivity activity : orderedActivities) {
+                    fireActivity(activity);
                 }
             }
         });
@@ -326,17 +334,21 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 return;
             }
 
-            ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
-            try {
-                delta.accept(visitor);
-            } catch (CoreException e) {
-                log.error("ToStringResourceDelta visitor crashed", e);
-                return;
-            }
-            log.warn("Resource changed while paused:\n" + visitor.toString());
+            log.warn("Resource changed while paused:\n" + deltaToString(delta));
         } else {
             log.error("Unexpected event type in in logPauseWarning: " + event);
         }
+    }
+
+    protected String deltaToString(IResourceDelta delta) {
+        ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
+        try {
+            delta.accept(visitor);
+        } catch (CoreException e) {
+            log.error("ToStringResourceDelta visitor crashed", e);
+            return "";
+        }
+        return visitor.toString();
     }
 
     @Override
@@ -348,6 +360,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         try {
             fileReplacementInProgressObservable.startReplacement();
+
+            log.trace("execing " + activity.toString() + " in "
+                + Thread.currentThread().getName());
 
             if (activity instanceof FileActivity) {
                 exec((FileActivity) activity);
@@ -361,6 +376,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             log.error("Failed to execute resource activity.", e);
         } finally {
             fileReplacementInProgressObservable.replacementDone();
+            log.trace("done execing " + activity.toString());
         }
     }
 
@@ -478,11 +494,15 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             progressMonitorDialog.open();
             Shell pmdShell = progressMonitorDialog.getShell();
             pmdShell.setText("Saros running VCS operation");
+            log.trace("about to call progressMonitorDialog.run");
             progressMonitorDialog.run(false, false,
                 new IRunnableWithProgress() {
                     public void run(IProgressMonitor progress)
 
                     throws InvocationTargetException, InterruptedException {
+                        log.trace("progressMonitorDialog.run started");
+                        if (!Util.isSWT())
+                            log.trace("not in SWT thread");
                         if (activityType == VCSActivity.Type.Connect) {
                             vcs.connect(project, url, directory, progress);
                         } else if (activityType == VCSActivity.Type.Disconnect) {
@@ -494,6 +514,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                         } else {
                             log.error("VCS activity type not implemented yet.");
                         }
+                        log.trace("progressMonitorDialog.run done");
                     }
 
                 });
