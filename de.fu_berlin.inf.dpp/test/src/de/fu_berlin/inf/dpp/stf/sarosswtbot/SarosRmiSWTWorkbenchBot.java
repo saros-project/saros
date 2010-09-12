@@ -7,22 +7,16 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -47,13 +41,13 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (delegate != null && self != null)
             return self;
 
-        SWTWorkbenchBot swtwbb = new SWTWorkbenchBot();
+        SarosSWTWorkbenchBot swtwbb = new SarosSWTWorkbenchBot();
         self = new SarosRmiSWTWorkbenchBot(swtwbb);
         return self;
     }
 
     /** RmiSWTWorkbenchBot is a singleton, but inheritance is possible */
-    protected SarosRmiSWTWorkbenchBot(SWTWorkbenchBot bot) {
+    protected SarosRmiSWTWorkbenchBot(SarosSWTWorkbenchBot bot) {
         super(bot);
     }
 
@@ -98,29 +92,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * 
      * This method captures two screenshots as side effect.
      */
-    public void ackProject1(String inviter) throws RemoteException {
-        activateShellByText("Session Invitation");
-
-        if (!delegate.textWithLabel("Inviter").getText().equals(inviter))
+    public void ackProjectStep1(String inviter) throws RemoteException {
+        activateShellWithText(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        if (!equalFieldTextWithText(SarosConstant.TEXT_LABEL_INVITER, inviter))
             log.warn("inviter does not match: " + inviter);
-
         captureScreenshot(TEMPDIR + "/acknowledge_project1.png");
-        try {
-            while (!delegate.button("Next >").isEnabled()) {
-                delegate.sleep(100);
-            }
-        } catch (Exception e) {
-            // next window opened
-        }
-        delegate.button("Next >").click();
+        waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
+        clickButton(SarosConstant.BUTTON_NEXT);
         captureScreenshot(TEMPDIR + "/acknowledge_project2.png");
-        try {
-            while (!delegate.button("Finish").isEnabled()) {
-                delegate.sleep(100);
-            }
-        } catch (Exception e) {
-            // next window opened
-        }
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
     }
 
     /**
@@ -128,46 +108,67 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * 
      * This method captures two screenshots as side effect.
      */
-    public void ackNewProject2(String projectName) throws RemoteException {
-        delegate.radio("Create new project").click();
+    public void ackProjectStep2UsingNewProject(String projectName)
+        throws RemoteException {
+        clickRadio(SarosConstant.RADIO_LABEL_CREATE_NEW_PROJECT);
         captureScreenshot(TEMPDIR + "/acknowledge_project3.png");
-        delegate.button("Finish").click();
+        clickButton(SarosConstant.BUTTON_FINISH);
         captureScreenshot(TEMPDIR + "/acknowledge_project4.png");
-        try {
-            while (true) {
-                delegate.shell("Session Invitation");
-                delegate.sleep(100);
-            }
-        } catch (Exception e) {
-            // window closed
-        }
+        waitUntilShellCloses(getShellWithText(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+    }
+
+    public void ackProjectStep2UsingExistProject(String projectName)
+        throws RemoteException {
+        delegate.radio("Use existing project").click();
+        delegate.sleep(750);
+        delegate.button("Browse").click();
+        activateShellWithText("Folder Selection");
+        delegate.tree().getTreeItem(projectName).click();
+        delegate.sleep(750);
+        delegate.button("OK").click();
+        delegate.sleep(750);
+        delegate.button("Finish").click();
+        delegate.sleep(750);
+        confirmWindow("Warning: Local changes will be deleted", "Yes");
+        waitUntilShellCloses(getShellWithText("Session Invitation"));
+    }
+
+    public void ackProjectStep2UsingExistProjectWithCopy(String projectName)
+        throws RemoteException {
+        delegate.radio("Use existing project").click();
+        delegate.sleep(750);
+        delegate
+            .checkBox("Create copy for working distributed. New project name:");
+        delegate.sleep(750);
+        delegate.button("Finish").click();
+        waitUntilShellCloses(getShellWithText("Session Invitation"));
     }
 
     public void addNewContact(String name) throws RemoteException {
         if (!isRosterViewOpen())
             addSarosSessionView();
 
-        delegate.viewByTitle("Roster").toolbarButton("Add a new contact")
-            .click();
+        // delegate.viewByTitle("Roster").toolbarButton("Add a new contact")
+        // .click();
+        clickToolbarButtonWithTooltipInViewWithTitle(
+            SarosConstant.VIEW_TITLE_ROSTER,
+            SarosConstant.TOOL_TIP_TEXT_ADD_A_NEW_CONTACT);
 
         // new contact window
-        SWTBotShell shell = delegate.shell("New Contact");
-        while (!shell.isEnabled()) {
-            delegate.sleep(100);
-            log.debug("shell was not enabled");
-            shell = delegate.shell("New Contact");
-        }
-        shell.activate();
+        // SWTBotShell shell = delegate.shell("New Contact");
+        // while (!shell.isEnabled()) {
+        // delegate.sleep(100);
+        // log.debug("shell was not enabled");
+        // shell = delegate.shell("New Contact");
+        // }
+        // shell.activate();
+        activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
 
         // try to add contact
-        SWTBotText text = delegate.textWithLabel("Jabber ID");
-        text.setText(name);
-        while (!delegate.button("Finish").isEnabled()) {
-            delegate.sleep(100);
-            log.debug("Finish button is not enabled");
-        }
-        SWTBotButton button = delegate.button("Finish");
-        button.click();
+        setTextWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID, name);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        clickButton(SarosConstant.BUTTON_FINISH);
+        delegate.sleep(sleepTime);
 
         // // server respond with failure code 503, service unavailable, add
         // // contact anyway
@@ -179,22 +180,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         // }
     }
 
-    public void ackContactAdded(String name) {
-        try {
-            delegate.shell("Request of subscription received").activate();
-            delegate.sleep(750);
-            delegate.button("OK").click();
-            delegate.sleep(750);
-        } catch (WidgetNotFoundException e) {
-            // ignore
-        }
-    }
+    // public void ackContactAdded(String name) {
+    // try {
+    // delegate.shell("Request of subscription received").activate();
+    // delegate.sleep(750);
+    // delegate.button("OK").click();
+    // delegate.sleep(750);
+    // } catch (WidgetNotFoundException e) {
+    // // ignore
+    // }
+    // }
 
-    public void addSarosRosterView() {
+    public void addSarosRosterView() throws RemoteException {
         openViewByName("Saros", "Roster");
     }
 
-    public void addSarosSessionView() {
+    public void addSarosSessionView() throws RemoteException {
         openViewByName("Saros", "Saros Session");
     }
 
@@ -210,24 +211,25 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
 
     public void doSarosConfiguration(String xmppServer, String jid,
-        String password) {
+        String password) throws RemoteException {
 
-        delegate.shell("Saros Configuration");
-        delegate.textWithLabel("Jabber Server").setText(xmppServer);
-        delegate.sleep(750);
-        delegate.textWithLabel("Username").setText(jid);
-        delegate.sleep(750);
-        delegate.textWithLabel("Password").setText(password);
-        delegate.sleep(750);
+        delegate.shell(SarosConstant.SAROS_CONFI_SHELL_TITLE);
+        setTextWithLabel(SarosConstant.TEXT_LABEL_JABBER_SERVER, xmppServer);
+        delegate.sleep(sleepTime);
+        setTextWithLabel(SarosConstant.TEXT_LABEL_USER_NAME, jid);
+        delegate.sleep(sleepTime);
+        setTextWithLabel(SarosConstant.TEXT_LABEL_PASSWORD, password);
+        delegate.sleep(sleepTime);
+
         while (delegate.button("Next >").isEnabled()) {
             delegate.button("Next >").click();
             log.debug("click Next > Button.");
-            delegate.sleep(750);
+            delegate.sleep(sleepTime);
         }
 
-        if (delegate.button("Finish").isEnabled()) {
-            delegate.button("Finish").click();
-            delegate.sleep(750);
+        if (isButtonEnabled(SarosConstant.BUTTON_FINISH)) {
+            clickButton(SarosConstant.BUTTON_FINISH);
+            delegate.sleep(sleepTime);
             return;
         } else {
             System.out.println("can't click finish button");
@@ -237,43 +239,48 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             "only set text fields and click Finish is implemented.");
     }
 
-    public boolean isConfigShellPoppedUp() {
-        try {
-            delegate.shell("Saros Configuration");
-            return true;
-        } catch (WidgetNotFoundException e) {
-            // ignore
-        }
-        return false;
-    }
+    // public boolean isConfigShellPoppedUp() throws RemoteException {
+    // try {
+    // delegate.shell("Saros Configuration");
+    // return true;
+    // } catch (WidgetNotFoundException e) {
+    // // ignore
+    // }
+    // return false;
+    // }
 
     public boolean isConnectedByXmppGuiCheck() throws RemoteException {
         if (!isRosterViewOpen())
             return false;
-        setFocusOnViewByTitle("Roster");
-        SWTBotToolbarButton toolbarButton = getXmppDisconnectButton();
+        setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        SWTBotToolbarButton toolbarButton = getToolbarButtonWithTooltipInViewWithTitle(
+            SarosConstant.VIEW_TITLE_ROSTER,
+            SarosConstant.TOOL_TIP_TEXT_DISCONNECT);
         return (toolbarButton != null && toolbarButton.isVisible());
     }
 
     public boolean isContactInRosterView(String contact) throws RemoteException {
         if (!isRosterViewOpen())
-            addSarosRosterView();
+            addSarosSessionView();
         if (!isConnectedByXmppGuiCheck())
             xmppConnect();
-        setFocusOnViewByTitle("Roster");
-        try {
-            SWTBotTree tree = delegate.viewByTitle("Roster").bot().tree();
-            if (tree != null) {
-                SWTBotTreeItem buddy = tree.getTreeItem("Buddies");
-                SWTBotTreeItem contact_added = buddy.getNode(contact).select();
-                delegate.sleep(1000);
-                return contact_added != null
-                    && contact_added.getText().equals(contact);
-            }
-        } catch (WidgetNotFoundException e) {
-            log.warn("Contact not found: " + contact, e);
-        }
-        return false;
+        setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        SWTBotTreeItem contact_added = selectTreeWithLabelsInViewWithTitle(
+            SarosConstant.VIEW_TITLE_ROSTER, "Buddies", contact);
+        return contact_added != null && contact_added.getText().equals(contact);
+        // try {
+        // SWTBotTree tree = delegate.viewByTitle("Roster").bot().tree();
+        // if (tree != null) {
+        // SWTBotTreeItem buddy = tree.getTreeItem("Buddies");
+        // SWTBotTreeItem contact_added = buddy.getNode(contact).select();
+        // delegate.sleep(1000);
+        // return contact_added != null
+        // && contact_added.getText().equals(contact);
+        // }
+        // } catch (WidgetNotFoundException e) {
+        // log.warn("Contact not found: " + contact, e);
+        // }
+        // return false;
     }
 
     public boolean isContactOnline(String contact) {
@@ -320,21 +327,25 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    public boolean isRosterViewOpen() {
-        return isViewOpen("Roster");
+    public boolean isRosterViewOpen() throws RemoteException {
+        return isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
-    public boolean isSharedSessionViewOpen() {
-        return isViewOpen("Shared Project Session");
+    public boolean isSharedSessionViewOpen() throws RemoteException {
+        return isViewOpen(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
     }
 
     /**
      * "Shared Project Session" View must be open
      */
     public void leaveSession() throws RemoteException {
-        setFocusOnViewByTitle("Shared Project Session");
-        delegate.viewByTitle("Shared Project Session")
-            .toolbarButton("Leave the session").click();
+        setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
+        clickToolbarButtonWithTooltipInViewWithTitle(
+            SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
+            SarosConstant.CONTEXT_MENU_LEAVE_THE_SESSION);
+        delegate.sleep(sleepTime);
+        // delegate.viewByTitle("Shared Project Session").toolbarButton(
+        // "Leave the session").click();
     }
 
     /**
@@ -345,24 +356,31 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             return;
         try {
 
-            SWTBotTree tree = delegate.viewByTitle("Roster").bot().tree();
-            if (tree != null) {
-                SWTBotTreeItem buddy = tree.getTreeItem("Buddies");
-                SWTBotTreeItem item = buddy.getNode(contact).select();
-                // remove by context menu
-                delegate.sleep(750);
-                item.contextMenu("Delete").click();
-                delegate.sleep(750);
-                // confirm delete
-                delegate.shell("Confirm Delete").activate();
-                delegate.sleep(750);
-                delegate.button("Yes").click();
+            clickContextMenuOfTreeInViewWithTitle(
+                SarosConstant.VIEW_TITLE_ROSTER,
+                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
+                contact);
+            // SWTBotTree tree = delegate.viewByTitle("Roster").bot().tree();
+            // if (tree != null) {
+            // SWTBotTreeItem buddy = tree.getTreeItem("Buddies");
+            // SWTBotTreeItem item = buddy.getNode(contact).select();
+            // // remove by context menu
+            // delegate.sleep(750);
+            // item.contextMenu("Delete").click();
+            // delegate.sleep(750);
+            // confirm delete
+            confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
+                SarosConstant.BUTTON_YES);
+            // activateShellByText(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
+            // delegate.sleep(sleepTime);
+            // clickButton(SarosConstant.BUTTON_YES);
+            // delegate.button("Yes").click();
 
-                // send backspace
-                // item.pressShortcut(0, '\b'); // 0 == don't add keystroke
+            // send backspace
+            // item.pressShortcut(0, '\b'); // 0 == don't add keystroke
 
-                delegate.sleep(1000);
-            }
+            delegate.sleep(sleepTime);
+            // }
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + contact, e);
         }
@@ -371,12 +389,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * Select the given invitee
      */
-    public void selectCheckBoxInvitation(String invitee) {
+    public void selectCheckBoxInvitation(String invitee) throws RemoteException {
         for (int i = 0; i < delegate.table().rowCount(); i++) {
             if (delegate.table().getTableItem(i).getText(0).equals(invitee)) {
                 delegate.table().getTableItem(i).check();
                 log.debug("found invitee: " + invitee);
-                delegate.sleep(750);
+                delegate.sleep(sleepTime);
                 return;
             }
         }
@@ -391,34 +409,38 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    /**
-     * Create a {@link ISarosSession} using context menu off the given project
-     * on package explorer view.
-     */
-    public void shareProject(String projectName) throws RemoteException {
-        SWTBotView view = delegate.viewByTitle("Package Explorer");
-        SWTBotTree tree = view.bot().tree().select(projectName);
-        SWTBotTreeItem item = tree.getTreeItem(projectName).select();
-        SWTBotMenu menu = item.contextMenu("Share project...");
-        menu.click();
-    }
+    // /**
+    // * Create a {@link ISarosSession} using context menu off the given project
+    // * on package explorer view.
+    // */
+    // public void clickProjectContextMenu(String projectName,
+    // String nameOfContextMenu) throws RemoteException {
+    // SWTBotView view = delegate.viewByTitle("Package Explorer");
+    // SWTBotTree tree = view.bot().tree().select(projectName);
+    // SWTBotTreeItem item = tree.getTreeItem(projectName).select();
+    // SWTBotMenu menu = item.contextMenu(nameOfContextMenu);
+    // menu.click();
+    // }
 
     /**
      * This method captures two screenshots as side effect.
      */
-    public void shareProject(String projectName, String invitee)
-        throws RemoteException {
+    public void shareProject(String projectName, String nameOfContextMenu,
+        String invitee) throws RemoteException {
 
-        shareProject(projectName);
+        // clickProjectContextMenu(projectName, nameOfContextMenu);
+        clickContextMenuOfTreeInViewWithTitle(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nameOfContextMenu,
+            projectName);
         captureScreenshot(TEMPDIR + "/shareProjectStep1.png");
         selectCheckBoxInvitation(invitee);
         captureScreenshot(TEMPDIR + "/shareProjectStep2.png");
         delegate.button("Finish").click();
     }
 
-    public void shareProjectSequential(String projectName, List<String> invitees)
-        throws RemoteException {
-        shareProject(projectName, invitees.remove(0));
+    public void shareProjectSequential(String projectName,
+        String nameOfContextMenu, List<String> invitees) throws RemoteException {
+        shareProject(projectName, nameOfContextMenu, invitees.remove(0));
         for (String toInvite : invitees)
             inviteToProject(toInvite);
     }
@@ -428,23 +450,31 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException {
-        shareProject(projectName);
+        clickContextMenuOfTreeInViewWithTitle(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+            SarosConstant.SHARE_PROJECT, projectName);
+        // clickProjectContextMenu(projectName, "Share project...");
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
         selectCheckBoxInvitation(invitees);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
-        delegate.button("Finish").click();
+        // delegate.button("Finish").click();
+        clickButton(SarosConstant.BUTTON_FINISH);
     }
 
     /**
      * Roster must be open
      */
     public void xmppConnect() throws RemoteException {
-        setFocusOnViewByTitle("Roster");
-        while (delegate.viewByTitle("Roster").toolbarButton("Connect") == null
-            || !delegate.viewByTitle("Roster").toolbarButton("Connect")
-                .isEnabled())
-            delegate.sleep(100);
-        delegate.viewByTitle("Roster").toolbarButton("Connect").click();
+        setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        clickToolbarButtonWithTooltipInViewWithTitle(
+            SarosConstant.VIEW_TITLE_ROSTER,
+            SarosConstant.TOOL_TIP_TEXT_CONNECT);
+        // while (delegate.viewByTitle("Roster").toolbarButton("Connect") ==
+        // null
+        // || !delegate.viewByTitle("Roster").toolbarButton("Connect")
+        // .isEnabled())
+        // delegate.sleep(100);
+        // delegate.viewByTitle("Roster").toolbarButton("Connect").click();
 
     }
 
@@ -452,56 +482,42 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Roster must be open
      */
     public boolean xmppDisconnect() throws RemoteException {
-        setFocusOnViewByTitle("Roster");
-        // disconnect from xmpp
-        if (delegate.viewByTitle("Roster") != null) {
-            for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle(
-                "Roster").getToolbarButtons()) {
-                String s = toolbarButton.getToolTipText();
-                log.debug("tip:" + s);
-                if (s.matches("Disconnect.*")) {
-                    delegate.sleep(750);
-                    toolbarButton.click();
-                    return true;
-                }
-            }
-        }
-        return false;
+        setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        return clickToolbarButtonWithTooltipInViewWithTitle(
+            SarosConstant.VIEW_TITLE_ROSTER,
+            SarosConstant.TOOL_TIP_TEXT_DISCONNECT) != null;
+
     }
 
     /*********** not exported Helper Methods *****************/
 
-    protected SWTBotToolbarButton getXmppDisconnectButton() {
-        for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle("Roster")
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches("Disconnect.*")) {
-                return toolbarButton;
-            }
-        }
-
-        return null;
-    }
+    // protected SWTBotToolbarButton getXmppDisconnectButton() {
+    // for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle("Roster")
+    // .getToolbarButtons()) {
+    // if (toolbarButton.getToolTipText().matches("Disconnect.*")) {
+    // return toolbarButton;
+    // }
+    //
+    // }
+    //
+    // return null;
+    // }
 
     public void follow(String participantJID, String sufix)
         throws RemoteException {
         if (!isSharedSessionViewOpen())
             addSarosSessionView();
-        setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
-        try {
-            SWTBotTable table = delegate
-                .viewByTitle(BotConfiguration.NAME_SESSION_VIEW).bot().table();
-            if (table != null) {
-                SWTBotTableItem item = table.getTableItem(participantJID
-                    + sufix);
-                delegate.sleep(750);
-                SWTBotMenu menu = item.contextMenu("Follow this user");
-                delegate.sleep(750);
-                menu.click();
-                delegate.sleep(750);
-            }
-        } catch (WidgetNotFoundException e) {
-            log.warn("Driver not found: " + participantJID, e);
-        }
+        clickContextMenuOfTableInViewWithTitle(
+            BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
+            SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER);
+    }
+
+    public void giveDriverRole(String inviteeJID) throws RemoteException {
+        if (!isSharedSessionViewOpen())
+            addSarosSessionView();
+        clickContextMenuOfTableInViewWithTitle(
+            BotConfiguration.NAME_SESSION_VIEW, inviteeJID,
+            SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
     }
 
     public boolean isInFollowMode(String participantJID, String sufix)
@@ -509,22 +525,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (!isSharedSessionViewOpen())
             addSarosSessionView();
         setFocusOnViewByTitle(BotConfiguration.NAME_SESSION_VIEW);
-        try {
-            SWTBotTable table = delegate
-                .viewByTitle(BotConfiguration.NAME_SESSION_VIEW).bot().table();
-            if (table != null) {
-                SWTBotTableItem item;
 
-                item = table.getTableItem(participantJID + sufix);
-                log.error("item: " + item.getText());
-                SWTBotMenu menu = item.contextMenu("Stop following this user");
-                if (menu != null)
-                    return true;
-            }
-            return false;
-        } catch (WidgetNotFoundException e) {
-            log.warn("Driver not found: " + participantJID, e);
-            return false;
-        }
+        return existContextMenuOfTableItemOnView(
+            BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
+            SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
+
     }
+
 }

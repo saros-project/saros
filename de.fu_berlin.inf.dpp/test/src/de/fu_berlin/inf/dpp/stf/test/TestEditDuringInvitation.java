@@ -24,12 +24,13 @@ public class TestEditDuringInvitation {
      * There should not be an inconsistency.
      */
     // bots
-    protected Musician alice;
-    protected Musician bob;
-    protected Musician carl;
+    protected static Musician alice;
+    protected static Musician bob;
+    protected static Musician carl;
 
     @BeforeClass
-    public void configureCarl() throws RemoteException, NotBoundException {
+    public static void configureCarl() throws RemoteException,
+        NotBoundException {
         carl = new Musician(new JID(BotConfiguration.JID_CARL),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_CARL,
             BotConfiguration.PORT_CARL);
@@ -37,7 +38,7 @@ public class TestEditDuringInvitation {
     }
 
     @BeforeClass
-    public void configureBob() throws RemoteException, NotBoundException {
+    public static void configureBob() throws RemoteException, NotBoundException {
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
@@ -45,7 +46,8 @@ public class TestEditDuringInvitation {
     }
 
     @BeforeClass
-    public void configureInviter() throws RemoteException, NotBoundException {
+    public static void configureInviter() throws RemoteException,
+        NotBoundException {
         alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
@@ -95,8 +97,7 @@ public class TestEditDuringInvitation {
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
-        carl
-            .ackProjectStep2UsingNewproject(alice, BotConfiguration.PACKAGENAME);
+        carl.ackProjectStep2UsingNewproject(alice, BotConfiguration.PACKAGENAME);
 
         String textFromCarl = carl.getTextOfClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);

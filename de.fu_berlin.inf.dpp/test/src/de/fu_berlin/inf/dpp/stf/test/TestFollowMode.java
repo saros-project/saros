@@ -12,6 +12,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestFollowMode {
     // bots
@@ -20,28 +21,22 @@ public class TestFollowMode {
 
     @Before
     public void configureInvitee() throws RemoteException, NotBoundException {
+
         invitee = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        invitee.initRmi();
-        invitee.activeMusican();
-        invitee.openPerspective("Java");
-        invitee.openSarosViews();
+        invitee.initBot();
 
-        invitee.xmppConnect();
     }
 
     @Before
     public void configureInviter() throws RemoteException, NotBoundException {
+
         inviter = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        inviter.initRmi();
-        inviter.activeMusican();
-        inviter.openPerspective("Java");
-        inviter.openSarosViews();
+        inviter.initBot();
 
-        inviter.xmppConnect();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
@@ -60,35 +55,32 @@ public class TestFollowMode {
 
     @Test
     public void testShareProject() throws RemoteException {
-        inviter.shareProject(invitee, BotConfiguration.PROJECTNAME);
-        invitee.waitOnWindowByTitle("Session Invitation");
-        invitee.ackProject(inviter, BotConfiguration.PROJECTNAME);
+        inviter.buildSession(invitee, BotConfiguration.PROJECTNAME,
+            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
+
         invitee.openFile(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
-        inviter.typeInTextInClass(BotConfiguration.CONTENTPATH,
+        inviter.setTextInClass(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
-        invitee.sleep(750);
         invitee.follow(inviter);
-        invitee.sleep(750);
+        invitee.sleep(1000);
         assertTrue(invitee.isInFollowMode(inviter));
-        invitee.sleep(750);
+
         inviter.createJavaClassInProject(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME2);
-        inviter.sleep(2000);
+        inviter.sleep(1000);
         assertTrue(invitee.isEditorActive(BotConfiguration.CLASSNAME2));
-        inviter.sleep(750);
 
         inviter.follow(invitee);
-        inviter.sleep(750);
+        inviter.sleep(1000);
         assertTrue(inviter.isInFollowMode(invitee));
-        inviter.sleep(750);
+
         invitee.activeEditor(BotConfiguration.CLASSNAME);
-        invitee.sleep(2000);
+        invitee.sleep(750);
         assertTrue(inviter.isEditorActive(BotConfiguration.CLASSNAME));
-        inviter.sleep(750);
 
     }
 }

@@ -39,6 +39,8 @@ public class BotConfiguration {
     public final static String NAME_SESSION_VIEW = "Shared Project Session";
     public final static String NAME_CHAT_VIEW = "Chat View";
 
+    public final static String SVN_URL = "http://swtbot-examples.googlecode.com/svn";
+
     /**
      * VM test accounts
      */
@@ -77,18 +79,27 @@ public class BotConfiguration {
     /**
      * Local test accounts
      */
-    private final static String JID_ALICE_LOCAL = ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_ALICE_LOCAL = "lin";
+    // private final static String JID_ALICE_LOCAL =
+    // ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_ALICE_LOCAL = "lin";
+    private final static String JID_ALICE_LOCAL = ("alice1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
     private final static String HOST_ALICE_LOCAL = "localhost";
     private final static int PORT_ALICE_LOCAL = 12345;
 
-    private final static String JID_BOB_LOCAL = ("lin2@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_BOB_LOCAL = "lin2";
+    // private final static String JID_BOB_LOCAL =
+    // ("lin2@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_BOB_LOCAL = "lin2";
+    private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
     private final static String HOST_BOB_LOCAL = "localhost";
     private final static int PORT_BOB_LOCAL = 12346;
 
-    private final static String JID_CARL_LOCAL = ("carl_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_CARL_LOCAL = "carl";
+    // private final static String JID_CARL_LOCAL =
+    // ("lin3@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_CARL_LOCAL = "lin3";
+    private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
     private final static String HOST_CARL_LOCAL = "localhost";
     private final static int PORT_CARL_LOCAL = 12347;
 

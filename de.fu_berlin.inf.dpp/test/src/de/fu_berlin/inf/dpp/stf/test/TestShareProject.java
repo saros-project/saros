@@ -13,6 +13,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestShareProject {
     // bots
@@ -24,12 +25,7 @@ public class TestShareProject {
         invitee = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        invitee.initRmi();
-        invitee.activeMusican();
-
-        invitee.openSarosViews();
-        invitee.openPerspective("Java");
-        invitee.xmppConnect();
+        invitee.initBot();
     }
 
     @Before
@@ -37,12 +33,7 @@ public class TestShareProject {
         inviter = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        inviter.initRmi();
-        inviter.activeMusican();
-
-        inviter.openSarosViews();
-        inviter.openPerspective("Java");
-        inviter.xmppConnect();
+        inviter.initBot();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
@@ -60,19 +51,16 @@ public class TestShareProject {
 
     @Test
     public void testShareProject() throws RemoteException {
-        invitee.waitForConnect();
-        inviter.waitForConnect();
 
-        inviter.shareProject(invitee, BotConfiguration.PROJECTNAME);
-        invitee.waitOnWindowByTitle("Session Invitation");
-        invitee.ackProject(inviter, BotConfiguration.PROJECTNAME);
+        inviter.buildSession(invitee, BotConfiguration.PROJECTNAME,
+            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
 
         invitee.captureScreenshot(invitee.getPathToScreenShot()
             + "/invitee_in_sharedproject.png");
         inviter.captureScreenshot(inviter.getPathToScreenShot()
             + "/inviter_in_sharedproject.png");
 
-        inviter.typeInTextInClass(BotConfiguration.CONTENTPATH,
+        inviter.setTextInClass(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 

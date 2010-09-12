@@ -17,23 +17,26 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void accountBySarosMenu(String server, String username,
         String password) throws RemoteException;
 
-    public void ackContactAdded(String bareJid) throws RemoteException;
+    // public void ackContactAdded(String bareJid) throws RemoteException;
 
     /**
      * First acknowledge of a new Session initiated by the given inviter.
      */
-    public void ackProject1(String inviter) throws RemoteException;
+    public void ackProjectStep1(String inviter) throws RemoteException;
 
     /**
      * Acknowledge the given Project creating a new Project in your workspace
      */
-    public void ackNewProject2(String projectName) throws RemoteException;
+    public void ackProjectStep2UsingNewProject(String projectName)
+        throws RemoteException;
+
+    public void ackProjectStep2UsingExistProject(String projectName)
+        throws RemoteException;
+
+    public void ackProjectStep2UsingExistProjectWithCopy(String projectName)
+        throws RemoteException;
 
     public void addNewContact(String name) throws RemoteException;
-
-    public void addSarosRosterView() throws RemoteException;
-
-    public void addSarosSessionView() throws RemoteException;
 
     public void addToSharedProject(String bareJid) throws RemoteException;
 
@@ -43,7 +46,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void doSarosConfiguration(String xmppServer, String jid,
         String password) throws RemoteException;
 
-    public boolean isConfigShellPoppedUp() throws RemoteException;
+    // public boolean isConfigShellPoppedUp() throws RemoteException;
 
     /**
      * It returns true if the GUI on the {@link RosterView} is showing the
@@ -72,16 +75,17 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void removeContact(String name) throws RemoteException;
 
-    /**
-     * It shares a project, but cancel the interface popped up
-     */
-    public void shareProject(String projectName) throws RemoteException;
+    // /**
+    // * It shares a project, but cancel the interface popped up
+    // */
+    // public void clickProjectContextMenu(String projectName,
+    // String nameOfContextMenu) throws RemoteException;
 
-    public void shareProject(String projectName, String invitee)
-        throws RemoteException;
+    public void shareProject(String projectName, String nameOfContextMenu,
+        String invitee) throws RemoteException;
 
-    public void shareProjectSequential(String projectName, List<String> invitees)
-        throws RemoteException;
+    public void shareProjectSequential(String projectName,
+        String nameOfContextMenu, List<String> invitees) throws RemoteException;
 
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException;
@@ -93,7 +97,10 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void follow(String participantJID, String sufix)
         throws RemoteException;
 
+    public void giveDriverRole(String inviteeJID) throws RemoteException;
+
     public boolean isInFollowMode(String participantJID, String sufix)
         throws RemoteException;
 
+    public void selectCheckBoxInvitation(String invitee) throws RemoteException;
 }
