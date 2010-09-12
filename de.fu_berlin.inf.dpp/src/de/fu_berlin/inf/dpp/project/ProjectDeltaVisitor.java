@@ -160,11 +160,8 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
         switch (kind) {
         case IResourceDelta.CHANGED:
-            // The file's timestamp changed.
-            if (!isContentChange(delta))
-                return;
-
-            addCreatedUnlessOpen(resource);
+            if (isContentChange(delta))
+                addCreatedUnlessOpen(resource);
             return;
 
         case IResourceDelta.ADDED:
@@ -288,7 +285,8 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     /**
-     * Returns true if the CONTENT flag is set.
+     * Returns true if the CONTENT flag is set, which means that the file's
+     * timestamp changed.
      */
     protected boolean isContentChange(IResourceDelta delta) {
         return ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
