@@ -1,6 +1,11 @@
 package de.fu_berlin.inf.dpp.project;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.subscribers.ISubscriberChangeEvent;
+import org.eclipse.team.core.subscribers.ISubscriberChangeListener;
+import org.eclipse.team.core.subscribers.Subscriber;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -19,7 +24,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
  * project.<br>
  * TODO Rename to SharedProjectState?
  */
-public class SharedProject {
+public class SharedProject implements ISubscriberChangeListener {
     /**
      * A value of type E with a convenient update method to check if the value
      * was changed.
@@ -51,6 +56,8 @@ public class SharedProject {
         }
     }
 
+    private static final Logger log = Logger.getLogger(SharedProject.class);
+
     protected final ISarosSession sarosSession;
 
     protected final IProject project;
@@ -64,10 +71,13 @@ public class SharedProject {
 
     protected UpdatableValue<String> vcsRevision;
 
+    protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
+        false);
+
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user) {
-            if (sarosSession.isDriver())
+            if (isDriver.update(sarosSession.isDriver()))
                 initializeVCSInformation();
         }
     };
@@ -83,7 +93,9 @@ public class SharedProject {
         boolean useVersionControl = sarosSession.useVersionControl();
         if (useVersionControl) {
             sarosSession.addListener(sharedProjectListener);
-            if (sarosSession.isDriver())
+            boolean isDriver = sarosSession.isDriver();
+            this.isDriver.update(isDriver);
+            if (isDriver)
                 initializeVCSInformation();
         }
     }
@@ -93,6 +105,13 @@ public class SharedProject {
         this.vcs = new UpdatableValue<VCSAdapter>(vcs);
         if (vcs == null)
             return;
+        RepositoryProvider provider = RepositoryProvider.getProvider(project);
+        Subscriber subscriber = provider.getSubscriber();
+        if (subscriber != null)
+            subscriber.addListener(this);
+        else
+            log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
+
         VCSResourceInformation info = vcs.getResourceInformation(project);
         vcsUrl = new UpdatableValue<String>(info.repositoryRoot + info.path);
         vcsRevision = new UpdatableValue<String>(info.revision);
@@ -130,5 +149,23 @@ public class SharedProject {
      */
     public boolean belongsTo(IProject project) {
         return this.project.equals(project);
+    }
+
+    public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
+        String s = "subscriberResourceChanged:\n";
+        for (ISubscriberChangeEvent delta : deltas) {
+            int flags = delta.getFlags();
+            if (flags == ISubscriberChangeEvent.NO_CHANGE)
+                s += "0";
+            if ((flags & ISubscriberChangeEvent.SYNC_CHANGED) != 0)
+                s += "S";
+            if ((flags & ISubscriberChangeEvent.ROOT_ADDED) != 0)
+                s += "+";
+            if ((flags & ISubscriberChangeEvent.ROOT_REMOVED) != 0)
+                s += "-";
+            s += " " + delta.getResource().getFullPath().toPortableString()
+                + "\n";
+        }
+        log.trace(s);
     }
 }

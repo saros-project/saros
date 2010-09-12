@@ -39,6 +39,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
@@ -157,6 +162,15 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     };
 
+    private IJobChangeListener jobChangeListener = new JobChangeAdapter() {
+        @Override
+        public void done(IJobChangeEvent event) {
+            Job job = event.getJob();
+            log.trace("Job " + job.getName() + " done");
+            job.removeJobChangeListener(jobChangeListener);
+        }
+    };
+
     public SharedResourcesManager(ISessionManager sessionManager,
         StopManager stopManager) {
         this.sessionManager = sessionManager;
@@ -182,6 +196,16 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             return;
         }
 
+        if (log.isTraceEnabled()) {
+            IJobManager jobManager = Job.getJobManager();
+            Job currentJob = jobManager.currentJob();
+            if (currentJob != null) {
+                currentJob.addJobChangeListener(jobChangeListener);
+                log.trace("currentJob='" + currentJob.getName() + "'");
+                // if (currentJob.getName().equals("SVN Switch"))
+                // return;
+            }
+        }
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
             // Creations, deletions, modifications of files and folders.
             handlePostChange(event);
@@ -266,6 +290,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 }
             }
         });
+        log.trace("Sending activities " + orderedActivities.toString());
     }
 
     /**
