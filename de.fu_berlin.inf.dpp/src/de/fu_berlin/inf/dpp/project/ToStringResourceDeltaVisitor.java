@@ -73,6 +73,12 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
         }
         IResource resource = delta.getResource();
         if (resource != null) {
+            if (resource.isDerived())
+                sb.append("* ");
+            if (resource.isPhantom())
+                sb.append("P ");
+            if (resource.isHidden())
+                sb.append("H ");
             sb.append(resource.getFullPath().toPortableString());
             IProject project = resource.getProject();
             if (project != null) {
