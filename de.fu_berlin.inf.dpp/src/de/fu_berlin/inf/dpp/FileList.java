@@ -45,7 +45,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
@@ -340,7 +339,7 @@ public class FileList {
         VCSAdapter vcs = null;
         if (useVersionControl) {
             project = resources[0].getProject();
-            vcs = VCSAdapterFactory.getAdapter(project);
+            vcs = VCSAdapter.getAdapter(project);
             if (vcs != null) {
                 String providerID = vcs.getProviderID(project);
 

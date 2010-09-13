@@ -67,7 +67,6 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -504,8 +503,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         // Connect is special since the project doesn't have a VCSAdapter
         // yet.
-        final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapterFactory
-            .getAdapter(revision) : VCSAdapterFactory.getAdapter(project);
+        final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapter
+            .getAdapter(revision) : VCSAdapter.getAdapter(project);
         if (vcs == null) {
             log.error("Could not execute VCS activity.");
             return;

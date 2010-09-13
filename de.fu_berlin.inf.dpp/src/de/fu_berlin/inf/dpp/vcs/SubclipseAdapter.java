@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.RepositoryProviderType;
 import org.eclipse.team.core.TeamException;
 import org.tigris.subversion.subclipse.core.ISVNLocalFolder;
 import org.tigris.subversion.subclipse.core.ISVNLocalResource;
@@ -38,12 +39,18 @@ import de.fu_berlin.inf.dpp.FileList;
  * 
  * @author ahaferburg
  */
-class SubclipseAdapter implements VCSAdapter {
-    private static final Logger log = Logger.getLogger(SubclipseAdapter.class);
-
+class SubclipseAdapter extends VCSAdapter {
     static final String identifier = "org.tigris.subversion.subclipse.core.svnnature";
-    RepositoryProvider provider;
 
+    @SuppressWarnings("hiding")
+    protected static final Logger log = Logger
+        .getLogger(SubclipseAdapter.class);
+
+    public SubclipseAdapter(RepositoryProviderType provider) {
+        super(provider);
+    }
+
+    @Override
     public boolean isInManagedProject(IResource resource) {
         boolean underVCS;
         IProject project = resource.getProject();
@@ -54,14 +61,7 @@ class SubclipseAdapter implements VCSAdapter {
         return identifier.equals(getProviderID(resource));
     }
 
-    public String getProviderID(IResource resource) {
-        IProject project = resource.getProject();
-        RepositoryProvider provider = RepositoryProvider.getProvider(project);
-        String vcsIdentifier = provider.getID();
-
-        return vcsIdentifier;
-    }
-
+    @Override
     public boolean isManaged(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
@@ -76,23 +76,7 @@ class SubclipseAdapter implements VCSAdapter {
         return result;
     }
 
-    public String getRevisionString(IResource resource) {
-        ISVNLocalResource svnResource = SVNWorkspaceRoot
-            .getSVNResourceFor(resource);
-        SVNRevision revision;
-        try {
-            if (!svnResource.isManaged())
-                return null;
-            revision = svnResource.getRevision();
-        } catch (SVNException e) {
-            e.printStackTrace();
-            return null;
-        }
-        if (revision == null)
-            return null;
-        return revision.toString();
-    }
-
+    @Override
     public String getRepositoryString(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
@@ -112,6 +96,7 @@ class SubclipseAdapter implements VCSAdapter {
         return null;
     }
 
+    @Override
     public IProject checkoutProject(String newProjectName, FileList fileList,
         SubMonitor monitor) {
         ISVNRepositoryLocation loc;
@@ -157,11 +142,7 @@ class SubclipseAdapter implements VCSAdapter {
         return result;
     }
 
-    /** It is unclear under which circumstances this exception is thrown. */
-    protected void undocumentedException(Exception e) {
-        log.error("Undocumented exception", e);
-    }
-
+    @Override
     public String getProjectPath(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
@@ -178,6 +159,7 @@ class SubclipseAdapter implements VCSAdapter {
         return null;
     }
 
+    @Override
     public void update(IResource resource, String targetRevision,
         IProgressMonitor monitor) {
         String taskName = "Updating " + resource.getName() + " to revision "
@@ -217,6 +199,7 @@ class SubclipseAdapter implements VCSAdapter {
         }
     }
 
+    @Override
     public VCSResourceInformation getResourceInformation(IResource resource) {
         VCSResourceInformation info = new VCSResourceInformation();
         info.repositoryRoot = getRepositoryString(resource);
@@ -225,6 +208,7 @@ class SubclipseAdapter implements VCSAdapter {
         return info;
     }
 
+    @Override
     public void switch_(IResource resource, String url, String revisionString,
         IProgressMonitor monitor) {
         if (resource == null)
@@ -266,6 +250,7 @@ class SubclipseAdapter implements VCSAdapter {
         }
     }
 
+    @Override
     public void connect(IProject project, String repositoryRoot,
         String directory, IProgressMonitor monitor) {
         // cf
@@ -307,6 +292,7 @@ class SubclipseAdapter implements VCSAdapter {
         }
     }
 
+    @Override
     public boolean hasLocalCache(IProject project) {
         // cf org.tigris.subversion.subclipse.ui.wizards.sharing.SharingWizard
         boolean isSVNFolder = false;
@@ -320,6 +306,7 @@ class SubclipseAdapter implements VCSAdapter {
         return isSVNFolder;
     }
 
+    @Override
     public void disconnect(IProject project, boolean deleteContent,
         IProgressMonitor monitor) {
         // cf org.tigris.subversion.subclipse.ui.actions.UnmanageAction

@@ -74,7 +74,6 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
@@ -254,7 +253,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
             }
         }
 
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(this.remoteFileList
+        VCSAdapter vcs = VCSAdapter.getAdapter(this.remoteFileList
             .getVcsProviderID());
 
         assignLocalProject(baseProject, newProjectName, vcs, monitor);

@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
@@ -82,7 +81,7 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
             sb.append(resource.getFullPath().toPortableString());
             IProject project = resource.getProject();
             if (project != null) {
-                VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+                VCSAdapter vcs = VCSAdapter.getAdapter(project);
                 if (vcs != null) {
                     VCSResourceInformation info = vcs
                         .getResourceInformation(resource);

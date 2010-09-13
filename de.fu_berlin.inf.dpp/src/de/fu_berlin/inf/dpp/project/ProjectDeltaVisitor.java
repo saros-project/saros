@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
@@ -60,7 +59,7 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             if (!project.isOpen())
                 return false;
 
-            VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+            VCSAdapter vcs = VCSAdapter.getAdapter(project);
             VCSAdapter oldVcs = sharedProject.getVCSAdapter();
             if (sharedProject.updateVcs(vcs)) {
                 if (vcs == null) {

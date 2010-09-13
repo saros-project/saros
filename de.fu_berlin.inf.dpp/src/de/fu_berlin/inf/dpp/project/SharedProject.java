@@ -9,7 +9,6 @@ import org.eclipse.team.core.subscribers.Subscriber;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
@@ -101,7 +100,7 @@ public class SharedProject implements ISubscriberChangeListener {
     }
 
     protected void initializeVCSInformation() {
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(project);
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
         this.vcs = new UpdatableValue<VCSAdapter>(vcs);
         if (vcs == null)
             return;
