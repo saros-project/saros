@@ -258,7 +258,7 @@ public class MessagingManager implements IConnectionListener,
                 }
             }
 
-            if (createdRoom) {
+            if (sessionManager.getSarosSession().isHost()) {
                 try {
                     // Get the the room's configuration form
                     Form form = muc.getConfigurationForm();
