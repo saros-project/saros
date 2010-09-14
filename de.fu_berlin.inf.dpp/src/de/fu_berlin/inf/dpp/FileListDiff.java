@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -205,21 +205,13 @@ public class FileListDiff {
                 // SubMonitor monitor = (SubMonitor) progress;// doesn't work?
                 for (IPath path : toDelete) {
                     monitor.subTask("Deleting " + path.lastSegment());
-                    if (path.hasTrailingSeparator()) {
-                        IFolder folder = localProject.getFolder(path);
+                    IResource resource = path.hasTrailingSeparator() ? localProject
+                        .getFolder(path) : localProject.getFile(path);
 
-                        if (folder.exists()) {
-                            folder.delete(true, monitor.newChild(1));
-                        }
-
-                    } else {
-                        IFile file = localProject.getFile(path);
-
-                        // check if file exists because it might have already
-                        // been deleted when deleting its folder
-                        if (file.exists()) {
-                            file.delete(true, monitor.newChild(1));
-                        }
+                    // Check if resource exists because it might have already
+                    // been deleted when deleting its folder
+                    if (resource.exists()) {
+                        resource.delete(true, monitor.newChild(1));
                     }
                 }
             }
