@@ -10,7 +10,6 @@ import org.eclipse.team.core.RepositoryProviderType;
 import org.eclipse.team.core.TeamException;
 import org.eclipse.team.core.subscribers.Subscriber;
 import org.eclipse.team.core.synchronize.SyncInfo;
-import org.eclipse.team.core.variants.IResourceVariant;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -71,9 +70,6 @@ public abstract class VCSAdapter {
         }
         if (syncInfo == null)
             return null;
-        IResourceVariant base = syncInfo.getBase();
-        if (base != null)
-            log.error("" + base.getName() + " " + base.getContentIdentifier());
         return syncInfo.getLocalContentIdentifier();
     }
 
