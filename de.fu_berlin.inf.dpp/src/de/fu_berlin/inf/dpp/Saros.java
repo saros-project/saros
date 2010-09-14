@@ -764,42 +764,27 @@ public class Saros extends AbstractUIPlugin {
             if (cause instanceof SaslException) {
                 Util.popUpFailureMessage("Error Connecting via SASL",
                     cause.getMessage(), failSilently);
-            } else if (cause instanceof UnknownHostException) {
-                log.info("Unknown host: " + cause);
-
-                // HACK Duplicate code.
-                /**
-                 * Only an error message was displayed: if a server was
-                 * unreachable. Now, the connection preferences will pop up if
-                 * the user decides to.
-                 */
-
-                boolean ok = Util.popUpYesNoQuestion("Error Connecting",
-                    "Error Connecting to XMPP server: '" + server
-                        + "'.\n\nDo you want to use other parameters?",
-                    failSilently);
-
-                if (ok) {
-                    ok = Util.showConfigurationWizard(true, false);
-                    if (ok)
-                        connect(failSilently);
-                }
-
             } else {
-                log.info("xmpp: " + cause.getMessage(), cause);
+                String question;
+                if (cause instanceof UnknownHostException) {
+                    log.info("Unknown host: " + cause);
 
-                boolean ok = Util.popUpYesNoQuestion("Error Connecting",
-                    "Could not connect to server '" + server + "' as user '"
-                        + username + "'. Do You want to use other parameters?",
-                    failSilently);
+                    question = "Error Connecting to XMPP server: '" + server
+                        + "'.\n\nDo you want to use other parameters?";
+                } else {
+                    log.info("xmpp: " + cause.getMessage(), cause);
 
-                if (ok) {
-                    ok = Util.showConfigurationWizard(true, false);
-                    if (ok)
+                    question = "Could not connect to server '" + server
+                        + "' as user '" + username
+                        + "'. Do You want to use other parameters?";
+                }
+                boolean showConfigurationWizard = Util.popUpYesNoQuestion(
+                    "Error Connecting", question, failSilently);
+                if (showConfigurationWizard) {
+                    if (Util.showConfigurationWizard(true, false))
                         connect(failSilently);
                 }
             }
-
         } catch (Exception e) {
             log.warn("Unhandled exception:", e);
             setConnectionState(ConnectionState.ERROR, e);
