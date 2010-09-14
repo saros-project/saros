@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 /**
- * Vector time is a concept used in almost all OT algorithms to determine
- * causality relations of operations.
+ * Vector time is a concept used in almost all Operational Transformation
+ * algorithms to determine causality relations of operations.
  */
 public interface VectorTime extends Timestamp {
 

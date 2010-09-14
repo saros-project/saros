@@ -99,7 +99,8 @@ public class ActivitySequencer {
     /**
      * A priority queue for timed activityDataObjects. Fore each remote user
      * there is one ActivityQueue, in which received events from those are
-     * stored. TODO "Timestamps" are treated more like consecutive sequence
+     * stored.
+     * TODO "Timestamps" are treated more like consecutive sequence
      * numbers, so may be all names and documentation should be changed to
      * reflect this.
      */

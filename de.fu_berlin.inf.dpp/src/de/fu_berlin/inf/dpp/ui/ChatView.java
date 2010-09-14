@@ -249,21 +249,20 @@ public class ChatView extends ViewPart {
         this.inputText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.keyCode) {
-                case SWT.CR:
-                case SWT.KEYPAD_CR:
-                    if (e.stateMask == 0) {
-                        String text = ChatView.this.inputText.getText();
-                        text = text.trim();
-                        ChatView.this.inputText.setText("");
+                if (!(e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR))
+                    return;
+                if (e.stateMask != 0)
+                    return;
+                e.doit = false; // Don't append the '\n'.
 
-                        if (!text.equals("")
-                            && messagingManager.getSession() != null) {
-                            messagingManager.getSession().sendMessage(text);
-                        }
-                        e.doit = false;
-                    }
-                    break;
+                String text = ChatView.this.inputText.getText();
+                text = text.trim();
+                ChatView.this.inputText.setText("");
+
+                MessagingManager.SessionProvider session = messagingManager
+                    .getSession();
+                if (!text.equals("") && session != null) {
+                    session.sendMessage(text);
                 }
             }
         });

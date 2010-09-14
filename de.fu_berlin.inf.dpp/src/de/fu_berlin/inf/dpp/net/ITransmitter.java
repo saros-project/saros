@@ -158,7 +158,7 @@ public interface ITransmitter {
         SubMonitor monitor, boolean b) throws IOException,
         SarosCancellationException;
 
-    // FIXME Javadoc. Why is an invitationID needed?
+    // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,

@@ -50,7 +50,7 @@ public class PartialNewSessionAction extends GeneralNewSessionAction {
         if (dialog.open() == Window.OK) {
             Util.runSafeSync(log, new Runnable() {
                 public void run() {
-                    runNewSession(dialog.getSelectedResources(), true);
+                    runNewSession(dialog.getSelectedResources(), false);
                 }
             });
         }

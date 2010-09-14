@@ -21,9 +21,9 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         this.activityListeners.remove(listener);
     }
 
-    public void fireActivity(IActivity activityDataObject) {
+    public void fireActivity(IActivity activity) {
         for (IActivityListener activityListener : activityListeners) {
-            activityListener.activityCreated(activityDataObject);
+            activityListener.activityCreated(activity);
         }
     }
 

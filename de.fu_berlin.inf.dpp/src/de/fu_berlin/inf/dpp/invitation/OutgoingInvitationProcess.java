@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * @author rdjemili
  * @author sotitas
  */
-
 public class OutgoingInvitationProcess extends InvitationProcess {
 
     private final static Logger log = Logger

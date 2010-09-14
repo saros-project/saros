@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
@@ -436,10 +437,21 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
                 if (e.getMessage() == null) { // remote user canceled purposely
 
+                    SessionView.showNotification("Canceled Invitation", peer
+                        + " has canceled your Invitation.");
+
                     return new Status(IStatus.ERROR, Saros.SAROS, peer
                         + " has canceled your Invitation.");
 
                 } else {
+
+                    SessionView
+                        .showNotification(
+                            "Error during Invitation",
+                            "Your invitation to "
+                                + peer
+                                + " has been canceled remotely because of an error:\n\n"
+                                + e.getMessage());
 
                     return new Status(
                         IStatus.ERROR,

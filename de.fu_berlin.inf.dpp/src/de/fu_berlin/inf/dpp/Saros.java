@@ -166,6 +166,8 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
  */
 @Component(module = "core")
 public class Saros extends AbstractUIPlugin {
+    private static final int REFRESH_SECONDS = 3;
+
     /**
      * The single instance of the Saros plugin.
      */
@@ -704,6 +706,17 @@ public class Saros extends AbstractUIPlugin {
                 disconnect();
             }
 
+            /**
+             * Infinite connecting state: when providing an empty server address
+             * and connecting via Roster view.
+             */
+
+            while (prefStore.getString(PreferenceConstants.SERVER).equals("")) {
+                boolean ok = Util.showConfigurationWizard(true, false);
+                if (!ok)
+                    return;
+            }
+
             setConnectionState(ConnectionState.CONNECTING, null);
             this.connection = new XMPPConnection(getConnectionConfiguration());
 
@@ -753,9 +766,25 @@ public class Saros extends AbstractUIPlugin {
                     cause.getMessage(), failSilently);
             } else if (cause instanceof UnknownHostException) {
                 log.info("Unknown host: " + cause);
-                Util.popUpFailureMessage("Error Connecting",
-                    "Error Connecting to XMPP server: " + cause.getMessage(),
+
+                // HACK Duplicate code.
+                /**
+                 * Only an error message was displayed: if a server was
+                 * unreachable. Now, the connection preferences will pop up if
+                 * the user decides to.
+                 */
+
+                boolean ok = Util.popUpYesNoQuestion("Error Connecting",
+                    "Error Connecting to XMPP server: '" + server
+                        + "'.\n\nDo you want to use other parameters?",
                     failSilently);
+
+                if (ok) {
+                    ok = Util.showConfigurationWizard(true, false);
+                    if (ok)
+                        connect(failSilently);
+                }
+
             } else {
                 log.info("xmpp: " + cause.getMessage(), cause);
 
@@ -1199,8 +1228,10 @@ public class Saros extends AbstractUIPlugin {
     protected void setupLoggers() {
         try {
             log = Logger.getLogger("de.fu_berlin.inf.dpp");
-            PropertyConfigurator
-                .configureAndWatch("log4j.properties", 3 * 1000);
+
+            PropertyConfigurator.configureAndWatch("log4j.properties",
+                REFRESH_SECONDS * 1000);
+
         } catch (SecurityException e) {
             System.err.println("Could not start logging:");
             e.printStackTrace();
