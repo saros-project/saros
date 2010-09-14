@@ -296,7 +296,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     /**
      * Returns true a {@link SWTBotShell} with the given title is open.
      */
-    public boolean isShellOpenByTitle(String title) throws RemoteException;
+    public boolean isShellActive(String title) throws RemoteException;
 
     /**
      * Returns true if a {@link SWTBotView} with the given title is visible.

@@ -261,14 +261,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     private void implementsInterface(String interfaceClass)
         throws WidgetNotFoundException {
         delegate.button("Add...").click();
-        delegate.sleep(750);
+        delegate.sleep(sleepTime);
         delegate.shell("Implemented Interfaces Selection").activate();
-        delegate.sleep(750);
+        delegate.sleep(sleepTime);
         delegate.textWithLabel("Choose interfaces:").setText(interfaceClass);
-        delegate.sleep(750);
+        delegate.sleep(sleepTime);
         delegate.waitUntil(Conditions.tableHasRows(delegate.table(), 1));
         delegate.button("OK").click();
-        delegate.sleep(750);
+        delegate.sleep(sleepTime);
         delegate.shell("New Java Class").activate();
     }
 
@@ -321,7 +321,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
             delegate.button("Finish").click();
 
-            if (isShellOpenByTitle("Open Associated Perspective?")) {
+            if (isShellActive("Open Associated Perspective?")) {
                 // delegate.button("Yes").click();
                 clickButton(SarosConstant.BUTTON_YES);
             }
@@ -566,7 +566,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void closeViewByTitle(String title) throws RemoteException {
-        delegate.viewByTitle(title).close();
+        SWTBotView viewByTitle = delegate.viewByTitle(title);
+        viewByTitle.close();
         delegate.sleep(sleepTime);
     }
 
@@ -586,10 +587,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return delegate.button(name).isEnabled();
     }
 
-    public boolean isShellOpenByTitle(String title) {
+    public boolean isShellActive(String title) {
         try {
-            SWTBotShell shell = delegate.shell(title);
-            return shell.isActive();
+            SWTBotShell activeShell = delegate.activeShell();
+            if (title.equals(activeShell.getText()))
+                return true;
         } catch (WidgetNotFoundException e) {
             log.info("No shell with title " + title + " was found.");
         }
@@ -597,12 +599,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isViewOpen(String title) throws RemoteException {
-        try {
-            return delegate.viewByTitle(title) != null;
-        } catch (WidgetNotFoundException e) {
-            log.info("view " + title + "can not be fund!");
-            return false;
+        List<SWTBotView> views = delegate.views();
+        for (SWTBotView swtBotView : views) {
+            if (title.equals(swtBotView.getTitle()))
+                return true;
         }
+        log.info("View " + title + " not found.");
+        return false;
     }
 
     /**
@@ -657,7 +660,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         if (shells != null) {
             if (!shells[0].isActive()) {
                 shells[0].activate();
-                delegate.sleep(750);
+                delegate.sleep(sleepTime);
             }
 
         } else {

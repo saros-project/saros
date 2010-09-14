@@ -39,21 +39,31 @@ public class Musician {
 
     public void initBot() throws AccessException, RemoteException,
         NotBoundException {
+        log.trace("initBot enter, initRmi");
         initRmi();
+        log.trace("activeMusican");
         activeMusican();
+        log.trace("closeViewByTitle");
         closeViewByTitle(SarosConstant.VIEW_TITLE_WELCOME);
+        log.trace("openPerspective");
         openPerspective(SarosConstant.PERSPECTIVE_TITLE_JAVA);
+        log.trace("openSarosViews");
         openSarosViews();
+        log.trace("xmppConnect");
         xmppConnect();
+        log.trace("initBot leave");
     }
 
     public void buildSession(Musician invitee, String projectName,
         String NameOfContextMenu, int typeOfSharingProject)
         throws RemoteException {
-        this.shareProject(invitee, projectName, NameOfContextMenu);
+        log.trace("buildSession enter, shareProject");
+        shareProject(invitee, projectName, NameOfContextMenu);
+        log.trace("waitUntilShellActive");
         invitee.waitUntilShellActive("Session Invitation");
         switch (typeOfSharingProject) {
         case SarosConstant.CREATE_NEW_PROJECT:
+            log.trace("ackProject");
             invitee.ackProject(this, projectName);
             break;
         case SarosConstant.USE_EXISTING_PROJECT:
@@ -65,6 +75,7 @@ public class Musician {
         default:
             break;
         }
+        log.trace("buildSession leave");
     }
 
     // public void ackProject1(Musician inviter, String projectname)
@@ -143,8 +154,12 @@ public class Musician {
 
     public void closeViewByTitle(String title) {
         try {
-            if (isViewOpen(title))
+            log.trace("isViewOpen");
+            boolean viewOpen = isViewOpen(title);
+            if (viewOpen) {
+                log.trace("closeViewByTitle");
                 bot.closeViewByTitle(title);
+            }
         } catch (RemoteException e) {
             log.error("View with title '" + title + "' could not be closed", e);
         }
@@ -393,10 +408,16 @@ public class Musician {
     }
 
     public void xmppConnect() throws RemoteException {
+        log.trace("openRosterView");
         openRosterView();
-        if (!isConnectedByXMPP())
+        log.trace("isConnectedByXMPP");
+        if (!isConnectedByXMPP()) {
+            log.trace("xmppConnect");
             bot.xmppConnect();
-        if (isShellOpenByTitle(SarosConstant.SAROS_CONFI_SHELL_TITLE)) {
+        }
+        log.trace("isShellActive");
+        if (isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE)) {
+            log.trace("doSarosConfiguration");
             bot.doSarosConfiguration(getXmppServer(), jid.getName(), password);
         }
     }
@@ -493,8 +514,8 @@ public class Musician {
         bot.activeJavaEditor(className);
     }
 
-    public boolean isShellOpenByTitle(String title) throws RemoteException {
-        return bot.isShellOpenByTitle(title);
+    public boolean isShellActive(String title) throws RemoteException {
+        return bot.isShellActive(title);
 
     }
 

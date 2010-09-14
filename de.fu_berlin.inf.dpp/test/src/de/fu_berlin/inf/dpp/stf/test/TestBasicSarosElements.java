@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,17 +16,21 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestBasicSarosElements {
+    private static final Logger log = Logger
+        .getLogger(TestBasicSarosElements.class);
     // bots
     protected static Musician bot;
 
     @BeforeClass
     public static void configureInvitee() throws RemoteException,
         NotBoundException {
+        log.debug("configureInvitee start");
         bot = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
+        log.debug("initBot");
         bot.initBot();
-
+        log.debug("configureInvitee end");
     }
 
     @AfterClass
@@ -36,27 +41,6 @@ public class TestBasicSarosElements {
             // ignore
         }
     }
-
-    // @Before
-    // public void xmppConnect() {
-    // try {
-    // bot.openRosterView();
-    // bot.xmppConnect();
-    // bot.waitForConnect();
-    //
-    // } catch (RemoteException e) {
-    // // ignore cleanup
-    // }
-    // }
-    //
-    // @After
-    // public void xmppDisconnect() {
-    // try {
-    // bot.xmppDisconnect();
-    // } catch (RemoteException e) {
-    // // ignore cleanup
-    // }
-    // }
 
     @Test
     public void testSessionView() throws RemoteException {
@@ -80,9 +64,13 @@ public class TestBasicSarosElements {
 
     @Test
     public void testXmppConnect() throws RemoteException {
+        log.trace("xmppDisconnect");
         bot.xmppDisconnect();
+        log.trace("xmppConnect");
         bot.xmppConnect();
+        log.trace("captureScreenshot");
         bot.captureScreenshot(bot.getPathToScreenShot() + "/xmpp_connected.png");
+        log.trace("waitForConnect");
         bot.waitForConnect();
         assertEquals(true, bot.isConnectedByXMPP());
     }
