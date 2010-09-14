@@ -689,10 +689,15 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public SharedProject getSharedProject(IProject project) {
-        if (!sharedProject.belongsTo(project))
+        if (!isShared(project))
+            return null;
+
+        if (!sharedProject.belongsTo(project)) {
             // TODO support more than one project...
             throw new NotImplementedException("More than one shared project "
                 + "not supported.");
+        }
+
         return sharedProject;
     }
 

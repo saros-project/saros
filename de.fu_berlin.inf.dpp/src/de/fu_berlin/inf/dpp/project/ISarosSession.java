@@ -357,7 +357,7 @@ public interface ISarosSession extends IActivityListener {
 
     /**
      * Returns the {@link SharedProject} associated with the {@link IProject}
-     * <code>project</code>.
+     * <code>project</code>, or <code>null</code> if the project is not shared.
      */
     public SharedProject getSharedProject(IProject project);
 
