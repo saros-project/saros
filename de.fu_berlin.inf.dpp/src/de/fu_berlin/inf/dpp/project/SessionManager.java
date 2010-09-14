@@ -297,10 +297,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 sarosUI.openSarosViews();
             }
         });
-
-        for (ISessionListener listener : this.listeners) {
-            listener.invitationReceived(process);
-        }
     }
 
     public void connectionStateChanged(XMPPConnection connection,
