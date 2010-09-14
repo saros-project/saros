@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
  * project.<br>
  * TODO Rename to SharedProjectState?
  */
-public class SharedProject implements ISubscriberChangeListener {
+public class SharedProject {
     /**
      * A value of type E with a convenient update method to check if the value
      * was changed.
@@ -62,13 +62,16 @@ public class SharedProject implements ISubscriberChangeListener {
     protected final IProject project;
 
     /* Stored state values: */
-    protected UpdatableValue<Boolean> projectIsOpen;
+    protected UpdatableValue<Boolean> projectIsOpen = new UpdatableValue<Boolean>(
+        false);
 
-    protected UpdatableValue<VCSAdapter> vcs;
+    protected UpdatableValue<VCSAdapter> vcs = new UpdatableValue<VCSAdapter>(
+        null);
 
-    protected UpdatableValue<String> vcsUrl;
+    protected UpdatableValue<String> vcsUrl = new UpdatableValue<String>(null);
 
-    protected UpdatableValue<String> vcsRevision;
+    protected UpdatableValue<String> vcsRevision = new UpdatableValue<String>(
+        null);
 
     protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
         false);
@@ -78,6 +81,27 @@ public class SharedProject implements ISubscriberChangeListener {
         public void roleChanged(User user) {
             if (isDriver.update(sarosSession.isDriver()))
                 initializeVCSInformation();
+        }
+    };
+
+    /** Used only for logging. */
+    private ISubscriberChangeListener subscriberChangeListener = new ISubscriberChangeListener() {
+        public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
+            String s = "subscriberResourceChanged:\n";
+            for (ISubscriberChangeEvent delta : deltas) {
+                int flags = delta.getFlags();
+                if (flags == ISubscriberChangeEvent.NO_CHANGE)
+                    s += "0";
+                if ((flags & ISubscriberChangeEvent.SYNC_CHANGED) != 0)
+                    s += "S";
+                if ((flags & ISubscriberChangeEvent.ROOT_ADDED) != 0)
+                    s += "+";
+                if ((flags & ISubscriberChangeEvent.ROOT_REMOVED) != 0)
+                    s += "-";
+                s += " " + delta.getResource().getFullPath().toPortableString()
+                    + "\n";
+            }
+            log.trace(s);
         }
     };
 
@@ -101,19 +125,21 @@ public class SharedProject implements ISubscriberChangeListener {
 
     protected void initializeVCSInformation() {
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        this.vcs = new UpdatableValue<VCSAdapter>(vcs);
+        this.vcs.update(vcs);
         if (vcs == null)
             return;
-        RepositoryProvider provider = RepositoryProvider.getProvider(project);
-        Subscriber subscriber = provider.getSubscriber();
-        if (subscriber != null)
-            subscriber.addListener(this);
-        else
-            log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
-
+        if (log.isTraceEnabled()) {
+            RepositoryProvider provider = RepositoryProvider
+                .getProvider(project);
+            Subscriber subscriber = provider.getSubscriber();
+            if (subscriber != null)
+                subscriber.addListener(subscriberChangeListener);
+            else
+                log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
+        }
         VCSResourceInformation info = vcs.getResourceInformation(project);
-        vcsUrl = new UpdatableValue<String>(info.repositoryRoot + info.path);
-        vcsRevision = new UpdatableValue<String>(info.revision);
+        vcsUrl.update(info.repositoryRoot + info.path);
+        vcsRevision.update(info.revision);
     }
 
     /** Updates the current VCSAdapter, and returns true if the value changed. */
@@ -148,23 +174,5 @@ public class SharedProject implements ISubscriberChangeListener {
      */
     public boolean belongsTo(IProject project) {
         return this.project.equals(project);
-    }
-
-    public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
-        String s = "subscriberResourceChanged:\n";
-        for (ISubscriberChangeEvent delta : deltas) {
-            int flags = delta.getFlags();
-            if (flags == ISubscriberChangeEvent.NO_CHANGE)
-                s += "0";
-            if ((flags & ISubscriberChangeEvent.SYNC_CHANGED) != 0)
-                s += "S";
-            if ((flags & ISubscriberChangeEvent.ROOT_ADDED) != 0)
-                s += "+";
-            if ((flags & ISubscriberChangeEvent.ROOT_REMOVED) != 0)
-                s += "-";
-            s += " " + delta.getResource().getFullPath().toPortableString()
-                + "\n";
-        }
-        log.trace(s);
     }
 }
