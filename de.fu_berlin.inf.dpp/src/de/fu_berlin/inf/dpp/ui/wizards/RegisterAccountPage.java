@@ -353,7 +353,12 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             });
 
         } catch (InvocationTargetException e) {
-            setErrorMessage(extractErrorMessage(e).trim());
+            String extractErrorMessage = extractErrorMessage(e);
+            if (extractErrorMessage != null)
+                extractErrorMessage = extractErrorMessage.trim();
+            else
+                log.error("");
+            setErrorMessage(extractErrorMessage);
             return false;
         } catch (InterruptedException e) {
             log.error("An internal error occurred: InterruptedException"

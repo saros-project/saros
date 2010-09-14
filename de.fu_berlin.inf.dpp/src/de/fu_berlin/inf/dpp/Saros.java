@@ -506,6 +506,11 @@ public class Saros extends AbstractUIPlugin {
         Connection
             .addConnectionCreationListener(new ConnectionCreationListener() {
                 public void connectionCreated(Connection connection) {
+                    if (Saros.this.connection != connection) {
+                        // Ignore the connections created in createAccount.
+                        return;
+                    }
+
                     ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                         .getInstanceFor(connection);
                     sdm.addFeature(Saros.NAMESPACE);
@@ -1194,8 +1199,8 @@ public class Saros extends AbstractUIPlugin {
     protected void setupLoggers() {
         try {
             log = Logger.getLogger("de.fu_berlin.inf.dpp");
-            PropertyConfigurator.configureAndWatch("log4j.properties",
-                3 * 1000);
+            PropertyConfigurator
+                .configureAndWatch("log4j.properties", 3 * 1000);
         } catch (SecurityException e) {
             System.err.println("Could not start logging:");
             e.printStackTrace();
