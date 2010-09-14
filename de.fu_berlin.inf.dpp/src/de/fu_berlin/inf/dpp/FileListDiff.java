@@ -199,6 +199,7 @@ public class FileListDiff {
         final SubMonitor monitor) throws CoreException {
         // TODO don't throw CoreException
 
+        // TODO Move to FileUtil, refactor FileUtil#delete(IResource).
         final List<IPath> toDelete = this.getRemovedPaths();
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor progress) throws CoreException {
