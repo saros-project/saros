@@ -427,7 +427,7 @@ public class MessagingManager implements IConnectionListener,
      * This method calls connectMultiUserChat() or disconnectMultiUserChat(),
      * but only if that's possible and necessary.
      */
-    private synchronized void checkChatState() {
+    private void checkChatState() {
         if (chatJoined) {
             if (!sessionStarted || chatListeners.isEmpty()
                 || currentConnection == null

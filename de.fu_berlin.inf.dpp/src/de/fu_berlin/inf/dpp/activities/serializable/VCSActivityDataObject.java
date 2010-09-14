@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class VCSActivityDataObject extends AbstractActivityDataObject implements
     IResourceActivityDataObject {
 
-    protected String revision;
+    protected String param1;
     protected String url;
     protected String directory;
     protected SPathDataObject path;
@@ -28,19 +28,19 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
     }
 
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
-        SPathDataObject path, String directory, String revision) {
+        SPathDataObject path, String directory, String param1) {
         super(source);
         this.type = type;
         this.url = url;
         this.directory = directory;
         this.path = path;
-        this.revision = revision;
+        this.param1 = param1;
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
         SPath sPath = path == null ? null : path.toSPath(sarosSession);
         User user = sarosSession == null ? null : sarosSession.getUser(source);
-        return new VCSActivity(type, user, sPath, url, directory, revision);
+        return new VCSActivity(type, user, sPath, url, directory, param1);
     }
 
     public SPathDataObject getPath() {

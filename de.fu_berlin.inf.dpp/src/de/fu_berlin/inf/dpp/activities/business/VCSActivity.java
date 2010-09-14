@@ -56,13 +56,13 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     protected String param1;
 
     public VCSActivity(Type type, User source, SPath path, String url,
-        String directory, String revision) {
+        String directory, String param1) {
         super(source);
         this.type = type;
         this.path = path;
         this.url = url;
         this.directory = directory;
-        this.param1 = revision;
+        this.param1 = param1;
     }
 
     public boolean dispatch(IActivityConsumer consumer) {
