@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -51,7 +52,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosProjectMapper;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -206,6 +206,9 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void addSharedProject(IProject project, String projectID) {
         this.projectMapper.addMapping(projectID, project);
+        if (this.sharedProject != null)
+            throw new NotImplementedException(
+                "More than one project not supported.");
         this.sharedProject = new SharedProject(project, this);
     }
 
@@ -681,10 +684,6 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.isShared(project);
     }
 
-    public SarosProjectMapper getProjectMapper() {
-        return projectMapper;
-    }
-
     public boolean useVersionControl() {
         return this.useVersionControl;
     }
@@ -692,8 +691,16 @@ public class SarosSession implements ISarosSession, Disposable {
     public SharedProject getSharedProject(IProject project) {
         if (!sharedProject.belongsTo(project))
             // TODO support more than one project...
-            throw new IllegalArgumentException("More than one shared project "
+            throw new NotImplementedException("More than one shared project "
                 + "not supported.");
         return sharedProject;
+    }
+
+    public String getProjectID(IProject project) {
+        return projectMapper.getID(project);
+    }
+
+    public IProject getProject(String projectID) {
+        return projectMapper.getProject(projectID);
     }
 }

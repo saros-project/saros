@@ -70,7 +70,7 @@ public class SPath {
      */
     public SPathDataObject toSPathDataObject(ISarosSession sarosSession) {
 
-        String id = sarosSession.getProjectMapper().getID(project);
+        String id = sarosSession.getProjectID(project);
         if (id == null)
             throw new IllegalArgumentException(
                 "Trying to send a SPath which refers to a file in project which is not shared: "

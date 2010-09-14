@@ -46,8 +46,7 @@ public class SPathDataObject {
      */
     public SPath toSPath(ISarosSession sarosSession) {
 
-        IProject project = sarosSession.getProjectMapper().getProject(
-            projectID);
+        IProject project = sarosSession.getProject(projectID);
         if (project == null)
             throw new IllegalArgumentException(
                 "SPathDataObject cannot be connected to SarosSession because its ID is unknown: "

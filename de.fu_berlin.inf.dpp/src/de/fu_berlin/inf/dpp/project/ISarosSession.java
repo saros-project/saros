@@ -347,12 +347,6 @@ public interface ISarosSession extends IActivityListener {
     public boolean isShared(IProject project);
 
     /**
-     * Returns the mapper, which can be used to translate project IDs to
-     * IProjects
-     */
-    public SarosProjectMapper getProjectMapper();
-
-    /**
      * Returns true if this session uses VCS support. Clients are required to
      * have all the necessary plugins (e.g. Subclipse if it's an SVN project),
      * otherwise they won't be able to participate in the session.
@@ -366,4 +360,25 @@ public interface ISarosSession extends IActivityListener {
      * <code>project</code>.
      */
     public SharedProject getSharedProject(IProject project);
+
+    /**
+     * Returns the global ID of the <code>project</code>.
+     */
+    public String getProjectID(IProject project);
+
+    /**
+     * Returns the project with the given global ID.
+     */
+    public IProject getProject(String projectID);
+
+    /**
+     * Adds the specified project as a shared project to this session.
+     * 
+     * @param project
+     *            The project to share.
+     * @param projectID
+     *            The global project ID.
+     */
+    public void addSharedProject(IProject project, String projectID);
+
 }
