@@ -407,10 +407,9 @@ public class FileUtil {
                 if (resource.getResourceAttributes() == null)
                     return;
 
-                if (!setReadOnly(resource, false))
-                    return;
+                setReadOnly(resource, false);
 
-                resource.delete(false, monitor);
+                resource.delete(true, monitor);
 
                 if (monitor.isCanceled()) {
                     log.warn("Removing resource failed: " + resource);

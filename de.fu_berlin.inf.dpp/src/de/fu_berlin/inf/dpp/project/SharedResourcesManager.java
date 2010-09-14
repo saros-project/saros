@@ -67,6 +67,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -201,8 +202,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             if (currentJob != null) {
                 currentJob.addJobChangeListener(jobChangeListener);
                 log.trace("currentJob='" + currentJob.getName() + "'");
-                // if (currentJob.getName().equals("SVN Switch"))
-                // return;
             }
         }
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -244,26 +243,24 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             if (!sarosSession.isShared(project))
                 continue;
 
+            if (!checkOpenClosed(project))
+                continue;
+
+            if (!checkVCSConnection(project, pendingActivities))
+                continue;
+
             SharedProject sharedProject = sarosSession
                 .getSharedProject(project);
-            boolean isProjectOpen = project.isOpen();
-            if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
-                if (isProjectOpen) {
-                    // Since the project was just opened, we would get
-                    // a notification that each file in the project was just
-                    // added, so we're simply going to ignore this delta. Any
-                    // resources that were modified externally would be
-                    // out-of-sync anyways, so when the user refreshes them
-                    // we'll get notified.
-                    continue;
-                } else {
-                    // The project was just closed, what do we do here?
-                }
+
+            VCSAdapter vcs = VCSAdapter.getAdapter(project);
+            ProjectDeltaVisitor visitor;
+            if (vcs == null) {
+                visitor = new ProjectDeltaVisitor(this, sarosSession,
+                    sharedProject);
+            } else {
+                visitor = vcs.getProjectDeltaVisitor(this, sarosSession,
+                    sharedProject);
             }
-            if (!isProjectOpen)
-                continue;
-            ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(this,
-                sarosSession, sharedProject);
             try {
                 projectDelta.accept(visitor);
             } catch (CoreException e) {
@@ -277,10 +274,79 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         orderAndFire(pendingActivities);
     }
 
+    protected boolean checkOpenClosed(IProject project) {
+        SharedProject sharedProject = sarosSession.getSharedProject(project);
+
+        boolean isProjectOpen = project.isOpen();
+        if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
+            if (isProjectOpen) {
+                // Since the project was just opened, we would get
+                // a notification that each file in the project was just
+                // added, so we're simply going to ignore this delta. Any
+                // resources that were modified externally would be
+                // out-of-sync anyways, so when the user refreshes them
+                // we'll get notified.
+                return false;
+            } else {
+                // The project was just closed, what do we do here?
+            }
+        }
+        if (!isProjectOpen)
+            return false;
+        return true;
+    }
+
+    protected boolean checkVCSConnection(IProject project,
+        List<IResourceActivity> pendingActivities) {
+        SharedProject sharedProject = sarosSession.getSharedProject(project);
+
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        VCSAdapter oldVcs = sharedProject.getVCSAdapter();
+
+        if (sharedProject.updateVcs(vcs)) {
+            if (vcs == null) {
+                // Disconnect
+                boolean deleteContent = oldVcs == null
+                    || !oldVcs.hasLocalCache(project);
+                VCSActivity activity = VCSActivity.disconnect(sarosSession,
+                    project, deleteContent);
+                pendingActivities.add(activity);
+                sharedProject.updateRevision(null);
+                sharedProject.updateVcsUrl(null);
+            } else {
+                // Connect
+                VCSResourceInformation info;
+                info = vcs.getResourceInformation(project);
+                if (info.repositoryRoot == null || info.path == null) {
+                    // HACK For some reason, Subclipse returns null values
+                    // here. Pretend the vcs is still null and wait for the
+                    // next time we get here.
+                    sharedProject.updateVcs(null);
+                    return false;
+                }
+
+                VCSActivity activity = VCSActivity.connect(sarosSession,
+                    project, info.repositoryRoot, info.path,
+                    vcs.getProviderID(project));
+                pendingActivities.add(activity);
+                String url = info.repositoryRoot + info.path;
+                sharedProject.updateVcsUrl(url);
+                sharedProject.updateRevision(info.revision);
+
+                log.debug("Connect to VCS");
+            }
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Fires the ordered activities. To be run before change event ends.
      */
     protected void orderAndFire(List<IResourceActivity> pendingActivities) {
+        if (pendingActivities.isEmpty())
+            return;
         final List<IResourceActivity> orderedActivities = getOrderedActivities(pendingActivities);
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -499,7 +565,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         final IProject project = path.getProject();
         final String url = activity.getURL();
         final String directory = activity.getDirectory();
-        final String revision = activity.getRevision();
+        final String revision = activity.getParam1();
 
         // Connect is special since the project doesn't have a VCSAdapter
         // yet.

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -21,23 +20,18 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * Visits the resource changes in a shared project.
  */
-class ProjectDeltaVisitor implements IResourceDeltaVisitor {
-    private static final Logger log = Logger
-        .getLogger(ProjectDeltaVisitor.class);
+public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected SharedResourcesManager sharedResourcesManager;
     protected ISarosSession sarosSession;
 
     /** The project visited. */
     protected SharedProject sharedProject;
 
-    ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
+    public ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
         ISarosSession sarosSession, SharedProject sharedProject) {
         this.sharedResourcesManager = sharedResourcesManager;
         this.sharedProject = sharedProject;
@@ -53,82 +47,14 @@ class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return false;
         }
 
-        boolean isProject = resource instanceof IProject;
-        if (isProject) {
-            IProject project = (IProject) resource;
-            if (!project.isOpen())
-                return false;
-
-            VCSAdapter vcs = VCSAdapter.getAdapter(project);
-            VCSAdapter oldVcs = sharedProject.getVCSAdapter();
-            if (sharedProject.updateVcs(vcs)) {
-                if (vcs == null) {
-                    // Disconnect
-                    boolean deleteContent = oldVcs == null
-                        || !oldVcs.hasLocalCache(project);
-                    VCSActivity activity = VCSActivity.disconnect(sarosSession,
-                        project, deleteContent);
-                    addActivity(activity);
-                    sharedProject.updateRevision(null);
-                    sharedProject.updateVcsUrl(null);
-                } else {
-                    // Connect
-                    VCSResourceInformation info;
-                    // FIXME ndh Remove try/catch
-                    try {
-                        info = vcs.getResourceInformation(project);
-                        if (info.repositoryRoot == null || info.path == null) {
-                            // For some reason, Subclipse returns null values
-                            // here. Wait for the next time we get here.
-                            sharedProject.updateVcs(null);
-                            return false;
-                        }
-                    } catch (Exception e) {
-                        log.error("Fix getResourceInformation plx", e);
-                        return false;
-                    }
-
-                    VCSActivity activity = VCSActivity.connect(sarosSession,
-                        project, info.repositoryRoot, info.path,
-                        vcs.getProviderID(project));
-                    addActivity(activity);
-                    String url = info.repositoryRoot + info.path;
-                    sharedProject.updateVcsUrl(url);
-                    sharedProject.updateRevision(info.revision);
-
-                    log.debug("Connect to SVN");
-                }
-                return false;
-            }
-
-            if (vcs != null && isSync(delta)) {
-                VCSResourceInformation info = vcs
-                    .getResourceInformation(project);
-                String url = info.repositoryRoot + info.path;
-                if (sharedProject.updateVcsUrl(url)) {
-                    // Switch
-                    addActivity(VCSActivity.switch_(sarosSession, resource,
-                        url, info.revision));
-                    return false;
-                }
-
-                if (sharedProject.updateRevision(info.revision)) {
-                    // Update
-                    addActivity(VCSActivity.update(sarosSession, resource,
-                        info.revision));
-                    return false;
-                }
-            }
-        }
-
         if (resource instanceof IFile) {
             handleFileDelta(delta);
             return true;
-        } else if (resource instanceof IFolder || isProject) {
+        } else if (resource instanceof IFolder) {
+            // Note: IProject is not visited.
             return handleFolderDelta(delta);
         }
 
-        assert false;
         return true;
     }
 

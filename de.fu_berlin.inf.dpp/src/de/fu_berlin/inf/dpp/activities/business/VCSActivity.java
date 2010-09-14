@@ -22,14 +22,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
          * url: The repository root URL. <br>
          * directory: The path of the target dir relative to the repository
          * root. <br>
-         * revision: The provider ID.
+         * param1: The provider ID.
          */
         Connect,
 
         /**
          * path: The path of the project to be disconnected. <br>
          * Supported arguments:<br>
-         * revision: If !=null, delete contents.
+         * param1: If !=null, delete contents.
          */
         Disconnect,
 
@@ -37,14 +37,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
          * url: The URL of the target resource in the repo. <br>
-         * revision: The revision of the target resource.
+         * param1: The revision of the target resource.
          */
         Switch,
 
         /**
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
-         * revision: The revision of the target resource.
+         * param1: The revision of the target resource.
          */
         Update,
     }
@@ -53,7 +53,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     protected String url;
     protected String directory;
     protected SPath path;
-    protected String revision; // FIXME ndh rename
+    protected String param1;
 
     public VCSActivity(Type type, User source, SPath path, String url,
         String directory, String revision) {
@@ -62,7 +62,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         this.path = path;
         this.url = url;
         this.directory = directory;
-        this.revision = revision;
+        this.param1 = revision;
     }
 
     public boolean dispatch(IActivityConsumer consumer) {
@@ -77,7 +77,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         SPathDataObject sPathDataObject = path == null ? null : path
             .toSPathDataObject(sarosSession);
         return new VCSActivityDataObject(source.getJID(), getType(), url,
-            sPathDataObject, directory, revision);
+            sPathDataObject, directory, param1);
     }
 
     public static VCSActivity connect(ISarosSession sarosSession,
@@ -119,8 +119,8 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         return type;
     }
 
-    public String getRevision() {
-        return revision;
+    public String getParam1() {
+        return param1;
     }
 
     public String getURL() {
@@ -135,14 +135,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     public String toString() {
         String result = "VCSActivity(type=" + type;
         if (type == Type.Disconnect)
-            result += ", deleteContents=" + (revision != null);
+            result += ", deleteContents=" + (param1 != null);
         else {
             result += ", path=" + path;
             if (type == Type.Connect || type == Type.Switch)
                 result += ", url=" + url;
             if (type == Type.Connect)
                 result += ", directory=" + directory;
-            result += ", revision=" + revision;
+            result += ", revision=" + param1;
         }
         result += ")";
         return result;
