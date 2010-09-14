@@ -1,11 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,25 +14,17 @@ public class TestSVN {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        alice = initBot(BotConfiguration.JID_ALICE,
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
+        alice.initBot();
+        alice.createProjectWithClass(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
-        bob = initBot(BotConfiguration.JID_BOB, BotConfiguration.PASSWORD_BOB,
-            BotConfiguration.HOST_BOB, BotConfiguration.PORT_BOB);
-    }
-
-    private static Musician initBot(String jid, String password, String host,
-        int port) throws RemoteException, NotBoundException, AccessException {
-        Musician bot = new Musician(new JID(jid), password, host, port);
-        bot.initRmi();
-
-        if (bot.isViewOpen("Welcome"))
-            bot.closeViewByTitle("Welcome");
-
-        bot.xmppConnect();
-        bot.waitForConnect();
-        return bot;
+        bob = new Musician(new JID(BotConfiguration.JID_BOB),
+            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
+            BotConfiguration.PORT_BOB);
+        bob.initBot();
     }
 
     @AfterClass
@@ -46,8 +33,9 @@ public class TestSVN {
         bob.xmppDisconnect();
     }
 
-    @Before
+    @Test
     public void setUp() throws Exception {
+        alice.getProjectFromSVN(BotConfiguration.SVN_URL);
         // Make sure Alice has project "test" which is connected to SVN.
         // Make sure Alice is switched to trunk.
         // Make sure there is a file "src/main/Main.java" in the project.

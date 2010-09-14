@@ -16,6 +16,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
@@ -31,30 +32,20 @@ public class RmiTest {
         bot = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        bot.initRmi();
-
-        bot.activeMusican();
-
-        if (bot.isViewOpen("Welcome"))
-            bot.closeViewByTitle("Welcome");
-
-        bot.openPerspective("Java");
-
-        bot.setFocusOnViewByTitle("Package Explorer");
-
-        if (bot.isViewOpen("Roster"))
-            bot.closeViewByTitle("Roster");
+        bot.initBot();
     }
 
     @After
     public void cleanupBot() {
-        bot.closeViewByTitle("Roster");
+        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     @Test
     public void testWindows() throws RemoteException {
-        assertFalse(bot.isViewOpen("Roster"));
+        bot.waitForConnect();
+        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        assertFalse(bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
         bot.openRosterView();
-        assertTrue(bot.isViewOpen("Roster"));
+        assertTrue(bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
     }
 }

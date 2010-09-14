@@ -27,10 +27,7 @@ public class TestShareProject3Users {
         invitee1 = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        invitee1.initRmi();
-        invitee1.activeMusican();
-        invitee1.openSarosViews();
-        invitee1.xmppConnect();
+        invitee1.initBot();
     }
 
     @Before
@@ -38,10 +35,7 @@ public class TestShareProject3Users {
         invitee2 = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        invitee2.initRmi();
-        invitee2.activeMusican();
-        invitee2.openSarosViews();
-        invitee2.xmppConnect();
+        invitee2.initBot();
     }
 
     @Before
@@ -49,10 +43,7 @@ public class TestShareProject3Users {
         inviter = new Musician(new JID(BotConfiguration.JID_CARL),
             BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
             BotConfiguration.PORT_CARL);
-        inviter.initRmi();
-        inviter.activeMusican();
-        inviter.openSarosViews();
-        inviter.xmppConnect();
+        inviter.initBot();
         inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
@@ -60,14 +51,12 @@ public class TestShareProject3Users {
     @After
     public void cleanupInvitee1() throws RemoteException {
         invitee1.xmppDisconnect();
-        invitee1.setFocusOnViewByTitle("Package Explorer");
         invitee1.removeProject(BotConfiguration.PROJECTNAME);
     }
 
     @After
     public void cleanupInvitee2() throws RemoteException {
         invitee2.xmppDisconnect();
-        invitee2.setFocusOnViewByTitle("Package Explorer");
         invitee2.removeProject(BotConfiguration.PROJECTNAME);
     }
 
@@ -77,7 +66,6 @@ public class TestShareProject3Users {
     }
 
     @Test
-    // FIXME Fails when carl starts in Resource perspective
     public void testShareProjectParallel() throws RemoteException {
         invitee1.waitForConnect();
         invitee2.waitForConnect();
