@@ -10,6 +10,11 @@ import org.eclipse.ui.console.IPatternMatchListenerDelegate;
 import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
 
+/**
+ * SubclipseConsoleListener which doesn't do anything yet. Could be used to
+ * parse SVN operations on drivers in order to send VCSActivities as soon as the
+ * operation is started.
+ */
 public class SubclipseConsoleListener implements IPatternMatchListenerDelegate {
     private static final Logger log = Logger
         .getLogger(SubclipseConsoleListener.class);
@@ -33,6 +38,8 @@ public class SubclipseConsoleListener implements IPatternMatchListenerDelegate {
     }
 
     public void matchFound(PatternMatchEvent event) {
+        if (!log.isTraceEnabled())
+            return;
         log.trace("SVN console match");
         IDocument document = console.getDocument();
         int offset = event.getOffset();

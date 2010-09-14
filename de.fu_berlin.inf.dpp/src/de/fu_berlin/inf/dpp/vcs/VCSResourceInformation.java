@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.vcs;
 
-// FIXME ndh encapsulate fields
+/**
+ * A simple struct to hold VCS related information.
+ */
+// TODO Encapsulate fields?
 public class VCSResourceInformation {
     // @Inv: repositoryURL+projectPath is a valid URL.
     /** URL of the repository. */
