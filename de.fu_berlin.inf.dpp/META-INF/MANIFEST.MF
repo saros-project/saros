@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.team.core,
  org.eclipse.team.ui,
  org.tigris.subversion.subclipse.core;resolution:=optional,
- org.tigris.subversion.subclipse.ui;resolution:=optional
+ org.tigris.subversion.subclipse.ui;resolution:=optional,
+ org.eclipse.ui.console
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: bin/,
  lib/log4j-1.2.15.jar,

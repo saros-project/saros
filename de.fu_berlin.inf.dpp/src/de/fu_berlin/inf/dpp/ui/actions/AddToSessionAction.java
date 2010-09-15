@@ -73,12 +73,13 @@ public class AddToSessionAction implements IObjectActionDelegate {
 
         this.selectedProject = getProject(selection);
 
-        action.setEnabled(saros.isConnected()
-            && sessionManager.getSarosSession() != null
-            && (this.selectedProject != null)
-            && this.selectedProject.isAccessible()
-            && !sessionManager.getSarosSession()
-                .isShared(this.selectedProject));
+        action
+            .setEnabled(saros.isConnected()
+                && sessionManager.getSarosSession() != null
+                && (this.selectedProject != null)
+                && this.selectedProject.isAccessible()
+                && !sessionManager.getSarosSession().isShared(
+                    this.selectedProject));
     }
 
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
@@ -97,11 +98,11 @@ public class AddToSessionAction implements IObjectActionDelegate {
         final ISarosSession sarosSession = sessionManager.getSarosSession();
 
         if (sarosSession.isHost()) {
-            sarosSession.getProjectMapper().addMapping(
-                this.selectedProject.getName(), this.selectedProject);
+            sarosSession.addSharedProject(this.selectedProject,
+                this.selectedProject.getName());
 
-            log.info("Added mapping for project: "
-                + this.selectedProject.getName() + " using its name");
+            log.info("Added project: " + this.selectedProject.getName()
+                + " using its name");
 
         } else {
             Shell shell = EditorAPI.getShell();
@@ -116,7 +117,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
                         if (newText == null || newText.trim().length() == 0) {
                             return "Saros needs the name of the project on the host side!";
                         } else {
-                            if (sarosSession.getProjectMapper().getProject(newText) != null)
+                            if (sarosSession.getProject(newText) != null)
                                 return "Project Name is already used to share a project!";
                         }
                         // Okay...
@@ -125,11 +126,10 @@ public class AddToSessionAction implements IObjectActionDelegate {
                 });
 
             if (dialog.open() == Window.OK) {
-                sarosSession.getProjectMapper().addMapping(dialog.getValue(),
-                    this.selectedProject);
-                log.info("Added mapping for project: "
-                    + this.selectedProject.getName() + " using ID: "
-                    + dialog.getValue());
+                sarosSession.addSharedProject(this.selectedProject,
+                    dialog.getValue());
+                log.info("Added project: " + this.selectedProject.getName()
+                    + " using ID: " + dialog.getValue());
             }
         }
     }

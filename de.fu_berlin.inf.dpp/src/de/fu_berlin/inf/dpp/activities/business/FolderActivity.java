@@ -26,11 +26,6 @@ public class FolderActivity extends AbstractActivity implements
         return this.path;
     }
 
-    public SPath getOldPath() {
-        // Yes, that's a bit ugly.
-        return null;
-    }
-
     public Type getType() {
         return this.type;
     }
@@ -80,8 +75,8 @@ public class FolderActivity extends AbstractActivity implements
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new FolderActivityDataObject(source.getJID(), type, path
-            .toSPathDataObject(sarosSession));
+        return new FolderActivityDataObject(source.getJID(), type,
+            path.toSPathDataObject(sarosSession));
     }
 
 }

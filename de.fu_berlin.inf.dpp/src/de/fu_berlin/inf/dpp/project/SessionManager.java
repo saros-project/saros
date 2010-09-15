@@ -166,8 +166,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
 
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, project, myJID,
-            stopManager, new DateTime(), useVersionControl);
+            this.transferManager, dispatchThreadContext, myJID, stopManager,
+            new DateTime(), useVersionControl);
+        sarosSession.addSharedProject(project, project.getName());
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -188,8 +189,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         JID host, int colorID, DateTime sessionStart) {
 
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, projectID, project,
-            saros.getMyJID(), host, colorID, stopManager, sessionStart);
+            this.transferManager, dispatchThreadContext, saros.getMyJID(),
+            host, colorID, stopManager, sessionStart);
+        sarosSession.addSharedProject(project, projectID);
         this.sarosSessionObservable.setValue(sarosSession);
 
         for (ISessionListener listener : this.listeners) {
@@ -232,13 +234,14 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
             this.transmitter.sendLeaveMessage(sarosSession);
             log.debug("Leave message sent.");
-
-            try {
-                sarosSession.stop();
-                sarosSession.dispose();
-            } catch (RuntimeException e) {
-                log.error("Error stopping project: ", e);
+            if (!sarosSession.isStopped()) {
+                try {
+                    sarosSession.stop();
+                } catch (RuntimeException e) {
+                    log.error("Error stopping project: ", e);
+                }
             }
+            sarosSession.dispose();
 
             this.sarosSessionObservable.setValue(null);
 
@@ -295,10 +298,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 sarosUI.openSarosViews();
             }
         });
-
-        for (ISessionListener listener : this.listeners) {
-            listener.invitationReceived(process);
-        }
     }
 
     public void connectionStateChanged(XMPPConnection connection,

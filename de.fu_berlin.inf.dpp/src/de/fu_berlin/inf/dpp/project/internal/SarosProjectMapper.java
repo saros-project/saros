@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.Collections;
 import java.util.Set;
@@ -15,7 +15,7 @@ import com.google.common.collect.HashBiMap;
  * the local names of a shared project are different. Since only the host is
  * able to share projects, the ID is determined by the host.
  */
-public class SarosProjectMapper {
+class SarosProjectMapper {
 
     BiMap<String, IProject> mapping = HashBiMap.create();
 

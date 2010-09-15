@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
@@ -63,7 +64,7 @@ public class ActivitiesExtensionProvider extends
             SplitOperation.class, TimestampOperation.class, JID.class,
             SPathDataObject.class, ChecksumActivityDataObject.class,
             ChecksumErrorActivityDataObject.class,
-            ProgressActivityDataObject.class);
+            ProgressActivityDataObject.class, VCSActivityDataObject.class);
     }
 
     public PacketExtension create(String sessionID,

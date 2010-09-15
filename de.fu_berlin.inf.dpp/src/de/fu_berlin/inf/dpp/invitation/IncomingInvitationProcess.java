@@ -74,7 +74,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * @author rdjemili
@@ -253,7 +253,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
             }
         }
 
-        VCSAdapter vcs = VCSAdapterFactory.getAdapter(this.remoteFileList
+        VCSAdapter vcs = VCSAdapter.getAdapter(this.remoteFileList
             .getVcsProviderID());
 
         assignLocalProject(baseProject, newProjectName, vcs, monitor);
@@ -412,7 +412,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
         try {
-            localFileList = new FileList(this.localProject);
+            localFileList = new FileList(this.localProject, vcs != null);
         } catch (CoreException e) {
             e.printStackTrace();
             return new FileList();
@@ -473,8 +473,12 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (newProjectName == null) {
             this.localProject = baseProject;
             if (vcs != null) {
-                // TODO ndh Make sure that this project is under version
-                // control.
+                if (!vcs.isManaged(localProject)) {
+                    VCSResourceInformation info = remoteFileList
+                        .getProjectInformation();
+                    vcs.connect(localProject, info.repositoryRoot, info.path,
+                        monitor);
+                }
             }
             return;
         }

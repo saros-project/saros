@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -51,7 +52,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosProjectMapper;
+import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -59,8 +60,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer
- * all honor start() and stop() semantics.
+ * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
+ * honor start() and stop() semantics.
  */
 public class SarosSession implements ISarosSession, Disposable {
 
@@ -113,6 +114,8 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     };
 
+    protected SharedProject sharedProject;
+
     public static class QueueItem {
 
         public final List<User> recipients;
@@ -136,16 +139,15 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     protected SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, String projectID,
-        IProject project, StopManager stopManager, JID myJID, int myColorID,
-        DateTime sessionStart, boolean useVersionControl) {
+        DispatchThreadContext threadContext, StopManager stopManager,
+        JID myJID, int myColorID, DateTime sessionStart,
+        boolean useVersionControl) {
 
         assert transmitter != null;
         assert myJID != null;
 
         this.saros = saros;
         this.transmitter = transmitter;
-        this.projectMapper.addMapping(projectID, project);
         this.transferManager = transferManager;
         this.stopManager = stopManager;
         this.sessionStart = sessionStart;
@@ -163,13 +165,11 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, IProject project, JID myID,
-        StopManager stopManager, DateTime sessionStart,
-        boolean useVersionControl) {
+        DispatchThreadContext threadContext, JID myID, StopManager stopManager,
+        DateTime sessionStart, boolean useVersionControl) {
 
-        this(saros, transmitter, transferManager, threadContext, project
-            .getName(), project, stopManager, myID, 0, sessionStart,
-            useVersionControl);
+        this(saros, transmitter, transferManager, threadContext, stopManager,
+            myID, 0, sessionStart, useVersionControl);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
@@ -188,12 +188,11 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
-        DispatchThreadContext threadContext, String projectID,
-        IProject project, JID myID, JID hostID, int myColorID,
-        StopManager stopManager, DateTime sessionStart) {
+        DispatchThreadContext threadContext, JID myID, JID hostID,
+        int myColorID, StopManager stopManager, DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, projectID,
-            project, stopManager, myID, myColorID, sessionStart, true);
+        this(saros, transmitter, transferManager, threadContext, stopManager,
+            myID, myColorID, sessionStart, true);
 
         this.host = new User(this, hostID, 0);
         this.host.invitationCompleted();
@@ -203,6 +202,14 @@ public class SarosSession implements ISarosSession, Disposable {
         this.participants.put(myID, localUser);
 
         this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
+    }
+
+    public void addSharedProject(IProject project, String projectID) {
+        this.projectMapper.addMapping(projectID, project);
+        if (this.sharedProject != null)
+            throw new NotImplementedException(
+                "More than one project not supported.");
+        this.sharedProject = new SharedProject(project, this);
     }
 
     public Collection<User> getParticipants() {
@@ -464,6 +471,10 @@ public class SarosSession implements ISarosSession, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
+    public boolean isStopped() {
+        return stopped;
+    }
+
     /**
      * Stops the associated activityDataObject sequencer.
      * 
@@ -673,11 +684,28 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.isShared(project);
     }
 
-    public SarosProjectMapper getProjectMapper() {
-        return projectMapper;
-    }
-
     public boolean useVersionControl() {
         return this.useVersionControl;
+    }
+
+    public SharedProject getSharedProject(IProject project) {
+        if (!isShared(project))
+            return null;
+
+        if (!sharedProject.belongsTo(project)) {
+            // TODO support more than one project...
+            throw new NotImplementedException("More than one shared project "
+                + "not supported.");
+        }
+
+        return sharedProject;
+    }
+
+    public String getProjectID(IProject project) {
+        return projectMapper.getID(project);
+    }
+
+    public IProject getProject(String projectID) {
+        return projectMapper.getProject(projectID);
     }
 }

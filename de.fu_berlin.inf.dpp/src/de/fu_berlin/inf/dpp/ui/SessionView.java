@@ -132,7 +132,13 @@ public class SessionView extends ViewPart {
                         if (user == null)
                             continue;
 
-                        viewer.refresh(user);
+                        try {
+                            viewer.refresh(user);
+                        } catch (IllegalArgumentException e) {
+                            // FIXME This looks like a bug, we shouldn't get an
+                            // exception here.
+                            log.error("viewer.refresh(" + user.toString() + ")");
+                        }
                     }
                 }
             });

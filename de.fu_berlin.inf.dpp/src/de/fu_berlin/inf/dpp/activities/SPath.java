@@ -70,7 +70,7 @@ public class SPath {
      */
     public SPathDataObject toSPathDataObject(ISarosSession sarosSession) {
 
-        String id = sarosSession.getProjectMapper().getID(project);
+        String id = sarosSession.getProjectID(project);
         if (id == null)
             throw new IllegalArgumentException(
                 "Trying to send a SPath which refers to a file in project which is not shared: "
@@ -152,7 +152,7 @@ public class SPath {
     }
 
     /**
-     * Will return the IFile represented by this SPath.
+     * Returns the IFile represented by this SPath.
      * 
      * @return the IFile contained in the associated IProject for the given
      *         project relative path
@@ -161,6 +161,13 @@ public class SPath {
      */
     public IFile getFile() {
         return project.getFile(projectRelativePath);
+    }
+
+    /**
+     * Returns the IResource represented by this SPath.
+     */
+    public IResource getResource() {
+        return project.findMember(projectRelativePath);
     }
 
     /**

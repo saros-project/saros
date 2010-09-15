@@ -110,6 +110,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     protected Label bitrate;
     protected Label delay;
     protected Label welcomeMsg;
+    // HACK Remove the '\n' characters from this message, this is terrible.
     protected final String WELCOME_MSG = "Choose a participant from the \"Shared Project Session\" view\nand click the \"Share your Screen\" button to initialize\na videosharing connection.";
     protected final String CONNECTED_MSG = "Connected";
 
@@ -290,9 +291,6 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
      */
 
     public void initialize() {
-        // welcomeMsg.dispose();
-        // parent.layout(true);
-        // canvas.getShell().layout(true);
         welcomeMsg.setText(CONNECTED_MSG);
         welcomeMsg.pack();
 
@@ -313,7 +311,6 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
         bitrate.setText("");
         delay.setText("");
 
-        // welcomeMsg = new Label(parent, SWT.CENTER);
         welcomeMsg.setText(WELCOME_MSG);
         welcomeMsg.pack();
     }

@@ -20,11 +20,8 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,56 +32,84 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in an text editor. It creates and executes file
- * activityDataObjects and folder activityDataObjects.
- * 
- * @author rdjemili
- * 
+ * entering text in an text editor. It creates and executes file, folder, and
+ * VCS activities.
+ */
+/*
+ * For a good introduction to Eclipse's resource change notification mechanisms
+ * see
+ * http://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
  */
 @Component(module = "core")
-public class SharedResourcesManager implements IResourceChangeListener,
-    IActivityProvider, Disposable {
+public class SharedResourcesManager extends AbstractActivityProvider implements
+    IResourceChangeListener, Disposable {
+    /** The {@link IResourceChangeEvent}s we're going to register for. */
+    /*
+     * haferburg: We're really only interested in
+     * IResourceChangeEvent.POST_CHANGE events. I don't know why other events
+     * were tracked, so I removed them.
+     * 
+     * We're definitely not interested in PRE_REFRESH, refreshes are only
+     * interesting when they result in an actual change, in which case we will
+     * receive a POST_CHANGE event anyways.
+     * 
+     * We also don't need PRE_CLOSE, since we'll also get a POST_CHANGE and
+     * still have to test project.isOpen().
+     * 
+     * We might want to add PRE_DELETE if the user deletes our shared project
+     * though.
+     */
+    static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
-    private static Logger log = Logger.getLogger(SharedResourcesManager.class
-        .getName());
+    static Logger log = Logger.getLogger(SharedResourcesManager.class);
 
     /**
-     * While paused the SharedResourcesManager doesn't fire activityDataObjects
+     * If the StopManager has paused the project, the SharedResourcesManager
+     * doesn't react to resource changes.
      */
     protected boolean pause = false;
 
     protected ISarosSession sarosSession;
-
-    protected List<IActivityListener> listeners = new LinkedList<IActivityListener>();
 
     protected StopManager stopManager;
 
@@ -106,14 +131,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     protected ISessionManager sessionManager;
 
-    public SharedResourcesManager(ISessionManager sessionManager,
-        StopManager stopManager) {
-        this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
-        this.stopManager = stopManager;
-        this.stopManager.addBlockable(stopManagerListener);
-    }
-
     protected Blockable stopManagerListener = new Blockable() {
         public void unblock() {
             SharedResourcesManager.this.pause = false;
@@ -124,322 +141,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     };
 
-    /**
-     * Listens for resource changes in shared project and fires
-     * activityDataObjects.
-     */
-    protected class ResourceDeltaVisitor implements IResourceDeltaVisitor {
-
-        // stores activityDataObjects that happen while one change event
-        protected List<IResourceActivity> activitiesBuffer = new ArrayList<IResourceActivity>();
-
-        /**
-         * Compares the length (in number segments) of IPaths of given
-         * Activities. Longer path is 'bigger'.
-         * */
-        protected class PathLengthComparator implements
-            Comparator<IResourceActivity> {
-
-            public int compare(IResourceActivity a1, IResourceActivity a2) {
-                int a1sc = a1.getPath().getProjectRelativePath().segmentCount();
-                int a2sc = a2.getPath().getProjectRelativePath().segmentCount();
-
-                return a1sc - a2sc;
-            }
-
-        }
-
-        /**
-         * Compares the length (in number segments) of IPaths of given
-         * Activities. Shorter path is 'bigger'.
-         * */
-        protected class ReversePathLengthComparator implements
-            Comparator<IResourceActivity> {
-
-            PathLengthComparator pathLengthComparator = new PathLengthComparator();
-
-            public int compare(IResourceActivity a1, IResourceActivity a2) {
-                return -pathLengthComparator.compare(a1, a2);
-            }
-        }
-
-        /**
-         * To be run before change event ends. It orders activityDataObjects in
-         * buffer and fires them.
-         */
-        public void finish() {
-            for (IActivity activityDataObject : getOrderedActivities())
-                fireActivity(activityDataObject);
-        }
-
-        /**
-         * Orders activityDataObjects in buffer.
-         */
-        protected List<IResourceActivity> getOrderedActivities() {
-            // TODO Use a comparator which includes all this as a sorting rule
-
-            List<IResourceActivity> fileCreateActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> fileMoveActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> fileRemoveActivities = new ArrayList<IResourceActivity>();
-
-            List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
-
-            List<IResourceActivity> orderedList;
-
-            /**
-             * split all activityDataObjects in activityDataObjects buffer in
-             * groups ({File,Folder} * {Create, Move, Delete})
-             */
-            for (IResourceActivity activity : activitiesBuffer) {
-                FolderActivity.Type tFolder;
-                FileActivity.Type tFile;
-
-                if (activity instanceof FileActivity) {
-                    tFile = ((FileActivity) activity).getType();
-                    if (tFile == FileActivity.Type.Created)
-                        fileCreateActivities.add(activity);
-                    else if (tFile == FileActivity.Type.Moved)
-                        fileMoveActivities.add(activity);
-                    else if (tFile == FileActivity.Type.Removed)
-                        fileRemoveActivities.add(activity);
-
-                }
-                if (activity instanceof FolderActivity) {
-                    tFolder = ((FolderActivity) activity).getType();
-                    if (tFolder == FolderActivity.Type.Created)
-                        folderCreateActivities.add(activity);
-                    else if (tFolder == FolderActivity.Type.Removed)
-                        folderRemoveActivities.add(activity);
-
-                }
-            }
-
-            PathLengthComparator pathLengthComparator = new PathLengthComparator();
-            ReversePathLengthComparator iplc = new ReversePathLengthComparator();
-
-            // Sorts Activities by their length
-            Collections.sort(fileCreateActivities, pathLengthComparator);
-            Collections.sort(fileMoveActivities, pathLengthComparator);
-            Collections.sort(fileRemoveActivities, iplc);
-            Collections.sort(folderCreateActivities, pathLengthComparator);
-            Collections.sort(folderRemoveActivities, iplc);
-
-            orderedList = new ArrayList<IResourceActivity>();
-
-            // add activityDataObjects to the result
-            orderedList.addAll(folderCreateActivities);
-            orderedList.addAll(fileMoveActivities);
-            orderedList.addAll(fileCreateActivities);
-            orderedList.addAll(fileRemoveActivities);
-            orderedList.addAll(folderRemoveActivities);
-
-            return orderedList;
-        }
-
-        public boolean visit(IResourceDelta delta) {
-
-            assert sarosSession != null;
-
-            if (!sarosSession.isDriver()) {
-                return false;
-            }
-
-            IResource resource = delta.getResource();
-            if (resource.getProject() == null) {
-                return true;
-            }
-
-            if (!sarosSession.isShared(resource.getProject()))
-                return false;
-
-            if (resource.isDerived()) {
-                return false;
-            }
-
-            IResourceActivity activity = null;
-
-            if (resource instanceof IFile)
-                activity = handleFileDelta(delta);
-            else if (resource instanceof IFolder)
-                activity = handleFolderDelta(delta);
-
-            if (activity != null) {
-
-                // TODO A delete activityDataObject is triggered twice
-                activitiesBuffer.add(activity);
-            }
-
-            return delta.getKind() != IResourceDelta.NO_CHANGE;
-        }
-
-        protected IResourceActivity handleFolderDelta(IResourceDelta delta) {
-            IResource resource = delta.getResource();
-            switch (delta.getKind()) {
-            case IResourceDelta.ADDED:
-
-                return new FolderActivity(sarosSession.getLocalUser(),
-                    FolderActivity.Type.Created, new SPath(resource));
-
-            case IResourceDelta.REMOVED:
-
-                return new FolderActivity(sarosSession.getLocalUser(),
-                    FolderActivity.Type.Removed, new SPath(resource));
-
-            default:
-                return null;
-            }
-        }
-
-        protected IResourceActivity handleFileDelta(IResourceDelta delta) {
-            IResource resource = delta.getResource();
-            int kind = delta.getKind();
-
-            switch (kind) {
-            case IResourceDelta.CHANGED:
-                if (!isContentChange(delta))
-                    return null;
-
-                return createdUnlessOpen(resource);
-
-            case IResourceDelta.ADDED:
-
-                // is this an "ADD" while moving/renaming a file?
-                if (isMovedFrom(delta)) {
-
-                    IPath newPath = resource.getFullPath();
-                    // Adds have getMovedFrom set:
-                    IPath oldPath = delta.getMovedFromPath();
-
-                    IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-                        .getRoot();
-
-                    IProject newProject = root.getProject(newPath.segment(0));
-                    IProject oldProject = root.getProject(oldPath.segment(0));
-
-                    if (sarosSession.isShared(newProject)) {
-                        if (sarosSession.isShared(oldProject)) {
-                            // Moving inside the shared project
-                            try {
-                                return FileActivity.moved(
-                                    sarosSession.getLocalUser(),
-                                    new SPath(newProject, newPath
-                                        .removeFirstSegments(1)),
-                                    new SPath(oldProject, oldPath
-                                        .removeFirstSegments(1)),
-                                    isContentChange(delta));
-                            } catch (IOException e) {
-                                log.warn("Resource could not be read for"
-                                    + " sending to peers:"
-                                    + resource.getLocation());
-                            }
-                        } else {
-                            // Moving a file into the shared project
-                            // -> Treat like an add!
-
-                            // Fall-through
-                        }
-                    } else {
-                        // Moving away!
-                        return FileActivity.removed(
-                            sarosSession.getLocalUser(), new SPath(resource),
-                            Purpose.ACTIVITY);
-                    }
-                }
-
-                // usual files adding procedure
-
-                return createdUnlessOpen(resource);
-
-            case IResourceDelta.REMOVED:
-                if (isMoved(delta)) {
-
-                    // REMOVED deltas have MovedTo set
-                    IPath newPath = delta.getMovedToPath();
-
-                    IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-                        .getRoot();
-
-                    IProject newProject = root.getProject(newPath.segment(0));
-
-                    if (sarosSession.isShared(newProject)) {
-                        // Ignore "REMOVED" while moving into shared project
-                        return null;
-                    }
-                    // else moving file away from shared project, need to tell
-                    // others to delete! Fall-through...
-                }
-
-                return FileActivity.removed(sarosSession.getLocalUser(),
-                    new SPath(resource), Purpose.ACTIVITY);
-
-            default:
-                return null;
-            }
-        }
-
-        /**
-         * Returns a new FileActivity.created if the file is not currently in
-         * any open editor. We ignore opened files because otherwise we might
-         * send CHANGED events for files that are also handled by the editor
-         * manager.<br>
-         * If an error occurs while reading the file, this method returns null.
-         * 
-         * @param resource
-         * @return
-         */
-        private IResourceActivity createdUnlessOpen(IResource resource) {
-            SPath spath = new SPath(resource);
-            if (editorManager.isOpened(spath)) {
-                return null;
-            }
-
-            log.debug("Resource " + resource.getName() + " changed");
-            try {
-                return FileActivity.created(sarosSession.getLocalUser(), spath,
-                    Purpose.ACTIVITY);
-            } catch (IOException e) {
-                log.warn("Resource could not be read for sending to peers:"
-                    + resource.getLocation(), e);
-                return null;
-            }
-        }
-
-        /**
-         * It analyzes the given IResourceDelta and returns true if the
-         * "Moved"-flags are set.
-         * */
-        protected boolean isMoved(IResourceDelta delta) {
-            return (isMovedFrom(delta) || isMovedTo(delta));
-        }
-
-        protected boolean isMovedFrom(IResourceDelta delta) {
-            return ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0);
-        }
-
-        protected boolean isMovedTo(IResourceDelta delta) {
-            return ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0);
-        }
-
-        /**
-         * Indicates content change of a resource while checking its delta.
-         */
-        protected boolean isContentChange(IResourceDelta delta) {
-            return ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
-
-        }
-
-        protected void fireActivity(final IActivity activityDataObject) {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    for (IActivityListener listener : listeners) {
-                        listener.activityCreated(activityDataObject);
-                    }
-                }
-            });
-        }
-    }
-
     public ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
@@ -447,7 +148,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             sarosSession = newSarosSession;
             sarosSession.addActivityProvider(SharedResourcesManager.this);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                SharedResourcesManager.this);
+                SharedResourcesManager.this, INTERESTING_EVENTS);
         }
 
         @Override
@@ -461,24 +162,25 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     };
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void addActivityListener(IActivityListener listener) {
-        if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
+    private IJobChangeListener jobChangeListener = new JobChangeAdapter() {
+        @Override
+        public void done(IJobChangeEvent event) {
+            Job job = event.getJob();
+            log.trace("Job " + job.getName() + " done");
+            job.removeJobChangeListener(jobChangeListener);
         }
+    };
+
+    public SharedResourcesManager(ISessionManager sessionManager,
+        StopManager stopManager) {
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSessionListener(sessionListener);
+        this.stopManager = stopManager;
+        this.stopManager.addBlockable(stopManagerListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void removeActivityListener(IActivityListener listener) {
-        this.listeners.remove(listener);
+    public void dispose() {
+        stopManager.removeBlockable(stopManagerListener);
     }
 
     /**
@@ -489,63 +191,230 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
-        /*
-         * If the StopManager has paused the project do not react to resource
-         * changes
-         */
         if (pause) {
-            /*
-             * TODO This warning is misleading! The consistency recovery process
-             * might cause IResourceChangeEvents (which do not need to be
-             * replicated)
-             */
             logPauseWarning(event);
             return;
         }
 
-        try {
-            switch (event.getType()) {
-
-            case IResourceChangeEvent.PRE_BUILD:
-            case IResourceChangeEvent.POST_BUILD:
-            case IResourceChangeEvent.POST_CHANGE:
-
-                IResourceDelta delta = event.getDelta();
-                log.trace(".resourceChanged() - Delta will be processed");
-                if (delta != null) {
-                    ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
-                    delta.accept(visitor);
-                    visitor.finish();
-                } else
-                    log.error("Unexpected empty delta in "
-                        + "SharedResourcesManager: " + event);
-                break;
-            case IResourceChangeEvent.PRE_CLOSE:
-            case IResourceChangeEvent.PRE_DELETE:
-            case IResourceChangeEvent.PRE_REFRESH:
-
-                // TODO We should handle these as well (at least if the user
-                // deletes / refreshes our shared project)
-                break;
-
-            default:
-                // Because additional events might be added in the future
-                log.error("Unhandled case in in SharedResourcesManager: "
-                    + event);
+        if (log.isTraceEnabled()) {
+            IJobManager jobManager = Job.getJobManager();
+            Job currentJob = jobManager.currentJob();
+            if (currentJob != null) {
+                currentJob.addJobChangeListener(jobChangeListener);
+                log.trace("currentJob='" + currentJob.getName() + "'");
             }
-
-        } catch (Exception e) {
-            log.error("Couldn't handle resource change.", e);
+        }
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+            // Creations, deletions, modifications of files and folders.
+            handlePostChange(event);
+        } else {
+            log.error("Unhandled event type in in SharedResourcesManager: "
+                + event);
         }
     }
 
+    protected void handlePostChange(IResourceChangeEvent event) {
+        assert sarosSession != null;
+
+        if (!sarosSession.isDriver()) {
+            return;
+        }
+
+        IResourceDelta delta = event.getDelta();
+        log.trace(".resourceChanged() - Delta will be processed");
+        if (delta == null) {
+            log.error("Unexpected empty delta in " + "SharedResourcesManager: "
+                + event);
+            return;
+        }
+
+        if (log.isTraceEnabled())
+            log.trace("handlePostChange\n" + deltaToString(delta));
+
+        assert delta.getResource() instanceof IWorkspaceRoot;
+
+        // Iterate over all projects.
+        IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+        List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
+        for (IResourceDelta projectDelta : projectDeltas) {
+            IResource resource = projectDelta.getResource();
+            assert resource instanceof IProject;
+            IProject project = (IProject) resource;
+            if (!sarosSession.isShared(project))
+                continue;
+
+            if (!checkOpenClosed(project))
+                continue;
+
+            if (!checkVCSConnection(project, pendingActivities))
+                continue;
+
+            SharedProject sharedProject = sarosSession
+                .getSharedProject(project);
+
+            VCSAdapter vcs = VCSAdapter.getAdapter(project);
+            ProjectDeltaVisitor visitor;
+            if (vcs == null) {
+                visitor = new ProjectDeltaVisitor(this, sarosSession,
+                    sharedProject);
+            } else {
+                visitor = vcs.getProjectDeltaVisitor(this, sarosSession,
+                    sharedProject);
+            }
+            try {
+                projectDelta.accept(visitor);
+            } catch (CoreException e) {
+                // The Eclipse documentation doesn't specify when CoreExceptions
+                // can occur.
+                log.debug("ProjectDeltaVisitor of project " + project.getName()
+                    + " failed for some reason.", e);
+            }
+            pendingActivities.addAll(visitor.pendingActivities);
+        }
+        orderAndFire(pendingActivities);
+    }
+
+    protected boolean checkOpenClosed(IProject project) {
+        SharedProject sharedProject = sarosSession.getSharedProject(project);
+
+        boolean isProjectOpen = project.isOpen();
+        if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
+            if (isProjectOpen) {
+                // Since the project was just opened, we would get
+                // a notification that each file in the project was just
+                // added, so we're simply going to ignore this delta. Any
+                // resources that were modified externally would be
+                // out-of-sync anyways, so when the user refreshes them
+                // we'll get notified.
+                return false;
+            } else {
+                // The project was just closed, what do we do here?
+            }
+        }
+        if (!isProjectOpen)
+            return false;
+        return true;
+    }
+
+    protected boolean checkVCSConnection(IProject project,
+        List<IResourceActivity> pendingActivities) {
+        SharedProject sharedProject = sarosSession.getSharedProject(project);
+
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        VCSAdapter oldVcs = sharedProject.getVCSAdapter();
+
+        if (sharedProject.updateVcs(vcs)) {
+            if (vcs == null) {
+                // Disconnect
+                boolean deleteContent = oldVcs == null
+                    || !oldVcs.hasLocalCache(project);
+                VCSActivity activity = VCSActivity.disconnect(sarosSession,
+                    project, deleteContent);
+                pendingActivities.add(activity);
+                sharedProject.updateRevision(null);
+                sharedProject.updateVcsUrl(null);
+            } else {
+                // Connect
+                VCSResourceInformation info;
+                info = vcs.getResourceInformation(project);
+                if (info.repositoryRoot == null || info.path == null) {
+                    // HACK For some reason, Subclipse returns null values
+                    // here. Pretend the vcs is still null and wait for the
+                    // next time we get here.
+                    sharedProject.updateVcs(null);
+                    return false;
+                }
+
+                VCSActivity activity = VCSActivity.connect(sarosSession,
+                    project, info.repositoryRoot, info.path,
+                    vcs.getProviderID(project));
+                pendingActivities.add(activity);
+                String url = info.repositoryRoot + info.path;
+                sharedProject.updateVcsUrl(url);
+                sharedProject.updateRevision(info.revision);
+
+                log.debug("Connect to VCS");
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Fires the ordered activities. To be run before change event ends.
+     */
+    protected void orderAndFire(List<IResourceActivity> pendingActivities) {
+        if (pendingActivities.isEmpty())
+            return;
+        final List<IResourceActivity> orderedActivities = getOrderedActivities(pendingActivities);
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                for (final IActivity activity : orderedActivities) {
+                    fireActivity(activity);
+                }
+            }
+        });
+        log.trace("Sending activities " + orderedActivities.toString());
+    }
+
+    /**
+     * Returns the activities in the order: folder creations, file activities,
+     * folder removals, then everything else.
+     * 
+     * haferburg: Sorting is not necessary, because activities are already
+     * sorted enough (activity on parent comes before activity on child). All we
+     * need to do is make sure that folders are created first and deleted last.
+     * The sorting stuff was introduced with 1742 (1688).
+     */
+    protected List<IResourceActivity> getOrderedActivities(
+        List<IResourceActivity> activities) {
+        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
+
+        /**
+         * Split all pendingActivities.
+         */
+        for (IResourceActivity activity : activities) {
+
+            if (activity instanceof FileActivity) {
+                fileActivities.add(activity);
+            } else if (activity instanceof FolderActivity) {
+                FolderActivity.Type tFolder = ((FolderActivity) activity)
+                    .getType();
+                if (tFolder == FolderActivity.Type.Created)
+                    folderCreateActivities.add(activity);
+                else if (tFolder == FolderActivity.Type.Removed)
+                    folderRemoveActivities.add(activity);
+            } else {
+                otherActivities.add(activity);
+            }
+        }
+
+        // Add activities to the result.
+        List<IResourceActivity> result = folderCreateActivities;
+        result.addAll(fileActivities);
+        result.addAll(folderRemoveActivities);
+        result.addAll(otherActivities);
+
+        return result;
+    }
+
+    /*
+     * coezbek: This warning is misleading! The consistency recovery process
+     * might cause IResourceChangeEvents (which do not need to be replicated)
+     * [Added in branches/10.2.26.r2028, the commit message claims "Improved
+     * logging of ResourceChanges while paused".]
+     * 
+     * haferburg: When is this even called? We don't get here while this class
+     * executes any activity. We can only get here when pause is true, but not
+     * fileReplacementInProgressObservable. Also, why add a misleading warning
+     * in the first place??
+     */
     protected void logPauseWarning(IResourceChangeEvent event) {
-
-        switch (event.getType()) {
-
-        case IResourceChangeEvent.PRE_BUILD:
-        case IResourceChangeEvent.POST_BUILD:
-        case IResourceChangeEvent.POST_CHANGE:
+        if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
 
             IResourceDelta delta = event.getDelta();
             if (delta == null) {
@@ -555,54 +424,49 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return;
             }
 
-            ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
-            try {
-                delta.accept(visitor);
-            } catch (CoreException e) {
-                log.error("ToStringResourceDelta visitor crashed", e);
-                return;
-            }
-            log.warn("Resource changed while paused:\n" + visitor.toString());
-            break;
-        case IResourceChangeEvent.PRE_CLOSE:
-        case IResourceChangeEvent.PRE_DELETE:
-        case IResourceChangeEvent.PRE_REFRESH:
-
-            IResource resource = event.getResource();
-            if (resource != null) {
-                log.warn("Resource changed while paused: "
-                    + event.getResource().getFullPath().toPortableString());
-            } else {
-                log.warn("ResourceChange occurred while paused with no resource given");
-            }
-            break;
-        default:
-            // Because additional events might be added in the future
-            log.error("Unhandled case in in SharedResourcesManager: " + event);
+            log.warn("Resource changed while paused:\n" + deltaToString(delta));
+        } else {
+            log.error("Unexpected event type in in logPauseWarning: " + event);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void exec(IActivity activityDataObject) {
+    protected String deltaToString(IResourceDelta delta) {
+        ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
+        try {
+            delta.accept(visitor);
+        } catch (CoreException e) {
+            log.error("ToStringResourceDelta visitor crashed", e);
+            return "";
+        }
+        return visitor.toString();
+    }
 
-        if (!(activityDataObject instanceof FileActivity || activityDataObject instanceof FolderActivity))
+    @Override
+    public void exec(IActivity activity) {
+
+        if (!(activity instanceof FileActivity
+            || activity instanceof FolderActivity || activity instanceof VCSActivity))
             return;
 
         try {
             fileReplacementInProgressObservable.startReplacement();
 
-            if (activityDataObject instanceof FileActivity) {
-                exec((FileActivity) activityDataObject);
-            } else if (activityDataObject instanceof FolderActivity) {
-                exec((FolderActivity) activityDataObject);
+            log.trace("execing " + activity.toString() + " in "
+                + Thread.currentThread().getName());
+
+            if (activity instanceof FileActivity) {
+                exec((FileActivity) activity);
+            } else if (activity instanceof FolderActivity) {
+                exec((FolderActivity) activity);
+            } else if (activity instanceof VCSActivity) {
+                exec((VCSActivity) activity);
             }
 
         } catch (CoreException e) {
-            log.error("Failed to execute resource activityDataObject.", e);
+            log.error("Failed to execute resource activity.", e);
         } finally {
             fileReplacementInProgressObservable.replacementDone();
+            log.trace("done execing " + activity.toString());
         }
     }
 
@@ -626,8 +490,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         // Create or remove file
-        if (activity.getType() == FileActivity.Type.Created) {
-            // TODO should be reported to the user
+        FileActivity.Type type = activity.getType();
+        if (type == FileActivity.Type.Created) {
+            // TODO The progress should be reported to the user.
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
                 FileUtil.writeFile(
@@ -636,9 +501,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
-        } else if (activity.getType() == FileActivity.Type.Removed) {
+        } else if (type == FileActivity.Type.Removed) {
             FileUtil.delete(file);
-        } else if (activity.getType() == FileActivity.Type.Moved) {
+        } else if (type == FileActivity.Type.Moved) {
 
             IPath newFilePath = activity.getPath().getFile().getFullPath();
 
@@ -693,7 +558,61 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     }
 
-    public void dispose() {
-        stopManager.removeBlockable(stopManagerListener);
+    protected void exec(VCSActivity activity) {
+        final VCSActivity.Type activityType = activity.getType();
+        SPath path = activity.getPath();
+        final IResource resource = path.getResource();
+        final IProject project = path.getProject();
+        final String url = activity.getURL();
+        final String directory = activity.getDirectory();
+        final String revision = activity.getParam1();
+
+        // Connect is special since the project doesn't have a VCSAdapter
+        // yet.
+        final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapter
+            .getAdapter(revision) : VCSAdapter.getAdapter(project);
+        if (vcs == null) {
+            log.error("Could not execute VCS activity.");
+            return;
+        }
+
+        try {
+            // TODO Should these operations run in an IWorkspaceRunnable?
+            Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
+            ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(
+                shell);
+            progressMonitorDialog.open();
+            Shell pmdShell = progressMonitorDialog.getShell();
+            pmdShell.setText("Saros running VCS operation");
+            log.trace("about to call progressMonitorDialog.run");
+            progressMonitorDialog.run(false, false,
+                new IRunnableWithProgress() {
+                    public void run(IProgressMonitor progress)
+
+                    throws InvocationTargetException, InterruptedException {
+                        log.trace("progressMonitorDialog.run started");
+                        if (!Util.isSWT())
+                            log.trace("not in SWT thread");
+                        if (activityType == VCSActivity.Type.Connect) {
+                            vcs.connect(project, url, directory, progress);
+                        } else if (activityType == VCSActivity.Type.Disconnect) {
+                            vcs.disconnect(project, revision != null, progress);
+                        } else if (activityType == VCSActivity.Type.Switch) {
+                            vcs.switch_(resource, url, revision, progress);
+                        } else if (activityType == VCSActivity.Type.Update) {
+                            vcs.update(resource, revision, progress);
+                        } else {
+                            log.error("VCS activity type not implemented yet.");
+                        }
+                        log.trace("progressMonitorDialog.run done");
+                    }
+
+                });
+            pmdShell.dispose();
+        } catch (InvocationTargetException e) {
+            assert false; // TODO We can't get here, right?
+        } catch (InterruptedException e) {
+            assert false; // We can't get here
+        }
     }
 }

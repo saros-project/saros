@@ -34,7 +34,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
-import de.fu_berlin.inf.dpp.MessagingManager.SessionProvider;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -216,13 +215,11 @@ public class ChatView extends ViewPart {
 
         rosterTracker.addRosterListener(rosterListener);
         log.debug("RosterListener added!");
-        log.debug("SessionListener added!");
 
-        if (sessionManager.getSarosSession() == null) {
+        if (sessionManager.getSarosSession() != null) {
             log.debug("session started");
             if (!chatUsers.containsKey(saros.getMyJID()))
                 chatUsers.put(saros.getMyJID(), SELF_REFERENCE);
-
         }
         this.prefStore = saros.getPreferenceStore();
     }
@@ -262,7 +259,8 @@ public class ChatView extends ViewPart {
                 text = text.trim();
                 ChatView.this.inputText.setText("");
 
-                SessionProvider session = messagingManager.getSession();
+                MessagingManager.SessionProvider session = messagingManager
+                    .getSession();
                 if (!text.equals("") && session != null) {
                     session.sendMessage(text);
                 }

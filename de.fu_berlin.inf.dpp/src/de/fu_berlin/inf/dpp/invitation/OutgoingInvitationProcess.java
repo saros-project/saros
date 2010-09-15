@@ -304,9 +304,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             .getFileListRequestCollector(invitationID);
 
         CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
-        transmitter.sendInvitation(
-            sarosSession.getProjectMapper().getID(this.project), peer,
-            description, colorID, hostVersionInfo, invitationID,
+        transmitter.sendInvitation(sarosSession.getProjectID(this.project),
+            peer, description, colorID, hostVersionInfo, invitationID,
             sarosSession.getSessionStart(), doStream, comPrefs);
 
         subMonitor.worked(25);

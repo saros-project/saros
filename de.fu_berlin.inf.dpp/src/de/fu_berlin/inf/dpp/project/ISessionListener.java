@@ -19,8 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
-
 /**
  * A listener for SarosSession life-cycle related events.
  * 
@@ -46,12 +44,4 @@ public interface ISessionListener {
      *            <code>null</code>.
      */
     public void sessionEnded(ISarosSession oldSarosSession);
-
-    /**
-     * Is fired when the local user is invited to a session.
-     * 
-     * @param invitation
-     *            the invitation process which represents the invitation.
-     */
-    public void invitationReceived(IncomingInvitationProcess invitation);
 }

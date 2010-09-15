@@ -396,7 +396,8 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             return errorMessage;
         } catch (Throwable t) {
             log.error("An internal error occurred: ", t);
-            return t.getMessage();
+            String message = t.getMessage();
+            return message == null ? "" : message;
         }
     }
 }

@@ -45,8 +45,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapterFactory;
-import de.fu_berlin.inf.dpp.vcs.VCSProjectInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * A FileList is a list of resources - files and folders - which belong to the
@@ -76,7 +75,7 @@ public class FileList {
     /** Identifies the VCS used. */
     protected String vcsProviderID;
     /** VCS internal information. */
-    protected VCSProjectInformation vcsProjectInformation;
+    protected VCSResourceInformation vcsProjectInformation;
 
     static class FileListData {
         /** Checksum of this file. */
@@ -245,9 +244,9 @@ public class FileList {
     }
 
     /**
-     * Calculate an approximation of how equal <code>this</code>
-     * <code>FileList</code> is to <code>project</code>. NOTE: This is a
-     * long-running method linear to size of the length of the two file lists.
+     * Calculate an approximation of how equal this <code>FileList</code> is to
+     * <code>project</code>. NOTE: This is a long-running method linear to size
+     * of the length of the two file lists.
      * 
      * @param project
      * @return Percentage of "sameness" of <code>this</code> and
@@ -340,12 +339,12 @@ public class FileList {
         VCSAdapter vcs = null;
         if (useVersionControl) {
             project = resources[0].getProject();
-            vcs = VCSAdapterFactory.getAdapter(project);
+            vcs = VCSAdapter.getAdapter(project);
             if (vcs != null) {
                 String providerID = vcs.getProviderID(project);
 
                 this.vcsProviderID = providerID;
-                this.vcsProjectInformation = vcs.getProjectInformation(project);
+                this.vcsProjectInformation = vcs.getResourceInformation(project);
             }
         }
 
@@ -424,7 +423,7 @@ public class FileList {
         return vcsProviderID;
     }
 
-    public VCSProjectInformation getProjectInformation() {
+    public VCSResourceInformation getProjectInformation() {
         return vcsProjectInformation;
     }
 }

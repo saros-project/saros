@@ -6,11 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList.FileListData;
@@ -191,40 +195,39 @@ public class FileListDiff {
      *            the local project were the shared project will be replicated.
      * @throws CoreException
      */
-    public FileListDiff removeUnneededResources(IProject localProject,
-        SubMonitor monitor) throws CoreException {
-
+    public FileListDiff removeUnneededResources(final IProject localProject,
+        final SubMonitor monitor) throws CoreException {
         // TODO don't throw CoreException
-        // TODO check if this triggers the resource listener
 
-        List<IPath> toDelete = this.getRemovedPaths();
-        monitor.beginTask("Removing resources", toDelete.size());
+        // TODO Move to FileUtil, refactor FileUtil#delete(IResource).
+        final List<IPath> toDelete = this.getRemovedPaths();
+        IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
+            public void run(IProgressMonitor progress) throws CoreException {
+                // SubMonitor monitor = (SubMonitor) progress;// doesn't work?
+                for (IPath path : toDelete) {
+                    monitor.subTask("Deleting " + path.lastSegment());
+                    IResource resource = path.hasTrailingSeparator() ? localProject
+                        .getFolder(path) : localProject.getFile(path);
 
-        for (IPath path : toDelete) {
-
-            monitor.subTask("Deleting " + path.lastSegment());
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-
-                if (folder.exists()) {
-                    folder.delete(true, monitor.newChild(1));
-                }
-
-            } else {
-                IFile file = localProject.getFile(path);
-
-                // check if file exists because it might have already been
-                // deleted when deleting its folder
-                if (file.exists()) {
-                    file.delete(true, monitor.newChild(1));
+                    // Check if resource exists because it might have already
+                    // been deleted when deleting its folder
+                    if (resource.exists()) {
+                        resource.delete(true, monitor.newChild(1));
+                    }
                 }
             }
-        }
+        };
+
+        monitor.beginTask("Removing resources", toDelete.size());
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        workspace.run(deleteProcedure, workspace.getRoot(),
+            IWorkspace.AVOID_UPDATE, monitor);
 
         FileListDiff result = new FileListDiff();
         result.added.addAll(this.added);
         result.altered.addAll(this.altered);
         // Removed is empty now
+        // TODO only if there was no exception
         result.unaltered.addAll(this.unaltered);
 
         monitor.done();
