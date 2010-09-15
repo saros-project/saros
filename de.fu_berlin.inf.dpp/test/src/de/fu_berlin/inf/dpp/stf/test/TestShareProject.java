@@ -7,8 +7,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -20,11 +20,12 @@ public class TestShareProject {
     private static final Logger log = Logger.getLogger(TestShareProject.class);
 
     // bots
-    protected Musician inviter;
-    protected Musician invitee;
+    protected static Musician inviter;
+    protected static Musician invitee;
 
-    @Before
-    public void configureInvitee() throws RemoteException, NotBoundException {
+    @BeforeClass
+    public static void configureInvitee() throws RemoteException,
+        NotBoundException {
         log.trace("configureInvitee enter");
         invitee = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
@@ -32,25 +33,26 @@ public class TestShareProject {
         invitee.initBot();
     }
 
-    @Before
-    public void configureInviter() throws RemoteException, NotBoundException {
+    @BeforeClass
+    public static void configureInviter() throws RemoteException,
+        NotBoundException {
         log.trace("configureInviter");
         inviter = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         inviter.initBot();
-        inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
+        inviter.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
-    @After
-    public void cleanupInvitee() throws RemoteException {
+    @AfterClass
+    public static void cleanupInvitee() throws RemoteException {
         invitee.xmppDisconnect();
-        invitee.removeProject(BotConfiguration.PROJECTNAME);
+        invitee.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
-    @After
-    public void cleanupInviter() throws RemoteException {
+    @AfterClass
+    public static void cleanupInviter() {
         inviter.xmppDisconnect();
     }
 
@@ -67,33 +69,34 @@ public class TestShareProject {
             + "/inviter_in_sharedproject.png");
 
         log.trace("inviter.setTextInClass");
-        inviter.setTextInClass(BotConfiguration.CONTENTPATH,
+        inviter.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
         log.trace("invitee.openFile");
-        invitee.openFile(BotConfiguration.PROJECTNAME,
+        invitee.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
-        invitee.sleep(2000);
+        // invitee.sleep(2000);
         assertTrue(invitee.isParticipant());
         assertTrue(invitee.isObserver());
-        assertTrue(invitee.isParticipant(inviter));
+        assertTrue(invitee.hasParticipant(inviter));
         assertTrue(invitee.isDriver(inviter));
 
         assertTrue(inviter.isParticipant());
         assertTrue(inviter.isDriver());
-        assertTrue(inviter.isParticipant(invitee));
+        assertTrue(inviter.hasParticipant(invitee));
         assertTrue(inviter.isObserver(invitee));
 
+        invitee.leaveSession();
         log.trace("invitee.leave");
-        invitee.leave(true);
-        invitee.sleep(2000);
         assertFalse(invitee.isParticipant());
 
+        inviter.waitUntilSessionClosesBy(invitee);
+
+        inviter.leaveSession();
         log.trace("inviter.leave");
-        inviter.leave(false);
-        invitee.sleep(2000);
         assertFalse(inviter.isParticipant());
+        invitee.waitUntilSessionClosesBy(inviter);
     }
 }

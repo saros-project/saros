@@ -18,6 +18,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  */
 public interface ISarosState extends Remote {
 
+    public boolean existSession() throws RemoteException;
+
     /**
      * Returns true if all given jids are drivers of the project.
      */
@@ -122,7 +124,7 @@ public interface ISarosState extends Remote {
      */
     public ConnectionState getXmppConnectionState() throws RemoteException;
 
-    public boolean hasContact(JID jid) throws RemoteException;
+    public boolean hasContactWith(JID jid) throws RemoteException;
 
     public ISarosSession getProject() throws RemoteException;
 

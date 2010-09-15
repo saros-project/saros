@@ -16,7 +16,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
@@ -37,15 +36,18 @@ public class RmiTest {
 
     @After
     public void cleanupBot() {
-        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        bot.xmppDisconnect();
+        bot.closeRosterView();
+        bot.closeChatView();
+        bot.closeRmoteScreenView();
+        bot.closeSarosSessionView();
     }
 
     @Test
-    public void testWindows() throws RemoteException {
-        bot.waitForConnect();
-        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
-        assertFalse(bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
+    public void testWindows() {
+        bot.closeRosterView();
+        assertFalse(bot.isRosterViewOpen());
         bot.openRosterView();
-        assertTrue(bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
+        assertTrue(bot.isRosterViewOpen());
     }
 }

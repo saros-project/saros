@@ -13,7 +13,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestBasicSarosElements {
     private static final Logger log = Logger
@@ -35,52 +34,58 @@ public class TestBasicSarosElements {
 
     @AfterClass
     public static void afterClass() {
-        try {
-            bot.xmppDisconnect();
-        } catch (RemoteException e) {
-            // ignore
-        }
+        bot.xmppDisconnect();
     }
 
     @Test
-    public void testSessionView() throws RemoteException {
-        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
-        assertEquals(false,
-            bot.isViewOpen(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION));
-        bot.openSessionView();
+    public void testSessionView() {
+        bot.closeSarosSessionView();
+        assertEquals(false, bot.issharedSessionViewOpen());
+        bot.openSarosSessionView();
         bot.captureScreenshot(bot.getPathToScreenShot() + "/session_view.png");
-        assertEquals(true,
-            bot.isViewOpen(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION));
+        assertEquals(true, bot.issharedSessionViewOpen());
     }
 
     @Test
-    public void testRosterView() throws RemoteException {
-        bot.closeViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
-        assertEquals(false, bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
+    public void testRosterView() {
+        bot.closeRosterView();
+        assertEquals(false, bot.isRosterViewOpen());
         bot.openRosterView();
         bot.captureScreenshot(bot.getPathToScreenShot() + "/roster_view.png");
-        assertEquals(true, bot.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER));
+        assertEquals(true, bot.isRosterViewOpen());
     }
 
     @Test
-    public void testXmppConnect() throws RemoteException {
+    public void testChatView() {
+        bot.closeChatView();
+        assertEquals(false, bot.isChatViewOpen());
+        bot.openChatView();
+        assertEquals(true, bot.isChatViewOpen());
+    }
+
+    @Test
+    public void testRemoteScreenView() {
+        bot.closeRmoteScreenView();
+        assertEquals(false, bot.isRemoteScreenViewOpen());
+        bot.openRemoteScreenView();
+        assertEquals(true, bot.isRemoteScreenViewOpen());
+    }
+
+    @Test
+    public void testXmppConnect() {
         log.trace("xmppDisconnect");
         bot.xmppDisconnect();
         log.trace("xmppConnect");
         bot.xmppConnect();
         log.trace("captureScreenshot");
         bot.captureScreenshot(bot.getPathToScreenShot() + "/xmpp_connected.png");
-        log.trace("waitForConnect");
-        bot.waitForConnect();
         assertEquals(true, bot.isConnectedByXMPP());
     }
 
     @Test
-    public void testXmppDisconnect() throws RemoteException {
+    public void testXmppDisconnect() {
         bot.xmppConnect();
-        bot.waitForConnect();
         bot.xmppDisconnect();
-
         bot.captureScreenshot(bot.getPathToScreenShot()
             + "/xmpp_disconnected.png");
         assertEquals(false, bot.isConnectedByXMPP());

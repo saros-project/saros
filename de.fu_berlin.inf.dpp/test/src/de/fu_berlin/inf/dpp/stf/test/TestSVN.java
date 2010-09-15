@@ -18,7 +18,7 @@ public class TestSVN {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.createProjectWithClass(BotConfiguration.PROJECTNAME,
+        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
@@ -35,7 +35,7 @@ public class TestSVN {
 
     @Test
     public void setUp() throws Exception {
-        alice.getProjectFromSVN(BotConfiguration.SVN_URL);
+        alice.importProjectFromSVN(BotConfiguration.SVN_URL);
         // Make sure Alice has project "test" which is connected to SVN.
         // Make sure Alice is switched to trunk.
         // Make sure there is a file "src/main/Main.java" in the project.

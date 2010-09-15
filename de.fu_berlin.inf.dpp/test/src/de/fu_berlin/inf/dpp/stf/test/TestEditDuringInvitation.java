@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -52,32 +52,29 @@ public class TestEditDuringInvitation {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.createProjectWithClass(BotConfiguration.PROJECTNAME,
+        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
-    @After
-    public void cleanupBob() throws RemoteException {
+    @AfterClass
+    public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.removeProject(BotConfiguration.PROJECTNAME);
+        bob.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
-    @After
-    public void cleanupCarl() throws RemoteException {
+    @AfterClass
+    public static void cleanupCarl() throws RemoteException {
         carl.xmppDisconnect();
-        carl.removeProject(BotConfiguration.PROJECTNAME);
+        carl.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
-    @After
-    public void cleanupAlice() throws RemoteException {
+    @AfterClass
+    public static void cleanupAlice() {
         alice.xmppDisconnect();
     }
 
     @Test
-    public void testShareProjectParallel() throws RemoteException {
-        bob.waitForConnect();
-        carl.waitForConnect();
-        alice.waitForConnect();
+    public void testEditDuringInvitation() throws RemoteException {
 
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
             SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
@@ -86,22 +83,19 @@ public class TestEditDuringInvitation {
 
         assertTrue(bob.isDriver(alice));
 
-        bob.openFile(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-
         alice.inviteUser(carl, BotConfiguration.PROJECTNAME);
 
-        carl.ackProjectStep1(alice);
+        carl.confirmSessionInvitationWindowStep1(alice);
 
-        bob.setTextInClass(BotConfiguration.CONTENTPATH,
+        bob.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
-        carl.ackProjectStep2UsingNewproject(alice, BotConfiguration.PACKAGENAME);
+        carl.confirmSessionInvitationWindowStep2UsingNewproject(BotConfiguration.PACKAGENAME);
 
-        String textFromCarl = carl.getTextOfClass(BotConfiguration.PROJECTNAME,
+        String textFromCarl = carl.getTextOfJavaEditor(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-        String textFormAlice = alice.getTextOfClass(
+        String textFormAlice = alice.getTextOfJavaEditor(
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
         assertTrue(textFromCarl.equals(textFormAlice));

@@ -8,13 +8,28 @@ public class SarosConstant {
     public final static int USE_EXISTING_PROJECT = 2;
     public final static int USE_EXISTING_PROJECT_WITH_COPY = 3;
     public final static String VIEW_TITLE_ROSTER = "Roster";
+    public final static String VIEW_TITLE_CHAT_VIEW = "Chat View";
     public final static String VIEW_TITLE_SHARED_PROJECT_SESSION = "Shared Project Session";
     public final static String VIEW_TITLE_PACKAGE_EXPLORER = "Package Explorer";
     public final static String VIEW_TITLE_WELCOME = "Welcome";
+    public final static String VIEW_TITLE_REMOTE_SCREEN = "Remote Screen";
+
     public final static String TOOL_TIP_TEXT_DISCONNECT = "Disconnect.*";
     public final static String TOOL_TIP_TEXT_CONNECT = "Connect";
     public final static String TOOL_TIP_TEXT_OPEN_INVITATION_INTERFACE = "Open invitation interface";
     public final static String TOOL_TIP_TEXT_ADD_A_NEW_CONTACT = "Add a new contact";
+    public final static String TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER = "Share your screen with selected user";
+    public final static String TOOL_TIP_TEXT_STOP_SESSION_WITH_USER = "Stop session with user";
+    public final static String TOOL_TIP_TEXT_CHANGE_MODE_IMAGE_SOURCE = "Change mode of image source";
+    public final static String TOOL_TIP_TEXT_STOP_RUNNING_SESSION = "Stop running session";
+    public final static String TOOL_TIP_TEXT_RESUME = "Resume";
+    public final static String TOOL_TIP_TEXT_PAUSE = "Pause";
+    public final static String TOOL_TIP_TEXT_SEND_FILE_TO_SELECTED_USER = "Send a file to selected user";
+    public final static String TOOL_TIP_TEXT_START_VOIP_SESSION = "Start a VoIP Session...";
+    public final static String TOOL_TIP_TEXT_NO_INCONSISTENCIES = "No inconsistencies";
+    public final static String TOOL_TIP_TEXT_REMOVE_ALL_DRIVER_ROLES = "Remove all driver roles";
+    public final static String TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
+    public final static String TOOL_TIP_TEXT_LEAVE_THE_SESSION = "Leave the session";
 
     public final static String SAROS_CONFI_SHELL_TITLE = "Saros Configuration";
     public final static String TEXT_LABEL_JABBER_SERVER = "Jabber Server";
@@ -37,15 +52,23 @@ public class SarosConstant {
     public final static String MENU_TITLE_DELETE = "Delete";
     public final static String MENU_TITLE_FILE = "File";
     public final static String MENU_TITLE_NEW = "New";
+    public final static String MENU_TITLE_PROJECT = "Project...";
     public final static String MENU_TITLE_CLASS = "Class";
     public final static String MENU_TITLE_IMPORT = "Import...";
     public final static String MENU_TITLE_JAVA_PROJECT = "Java Project";
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
-    public final static String INNODE_SAROS = "Saros";
-    public final static String LEAF_ROSTER = "Roster";
+    public final static String CATEGORY_SAROS = "Saros";
+    public final static String CATEGORY_JAVA = "Java";
+    public final static String NODE_JAVA_PROJECT = "Java Project";
+    public final static String NODE_CHAT_VIEW = "Chat View";
+    public final static String NODE_REMOTE_SCREEN = "Remote Screen";
+    public final static String NODE_ROSTER = "Roster";
+    public final static String NODE_SAROS_SESSION = "Saros Session";
 
     public final static String SHELL_TITLE_DELETE_RESOURCE = "Delete Resources";
+    public final static String SHELL_TITLE_NEW_PROJECT = "New project";
+    public final static String SHELL_TITLE_INVITATION = "Invitation";
     public final static String SHELL_TITLE_SESSION_INVITATION = "Session Invitation";
     public final static String SHELL_TITLE_NEW_JAVA_CLASS = "New Java Class";
     public final static String SHELL_TITLE_CONFIRM_DELETE = "Confirm Delete";
@@ -56,10 +79,13 @@ public class SarosConstant {
     public final static String SHELL_TITLE_IMPORT = "Import";
 
     public final static String CONTEXT_MENU_GIVE_DRIVER_ROLE = "Give driver role";
+    public final static String CONTEXT_MENU__DRIVER_ROLE = "Give exclusive driver role";
+    public final static String CONTEXT_MENU_REMOVE_DRIVER_ROLE = "Remove driver role";
     public final static String CONTEXT_MENU_OPEN = "Open";
     public final static String CONTEXT_MENU_FOLLOW_THIS_USER = "Follow this user";
     public final static String CONTEXT_MENU_STOP_FOLLOWING_THIS_USER = "Stop following this user";
     public final static String CONTEXT_MENU_DELETE = "Delete";
+    public final static String CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER = "Jump to position of selected user";
     public final static String CONTEXT_MENU_LEAVE_THE_SESSION = "Leave the session";
     public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
 

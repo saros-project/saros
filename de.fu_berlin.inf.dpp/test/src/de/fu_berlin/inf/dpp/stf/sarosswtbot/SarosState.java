@@ -74,6 +74,10 @@ public class SarosState implements ISarosState {
         return result;
     }
 
+    public boolean existSession() {
+        return sessionManager.getSarosSession() != null;
+    }
+
     public boolean areParticipants(List<JID> jids) {
         boolean result = true;
         for (JID jid : jids) {
@@ -101,7 +105,7 @@ public class SarosState implements ISarosState {
         return saros.getConnectionState();
     }
 
-    public boolean hasContact(JID jid) throws RemoteException {
+    public boolean hasContactWith(JID jid) throws RemoteException {
         return saros.getRoster().contains(jid.getBase());
     }
 

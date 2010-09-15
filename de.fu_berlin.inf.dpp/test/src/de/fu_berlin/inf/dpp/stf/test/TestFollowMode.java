@@ -6,7 +6,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -16,71 +17,85 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestFollowMode {
     // bots
-    protected Musician inviter;
-    protected Musician invitee;
+    protected static Musician alice;
+    protected static Musician bob;
 
-    @Before
-    public void configureInvitee() throws RemoteException, NotBoundException {
+    @BeforeClass
+    public static void configureInvitee() throws RemoteException,
+        NotBoundException {
 
-        invitee = new Musician(new JID(BotConfiguration.JID_ALICE),
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        invitee.initBot();
+        alice.initBot();
+        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
-    }
-
-    @Before
-    public void configureInviter() throws RemoteException, NotBoundException {
-
-        inviter = new Musician(new JID(BotConfiguration.JID_BOB),
+        bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        inviter.initBot();
+        bob.initBot();
 
-        inviter.createProjectWithClass(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        alice.buildSession(bob, BotConfiguration.PROJECTNAME,
+            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
+
+    }
+
+    @AfterClass
+    public static void cleanupBob() throws RemoteException {
+        bob.xmppDisconnect();
+        bob.deleteResource(BotConfiguration.PROJECTNAME);
+    }
+
+    @AfterClass
+    public static void cleanupAice() throws RemoteException {
+        alice.xmppDisconnect();
+        alice.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @After
-    public void cleanupInvitee() throws RemoteException {
-        invitee.xmppDisconnect();
-        invitee.removeProject(BotConfiguration.PROJECTNAME);
-    }
-
-    @After
-    public void cleanupInviter() throws RemoteException {
-        inviter.xmppDisconnect();
-        inviter.removeProject(BotConfiguration.PROJECTNAME);
+    public void StopFollowMode() throws RemoteException {
+        if (bob.isInFollowMode(alice))
+            bob.clickCMStopfollowingThisUserInSPSView(alice);
+        if (alice.isInFollowMode(bob))
+            alice.clickCMStopfollowingThisUserInSPSView(bob);
     }
 
     @Test
-    public void testShareProject() throws RemoteException {
-        inviter.buildSession(invitee, BotConfiguration.PROJECTNAME,
-            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
-
-        invitee.openFile(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-
-        inviter.setTextInClass(BotConfiguration.CONTENTPATH,
+    public void testBobFollowAlice() throws RemoteException {
+        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
-        invitee.follow(inviter);
-        invitee.sleep(1000);
-        assertTrue(invitee.isInFollowMode(inviter));
+        bob.followUser(alice);
+        bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
+        assertTrue(bob.isInFollowMode(alice));
+        assertTrue(bob.isJavaEditorActive(BotConfiguration.CLASSNAME));
 
-        inviter.createJavaClassInProject(BotConfiguration.PROJECTNAME,
+        String textFromInviter = alice.getTextOfJavaEditor(
+            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
+        bob.waitUntilFileEqualWithFile(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME,
+            textFromInviter);
+        String textFormInvitee = bob.getTextOfJavaEditor(
+            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
+
+        assertTrue(textFromInviter.equals(textFormInvitee));
+
+        alice.newJavaClassInProject(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME2);
-        inviter.sleep(1000);
-        assertTrue(invitee.isEditorActive(BotConfiguration.CLASSNAME2));
+        bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME2);
+        assertTrue(bob.isJavaEditorActive(BotConfiguration.CLASSNAME2));
+    }
 
-        inviter.follow(invitee);
-        inviter.sleep(1000);
-        assertTrue(inviter.isInFollowMode(invitee));
-
-        invitee.activeEditor(BotConfiguration.CLASSNAME);
-        invitee.sleep(750);
-        assertTrue(inviter.isEditorActive(BotConfiguration.CLASSNAME));
-
+    @Test
+    public void testAliceFollowBob() throws RemoteException {
+        alice.followUser(bob);
+        assertTrue(alice.isInFollowMode(bob));
+        bob.activateJavaEditor(BotConfiguration.CLASSNAME);
+        alice.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
+        assertTrue(alice.isJavaEditorActive(BotConfiguration.CLASSNAME));
     }
 }

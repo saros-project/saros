@@ -14,36 +14,37 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     /*************** Saros-specific-highlevel RMI exported Methods ******************/
 
-    public void accountBySarosMenu(String server, String username,
-        String password) throws RemoteException;
+    public void confirmCreateNewUserAccountWindow(String server,
+        String username, String password) throws RemoteException;
 
     // public void ackContactAdded(String bareJid) throws RemoteException;
 
     /**
      * First acknowledge of a new Session initiated by the given inviter.
      */
-    public void ackProjectStep1(String inviter) throws RemoteException;
+    public void confirmSessionInvitationWindowStep1(String inviter)
+        throws RemoteException;
 
     /**
      * Acknowledge the given Project creating a new Project in your workspace
      */
-    public void ackProjectStep2UsingNewProject(String projectName)
-        throws RemoteException;
+    public void confirmSessionInvitationWindowStep2UsingNewproject(
+        String projectName) throws RemoteException;
 
-    public void ackProjectStep2UsingExistProject(String projectName)
-        throws RemoteException;
+    public void confirmSessionInvitationWindowStep2UsingExistProject(
+        String projectName) throws RemoteException;
 
-    public void ackProjectStep2UsingExistProjectWithCopy(String projectName)
-        throws RemoteException;
+    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
+        String projectName) throws RemoteException;
 
-    public void addNewContact(String name) throws RemoteException;
+    // public void addNewContact(String name) throws RemoteException;
 
-    public void addToSharedProject(String bareJid) throws RemoteException;
+    // public void addToSharedProjects(String bareJid) throws RemoteException;
 
     /**
      * Popup Window with title "Saros Configuration"
      */
-    public void doSarosConfiguration(String xmppServer, String jid,
+    public void confirmSarosConfigurationWindow(String xmppServer, String jid,
         String password) throws RemoteException;
 
     // public boolean isConfigShellPoppedUp() throws RemoteException;
@@ -54,14 +55,14 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
      */
     public boolean isConnectedByXmppGuiCheck() throws RemoteException;
 
-    public boolean isContactInRosterView(String contact) throws RemoteException;
+    public boolean hasContactWith(String contact) throws RemoteException;
 
     public boolean isContactOnline(String contact) throws RemoteException;
 
     /**
      * Invite given jid to the current shared project
      */
-    public void inviteToProject(String jid) throws RemoteException;
+    public void inviteUserToProject(String jid) throws RemoteException;
 
     public boolean isInSession() throws RemoteException;
 
@@ -73,7 +74,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void leaveSession() throws RemoteException;
 
-    public void removeContact(String name) throws RemoteException;
+    public void deleteContact(String name) throws RemoteException;
 
     // /**
     // * It shares a project, but cancel the interface popped up
@@ -81,8 +82,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickProjectContextMenu(String projectName,
     // String nameOfContextMenu) throws RemoteException;
 
-    public void shareProject(String projectName, String nameOfContextMenu,
-        String invitee) throws RemoteException;
+    public void clickCMShareProjectInPEView(String projectName,
+        String nameOfContextMenu) throws RemoteException;
 
     public void shareProjectSequential(String projectName,
         String nameOfContextMenu, List<String> invitees) throws RemoteException;
@@ -90,17 +91,74 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException;
 
-    public void xmppConnect() throws RemoteException;
+    public void clickTBConnectInSPSView() throws RemoteException;
 
-    public boolean xmppDisconnect() throws RemoteException;
+    public boolean clickTBDisconnectInSPSView() throws RemoteException;
 
-    public void follow(String participantJID, String sufix)
+    public void followUser(String participantJID, String sufix)
         throws RemoteException;
 
-    public void giveDriverRole(String inviteeJID) throws RemoteException;
+    // public void clickCMgiveDriverRoleInSPSView(String inviteeJID)
+    // throws RemoteException;
 
     public boolean isInFollowMode(String participantJID, String sufix)
         throws RemoteException;
 
-    public void selectCheckBoxInvitation(String invitee) throws RemoteException;
+    public void clickShareYourScreenWithSelectedUserInSPSView()
+        throws RemoteException;
+
+    public void clickSendAFileToSelectedUserInSPSView(String inviteeJID)
+        throws RemoteException;
+
+    public void clickStopSessionWithUserInSPSView(String name)
+        throws RemoteException;
+
+    public void clickChangeModeOfImageSourceInRSView() throws RemoteException;
+
+    public void clickStopRunningSessionInRSView() throws RemoteException;
+
+    public void clickResumeInRSView() throws RemoteException;
+
+    public void clickPauseInRSView() throws RemoteException;
+
+    public void clickStartAVoIPSessionInSPSView() throws RemoteException;
+
+    public void clickNoInconsistenciesInSPSView() throws RemoteException;
+
+    public void clickRemoveAllRriverRolesInSPSView() throws RemoteException;
+
+    public void clickEnableDisableFollowModeInSPSView() throws RemoteException;
+
+    public void clickLeaveTheSessionInSPSView() throws RemoteException;
+
+    public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
+        throws RemoteException;
+
+    public void clickCMgiveExclusiveDriverRoleInSPSView(String inviteeJID)
+        throws RemoteException;
+
+    public void clickCMStopFollowingThisUserInSPSView(String participantJID,
+        String sufix) throws RemoteException;
+
+    public void clickCMJumpToPositionOfSelectedUserInSPSView(
+        String participantJID, String sufix) throws RemoteException;
+
+    public void waitUntilSessionCloses() throws RemoteException;
+
+    public void waitUntilSessionCloses(ISarosState state)
+        throws RemoteException;
+
+    public void openChatView() throws RemoteException;
+
+    public void openRemoteScreenView() throws RemoteException;
+
+    public void openSarosSessionView() throws RemoteException;
+
+    public void openRosterView() throws RemoteException;
+
+    public boolean isChatViewOpen() throws RemoteException;
+
+    public boolean isRemoteScreenViewOpen() throws RemoteException;
+
+    public void addContact(String plainJID) throws RemoteException;
 }
