@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -109,10 +109,6 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     protected Label fps;
     protected Label bitrate;
     protected Label delay;
-    protected Label welcomeMsg;
-    // HACK Remove the '\n' characters from this message, this is terrible.
-    protected final String WELCOME_MSG = "Choose a participant from the \"Shared Project Session\" view\nand click the \"Share your Screen\" button to initialize\na videosharing connection.";
-    protected final String CONNECTED_MSG = "Connected";
 
     protected Rectangle imageSize;
     protected BufferedImage nextImage = null;
@@ -169,21 +165,11 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             .getBoolean(PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO);
     }
 
-    /**
-     * No explanation on screen sharing view: changes in: createPartControl,
-     * initialize, reset FIX: We entered a massage how to use the screen sharing
-     * view, which is display when no remote screen session is active
-     */
-
     @Override
     public void createPartControl(Composite parent) {
         this.parent = parent;
         GridLayout layout = new GridLayout();
         parent.setLayout(layout);
-
-        welcomeMsg = new Label(parent, SWT.LEFT | SWT.WRAP);
-        welcomeMsg.setText(WELCOME_MSG);
-        welcomeMsg.pack();
 
         createCanvas(parent);
         createStatusBar(parent);
@@ -289,11 +275,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     /**
      * @swt
      */
-
     public void initialize() {
-        welcomeMsg.setText(CONNECTED_MSG);
-        welcomeMsg.pack();
-
         if (videoCanvas == null && !canvas.isDisposed())
             videoCanvas = new VideoCanvas(SWT_AWT.new_Frame(canvas));
         canvas.update();
@@ -310,9 +292,6 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
         fps.setText("");
         bitrate.setText("");
         delay.setText("");
-
-        welcomeMsg.setText(WELCOME_MSG);
-        welcomeMsg.pack();
     }
 
     protected void updateStatusbar() {
