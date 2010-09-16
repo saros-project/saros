@@ -15,14 +15,13 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
  * A SharedProject stores the state of a project (and its resources) shared in a
  * Saros session.<br>
  * <br>
- * We only want to send out activities if a value changes. To detect changes, we
- * must compare the current value to the one we previously saw. This class is
- * responsible for storing the project specific values we want to track.<br>
- * <br>
- * TODO Add the ability to track information on every file/folder in the
- * project.<br>
- * TODO Rename to SharedProjectState?
+ * Saros replicates a shared project, i.e. keeps copies of the project on the
+ * peers in sync with the local project. A SharedProject represents the state
+ * that these remote copies are supposed to be in. Whenever we detect a mismatch
+ * between the IProject and the corresponding SharedProject, we know that we
+ * need to send activities.
  */
+// TODO Rename to SharedProjectState?
 public class SharedProject {
     /**
      * A value of type E with a convenient update method to check if the value
