@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.text.MessageFormat;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
@@ -60,10 +61,8 @@ public class SubscriptionListener implements IConnectionListener {
                 }
 
                 final Presence presence = (Presence) packet;
-                log
-                    .debug("Received presence packet from: "
-                        + Util.prefix(new JID(presence.getFrom())) + " "
-                        + presence);
+                log.debug("Received presence packet from: "
+                    + Util.prefix(new JID(presence.getFrom())) + " " + presence);
 
                 switch (presence.getType()) {
                 case available:
@@ -86,9 +85,11 @@ public class SubscriptionListener implements IConnectionListener {
         String userName = Util.prefix(new JID(presence.getFrom()));
         switch (presence.getType()) {
         case error:
-            log.warn("Received error presence package - condition: "
-                + presence.getError().getCondition() + " message: "
-                + presence.getError().getMessage());
+            String message = MessageFormat.format("Received error "
+                + "presence package from {0}, condition: {1}, message: {2}",
+                presence.getFrom(), presence.getError().getCondition(),
+                presence.getError().getMessage());
+            log.warn(message);
             return;
 
         case subscribed:
