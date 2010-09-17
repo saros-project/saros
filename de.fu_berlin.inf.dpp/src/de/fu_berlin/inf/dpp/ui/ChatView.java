@@ -248,7 +248,7 @@ public class ChatView extends ViewPart {
 
         this.inputText.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 if (!(e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR))
                     return;
                 if (e.stateMask != 0)
