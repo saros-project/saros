@@ -183,6 +183,7 @@ public class SPath {
      * file/editor identified by this SPath.
      */
     public IPath getFullPath() {
-        return getFile().getFullPath();
+        final IPath fullProjectPath = project.getFullPath();
+        return fullProjectPath.append(projectRelativePath);
     }
 }
