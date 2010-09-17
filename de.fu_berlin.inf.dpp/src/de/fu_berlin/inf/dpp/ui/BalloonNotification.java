@@ -26,30 +26,30 @@ public class BalloonNotification {
      * The window will be hidden automatically after the value specified in the
      * timeout expires
      * 
-     * @param pControl
+     * @param control
      *            the control, next to where the widget will appear
-     * @param pTitle
+     * @param title
      *            the title of the balloon
-     * @param pText
+     * @param text
      *            the text to display as contents
-     * @param pTimeout
+     * @param timeout
      *            the timeout in milliseconds for automatically hidding the
      *            balloon
      */
-    public static void showNotification(Control pControl, String pTitle,
-        String pText, int pTimeout) {
+    public static void showNotification(Control control, String title,
+        String text, int timeout) {
 
-        if (pControl != null && pControl.isDisposed()) {
-            pControl = null;
+        if (control != null && control.isDisposed()) {
+            control = null;
         }
 
-        Shell parentShell = (pControl != null ? pControl.getShell() : null);
+        Shell parentShell = (control != null ? control.getShell() : null);
         parentShell.forceActive();
 
         final BalloonWindow window = new BalloonWindow(parentShell, SWT.ON_TOP
             | SWT.TOOL | SWT.CLOSE | SWT.TITLE);
 
-        window.setText(pTitle);
+        window.setText(title);
 
         // Adding the text to the contents. Pack() is required
         // so the size of the composite is recalculated, else
@@ -57,24 +57,27 @@ public class BalloonNotification {
         Composite c = window.getContents();
         c.setLayout(new FillLayout());
         Label l = new Label(c, SWT.NONE);
-        l.setText(pText);
+        l.setText(text);
         c.pack(true);
 
         // Locate the balloon to the widget location
-        if (pControl != null) {
-            Point widgetLocation = pControl.toDisplay(new Point(0, 0));
+        if (control != null) {
+            Point widgetLocation = control.toDisplay(new Point(0, 0));
             window.setLocation(widgetLocation);
         }
 
         // Runnable that will close the window after time has been expired
-        window.getShell().getDisplay().timerExec(pTimeout,
-            Util.wrapSafe(log, new Runnable() {
+        final Runnable closeWindow = Util.wrapSafe(log, new Runnable() {
 
-                public void run() {
-                    window.getShell().forceActive();
-                    window.close();
-                }
-            }));
+            public void run() {
+                final Shell shell = window.getShell();
+                if (shell.isDisposed())
+                    return;
+                shell.forceActive();
+                window.close();
+            }
+        });
+        window.getShell().getDisplay().timerExec(timeout, closeWindow);
 
         window.open();
 
