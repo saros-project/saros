@@ -75,16 +75,16 @@ public abstract class VCSAdapter {
 
     /**
      * @param resource
-     * @return The URL of the repository containing this resource as a String,
+     * @return The URL of the repository root of this resource as a String,
      *         or null.
      */
     public abstract String getRepositoryString(IResource resource);
 
     /**
      * @param resource
-     * @return The path of the resource relative to the repository, or null.
+     * @return The URL of the remote resource in the repository, or null.
      */
-    public abstract String getProjectPath(IResource resource);
+    public abstract String getUrl(IResource resource);
 
     /**
      * Checks out the project specified by the {@link FileList} as a new project
@@ -123,7 +123,7 @@ public abstract class VCSAdapter {
      * @param resource
      * @return
      */
-    public abstract VCSResourceInformation getResourceInformation(
+    public abstract VCSResourceInfo getResourceInfo(
         IResource resource);
 
     /**

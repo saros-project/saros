@@ -45,7 +45,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * A FileList is a list of resources - files and folders - which belong to the
@@ -74,8 +74,11 @@ public class FileList {
     protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
     /** Identifies the VCS used. */
     protected String vcsProviderID;
+
+    /** @see VCSAdapter#getRepositoryString(IResource) */
+    protected String vcsRepositoryRoot;
     /** VCS internal information. */
-    protected VCSResourceInformation vcsProjectInformation;
+    protected VCSResourceInfo vcsProjectInfo;
 
     static class FileListData {
         /** Checksum of this file. */
@@ -344,7 +347,8 @@ public class FileList {
                 String providerID = vcs.getProviderID(project);
 
                 this.vcsProviderID = providerID;
-                this.vcsProjectInformation = vcs.getResourceInformation(project);
+                this.vcsRepositoryRoot = vcs.getRepositoryString(project);
+                this.vcsProjectInfo = vcs.getResourceInfo(project);
             }
         }
 
@@ -368,7 +372,7 @@ public class FileList {
                     data.checksum = FileUtil.checksum(file);
 
                     if (isManagedProject)
-                        addVCSInformation(resource, data, vcs);
+                        addVCSInfo(resource, data, vcs);
 
                     this.entries.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
@@ -386,7 +390,7 @@ public class FileList {
                 FileListData data = null;
                 if (isManagedProject) {
                     data = new FileListData();
-                    if (!addVCSInformation(resource, data, vcs))
+                    if (!addVCSInfo(resource, data, vcs))
                         data = null;
                 }
                 this.entries.put(path, data);
@@ -395,7 +399,7 @@ public class FileList {
         }
     }
 
-    private boolean addVCSInformation(IResource resource, FileListData data,
+    private boolean addVCSInfo(IResource resource, FileListData data,
         VCSAdapter vcs) {
         String revision = vcs.getRevisionString(resource);
         if (revision == null)
@@ -423,7 +427,11 @@ public class FileList {
         return vcsProviderID;
     }
 
-    public VCSResourceInformation getProjectInformation() {
-        return vcsProjectInformation;
+    public VCSResourceInfo getProjectInfo() {
+        return vcsProjectInfo;
+    }
+
+    public String getRepositoryRoot() {
+        return vcsRepositoryRoot;
     }
 }

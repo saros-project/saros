@@ -74,7 +74,6 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
 
 /**
  * @author rdjemili
@@ -472,13 +471,12 @@ public class IncomingInvitationProcess extends InvitationProcess {
         throws LocalCancellationException {
         if (newProjectName == null) {
             this.localProject = baseProject;
-            if (vcs != null) {
-                if (!vcs.isManaged(localProject)) {
-                    VCSResourceInformation info = remoteFileList
-                        .getProjectInformation();
-                    vcs.connect(localProject, info.repositoryRoot, info.path,
-                        monitor);
-                }
+            if (vcs != null && !vcs.isManaged(localProject)) {
+                // TODO This should be handled with a VCSActivity.
+                String repositoryRoot = remoteFileList.getRepositoryRoot();
+                final String url = remoteFileList.getProjectInfo().url;
+                String directory = url.substring(repositoryRoot.length());
+                vcs.connect(localProject, repositoryRoot, directory, monitor);
             }
             return;
         }

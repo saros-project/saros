@@ -47,8 +47,8 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
         assert vcs != null;
 
         if (isSync(delta)) {
-            VCSResourceInformation info = vcs.getResourceInformation(project);
-            String url = info.repositoryRoot + info.path;
+            VCSResourceInfo info = vcs.getResourceInfo(project);
+            String url = info.url;
             if (sharedProject.updateVcsUrl(url)) {
                 // Switch
                 addActivity(VCSActivity.switch_(sarosSession, resource, url,

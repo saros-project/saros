@@ -91,7 +91,7 @@ class SubclipseAdapter extends VCSAdapter {
             ISVNRepositoryLocation repository = baseResource.getRepository();
             if (repository == null)
                 return null;
-            String result = repository.toString();
+            String result = repository.getRepositoryRoot().toString();
             return result;
         } catch (SVNException e) {
             log.debug("Undocumented exception", e);
@@ -107,9 +107,10 @@ class SubclipseAdapter extends VCSAdapter {
         IProject result = null;
 
         try {
-            VCSResourceInformation info = fileList.getProjectInformation();
-            loc = SVNRepositoryLocation.fromString(info.repositoryRoot);
-            SVNUrl url = new SVNUrl(info.repositoryRoot + info.path);
+            VCSResourceInfo info = fileList.getProjectInfo();
+            loc = SVNRepositoryLocation
+                .fromString(fileList.getRepositoryRoot());
+            SVNUrl url = new SVNUrl(info.url);
 
             ISVNRemoteFolder remote[] = { new RemoteFolder(loc, url,
                 SVNRevision.HEAD) };
@@ -147,7 +148,7 @@ class SubclipseAdapter extends VCSAdapter {
     }
 
     @Override
-    public String getProjectPath(IResource resource) {
+    public String getUrl(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
 
@@ -155,7 +156,7 @@ class SubclipseAdapter extends VCSAdapter {
             ISVNRemoteResource baseResource = svnResource.getBaseResource();
             if (baseResource == null)
                 return null;
-            String result = baseResource.getRepositoryRelativePath();
+            String result = baseResource.getUrl().toString();
             return result;
         } catch (SVNException e) {
             undocumentedException(e);
@@ -204,10 +205,9 @@ class SubclipseAdapter extends VCSAdapter {
     }
 
     @Override
-    public VCSResourceInformation getResourceInformation(IResource resource) {
-        VCSResourceInformation info = new VCSResourceInformation();
-        info.repositoryRoot = getRepositoryString(resource);
-        info.path = getProjectPath(resource);
+    public VCSResourceInfo getResourceInfo(IResource resource) {
+        VCSResourceInfo info = new VCSResourceInfo();
+        info.url = getUrl(resource);
         info.revision = getRevisionString(resource);
         return info;
     }

@@ -12,7 +12,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * IResourceDeltaVisitor which collects all changes as full paths to the
@@ -83,10 +83,10 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
             if (project != null) {
                 VCSAdapter vcs = VCSAdapter.getAdapter(project);
                 if (vcs != null) {
-                    VCSResourceInformation info = vcs
-                        .getResourceInformation(resource);
-                    if (info.path != null)
-                        sb.append(" " + info.path);
+                    VCSResourceInfo info = vcs
+                        .getResourceInfo(resource);
+                    if (info.url != null)
+                        sb.append(" " + info.url);
                     if (info.revision != null)
                         sb.append(":" + info.revision);
                 }

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.project;
 
-import java.text.MessageFormat;
+import static java.text.MessageFormat.format;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -9,9 +10,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.team.core.RepositoryProvider;
@@ -21,7 +19,7 @@ import org.eclipse.team.core.subscribers.Subscriber;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * A SharedProject stores the state of a project (and its resources) shared in a
@@ -98,12 +96,12 @@ public class SharedProject {
 
         @Override
         public String toString() {
-            return MessageFormat.format("R[{0}, {1}]", vcsUrl.toString(),
+            return format("R[{0}, {1}]", vcsUrl.toString(),
                 vcsRevision.toString());
         }
     }
 
-    /** Maps the full path of a resource. */
+    /** Maps the project relative path of a resource. */
     protected Map<IPath, ResourceInfo> resourceMap = new HashMap<IPath, SharedProject.ResourceInfo>();
 
     protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
@@ -116,7 +114,7 @@ public class SharedProject {
             // The order of the operands is supposed to be like that, we want to
             // call update even if driver is false.
             if (isDriver.update(driver) && driver) {
-                initializeVCSInformation();
+                initializeVCSInfo();
             }
         }
     };
@@ -142,10 +140,9 @@ public class SharedProject {
                     VCSAdapter vcs = VCSAdapter.getAdapter(resource
                         .getProject());
                     if (vcs.isManaged(resource)) {
-                        VCSResourceInformation info = vcs
-                            .getResourceInformation(resource);
-                        s += MessageFormat.format(" ({0} {1}:{2})",
-                            info.repositoryRoot, info.path, info.revision);
+                        VCSResourceInfo info = vcs
+                            .getResourceInfo(resource);
+                        s += format(" ({0}:{1})", info.url, info.revision);
                     }
                 }
                 s += "\n";
@@ -176,11 +173,11 @@ public class SharedProject {
             boolean isDriver = sarosSession.isDriver();
             this.isDriver.update(isDriver);
             if (isDriver)
-                initializeVCSInformation();
+                initializeVCSInfo();
         }
     }
 
-    protected void initializeVCSInformation() {
+    protected void initializeVCSInfo() {
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
         this.vcs.update(vcs);
         if (vcs == null)
@@ -194,14 +191,12 @@ public class SharedProject {
             else
                 log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
         }
-        Set<IPath> keySet = resourceMap.keySet();
-        for (IPath path : keySet) {
-            IWorkspace workspace = ResourcesPlugin.getWorkspace();
-            IWorkspaceRoot root = workspace.getRoot();
-            IResource resource = root.findMember(path);
+        Set<IPath> paths = resourceMap.keySet();
+        for (IPath path : paths) {
+            IResource resource = project.findMember(path);
             assert resource != null : "Resource not found";
-            VCSResourceInformation info = vcs.getResourceInformation(resource);
-            updateVcsUrl(resource, info.repositoryRoot + info.path);
+            VCSResourceInfo info = vcs.getResourceInfo(resource);
+            updateVcsUrl(resource, info.url);
             updateRevision(resource, info.revision);
         }
     }
@@ -218,9 +213,9 @@ public class SharedProject {
 
     /** Updates the current VCS URL, and returns true if the value changed. */
     public boolean updateVcsUrl(IResource resource, String newValue) {
-        IPath fullPath = resource.getFullPath();
-        ResourceInfo resourceInfo = resourceMap.get(fullPath);
-        assert resourceInfo != null : fullPath.toString() + " not found";
+        IPath path = resource.getProjectRelativePath();
+        ResourceInfo resourceInfo = resourceMap.get(path);
+        assert resourceInfo != null : path.toString() + " not found";
         return resourceInfo.vcsUrl.update(newValue);
     }
 
@@ -231,9 +226,9 @@ public class SharedProject {
 
     /** Updates the current VCS revision, and returns true if the value changed. */
     public boolean updateRevision(IResource resource, String newValue) {
-        IPath fullPath = resource.getFullPath();
-        ResourceInfo resourceInfo = resourceMap.get(fullPath);
-        assert resourceInfo != null : fullPath.toString() + " not found";
+        IPath path = resource.getProjectRelativePath();
+        ResourceInfo resourceInfo = resourceMap.get(path);
+        assert resourceInfo != null : path.toString() + " not found";
         return resourceInfo.vcsRevision.update(newValue);
     }
 
@@ -250,15 +245,15 @@ public class SharedProject {
     // deleted.
     public void remove(IResource resource) {
         assert resource.getProject() == project;
-        IPath fullPath = resource.getFullPath();
-        resourceMap.remove(fullPath);
+        IPath path = resource.getProjectRelativePath();
+        resourceMap.remove(path);
     }
 
     /** Adds the resource to the project. */
     public void add(IResource resource) {
         assert resource.getProject() == project;
         ResourceInfo resourceInfo = new ResourceInfo(null, null);
-        resourceMap.put(resource.getFullPath(), resourceInfo);
+        resourceMap.put(resource.getProjectRelativePath(), resourceInfo);
     }
 
     /**
@@ -281,8 +276,8 @@ public class SharedProject {
      * information associated with the resource.
      */
     // TODO Update information associated with the resource?
-    public void move(IPath oldFullPath, IPath newFullPath) {
-        resourceMap.put(newFullPath, resourceMap.remove(oldFullPath));
+    public void move(IPath oldPath, IPath newPath) {
+        resourceMap.put(newPath, resourceMap.remove(oldPath));
     }
 
     /** Returns the current VCSAdapter. */

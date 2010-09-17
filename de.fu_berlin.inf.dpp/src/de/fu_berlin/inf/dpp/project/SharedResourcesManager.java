@@ -67,7 +67,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -75,7 +75,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
  * entering text in an text editor. It creates and executes file, folder, and
  * VCS activities.<br>
  * TODO Add the ability to track information on every file/folder in the
- * project.<br>
+ * project, dispatch move/copy/delete of resources to the SharedProject.<br>
  */
 /*
  * For a good introduction to Eclipse's resource change notification mechanisms
@@ -317,9 +317,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 sharedProject.updateVcsUrl(null);
             } else {
                 // Connect
-                VCSResourceInformation info;
-                info = vcs.getResourceInformation(project);
-                if (info.repositoryRoot == null || info.path == null) {
+                VCSResourceInfo info = vcs
+                    .getResourceInfo(project);
+                String repositoryString = vcs.getRepositoryString(project);
+                if (repositoryString == null || info.url == null) {
                     // HACK For some reason, Subclipse returns null values
                     // here. Pretend the vcs is still null and wait for the
                     // next time we get here.
@@ -327,12 +328,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                     return false;
                 }
 
+                String directory = info.url
+                    .substring(repositoryString.length());
                 VCSActivity activity = VCSActivity.connect(sarosSession,
-                    project, info.repositoryRoot, info.path,
+                    project, repositoryString, directory,
                     vcs.getProviderID(project));
                 pendingActivities.add(activity);
-                String url = info.repositoryRoot + info.path;
-                sharedProject.updateVcsUrl(url);
+                sharedProject.updateVcsUrl(info.url);
                 sharedProject.updateRevision(info.revision);
 
                 log.debug("Connect to VCS");
