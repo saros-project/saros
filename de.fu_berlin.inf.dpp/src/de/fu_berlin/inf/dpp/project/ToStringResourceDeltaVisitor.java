@@ -33,7 +33,7 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
         map.put(IResourceDelta.DESCRIPTION, "D");
         map.put(IResourceDelta.ENCODING, "E");
         map.put(IResourceDelta.LOCAL_CHANGED, "L");
-        map.put(IResourceDelta.DERIVED_CHANGED, "d");
+        // if(Eclipse 3.6) {map.put(IResourceDelta.DERIVED_CHANGED, "d");}
     }
 
     StringBuilder sb = new StringBuilder();

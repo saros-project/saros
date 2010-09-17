@@ -73,7 +73,9 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInformation;
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
  * entering text in an text editor. It creates and executes file, folder, and
- * VCS activities.
+ * VCS activities.<br>
+ * TODO Add the ability to track information on every file/folder in the
+ * project.<br>
  */
 /*
  * For a good introduction to Eclipse's resource change notification mechanisms
