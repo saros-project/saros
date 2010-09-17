@@ -25,13 +25,16 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
 
@@ -103,6 +106,49 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected final boolean useVersionControl;
 
+    private BlockingQueue<IActivity> pendingActivities = new LinkedBlockingQueue<IActivity>();
+
+    protected SharedProject sharedProject;
+
+    public boolean cancelActivityDispatcher = false;
+
+    /**
+     * This thread executes pending activities in the SWT thread.<br>
+     * Reason: When a batch of activities arrives, it's not enough to exec them
+     * in a new Runnable with Util.runSafeSWTAsync(). Activity messages are
+     * ~1000ms apart, but a VCSActivity typically takes longer than that. Let's
+     * say this activity is dispatched to the SWT thread in a new Runnable r1.
+     * It now runs an SVN operation in a new thread t1. After 1000ms, another
+     * activity arrives, and is dispatched to SWT in runSafeSWTAsync(r2). Since
+     * r1 is mostly waiting on t1, the SWT thread is available to run the next
+     * runnable r2, because we used runSafeSWTAsync(r1).<br>
+     * That's also the reason why we have to use Util.runSafeSWTSync in the
+     * activityDispatcher thread.
+     * 
+     * @see Util#runSafeSWTAsync(Logger, Runnable)
+     * @see Display#asyncExec(Runnable)
+     */
+    private Thread activityDispatcher = new Thread("Saros Activity Dispatcher") {
+        @Override
+        public void run() {
+            try {
+                while (!cancelActivityDispatcher) {
+                    final IActivity activity = pendingActivities.take();
+                    Util.runSafeSWTSync(log, new Runnable() {
+                        public void run() {
+                            for (IActivityProvider executor : activityProviders) {
+                                executor.exec(activity);
+                            }
+                        }
+                    });
+                }
+            } catch (InterruptedException e) {
+                if (!cancelActivityDispatcher)
+                    log.error("activityDispatcher interrupted prematurely!", e);
+            }
+        }
+    };
+
     protected Blockable stopManagerListener = new Blockable() {
 
         public void unblock() {
@@ -113,8 +159,6 @@ public class SarosSession implements ISarosSession, Disposable {
             // TODO find a way to effectively block the user from doing anything
         }
     };
-
-    protected SharedProject sharedProject;
 
     public static class QueueItem {
 
@@ -158,6 +202,8 @@ public class SarosSession implements ISarosSession, Disposable {
         this.useVersionControl = useVersionControl;
 
         stopManager.addBlockable(stopManagerListener);
+        activityDispatcher.setDaemon(true);
+        activityDispatcher.start();
     }
 
     /**
@@ -498,6 +544,8 @@ public class SarosSession implements ISarosSession, Disposable {
             concurrentDocumentServer.dispose();
         }
         concurrentDocumentClient.dispose();
+        cancelActivityDispatcher = true;
+        activityDispatcher.interrupt();
     }
 
     /**
@@ -595,9 +643,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 }
 
                 for (IActivity activityDataObject : transformed.executeLocally) {
-                    for (IActivityProvider executor : activityProviders) {
-                        executor.exec(activityDataObject);
-                    }
+                    pendingActivities.add(activityDataObject);
                 }
             }
         });

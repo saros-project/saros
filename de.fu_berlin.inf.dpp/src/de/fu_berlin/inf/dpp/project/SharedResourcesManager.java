@@ -587,29 +587,28 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             Shell pmdShell = progressMonitorDialog.getShell();
             pmdShell.setText("Saros running VCS operation");
             log.trace("about to call progressMonitorDialog.run");
-            progressMonitorDialog.run(false, false,
-                new IRunnableWithProgress() {
-                    public void run(IProgressMonitor progress)
+            progressMonitorDialog.run(true, false, new IRunnableWithProgress() {
+                public void run(IProgressMonitor progress)
 
-                    throws InvocationTargetException, InterruptedException {
-                        log.trace("progressMonitorDialog.run started");
-                        if (!Util.isSWT())
-                            log.trace("not in SWT thread");
-                        if (activityType == VCSActivity.Type.Connect) {
-                            vcs.connect(project, url, directory, progress);
-                        } else if (activityType == VCSActivity.Type.Disconnect) {
-                            vcs.disconnect(project, revision != null, progress);
-                        } else if (activityType == VCSActivity.Type.Switch) {
-                            vcs.switch_(resource, url, revision, progress);
-                        } else if (activityType == VCSActivity.Type.Update) {
-                            vcs.update(resource, revision, progress);
-                        } else {
-                            log.error("VCS activity type not implemented yet.");
-                        }
-                        log.trace("progressMonitorDialog.run done");
+                throws InvocationTargetException, InterruptedException {
+                    log.trace("progressMonitorDialog.run started");
+                    if (!Util.isSWT())
+                        log.trace("not in SWT thread");
+                    if (activityType == VCSActivity.Type.Connect) {
+                        vcs.connect(project, url, directory, progress);
+                    } else if (activityType == VCSActivity.Type.Disconnect) {
+                        vcs.disconnect(project, revision != null, progress);
+                    } else if (activityType == VCSActivity.Type.Switch) {
+                        vcs.switch_(resource, url, revision, progress);
+                    } else if (activityType == VCSActivity.Type.Update) {
+                        vcs.update(resource, revision, progress);
+                    } else {
+                        log.error("VCS activity type not implemented yet.");
                     }
+                    log.trace("progressMonitorDialog.run done");
+                }
 
-                });
+            });
             pmdShell.dispose();
         } catch (InvocationTargetException e) {
             assert false; // TODO We can't get here, right?
