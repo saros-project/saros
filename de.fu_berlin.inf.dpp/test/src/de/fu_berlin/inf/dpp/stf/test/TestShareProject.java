@@ -27,9 +27,9 @@ public class TestShareProject {
     public static void configureInvitee() throws RemoteException,
         NotBoundException {
         log.trace("configureInvitee enter");
-        invitee = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
+        invitee = new Musician(new JID(BotConfiguration.JID_BOB),
+            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
+            BotConfiguration.PORT_BOB);
         invitee.initBot();
     }
 
@@ -37,9 +37,9 @@ public class TestShareProject {
     public static void configureInviter() throws RemoteException,
         NotBoundException {
         log.trace("configureInviter");
-        inviter = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
+        inviter = new Musician(new JID(BotConfiguration.JID_ALICE),
+            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
+            BotConfiguration.PORT_ALICE);
         inviter.initBot();
         inviter.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
@@ -52,8 +52,9 @@ public class TestShareProject {
     }
 
     @AfterClass
-    public static void cleanupInviter() {
+    public static void cleanupInviter() throws RemoteException {
         inviter.xmppDisconnect();
+        // inviter.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -61,7 +62,7 @@ public class TestShareProject {
         log.trace("testShareProject enter");
 
         inviter.buildSession(invitee, BotConfiguration.PROJECTNAME,
-            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
+            SarosConstant.CREATE_NEW_PROJECT);
 
         invitee.captureScreenshot(invitee.getPathToScreenShot()
             + "/invitee_in_sharedproject.png");
@@ -88,15 +89,18 @@ public class TestShareProject {
         assertTrue(inviter.hasParticipant(invitee));
         assertTrue(inviter.isObserver(invitee));
 
+    }
+
+    @Test
+    public void testLeaveSession() throws RemoteException {
         invitee.leaveSession();
         log.trace("invitee.leave");
         assertFalse(invitee.isParticipant());
-
         inviter.waitUntilSessionClosesBy(invitee);
 
         inviter.leaveSession();
         log.trace("inviter.leave");
         assertFalse(inviter.isParticipant());
-        invitee.waitUntilSessionClosesBy(inviter);
+        // invitee.waitUntilSessionClosesBy(inviter);
     }
 }

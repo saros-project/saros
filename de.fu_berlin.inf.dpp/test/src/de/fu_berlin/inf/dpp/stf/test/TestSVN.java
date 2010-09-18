@@ -18,8 +18,6 @@ public class TestSVN {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,

@@ -69,15 +69,16 @@ public class TestEditDuringInvitation {
     }
 
     @AfterClass
-    public static void cleanupAlice() {
+    public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
+        // alice.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test
     public void testEditDuringInvitation() throws RemoteException {
 
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
-            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
+            SarosConstant.CREATE_NEW_PROJECT);
 
         alice.giveDriverRole(bob);
 
@@ -93,8 +94,9 @@ public class TestEditDuringInvitation {
 
         carl.confirmSessionInvitationWindowStep2UsingNewproject(BotConfiguration.PACKAGENAME);
 
-        String textFromCarl = carl.getTextOfJavaEditor(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        String textFromCarl = carl.getTextOfJavaEditor(
+            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
         String textFormAlice = alice.getTextOfJavaEditor(
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);

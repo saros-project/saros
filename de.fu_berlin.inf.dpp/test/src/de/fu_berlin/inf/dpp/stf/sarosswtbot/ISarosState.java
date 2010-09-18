@@ -131,4 +131,5 @@ public interface ISarosState extends Remote {
     public String getContents(String path) throws RemoteException;
 
     public String getPathToScreenShot() throws RemoteException;
+
 }

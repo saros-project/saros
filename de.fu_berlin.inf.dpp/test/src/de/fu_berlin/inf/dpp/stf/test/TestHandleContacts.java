@@ -37,51 +37,36 @@ public class TestHandleContacts {
     }
 
     @After
-    public void cleanupRespondent() throws RemoteException {
+    public void cleanupRespondent() {
         alice.xmppDisconnect();
     }
 
     @After
-    public void cleanupQuestioner() throws RemoteException {
+    public void cleanupQuestioner() {
         bob.xmppDisconnect();
     }
 
     @Test
-    public void testAddAndRemoveContact() throws RemoteException {
-        assertTrue(bob.hasContactWith(alice));
-        assertTrue(alice.hasContactWith(bob));
-
+    public void testRemoveContact() throws RemoteException {
         bob.deleteContact(alice);
-
         alice
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-        try {
-            // Don't accept immediately, Bob needs time to realize that he
-            // removed Alice.
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            //
-        }
-
         alice.confirmWindow(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
             SarosConstant.BUTTON_OK);
-
-        try {
-            // Wait for the server.
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            //
-        }
-
+        bob.waitUntilHasNoContactWith(alice);
         assertFalse(bob.hasContactWith(alice));
+        alice.waitUntilHasNoContactWith(bob);
         assertFalse(alice.hasContactWith(bob));
+    }
 
+    @Test
+    public void testAddContact() throws RemoteException {
         bob.addContact(alice);
-
-        alice.ackContact(bob);
-        bob.ackContact(alice);
-
+        alice.confirmContact(bob);
+        bob.confirmContact(alice);
+        bob.waitUntilHasContactWith(alice);
         assertTrue(bob.hasContactWith(alice));
+        alice.waitUntilHasContactWith(bob);
         assertTrue(alice.hasContactWith(bob));
     }
 }

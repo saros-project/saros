@@ -2,7 +2,7 @@ package my.pkg;
 
 import java.util.*;
 
-public class MyClass {
+public class MyClass3 {
 
         private static void fill(Collection c) {
                 for (int i = 0; i < 5; i++)

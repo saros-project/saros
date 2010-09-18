@@ -17,6 +17,10 @@ public class SarosConditions extends Conditions {
         return new IsConnect(bot);
     }
 
+    public static ICondition isDisConnected(SWTWorkbenchBot bot) {
+        return new isDisConnected(bot);
+    }
+
     public static ICondition existTreeItem(SWTBotTreeItem treeItem,
         String nodeName) {
         return new ExistTreeItem(treeItem, nodeName);
@@ -46,6 +50,10 @@ public class SarosConditions extends Conditions {
 
     public static ICondition isSessionClosed(ISarosState state) {
         return new isSessionclosed(state);
+    }
+
+    public static ICondition isInSession(ISarosState state) {
+        return new IsInSession(state);
     }
 
     public static ICondition isShellClosed(SWTWorkbenchBot bot, String name) {

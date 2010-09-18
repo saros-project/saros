@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.RGB;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.RosterView;
@@ -46,8 +47,8 @@ public class Musician {
         log.trace("activeEclipseShell");
         activateEclipseShell();
         log.trace("closeViewByTitle");
-        closeViewWithText(SarosConstant.VIEW_TITLE_WELCOME);
-        openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_JAVA);
+        closeWelcomeView();
+        openJavaPerspective();
         openSarosViews();
         xmppConnect();
     }
@@ -74,27 +75,38 @@ public class Musician {
     // }
 
     public void buildSession(Musician invitee, String projectName,
-        String NameOfContextMenu, int typeOfSharingProject)
-        throws RemoteException {
-        openJavaPackageExplorerView();
+        int typeOfSharingProject) throws RemoteException {
+        openPackageExplorerView();
         activatePackageExplorerView();
-        clickCMShareProjectInPEView(projectName, NameOfContextMenu);
+        clickCMShareProjectInPEView(projectName);
         confirmInvitationWindow(invitee);
         invitee
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         switch (typeOfSharingProject) {
         case SarosConstant.CREATE_NEW_PROJECT:
-            invitee.ackProject(this, projectName);
+            invitee.confirmSessionInvitationWizard(this, projectName);
             break;
         case SarosConstant.USE_EXISTING_PROJECT:
-            invitee.ackProjectUsingExistProject(this, projectName);
+            invitee.confirmSessionInvitationWizardUsingExistProject(this,
+                projectName);
             break;
         case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
-            invitee.ackProjectUsingExistProjectWithCopy(this, projectName);
+            invitee.confirmSessionInvitationWizardUsingExistProjectWithCopy(
+                this, projectName);
             break;
         default:
             break;
         }
+    }
+
+    public void setBreakPoint(int line, String projectName, String packageName,
+        String className) throws RemoteException {
+        bot.setBreakPoint(line, projectName, packageName, className);
+    }
+
+    public void debugJavaFile(String projectName, String packageName,
+        String className) throws RemoteException {
+        bot.debugJavaFile(projectName, packageName, className);
     }
 
     public void shareScreenWithUser(Musician respondent) throws RemoteException {
@@ -128,15 +140,14 @@ public class Musician {
 
     public void xmppConnect() {
         try {
-            openRosterView();
-            activateRosterView();
-            if (!isConnectedByXMPP())
-                bot.clickTBConnectInSPSView();
-            if (isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE)) {
-                bot.confirmSarosConfigurationWindow(getXmppServer(), getName(),
-                    password);
+            if (!isConnectedByXMPP()) {
+                bot.clickTBConnectInRosterView();
+                if (isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE)) {
+                    bot.confirmSarosConfigurationWindow(getXmppServer(),
+                        getName(), password);
+                }
+                waitUntilConnected();
             }
-            waitUntilConnect();
         } catch (RemoteException e) {
             log.error("can't conncet!");
         }
@@ -145,13 +156,14 @@ public class Musician {
 
     public void xmppDisconnect() {
         try {
-            openRosterView();
-            activateRosterView();
-            if (isConnectedByXMPP())
-                bot.clickTBDisconnectInSPSView();
+            if (isConnectedByXMPP()) {
+                bot.clickTBDisconnectInRosterView();
+                waitUntilDisConnected();
+            }
         } catch (RemoteException e) {
             // ignore if no window popped up
         }
+
     }
 
     public void creatNewAccount(String server, String username, String password)
@@ -162,11 +174,7 @@ public class Musician {
 
     public void inviteUser(Musician invitee, String projectName)
         throws RemoteException {
-        openSarosSessionView();
-        activateSharedSessionView();
-        bot.clickToolbarPushButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-            SarosConstant.TOOL_TIP_TEXT_OPEN_INVITATION_INTERFACE);
+        bot.clickTBOpenInvitationInterfaceInSPSView();
         bot.waitUntilShellActive("Invitation");
         bot.confirmWindowWithCheckBox("Invitation",
             SarosConstant.BUTTON_FINISH, invitee.getPlainJid());
@@ -178,12 +186,12 @@ public class Musician {
 
     public void leaveSession() throws RemoteException {
         if (!this.isDriver()) {
-            bot.leaveSession();
+            bot.clickTBLeaveTheSessionInSPSView();
             bot.confirmWindow(
                 SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
                 SarosConstant.BUTTON_YES);
         } else {
-            bot.leaveSession();
+            bot.clickTBLeaveTheSessionInSPSView();
             // if (isShellActive("Confirm Closing Session")) {
             // bot.confirmWindow("Confirm Closing Session",
             // SarosConstant.BUTTON_YES);
@@ -194,8 +202,6 @@ public class Musician {
 
     public void shareProjectParallel(String projectName, List<Musician> invitees)
         throws RemoteException {
-        if (isViewOpen(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER))
-            openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_JAVA);
         List<String> list = new LinkedList<String>();
         for (Musician invitee : invitees)
             list.add(invitee.getPlainJid());
@@ -238,26 +244,25 @@ public class Musician {
         bot.confirmSessionInvitationWindowStep2UsingNewproject(projectName);
     }
 
-    /******************* ack ********************/
-    public void ackProject(Musician inviter, String projectname)
-        throws RemoteException {
+    public void confirmSessionInvitationWizard(Musician inviter,
+        String projectname) throws RemoteException {
         confirmSessionInvitationWindowStep1(inviter);
         confirmSessionInvitationWindowStep2UsingNewproject(projectname);
     }
 
-    public void ackProjectUsingExistProject(Musician inviter, String projectName)
-        throws RemoteException {
+    public void confirmSessionInvitationWizardUsingExistProject(
+        Musician inviter, String projectName) throws RemoteException {
         confirmSessionInvitationWindowStep1(inviter);
         bot.confirmSessionInvitationWindowStep2UsingExistProject(projectName);
     }
 
-    public void ackProjectUsingExistProjectWithCopy(Musician inviter,
-        String projectName) throws RemoteException {
+    public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
+        Musician inviter, String projectName) throws RemoteException {
         confirmSessionInvitationWindowStep1(inviter);
         bot.confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(projectName);
     }
 
-    public void ackContact(Musician questioner) throws RemoteException {
+    public void confirmContact(Musician questioner) throws RemoteException {
         // bot.ackContactAdded(questioner.getPlainJid());
         bot.confirmWindow(
             SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
@@ -266,45 +271,62 @@ public class Musician {
 
     /******************** close widget ***********************/
 
-    public void closeViewWithText(String title) {
+    public void closeWelcomeView() {
         try {
-            bot.closeViewWithText(title);
+            bot.closeWelcomeView();
         } catch (RemoteException e) {
-            log.error("can't not close view + " + title);
+            log.error("can't not close welcome view ");
         }
     }
 
     public void closeRosterView() {
-        closeViewWithText(SarosConstant.VIEW_TITLE_ROSTER);
+        try {
+            bot.closeRosterView();
+        } catch (RemoteException e) {
+            log.error("can't not close roster view ");
+        }
     }
 
     public void closeSarosSessionView() {
-        closeViewWithText(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
+        try {
+            bot.closeSharedSessionView();
+        } catch (RemoteException e) {
+            log.error("can't not close shared project session view ");
+        }
     }
 
     public void closeChatView() {
-        closeViewWithText(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        try {
+            bot.closeChatView();
+        } catch (RemoteException e) {
+            log.error("can't not close chat view ");
+        }
     }
 
     public void closeRmoteScreenView() {
-        closeViewWithText(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
+        try {
+            bot.closeRemoteScreenView();
+        } catch (RemoteException e) {
+            log.error("can't not close remote screen view ");
+        }
     }
 
     /***************** new widget *******************/
 
     public void newProjectWithClass(String projectName, String packageName,
         String className) throws RemoteException {
-        openJavaPackageExplorerView();
-        activatePackageExplorerView();
+
         if (!isJavaProjectExist(projectName)) {
             bot.newJavaProject(projectName);
-            bot.newJavaClass(projectName, packageName, className);
         }
+        if (!isJavaClassExist(projectName, packageName, className))
+            bot.newJavaClass(projectName, packageName, className);
     }
 
     public void newJavaClassInProject(String projectName, String packageName,
         String className) throws RemoteException {
-        bot.newJavaClass(projectName, packageName, className);
+        if (!isJavaClassExist(className, projectName, packageName))
+            bot.newJavaClass(projectName, packageName, className);
     }
 
     /**************** get ****************/
@@ -328,11 +350,7 @@ public class Musician {
 
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        if (!isEditorOpen(className, "java"))
-            openJavaFileWithEditor(projectName, packageName, className);
-        activateJavaEditor(className);
-        return bot.getTextOfJavaEditor(projectName, packageName, className
-            + ".java");
+        return bot.getTextOfJavaEditor(projectName, packageName, className);
     }
 
     public String getName() {
@@ -357,7 +375,25 @@ public class Musician {
         return jid.getDomain();
     }
 
+    public String getJavaTextOnLine(String projectName, String packageName,
+        String className, int line) throws RemoteException {
+        return bot.getJavaTextOnLine(projectName, packageName, className, line);
+    }
+
+    public int getJavaCursorLinePosition(String projectName,
+        String packageName, String className) throws RemoteException {
+        return bot.getJavaCursorLinePosition(projectName, packageName,
+            className);
+    }
+
+    public RGB getJavaLineBackground(String projectName, String packageName,
+        String className, int line) throws RemoteException {
+        return bot.getJavaLineBackground(projectName, packageName, className,
+            line);
+    }
+
     /************* has *************/
+
     public boolean hasContactWith(Musician respondent) {
         try {
             return state.hasContactWith(respondent.jid)
@@ -366,6 +402,10 @@ public class Musician {
             log.error("Failed to check if the contact was found", e);
         }
         return false;
+    }
+
+    public boolean hasObserver(Musician other) throws RemoteException {
+        return state.isObserver(other.jid);
     }
 
     public boolean hasParticipant(Musician other) throws RemoteException {
@@ -386,22 +426,25 @@ public class Musician {
      */
     public void setTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException {
-        String contents = state.getContents(contentPath);
-        openJavaFileWithEditor(projectName, packageName, className);
-        activateJavaEditor(className);
-        setTextInEditor(contents, className, "java");
+        // String contents = state.getContents(contentPath);
+        // openJavaFileWithEditor(projectName, packageName, className);
+        // activateJavaEditor(className);
+        bot.setTextInJavaEditor(contentPath, projectName, packageName,
+            className);
+        // setTextInEditor(contents, className, "java");
+
     }
 
-    public void setTextInEditor(String contents, String fileName,
-        String extension) throws RemoteException {
-        bot.setTextinEditor(contents, fileName + "." + extension);
-    }
+    // public void setTextInEditor(String contents, String fileName,
+    // String extension) throws RemoteException {
+    // bot.setTextinEditor(contents, fileName + "." + extension);
+    // }
 
     /******************* open widget *************************/
 
-    public void openJavaPackageExplorerView() {
+    public void openPackageExplorerView() {
         try {
-            bot.openJavaPackageExplorerView();
+            bot.openPackageExplorerView();
         } catch (RemoteException e) {
             log.error("Failed to open package explorer view", e);
         }
@@ -453,44 +496,60 @@ public class Musician {
         openRemoteScreenView();
     }
 
-    /**
-     * 
-     * @param viewTitle
-     *            The title of the View. Example: "Shared Project Session"
-     * @param inode
-     *            The inode of the tree on the "Show View" window. Example:
-     *            "Saros"
-     * @param leaf
-     *            The leaf of the tree on the "Show View" window. Example:
-     *            "Saros Session"
-     * 
-     * @throws RemoteException
-     */
-    public void openView(String viewTitle, String inode, String leaf)
-        throws RemoteException {
-        bot.openViewWithName(viewTitle, inode, leaf);
-    }
+    // /**
+    // *
+    // * @param viewTitle
+    // * The title of the View. Example: "Shared Project Session"
+    // * @param inode
+    // * The inode of the tree on the "Show View" window. Example:
+    // * "Saros"
+    // * @param leaf
+    // * The leaf of the tree on the "Show View" window. Example:
+    // * "Saros Session"
+    // *
+    // * @throws RemoteException
+    // */
+    // public void openView(String viewTitle, String inode, String leaf)
+    // throws RemoteException {
+    // bot.openViewWithName(viewTitle, inode, leaf);
+    // }
 
     public void openJavaFileWithEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        bot.openJavaFileWithEditor(projectName, packageName, className
-            + ".java");
+        bot.openJavaFileWithEditor(projectName, packageName, className);
     }
 
-    public void openPerspectiveWithName(String nodeName) {
-        try {
-            bot.openPerspectiveWithName(nodeName);
-        } catch (RemoteException e) {
-            log.error("can't open perspective " + nodeName);
-        }
+    public void openJavaPerspective() throws RemoteException {
+        bot.openJavaPerspective();
     }
+
+    public void openDebugPerspective() throws RemoteException {
+        bot.openDebugPerspective();
+    }
+
+    // public void openPerspectiveWithName(String nodeName) {
+    // try {
+    // bot.openPerspectiveWithName(nodeName);
+    // } catch (RemoteException e) {
+    // log.error("can't open perspective " + nodeName);
+    // }
+    // }
 
     /******************** boolean: is.. ************************/
 
     public boolean isJavaProjectExist(String projectName) {
         try {
-            return bot.isProjectInViewExisted(
-                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, projectName);
+            return bot.isJavaProjectExist(projectName);
+        } catch (RemoteException e) {
+            log.error("Could not know, if the javaproje", e);
+            return false;
+        }
+    }
+
+    public boolean isJavaClassExist(String projectName, String pkg,
+        String className) {
+        try {
+            return bot.isJavaClassExist(projectName, pkg, className);
         } catch (RemoteException e) {
             log.error("Could not know, if the javaproje", e);
             return false;
@@ -502,15 +561,17 @@ public class Musician {
     }
 
     public boolean isJavaEditorActive(String className) throws RemoteException {
-        return isEditorActive(className, "java");
+
+        return bot.isJavaEditorActive(className);
     }
 
-    public boolean isEditorActive(String fileName, String extension)
-        throws RemoteException {
-        return bot.isEditorActive(fileName + "." + extension);
-    }
+    // public boolean isEditorActive(String fileName, String extension)
+    // throws RemoteException {
+    // return bot.isEditorActive(fileName + "." + extension);
+    // }
 
     public boolean isInFollowMode(Musician participant) throws RemoteException {
+
         if (participant.isDriver()) {
             return bot.isInFollowMode(participant.jid.getBase(), " (Driver)");
         } else {
@@ -518,8 +579,21 @@ public class Musician {
         }
     }
 
-    public boolean isPerspectiveOpen(String title) throws RemoteException {
-        return bot.isPerspectiveActive(title);
+    public boolean isPerspectiveActive(String title) {
+        try {
+            return bot.isPerspectiveActive(title);
+        } catch (RemoteException e) {
+            log.error("Could not know, if the perspective is active", e);
+            return false;
+        }
+    }
+
+    public boolean isDebugPerspectiveActive() {
+        return isPerspectiveActive(SarosConstant.PERSPECTIVE_TITLE_DEBUG);
+    }
+
+    public boolean isJavaPerspectiveActive() {
+        return isPerspectiveActive(SarosConstant.PERSPECTIVE_TITLE_JAVA);
     }
 
     /**
@@ -605,6 +679,11 @@ public class Musician {
         }
     }
 
+    /*
+     * wenn du junitest mehrfach durchführen willst, muss vor den Test den
+     * sarosInstance aktviert werden. Bei Default ist der sarosinstanze nach der
+     * Durchführung von junittest deactiviert.
+     */
     public void activateShellWithMatchText(String matchText) {
         try {
             bot.activateShellWithMatchText(matchText);
@@ -619,17 +698,21 @@ public class Musician {
         activateShellWithMatchText(".+? - .+");
     }
 
-    public void activateEditor(String textName, String extension) {
-        try {
-            bot.activateEditor(textName + "." + extension);
-        } catch (RemoteException e) {
-            log.error("Could not activate the editor with name " + textName
-                + extension, e);
-        }
-    }
+    // public void activateEditor(String textName, String extension) {
+    // try {
+    // bot.activateEditor(textName + "." + extension);
+    // } catch (RemoteException e) {
+    // log.error("Could not activate the editor with name " + textName
+    // + extension, e);
+    // }
+    // }
 
     public void activateJavaEditor(String className) {
-        activateEditor(className, "java");
+        try {
+            bot.activateJavaEditor(className);
+        } catch (RemoteException e) {
+            log.error("Could not activate the editor with name " + className, e);
+        }
     }
 
     public void activatePackageExplorerView() {
@@ -660,15 +743,27 @@ public class Musician {
     }
 
     /************* wait until *****************/
+
+    public void waitUntilOtherLeaveSession(Musician other)
+        throws RemoteException {
+        while (hasParticipant(other)) {
+            sleep(100);
+        }
+    }
+
+    public void waitUntilIsObserverBy(Musician other) throws RemoteException {
+        while (!other.hasObserver(this)) {
+            sleep(100);
+        }
+    }
+
     public void waitUntilShellCloses(String title) throws RemoteException {
         bot.waitUntilShellCloses(bot.getShellWithText(title));
     }
 
     public void waitUntilSessionClosesBy(Musician participant)
         throws RemoteException {
-
         bot.waitUntilSessionCloses(participant.state);
-
     }
 
     public void waitUntilSessionCloses() throws RemoteException {
@@ -677,16 +772,24 @@ public class Musician {
 
     public void waitUntilJavaEditorActive(String className)
         throws RemoteException {
-        waitUntilEditorActive(className, "java");
+        bot.waitUntilJavaEditorActive(className);
     }
 
-    public void waitUntilEditorActive(String fileName, String extension)
+    public void waitUntilSessionOpenBy(Musician participant)
         throws RemoteException {
-        bot.waitUntilEditorActive(fileName + "." + extension);
+        bot.waitUntilSessionOpenBy(participant.state);
     }
 
-    public void waitUntilConnect() throws RemoteException {
+    public void waitUntilSessionOpen() throws RemoteException {
+        bot.waitUntilSessionOpen();
+    }
+
+    public void waitUntilConnected() throws RemoteException {
         bot.waitUntilConnected();
+    }
+
+    public void waitUntilDisConnected() throws RemoteException {
+        bot.waitUntilDisConnected();
     }
 
     public void waitUntilFileEqualWithFile(String projectName,
@@ -701,6 +804,20 @@ public class Musician {
             sleep(100);
             myFile = getTextOfJavaEditor(BotConfiguration.PROJECTNAME,
                 BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        }
+    }
+
+    public void waitUntilHasContactWith(Musician respondent)
+        throws RemoteException {
+        while (!hasContactWith(respondent)) {
+            sleep(50);
+        }
+    }
+
+    public void waitUntilHasNoContactWith(Musician respondent)
+        throws RemoteException {
+        while (hasContactWith(respondent)) {
+            sleep(50);
         }
     }
 
@@ -722,20 +839,21 @@ public class Musician {
     /**
      * Share given project with given invitee. click contextmenu
      */
-    public void clickCMShareProjectInPEView(String project,
-        String nameOfContextMenu) throws RemoteException {
-        bot.clickCMShareProjectInPEView(project, nameOfContextMenu);
+    public void clickCMShareProjectInPEView(String project)
+        throws RemoteException {
+        bot.clickCMShareProjectInPEView(project);
     }
 
-    public void clickLeaveTheSessionInSPSView() throws RemoteException {
-        bot.clickLeaveTheSessionInSPSView();
+    public void clickTBLeaveTheSessionInSPSView() throws RemoteException {
+        bot.clickTBLeaveTheSessionInSPSView();
     }
 
-    public void clickEnableDisableFollowModeInSPSView() throws RemoteException {
+    public void clickTBEnableDisableFollowModeInSPSView()
+        throws RemoteException {
         bot.clickEnableDisableFollowModeInSPSView();
     }
 
-    public void clickRemoveAllRriverRolesInSPSView() throws RemoteException {
+    public void clickTBRemoveAllRriverRolesInSPSView() throws RemoteException {
         bot.clickRemoveAllRriverRolesInSPSView();
     }
 

@@ -26,9 +26,9 @@ public class TestShareProject3Users {
     @BeforeClass
     public static void configureInvitee1() throws RemoteException,
         NotBoundException {
-        invitee1 = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
+        invitee1 = new Musician(new JID(BotConfiguration.JID_CARL),
+            BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
+            BotConfiguration.PORT_CARL);
         invitee1.initBot();
     }
 
@@ -44,9 +44,9 @@ public class TestShareProject3Users {
     @BeforeClass
     public static void configureInviter() throws RemoteException,
         NotBoundException {
-        inviter = new Musician(new JID(BotConfiguration.JID_CARL),
-            BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
-            BotConfiguration.PORT_CARL);
+        inviter = new Musician(new JID(BotConfiguration.JID_ALICE),
+            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
+            BotConfiguration.PORT_ALICE);
         inviter.initBot();
         inviter.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
@@ -67,6 +67,7 @@ public class TestShareProject3Users {
     @After
     public void cleanupInviter() throws RemoteException {
         inviter.xmppDisconnect();
+        // inviter.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -78,8 +79,10 @@ public class TestShareProject3Users {
 
         inviter.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
 
-        invitee1.ackProject(inviter, BotConfiguration.PROJECTNAME);
-        invitee2.ackProject(inviter, BotConfiguration.PROJECTNAME);
+        invitee1.confirmSessionInvitationWizard(inviter,
+            BotConfiguration.PROJECTNAME);
+        invitee2.confirmSessionInvitationWizard(inviter,
+            BotConfiguration.PROJECTNAME);
 
         assertTrue(invitee1.isParticipant());
         assertTrue(invitee1.isObserver());
@@ -108,7 +111,13 @@ public class TestShareProject3Users {
         invitee2.leaveSession();
         assertFalse(invitee2.isParticipant());
 
+        inviter.waitUntilOtherLeaveSession(invitee1);
+        inviter.waitUntilOtherLeaveSession(invitee2);
         inviter.leaveSession();
         assertFalse(inviter.isParticipant());
+
+        // invitee1.sleep(1000);
+        // invitee2.sleep(1000);
+
     }
 }

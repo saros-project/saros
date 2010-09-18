@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.NotBoundException;
@@ -37,7 +38,7 @@ public class TestFollowMode {
         bob.initBot();
 
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
-            SarosConstant.SHARE_PROJECT, SarosConstant.CREATE_NEW_PROJECT);
+            SarosConstant.CREATE_NEW_PROJECT);
 
     }
 
@@ -50,7 +51,7 @@ public class TestFollowMode {
     @AfterClass
     public static void cleanupAice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteResource(BotConfiguration.PROJECTNAME);
+        // alice.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @After
@@ -59,6 +60,7 @@ public class TestFollowMode {
             bob.clickCMStopfollowingThisUserInSPSView(alice);
         if (alice.isInFollowMode(bob))
             alice.clickCMStopfollowingThisUserInSPSView(bob);
+
     }
 
     @Test
@@ -66,7 +68,6 @@ public class TestFollowMode {
         alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
-
         bob.followUser(alice);
         bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
         assertTrue(bob.isInFollowMode(alice));
@@ -93,9 +94,37 @@ public class TestFollowMode {
     @Test
     public void testAliceFollowBob() throws RemoteException {
         alice.followUser(bob);
-        assertTrue(alice.isInFollowMode(bob));
         bob.activateJavaEditor(BotConfiguration.CLASSNAME);
         alice.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
+        assertTrue(alice.isInFollowMode(bob));
         assertTrue(alice.isJavaEditorActive(BotConfiguration.CLASSNAME));
+    }
+
+    @Test
+    public void teatBobFollowAliceWithDebugging() throws RemoteException {
+        bob.followUser(alice);
+        alice.newJavaClassInProject(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
+        alice.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
+        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH3,
+            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME3);
+        alice.setBreakPoint(13, BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
+        alice.debugJavaFile(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
+        bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);
+        assertFalse(bob.isDebugPerspectiveActive());
+        alice.openJavaPerspective();
+        // bob.sleep(1000);
+        // int lineFromAlice = alice.getJavaCursorLinePosition(
+        // BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+        // BotConfiguration.CLASSNAME3);
+        // int lineFromBob = bob.getJavaCursorLinePosition(
+        // BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+        // BotConfiguration.CLASSNAME3);
+        // assertEquals(lineFromAlice, lineFromBob);
+        // alice.waitUntilShellActive("Confirm Perspective Switch");
+        // assertTrue(alice.isShellActive("Confirm Perspective Switch"));
     }
 }

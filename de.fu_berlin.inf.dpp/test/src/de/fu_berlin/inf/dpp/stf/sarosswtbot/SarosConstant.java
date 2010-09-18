@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.stf.sarosswtbot;
 
 public class SarosConstant {
 
-    public final static String SHARE_PROJECT = "Share project...";
-
     public final static int CREATE_NEW_PROJECT = 1;
     public final static int USE_EXISTING_PROJECT = 2;
     public final static int USE_EXISTING_PROJECT_WITH_COPY = 3;
@@ -44,6 +42,7 @@ public class SarosConstant {
     public final static String BUTTON_YES = "Yes";
 
     public final static String PERSPECTIVE_TITLE_JAVA = "Java";
+    public final static String PERSPECTIVE_TITLE_DEBUG = "Debug";
     public final static String MENU_TITLE_WINDOW = "Window";
     public final static String MENU_TITLE_OPEN_PERSPECTIVE = "Open Perspective";
     public final static String MENU_TITLE_OTHER = "Other...";
@@ -88,6 +87,9 @@ public class SarosConstant {
     public final static String CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER = "Jump to position of selected user";
     public final static String CONTEXT_MENU_LEAVE_THE_SESSION = "Leave the session";
     public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
+    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+    public final static String CONTEXT_MENU_SHARE_PROJECT_PARTIALLY = "Share project partially (experimental)...";
+    public final static String CONTEXT_MENU_ADD_TO_SESSION = "Add to session (experimental)...";
 
     public final static String RADIO_LABEL_CREATE_NEW_PROJECT = "Create new project";
 

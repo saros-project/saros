@@ -4,7 +4,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -43,7 +45,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String)} to add the
      * View called "Package Explorer".
      */
-    public void openJavaPackageExplorerView() throws RemoteException;
+    public void openPackageExplorerView() throws RemoteException;
 
     /**
      * Convenient method for
@@ -77,14 +79,14 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void confirmWindow(String title, String buttonText)
         throws RemoteException;
 
-    public boolean isTreeItemInViewExist(String viewName, String... labels)
-        throws RemoteException;
+    // public boolean isTreeItemInViewExist(String viewName, String... labels)
+    // throws RemoteException;
+    //
+    // public boolean isTreeItemInWindowExist(String title, String... labels)
+    // throws RemoteException;
 
-    public boolean isTreeItemInWindowExist(String title, String... labels)
-        throws RemoteException;
-
-    public boolean isTreeItemExist(SWTBotTree tree, String... labels)
-        throws RemoteException;
+    // public boolean isTreeItemExist(SWTBotTree tree, String... labels)
+    // throws RemoteException;
 
     public boolean istableItemInViewExist(String viewName, String itemName)
         throws RemoteException;
@@ -391,7 +393,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void waitUntilShellCloses(String shellText) throws RemoteException;
 
-    public void openPerspectiveWithName(String nodeName) throws RemoteException;
+    // public void openPerspectiveWithName(String nodeName) throws
+    // RemoteException;
 
     // public void setTextInJavaEditor(String contents, String projectName,
     // String packageName, String className) throws RemoteException;
@@ -402,13 +405,15 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void openJavaFileWithEditor(String projectName, String packageName,
         String className) throws RemoteException;
 
-    public void openFileWithEditorInView(String viewName, String... names)
-        throws RemoteException;
+    // public void openFileWithEditorInView(String viewName, String... names)
+    // throws RemoteException;
 
-    public boolean isEditorActive(String className) throws RemoteException;
+    public boolean isJavaEditorActive(String className) throws RemoteException;
+
+    // public boolean isEditorActive(String className) throws RemoteException;
 
     // public void activeJavaEditor(String className) throws RemoteException;
-    public void activateEditor(String name) throws RemoteException;
+    // public void activateEditor(String name) throws RemoteException;
 
     public void clickCheckBox(String title) throws RemoteException;
 
@@ -446,8 +451,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void waitUntilButtonEnabled(String mnemonicText)
         throws RemoteException;
-
-    public void waitUntilConnected() throws RemoteException;
 
     public void waitUntilShellActive(String title) throws RemoteException;
 
@@ -512,11 +515,64 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void setTextinEditor(String contents, String fileName)
         throws RemoteException;
 
-    public boolean isProjectInViewExisted(String viewName, String label)
+    public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label)
         throws RemoteException;
 
     public void waitUntilFileEqualWithFile(String projectName,
         String packageName, String className, String file)
         throws RemoteException;
+
+    public boolean isTreeItemExist(String viewTitle, String... paths)
+        throws RemoteException;
+
+    public SWTBotTreeItem getTreeWithLabels(SWTBotTree tree, String... labels)
+        throws RemoteException;
+
+    public void selectLineInJavaEditor(int line, String fileName)
+        throws RemoteException;
+
+    // public void selectLineInEditor(int line, String fileName)
+    // throws RemoteException;
+
+    public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
+        String... labels) throws RemoteException;
+
+    public void waitUntilTreeExisted(SWTBotTree tree, String nodeName)
+        throws RemoteException;
+
+    public void setBreakPoint(int line, String projectName, String packageName,
+        String className) throws RemoteException;
+
+    public void waitUntilJavaEditorActive(String className)
+        throws RemoteException;
+
+    public void activateJavaEditor(String className) throws RemoteException;
+
+    public void debugJavaFile(String projectName, String packageName,
+        String className) throws RemoteException;
+
+    public int getJavaCursorLinePosition(String projectName,
+        String packageName, String className) throws RemoteException;
+
+    public String getJavaTextOnLine(String projectName, String packageName,
+        String className, int line) throws RemoteException;
+
+    public SWTBotEclipseEditor getJavaEditor(String className)
+        throws RemoteException;
+
+    public RGB getJavaLineBackground(String projectName, String packageName,
+        String className, int line) throws RemoteException;
+
+    public void openJavaPerspective() throws RemoteException;
+
+    public void openDebugPerspective() throws RemoteException;
+
+    public void activatePackageExplorerView() throws RemoteException;
+
+    public boolean isJavaProjectExist(String projectName)
+        throws RemoteException;
+
+    public boolean isJavaClassExist(String className, String projectName,
+        String pkg) throws RemoteException;
 
 }

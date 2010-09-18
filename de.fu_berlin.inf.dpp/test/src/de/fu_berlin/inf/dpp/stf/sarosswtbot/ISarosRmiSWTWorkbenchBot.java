@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.stf.sarosswtbot;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+
 import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
@@ -72,7 +74,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean isSharedSessionViewOpen() throws RemoteException;
 
-    public void leaveSession() throws RemoteException;
+    // public void leaveSession() throws RemoteException;
 
     public void deleteContact(String name) throws RemoteException;
 
@@ -82,8 +84,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickProjectContextMenu(String projectName,
     // String nameOfContextMenu) throws RemoteException;
 
-    public void clickCMShareProjectInPEView(String projectName,
-        String nameOfContextMenu) throws RemoteException;
+    public void clickCMShareProjectInPEView(String projectName)
+        throws RemoteException;
 
     public void shareProjectSequential(String projectName,
         String nameOfContextMenu, List<String> invitees) throws RemoteException;
@@ -91,9 +93,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException;
 
-    public void clickTBConnectInSPSView() throws RemoteException;
+    public void clickTBConnectInRosterView() throws RemoteException;
 
-    public boolean clickTBDisconnectInSPSView() throws RemoteException;
+    public boolean clickTBDisconnectInRosterView() throws RemoteException;
 
     public void followUser(String participantJID, String sufix)
         throws RemoteException;
@@ -129,7 +131,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void clickEnableDisableFollowModeInSPSView() throws RemoteException;
 
-    public void clickLeaveTheSessionInSPSView() throws RemoteException;
+    public void clickTBLeaveTheSessionInSPSView() throws RemoteException;
 
     public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException;
@@ -161,4 +163,47 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public boolean isRemoteScreenViewOpen() throws RemoteException;
 
     public void addContact(String plainJID) throws RemoteException;
+
+    public void setTextInJavaEditor(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException;
+
+    // public boolean isConnectedByXMPP() throws RemoteException;
+
+    public void clickTBOpenInvitationInterfaceInSPSView()
+        throws RemoteException;
+
+    public void clickTBAddANewContactInRosterView() throws RemoteException;
+
+    public void clickCMShareprojectWithVCSSupportInPEView(String projectName)
+        throws RemoteException;
+
+    public void clickCMShareProjectParticallyInPEView(String projectName)
+        throws RemoteException;
+
+    public void clickCMAddToSessionInPEView(String projectName)
+        throws RemoteException;
+
+    public void closeRosterView() throws RemoteException;
+
+    public void closeSharedSessionView() throws RemoteException;
+
+    public void closeRemoteScreenView() throws RemoteException;
+
+    public void closeChatView() throws RemoteException;
+
+    public void closePackageExplorerView() throws RemoteException;
+
+    public void closeWelcomeView() throws RemoteException;
+
+    public void waitUntilConnected() throws RemoteException;
+
+    public void waitUntilDisConnected() throws RemoteException;
+
+    public SWTBotTreeItem selectBuddy(String contact) throws RemoteException;
+
+    public void waitUntilSessionOpenBy(ISarosState state)
+        throws RemoteException;
+
+    public void waitUntilSessionOpen() throws RemoteException;
+
 }

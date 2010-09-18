@@ -12,6 +12,7 @@ import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -61,6 +62,9 @@ public class StartupSaros implements IStartup {
     @Inject
     protected PreferenceUtils preferenceUtils;
 
+    @Inject
+    protected EditorManager editorManager;
+
     public StartupSaros() {
         Saros.reinject(this);
     }
@@ -71,14 +75,17 @@ public class StartupSaros implements IStartup {
             PreferenceConstants.SAROS_VERSION, "unknown");
 
         String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
+        String sleepTime = System.getProperty("de.fu_berlin.inf.dpp.sleepTime");
         log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
 
         boolean testmode = portNumber != null;
 
         if (testmode) {
             int port = Integer.parseInt(portNumber);
+            int time = Integer.parseInt(sleepTime);
             log.info("entered testmode, start RMI bot listen on port " + port);
-            startRmiBot(port);
+            log.info("sleep time: " + sleepTime);
+            startRmiBot(port, time);
         }
 
         boolean assertEnabled = false;
@@ -99,13 +106,14 @@ public class StartupSaros implements IStartup {
         showConfigurationWizard();
     }
 
-    protected void startRmiBot(final int port) {
+    protected void startRmiBot(final int port, final int time) {
         log.info("start RMI Bot");
         Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 log.debug("Util.isSWT(): " + Util.isSWT());
                 SarosRmiSWTWorkbenchBot bot = SarosRmiSWTWorkbenchBot
                     .getInstance();
+                bot.sleepTime = time;
 
                 try {
                     bot.init("Bot", port);
@@ -118,7 +126,7 @@ public class StartupSaros implements IStartup {
                      * object in the server JVM.
                      */
                     SarosState.classVariable = new SarosState(saros,
-                        sessionManager, dataTransferManager);
+                        sessionManager, dataTransferManager, editorManager);
                     bot.exportState(SarosState.classVariable, "state");
                     bot.listRmiObjects();
                 } catch (RemoteException e) {

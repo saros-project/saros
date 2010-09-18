@@ -12,6 +12,7 @@ import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -35,10 +36,11 @@ public class SarosState implements ISarosState {
     }
 
     public SarosState(Saros saros, SessionManager sessionManager,
-        DataTransferManager dataTransferManager) {
+        DataTransferManager dataTransferManager, EditorManager editorManager) {
         this.saros = saros;
         this.sessionManager = sessionManager;
         this.dataTransferManager = dataTransferManager;
+        this.editorManager = editorManager;
     }
 
     protected transient Saros saros;
@@ -46,6 +48,8 @@ public class SarosState implements ISarosState {
     protected transient SessionManager sessionManager;
 
     protected transient DataTransferManager dataTransferManager;
+
+    protected transient EditorManager editorManager;
 
     public boolean areDrivers(List<JID> jids) {
         boolean result = true;
@@ -114,6 +118,14 @@ public class SarosState implements ISarosState {
 
     public boolean isConnectedByXMPP() {
         return saros.isConnected();
+    }
+
+    public boolean isInFollowMode(JID jid) throws RemoteException {
+        // ISarosSession sarosSession = sessionManager.getSarosSession();
+        // User user = sarosSession.getUser(jid);
+        //
+        // editorManager.getFollowedUser();
+        return editorManager.isFollowing();
     }
 
     public boolean isDriver(JID jid) throws RemoteException {
