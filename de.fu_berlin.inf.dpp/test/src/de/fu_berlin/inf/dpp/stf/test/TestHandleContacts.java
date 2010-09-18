@@ -17,60 +17,71 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestHandleContacts {
     // bots
-    protected Musician questioner;
-    protected Musician respondent;
+    protected Musician bob;
+    protected Musician alice;
 
     @Before
     public void configureRespondent() throws RemoteException, NotBoundException {
-        respondent = new Musician(new JID(BotConfiguration.JID_ALICE),
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        respondent.initBot();
+        alice.initBot();
     }
 
     @Before
     public void configureQuestioner() throws RemoteException, NotBoundException {
-        questioner = new Musician(new JID(BotConfiguration.JID_BOB),
+        bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        questioner.initBot();
+        bob.initBot();
     }
 
     @After
     public void cleanupRespondent() throws RemoteException {
-        respondent.xmppDisconnect();
+        alice.xmppDisconnect();
     }
 
     @After
     public void cleanupQuestioner() throws RemoteException {
-        questioner.xmppDisconnect();
+        bob.xmppDisconnect();
     }
 
     @Test
     public void testAddAndRemoveContact() throws RemoteException {
-        assertTrue(questioner.hasContactWith(respondent));
-        assertTrue(respondent.hasContactWith(questioner));
+        assertTrue(bob.hasContactWith(alice));
+        assertTrue(alice.hasContactWith(bob));
 
-        questioner.deleteContact(respondent);
+        bob.deleteContact(alice);
 
-        respondent
+        alice
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-        respondent.confirmWindow(
-            SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
+        try {
+            // Don't accept immediately, Bob needs time to realize that he
+            // removed Alice.
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            //
+        }
+
+        alice.confirmWindow(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
             SarosConstant.BUTTON_OK);
-        respondent.sleep(200);
 
-        questioner.sleep(200);
+        try {
+            // Wait for the server.
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            //
+        }
 
-        assertFalse(questioner.hasContactWith(respondent));
-        assertFalse(respondent.hasContactWith(questioner));
+        assertFalse(bob.hasContactWith(alice));
+        assertFalse(alice.hasContactWith(bob));
 
-        questioner.addContact(respondent);
+        bob.addContact(alice);
 
-        respondent.ackContact(questioner);
-        questioner.ackContact(respondent);
+        alice.ackContact(bob);
+        bob.ackContact(alice);
 
-        assertTrue(questioner.hasContactWith(respondent));
-        assertTrue(respondent.hasContactWith(questioner));
+        assertTrue(bob.hasContactWith(alice));
+        assertTrue(alice.hasContactWith(bob));
     }
 }

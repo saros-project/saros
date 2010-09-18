@@ -513,9 +513,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             // item.contextMenu("Delete").click();
             // delegate.sleep(750);
             // confirm delete
+
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
-                SarosConstant.BUTTON_OK);
+                SarosConstant.BUTTON_YES);
             // activateShellByText(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             // delegate.sleep(sleepTime);
             // clickButton(SarosConstant.BUTTON_YES);
