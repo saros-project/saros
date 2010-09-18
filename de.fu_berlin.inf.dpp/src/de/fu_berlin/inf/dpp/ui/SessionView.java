@@ -398,11 +398,6 @@ public class SessionView extends ViewPart {
         // Unfortunately, child.getParent is immutable, so we have to ask Saros.
         saros.removeChildContainer(container.getDelegate());
 
-        awayImage.dispose();
-        userImage.dispose();
-        driverImage.dispose();
-        observerImage.dispose();
-
         super.dispose();
     }
 
