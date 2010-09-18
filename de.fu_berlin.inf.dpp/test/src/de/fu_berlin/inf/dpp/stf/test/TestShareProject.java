@@ -54,7 +54,7 @@ public class TestShareProject {
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
         inviter.xmppDisconnect();
-        // inviter.deleteResource(BotConfiguration.PROJECTNAME);
+        inviter.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test

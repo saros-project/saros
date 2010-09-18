@@ -71,7 +71,7 @@ public class TestEditDuringInvitation {
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        // alice.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test

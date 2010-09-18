@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.NotBoundException;
@@ -49,9 +48,9 @@ public class TestFollowMode {
     }
 
     @AfterClass
-    public static void cleanupAice() throws RemoteException {
+    public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        // alice.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @After
@@ -101,21 +100,21 @@ public class TestFollowMode {
     }
 
     @Test
-    public void teatBobFollowAliceWithDebugging() throws RemoteException {
+    public void testBobFollowAliceWithDebugging() throws RemoteException {
         bob.followUser(alice);
         alice.newJavaClassInProject(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
-        alice.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME);
+        alice.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);
         alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH3,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME3);
         alice.setBreakPoint(13, BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
-        alice.debugJavaFile(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
-        bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);
-        assertFalse(bob.isDebugPerspectiveActive());
-        alice.openJavaPerspective();
+        // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
+        // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
+        // bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);
+        // assertFalse(bob.isDebugPerspectiveActive());
+        // alice.openJavaPerspective();
         // bob.sleep(1000);
         // int lineFromAlice = alice.getJavaCursorLinePosition(
         // BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
