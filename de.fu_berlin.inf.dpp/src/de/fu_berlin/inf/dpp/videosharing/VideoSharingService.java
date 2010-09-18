@@ -22,8 +22,7 @@ package de.fu_berlin.inf.dpp.videosharing;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -73,14 +72,11 @@ public class VideoSharingService extends StreamService {
             return false; // TODO reason to initiator
         Callable<Boolean> askUser = new Callable<Boolean>() {
             public Boolean call() throws Exception {
-                MessageBox messageBox = new MessageBox(EditorAPI.getShell(),
-                    SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-                messageBox.setMessage("Accept to receive the screen from "
-                    + from.getHumanReadableName() + " ?");
-                messageBox.setText("Incoming screenshare session");
-                int response = messageBox.open();
-
-                return (response == SWT.YES);
+                return (MessageDialog.openQuestion(
+                    EditorAPI.getShell(),
+                    "Incoming screensharing session",
+                    "Accept screensharing request from "
+                        + from.getHumanReadableName() + " ?"));
             }
         };
 
