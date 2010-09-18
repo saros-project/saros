@@ -421,7 +421,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public boolean hasContactWith(String contact) throws RemoteException {
         if (!isRosterViewOpen())
-            openSarosSessionView();
+            openRosterView();
         if (!isConnectedByXmppGuiCheck())
             clickTBConnectInSPSView();
         activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
@@ -515,7 +515,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             // confirm delete
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
-                SarosConstant.BUTTON_YES);
+                SarosConstant.BUTTON_OK);
             // activateShellByText(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             // delegate.sleep(sleepTime);
             // clickButton(SarosConstant.BUTTON_YES);

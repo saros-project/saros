@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
+import org.jivesoftware.smack.Roster;
 import org.limewire.collection.Tuple;
 import org.osgi.framework.Bundle;
 
@@ -106,7 +107,9 @@ public class SarosState implements ISarosState {
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return saros.getRoster().contains(jid.getBase());
+        Roster roster = saros.getRoster();
+        String jidBase = jid.getBase();
+        return roster.contains(jidBase);
     }
 
     public boolean isConnectedByXMPP() {

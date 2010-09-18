@@ -48,13 +48,20 @@ public class TestHandleContacts {
 
     @Test
     public void testAddAndRemoveContact() throws RemoteException {
+        assertTrue(questioner.hasContactWith(respondent));
+        assertTrue(respondent.hasContactWith(questioner));
+
         questioner.deleteContact(respondent);
+
         respondent
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
         respondent.confirmWindow(
             SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
             SarosConstant.BUTTON_OK);
-        respondent.sleep(1000);
+        respondent.sleep(200);
+
+        questioner.sleep(200);
+
         assertFalse(questioner.hasContactWith(respondent));
         assertFalse(respondent.hasContactWith(questioner));
 
