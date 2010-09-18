@@ -474,35 +474,20 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     protected boolean isEditorActive(String name) {
         return delegate.activeEditor().getTitle().equals(name);
-        // try {
-        // // waitUntilEditorActive(name);
-        // SWTBotEditor editor = delegate.editorByTitle(name);
-        // return editor.isActive();
-        // } catch (TimeoutException e) {
-        // return false;
-        // } catch (WidgetNotFoundException e) {
-        // return false;
-        // }
     }
 
     public boolean isShellOpen(String title) throws RemoteException {
-        try {
-            return delegate.shell(title) != null;
-        } catch (WidgetNotFoundException e) {
-            log.warn("Shell '" + title + "' doesn't exist!");
-            return false;
-        }
-
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells)
+            if (shell.getText().equals(title))
+                return true;
+        return false;
     }
 
     public boolean isShellActive(String title) throws RemoteException {
-        try {
-            return delegate.shell(title).isActive();
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-        // return delegate.activeShell().getText().equals(title);
-
+        SWTBotShell activeShell = delegate.activeShell();
+        String shellTitle = activeShell.getText();
+        return shellTitle.equals(title);
     }
 
     public boolean isContextMenuOfTableItemInViewExist(String viewName,
