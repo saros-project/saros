@@ -86,7 +86,9 @@ public class FollowModeAction extends Action implements Disposable {
                     public void run() {
                         Util.runSafeSWTAsync(log, new Runnable() {
                             public void run() {
-                                FollowModeAction.this.run();
+                                if (sessionManager.getSarosSession() != null) {
+                                    FollowModeAction.this.run();
+                                }
                             }
                         });
                     }
