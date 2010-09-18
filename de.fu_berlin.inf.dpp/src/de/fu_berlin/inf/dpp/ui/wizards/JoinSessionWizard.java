@@ -401,6 +401,9 @@ public class JoinSessionWizard extends Wizard {
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
+                Shell shell = wizardDialog.getShell();
+                if (shell == null || shell.isDisposed())
+                    return;
                 wizardDialog.close();
             }
         });
