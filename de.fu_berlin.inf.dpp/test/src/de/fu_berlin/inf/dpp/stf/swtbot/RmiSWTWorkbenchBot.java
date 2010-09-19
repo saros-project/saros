@@ -497,6 +497,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isShellActive(String title) throws RemoteException {
+        if (!isShellOpen(title))
+            return false;
         SWTBotShell activeShell = delegate.activeShell();
         String shellTitle = activeShell.getText();
         return shellTitle.equals(title);

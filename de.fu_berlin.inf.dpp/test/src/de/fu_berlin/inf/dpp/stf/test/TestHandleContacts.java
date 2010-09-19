@@ -46,8 +46,12 @@ public class TestHandleContacts {
         bob.xmppDisconnect();
     }
 
+    // FIXME these testAddContact assumes that testRemoveContact succeeds
+    // FIXME all the other tests in the suite would fail if testAddContact fails
+
     @Test
     public void testRemoveContact() throws RemoteException {
+        assertTrue(alice.hasContactWith(bob));
         bob.deleteContact(alice);
         alice
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);

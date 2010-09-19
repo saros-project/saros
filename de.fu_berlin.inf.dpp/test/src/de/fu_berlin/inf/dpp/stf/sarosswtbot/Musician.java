@@ -815,15 +815,21 @@ public class Musician {
 
     public void waitUntilHasContactWith(Musician respondent)
         throws RemoteException {
-        while (!hasContactWith(respondent)) {
-            sleep(50);
+    	// FIXME infinite loop, replace with wait condition
+//        while (!hasContactWith(respondent)) {
+//            sleep(50);
+        if (!hasContactWith(respondent)) {
+            sleep(500);
         }
     }
 
     public void waitUntilHasNoContactWith(Musician respondent)
         throws RemoteException {
-        while (hasContactWith(respondent)) {
-            sleep(50);
+        // FIXME infinite loop, replace with wait condition
+//        while (hasContactWith(respondent)) {
+//            sleep(50);
+        if (hasContactWith(respondent)) {
+            sleep(500);
         }
     }
 
