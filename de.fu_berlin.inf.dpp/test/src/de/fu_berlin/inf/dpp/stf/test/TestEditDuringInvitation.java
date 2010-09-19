@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,41 +60,50 @@ public class TestEditDuringInvitation {
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.deleteResource(BotConfiguration.PROJECTNAME);
+        bob.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupCarl() throws RemoteException {
         carl.xmppDisconnect();
-        carl.deleteResource(BotConfiguration.PROJECTNAME);
+        carl.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.deleteProject(BotConfiguration.PROJECTNAME);
     }
+
+    private static final Logger log = Logger
+        .getLogger(TestEditDuringInvitation.class);
 
     @Test
     public void testEditDuringInvitation() throws RemoteException {
-
+        log.trace("starting testEditDuringInvitation, alice.buildSession");
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
             SarosConstant.CREATE_NEW_PROJECT);
 
+        log.trace("alice.giveDriverRole");
         alice.giveDriverRole(bob);
 
         assertTrue(bob.isDriver(alice));
 
+        log.trace("alice.inviteUser(carl");
         alice.inviteUser(carl, BotConfiguration.PROJECTNAME);
 
+        log.trace("carl.confirmSessionInvitationWindowStep1");
         carl.confirmSessionInvitationWindowStep1(alice);
 
+        log.trace("bob.setTextInJavaEditor");
         bob.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
+        log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
         carl.confirmSessionInvitationWindowStep2UsingNewproject(BotConfiguration.PACKAGENAME);
 
+        log.trace("getTextOfJavaEditor");
         String textFromCarl = carl.getTextOfJavaEditor(
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
@@ -102,5 +112,6 @@ public class TestEditDuringInvitation {
             BotConfiguration.CLASSNAME);
         assertTrue(textFromCarl.equals(textFormAlice));
 
+        log.trace("testEditDuringInvitation done");
     }
 }

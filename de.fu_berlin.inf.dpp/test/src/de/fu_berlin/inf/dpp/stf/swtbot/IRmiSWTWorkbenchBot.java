@@ -29,7 +29,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
  */
 public interface IRmiSWTWorkbenchBot extends Remote {
 
-    public SWTBotShell activateShellWithMatchText(String matchText)
+    public void activateShellWithMatchText(String matchText)
         throws RemoteException;
 
     /*********************** high-level RMI exported Methods *******************/
@@ -38,26 +38,26 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * Removes and deletes a project identified by it's name on the View called
      * "Package Explorer".
      */
-    public void deleteResource(String projectName) throws RemoteException;
+    public void deleteProject(String projectName) throws RemoteException;
 
     /**
      * Convenient method for
-     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String)} to add the
-     * View called "Package Explorer".
+     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String, String)} to
+     * add the View called "Package Explorer".
      */
     public void openPackageExplorerView() throws RemoteException;
 
     /**
      * Convenient method for
-     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String)} to add the
-     * View called "Problems".
+     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String, String)} to
+     * add the View called "Problems".
      */
     public void openProblemsView() throws RemoteException;
 
     /**
      * Convenient method for
-     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String)} to add the
-     * View called "Project Explorer".
+     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String, String)} to
+     * add the View called "Project Explorer".
      */
     public void openProjectExplorerView() throws RemoteException;
 

@@ -44,13 +44,13 @@ public class TestFollowMode {
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.deleteResource(BotConfiguration.PROJECTNAME);
+        bob.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @After

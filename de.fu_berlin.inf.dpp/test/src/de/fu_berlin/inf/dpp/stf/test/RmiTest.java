@@ -6,9 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,35 +17,46 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
-    static {
-        log.addAppender(new ConsoleAppender(new PatternLayout(
-            "%-5p %d{HH:mm:ss,SSS} (%F:%L) %m%n")));
-    }
 
-    protected Musician bot;
+    protected Musician alice;
+
+    private String projectName = BotConfiguration.PROJECTNAME;
 
     @Before
     public void configureBot() throws RemoteException, NotBoundException {
-        bot = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bot.initBot();
+        log.trace("new Musician");
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
+            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
+            BotConfiguration.PORT_ALICE);
+        log.trace("initBot");
+        alice.initBot();
     }
 
     @After
-    public void cleanupBot() {
-        bot.xmppDisconnect();
-        bot.closeRosterView();
-        bot.closeChatView();
-        bot.closeRmoteScreenView();
-        bot.closeSarosSessionView();
+    public void cleanupBot() throws RemoteException {
+        alice.xmppDisconnect();
+        alice.closeRosterView();
+        alice.closeChatView();
+        alice.closeRmoteScreenView();
+        alice.closeSarosSessionView();
+        if (alice.isJavaProjectExist(projectName))
+            alice.deleteProject(projectName);
     }
 
     @Test
-    public void testWindows() {
-        bot.closeRosterView();
-        assertFalse(bot.isRosterViewOpen());
-        bot.openRosterView();
-        assertTrue(bot.isRosterViewOpen());
+    public void testViews() {
+        alice.closeRosterView();
+        assertFalse(alice.isRosterViewOpen());
+        alice.openRosterView();
+        assertTrue(alice.isRosterViewOpen());
+    }
+
+    @Test
+    public void testProject() throws RemoteException {
+        assertFalse(alice.isJavaProjectExist(projectName));
+        alice.newProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.isJavaProjectExist(projectName));
+        alice.deleteProject(projectName);
+        assertFalse(alice.isJavaProjectExist(projectName));
     }
 }

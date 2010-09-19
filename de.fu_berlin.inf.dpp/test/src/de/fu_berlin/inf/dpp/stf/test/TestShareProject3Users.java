@@ -19,102 +19,102 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 
 public class TestShareProject3Users {
     // bots
-    protected static Musician inviter;
-    protected static Musician invitee1;
-    protected static Musician invitee2;
+    protected static Musician alice;
+    protected static Musician carl;
+    protected static Musician bob;
 
     @BeforeClass
-    public static void configureInvitee1() throws RemoteException,
+    public static void configurePeer1() throws RemoteException,
         NotBoundException {
-        invitee1 = new Musician(new JID(BotConfiguration.JID_CARL),
+        carl = new Musician(new JID(BotConfiguration.JID_CARL),
             BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
             BotConfiguration.PORT_CARL);
-        invitee1.initBot();
+        carl.initBot();
     }
 
     @BeforeClass
-    public static void configureInvitee2() throws RemoteException,
+    public static void configurePeer2() throws RemoteException,
         NotBoundException {
-        invitee2 = new Musician(new JID(BotConfiguration.JID_BOB),
+        bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        invitee2.initBot();
+        bob.initBot();
     }
 
     @BeforeClass
-    public static void configureInviter() throws RemoteException,
+    public static void configureHost() throws RemoteException,
         NotBoundException {
-        inviter = new Musician(new JID(BotConfiguration.JID_ALICE),
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        inviter.initBot();
-        inviter.newProjectWithClass(BotConfiguration.PROJECTNAME,
+        alice.initBot();
+        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee1() throws RemoteException {
-        invitee1.xmppDisconnect();
-        invitee1.deleteResource(BotConfiguration.PROJECTNAME);
+        carl.xmppDisconnect();
+        carl.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee2() throws RemoteException {
-        invitee2.xmppDisconnect();
-        invitee2.deleteResource(BotConfiguration.PROJECTNAME);
+        bob.xmppDisconnect();
+        bob.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @After
     public void cleanupInviter() throws RemoteException {
-        inviter.xmppDisconnect();
-        // inviter.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.xmppDisconnect();
+        alice.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @Test
     public void testShareProjectParallel() throws RemoteException {
 
         List<Musician> musicians = new LinkedList<Musician>();
-        musicians.add(invitee1);
-        musicians.add(invitee2);
+        musicians.add(carl);
+        musicians.add(bob);
 
-        inviter.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
+        alice.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
 
-        invitee1.confirmSessionInvitationWizard(inviter,
+        carl.confirmSessionInvitationWizard(alice,
             BotConfiguration.PROJECTNAME);
-        invitee2.confirmSessionInvitationWizard(inviter,
+        bob.confirmSessionInvitationWizard(alice,
             BotConfiguration.PROJECTNAME);
 
-        assertTrue(invitee1.isParticipant());
-        assertTrue(invitee1.isObserver());
-        assertTrue(invitee1.hasParticipant(invitee2));
-        assertTrue(invitee1.isObserver(invitee2));
-        assertTrue(invitee1.hasParticipant(inviter));
-        assertTrue(invitee1.isDriver(inviter));
+        assertTrue(carl.isParticipant());
+        assertTrue(carl.isObserver());
+        assertTrue(carl.hasParticipant(bob));
+        assertTrue(carl.isObserver(bob));
+        assertTrue(carl.hasParticipant(alice));
+        assertTrue(carl.isDriver(alice));
 
-        assertTrue(invitee2.isParticipant());
-        assertTrue(invitee2.isObserver());
-        assertTrue(invitee2.hasParticipant(invitee1));
-        assertTrue(invitee2.isObserver(invitee1));
-        assertTrue(invitee2.hasParticipant(inviter));
-        assertTrue(invitee2.isDriver(inviter));
+        assertTrue(bob.isParticipant());
+        assertTrue(bob.isObserver());
+        assertTrue(bob.hasParticipant(carl));
+        assertTrue(bob.isObserver(carl));
+        assertTrue(bob.hasParticipant(alice));
+        assertTrue(bob.isDriver(alice));
 
-        assertTrue(inviter.isParticipant());
-        assertTrue(inviter.isDriver());
-        assertTrue(inviter.hasParticipant(invitee1));
-        assertTrue(inviter.isObserver(invitee1));
-        assertTrue(inviter.hasParticipant(invitee2));
-        assertTrue(inviter.isObserver(invitee2));
+        assertTrue(alice.isParticipant());
+        assertTrue(alice.isDriver());
+        assertTrue(alice.hasParticipant(carl));
+        assertTrue(alice.isObserver(carl));
+        assertTrue(alice.hasParticipant(bob));
+        assertTrue(alice.isObserver(bob));
 
-        invitee1.leaveSession();
-        assertFalse(invitee1.isParticipant());
+        carl.leaveSession();
+        assertFalse(carl.isParticipant());
 
-        invitee2.leaveSession();
-        assertFalse(invitee2.isParticipant());
+        bob.leaveSession();
+        assertFalse(bob.isParticipant());
 
-        inviter.waitUntilOtherLeaveSession(invitee1);
-        inviter.waitUntilOtherLeaveSession(invitee2);
-        inviter.leaveSession();
-        assertFalse(inviter.isParticipant());
+        alice.waitUntilOtherLeaveSession(carl);
+        alice.waitUntilOtherLeaveSession(bob);
+        alice.leaveSession();
+        assertFalse(alice.isParticipant());
 
         // invitee1.sleep(1000);
         // invitee2.sleep(1000);

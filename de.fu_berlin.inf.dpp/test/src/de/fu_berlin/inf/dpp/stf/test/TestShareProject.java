@@ -20,87 +20,87 @@ public class TestShareProject {
     private static final Logger log = Logger.getLogger(TestShareProject.class);
 
     // bots
-    protected static Musician inviter;
-    protected static Musician invitee;
+    protected static Musician alice;
+    protected static Musician bob;
 
     @BeforeClass
     public static void configureInvitee() throws RemoteException,
         NotBoundException {
         log.trace("configureInvitee enter");
-        invitee = new Musician(new JID(BotConfiguration.JID_BOB),
+        bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
-        invitee.initBot();
+        bob.initBot();
     }
 
     @BeforeClass
     public static void configureInviter() throws RemoteException,
         NotBoundException {
         log.trace("configureInviter");
-        inviter = new Musician(new JID(BotConfiguration.JID_ALICE),
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
-        inviter.initBot();
-        inviter.newProjectWithClass(BotConfiguration.PROJECTNAME,
+        alice.initBot();
+        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee() throws RemoteException {
-        invitee.xmppDisconnect();
-        invitee.deleteResource(BotConfiguration.PROJECTNAME);
+        bob.xmppDisconnect();
+        bob.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
-        inviter.xmppDisconnect();
-        inviter.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.xmppDisconnect();
+        alice.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @Test
     public void testShareProject() throws RemoteException {
         log.trace("testShareProject enter");
 
-        inviter.buildSession(invitee, BotConfiguration.PROJECTNAME,
+        alice.buildSession(bob, BotConfiguration.PROJECTNAME,
             SarosConstant.CREATE_NEW_PROJECT);
 
-        invitee.captureScreenshot(invitee.getPathToScreenShot()
+        bob.captureScreenshot(bob.getPathToScreenShot()
             + "/invitee_in_sharedproject.png");
-        inviter.captureScreenshot(inviter.getPathToScreenShot()
+        alice.captureScreenshot(alice.getPathToScreenShot()
             + "/inviter_in_sharedproject.png");
 
         log.trace("inviter.setTextInClass");
-        inviter.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
+        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
             BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
 
         log.trace("invitee.openFile");
-        invitee.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
+        bob.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         // invitee.sleep(2000);
-        assertTrue(invitee.isParticipant());
-        assertTrue(invitee.isObserver());
-        assertTrue(invitee.hasParticipant(inviter));
-        assertTrue(invitee.isDriver(inviter));
+        assertTrue(bob.isParticipant());
+        assertTrue(bob.isObserver());
+        assertTrue(bob.hasParticipant(alice));
+        assertTrue(bob.isDriver(alice));
 
-        assertTrue(inviter.isParticipant());
-        assertTrue(inviter.isDriver());
-        assertTrue(inviter.hasParticipant(invitee));
-        assertTrue(inviter.isObserver(invitee));
+        assertTrue(alice.isParticipant());
+        assertTrue(alice.isDriver());
+        assertTrue(alice.hasParticipant(bob));
+        assertTrue(alice.isObserver(bob));
 
     }
 
     @Test
     public void testLeaveSession() throws RemoteException {
-        invitee.leaveSession();
+        bob.leaveSession();
         log.trace("invitee.leave");
-        assertFalse(invitee.isParticipant());
-        inviter.waitUntilSessionClosesBy(invitee);
+        assertFalse(bob.isParticipant());
+        alice.waitUntilSessionClosesBy(bob);
 
-        inviter.leaveSession();
+        alice.leaveSession();
         log.trace("inviter.leave");
-        assertFalse(inviter.isParticipant());
+        assertFalse(alice.isParticipant());
         // invitee.waitUntilSessionClosesBy(inviter);
     }
 }

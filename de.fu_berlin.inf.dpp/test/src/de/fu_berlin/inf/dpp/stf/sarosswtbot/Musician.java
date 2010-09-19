@@ -20,8 +20,7 @@ import de.fu_berlin.inf.dpp.ui.RosterView;
  * for Sandor's Test Framework.
  */
 public class Musician {
-    private static final transient Logger log = Logger
-        .getLogger(Musician.class);
+    private static final Logger log = Logger.getLogger(Musician.class);
 
     protected ISarosRmiSWTWorkbenchBot bot;
     protected ISarosState state;
@@ -46,11 +45,15 @@ public class Musician {
         initRmi();
         log.trace("activeEclipseShell");
         activateEclipseShell();
-        log.trace("closeViewByTitle");
+        log.trace("closeWelcomeView");
         closeWelcomeView();
+        log.trace("openJavaPerspective");
         openJavaPerspective();
+        log.trace("openSarosViews");
         openSarosViews();
+        log.trace("xmppConnect");
         xmppConnect();
+        log.trace("initBot leave");
     }
 
     public void initRmi() throws RemoteException, NotBoundException,
@@ -140,9 +143,15 @@ public class Musician {
 
     public void xmppConnect() {
         try {
-            if (!isConnectedByXMPP()) {
+            log.trace("connectedByXMPP");
+            boolean connectedByXMPP = isConnectedByXMPP();
+            if (!connectedByXMPP) {
+                log.trace("clickTBConnectInRosterView");
                 bot.clickTBConnectInRosterView();
-                if (isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE)) {
+                log.trace("isShellActive");
+                boolean shellActive = isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
+                if (shellActive) {
+                    log.trace("confirmSarosConfigurationWindow");
                     bot.confirmSarosConfigurationWindow(getXmppServer(),
                         getName(), password);
                 }
@@ -417,8 +426,8 @@ public class Musician {
         bot.deleteContact(contact.jid.getBase());
     }
 
-    public void deleteResource(String projectname) throws RemoteException {
-        bot.deleteResource(projectname);
+    public void deleteProject(String projectname) throws RemoteException {
+        bot.deleteProject(projectname);
     }
 
     /*
@@ -486,8 +495,6 @@ public class Musician {
      * Convenient method for opening all views that are needed for tests. The
      * titles of the views are: "Roster","Shared Project Session" and
      * "Package Explorer".
-     * 
-     * @throws RemoteException
      */
     public void openSarosViews() {
         openRosterView();
@@ -687,10 +694,9 @@ public class Musician {
     public void activateShellWithMatchText(String matchText) {
         try {
             bot.activateShellWithMatchText(matchText);
-            log.trace("eclipseShell is actived");
+            log.trace("Eclipse shell is active");
         } catch (RemoteException e) {
-            log.error("Could not activate the Shell with matchText "
-                + matchText, e);
+            log.error("Could not activate shell matching " + matchText, e);
         }
     }
 
