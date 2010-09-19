@@ -182,7 +182,6 @@ Export-Package: de.fu_berlin.inf.dpp;
  org.jivesoftware.smackx;x-friends:="de.fu_berlin.inf.dpp.test",
  org.jivesoftware.smackx.bookmark;x-friends:="de.fu_berlin.inf.dpp.test",
  org.jivesoftware.smackx.commands;x-friends:="de.fu_berlin.inf.dpp.test",
- org.jivesoftware.smackx.debugger;x-friends:="de.fu_berlin.inf.dpp.test",
  org.jivesoftware.smackx.filetransfer;x-friends:="de.fu_berlin.inf.dpp.test",
  org.jivesoftware.smackx.jingle;x-friends:="de.fu_berlin.inf.dpp.test",
  org.jivesoftware.smackx.jingle.listeners;x-friends:="de.fu_berlin.inf.dpp.test",

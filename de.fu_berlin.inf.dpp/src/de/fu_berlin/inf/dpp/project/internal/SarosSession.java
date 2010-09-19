@@ -217,16 +217,16 @@ public class SarosSession implements ISarosSession, Disposable {
         this(saros, transmitter, transferManager, threadContext, stopManager,
             myID, 0, sessionStart, useVersionControl);
 
-        this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
-        this.localUser.setUserRole(UserRole.DRIVER);
-        this.host = localUser;
-        this.host.invitationCompleted();
+        freeColors = new FreeColors(MAX_USERCOLORS - 1);
+        localUser.setUserRole(UserRole.DRIVER);
+        host = localUser;
+        host.invitationCompleted();
 
-        this.participants.put(this.host.getJID(), this.host);
+        participants.put(host.getJID(), host);
 
         /* add host to driver list. */
-        this.concurrentDocumentServer = new ConcurrentDocumentServer(this);
-        this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
+        concurrentDocumentServer = new ConcurrentDocumentServer(this);
+        concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
     /**
@@ -240,26 +240,26 @@ public class SarosSession implements ISarosSession, Disposable {
         this(saros, transmitter, transferManager, threadContext, stopManager,
             myID, myColorID, sessionStart, true);
 
-        this.host = new User(this, hostID, 0);
-        this.host.invitationCompleted();
-        this.host.setUserRole(UserRole.DRIVER);
+        host = new User(this, hostID, 0);
+        host.invitationCompleted();
+        host.setUserRole(UserRole.DRIVER);
 
-        this.participants.put(hostID, host);
-        this.participants.put(myID, localUser);
+        participants.put(hostID, host);
+        participants.put(myID, localUser);
 
-        this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
+        concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
     public void addSharedProject(IProject project, String projectID) {
-        this.projectMapper.addMapping(projectID, project);
-        if (this.sharedProject != null)
+        projectMapper.addMapping(projectID, project);
+        if (sharedProject != null)
             throw new NotImplementedException(
                 "More than one project not supported.");
-        this.sharedProject = new SharedProject(project, this);
+        sharedProject = new SharedProject(project, this);
     }
 
     public Collection<User> getParticipants() {
-        return this.participants.values();
+        return participants.values();
     }
 
     public List<User> getRemoteObservers() {
@@ -312,7 +312,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public ActivitySequencer getSequencer() {
-        return this.activitySequencer;
+        return activitySequencer;
     }
 
     /**
@@ -370,7 +370,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         log.info("User " + user + " is now a " + role);
 
-        this.listenerDispatch.roleChanged(user);
+        listenerDispatch.roleChanged(user);
     }
 
     /**
@@ -405,7 +405,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public User getHost() {
-        return this.host;
+        return host;
     }
 
     /*
@@ -414,7 +414,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public boolean isHost() {
-        return this.localUser.isHost();
+        return localUser.isHost();
     }
 
     /*
@@ -423,7 +423,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
-        return this.localUser.isDriver();
+        return localUser.isDriver();
     }
 
     public boolean isExclusiveDriver() {
@@ -457,7 +457,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void removeUser(User user) {
         JID jid = user.getJID();
-        if (this.participants.remove(jid) == null) {
+        if (participants.remove(jid) == null) {
             log.warn("Tried to remove user who was not in participants: "
                 + Util.prefix(jid));
             return;
@@ -466,7 +466,7 @@ public class SarosSession implements ISarosSession, Disposable {
             returnColor(user.getColorID());
         }
 
-        this.activitySequencer.userLeft(jid);
+        activitySequencer.userLeft(jid);
 
         // TODO what is to do here if no driver exists anymore?
         listenerDispatch.userLeft(user);
@@ -498,7 +498,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
     public Set<IProject> getProjects() {
-        return this.projectMapper.getProjects();
+        return projectMapper.getProjects();
     }
 
     public Thread requestTransmitter = null;
@@ -562,7 +562,7 @@ public class SarosSession implements ISarosSession, Disposable {
                     + Util.prefix(jid));
         }
 
-        User user = this.participants.get(jid);
+        User user = participants.get(jid);
 
         if (user == null || !user.getJID().strictlyEquals(jid))
             return null;
@@ -580,7 +580,7 @@ public class SarosSession implements ISarosSession, Disposable {
         if (jid == null)
             throw new IllegalArgumentException();
 
-        User user = this.participants.get(jid);
+        User user = participants.get(jid);
 
         if (user == null)
             return null;
@@ -678,7 +678,7 @@ public class SarosSession implements ISarosSession, Disposable {
          * Let ConcurrentDocumentManager have a look at the activityDataObjects
          * first
          */
-        List<QueueItem> toSend = this.concurrentDocumentClient
+        List<QueueItem> toSend = concurrentDocumentClient
             .transformOutgoing(activity);
 
         for (QueueItem item : toSend) {
@@ -712,13 +712,13 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void addActivityProvider(IActivityProvider provider) {
         if (!activityProviders.contains(provider)) {
-            this.activityProviders.add(provider);
+            activityProviders.add(provider);
             provider.addActivityListener(this);
         }
     }
 
     public void removeActivityProvider(IActivityProvider provider) {
-        this.activityProviders.remove(provider);
+        activityProviders.remove(provider);
         provider.removeActivityListener(this);
     }
 
@@ -731,7 +731,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public boolean useVersionControl() {
-        return this.useVersionControl;
+        return useVersionControl;
     }
 
     public SharedProject getSharedProject(IProject project) {

@@ -82,13 +82,12 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
             IProject project = resource.getProject();
             if (project != null) {
                 VCSAdapter vcs = VCSAdapter.getAdapter(project);
-                if (vcs != null) {
-                    VCSResourceInfo info = vcs
-                        .getResourceInfo(resource);
+                if (vcs != null && vcs.isManaged(resource)) {
+                    VCSResourceInfo info = vcs.getResourceInfo(resource);
                     if (info.url != null)
                         sb.append(" " + info.url);
                     if (info.revision != null)
-                        sb.append(":" + info.revision);
+                        sb.append("@" + info.revision);
                 }
             }
         } else {

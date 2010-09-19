@@ -443,7 +443,7 @@ public class FileUtil {
 
         if (!source.isAccessible()) {
             log.warn(".move Source file can not be accessed  "
-                + source.getName());
+                + source.getFullPath());
             return;
         }
 

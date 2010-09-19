@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
  * 
  * @author haferburg
  */
+// TODO Maybe change to VCProject implements IAdaptable? Make connect static.
 public abstract class VCSAdapter {
     protected static final Logger log = Logger.getLogger(VCSAdapter.class);
 
@@ -75,8 +76,8 @@ public abstract class VCSAdapter {
 
     /**
      * @param resource
-     * @return The URL of the repository root of this resource as a String,
-     *         or null.
+     * @return The URL of the repository root of this resource as a String, or
+     *         null.
      */
     public abstract String getRepositoryString(IResource resource);
 
@@ -123,8 +124,7 @@ public abstract class VCSAdapter {
      * @param resource
      * @return
      */
-    public abstract VCSResourceInfo getResourceInfo(
-        IResource resource);
+    public abstract VCSResourceInfo getResourceInfo(IResource resource);
 
     /**
      * Connects the project to the directory in the repository.
