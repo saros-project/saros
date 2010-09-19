@@ -692,8 +692,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return delegate.shell(text);
     }
 
-    public SWTBotShell getCurrentActiveShell() {
-        return delegate.activeShell();
+    public String getCurrentActiveShell() {
+        final SWTBotShell activeShell = delegate.activeShell();
+        return activeShell == null ? null : activeShell.getText();
     }
 
     public List<String> getViewTitles() throws RemoteException {
@@ -919,8 +920,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         activateEditor(className + ".java");
     }
 
-    public SWTBotShell activateShellWithText(String title)
-        throws RemoteException {
+    public boolean activateShellWithText(String title) throws RemoteException {
         SWTBotShell[] shells = delegate.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().equals(title)) {
@@ -928,11 +928,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 if (!shell.isActive()) {
                     shell.activate();
                 }
-                return shell;
+                return true;
             }
         }
         log.error("No shell found matching \"" + title + "\"!");
-        return null;
+        return false;
     }
 
     public void activateShellWithMatchText(String matchText)
@@ -940,15 +940,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         SWTBotShell[] shells = delegate.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().matches(matchText)) {
-                log.debug("shell found");
+                log.debug("shell found matching \"" + matchText + "\"");
                 if (!shell.isActive()) {
                     shell.activate();
                 }
+                // if (shell.widget.getMinimized()) {
+                // shell.widget.setMinimized(false);
+                // }
                 return;
             }
         }
-        log.error("No shell found matching \"" + matchText + "\"!");
-        return;
+        final String message = "No shell found matching \"" + matchText + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
     }
 
     /**

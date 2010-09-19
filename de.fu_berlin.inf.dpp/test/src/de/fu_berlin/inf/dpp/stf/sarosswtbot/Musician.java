@@ -148,6 +148,7 @@ public class Musician {
             if (!connectedByXMPP) {
                 log.trace("clickTBConnectInRosterView");
                 bot.clickTBConnectInRosterView();
+                bot.sleep(100);// wait a bit to check if shell pops up
                 log.trace("isShellActive");
                 boolean shellActive = isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
                 if (shellActive) {
@@ -158,7 +159,7 @@ public class Musician {
                 waitUntilConnected();
             }
         } catch (RemoteException e) {
-            log.error("can't conncet!");
+            log.error("can't connect!");
         }
 
     }
@@ -340,12 +341,13 @@ public class Musician {
 
     /**************** get ****************/
 
-    public void getCurrentActiveShell() {
+    public String getCurrentActiveShell() {
         try {
-            bot.getCurrentActiveShell();
+            return bot.getCurrentActiveShell();
         } catch (RemoteException e) {
             log.error("Could not get the current activated Shell", e);
         }
+        return null;
     }
 
     public String getPathToScreenShot() {
@@ -815,9 +817,9 @@ public class Musician {
 
     public void waitUntilHasContactWith(Musician respondent)
         throws RemoteException {
-    	// FIXME infinite loop, replace with wait condition
-//        while (!hasContactWith(respondent)) {
-//            sleep(50);
+        // FIXME infinite loop, replace with wait condition
+        // while (!hasContactWith(respondent)) {
+        // sleep(50);
         if (!hasContactWith(respondent)) {
             sleep(500);
         }
@@ -826,8 +828,8 @@ public class Musician {
     public void waitUntilHasNoContactWith(Musician respondent)
         throws RemoteException {
         // FIXME infinite loop, replace with wait condition
-//        while (hasContactWith(respondent)) {
-//            sleep(50);
+        // while (hasContactWith(respondent)) {
+        // sleep(50);
         if (hasContactWith(respondent)) {
             sleep(500);
         }

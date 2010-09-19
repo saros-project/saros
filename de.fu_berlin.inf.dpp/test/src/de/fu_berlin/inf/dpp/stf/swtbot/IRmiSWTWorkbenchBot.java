@@ -29,9 +29,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
  */
 public interface IRmiSWTWorkbenchBot extends Remote {
 
-    public void activateShellWithMatchText(String matchText)
-        throws RemoteException;
-
     /*********************** high-level RMI exported Methods *******************/
 
     /**
@@ -158,7 +155,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#activeShell()};
      * </pre>
      */
-    public SWTBotShell getCurrentActiveShell() throws RemoteException;
+    public String getCurrentActiveShell() throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -167,7 +164,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#shell(String)}.activate();
      * </pre>
      */
-    public SWTBotShell activateShellWithText(String text)
+    public boolean activateShellWithText(String text) throws RemoteException;
+
+    public void activateShellWithMatchText(String matchText)
         throws RemoteException;
 
     /**
