@@ -71,7 +71,7 @@ public class TestShareProject3Users {
     }
 
     @Test
-    public void testShareProjectParallel() throws RemoteException {
+    public void testShareProject() throws RemoteException {
 
         List<Musician> musicians = new LinkedList<Musician>();
         musicians.add(carl);
@@ -79,10 +79,8 @@ public class TestShareProject3Users {
 
         alice.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
 
-        carl.confirmSessionInvitationWizard(alice,
-            BotConfiguration.PROJECTNAME);
-        bob.confirmSessionInvitationWizard(alice,
-            BotConfiguration.PROJECTNAME);
+        carl.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
+        bob.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
 
         assertTrue(carl.isParticipant());
         assertTrue(carl.isObserver());
