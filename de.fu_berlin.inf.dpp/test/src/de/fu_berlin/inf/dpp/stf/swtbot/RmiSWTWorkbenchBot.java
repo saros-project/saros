@@ -420,19 +420,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         String className) throws RemoteException {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-        log.info("Checking for file \"" + path + "\"");
+        log.info("Checking existence of file \"" + path + "\"");
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
         return file.exists();
     }
 
+    // FIXME If the file doesn't exist, this method hits the
+    // SWTBotPreferences.TIMEOUT (5000ms) while waiting on a tree node.
     public boolean isJavaClassExistInGui(String projectName, String pkg,
-            String className) throws RemoteException {
-            openPackageExplorerView();
-            activatePackageExplorerView();
-            return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-                projectName, "src", pkg, className + ".java");
-        }
+        String className) throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+            projectName, "src", pkg, className + ".java");
+    }
 
     public boolean isTextWithLabelEqualWithText(String label, String text)
         throws RemoteException {
@@ -462,7 +464,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         try {
             activeView = delegate.activeView();
         } catch (WidgetNotFoundException e) {
-        	// no active view
+            // no active view
             return false;
         }
         return activeView.getTitle().equals(title);
