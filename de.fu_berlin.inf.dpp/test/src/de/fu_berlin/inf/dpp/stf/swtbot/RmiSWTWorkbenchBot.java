@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -42,6 +43,8 @@ import de.fu_berlin.inf.dpp.stf.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
@@ -161,12 +164,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /**************** import project *********************/
     public void importProjectFromSVN(String path) throws RemoteException {
+
         clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
             SarosConstant.MENU_TITLE_IMPORT);
         confirmWindowWithTreeWithFilterText(SarosConstant.SHELL_TITLE_IMPORT,
             "SVN", "Checkout Projects from SVN", SarosConstant.BUTTON_NEXT);
-        confirmWindowWithTable("Checkout from SVN", BotConfiguration.SVN_URL,
-            SarosConstant.BUTTON_NEXT);
+        if (delegate.table().containsItem(path)) {
+            confirmWindowWithTable("Checkout from SVN",
+                BotConfiguration.SVN_URL, SarosConstant.BUTTON_NEXT);
+        } else {
+            clickRadio("Create a new repository location");
+            clickButton(SarosConstant.BUTTON_NEXT);
+            delegate.comboBoxWithLabel("Url:").setText(path);
+            clickButton(SarosConstant.BUTTON_NEXT);
+            waitUntilShellActive("Checkout from SVN");
+        }
         confirmWindowWithTree("Checkout from SVN", SarosConstant.BUTTON_FINISH,
             path, "trunk", "examples");
         waitUntilShellActive("SVN Checkout");
@@ -408,6 +420,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     /******************** is... **************************/
+
+    public boolean isInSVN() throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(BotConfiguration.PROJECTNAME_SVN);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null)
+            return false;
+        return true;
+    }
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
@@ -674,6 +695,40 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /************* get widget **************************/
 
+    public String getURLOfRemoteResource(String fullPath)
+        throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs == null)
+            return null;
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        return info.url;
+
+        // IProject project = ResourcesPlugin.getWorkspace().getRoot()
+        // .getProject("examples");
+        // final Path path = new Path(
+        // "examples/src/org.eclipsecon.swtbot.example.MyFirstTest01.java");
+        // IResource resource = project.findMember(path);
+        // final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        // if (vcs == null)
+        // return null;
+        // final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        // return info.url;
+    }
+
+    public String getRevision(String fullPath) throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs == null)
+            return null;
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        return info.revision;
+    }
+
     public SWTBotTreeItem getTreeWithLabels(SWTBotTree tree, String... labels) {
         // SWTBotTreeItem selectedTreeItem = null;
         // for (String label : labels) {
@@ -832,33 +887,27 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
         String... labels) throws RemoteException {
-        try {
-            return tree.expandNode(labels).select();
-        } catch (WidgetNotFoundException e) {
-            log.error("treeitem not found", e);
-            return null;
+        SWTBotTreeItem selectedTreeItem = null;
+        for (String label : labels) {
+            try {
+                if (selectedTreeItem == null) {
+                    waitUntilTreeExisted(tree, label);
+                    selectedTreeItem = tree.expandNode(label);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                } else {
+                    waitUntilTreeItemExisted(selectedTreeItem, label);
+                    selectedTreeItem = selectedTreeItem.expandNode(label);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                }
+            } catch (WidgetNotFoundException e) {
+                log.error("treeitem \"" + label + "\" not found");
+            }
         }
-        // SWTBotTreeItem selectedTreeItem = null;
-        // for (String label : labels) {
-        // try {
-        // if (selectedTreeItem == null) {
-        // waitUntilTreeExisted(tree, label);
-        // selectedTreeItem = tree.expandNode(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // } else {
-        // waitUntilTreeItemExisted(selectedTreeItem, label);
-        // selectedTreeItem = selectedTreeItem.expandNode(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // }
-        // } catch (WidgetNotFoundException e) {
-        // log.error("treeitem \"" + label + "\" not found");
-        // }
-        // }
-        // if (selectedTreeItem != null) {
-        // selectedTreeItem.select();
-        // return selectedTreeItem;
-        // }
-        // return null;
+        if (selectedTreeItem != null) {
+            selectedTreeItem.select();
+            return selectedTreeItem;
+        }
+        return null;
     }
 
     /**
@@ -1348,5 +1397,34 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             confirmWindow("Confirm Perspective Switch",
                 SarosConstant.BUTTON_YES);
         openPerspectiveWithName("Debug");
+    }
+
+    public void switchToTag() throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+
+        SWTBotTree tree = getViewWithText(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+        tree.getAllItems()[0].select();
+        ContextMenuHelper.clickContextMenu(tree, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickButton("Select...");
+        confirmWindowWithTree("Repository Browser", SarosConstant.BUTTON_OK,
+            "tags", "eclipsecon2009");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
+    public boolean isSubContextMenuOfTreeItemInViewExsts(String viewName,
+        String itemName, String... contexts) throws RemoteException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public SWTBotMenu clickSubContextMenuOfTreeItemInView(String viewName,
+        String itemName, String... contexts) throws RemoteException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

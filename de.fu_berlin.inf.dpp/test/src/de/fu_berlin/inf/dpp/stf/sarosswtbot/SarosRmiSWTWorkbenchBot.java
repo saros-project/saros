@@ -629,8 +629,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
         clickCMShareProjectInPEView(projectName);
         // clickProjectContextMenu(projectName, "Share project...");
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");

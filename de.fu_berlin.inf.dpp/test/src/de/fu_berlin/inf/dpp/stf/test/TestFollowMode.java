@@ -37,6 +37,7 @@ public class TestFollowMode {
         bob.initBot();
 
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.CREATE_NEW_PROJECT);
 
     }

@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
+import java.rmi.RemoteException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -7,6 +9,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestSVN {
     protected static Musician alice;
@@ -18,6 +21,7 @@ public class TestSVN {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
+        alice.importProjectFromSVN(BotConfiguration.SVN_URL);
 
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
@@ -26,35 +30,66 @@ public class TestSVN {
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        alice.xmppDisconnect();
+    public static void tearDownBob() throws Exception {
+
         bob.xmppDisconnect();
+        bob.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
-    @Test
-    public void setUp() throws Exception {
-        alice.importProjectFromSVN(BotConfiguration.SVN_URL);
-        // Make sure Alice has project "test" which is connected to SVN.
-        // Make sure Alice is switched to trunk.
-        // Make sure there is a file "src/main/Main.java" in the project.
-        // Make sure Bob has no project named "test".
+    @AfterClass
+    public static void tearDownAlice() throws Exception {
+        alice.xmppDisconnect();
+        alice.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
+    // @BeforeClass
+    // public static void setUp() throws Exception {
+    // // Make sure Alice has project "examples" which is connected to SVN.
+    // // Make sure Alice is switched to trunk.
+    // // Make sure there is a file
+    // // "src/org.eclipsecon.swtbot.example/MyFirstTest01.java" in the
+    // // project.
+    // // Make sure Bob has no project named "examples".
+    // alice.importProjectFromSVN(BotConfiguration.SVN_URL);
+    //
+    // }
+
     @Test
-    public void testCheckout() {
-        // Alice shares project "test" with VCS support with Bob.
-        // Bob accepts invitation, new project "test".
+    public void testCheckout() throws RemoteException {
+        // Alice shares project "examples" with VCS support with Bob.
+        // Bob accepts invitation, new project "examples".
         // Make sure Bob has joined the session.
         // Make sure Bob has checked out project test from SVN.
+        alice.buildSession(bob, BotConfiguration.PROJECTNAME_SVN_TRUNK,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS,
+            SarosConstant.CREATE_NEW_PROJECT);
+        alice.waitUntilOtherInSession(bob);
+        alice.isDriver();
+        alice.hasParticipant(bob);
+        bob.isObserver();
+        bob.isInSVN();
+
     }
 
     @Test
-    public void testSwitch() {
+    public void testSwitch() throws RemoteException {
         // Alice shares project "test" with VCS support with Bob
         // Bob accepts invitation, new project "test".
         // Make sure Bob has joined the session.
         // Alice switches to branch "testing".
         // Make sure Bob is switched to branch "testing".
+        alice.switchToTag();
+        // bob.getRevision("/" + BotConfiguration.PROJECTNAME_SVN
+        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
+        // String url_alice = alice
+        // .getURLOfRemoteResource(BotConfiguration.PROJECTNAME_SVN
+        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
+        // String url_bob = bob
+        // .getURLOfRemoteResource(BotConfiguration.PROJECTNAME_SVN
+        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
+        //
+        // assertTrue(url_alice.equals(url_bob));
+
     }
 
     @Test

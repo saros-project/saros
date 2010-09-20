@@ -62,6 +62,7 @@ public class TestShareProject {
         log.trace("testShareProject enter");
 
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.CREATE_NEW_PROJECT);
 
         bob.captureScreenshot(bob.getPathToScreenShot()

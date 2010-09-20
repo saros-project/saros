@@ -82,6 +82,7 @@ public class TestEditDuringInvitation {
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.CREATE_NEW_PROJECT);
 
         log.trace("alice.giveDriverRole");

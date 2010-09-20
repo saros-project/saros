@@ -78,10 +78,19 @@ public class Musician {
     // }
 
     public void buildSession(Musician invitee, String projectName,
-        int typeOfSharingProject) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        clickCMShareProjectInPEView(projectName);
+        String shareProjectWith, int typeOfSharingProject)
+        throws RemoteException {
+        if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
+            bot.clickCMShareProjectInPEView(projectName);
+        } else if (shareProjectWith
+            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS))
+            bot.clickCMShareprojectWithVCSSupportInPEView(projectName);
+        else if (shareProjectWith
+            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY))
+            bot.clickCMShareProjectParticallyInPEView(projectName);
+        else
+            bot.clickCMAddToSessionInPEView(projectName);
+
         confirmInvitationWindow(invitee);
         invitee
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
@@ -339,6 +348,27 @@ public class Musician {
     }
 
     /**************** get ****************/
+
+    public String getRevision(String fullPath) {
+        try {
+            log.info("revison: " + bot.getRevision(fullPath));
+            return bot.getRevision(fullPath);
+
+        } catch (RemoteException e) {
+            log.error("Could not get the revision", e);
+            return null;
+        }
+    }
+
+    public String getURLOfRemoteResource(String fullPath) {
+        try {
+            log.info("url: " + bot.getURLOfRemoteResource(fullPath));
+            return bot.getURLOfRemoteResource(fullPath);
+        } catch (RemoteException e) {
+            log.error("Could not get the url", e);
+            return null;
+        }
+    }
 
     public String getCurrentActiveShell() {
         try {
@@ -677,6 +707,15 @@ public class Musician {
         return false;
     }
 
+    public boolean isInSVN() {
+        try {
+            bot.isInSVN();
+        } catch (RemoteException e) {
+            log.error("Failed to get svn info.", e);
+        }
+        return false;
+    }
+
     /*************** activate widget ******************/
 
     public void activateShellWithText(String text) {
@@ -761,6 +800,14 @@ public class Musician {
         throws RemoteException {
         while (hasParticipant(other)) {
             sleep(100);
+        }
+    }
+
+    public void waitUntilOtherInSession(Musician other) throws RemoteException {
+        int time = 0;
+        while (!hasParticipant(other) && time < 2000) {
+            sleep(100);
+            time = time + 100;
         }
     }
 
@@ -951,5 +998,10 @@ public class Musician {
 
     public void sleep(long millis) throws RemoteException {
         bot.sleep(millis);
+    }
+
+    public void switchToTag() throws RemoteException {
+        bot.switchToTag();
+
     }
 }

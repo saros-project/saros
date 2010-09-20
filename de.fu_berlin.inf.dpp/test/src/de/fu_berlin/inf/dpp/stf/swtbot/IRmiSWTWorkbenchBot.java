@@ -563,4 +563,12 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isJavaClassExist(String className, String projectName,
         String pkg) throws RemoteException;
 
+    public boolean isInSVN() throws RemoteException;
+
+    public String getRevision(String fullPath) throws RemoteException;
+
+    public String getURLOfRemoteResource(String fullPath)
+        throws RemoteException;
+
+    public void switchToTag() throws RemoteException;
 }
