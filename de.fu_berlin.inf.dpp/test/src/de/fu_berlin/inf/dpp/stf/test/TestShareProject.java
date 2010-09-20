@@ -90,15 +90,15 @@ public class TestShareProject {
         assertTrue(alice.hasParticipant(bob));
         assertTrue(alice.isObserver(bob));
 
-    }
-
-    @Test
-    public void testLeaveSession() throws RemoteException {
+        // TODO make tests independent of each other
+        // @Test
+        // public void testLeaveSession() throws RemoteException {
         bob.leaveSession();
         log.trace("invitee.leave");
         assertFalse(bob.isParticipant());
-        alice.waitUntilSessionClosesBy(bob);
 
+        alice.waitUntilSessionClosesBy(bob);
+        alice.sleep(50);
         alice.leaveSession();
         log.trace("inviter.leave");
         assertFalse(alice.isParticipant());
