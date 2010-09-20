@@ -246,6 +246,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 SarosConstant.CATEGORY_JAVA, SarosConstant.NODE_JAVA_PROJECT,
                 SarosConstant.BUTTON_NEXT);
         }
+
         waitUntilShellActive("New Java Project");
         final SWTBotShell newProjectDialog = delegate.activeShell();
 
@@ -255,6 +256,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
         if (isShellActive("Open Associated Perspective?")) {
             clickButton(SarosConstant.BUTTON_YES);
+            waitUntilShellCloses("Open Associated Perspective?");
         }
     }
 
@@ -266,11 +268,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
             final SWTBotShell newClassDialog = delegate.activeShell();
             setTextWithLabel("Source folder:", projectName + "/src");
-            // delegate.sleep(sleepTime);
             setTextWithLabel("Package:", pkg);
-            // delegate.sleep(sleepTime);
             setTextWithLabel("Name:", className);
-            // delegate.sleep(sleepTime);
             // implementsInterface("java.lang.Runnable");
             // delegate.checkBox("Inherited abstract methods").click();
             clickCheckBox("Inherited abstract methods");
@@ -567,6 +566,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label)
         throws RemoteException {
         return getAllItemsOftreeInView().contains(label);
+        // try {
+        // tree.getTreeItem(label);
+        // return true;
+        // } catch (WidgetNotFoundException e) {
+        // return false;
+        // }
+
     }
 
     public boolean isTreeItemExist(String viewTitle, String... paths)
@@ -1081,10 +1087,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         SWTBotMenu selectedmenu = null;
         for (String text : texts) {
             try {
-                if (selectedmenu == null)
+                if (selectedmenu == null) {
                     selectedmenu = delegate.menu(text);
-                else
+                } else {
                     selectedmenu = selectedmenu.menu(text);
+                }
             } catch (WidgetNotFoundException e) {
                 log.error("menu \"" + text + "\" not found!");
                 throw e;
@@ -1401,11 +1408,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void switchToTag() throws RemoteException {
         openPackageExplorerView();
         activatePackageExplorerView();
-
-        SWTBotTree tree = getViewWithText(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
-        tree.getAllItems()[0].select();
-        ContextMenuHelper.clickContextMenu(tree, "Team",
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Switch to another Branch/Tag/Revision...");
         waitUntilShellActive("Switch");
         clickButton("Select...");
@@ -1415,15 +1420,74 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilShellCloses("SVN Switch");
     }
 
-    public boolean isSubContextMenuOfTreeItemInViewExsts(String viewName,
-        String itemName, String... contexts) throws RemoteException {
-        // TODO Auto-generated method stub
-        return false;
+    public SWTBotTreeItem getTreeItemWithMatchText(SWTBotTree tree,
+        String... regexs) throws RemoteException {
+        try {
+            SWTBotTreeItem item = null;
+            for (String regex : regexs) {
+                if (item == null) {
+                    for (int i = 0; i < tree.getAllItems().length; i++) {
+                        log.info("treeItem'name: "
+                            + tree.getAllItems()[i].getText());
+                        if (tree.getAllItems()[i].getText().matches(regex)) {
+                            item = tree.getAllItems()[i].expand();
+                        }
+                    }
+                } else {
+                    for (String nodeName : item.getNodes()) {
+                        log.info("node'name: " + nodeName);
+                        if (nodeName.matches(regex)) {
+                            item = item.getNode(nodeName).expand();
+                        }
+                    }
+                }
+            }
+            return item;
+        } catch (WidgetNotFoundException e) {
+            log.error("gematched Context menu can't be found!", e);
+            return null;
+        }
     }
 
-    public SWTBotMenu clickSubContextMenuOfTreeItemInView(String viewName,
-        String itemName, String... contexts) throws RemoteException {
-        // TODO Auto-generated method stub
-        return null;
+    public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
+        String... regexs) throws RemoteException {
+        if (getTreeItemWithMatchText(tree, regexs) == null)
+            return false;
+        else
+            return true;
     }
+
+    public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
+        String[] matchTexts, String... contexts) throws RemoteException {
+        try {
+            SWTBotTree tree = getViewWithText(
+                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+            // you should first select the project,whose context you want to
+            // click.
+            SWTBotTreeItem treeItem = getTreeItemWithMatchText(tree, contexts);
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, contexts);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public void clickMenusOfContextMenuOfTreeItemInView(String viewTitle,
+        String[] matchTexts, String... contexts) throws RemoteException {
+
+        try {
+            SWTBotTree tree = getViewWithText(
+                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+            // you should first select the project,whose context you want to
+            // click.
+            SWTBotTreeItem treeItem = getTreeItemWithMatchText(tree, matchTexts);
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, contexts);
+        } catch (WidgetNotFoundException e) {
+            log.error("context menu can't be found.", e);
+        }
+
+    }
+
 }

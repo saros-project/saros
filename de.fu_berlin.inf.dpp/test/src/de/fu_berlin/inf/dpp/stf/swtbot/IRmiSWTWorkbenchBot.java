@@ -571,4 +571,16 @@ public interface IRmiSWTWorkbenchBot extends Remote {
         throws RemoteException;
 
     public void switchToTag() throws RemoteException;
+
+    public SWTBotTreeItem getTreeItemWithMatchText(SWTBotTree tree,
+        String... regexs) throws RemoteException;
+
+    public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
+        String... regexs) throws RemoteException;
+
+    public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
+        String[] matchTexts, String... contexts) throws RemoteException;
+
+    public void clickMenusOfContextMenuOfTreeItemInView(String viewName,
+        String[] matchTexts, String... contexts) throws RemoteException;
 }

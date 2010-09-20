@@ -80,30 +80,17 @@ public class TestFollowMode {
         String textFromInviter = alice.getTextOfJavaEditor(PROJECT, PKG, CLS1);
         bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
         String textFormInvitee = bob.getTextOfJavaEditor(PROJECT, PKG, CLS1);
-
         assertTrue(textFromInviter.equals(textFormInvitee));
 
         alice.newJavaClassInProject(PROJECT, PKG, CLS2);
         bob.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.isJavaEditorActive(CLS2));
 
-        // TODO make tests independent of each other
-        // }
-        //
-        // @Test
-        // public void testAliceFollowBob() throws RemoteException {
         alice.followUser(bob);
         bob.activateJavaEditor(CLS1);
         alice.waitUntilJavaEditorActive(CLS1);
         assertTrue(alice.isInFollowMode(bob));
         assertTrue(alice.isJavaEditorActive(CLS1));
-
-        // TODO make tests independent of each other
-        // }
-        //
-        // @Test
-        // public void testBobFollowAliceWithDebugging() throws RemoteException
-        // {
 
         bob.followUser(alice);
         alice.newJavaClassInProject(PROJECT, PKG, CLS3);
