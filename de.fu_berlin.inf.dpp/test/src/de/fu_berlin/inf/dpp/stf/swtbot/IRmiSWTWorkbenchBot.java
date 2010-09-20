@@ -166,7 +166,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      */
     public boolean activateShellWithText(String text) throws RemoteException;
 
-    public void activateShellWithMatchText(String matchText)
+    public boolean activateShellWithMatchText(String matchText)
         throws RemoteException;
 
     /**
@@ -178,17 +178,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * </pre>
      */
     public void clickButton() throws RemoteException;
-
-    /**
-     * This is the same as the following method chain:
-     * 
-     * <pre>
-     * {@link SWTBotButton} button = {@link SWTWorkbenchBot#button(String,int)};
-     * button.click();
-     * </pre>
-     */
-    public void clickButton(String mnemonicText, int index)
-        throws RemoteException;
 
     /**
      * This is the same as the following method chain:

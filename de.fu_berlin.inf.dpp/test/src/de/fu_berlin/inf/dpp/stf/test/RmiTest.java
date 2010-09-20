@@ -62,27 +62,35 @@ public class RmiTest {
         assertFalse(alice.isJavaProjectExist(projectName));
         alice.newProjectWithClass(projectName, "pkg", "Cls");
         assertTrue(alice.isJavaProjectExist(projectName));
+        assertTrue(alice.isJavaClassExist(projectName, "pkg", "Cls"));
+
         alice.deleteProject(projectName);
         assertFalse(alice.isJavaProjectExist(projectName));
     }
 
     @Test
     public void test_newJavaClassInProject() throws RemoteException {
+        final String pkg = "pkg";
+        final String className = "Cls";
+
         log.trace("alice.isJavaProjectExist()");
         assertFalse(alice.isJavaProjectExist(projectName));
         log.trace("alice.newProjectWithClass()");
-        alice.newProjectWithClass(projectName, "pkg", "Cls");
+
+        alice.newProjectWithClass(projectName, pkg, className);
         log.trace("alice.isJavaProjectExist()");
         assertTrue(alice.isJavaProjectExist(projectName));
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.isJavaClassExist(projectName, "pkg", "Cls"));
+        assertTrue(alice.isJavaClassExist(projectName, pkg, className));
 
         log.trace("alice.isJavaClassExist()");
-        assertFalse(alice.isJavaClassExist(projectName, "pkg", "Cls2"));
+        final String className2 = "Cls2";
+        assertFalse(alice.isJavaClassExist(projectName, pkg, className2));
         log.trace("alice.newJavaClassInProject()");
-        alice.newJavaClassInProject(projectName, "pkg", "Cls2");
+        alice.newJavaClassInProject(projectName, pkg, className2);
+
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.isJavaClassExist(projectName, "pkg", "Cls2"));
+        assertTrue(alice.isJavaClassExist(projectName, pkg, className2));
 
         log.trace("alice.deleteProject()");
         alice.deleteProject(projectName);

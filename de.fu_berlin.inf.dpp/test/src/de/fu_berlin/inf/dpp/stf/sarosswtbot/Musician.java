@@ -329,13 +329,12 @@ public class Musician {
         if (!isJavaProjectExist(projectName)) {
             bot.newJavaProject(projectName);
         }
-        if (!isJavaClassExist(projectName, packageName, className))
-            bot.newJavaClass(projectName, packageName, className);
+        newJavaClassInProject(projectName, packageName, className);
     }
 
     public void newJavaClassInProject(String projectName, String packageName,
         String className) throws RemoteException {
-        if (!isJavaClassExist(className, projectName, packageName))
+        if (!isJavaClassExist(projectName, packageName, className))
             bot.newJavaClass(projectName, packageName, className);
     }
 
@@ -693,17 +692,23 @@ public class Musician {
      * sarosInstance aktviert werden. Bei Default ist der sarosinstanze nach der
      * Durchführung von junittest deactiviert.
      */
-    public void activateShellWithMatchText(String matchText) {
+    public boolean activateShellWithMatchText(String matchText) {
         try {
-            bot.activateShellWithMatchText(matchText);
-            log.trace("Eclipse shell is active");
+            if (bot.activateShellWithMatchText(matchText)) {
+                log.trace("Eclipse shell is active");
+                return true;
+            } else {
+                log.error("Could not activate shell matching " + matchText);
+            }
         } catch (RemoteException e) {
             log.error("Could not activate shell matching " + matchText, e);
+            //
         }
+        return false;
     }
 
-    public void activateEclipseShell() {
-        activateShellWithMatchText(".+? - .+");
+    public boolean activateEclipseShell() {
+        return activateShellWithMatchText(".+? - .+");
     }
 
     // public void activateEditor(String textName, String extension) {

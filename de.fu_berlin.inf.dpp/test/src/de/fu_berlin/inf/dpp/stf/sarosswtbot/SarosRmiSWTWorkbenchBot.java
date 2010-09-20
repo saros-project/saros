@@ -636,7 +636,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
         selectCheckBoxWithList(invitees);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
-        // delegate.button("Finish").click();
         clickButton(SarosConstant.BUTTON_FINISH);
     }
 
@@ -713,7 +712,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         view.toolbarButton("Open invitation interface").click();
         selectCheckBoxWithText(jid);
         delegate.sleep(750);
-        delegate.button("Finish").click();
+        delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
 
     public void addContact(String plainJID) throws RemoteException {

@@ -14,9 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -252,6 +255,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                 SarosConstant.MENU_TITLE_NEW, SarosConstant.MENU_TITLE_CLASS);
             waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
+            final SWTBotShell newClassDialog = delegate.activeShell();
             setTextWithLabel("Source folder:", projectName + "/src");
             // delegate.sleep(sleepTime);
             setTextWithLabel("Package:", pkg);
@@ -263,7 +267,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             clickCheckBox("Inherited abstract methods");
             waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
             clickButton(SarosConstant.BUTTON_FINISH);
-            // waitUntilShellCloses(shell);
+            waitUntilShellCloses(newClassDialog);
             // openJavaFileWithEditor(projectName, pkg, className + ".java");
             // delegate.sleep(sleepTime);
             // editor.navigateTo(2, 0);
@@ -414,11 +418,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaClassExist(String projectName, String pkg,
         String className) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            projectName, "src", pkg, className + ".java");
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        log.info("Checking for file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        return file.exists();
     }
+
+    public boolean isJavaClassExistInGui(String projectName, String pkg,
+            String className) throws RemoteException {
+            openPackageExplorerView();
+            activatePackageExplorerView();
+            return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+                projectName, "src", pkg, className + ".java");
+        }
 
     public boolean isTextWithLabelEqualWithText(String label, String text)
         throws RemoteException {
@@ -444,13 +458,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isViewActive(String title) throws RemoteException {
-        return delegate.activeView().getTitle().equals(title);
-        // try {
-        // return delegate.viewByTitle(title).isActive();
-        // } catch (WidgetNotFoundException e) {
-        // log.info("view" + title + "can not be fund!");
-        // return false;
-        // }
+        SWTBotView activeView;
+        try {
+            activeView = delegate.activeView();
+        } catch (WidgetNotFoundException e) {
+        	// no active view
+            return false;
+        }
+        return activeView.getTitle().equals(title);
     }
 
     public boolean isPerspectiveOpen(String title) throws RemoteException {
@@ -935,7 +950,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return false;
     }
 
-    public void activateShellWithMatchText(String matchText)
+    public boolean activateShellWithMatchText(String matchText)
         throws RemoteException {
         SWTBotShell[] shells = delegate.shells();
         for (SWTBotShell shell : shells) {
@@ -944,10 +959,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 if (!shell.isActive()) {
                     shell.activate();
                 }
-                // if (shell.widget.getMinimized()) {
-                // shell.widget.setMinimized(false);
-                // }
-                return;
+                return shell.isActive();
             }
         }
         final String message = "No shell found matching \"" + matchText + "\"!";
@@ -1010,11 +1022,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void clickButton(String name) {
         delegate.button(name).click();
-    }
-
-    public void clickButton(String mnemonicText, int index)
-        throws RemoteException {
-        delegate.button(mnemonicText, index).click();
     }
 
     public void clickMenuWithText(String text) throws RemoteException {
