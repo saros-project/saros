@@ -583,4 +583,26 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void clickMenusOfContextMenuOfTreeItemInView(String viewName,
         String[] matchTexts, String... contexts) throws RemoteException;
+
+    public void disConnectSVN() throws RemoteException;
+
+    public void waitUntilProjectInSVN(String projectName)
+        throws RemoteException;
+
+    public void waitUntilProjectNotInSVN(String projectName)
+        throws RemoteException;
+
+    public void connectSVN() throws RemoteException;
+
+    public void switchToOtherRevision() throws RemoteException;
+
+    public void switchToOtherRevision(String CLS_PATH) throws RemoteException;
+
+    public void deleteFile(String CLS_PATH) throws RemoteException;
+
+    public boolean isFileExistedWithGUI(String CLS_PATH) throws RemoteException;
+
+    public void revert() throws RemoteException;
+
+    public boolean isFileExist(String CLS_PATH) throws RemoteException;
 }

@@ -1288,6 +1288,16 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /********************** waitUntil ********************/
 
+    public void waitUntilProjectNotInSVN(String projectName)
+        throws RemoteException {
+        waitUntil(SarosConditions.isNotInSVN(projectName));
+    }
+
+    public void waitUntilProjectInSVN(String projectName)
+        throws RemoteException {
+        waitUntil(SarosConditions.isInSVN(projectName));
+    }
+
     public void waitUntilFileEqualWithFile(String projectName,
         String packageName, String className, String file)
         throws RemoteException {
@@ -1451,10 +1461,32 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
         String... regexs) throws RemoteException {
-        if (getTreeItemWithMatchText(tree, regexs) == null)
-            return false;
-        else
-            return true;
+        SWTBotTreeItem item = null;
+        for (String regex : regexs) {
+            boolean exist = false;
+            if (item == null) {
+                for (int i = 0; i < tree.getAllItems().length; i++) {
+                    log.info("treeItem'name: "
+                        + tree.getAllItems()[i].getText());
+                    if (tree.getAllItems()[i].getText().matches(regex)) {
+                        item = tree.getAllItems()[i].expand();
+                        exist = true;
+                    }
+                }
+            } else {
+                for (String nodeName : item.getNodes()) {
+                    log.info("node'name: " + nodeName);
+                    if (nodeName.matches(regex)) {
+                        item = item.getNode(nodeName).expand();
+                        exist = true;
+                    }
+                }
+            }
+            if (!exist) {
+                return false;
+            }
+        }
+        return item != null;
     }
 
     public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
@@ -1487,7 +1519,103 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         } catch (WidgetNotFoundException e) {
             log.error("context menu can't be found.", e);
         }
+    }
 
+    public void disConnectSVN() throws RemoteException {
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Disconnect...");
+        confirmWindow("Confirm Disconnect from SVN", SarosConstant.BUTTON_YES);
+    }
+
+    public void connectSVN() throws RemoteException {
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Share Project...");
+        confirmWindowWithTable("Share Project", "SVN",
+            SarosConstant.BUTTON_NEXT);
+        clickButton(SarosConstant.BUTTON_FINISH);
+    }
+
+    public void switchToOtherRevision() throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickCheckBox("Switch to HEAD revision");
+        setTextWithLabel("Revision:", "115");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
+    public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+
+        String[] matchTexts = CLS_PATH.split("/");
+        for (int i = 0; i < matchTexts.length; i++) {
+            matchTexts[i] = matchTexts[i] + ".*";
+        }
+        // String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickCheckBox("Switch to HEAD revision");
+        setTextWithLabel("Revision:", "116");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
+    public void revert() throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Revert...");
+        confirmWindow("Revert", SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("Revert");
+    }
+
+    public void deleteFile(String CLS_PATH) throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = CLS_PATH.split("/");
+        for (int i = 0; i < matchTexts.length; i++) {
+            matchTexts[i] = matchTexts[i] + ".*";
+        }
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Delete");
+        confirmWindow("Confirm Delete", SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("Confirm Delete");
+    }
+
+    public boolean isFileExistedWithGUI(String CLS_PATH) throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = CLS_PATH.split("/");
+        for (int i = 0; i < matchTexts.length; i++) {
+            matchTexts[i] = matchTexts[i] + ".*";
+        }
+        SWTBotTree tree = getViewWithText(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+
+        return isTreeItemWithMatchTextExist(tree, matchTexts);
+    }
+
+    public boolean isFileExist(String CLS_PATH) throws RemoteException {
+        IPath path = new Path(CLS_PATH);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            return false;
+        return true;
     }
 
 }

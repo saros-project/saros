@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.rmi.RemoteException;
 
 import org.junit.AfterClass;
@@ -14,6 +17,8 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 public class TestSVN {
     protected static Musician alice;
     protected static Musician bob;
+    private static final String CLS_PATH = BotConfiguration.PROJECTNAME_SVN
+        + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -27,6 +32,11 @@ public class TestSVN {
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         bob.initBot();
+
+        alice.buildSession(bob, BotConfiguration.PROJECTNAME_SVN_TRUNK,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS,
+            SarosConstant.CREATE_NEW_PROJECT);
+        alice.waitUntilOtherInSession(bob);
     }
 
     @AfterClass
@@ -42,32 +52,17 @@ public class TestSVN {
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
-    // @BeforeClass
-    // public static void setUp() throws Exception {
-    // // Make sure Alice has project "examples" which is connected to SVN.
-    // // Make sure Alice is switched to trunk.
-    // // Make sure there is a file
-    // // "src/org.eclipsecon.swtbot.example/MyFirstTest01.java" in the
-    // // project.
-    // // Make sure Bob has no project named "examples".
-    // alice.importProjectFromSVN(BotConfiguration.SVN_URL);
-    //
-    // }
-
     @Test
     public void testCheckout() throws RemoteException {
         // Alice shares project "examples" with VCS support with Bob.
         // Bob accepts invitation, new project "examples".
         // Make sure Bob has joined the session.
         // Make sure Bob has checked out project test from SVN.
-        alice.buildSession(bob, BotConfiguration.PROJECTNAME_SVN_TRUNK,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS,
-            SarosConstant.CREATE_NEW_PROJECT);
-        alice.waitUntilOtherInSession(bob);
+
         alice.state.isDriver(alice.jid);
         alice.state.isParticipant(bob.jid);
         bob.state.isObserver(bob.jid);
-        bob.bot.isInSVN();
+        assertTrue(bob.bot.isInSVN());
 
     }
 
@@ -78,61 +73,62 @@ public class TestSVN {
         // Make sure Bob has joined the session.
         // Alice switches to branch "testing".
         // Make sure Bob is switched to branch "testing".
+
         alice.bot.switchToTag();
-        // bob.getRevision("/" + BotConfiguration.PROJECTNAME_SVN
-        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
-        // String url_alice = alice
-        // .getURLOfRemoteResource(BotConfiguration.PROJECTNAME_SVN
-        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
-        // String url_bob = bob
-        // .getURLOfRemoteResource(BotConfiguration.PROJECTNAME_SVN
-        // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
-        //
-        // assertTrue(url_alice.equals(url_bob));
+        bob.bot.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.bot.getURLOfRemoteResource(CLS_PATH)));
 
     }
 
     @Test
-    public void testDisconnect() {
+    public void testDisconnectAndConnect() throws RemoteException {
+
         // Alice shares project "test" with VCS support with Bob
         // Bob accepts invitation, new project "test".
         // Make sure Bob has joined the session.
         // Alice disconnects project "test" from SVN.
         // Make sure Bob is disconnected.
+        alice.bot.disConnectSVN();
+        bob.bot.waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertFalse(bob.bot.isInSVN());
+
+        alice.bot.connectSVN();
+        bob.bot.waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertTrue(bob.bot.isInSVN());
+
     }
 
     @Test
-    public void testConnect() {
-        // Alice shares project "test" with VCS support with Bob
-        // Bob accepts invitation, new project "test".
-        // Make sure Bob has joined the session.
-        // Alice disconnects project "test" from SVN.
-        // Make sure both Alice and Bob are disconnected from SVN.
-        // Alice connects project "test" to SVN.
-        // Make sure both Alice and Bob are connected to SVN.
-    }
-
-    @Test
-    public void testUpdate() {
+    public void testUpdate() throws RemoteException {
         // Alice shares project "test" with VCS support with Bob
         // Bob accepts invitation, new project "test".
         // Make sure Bob has joined the session.
         // Alice updates the entire project to the older revision Y (< HEAD).
         // Make sure Bob's revision of "test" is Y.
+
+        alice.bot.switchToOtherRevision();
+        bob.bot.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.bot.getURLOfRemoteResource(CLS_PATH)));
     }
 
     @Test
-    public void testUpdateSingleFile() {
+    public void testUpdateSingleFile() throws RemoteException {
         // Alice shares project "test" with VCS support with Bob
         // Bob accepts invitation, new project "test".
         // Make sure Bob has joined the session.
         // Alice updates the file Main.java to the older revision Y (< HEAD).
         // Make sure Bob's revision of file "src/main/Main.java" is Y.
         // Make sure Bob's revision of project "test" is HEAD.
+        alice.bot.switchToOtherRevision(CLS_PATH);
+        bob.bot.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.bot.getURLOfRemoteResource(CLS_PATH)));
     }
 
     @Test
-    public void testRevert() {
+    public void testRevert() throws RemoteException {
         // Alice shares project "test" with VCS support with Bob
         // Bob accepts invitation, new project "test".
         // Make sure Bob has joined the session.
@@ -140,5 +136,10 @@ public class TestSVN {
         // Make sure Bob has no file Main.java.
         // Alice reverts the project "test".
         // Make sure Bob has the file Main.java.
+        alice.bot.deleteFile(CLS_PATH);
+        assertFalse(bob.bot.isFileExist(CLS_PATH));
+        alice.bot.revert();
+        // bob.sleep(2000);
+        assertTrue(bob.bot.isFileExist(CLS_PATH));
     }
 }

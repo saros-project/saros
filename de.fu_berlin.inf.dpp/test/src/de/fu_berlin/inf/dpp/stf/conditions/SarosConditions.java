@@ -68,4 +68,12 @@ public class SarosConditions extends Conditions {
         String projectName, String packageName, String className, String name) {
         return new isFilesEqual(bot, projectName, packageName, className, name);
     }
+
+    public static ICondition isNotInSVN(String projectName) {
+        return new IsNotInSVN(projectName);
+    }
+
+    public static ICondition isInSVN(String projectName) {
+        return new IsInSVN(projectName);
+    }
 }

@@ -21,6 +21,8 @@ public class RmiTest {
     protected Musician alice;
 
     private String projectName = BotConfiguration.PROJECTNAME;
+    private String CLS_PATH = BotConfiguration.PROJECTNAME
+        + "/src/pkg/Cls.java";
 
     @Before
     public void configureBot() throws RemoteException, NotBoundException {
@@ -41,6 +43,25 @@ public class RmiTest {
         alice.bot.closeSharedSessionView();
         if (alice.bot.isJavaProjectExist(projectName))
             alice.bot.deleteProject(projectName);
+    }
+
+    @Test
+    public void TestIsFileExist() throws RemoteException {
+        alice.newProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.bot.isFileExist(CLS_PATH));
+        alice.bot.deleteFile(CLS_PATH);
+        assertFalse(alice.bot.isFileExist(CLS_PATH));
+    }
+
+    @Test
+    public void TestIsFileExistWithGUI() throws RemoteException {
+
+        alice.newProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.bot.isFileExistedWithGUI(CLS_PATH));
+        alice.bot.deleteFile(CLS_PATH);
+
+        assertFalse(alice.bot.isFileExistedWithGUI(CLS_PATH));
+
     }
 
     @Test
