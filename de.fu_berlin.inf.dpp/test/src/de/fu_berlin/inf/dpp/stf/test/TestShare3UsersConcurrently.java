@@ -116,8 +116,8 @@ public class TestShare3UsersConcurrently {
                 public Void call() throws Exception {
                     musician.xmppDisconnect();
                     final String projectName = BotConfiguration.PROJECTNAME;
-                    if (musician.isJavaProjectExist(projectName))
-                        musician.deleteProject(projectName);
+                    if (musician.bot.isJavaProjectExist(projectName))
+                        musician.bot.deleteProject(projectName);
                     return null;
                 }
             });
@@ -150,26 +150,26 @@ public class TestShare3UsersConcurrently {
         log.trace("workAll(joinSessionTasks)");
         workAll(joinSessionTasks);
 
-        assertTrue(carl.isParticipant());
-        assertTrue(carl.isObserver());
-        assertTrue(carl.hasParticipant(bob));
-        assertTrue(carl.isObserver(bob));
-        assertTrue(carl.hasParticipant(alice));
-        assertTrue(carl.isDriver(alice));
+        assertTrue(carl.state.isParticipant(carl.jid));
+        assertTrue(carl.state.isObserver(carl.jid));
+        assertTrue(carl.state.isParticipant(bob.jid));
+        assertTrue(carl.state.isObserver(bob.jid));
+        assertTrue(carl.state.isParticipant(alice.jid));
+        assertTrue(carl.state.isDriver(alice.jid));
 
-        assertTrue(bob.isParticipant());
-        assertTrue(bob.isObserver());
-        assertTrue(bob.hasParticipant(carl));
-        assertTrue(bob.isObserver(carl));
-        assertTrue(bob.hasParticipant(alice));
-        assertTrue(bob.isDriver(alice));
+        assertTrue(bob.state.isParticipant(bob.jid));
+        assertTrue(bob.state.isObserver(bob.jid));
+        assertTrue(bob.state.isParticipant(carl.jid));
+        assertTrue(bob.state.isObserver(carl.jid));
+        assertTrue(bob.state.isParticipant(alice.jid));
+        assertTrue(bob.state.isDriver(alice.jid));
 
-        assertTrue(alice.isParticipant());
-        assertTrue(alice.isDriver());
-        assertTrue(alice.hasParticipant(carl));
-        assertTrue(alice.isObserver(carl));
-        assertTrue(alice.hasParticipant(bob));
-        assertTrue(alice.isObserver(bob));
+        assertTrue(alice.state.isParticipant(alice.jid));
+        assertTrue(alice.state.isDriver(alice.jid));
+        assertTrue(alice.state.isParticipant(carl.jid));
+        assertTrue(alice.state.isObserver(carl.jid));
+        assertTrue(alice.state.isParticipant(bob.jid));
+        assertTrue(alice.state.isObserver(bob.jid));
 
         List<Callable<Boolean>> leaveTasks = new ArrayList<Callable<Boolean>>();
         for (int i = 0; i < peers.size(); i++) {
@@ -177,7 +177,7 @@ public class TestShare3UsersConcurrently {
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     musician.leaveSession();
-                    return musician.isParticipant();
+                    return musician.state.isParticipant(musician.jid);
                 }
             });
         }
@@ -190,7 +190,7 @@ public class TestShare3UsersConcurrently {
         alice.waitUntilOtherLeaveSession(carl);
         alice.waitUntilOtherLeaveSession(bob);
         alice.leaveSession();
-        assertFalse(alice.isParticipant());
+        assertFalse(alice.state.isParticipant(alice.jid));
         log.trace("testShareProjectParallel done");
     }
 }

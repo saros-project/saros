@@ -48,13 +48,13 @@ public class TestShareProject {
     @AfterClass
     public static void cleanupInvitee() throws RemoteException {
         bob.xmppDisconnect();
-        bob.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -64,44 +64,40 @@ public class TestShareProject {
         alice.buildSession(bob, BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.CREATE_NEW_PROJECT);
-
-        bob.captureScreenshot(bob.getPathToScreenShot()
-            + "/invitee_in_sharedproject.png");
-        alice.captureScreenshot(alice.getPathToScreenShot()
-            + "/inviter_in_sharedproject.png");
-
+        bob.bot
+            .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
+        alice.bot
+            .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
-            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
-            BotConfiguration.CLASSNAME);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+        BotConfiguration.CLASSNAME);
 
         log.trace("invitee.openFile");
-        bob.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        bob.bot.openJavaFileWithEditor(BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         // invitee.sleep(2000);
-        assertTrue(bob.isParticipant());
-        assertTrue(bob.isObserver());
-        assertTrue(bob.hasParticipant(alice));
-        assertTrue(bob.isDriver(alice));
+        assertTrue(bob.state.isParticipant(bob.jid));
+        assertTrue(bob.state.isObserver(bob.jid));
+        assertTrue(bob.state.isParticipant(alice.jid));
+        assertTrue(bob.state.isDriver(alice.jid));
 
-        assertTrue(alice.isParticipant());
-        assertTrue(alice.isDriver());
-        assertTrue(alice.hasParticipant(bob));
-        assertTrue(alice.isObserver(bob));
+        assertTrue(alice.state.isParticipant(alice.jid));
+        assertTrue(alice.state.isDriver(alice.jid));
+        assertTrue(alice.state.isParticipant(bob.jid));
+        assertTrue(alice.state.isObserver(bob.jid));
 
         // TODO make tests independent of each other
         // @Test
         // public void testLeaveSession() throws RemoteException {
         bob.leaveSession();
         log.trace("invitee.leave");
-        assertFalse(bob.isParticipant());
+        assertFalse(bob.state.isParticipant(bob.jid));
 
-        alice.waitUntilSessionClosesBy(bob);
+        alice.bot.waitUntilSessionCloses(bob.state);
         alice.sleep(50);
         alice.leaveSession();
         log.trace("inviter.leave");
-        assertFalse(alice.isParticipant());
+        assertFalse(alice.state.isParticipant(alice.jid));
         // invitee.waitUntilSessionClosesBy(inviter);
     }
 }

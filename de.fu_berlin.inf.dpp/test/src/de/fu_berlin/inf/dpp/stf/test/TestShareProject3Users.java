@@ -55,19 +55,19 @@ public class TestShareProject3Users {
     @AfterClass
     public static void cleanupInvitee1() throws RemoteException {
         carl.xmppDisconnect();
-        carl.deleteProject(BotConfiguration.PROJECTNAME);
+        carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee2() throws RemoteException {
         bob.xmppDisconnect();
-        bob.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @After
     public void cleanupInviter() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -82,37 +82,37 @@ public class TestShareProject3Users {
         carl.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
         bob.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
 
-        assertTrue(carl.isParticipant());
-        assertTrue(carl.isObserver());
-        assertTrue(carl.hasParticipant(bob));
-        assertTrue(carl.isObserver(bob));
-        assertTrue(carl.hasParticipant(alice));
-        assertTrue(carl.isDriver(alice));
+        assertTrue(carl.state.isParticipant(carl.jid));
+        assertTrue(carl.state.isObserver(carl.jid));
+        assertTrue(carl.state.isParticipant(bob.jid));
+        assertTrue(carl.state.isObserver(bob.jid));
+        assertTrue(carl.state.isParticipant(alice.jid));
+        assertTrue(carl.state.isDriver(alice.jid));
 
-        assertTrue(bob.isParticipant());
-        assertTrue(bob.isObserver());
-        assertTrue(bob.hasParticipant(carl));
-        assertTrue(bob.isObserver(carl));
-        assertTrue(bob.hasParticipant(alice));
-        assertTrue(bob.isDriver(alice));
+        assertTrue(bob.state.isParticipant(bob.jid));
+        assertTrue(bob.state.isObserver(bob.jid));
+        assertTrue(bob.state.isParticipant(carl.jid));
+        assertTrue(bob.state.isObserver(carl.jid));
+        assertTrue(bob.state.isParticipant(alice.jid));
+        assertTrue(bob.state.isDriver(alice.jid));
 
-        assertTrue(alice.isParticipant());
-        assertTrue(alice.isDriver());
-        assertTrue(alice.hasParticipant(carl));
-        assertTrue(alice.isObserver(carl));
-        assertTrue(alice.hasParticipant(bob));
-        assertTrue(alice.isObserver(bob));
+        assertTrue(alice.state.isParticipant(alice.jid));
+        assertTrue(alice.state.isDriver(alice.jid));
+        assertTrue(alice.state.isParticipant(carl.jid));
+        assertTrue(alice.state.isObserver(carl.jid));
+        assertTrue(alice.state.isParticipant(bob.jid));
+        assertTrue(alice.state.isObserver(bob.jid));
 
         carl.leaveSession();
-        assertFalse(carl.isParticipant());
+        assertFalse(carl.state.isParticipant(carl.jid));
 
         bob.leaveSession();
-        assertFalse(bob.isParticipant());
+        assertFalse(bob.state.isParticipant(bob.jid));
 
         alice.waitUntilOtherLeaveSession(carl);
         alice.waitUntilOtherLeaveSession(bob);
         alice.leaveSession();
-        assertFalse(alice.isParticipant());
+        assertFalse(alice.state.isParticipant(alice.jid));
 
         // invitee1.sleep(1000);
         // invitee2.sleep(1000);

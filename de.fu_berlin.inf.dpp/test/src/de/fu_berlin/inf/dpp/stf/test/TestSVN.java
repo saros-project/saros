@@ -21,7 +21,7 @@ public class TestSVN {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.importProjectFromSVN(BotConfiguration.SVN_URL);
+        alice.bot.importProjectFromSVN(BotConfiguration.SVN_URL);
 
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
@@ -33,13 +33,13 @@ public class TestSVN {
     public static void tearDownBob() throws Exception {
 
         bob.xmppDisconnect();
-        bob.deleteProject(BotConfiguration.PROJECTNAME_SVN);
+        bob.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
     @AfterClass
     public static void tearDownAlice() throws Exception {
         alice.xmppDisconnect();
-        alice.deleteProject(BotConfiguration.PROJECTNAME_SVN);
+        alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
     // @BeforeClass
@@ -64,10 +64,10 @@ public class TestSVN {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS,
             SarosConstant.CREATE_NEW_PROJECT);
         alice.waitUntilOtherInSession(bob);
-        alice.isDriver();
-        alice.hasParticipant(bob);
-        bob.isObserver();
-        bob.isInSVN();
+        alice.state.isDriver(alice.jid);
+        alice.state.isParticipant(bob.jid);
+        bob.state.isObserver(bob.jid);
+        bob.bot.isInSVN();
 
     }
 
@@ -78,7 +78,7 @@ public class TestSVN {
         // Make sure Bob has joined the session.
         // Alice switches to branch "testing".
         // Make sure Bob is switched to branch "testing".
-        alice.switchToTag();
+        alice.bot.switchToTag();
         // bob.getRevision("/" + BotConfiguration.PROJECTNAME_SVN
         // + "/src/org.eclipsecon.swtbot.example/MyFirstTest01.java");
         // String url_alice = alice

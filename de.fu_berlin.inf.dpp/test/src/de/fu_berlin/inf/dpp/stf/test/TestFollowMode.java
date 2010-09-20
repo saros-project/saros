@@ -50,13 +50,13 @@ public class TestFollowMode {
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.deleteProject(PROJECT);
+        bob.bot.deleteProject(PROJECT);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.deleteProject(PROJECT);
+        alice.bot.deleteProject(PROJECT);
     }
 
     @After
@@ -70,34 +70,34 @@ public class TestFollowMode {
 
     @Test
     public void testBobFollowAlice() throws RemoteException {
-        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT, PKG,
-            CLS1);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT, PKG,
+        CLS1);
         bob.followUser(alice);
-        bob.waitUntilJavaEditorActive(CLS1);
+        bob.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.isInFollowMode(alice));
-        assertTrue(bob.isJavaEditorActive(CLS1));
+        assertTrue(bob.bot.isJavaEditorActive(CLS1));
 
-        String textFromInviter = alice.getTextOfJavaEditor(PROJECT, PKG, CLS1);
+        String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS1);
         bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
-        String textFormInvitee = bob.getTextOfJavaEditor(PROJECT, PKG, CLS1);
+        String textFormInvitee = bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS1);
         assertTrue(textFromInviter.equals(textFormInvitee));
 
         alice.newJavaClassInProject(PROJECT, PKG, CLS2);
-        bob.waitUntilJavaEditorActive(CLS2);
-        assertTrue(bob.isJavaEditorActive(CLS2));
+        bob.bot.waitUntilJavaEditorActive(CLS2);
+        assertTrue(bob.bot.isJavaEditorActive(CLS2));
 
         alice.followUser(bob);
-        bob.activateJavaEditor(CLS1);
-        alice.waitUntilJavaEditorActive(CLS1);
+        bob.bot.activateJavaEditor(CLS1);
+        alice.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(alice.isInFollowMode(bob));
-        assertTrue(alice.isJavaEditorActive(CLS1));
+        assertTrue(alice.bot.isJavaEditorActive(CLS1));
 
         bob.followUser(alice);
         alice.newJavaClassInProject(PROJECT, PKG, CLS3);
-        alice.waitUntilJavaEditorActive(CLS3);
-        alice.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT, PKG,
-            CLS3);
-        alice.setBreakPoint(13, PROJECT, PKG, CLS3);
+        alice.bot.waitUntilJavaEditorActive(CLS3);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT, PKG,
+        CLS3);
+        alice.bot.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
         // bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);

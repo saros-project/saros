@@ -35,37 +35,37 @@ public class RmiTest {
     @After
     public void cleanupBot() throws RemoteException {
         alice.xmppDisconnect();
-        alice.closeRosterView();
-        alice.closeChatView();
-        alice.closeRmoteScreenView();
-        alice.closeSarosSessionView();
-        if (alice.isJavaProjectExist(projectName))
-            alice.deleteProject(projectName);
+        alice.bot.closeRosterView();
+        alice.bot.closeChatView();
+        alice.bot.closeRemoteScreenView();
+        alice.bot.closeSharedSessionView();
+        if (alice.bot.isJavaProjectExist(projectName))
+            alice.bot.deleteProject(projectName);
     }
 
     @Test
-    public void testViews() {
-        alice.closeRosterView();
-        assertFalse(alice.isRosterViewOpen());
-        alice.openRosterView();
-        assertTrue(alice.isRosterViewOpen());
+    public void testViews() throws RemoteException {
+        alice.bot.closeRosterView();
+        assertFalse(alice.bot.isRosterViewOpen());
+        alice.bot.openRosterView();
+        assertTrue(alice.bot.isRosterViewOpen());
     }
 
     @Test
-    public void test_getCurrentActiveShell() {
-        final String currentActiveShell = alice.getCurrentActiveShell();
+    public void test_getCurrentActiveShell() throws RemoteException {
+        final String currentActiveShell = alice.bot.getCurrentActiveShell();
         assertTrue(currentActiveShell != null);
     }
 
     @Test
     public void test_newProjectWithClass() throws RemoteException {
-        assertFalse(alice.isJavaProjectExist(projectName));
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
         alice.newProjectWithClass(projectName, "pkg", "Cls");
-        assertTrue(alice.isJavaProjectExist(projectName));
-        assertTrue(alice.isJavaClassExist(projectName, "pkg", "Cls"));
+        assertTrue(alice.bot.isJavaProjectExist(projectName));
+        assertTrue(alice.bot.isJavaClassExist(projectName, "pkg", "Cls"));
 
-        alice.deleteProject(projectName);
-        assertFalse(alice.isJavaProjectExist(projectName));
+        alice.bot.deleteProject(projectName);
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
     }
 
     @Test
@@ -74,28 +74,28 @@ public class RmiTest {
         final String className = "Cls";
 
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.isJavaProjectExist(projectName));
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
         log.trace("alice.newProjectWithClass()");
 
         alice.newProjectWithClass(projectName, pkg, className);
         log.trace("alice.isJavaProjectExist()");
-        assertTrue(alice.isJavaProjectExist(projectName));
+        assertTrue(alice.bot.isJavaProjectExist(projectName));
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.isJavaClassExist(projectName, pkg, className));
+        assertTrue(alice.bot.isJavaClassExist(projectName, pkg, className));
 
         log.trace("alice.isJavaClassExist()");
         final String className2 = "Cls2";
-        assertFalse(alice.isJavaClassExist(projectName, pkg, className2));
+        assertFalse(alice.bot.isJavaClassExist(projectName, pkg, className2));
         log.trace("alice.newJavaClassInProject()");
         alice.newJavaClassInProject(projectName, pkg, className2);
 
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.isJavaClassExist(projectName, pkg, className2));
+        assertTrue(alice.bot.isJavaClassExist(projectName, pkg, className2));
 
         log.trace("alice.deleteProject()");
-        alice.deleteProject(projectName);
+        alice.bot.deleteProject(projectName);
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.isJavaProjectExist(projectName));
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
     }
 
 }

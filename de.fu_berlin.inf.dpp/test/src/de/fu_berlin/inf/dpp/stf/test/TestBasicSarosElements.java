@@ -18,76 +18,79 @@ public class TestBasicSarosElements {
     private static final Logger log = Logger
         .getLogger(TestBasicSarosElements.class);
     // bots
-    protected static Musician bot;
+    protected static Musician alice;
 
     @BeforeClass
     public static void configureInvitee() throws RemoteException,
         NotBoundException {
         log.debug("configureInvitee start");
-        bot = new Musician(new JID(BotConfiguration.JID_ALICE),
+        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         log.debug("initBot");
-        bot.initBot();
+        alice.initBot();
         log.debug("configureInvitee end");
     }
 
     @AfterClass
     public static void afterClass() {
-        bot.xmppDisconnect();
+        alice.xmppDisconnect();
     }
 
     @Test
-    public void testSessionView() {
-        bot.closeSarosSessionView();
-        assertEquals(false, bot.issharedSessionViewOpen());
-        bot.openSarosSessionView();
-        bot.captureScreenshot(bot.getPathToScreenShot() + "/session_view.png");
-        assertEquals(true, bot.issharedSessionViewOpen());
+    public void testSessionView() throws RemoteException {
+        alice.bot.closeSharedSessionView();
+        assertEquals(false, alice.bot.isSharedSessionViewOpen());
+        alice.bot.openSarosSessionView();
+        alice.bot
+            .captureScreenshot((alice.state.getPathToScreenShot() + "/session_view.png"));
+        assertEquals(true, alice.bot.isSharedSessionViewOpen());
     }
 
     @Test
-    public void testRosterView() {
-        bot.closeRosterView();
-        assertEquals(false, bot.isRosterViewOpen());
-        bot.openRosterView();
-        bot.captureScreenshot(bot.getPathToScreenShot() + "/roster_view.png");
-        assertEquals(true, bot.isRosterViewOpen());
+    public void testRosterView() throws RemoteException {
+        alice.bot.closeRosterView();
+        assertEquals(false, alice.bot.isRosterViewOpen());
+        alice.bot.openRosterView();
+        alice.bot
+            .captureScreenshot((alice.state.getPathToScreenShot() + "/roster_view.png"));
+        assertEquals(true, alice.bot.isRosterViewOpen());
     }
 
     @Test
-    public void testChatView() {
-        bot.closeChatView();
-        assertEquals(false, bot.isChatViewOpen());
-        bot.openChatView();
-        assertEquals(true, bot.isChatViewOpen());
+    public void testChatView() throws RemoteException {
+        alice.bot.closeChatView();
+        assertEquals(false, alice.bot.isChatViewOpen());
+        alice.bot.openChatView();
+        assertEquals(true, alice.bot.isChatViewOpen());
     }
 
     @Test
-    public void testRemoteScreenView() {
-        bot.closeRmoteScreenView();
-        assertEquals(false, bot.isRemoteScreenViewOpen());
-        bot.openRemoteScreenView();
-        assertEquals(true, bot.isRemoteScreenViewOpen());
+    public void testRemoteScreenView() throws RemoteException {
+        alice.bot.closeRemoteScreenView();
+        assertEquals(false, alice.bot.isRemoteScreenViewOpen());
+        alice.bot.openRemoteScreenView();
+        assertEquals(true, alice.bot.isRemoteScreenViewOpen());
     }
 
     @Test
-    public void testXmppConnect() {
+    public void testXmppConnect() throws RemoteException {
         log.trace("xmppDisconnect");
-        bot.xmppDisconnect();
+        alice.xmppDisconnect();
         log.trace("xmppConnect");
-        bot.xmppConnect();
+        alice.xmppConnect();
         log.trace("captureScreenshot");
-        bot.captureScreenshot(bot.getPathToScreenShot() + "/xmpp_connected.png");
-        assertEquals(true, bot.isConnectedByXMPP());
+        alice.bot
+            .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_connected.png"));
+        assertEquals(true, alice.isConnectedByXMPP());
     }
 
     @Test
-    public void testXmppDisconnect() {
-        bot.xmppConnect();
-        bot.xmppDisconnect();
-        bot.captureScreenshot(bot.getPathToScreenShot()
-            + "/xmpp_disconnected.png");
-        assertEquals(false, bot.isConnectedByXMPP());
+    public void testXmppDisconnect() throws RemoteException {
+        alice.xmppConnect();
+        alice.xmppDisconnect();
+        alice.bot
+            .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_disconnected.png"));
+        assertEquals(false, alice.isConnectedByXMPP());
     }
 }
