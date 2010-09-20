@@ -230,34 +230,31 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void newJavaProject(String project) throws RemoteException {
+        // TODO version without timeout
         try {
+            // New Java Project
             clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                 SarosConstant.MENU_TITLE_NEW,
                 SarosConstant.MENU_TITLE_JAVA_PROJECT);
         } catch (WidgetNotFoundException e) {
+            // New Project...
             clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                 SarosConstant.MENU_TITLE_NEW, SarosConstant.MENU_TITLE_PROJECT);
+            // Java Project
             confirmWindowWithTreeWithFilterText(
                 SarosConstant.SHELL_TITLE_NEW_PROJECT,
                 SarosConstant.CATEGORY_JAVA, SarosConstant.NODE_JAVA_PROJECT,
                 SarosConstant.BUTTON_NEXT);
         }
+        waitUntilShellActive("New Java Project");
+        final SWTBotShell newProjectDialog = delegate.activeShell();
 
-        try {
-            // delegate.sleep(sleepTime);
-            setTextWithLabel("Project name:", project);
-            // Integer i = 0;
-            // while (!isButtonEnabled(SarosConstant.BUTTON_FINISH)) {
-            // i++;
-            // setTextWithLabel("Project name:", project + i.toString());
-            // }
-            delegate.button("Finish").click();
-            if (isShellActive("Open Associated Perspective?")) {
-                clickButton(SarosConstant.BUTTON_YES);
-            }
-            // delegate.sleep(sleepTime);
-        } catch (WidgetNotFoundException e) {
-            log.error("error creating new Java Project", e);
+        setTextWithLabel("Project name:", project);
+        clickButton(SarosConstant.BUTTON_FINISH);
+        waitUntilShellCloses(newProjectDialog);
+
+        if (isShellActive("Open Associated Perspective?")) {
+            clickButton(SarosConstant.BUTTON_YES);
         }
     }
 
@@ -1293,10 +1290,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException {
         waitUntil(shellCloses(shell));
+        delegate.sleep(10);
     }
 
     public void waitUntilShellCloses(String shellText) throws RemoteException {
         waitUntil(SarosConditions.isShellClosed(delegate, shellText));
+        delegate.sleep(10);
     }
 
     public void waitUntilJavaEditorActive(String className)
