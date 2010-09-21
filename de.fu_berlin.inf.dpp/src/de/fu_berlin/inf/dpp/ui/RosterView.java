@@ -104,8 +104,8 @@ public class RosterView extends ViewPart {
     public static final Image personImage = SarosUI.getImage("icons/user.png");
     public static final Image personAwayImage = SarosUI
         .getImage("icons/clock.png");
-    public static final Image personOfflineImage = new Image(Display
-        .getDefault(), personImage, SWT.IMAGE_DISABLE);
+    public static final Image personOfflineImage = new Image(
+        Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
 
     protected TreeViewer viewer;
 
@@ -306,7 +306,8 @@ public class RosterView extends ViewPart {
         public Image getImage() {
             final Presence presence = roster.getPresence(jid);
 
-            if (presence.isAvailable()) {
+            // remember to show buddies offline if disconnecting or disconnected
+            if (presence.isAvailable() && saros.isConnected()) {
                 return presence.isAway() ? personAwayImage : personImage;
             } else {
                 return personOfflineImage;
@@ -431,8 +432,8 @@ public class RosterView extends ViewPart {
         }
 
         public Collection<TreeItem> getChildren() {
-            final List<TreeItem> result = new ArrayList<TreeItem>(group
-                .getEntryCount());
+            final List<TreeItem> result = new ArrayList<TreeItem>(
+                group.getEntryCount());
             for (RosterEntry rosterEntry : group.getEntries()) {
                 result.add(new ContactItem(rosterEntry.getUser()));
             }
@@ -478,8 +479,8 @@ public class RosterView extends ViewPart {
     protected class UnfiledGroupItem extends AbstractGroupItem {
 
         public Collection<TreeItem> getChildren() {
-            final List<TreeItem> result = new ArrayList<TreeItem>(roster
-                .getUnfiledEntryCount());
+            final List<TreeItem> result = new ArrayList<TreeItem>(
+                roster.getUnfiledEntryCount());
             for (RosterEntry rosterEntry : roster.getUnfiledEntries()) {
                 result.add(new ContactItem(rosterEntry.getUser()));
             }
@@ -635,8 +636,8 @@ public class RosterView extends ViewPart {
 
         saros.addListener(connectionListener);
         rosterTracker.addRosterListener(rosterListener);
-        connectionListener.connectionStateChanged(saros.getConnection(), saros
-            .getConnectionState());
+        connectionListener.connectionStateChanged(saros.getConnection(),
+            saros.getConnectionState());
         rosterListener.rosterChanged(saros.getRoster());
     }
 
