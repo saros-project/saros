@@ -81,6 +81,23 @@ class SubclipseAdapter extends VCSAdapter {
     }
 
     @Override
+    public String getRevisionString(IResource resource) {
+        if (!isManaged(resource))
+            return null;
+        if (!resource.exists())
+            return null;
+        try {
+            final SVNRevision revision = SVNWorkspaceRoot.getSVNResourceFor(
+                resource).getRevision();
+            if (revision != null)
+                return revision.toString();
+        } catch (SVNException e) {
+            log.error("Error retrieving revision for " + resource, e);
+        }
+        return null;
+    }
+
+    @Override
     public String getRepositoryString(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
@@ -165,15 +182,20 @@ class SubclipseAdapter extends VCSAdapter {
     }
 
     @Override
-    public void update(IResource resource, String targetRevision,
+    public void update(IResource resource, String revisionString,
         IProgressMonitor monitor) {
+        if (isAddedToVersionControl(revisionString)) {
+            addToVersionControl(resource);
+            return;
+        }
+
         String taskName = "Updating " + resource.getName() + " to revision "
-            + targetRevision;
+            + revisionString;
         // TODO Why doesn't this work? The caption of the dialog still reads
         // "Operation in progress".
         monitor.beginTask(taskName, 1);
 
-        SVNRevision revision = getRevision(targetRevision);
+        SVNRevision revision = getRevision(revisionString);
         if (revision == null)
             return;
         SVNWorkspaceRoot root;
@@ -204,6 +226,19 @@ class SubclipseAdapter extends VCSAdapter {
         }
     }
 
+    private void addToVersionControl(IResource resource) {
+        // TODO
+    }
+
+    /**
+     * When adding a resource, SVN seems to (sometimes?) assign it the revision
+     * "0". This method is used to prevent an update or switch of a resource
+     * when it was merely added to version control.
+     */
+    private boolean isAddedToVersionControl(String revisionString) {
+        return revisionString.equals("0");
+    }
+
     @Override
     public VCSResourceInfo getResourceInfo(IResource resource) {
         VCSResourceInfo info = new VCSResourceInfo();
@@ -217,6 +252,10 @@ class SubclipseAdapter extends VCSAdapter {
         IProgressMonitor monitor) {
         if (resource == null)
             return;
+        if (isAddedToVersionControl(revisionString)) {
+            addToVersionControl(resource);
+            return;
+        }
         String taskName = "Switching " + resource.getName();
         monitor.beginTask(taskName, 1);
         SVNRevision revision = getRevision(revisionString);
