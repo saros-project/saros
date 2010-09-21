@@ -1048,6 +1048,14 @@ public class Saros extends AbstractUIPlugin {
                 throw new XMPPException("RosterEntry for user " + jid
                     + " already exists");
             }
+            /*
+             * if user is trying to add himself, throw exception since there is
+             * a strange behaviour if he does (he appears as not using Saros)
+             */
+            if (jid.equals(getMyJID())) {
+                monitor.worked(1);
+                throw new XMPPException("You can't add yourself to the Roster.");
+            }
             monitor.worked(1);
 
             connection.getRoster()

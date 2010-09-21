@@ -156,8 +156,7 @@ public class AddContactWizard extends Wizard {
 
             if (!userAtHostPattern.matcher(this.idText.getText().trim())
                 .matches()) {
-                this
-                    .setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
+                this.setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
                 this.setMessage(null);
                 this.setPageComplete(false);
                 return;
@@ -259,12 +258,12 @@ public class AddContactWizard extends Wizard {
                 if (allowToEnterNick && !(nickname.length() == 0)) {
                     saros.addContact(jid, nickname, null, monitor.newChild(1));
                 } else {
-                    saros.addContact(jid, jid.toString(), null, monitor
-                        .newChild(1));
+                    saros.addContact(jid, jid.toString(), null,
+                        monitor.newChild(1));
                 }
             } catch (XMPPException e) {
                 throw new InvocationTargetException(e, "Couldn't add contact "
-                    + jid + " to Roster.");
+                    + jid + " to Roster: " + e.getMessage());
             }
         } finally {
             monitor.done();
