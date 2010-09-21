@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.undo;
 
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +16,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
-import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 /**
  * testing TextOperationHistory and UndoManager
@@ -24,8 +24,7 @@ public class UndoTest {
 
     // private static Logger log = Logger.getLogger(UndoTest.class.getName());
 
-    protected IProject project = SarosTestUtils
-        .replayFluid(createMock(IProject.class));
+    protected IProject project = replay(createMock(IProject.class));
 
     protected SPath path1 = new SPath(project, new Path("path1"));
     protected SPath path2 = new SPath(project, new Path("path2"));

@@ -4,10 +4,11 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
  * This test class represent local execution of document changes and
  * appropriate jupiter operations.
  */
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
+import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -21,7 +22,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
@@ -32,8 +32,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
     @Test
     public void testExecuteLocalOperations() {
         Algorithm algo = new Jupiter(true);
-        IProject project = SarosTestUtils.replayFluid(EasyMock
-            .createMock(IProject.class));
+        IProject project = replay(createMock(IProject.class));
         IPath path = new Path("dummy");
 
         Document doc = new Document("abc", project, path);

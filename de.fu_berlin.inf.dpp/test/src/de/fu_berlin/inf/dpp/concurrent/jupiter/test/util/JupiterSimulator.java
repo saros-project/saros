@@ -1,12 +1,14 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
+import static org.easymock.EasyMock.createMock;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -18,7 +20,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 public class JupiterSimulator {
 
@@ -31,8 +32,7 @@ public class JupiterSimulator {
 
     public JupiterSimulator(String document) {
 
-        IProject project = SarosTestUtils.replayFluid(EasyMock
-            .createMock(IProject.class));
+        IProject project = replay(createMock(IProject.class));
         IPath path = new Path("test");
 
         client = new Peer(new Jupiter(true), document, project, path);

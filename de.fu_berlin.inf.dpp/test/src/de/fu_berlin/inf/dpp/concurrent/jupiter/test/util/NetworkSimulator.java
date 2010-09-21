@@ -1,15 +1,16 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
+import static org.easymock.EasyMock.createMock;
+
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
-import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 /**
  * This class simulates a network.
@@ -22,8 +23,7 @@ public class NetworkSimulator {
 
     private RuntimeException error;
 
-    public IProject project = SarosTestUtils.replayFluid(EasyMock
-        .createMock(IProject.class));
+    public IProject project = replay(createMock(IProject.class));
 
     public IPath path = new Path("dummy");
 

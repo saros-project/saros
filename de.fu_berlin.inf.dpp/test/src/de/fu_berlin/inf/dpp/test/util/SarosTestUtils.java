@@ -10,10 +10,10 @@ public class SarosTestUtils {
      * Returns a mock for the given class which is already switched to replay
      */
     public static <T> T createReplayMock(Class<T> clazz) {
-        return replayFluid(createMock(clazz));
+        return replay(createMock(clazz));
     }
 
-    public static <T> T replayFluid(T t) {
+    public static <T> T replay(T t) {
         EasyMock.replay(t);
         return t;
     }

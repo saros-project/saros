@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 
@@ -20,15 +21,13 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
 
 /**
  * testing SplitOperation.toTextEdit()
  */
 public class SplitOperationTest {
 
-    protected IProject project = SarosTestUtils
-        .replayFluid(createMock(IProject.class));
+    protected IProject project = replay(createMock(IProject.class));
 
     protected SPath path = new SPath(project, new Path("path"));
     protected User source = JupiterTestCase.createUserMock("source");
@@ -55,15 +54,15 @@ public class SplitOperationTest {
         Operation split1 = S(I(4, "0ab"), I(7, "cd"));
         TextEditActivity expected1 = new TextEditActivity(source, 4, "0abcd",
             "", path);
-        assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected1),
+            split1.toTextEdit(path, source));
 
         // vice versa
         Operation split2 = S(I(6, "0ab"), I(4, "cd"));
         TextEditActivity expected2 = new TextEditActivity(source, 4, "cd0ab",
             "", path);
-        assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected2),
+            split2.toTextEdit(path, source));
     }
 
     @Test
@@ -72,14 +71,14 @@ public class SplitOperationTest {
         Operation split1 = S(D(5, "ab"), D(5, "cde"));
         TextEditActivity expected1 = new TextEditActivity(source, 5, "",
             "abcde", path);
-        assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected1),
+            split1.toTextEdit(path, source));
 
         Operation split2 = S(D(5, "cde"), D(5, "ab"));
         TextEditActivity expected2 = new TextEditActivity(source, 5, "",
             "cdeab", path);
-        assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected2),
+            split2.toTextEdit(path, source));
     }
 
     @Test
@@ -88,14 +87,14 @@ public class SplitOperationTest {
         Operation split1 = S(I(5, "ab"), D(5, "abcd"));
         TextEditActivity expected1 = new TextEditActivity(source, 5, "", "cd",
             path);
-        assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected1),
+            split1.toTextEdit(path, source));
 
         Operation split2 = S(I(5, "abcde"), D(5, "abcd"));
         TextEditActivity expected2 = new TextEditActivity(source, 5, "e", "",
             path);
-        assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected2),
+            split2.toTextEdit(path, source));
     }
 
     @Test
@@ -104,8 +103,8 @@ public class SplitOperationTest {
         Operation split1 = S(D(8, "abc"), I(8, "ghijk"));
         TextEditActivity expected1 = new TextEditActivity(source, 8, "ghijk",
             "abc", path);
-        assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected1),
+            split1.toTextEdit(path, source));
     }
 
     @Test
@@ -114,15 +113,15 @@ public class SplitOperationTest {
         Operation split = S(D(8, "abc"), S(nop(), I(8, "ghijk")));
         TextEditActivity expected = new TextEditActivity(source, 8, "ghijk",
             "abc", path);
-        assertEquals(Collections.singletonList(expected), split.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected),
+            split.toTextEdit(path, source));
     }
 
     @Test
     public void testSplitChain1() {
         // Split(Split(A,B), Split(C,D)) with B and C can be combined
-        Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), D(
-            15, "xyz")));
+        Operation split = S(S(D(8, "uvw"), I(2, "abcde")),
+            S(D(2, "abcd"), D(15, "xyz")));
 
         List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
         expected.add(new TextEditActivity(source, 8, "", "uvw", path));
@@ -135,8 +134,8 @@ public class SplitOperationTest {
     @Test
     public void testSplitChain2() {
         // Split(Split(A,B), Split(C,D)) with B, C and D can be combined
-        Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), I(3,
-            "xyz")));
+        Operation split = S(S(D(8, "uvw"), I(2, "abcde")),
+            S(D(2, "abcd"), I(3, "xyz")));
 
         List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
         expected.add(new TextEditActivity(source, 8, "", "uvw", path));
@@ -149,8 +148,8 @@ public class SplitOperationTest {
     @Test
     public void testSplitChain3() {
         // Split(Split(A,B), Split(C,D)) with A, B, C and D can be combined
-        Operation split = S(S(D(8, "abc"), D(8, "defg")), S(I(8, "1234"), I(12,
-            "56")));
+        Operation split = S(S(D(8, "abc"), D(8, "defg")),
+            S(I(8, "1234"), I(12, "56")));
 
         List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
         expected
