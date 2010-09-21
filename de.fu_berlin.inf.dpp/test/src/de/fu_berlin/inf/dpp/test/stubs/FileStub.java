@@ -32,10 +32,16 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  */
 public class FileStub implements IFile {
 
+    private IProject project = null;
     private IPath path;
     private String content;
 
     private boolean derived = false;
+
+    public FileStub(IProject project, String path, String content) {
+        this(path, content);
+        this.project = project;
+    }
 
     public FileStub(String path, String content) {
         this.path = new Path(path);
@@ -356,8 +362,7 @@ public class FileStub implements IFile {
     }
 
     public IProject getProject() {
-        throw new RuntimeException("Unexpected call to Stub");
-
+        return project;
     }
 
     public IPath getRawLocation() {

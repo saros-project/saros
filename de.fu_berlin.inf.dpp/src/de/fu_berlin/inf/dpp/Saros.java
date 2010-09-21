@@ -443,26 +443,30 @@ public class Saros extends AbstractUIPlugin {
     }
 
     protected void setBytestreamConnectionProperties() {
-
-        boolean changed = false;
+        boolean settingsChanged = false;
         int port = container.getComponent(PreferenceUtils.class)
             .getFileTransferPort();
         boolean proxyEnabled = !getPreferenceStore().getBoolean(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
 
-        // Note: to make it clean, the proxy gets restarted on port change,too
+        // Note: The proxy gets restarted on port change, too.
         if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
-            changed = true;
+            settingsChanged = true;
             SmackConfiguration.setLocalSocks5ProxyPort(port);
         }
 
+        /*
+         * TODO Fix in Smack: Either always start proxy or (preferably) never
+         * start it automatically. Currently it only starts after creating the
+         * proxy.
+         */
+        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
         if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
-            changed = true;
+            settingsChanged = true;
             SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
         }
 
-        if (changed) {
-            Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+        if (settingsChanged || proxy.isRunning() != proxyEnabled) {
             StringBuilder sb = new StringBuilder(
                 "Socks5Proxy properties changed.");
             if (proxy.isRunning()) {
@@ -473,7 +477,8 @@ public class Saros extends AbstractUIPlugin {
                 sb.append(" Starting.");
                 proxy.start();
             }
-            log.debug(sb);
+            if (settingsChanged)
+                log.debug(sb);
         }
 
         // TODO: just pasted from before
