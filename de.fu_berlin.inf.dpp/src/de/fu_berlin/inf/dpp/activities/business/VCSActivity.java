@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -65,6 +66,38 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         this.param1 = param1;
     }
 
+    public static VCSActivity connect(ISarosSession sarosSession,
+        IProject project, String url, String directory, String providerID) {
+        return new VCSActivity(Type.Connect, sarosSession, project, url,
+            directory, providerID);
+    }
+
+    public static VCSActivity disconnect(ISarosSession sarosSession,
+        IProject project, boolean deleteContents) {
+        String param1 = deleteContents ? "" : null;
+        return new VCSActivity(Type.Disconnect, sarosSession, project, null,
+            null, param1);
+    }
+
+    public static VCSActivity update(ISarosSession sarosSession,
+        IResource resource, String revision) {
+        return new VCSActivity(Type.Update, sarosSession, resource, null, null,
+            revision);
+    }
+
+    public static VCSActivity switch_(ISarosSession sarosSession,
+        IResource resource, String url, String revision) {
+        return new VCSActivity(Type.Switch, sarosSession, resource, url, null,
+            revision);
+    }
+
+    private VCSActivity(Type type, ISarosSession sarosSession,
+        IResource resource, String url, String directory, String param1) {
+        this(type, sarosSession != null ? sarosSession.getLocalUser() : null,
+            resource != null ? new SPath(resource) : null, url, directory,
+            param1);
+    }
+
     public boolean dispatch(IActivityConsumer consumer) {
         return consumer.consume(this);
     }
@@ -78,37 +111,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             .toSPathDataObject(sarosSession);
         return new VCSActivityDataObject(source.getJID(), getType(), url,
             sPathDataObject, directory, param1);
-    }
-
-    public static VCSActivity connect(ISarosSession sarosSession,
-        IProject project, String url, String directory, String providerID) {
-        User source = sarosSession.getLocalUser();
-        SPath path = new SPath(project);
-        return new VCSActivity(Type.Connect, source, path, url, directory,
-            providerID);
-    }
-
-    public static VCSActivity disconnect(ISarosSession sarosSession,
-        IProject project, boolean deleteContents) {
-        User source = sarosSession.getLocalUser();
-        SPath path = new SPath(project);
-        String revision = deleteContents ? "" : null;
-        return new VCSActivity(Type.Disconnect, source, path, null, null,
-            revision);
-    }
-
-    public static VCSActivity update(ISarosSession sarosSession,
-        IResource resource, String revision) {
-        User source = sarosSession.getLocalUser();
-        SPath path = new SPath(resource);
-        return new VCSActivity(Type.Update, source, path, null, null, revision);
-    }
-
-    public static VCSActivity switch_(ISarosSession sarosSession,
-        IResource resource, String url, String revision) {
-        User source = sarosSession.getLocalUser();
-        SPath path = new SPath(resource);
-        return new VCSActivity(Type.Switch, source, path, url, null, revision);
     }
 
     public SPath getPath() {
@@ -129,6 +131,34 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     public String getDirectory() {
         return directory;
+    }
+
+    /**
+     * Returns true if executing this activity would implicitely execute the
+     * otherActivity. In other words, if executing otherActivity after this one
+     * would be a null operation.<br>
+     * Currently this method only checks type and path, not URL and revision.
+     */
+    public boolean includes(IResourceActivity otherActivity) {
+        if (otherActivity == null || getPath() == null
+            || otherActivity.getPath() == null)
+            return false;
+        IPath vcsPath = getPath().getFullPath();
+        IPath otherPath = otherActivity.getPath().getFullPath();
+        if (!vcsPath.isPrefixOf(otherPath))
+            return false;
+        // An update can't include a switch.
+        if (getType() == VCSActivity.Type.Update
+            && otherActivity instanceof VCSActivity
+            && ((VCSActivity) otherActivity).getType() == VCSActivity.Type.Switch) {
+            return false;
+        }
+        if (vcsPath.equals(otherPath)) {
+            // TODO
+            return false;
+        }
+
+        return true;
     }
 
     @Override
