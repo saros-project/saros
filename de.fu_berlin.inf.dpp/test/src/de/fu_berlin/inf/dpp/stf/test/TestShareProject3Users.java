@@ -55,19 +55,19 @@ public class TestShareProject3Users {
     @AfterClass
     public static void cleanupInvitee1() throws RemoteException {
         carl.xmppDisconnect();
-        carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        carl.bot.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee2() throws RemoteException {
         bob.xmppDisconnect();
-        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @After
     public void cleanupInviter() throws RemoteException {
         alice.xmppDisconnect();
-        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -80,6 +80,7 @@ public class TestShareProject3Users {
         alice.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
 
         carl.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
+        // FIXME if this times out, cancel the invitation!
         bob.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
 
         assertTrue(carl.state.isParticipant(carl.jid));

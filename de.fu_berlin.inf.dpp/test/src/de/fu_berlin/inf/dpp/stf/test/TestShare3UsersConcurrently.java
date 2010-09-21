@@ -117,7 +117,7 @@ public class TestShare3UsersConcurrently {
                     musician.xmppDisconnect();
                     final String projectName = BotConfiguration.PROJECTNAME;
                     if (musician.bot.isJavaProjectExist(projectName))
-                        musician.bot.deleteProject(projectName);
+                        musician.bot.deleteResource(projectName);
                     return null;
                 }
             });
@@ -141,8 +141,8 @@ public class TestShare3UsersConcurrently {
             final Musician musician = peers.get(i);
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                	musician.confirmSessionInvitationWizard(alice,
-                            BotConfiguration.PROJECTNAME);
+                    musician.confirmSessionInvitationWizard(alice,
+                        BotConfiguration.PROJECTNAME);
                     return null;
                 }
             });

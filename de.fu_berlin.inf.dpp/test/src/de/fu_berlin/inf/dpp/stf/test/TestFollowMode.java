@@ -50,13 +50,13 @@ public class TestFollowMode {
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.bot.deleteProject(PROJECT);
+        bob.bot.deleteResource(PROJECT);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.bot.deleteProject(PROJECT);
+        alice.bot.deleteResource(PROJECT);
     }
 
     @After
@@ -70,16 +70,18 @@ public class TestFollowMode {
 
     @Test
     public void testBobFollowAlice() throws RemoteException {
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT, PKG,
-        CLS1);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
+            PKG, CLS1);
         bob.followUser(alice);
         bob.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.isInFollowMode(alice));
         assertTrue(bob.bot.isJavaEditorActive(CLS1));
 
-        String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS1);
+        String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG,
+            CLS1);
         bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
-        String textFormInvitee = bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS1);
+        String textFormInvitee = bob.bot
+            .getTextOfJavaEditor(PROJECT, PKG, CLS1);
         assertTrue(textFromInviter.equals(textFormInvitee));
 
         alice.newJavaClassInProject(PROJECT, PKG, CLS2);
@@ -95,8 +97,8 @@ public class TestFollowMode {
         bob.followUser(alice);
         alice.newJavaClassInProject(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT, PKG,
-        CLS3);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT,
+            PKG, CLS3);
         alice.bot.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);

@@ -1,9 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.conditions;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class ShellActive extends DefaultCondition {
 
@@ -20,11 +18,7 @@ public class ShellActive extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        try {
-            SWTBotShell shell = bot.shell(title);
-            return shell.isActive();
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+        // In conditions, only use methods that return immediately (no waiting)
+        return bot.activeShell().getText().equals(title);
     }
 }

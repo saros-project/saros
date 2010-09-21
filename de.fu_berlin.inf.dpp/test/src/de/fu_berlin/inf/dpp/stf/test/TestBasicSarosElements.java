@@ -39,9 +39,9 @@ public class TestBasicSarosElements {
 
     @Test
     public void testSessionView() throws RemoteException {
-        alice.bot.closeSharedSessionView();
+        alice.bot.closeSessionView();
         assertEquals(false, alice.bot.isSharedSessionViewOpen());
-        alice.bot.openSarosSessionView();
+        alice.bot.openSessionView();
         alice.bot
             .captureScreenshot((alice.state.getPathToScreenShot() + "/session_view.png"));
         assertEquals(true, alice.bot.isSharedSessionViewOpen());

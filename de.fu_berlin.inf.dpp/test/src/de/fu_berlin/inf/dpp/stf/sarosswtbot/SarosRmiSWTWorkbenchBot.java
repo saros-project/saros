@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -14,6 +15,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
@@ -207,7 +214,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickSendAFileToSelectedUserInSPSView(String inviteeJID)
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         selectTableItemWithLabelInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, inviteeJID);
@@ -218,7 +225,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickTBOpenInvitationInterfaceInSPSView()
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarPushButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -226,7 +233,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void clickStartAVoIPSessionInSPSView() throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -234,7 +241,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void clickNoInconsistenciesInSPSView() throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -242,7 +249,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void clickRemoveAllRriverRolesInSPSView() throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -250,7 +257,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void clickEnableDisableFollowModeInSPSView() throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -258,7 +265,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void clickTBLeaveTheSessionInSPSView() throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -267,7 +274,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickCMJumpToPositionOfSelectedUserInSPSView(
         String participantJID, String sufix) throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             participantJID + sufix,
@@ -276,7 +283,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickCMStopFollowingThisUserInSPSView(String participantJID,
         String sufix) throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             participantJID + sufix,
@@ -285,7 +292,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickCMgiveExclusiveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             inviteeJID, SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE);
@@ -298,7 +305,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             inviteeJID, SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE);
@@ -366,7 +373,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void clickShareYourScreenWithSelectedUserInSPSView()
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -377,7 +384,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         // selectTableItemWithLabelInViewWithTitle(
         // SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, name);
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
@@ -429,24 +436,69 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     /************ open **************/
 
-    public void openRosterView() throws RemoteException {
-        openViewWithName(SarosConstant.VIEW_TITLE_ROSTER,
-            SarosConstant.CATEGORY_SAROS, SarosConstant.NODE_ROSTER);
+    protected void hideViewById(final String viewId) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                final IViewPart view = page.findView(viewId);
+                if (view != null) {
+                    page.hideView(view);
+                }
+            }
+        });
     }
 
-    public void openSarosSessionView() throws RemoteException {
-        openViewWithName(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-            SarosConstant.CATEGORY_SAROS, SarosConstant.NODE_SAROS_SESSION);
+    protected void showViewById(final String viewId) {
+        try {
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    final IWorkbench wb = PlatformUI.getWorkbench();
+                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                    IWorkbenchPage page = win.getActivePage();
+                    try {
+                        page.showView(viewId);
+                    } catch (PartInitException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            log.debug("Couldn't initialize " + viewId, e.getCause());
+        }
+    }
+
+    public void openRosterView() throws RemoteException {
+        showViewById("de.fu_berlin.inf.dpp.ui.RosterView");
+    }
+
+    public void closeRosterView() throws RemoteException {
+        hideViewById("de.fu_berlin.inf.dpp.ui.RosterView");
+    }
+
+    public void openSessionView() throws RemoteException {
+        showViewById("de.fu_berlin.inf.dpp.ui.SessionView");
+    }
+
+    public void closeSessionView() throws RemoteException {
+        hideViewById("de.fu_berlin.inf.dpp.ui.SessionView");
     }
 
     public void openChatView() throws RemoteException {
-        openViewWithName(SarosConstant.VIEW_TITLE_CHAT_VIEW,
-            SarosConstant.CATEGORY_SAROS, SarosConstant.NODE_CHAT_VIEW);
+        showViewById("de.fu_berlin.inf.dpp.ui.ChatView");
+    }
+
+    public void closeChatView() throws RemoteException {
+        hideViewById("de.fu_berlin.inf.dpp.ui.ChatView");
     }
 
     public void openRemoteScreenView() throws RemoteException {
-        openViewWithName(SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
-            SarosConstant.CATEGORY_SAROS, SarosConstant.NODE_REMOTE_SCREEN);
+        showViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
+    }
+
+    public void closeRemoteScreenView() throws RemoteException {
+        hideViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
     }
 
     // public void addToSharedProject(String invitee) throws RemoteException {
@@ -470,7 +522,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public boolean isInFollowMode(String participantJID, String sufix)
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         return isContextMenuOfTableItemInViewExist(
             BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
@@ -617,13 +669,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     // }
 
     /***************** share *******************/
-    public void shareProjectSequential(String projectName,
-        String nameOfContextMenu, List<String> invitees) throws RemoteException {
-        clickCMShareProjectInPEView(projectName);
-        for (String toInvite : invitees)
-            inviteUserToProject(toInvite);
-    }
-
     /**
      * This method captures two screenshots as side effect.
      */
@@ -631,6 +676,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         clickCMShareProjectInPEView(projectName);
         // clickProjectContextMenu(projectName, "Share project...");
+        waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
         selectCheckBoxWithList(invitees);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
@@ -684,7 +730,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void followUser(String participantJID, String sufix)
         throws RemoteException {
-        openSarosSessionView();
+        openSessionView();
         activateSharedSessionView();
         clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             participantJID + sufix, SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER);
@@ -702,16 +748,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     // clickTBLeaveTheSessionInSPSView();
     // delegate.sleep(sleepTime);
     // }
-
-    public void inviteUserToProject(String jid) throws RemoteException {
-        SWTBotView view = delegate.viewByTitle("Shared Project Session");
-        view.setFocus();
-        delegate.sleep(750);
-        view.toolbarButton("Open invitation interface").click();
-        selectCheckBoxWithText(jid);
-        delegate.sleep(750);
-        delegate.button(SarosConstant.BUTTON_FINISH).click();
-    }
 
     public void addContact(String plainJID) throws RemoteException {
         openRosterView();
@@ -734,22 +770,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     /**************** close ***********************/
-    public void closeRosterView() throws RemoteException {
-        closeViewWithText(SarosConstant.VIEW_TITLE_ROSTER);
-    }
-
-    public void closeSharedSessionView() throws RemoteException {
-        closeViewWithText(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
-    }
-
-    public void closeRemoteScreenView() throws RemoteException {
-        closeViewWithText(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
-    }
-
-    public void closeChatView() throws RemoteException {
-        closeViewWithText(SarosConstant.VIEW_TITLE_CHAT_VIEW);
-    }
-
     public void closePackageExplorerView() throws RemoteException {
         closeViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
     }
@@ -763,5 +783,4 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         return selectTreeWithLabelsInView(SarosConstant.VIEW_TITLE_ROSTER,
             "Buddies", contact);
     }
-
 }

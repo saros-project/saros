@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.RosterView;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -133,7 +134,7 @@ public class Musician {
     }
 
     public void giveDriverRole(Musician invitee) throws RemoteException {
-        bot.openSarosSessionView();
+        bot.openSessionView();
         activateSharedSessionView();
         bot.clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
             invitee.getPlainJid(), SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
@@ -190,13 +191,24 @@ public class Musician {
     }
 
     public void leaveSession() throws RemoteException {
-        if (!this.state.isDriver(this.jid)) {
-            bot.clickTBLeaveTheSessionInSPSView();
+        // Need to check for isDriver before leaving.
+        final boolean isDriver = this.state.isDriver(this.jid);
+        bot.clickTBLeaveTheSessionInSPSView();
+        if (!isDriver) {
             bot.confirmWindow(
                 SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
                 SarosConstant.BUTTON_YES);
         } else {
-            bot.clickTBLeaveTheSessionInSPSView();
+            Util.runSafeAsync(log, new Runnable() {
+                public void run() {
+                    try {
+                        bot.confirmWindow("Confirm Closing Session",
+                            SarosConstant.BUTTON_YES);
+                    } catch (RemoteException e) {
+                        // no popup
+                    }
+                }
+            });
         }
         bot.waitUntilSessionCloses();
     }
@@ -216,6 +228,7 @@ public class Musician {
 
     public void confirmInvitationWindow(Musician invitee)
         throws RemoteException {
+        bot.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
         bot.confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_INVITATION,
             SarosConstant.BUTTON_FINISH, invitee.getPlainJid());
     }
@@ -243,6 +256,7 @@ public class Musician {
 
     public void confirmContact(Musician questioner) throws RemoteException {
         // bot.ackContactAdded(questioner.getPlainJid());
+        bot.waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
         bot.confirmWindow(
             SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
             SarosConstant.BUTTON_OK);
@@ -306,7 +320,7 @@ public class Musician {
      */
     public void openSarosViews() throws RemoteException {
         bot.openRosterView();
-        bot.openSarosSessionView();
+        bot.openSessionView();
         bot.openChatView();
         bot.openRemoteScreenView();
     }

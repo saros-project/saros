@@ -48,13 +48,13 @@ public class TestShareProject {
     @AfterClass
     public static void cleanupInvitee() throws RemoteException {
         bob.xmppDisconnect();
-        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
         alice.xmppDisconnect();
-        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.deleteResource(BotConfiguration.PROJECTNAME);
     }
 
     @Test
@@ -69,11 +69,13 @@ public class TestShareProject {
         alice.bot
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
-        BotConfiguration.CLASSNAME);
+        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH,
+            BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
 
         log.trace("invitee.openFile");
-        bob.bot.openJavaFileWithEditor(BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        bob.bot.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
+            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         // invitee.sleep(2000);
         assertTrue(bob.state.isParticipant(bob.jid));
@@ -93,8 +95,8 @@ public class TestShareProject {
         log.trace("invitee.leave");
         assertFalse(bob.state.isParticipant(bob.jid));
 
-        alice.bot.waitUntilSessionCloses(bob.state);
-        alice.sleep(50);
+        bob.bot.waitUntilSessionCloses(bob.state);
+        // TODO Dialog "Do you really want to close" pops up
         alice.leaveSession();
         log.trace("inviter.leave");
         assertFalse(alice.state.isParticipant(alice.jid));

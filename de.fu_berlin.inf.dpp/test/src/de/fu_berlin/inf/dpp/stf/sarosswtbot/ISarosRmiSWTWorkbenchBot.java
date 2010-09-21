@@ -64,8 +64,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     /**
      * Invite given jid to the current shared project
      */
-    public void inviteUserToProject(String jid) throws RemoteException;
-
     public boolean isInSession() throws RemoteException;
 
     public boolean isInSharedProject(String jid) throws RemoteException;
@@ -86,9 +84,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void clickCMShareProjectInPEView(String projectName)
         throws RemoteException;
-
-    public void shareProjectSequential(String projectName,
-        String nameOfContextMenu, List<String> invitees) throws RemoteException;
 
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException;
@@ -154,7 +149,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void openRemoteScreenView() throws RemoteException;
 
-    public void openSarosSessionView() throws RemoteException;
+    public void openSessionView() throws RemoteException;
 
     public void openRosterView() throws RemoteException;
 
@@ -185,7 +180,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void closeRosterView() throws RemoteException;
 
-    public void closeSharedSessionView() throws RemoteException;
+    public void closeSessionView() throws RemoteException;
 
     public void closeRemoteScreenView() throws RemoteException;
 
@@ -205,5 +200,4 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         throws RemoteException;
 
     public void waitUntilSessionOpen() throws RemoteException;
-
 }
