@@ -686,7 +686,10 @@ public class RosterView extends ViewPart {
      * @swt Needs to called from UI thread.
      */
     protected void updateStatusInformation(final ConnectionState newState) {
-        label.setText(sarosUI.getDescription(newState));
+        if (label.getShell().isDisposed())
+            return;
+        final String description = sarosUI.getDescription(newState);
+        label.setText(description);
         composite.layout();
     }
 
