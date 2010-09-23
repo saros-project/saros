@@ -200,4 +200,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         throws RemoteException;
 
     public void waitUntilSessionOpen() throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
+        String projectName) throws RemoteException;
 }

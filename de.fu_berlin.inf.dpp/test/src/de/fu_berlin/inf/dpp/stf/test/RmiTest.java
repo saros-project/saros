@@ -60,10 +60,10 @@ public class RmiTest {
     public void TestIsFileExistWithGUI() throws RemoteException {
 
         alice.newProjectWithClass(projectName, "pkg", "Cls");
-        assertTrue(alice.bot.isFileExistedWithGUI(CLS_PATH));
+        assertTrue(alice.bot.isFileExistGUI(CLS_PATH));
         alice.bot.deleteResource(CLS_PATH);
 
-        assertFalse(alice.bot.isFileExistedWithGUI(CLS_PATH));
+        assertFalse(alice.bot.isFileExistGUI(CLS_PATH));
     }
 
     @Test

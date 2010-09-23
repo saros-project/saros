@@ -102,6 +102,11 @@ public class Musician {
             invitee.confirmSessionInvitationWizardUsingExistProject(this,
                 projectName);
             break;
+        case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
+            invitee
+                .confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
+                    this, projectName);
+            break;
         case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
             invitee.confirmSessionInvitationWizardUsingExistProjectWithCopy(
                 this, projectName);
@@ -209,6 +214,9 @@ public class Musician {
                     }
                 }
             });
+            if (bot.isShellActive("Confirm Closing Session"))
+                bot.confirmWindow("Confirm Closing Session",
+                    SarosConstant.BUTTON_YES);
         }
         bot.waitUntilSessionCloses();
     }
@@ -245,6 +253,14 @@ public class Musician {
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
         bot.confirmSessionInvitationWindowStep2UsingExistProject(projectName);
+    }
+
+    public void confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
+        Musician inviter, String projectName) throws RemoteException {
+        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
+        bot.confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(projectName);
+
     }
 
     public void confirmSessionInvitationWizardUsingExistProjectWithCopy(

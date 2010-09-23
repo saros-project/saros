@@ -594,9 +594,11 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void deleteResource(String fullPath) throws RemoteException;
 
-    public boolean isFileExistedWithGUI(String fullPath) throws RemoteException;
+    public boolean isFileExistGUI(String fullPath) throws RemoteException;
 
     public void revert() throws RemoteException;
 
     public boolean isFileExist(String fullPath) throws RemoteException;
+
+    public List<String> getAllProjects() throws RemoteException;
 }

@@ -129,24 +129,35 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void confirmSessionInvitationWindowStep2UsingExistProject(
         String projectName) throws RemoteException {
         clickRadio("Use existing project");
-        delegate.sleep(sleepTime);
         clickButton("Browse");
         confirmWindowWithTree("Folder Selection", SarosConstant.BUTTON_OK,
             projectName);
-        delegate.sleep(sleepTime);
+
         clickButton(SarosConstant.BUTTON_FINISH);
-        delegate.sleep(sleepTime);
+
         confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_YES);
         waitUntilShellCloses(getShellWithText(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
+    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
+        String projectName) throws RemoteException {
+        clickRadio("Use existing project");
+        clickButton("Browse");
+        confirmWindowWithTree("Folder Selection", SarosConstant.BUTTON_OK,
+            projectName);
+        clickButton(SarosConstant.BUTTON_FINISH);
+        confirmWindow("Warning: Local changes will be deleted",
+            SarosConstant.BUTTON_NO);
+    }
+
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
         String projectName) throws RemoteException {
         clickRadio("Use existing project");
-        delegate.sleep(sleepTime);
+        clickButton("Browse");
+        confirmWindowWithTree("Folder Selection", SarosConstant.BUTTON_OK,
+            projectName);
         clickCheckBox("Create copy for working distributed. New project name:");
-        delegate.sleep(sleepTime);
         clickButton(SarosConstant.BUTTON_FINISH);
         waitUntilShellCloses(getShellWithText(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }

@@ -222,7 +222,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void newJavaProject(String projectName) throws RemoteException {
         // TODO version without timeout
         final String baseName = projectName + "_base";
-        if (!isJavaProjectExist(baseName)) {
+        if (!isJavaProjectExist(projectName)) {
             activateEclipseShell();
             try {
                 // New Java Project
@@ -244,7 +244,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             waitUntilShellActive("New Java Project");
             final SWTBotShell newProjectDialog = delegate.activeShell();
 
-            setTextWithLabel("Project name:", baseName);
+            setTextWithLabel("Project name:", projectName);
             clickButton(SarosConstant.BUTTON_FINISH);
             waitUntilShellCloses(newProjectDialog);
 
@@ -1618,7 +1618,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
-    public boolean isFileExistedWithGUI(String CLS_PATH) throws RemoteException {
+    public boolean isFileExistGUI(String CLS_PATH) throws RemoteException {
         activateEclipseShell();
         openPackageExplorerView();
         activatePackageExplorerView();
@@ -1641,4 +1641,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return true;
     }
 
+    public List<String> getAllProjects() throws RemoteException {
+        SWTBotTree tree = getViewWithText(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+        List<String> projectNames = new ArrayList<String>();
+        for (int i = 0; i < tree.getAllItems().length; i++) {
+            projectNames.add(tree.getAllItems()[i].getText());
+        }
+        return projectNames;
+    }
 }

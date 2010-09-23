@@ -4,7 +4,8 @@ public class SarosConstant {
 
     public final static int CREATE_NEW_PROJECT = 1;
     public final static int USE_EXISTING_PROJECT = 2;
-    public final static int USE_EXISTING_PROJECT_WITH_COPY = 3;
+    public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
+    public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
     public final static String VIEW_TITLE_ROSTER = "Roster";
     public final static String VIEW_TITLE_CHAT_VIEW = "Chat View";
     public final static String VIEW_TITLE_SHARED_PROJECT_SESSION = "Shared Project Session";
@@ -40,6 +41,7 @@ public class SarosConstant {
     public final static String BUTTON_OK = "OK";
     public final static String BUTTON_CANCEL = "Cancel";
     public final static String BUTTON_YES = "Yes";
+    public final static String BUTTON_NO = "No";
 
     public final static String PERSPECTIVE_TITLE_JAVA = "Java";
     public final static String PERSPECTIVE_TITLE_DEBUG = "Debug";
