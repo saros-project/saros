@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
@@ -103,12 +104,10 @@ public class EditorAPI implements IEditorAPI {
                 Object adapter = getActiveEditor().getAdapter(
                     IEditorStatusLine.class);
                 if (adapter != null) {
-                    IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
-                    statusLine
-                        .setMessage(
-                            false,
-                            "You're not allowed to perform modifications while not being the driver of the session.",
-                            null);
+                    SessionView
+                        .showNotification(
+                            "Observer Notification",
+                            "You're not allowed to perform modifications while not being the driver of the session.");
                     Toolkit.getDefaultToolkit().beep();
                 }
             }
