@@ -100,8 +100,13 @@ public class RosterView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(RosterView.class);
 
+    @Inject
+    protected DiscoveryManager discoveryManager;
+
     public static final Image groupImage = SarosUI.getImage("icons/group.png");
     public static final Image personImage = SarosUI.getImage("icons/user.png");
+    public static final Image personImage_saros = SarosUI
+        .getImage("icons/user_saros.png");
     public static final Image personAwayImage = SarosUI
         .getImage("icons/clock.png");
     public static final Image personOfflineImage = new Image(
@@ -306,9 +311,16 @@ public class RosterView extends ViewPart {
         public Image getImage() {
             final Presence presence = roster.getPresence(jid);
 
-            // remember to show buddies offline if disconnecting or disconnected
+            // check if saros feature is supported. returns null if unsupported
+            JID rqPeer = discoveryManager.getSupportingPresence(getJID(),
+                Saros.NAMESPACE);
+
             if (presence.isAvailable() && saros.isConnected()) {
-                return presence.isAway() ? personAwayImage : personImage;
+                if (presence.isAway()) {
+                    return personAwayImage;
+                } else {
+                    return rqPeer == null ? personImage : personImage_saros;
+                }
             } else {
                 return personOfflineImage;
             }
