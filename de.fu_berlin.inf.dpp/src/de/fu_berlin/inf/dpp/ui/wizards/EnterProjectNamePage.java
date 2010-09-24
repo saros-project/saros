@@ -12,6 +12,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -288,8 +289,8 @@ class EnterProjectNamePage extends WizardPage {
             return null;
         }
         // TODO More error Checking
-        return ResourcesPlugin.getWorkspace().getRoot().findMember(
-            (Path) result[0]).getProject().getName();
+        return ResourcesPlugin.getWorkspace().getRoot()
+            .findMember((Path) result[0]).getProject().getName();
     }
 
     public void createControl(Composite parent) {
@@ -313,8 +314,8 @@ class EnterProjectNamePage extends WizardPage {
         this.projUpd.setText("Use existing project");
         this.projUpd.setSelection(joinSessionWizard.isUpdateSelected());
 
-        createUpdateProjectGroup(composite, joinSessionWizard
-            .getUpdateProject());
+        createUpdateProjectGroup(composite,
+            joinSessionWizard.getUpdateProject());
 
         if (preferenceUtils.isSkipSyncSelectable()) {
             this.skipCheckbox = new Button(composite, SWT.CHECK);
@@ -362,6 +363,27 @@ class EnterProjectNamePage extends WizardPage {
         };
 
         this.projCopy.addSelectionListener(s);
+
+        this.projUpd.addSelectionListener(new SelectionListener() {
+
+            public void widgetSelected(SelectionEvent e) {
+
+                // quickly scan for existing project with the same name
+                if (projUpd.getSelection()
+                    && !JoinSessionWizardUtils
+                        .projectIsUnique(joinSessionWizard.process
+                            .getProjectName())) {
+                    updateProjectText.setText(joinSessionWizard.process
+                        .getProjectName());
+                }
+
+            }
+
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // do nothing
+
+            }
+        });
 
         s.widgetSelected(null);
     }
@@ -466,8 +488,8 @@ class EnterProjectNamePage extends WizardPage {
     public IProject getSourceProject() {
 
         if (isUpdateSelected()) {
-            return ResourcesPlugin.getWorkspace().getRoot().getProject(
-                this.updateProjectText.getText());
+            return ResourcesPlugin.getWorkspace().getRoot()
+                .getProject(this.updateProjectText.getText());
         } else {
             return null;
         }
