@@ -82,9 +82,10 @@ public class TestShare3UsersConcurrently {
         alice = result.get(0);
         bob = result.get(1);
         carl = result.get(2);
+        String projectName = BotConfiguration.PROJECTNAME;
 
-        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        alice.bot.newJavaProject(projectName);
+        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
     protected static <T> List<T> workAll(List<Callable<T>> tasks)
@@ -117,7 +118,7 @@ public class TestShare3UsersConcurrently {
                     musician.xmppDisconnect();
                     final String projectName = BotConfiguration.PROJECTNAME;
                     if (musician.bot.isJavaProjectExist(projectName))
-                        musician.bot.deleteResource(projectName);
+                        musician.bot.deleteProject(projectName);
                     return null;
                 }
             });

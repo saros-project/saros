@@ -120,7 +120,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * Adds a new Java class with the given name in given project inside given
      * package.
      */
-    public void newJavaClass(String project, String pkg, String name)
+    public void newClass(String project, String pkg, String name)
         throws RemoteException;
 
     /**
@@ -130,7 +130,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * &quot;Foo-&quot;
      * </pre>
      */
-    public void newJavaProject() throws RemoteException;
+    // public void newJavaProject() throws RemoteException;
 
     /**
      * Adds a new Java Project with the given name.
@@ -554,8 +554,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException;
 
-    public boolean isJavaClassExist(String className, String projectName,
-        String pkg) throws RemoteException;
+    public boolean isClassExist(String className, String projectName, String pkg)
+        throws RemoteException;
 
     public boolean isInSVN() throws RemoteException;
 
@@ -592,13 +592,28 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void switchToOtherRevision(String CLS_PATH) throws RemoteException;
 
-    public void deleteResource(String fullPath) throws RemoteException;
+    public void deleteProject(String fullPath) throws RemoteException;
 
-    public boolean isFileExistGUI(String fullPath) throws RemoteException;
+    public boolean isClassExistGUI(String... matchTexts) throws RemoteException;
 
     public void revert() throws RemoteException;
 
-    public boolean isFileExist(String fullPath) throws RemoteException;
+    public boolean isResourceExist(String fullPath) throws RemoteException;
 
     public List<String> getAllProjects() throws RemoteException;
+
+    public void deleteProjectGui(String projectName) throws RemoteException;
+
+    public void deleteFileGui(String... labels) throws RemoteException;
+
+    public void deleteClass(String projectName, String pkg, String className)
+        throws RemoteException;
+
+    public List<String> getPerspectiveTitles() throws RemoteException;
+
+    public List<String> getEditorTitles() throws RemoteException;
+
+    public void newJavaProjectWithClass(String projectName, String pkg,
+        String className) throws RemoteException;
+
 }

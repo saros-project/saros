@@ -26,8 +26,8 @@ public class SarosConditions extends Conditions {
         return new ExistTreeItem(treeItem, nodeName);
     }
 
-    public static ICondition existTree(SWTBotTree tree, String nodeName) {
-        return new ExistTree(tree, nodeName);
+    public static ICondition existTree(SWTBotTree tree, String... nodeNames) {
+        return new ExistTree(tree, nodeNames);
     }
 
     public static ICondition ShellActive(SWTWorkbenchBot bot, String title) {

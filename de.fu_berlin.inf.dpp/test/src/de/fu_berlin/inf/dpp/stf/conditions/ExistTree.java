@@ -3,15 +3,16 @@ package de.fu_berlin.inf.dpp.stf.conditions;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class ExistTree extends DefaultCondition {
 
     private SWTBotTree tree;
-    private String nodeText;
+    private String[] nodeTexts;
 
-    ExistTree(SWTBotTree tree, String nodeText) {
+    ExistTree(SWTBotTree tree, String... nodeTexts) {
         this.tree = tree;
-        this.nodeText = nodeText;
+        this.nodeTexts = nodeTexts;
     }
 
     public String getFailureMessage() {
@@ -21,7 +22,14 @@ public class ExistTree extends DefaultCondition {
 
     public boolean test() throws Exception {
         try {
-            tree.getTreeItem(nodeText);
+            SWTBotTreeItem item = null;
+            for (int i = 0; i < nodeTexts.length; i++) {
+                if (item == null)
+                    item = tree.getTreeItem(nodeTexts[i]);
+                else {
+                    item = item.getNode(nodeTexts[i]);
+                }
+            }
             return true;
         } catch (WidgetNotFoundException e) {
             return false;

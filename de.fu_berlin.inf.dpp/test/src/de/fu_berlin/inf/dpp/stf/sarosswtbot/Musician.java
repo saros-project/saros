@@ -278,23 +278,6 @@ public class Musician {
             SarosConstant.BUTTON_OK);
     }
 
-    /***************** new widget *******************/
-
-    public void newProjectWithClass(String projectName, String packageName,
-        String className) throws RemoteException {
-
-        if (!bot.isJavaProjectExist(projectName)) {
-            bot.newJavaProject(projectName);
-        }
-        newJavaClassInProject(projectName, packageName, className);
-    }
-
-    public void newJavaClassInProject(String projectName, String packageName,
-        String className) throws RemoteException {
-        if (!bot.isJavaClassExist(projectName, packageName, className))
-            bot.newJavaClass(projectName, packageName, className);
-    }
-
     public String getName() {
         return jid.getName();
     }

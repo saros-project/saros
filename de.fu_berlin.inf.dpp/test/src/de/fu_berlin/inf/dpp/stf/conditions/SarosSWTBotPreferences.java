@@ -5,7 +5,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 public class SarosSWTBotPreferences extends SWTBotPreferences {
 
     public static long SAROS_TIMEOUT = toLong(
-        System.getProperty(KEY_TIMEOUT, "20000"), 2000);
+        System.getProperty(KEY_TIMEOUT, "50000"), 2000);
 
     private static long toLong(String timeoutValue, long defaultValue) {
         try {

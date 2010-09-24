@@ -691,6 +691,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
         selectCheckBoxWithList(invitees);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         clickButton(SarosConstant.BUTTON_FINISH);
     }
 

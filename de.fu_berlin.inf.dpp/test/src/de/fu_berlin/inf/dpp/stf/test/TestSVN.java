@@ -43,13 +43,13 @@ public class TestSVN {
     public static void tearDownBob() throws Exception {
 
         bob.xmppDisconnect();
-        bob.bot.deleteResource(BotConfiguration.PROJECTNAME_SVN);
+        bob.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
     @AfterClass
     public static void tearDownAlice() throws Exception {
         alice.xmppDisconnect();
-        alice.bot.deleteResource(BotConfiguration.PROJECTNAME_SVN);
+        alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
     @Test
@@ -136,10 +136,11 @@ public class TestSVN {
         // Make sure Bob has no file Main.java.
         // Alice reverts the project "test".
         // Make sure Bob has the file Main.java.
-        alice.bot.deleteResource(CLS_PATH);
-        assertFalse(bob.bot.isFileExist(CLS_PATH));
+        alice.bot.deleteProject(CLS_PATH);
+        bob.sleep(1000);
+        assertFalse(bob.bot.isResourceExist(CLS_PATH));
         alice.bot.revert();
-        // bob.sleep(2000);
-        assertTrue(bob.bot.isFileExist(CLS_PATH));
+        bob.sleep(1000);
+        assertTrue(bob.bot.isResourceExist(CLS_PATH));
     }
 }

@@ -26,6 +26,7 @@ public class TestShareProjectUsingExistingProject {
     private static final String CLS = BotConfiguration.CLASSNAME;
     private static final String CLS2 = BotConfiguration.CLASSNAME2;
     private static final String PROJECT2 = BotConfiguration.PROJECTNAME + " 2";
+
     private static final String CLS2_PATH_IN_PROJECT = PROJECT + "/src/my/pkg/"
         + CLS2 + ".java";
     private static final String CLS_PATH_IN_PROJECT2 = PROJECT2
@@ -53,33 +54,35 @@ public class TestShareProjectUsingExistingProject {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.newProjectWithClass(PROJECT, PKG, CLS);
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newClass(PROJECT, PKG, CLS);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.newProjectWithClass(PROJECT, PKG, CLS2);
+        bob.bot.newJavaProject(PROJECT);
+        bob.bot.newClass(PROJECT, PKG, CLS2);
     }
 
     @After
     public void cleanupBob() throws RemoteException {
         bob.leaveSession();
-        bob.bot.deleteResource(PROJECT);
+        bob.bot.deleteProject(PROJECT);
     }
 
     @After
     public void cleanupAlice() throws RemoteException {
         alice.leaveSession();
-        alice.bot.deleteResource(PROJECT);
+        alice.bot.deleteProject(PROJECT);
     }
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.bot.isFileExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         alice.buildSession(bob, PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.USE_EXISTING_PROJECT);
-        assertFalse(bob.bot.isFileExist(CLS2_PATH_IN_PROJECT));
+        assertFalse(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         assertFalse(bob.bot.isJavaProjectExist(PROJECT2));
 
     }
@@ -96,10 +99,10 @@ public class TestShareProjectUsingExistingProject {
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
         assertTrue(bob.bot.isJavaProjectExist(PROJECT));
-        assertTrue(bob.bot.isFileExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
-        assertTrue(bob.bot.isFileExist(CLS_PATH_IN_PROJECT2));
-        bob.bot.deleteResource(PROJECT2);
+        assertTrue(bob.bot.isResourceExist(CLS_PATH_IN_PROJECT2));
+        bob.bot.deleteProject(PROJECT2);
 
     }
 
@@ -110,10 +113,10 @@ public class TestShareProjectUsingExistingProject {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
             SarosConstant.USE_EXISTING_PROJECT_WITH_COPY);
         assertTrue(bob.bot.isJavaProjectExist(PROJECT));
-        assertTrue(bob.bot.isFileExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
-        assertTrue(bob.bot.isFileExist(CLS_PATH_IN_PROJECT2));
-        bob.bot.deleteResource(PROJECT2);
+        assertTrue(bob.bot.isResourceExist(CLS_PATH_IN_PROJECT2));
+        bob.bot.deleteProject(PROJECT2);
 
     }
 }

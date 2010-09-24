@@ -34,7 +34,8 @@ public class TestFollowMode {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.newProjectWithClass(PROJECT, PKG, CLS1);
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newClass(PROJECT, PKG, CLS1);
 
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
@@ -50,13 +51,13 @@ public class TestFollowMode {
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.xmppDisconnect();
-        bob.bot.deleteResource(PROJECT);
+        bob.bot.deleteProject(PROJECT);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
         alice.xmppDisconnect();
-        alice.bot.deleteResource(PROJECT);
+        alice.bot.deleteProject(PROJECT);
     }
 
     @After
@@ -84,7 +85,7 @@ public class TestFollowMode {
             .getTextOfJavaEditor(PROJECT, PKG, CLS1);
         assertTrue(textFromInviter.equals(textFormInvitee));
 
-        alice.newJavaClassInProject(PROJECT, PKG, CLS2);
+        alice.bot.newClass(PROJECT, PKG, CLS2);
         bob.bot.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.bot.isJavaEditorActive(CLS2));
 
@@ -95,7 +96,7 @@ public class TestFollowMode {
         assertTrue(alice.bot.isJavaEditorActive(CLS1));
 
         bob.followUser(alice);
-        alice.newJavaClassInProject(PROJECT, PKG, CLS3);
+        alice.bot.newClass(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT,
             PKG, CLS3);

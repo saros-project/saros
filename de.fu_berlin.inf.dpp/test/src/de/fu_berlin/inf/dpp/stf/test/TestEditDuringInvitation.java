@@ -39,7 +39,7 @@ public class TestEditDuringInvitation {
             BotConfiguration.PORT_CARL);
         carl.initBot();
         if (carl.bot.isJavaProjectExist(PROJECT))
-            carl.bot.deleteResource(PROJECT);
+            carl.bot.deleteProject(PROJECT);
         assertFalse(carl.bot.isJavaProjectExist(PROJECT));
     }
 
@@ -50,7 +50,7 @@ public class TestEditDuringInvitation {
             BotConfiguration.PORT_BOB);
         bob.initBot();
         if (bob.bot.isJavaProjectExist(PROJECT))
-            bob.bot.deleteResource(PROJECT);
+            bob.bot.deleteProject(PROJECT);
         assertFalse(bob.bot.isJavaProjectExist(PROJECT));
     }
 
@@ -61,26 +61,19 @@ public class TestEditDuringInvitation {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.newProjectWithClass(PROJECT, BotConfiguration.PACKAGENAME,
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newClass(PROJECT, BotConfiguration.PACKAGENAME,
             BotConfiguration.CLASSNAME);
     }
 
     @AfterClass
-    public static void cleanupBob() throws RemoteException {
-        bob.xmppDisconnect();
-        bob.bot.deleteResource(PROJECT);
-    }
-
-    @AfterClass
-    public static void cleanupCarl() throws RemoteException {
+    public static void cleanup() throws RemoteException {
         carl.xmppDisconnect();
-        carl.bot.deleteResource(PROJECT);
-    }
-
-    @AfterClass
-    public static void cleanupAlice() throws RemoteException {
+        carl.bot.deleteProject(PROJECT);
+        bob.xmppDisconnect();
+        bob.bot.deleteProject(PROJECT);
         alice.xmppDisconnect();
-        alice.bot.deleteResource(PROJECT);
+        alice.bot.deleteProject(PROJECT);
     }
 
     private static final Logger log = Logger

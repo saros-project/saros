@@ -41,20 +41,21 @@ public class TestShareProject {
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
-        alice.newProjectWithClass(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        String projectName = BotConfiguration.PROJECTNAME;
+        alice.bot.newJavaProject(projectName);
+        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee() throws RemoteException {
         bob.xmppDisconnect();
-        bob.bot.deleteResource(BotConfiguration.PROJECTNAME);
+        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
         alice.xmppDisconnect();
-        alice.bot.deleteResource(BotConfiguration.PROJECTNAME);
+        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @Test
