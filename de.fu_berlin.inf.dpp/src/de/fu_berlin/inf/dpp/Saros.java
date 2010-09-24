@@ -70,6 +70,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
+import org.picocontainer.annotations.Inject;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
@@ -689,16 +690,42 @@ public class Saros extends AbstractUIPlugin {
         });
     }
 
+    @Inject
+    PreferenceUtils preferenceUtils;
+    @Inject
+    StatisticManager statisticManager;
+    @Inject
+    ErrorLogManager errorLogManager;
+
     /**
-     * Connects using the credentials from the preferences. It uses TLS if
-     * possible.
+     * Connects using the credentials from the preferences. If no credentials
+     * are present a wizard is opened before. It uses TLS if possible.
      * 
-     * If there is already a established connection when calling this method, it
-     * disconnects before connecting (including state transitions!).
+     * If there is already an established connection when calling this method,
+     * it disconnects before connecting (including state transitions!).
      * 
      * @blocking
      */
     public void connect(boolean failSilently) {
+        // check if we need to do a reinject
+        if (preferenceUtils == null || statisticManager == null
+            || errorLogManager == null)
+            Saros.reinject(this);
+
+        /*
+         * see if we have a user name and an agreement to submitting user
+         * statistics and the error log, if not, show wizard before connecting
+         */
+        boolean hasUsername = preferenceUtils.hasUserName();
+        boolean hasAgreement = statisticManager.hasStatisticAgreement()
+            && errorLogManager.hasErrorLogAgreement();
+
+        if (!hasUsername || !hasAgreement) {
+            boolean ok = Util.showConfigurationWizard(!hasUsername,
+                !hasAgreement);
+            if (!ok)
+                return;
+        }
 
         IPreferenceStore prefStore = getPreferenceStore();
 

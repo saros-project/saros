@@ -106,8 +106,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
-                        log
-                            .info("User clicked too fast, running already a connect or disconnect.");
+                        log.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
                     runConnectDisconnect();
@@ -122,24 +121,9 @@ public class ConnectDisconnectAction extends Action implements Disposable {
         try {
             if (saros.isConnected()) {
                 saros.disconnect();
-                return;
+            } else {
+                saros.connect(false);
             }
-            /*
-             * see if we have a user name and an agreement to submitting user
-             * statistics and the error log, if not, show wizard before
-             * connecting
-             */
-            boolean hasUsername = preferenceUtils.hasUserName();
-            boolean hasAgreement = statisticManager.hasStatisticAgreement()
-                && errorLogManager.hasErrorLogAgreement();
-
-            if (!hasUsername || !hasAgreement) {
-                boolean ok = Util.showConfigurationWizard(!hasUsername,
-                    !hasAgreement);
-                if (!ok)
-                    return;
-            }
-            saros.connect(false);
 
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);

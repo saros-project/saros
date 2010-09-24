@@ -72,8 +72,17 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
     public void runNewSession(List<IResource> resource,
         boolean useVersionControl) {
         try {
-            sessionManager.startSession(this.selectedProject, resource,
-                useVersionControl);
+            boolean running = sessionManager.getSarosSession() != null;
+            boolean connected = saros.isConnected();
+
+            if (!connected) {
+                saros.connect(false);
+            }
+            if (running) {
+                sessionManager.openInviteDialog(null);
+            } else
+                sessionManager.startSession(this.selectedProject, resource,
+                    useVersionControl);
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -89,16 +98,6 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
 
     public void selectionChanged(IAction action, ISelection selection) {
         this.selectedProject = getProject(selection);
-
-        boolean running = sessionManager.getSarosSession() != null;
-        boolean connected = saros.isConnected();
-
-        // TODO This action should rather connect if not already connected
-        // instead of being disabled.
-
-        action.setEnabled(connected && !running
-            && (this.selectedProject != null)
-            && this.selectedProject.isAccessible());
     }
 
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
