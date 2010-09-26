@@ -76,4 +76,12 @@ public class SarosConditions extends Conditions {
     public static ICondition isInSVN(String projectName) {
         return new IsInSVN(projectName);
     }
+
+    public static ICondition isResourceExist(String resourcePath) {
+        return new ExistResource(resourcePath);
+    }
+
+    public static ICondition isResourceNotExist(String resourcePath) {
+        return new ExistNoResource(resourcePath);
+    }
 }

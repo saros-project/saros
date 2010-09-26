@@ -472,7 +472,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public SWTBotTableItem selectTableItemWithLabelInView(String viewTitle,
         String label) throws RemoteException;
 
-    public void waitUntilEditorActive(String name) throws RemoteException;
+    // public void waitUntilEditorActive(String name) throws RemoteException;
 
     public void selectCheckBoxWithText(String invitee) throws RemoteException;
 
@@ -554,7 +554,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException;
 
-    public boolean isClassExist(String className, String projectName, String pkg)
+    public boolean isClassExist(String projectName, String pkg, String className)
         throws RemoteException;
 
     public boolean isInSVN() throws RemoteException;
@@ -615,5 +615,45 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void newJavaProjectWithClass(String projectName, String pkg,
         String className) throws RemoteException;
+
+    public void renameFile(String newName, String... texts)
+        throws RemoteException;
+
+    public void waitUntilClassExist(String projectName, String pkg,
+        String className) throws RemoteException;
+
+    public void waitUntilClassNotExist(String projectName, String pkg,
+        String className) throws RemoteException;
+
+    public boolean isPkgExist(String projectName, String pkg)
+        throws RemoteException;
+
+    public void newPkg(String projectName, String pkg) throws RemoteException;
+
+    public void waitUntilPkgExist(String projectName, String pkg)
+        throws RemoteException;
+
+    public void waitUntilPkgNotExist(String projectName, String pkg)
+        throws RemoteException;
+
+    public void deletePkg(String projectName, String pkg)
+        throws RemoteException;
+
+    public void moveClassTo(String projectName, String pkg, String className,
+        String targetProject, String targetPkg) throws RemoteException;
+
+    // public InputStream getContentOfClass(String projectName, String pkg,
+    // String className) throws RemoteException;
+    //
+    // public boolean isTwoClassSame(String projectName1, String pkg1,
+    // String className1, String projectName2, String pkg2, String className2)
+    // throws RemoteException, IOException;
+
+    public SWTBotShell getEclipseShell() throws RemoteException;
+
+    public void resetWorkbench() throws RemoteException;
+
+    public void renamePkg(String newName, String... texts)
+        throws RemoteException;
 
 }

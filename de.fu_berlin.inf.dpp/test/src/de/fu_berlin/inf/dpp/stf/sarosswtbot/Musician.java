@@ -324,14 +324,15 @@ public class Musician {
         bot.openRemoteScreenView();
     }
 
-    public boolean isInFollowMode(Musician participant) throws RemoteException {
-
-        if (participant.state.isDriver(participant.jid)) {
-            return bot.isInFollowMode(participant.jid.getBase(), " (Driver)");
-        } else {
-            return bot.isInFollowMode(participant.jid.getBase(), "");
-        }
-    }
+    // public boolean isInFollowMode(Musician participant) throws
+    // RemoteException {
+    //
+    // if (participant.state.isDriver(participant.jid)) {
+    // return bot.isInFollowMode(participant.jid.getBase(), " (Driver)");
+    // } else {
+    // return bot.isInFollowMode(participant.jid.getBase(), "");
+    // }
+    // }
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
         return bot.isPerspectiveActive(SarosConstant.PERSPECTIVE_TITLE_DEBUG);

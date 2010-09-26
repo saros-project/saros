@@ -98,8 +98,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickCMgiveDriverRoleInSPSView(String inviteeJID)
     // throws RemoteException;
 
-    public boolean isInFollowMode(String participantJID, String sufix)
-        throws RemoteException;
+    // public boolean isInFollowMode(String participantJID, String sufix)
+    // throws RemoteException;
 
     public void clickShareYourScreenWithSelectedUserInSPSView()
         throws RemoteException;

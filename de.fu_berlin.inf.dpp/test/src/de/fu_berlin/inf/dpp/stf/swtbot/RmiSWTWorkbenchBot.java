@@ -212,6 +212,22 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
+    public void deletePkg(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/"));
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + projectName, e);
+            }
+        }
+    }
+
     public void deleteClass(String projectName, String pkg, String className)
         throws RemoteException {
         IPath path = new Path(projectName + "/src/"
@@ -296,6 +312,24 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 log.debug("Couldn't copy project " + baseName, e);
             }
         }
+    }
+
+    public void newPkg(String projectName, String pkg) throws RemoteException {
+        if (!isPkgExist(projectName, pkg))
+            try {
+                activateEclipseShell();
+                clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+                    SarosConstant.MENU_TITLE_NEW, "Package");
+                activateShellWithMatchText("New Java Package");
+                setTextWithLabel("Source folder:", projectName + "/src");
+                setTextWithLabel("Name:", pkg);
+                clickButton(SarosConstant.BUTTON_FINISH);
+                waitUntilShellCloses("New java Package");
+            } catch (WidgetNotFoundException e) {
+                final String cause = "error creating new package";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
     }
 
     public void newClass(String projectName, String pkg, String className)
@@ -444,6 +478,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         String... itemNames) throws RemoteException {
         // waitUntilShellActive(shellName);
         SWTBotTree tree = delegate.tree();
+        log.info("allItems " + tree.getAllItems().length);
         selectTreeWithLabels(tree, itemNames);
         waitUntilButtonEnabled(buttonName);
         clickButton(buttonName);
@@ -531,6 +566,18 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isResourceExist(String CLS_PATH) throws RemoteException {
         IPath path = new Path(CLS_PATH);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            return false;
+        return true;
+    }
+
+    public boolean isPkgExist(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/"));
+
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
         if (resource == null)
@@ -822,6 +869,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /************* get widget **************************/
 
+    public SWTBotShell getEclipseShell() throws RemoteException {
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(".+? - .+")) {
+                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+
+                return shell;
+            }
+        }
+        final String message = "No shell found matching \"" + ".+? - .+"
+            + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
+
     public List<String> getAllProjects() throws RemoteException {
         SWTBotTree tree = getViewWithText(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
@@ -1016,6 +1078,69 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return getTextEditor(className + ".java");
     }
 
+    // public boolean isTwoClassSame(String projectName1, String pkg1,
+    // String className1, String projectName2, String pkg2, String className2)
+    // throws RemoteException, IOException {
+    // InputStream input1 = getContentOfClass(projectName1, pkg1, className1);
+    // InputStream input2 = getContentOfClass(projectName2, pkg2, className2);
+    // boolean error = false;
+    // try {
+    // byte[] buffer1 = new byte[1024];
+    // byte[] buffer2 = new byte[1024];
+    // try {
+    // int numRead1 = 0;
+    // int numRead2 = 0;
+    // while (true) {
+    // numRead1 = input1.read(buffer1);
+    // numRead2 = input2.read(buffer2);
+    // if (numRead1 > -1) {
+    // if (numRead2 != numRead1)
+    // return false;
+    // // Otherwise same number of bytes read
+    // if (!Arrays.equals(buffer1, buffer2))
+    // return false;
+    // // Otherwise same bytes read, so continue ...
+    // } else {
+    // // Nothing more in stream 1 ...
+    // return numRead2 < 0;
+    // }
+    // }
+    // } finally {
+    // input1.close();
+    // }
+    // } catch (IOException e) {
+    // error = true; // this error should be thrown, even if there is an
+    // // error closing stream 2
+    // throw e;
+    // } catch (RuntimeException e) {
+    // error = true; // this error should be thrown, even if there is an
+    // // error closing stream 2
+    // throw e;
+    // } finally {
+    // try {
+    // input2.close();
+    // } catch (IOException e) {
+    // if (!error)
+    // throw e;
+    // }
+    // }
+    // }
+    //
+    // public InputStream getContentOfClass(String projectName, String pkg,
+    // String className) throws RemoteException {
+    // IPath path = new Path(projectName + "/src/"
+    // + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+    // log.info("Checking existence of file \"" + path + "\"");
+    // final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+    // .getFile(path);
+    // try {
+    // return file.getContents();
+    // } catch (CoreException e) {
+    // log.debug("", e);
+    // }
+    // return null;
+    // }
+
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
         openJavaFileWithEditor(projectName, packageName, className);
@@ -1068,7 +1193,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
         }
         if (selectedTreeItem != null) {
+            log.info("treeItem name: " + selectedTreeItem.getText());
             selectedTreeItem.select();
+            selectedTreeItem.click();
             return selectedTreeItem;
         }
         return null;
@@ -1455,6 +1582,32 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /********************** waitUntil ********************/
 
+    public void waitUntilPkgExist(String projectName, String pkg)
+        throws RemoteException {
+        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
+        waitUntil(SarosConditions.isResourceExist(path));
+    }
+
+    public void waitUntilPkgNotExist(String projectName, String pkg)
+        throws RemoteException {
+        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
+        waitUntil(SarosConditions.isResourceNotExist(path));
+    }
+
+    public void waitUntilClassExist(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
+            + className + ".java";
+        waitUntil(SarosConditions.isResourceExist(path));
+    }
+
+    public void waitUntilClassNotExist(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
+            + className + ".java";
+        waitUntil(SarosConditions.isResourceNotExist(path));
+    }
+
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
         waitUntil(SarosConditions.isNotInSVN(projectName));
@@ -1487,7 +1640,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilEditorActive(className + ".java");
     }
 
-    public void waitUntilEditorActive(String name) throws RemoteException {
+    public void waitUntilEditorActive(String name) {
         waitUntil(SarosConditions.isEditorActive(delegate, name));
     }
 
@@ -1687,4 +1840,76 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilShellCloses("Revert");
     }
 
+    public void renameFile(String newName, String... texts)
+        throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(texts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Rename...");
+        activateShellWithText("Rename Compilation Unit");
+        setTextWithLabel("New name:", newName);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        clickButton(SarosConstant.BUTTON_FINISH);
+    }
+
+    public void renamePkg(String newName, String... texts)
+        throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(texts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Rename...");
+        activateShellWithText("Rename Package");
+        setTextWithLabel("New name:", newName);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("Rename Package");
+    }
+
+    public void moveClassTo(String projectName, String pkg, String className,
+        String targetProject, String targetPkg) throws RemoteException {
+        openPackageExplorerView();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(projectName, "src", pkg, className);
+        log.info("matchTexts: " + matchTexts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Move...");
+        waitUntilShellActive("Move");
+        confirmWindowWithTree("Move", SarosConstant.BUTTON_OK, targetProject,
+            "src", targetPkg);
+
+    }
+
+    protected String[] changeToRegex(String... texts) {
+        String[] matchTexts = new String[texts.length];
+        for (int i = 0; i < texts.length; i++) {
+            matchTexts[i] = texts[i] + ".*";
+        }
+        return matchTexts;
+    }
+
+    public void resetWorkbench() throws RemoteException {
+        List<? extends SWTBotEditor> editors = delegate.editors();
+        for (SWTBotEditor editor : editors) {
+            editor.close();
+        }
+
+        // if (delegate.activeShell() != null) {
+        // SWTBotShell activeShell = delegate.activeShell();
+        // if (activeShell != getEclipseShell()) {
+        // activeShell.close();
+        // }
+        // }
+
+        // page.resetPerspective();
+        // String defaultPerspectiveId = workbench.getPerspectiveRegistry()
+        // .getDefaultPerspective();
+        // workbench.showPerspective(defaultPerspectiveId, workbenchWindow);
+        // page.resetPerspective();
+
+    }
 }

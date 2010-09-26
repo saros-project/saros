@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test;
+package de.fu_berlin.inf.dpp.stf.test.rolesAndFollowmode;
 
 import static org.junit.Assert.assertTrue;
 
@@ -62,9 +62,9 @@ public class TestFollowMode {
 
     @After
     public void StopFollowMode() throws RemoteException {
-        if (bob.isInFollowMode(alice))
+        if (bob.state.isFollowing())
             bob.clickCMStopfollowingThisUserInSPSView(alice);
-        if (alice.isInFollowMode(bob))
+        if (alice.state.isFollowing())
             alice.clickCMStopfollowingThisUserInSPSView(bob);
 
     }
@@ -75,7 +75,7 @@ public class TestFollowMode {
             PKG, CLS1);
         bob.followUser(alice);
         bob.bot.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.isInFollowMode(alice));
+        assertTrue(bob.state.isFollowing());
         assertTrue(bob.bot.isJavaEditorActive(CLS1));
 
         String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG,
@@ -92,7 +92,7 @@ public class TestFollowMode {
         alice.followUser(bob);
         bob.bot.activateJavaEditor(CLS1);
         alice.bot.waitUntilJavaEditorActive(CLS1);
-        assertTrue(alice.isInFollowMode(bob));
+        assertTrue(alice.state.isFollowing());
         assertTrue(alice.bot.isJavaEditorActive(CLS1));
 
         bob.followUser(alice);

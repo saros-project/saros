@@ -531,14 +531,17 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     /*************** is... ******************/
 
-    public boolean isInFollowMode(String participantJID, String sufix)
-        throws RemoteException {
-        openSessionView();
-        activateSharedSessionView();
-        return isContextMenuOfTableItemInViewExist(
-            BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
-            SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
+    // public boolean isInFollowMode(String participantJID, String sufix)
+    // throws RemoteException {
+    // openSessionView();
+    // activateSharedSessionView();
+    // return isContextMenuOfTableItemInViewExist(
+    // BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
+    // SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
+    // }
 
+    public boolean isFollowing() throws RemoteException {
+        return state.isFollowing();
     }
 
     public boolean isConnectedByXmppGuiCheck() throws RemoteException {

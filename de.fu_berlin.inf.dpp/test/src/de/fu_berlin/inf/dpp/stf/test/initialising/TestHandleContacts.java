@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test;
+package de.fu_berlin.inf.dpp.stf.test.initialising;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

@@ -120,11 +120,7 @@ public class SarosState implements ISarosState {
         return saros.isConnected();
     }
 
-    public boolean isInFollowMode(JID jid) throws RemoteException {
-        // ISarosSession sarosSession = sessionManager.getSarosSession();
-        // User user = sarosSession.getUser(jid);
-        //
-        // editorManager.getFollowedUser();
+    public boolean isFollowing() throws RemoteException {
         return editorManager.isFollowing();
     }
 
@@ -225,4 +221,5 @@ public class SarosState implements ISarosState {
         return bundle.getLocation().substring(16)
             + BotConfiguration.SCREENSHOTDIR;
     }
+
 }
