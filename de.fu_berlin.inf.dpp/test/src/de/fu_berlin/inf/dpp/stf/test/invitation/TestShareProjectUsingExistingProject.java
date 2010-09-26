@@ -7,6 +7,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -54,26 +55,26 @@ public class TestShareProjectUsingExistingProject {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.bot.newJavaProject(PROJECT);
-        alice.bot.newClass(PROJECT, PKG, CLS);
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.bot.newJavaProject(PROJECT);
-        bob.bot.newClass(PROJECT, PKG, CLS2);
+        bob.bot.newJavaProjectWithClass(PROJECT, PKG, CLS2);
     }
 
     @After
-    public void cleanupBob() throws RemoteException {
+    public void cleanupAliceAndBob() throws RemoteException {
         bob.leaveSession();
+        alice.leaveSession();
+        alice.bot.deleteProject(PROJECT);
         bob.bot.deleteProject(PROJECT);
     }
 
-    @After
-    public void cleanupAlice() throws RemoteException {
-        alice.leaveSession();
-        alice.bot.deleteProject(PROJECT);
+    @AfterClass
+    public static void cleanup() throws RemoteException {
+        bob.xmppDisconnect();
+        alice.xmppDisconnect();
     }
 
     @Test

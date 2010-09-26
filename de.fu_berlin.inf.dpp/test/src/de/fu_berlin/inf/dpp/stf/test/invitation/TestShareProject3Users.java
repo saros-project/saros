@@ -74,15 +74,17 @@ public class TestShareProject3Users {
     @Test
     public void testShareProject() throws RemoteException {
 
-        List<Musician> musicians = new LinkedList<Musician>();
-        musicians.add(carl);
-        musicians.add(bob);
+        List<String> musicians = new LinkedList<String>();
+        musicians.add(carl.getPlainJid());
+        musicians.add(bob.getPlainJid());
 
-        alice.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
+        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
 
-        carl.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
+        carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+            BotConfiguration.PROJECTNAME);
         // FIXME if this times out, cancel the invitation!
-        bob.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
+        bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+            BotConfiguration.PROJECTNAME);
 
         assertTrue(carl.state.isParticipant(carl.jid));
         assertTrue(carl.state.isObserver(carl.jid));

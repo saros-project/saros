@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -107,17 +110,29 @@ public class RmiTest {
     // assertTrue(currentActiveShell != null);
     // }
     //
-    // @Test
-    // public void test_newProjectWithClass() throws RemoteException {
-    // assertFalse(alice.bot.isJavaProjectExist(projectName));
-    // alice.bot.newJavaProject(projectName);
-    // alice.bot.newClass(projectName, "pkg", "Cls");
-    // assertTrue(alice.bot.isJavaProjectExist(projectName));
-    // assertTrue(alice.bot.isClassExist(projectName, "pkg", "Cls"));
-    //
-    // alice.bot.deleteProject(projectName);
-    // assertFalse(alice.bot.isJavaProjectExist(projectName));
-    // }
+    @Test
+    public void test_newProjectWithClass() throws RemoteException {
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
+        alice.bot.newJavaProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.bot.isJavaProjectExist(projectName));
+        assertTrue(alice.bot.isClassExist(projectName, "pkg", "Cls"));
+    }
+
+    @Test
+    public void test_newProjectWithClass_2() throws RemoteException {
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
+        alice.bot.newJavaProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.bot.isJavaProjectExist(projectName));
+        assertTrue(alice.bot.isClassExist(projectName, "pkg", "Cls"));
+    }
+
+    @Test
+    public void test_newProjectWithClass_3() throws RemoteException {
+        assertFalse(alice.bot.isJavaProjectExist(projectName));
+        alice.bot.newJavaProjectWithClass(projectName, "pkg", "Cls");
+        assertTrue(alice.bot.isJavaProjectExist(projectName));
+        assertTrue(alice.bot.isClassExist(projectName, "pkg", "Cls"));
+    }
     //
     // @Test
     // public void test_newJavaClassInProject() throws RemoteException {

@@ -85,7 +85,8 @@ public class TestShare3UsersConcurrently {
         String projectName = BotConfiguration.PROJECTNAME;
 
         alice.bot.newJavaProject(projectName);
-        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
     }
 
     protected static <T> List<T> workAll(List<Callable<T>> tasks)
@@ -134,16 +135,20 @@ public class TestShare3UsersConcurrently {
         peers.add(carl);
         peers.add(bob);
 
+        List<String> peersName = new LinkedList<String>();
+        peersName.add(carl.getPlainJid());
+        peersName.add(bob.getPlainJid());
+
         log.trace("alice.shareProjectParallel");
-        alice.shareProjectParallel(BotConfiguration.PROJECTNAME, peers);
+        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.size(); i++) {
             final Musician musician = peers.get(i);
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.confirmSessionInvitationWizard(alice,
-                        BotConfiguration.PROJECTNAME);
+                    musician.bot.confirmSessionInvitationWizard(
+                        alice.getPlainJid(), BotConfiguration.PROJECTNAME);
                     return null;
                 }
             });

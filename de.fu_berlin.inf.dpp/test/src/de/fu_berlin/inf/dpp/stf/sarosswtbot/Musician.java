@@ -5,8 +5,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -91,25 +89,27 @@ public class Musician {
         else
             bot.clickCMAddToSessionInPEView(projectName);
 
-        confirmInvitationWindow(invitee);
+        bot.confirmInvitationWindow(invitee.getPlainJid());
         invitee.bot
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         switch (typeOfSharingProject) {
         case SarosConstant.CREATE_NEW_PROJECT:
-            invitee.confirmSessionInvitationWizard(this, projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT:
-            invitee.confirmSessionInvitationWizardUsingExistProject(this,
+            invitee.bot.confirmSessionInvitationWizard(this.getPlainJid(),
                 projectName);
             break;
+        case SarosConstant.USE_EXISTING_PROJECT:
+            invitee.bot.confirmSessionInvitationWizardUsingExistProject(
+                this.getPlainJid(), projectName);
+            break;
         case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
-            invitee
+            invitee.bot
                 .confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
-                    this, projectName);
+                    this.getPlainJid(), projectName);
             break;
         case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
-            invitee.confirmSessionInvitationWizardUsingExistProjectWithCopy(
-                this, projectName);
+            invitee.bot
+                .confirmSessionInvitationWizardUsingExistProjectWithCopy(
+                    this.getPlainJid(), projectName);
             break;
         default:
             break;
@@ -219,63 +219,6 @@ public class Musician {
                     SarosConstant.BUTTON_YES);
         }
         bot.waitUntilSessionCloses();
-    }
-
-    public void shareProjectParallel(String projectName, List<Musician> invitees)
-        throws RemoteException {
-        List<String> list = new LinkedList<String>();
-        for (Musician invitee : invitees)
-            list.add(invitee.getPlainJid());
-        bot.shareProjectParallel(projectName, list);
-    }
-
-    public void confirmScreenShareSession() throws RemoteException {
-        bot.confirmWindow("Incoming screenshare session",
-            SarosConstant.BUTTON_YES);
-    }
-
-    public void confirmInvitationWindow(Musician invitee)
-        throws RemoteException {
-        bot.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
-        bot.confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_INVITATION,
-            SarosConstant.BUTTON_FINISH, invitee.getPlainJid());
-    }
-
-    public void confirmSessionInvitationWizard(Musician inviter,
-        String projectname) throws RemoteException {
-        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
-        bot.confirmSessionInvitationWindowStep2UsingNewproject(projectname);
-    }
-
-    public void confirmSessionInvitationWizardUsingExistProject(
-        Musician inviter, String projectName) throws RemoteException {
-        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
-        bot.confirmSessionInvitationWindowStep2UsingExistProject(projectName);
-    }
-
-    public void confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
-        Musician inviter, String projectName) throws RemoteException {
-        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
-        bot.confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(projectName);
-
-    }
-
-    public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
-        Musician inviter, String projectName) throws RemoteException {
-        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        bot.confirmSessionInvitationWindowStep1(inviter.getPlainJid());
-        bot.confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(projectName);
-    }
-
-    public void confirmContact(Musician questioner) throws RemoteException {
-        // bot.ackContactAdded(questioner.getPlainJid());
-        bot.waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        bot.confirmWindow(
-            SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
-            SarosConstant.BUTTON_OK);
     }
 
     public String getName() {

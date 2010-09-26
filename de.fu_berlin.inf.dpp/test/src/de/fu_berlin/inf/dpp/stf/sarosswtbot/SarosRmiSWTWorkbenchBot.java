@@ -80,6 +80,48 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     /*************** Saros-specific-highlevel RMI exported Methods ******************/
 
+    public void confirmContact() throws RemoteException {
+        // bot.ackContactAdded(questioner.getPlainJid());
+        waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+        confirmWindow(
+            SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
+            SarosConstant.BUTTON_OK);
+    }
+
+    public void confirmInvitationWindow(String invitee) throws RemoteException {
+        activateShellWithText(SarosConstant.SHELL_TITLE_INVITATION);
+        confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_INVITATION,
+            SarosConstant.BUTTON_FINISH, invitee);
+    }
+
+    public void confirmSessionInvitationWizard(String inviter,
+        String projectname) throws RemoteException {
+        waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep2UsingNewproject(projectname);
+    }
+
+    public void confirmSessionInvitationWizardUsingExistProject(String inviter,
+        String projectName) throws RemoteException {
+        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep2UsingExistProject(projectName);
+    }
+
+    public void confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
+        String inviter, String projectName) throws RemoteException {
+        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(projectName);
+    }
+
+    public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
+        String inviter, String projectName) throws RemoteException {
+        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(projectName);
+    }
+
     public void confirmCreateNewUserAccountWindow(String server,
         String username, String password) throws RemoteException {
         try {
@@ -101,7 +143,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void confirmSessionInvitationWindowStep1(String inviter)
         throws RemoteException {
-        activateShellWithText(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         if (!isTextWithLabelEqualWithText(SarosConstant.TEXT_LABEL_INVITER,
             inviter))
             log.warn("inviter does not match: " + inviter);
@@ -689,7 +730,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void shareProjectParallel(String projectName, List<String> invitees)
         throws RemoteException {
         clickCMShareProjectInPEView(projectName);
-        // clickProjectContextMenu(projectName, "Share project...");
         waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
         selectCheckBoxWithList(invitees);

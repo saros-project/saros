@@ -49,12 +49,14 @@ public class TestFileOperations {
             BotConfiguration.PORT_CARL);
         carl.initBot();
 
-        List<Musician> musicians = new LinkedList<Musician>();
-        musicians.add(carl);
-        musicians.add(bob);
-        alice.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
-        carl.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
-        bob.confirmSessionInvitationWizard(alice, BotConfiguration.PROJECTNAME);
+        List<String> musicians = new LinkedList<String>();
+        musicians.add(carl.getPlainJid());
+        musicians.add(bob.getPlainJid());
+        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
+        carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+            BotConfiguration.PROJECTNAME);
+        bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+            BotConfiguration.PROJECTNAME);
         carl.followUser(alice);
     }
 

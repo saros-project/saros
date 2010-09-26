@@ -53,8 +53,11 @@ public class TestHandleContacts {
     public void testRemoveContact() throws RemoteException {
         assertTrue(alice.hasContactWith(bob));
         bob.bot.deleteContact(alice.jid.getBase());
-        alice.bot.waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-        alice.bot.confirmWindow(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION, SarosConstant.BUTTON_OK);
+        alice.bot
+            .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
+        alice.bot.confirmWindow(
+            SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
+            SarosConstant.BUTTON_OK);
         bob.waitUntilHasNoContactWith(alice);
         assertFalse(bob.hasContactWith(alice));
         alice.waitUntilHasNoContactWith(bob);
@@ -64,8 +67,8 @@ public class TestHandleContacts {
     @Test
     public void testAddContact() throws RemoteException {
         bob.bot.addContact(alice.getPlainJid());
-        alice.confirmContact(bob);
-        bob.confirmContact(alice);
+        alice.bot.confirmContact();
+        bob.bot.confirmContact();
         bob.waitUntilHasContactWith(alice);
         assertTrue(bob.hasContactWith(alice));
         alice.waitUntilHasContactWith(bob);

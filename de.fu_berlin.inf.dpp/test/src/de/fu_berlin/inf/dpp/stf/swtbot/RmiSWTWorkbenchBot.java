@@ -268,49 +268,57 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isJavaProjectExist(projectName)) {
-            // TODO version without timeout
-            final String baseName = projectName + "_base";
-            if (!isJavaProjectExist(projectName)) {
-                activateEclipseShell();
-                try {
-                    // New Java Project
-                    clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
-                        SarosConstant.MENU_TITLE_NEW,
-                        SarosConstant.MENU_TITLE_JAVA_PROJECT);
-                } catch (WidgetNotFoundException e) {
-                    // New Project...
-                    clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
-                        SarosConstant.MENU_TITLE_NEW,
-                        SarosConstant.MENU_TITLE_PROJECT);
-                    // Java Project
-                    confirmWindowWithTreeWithFilterText(
-                        SarosConstant.SHELL_TITLE_NEW_PROJECT,
-                        SarosConstant.CATEGORY_JAVA,
-                        SarosConstant.NODE_JAVA_PROJECT,
-                        SarosConstant.BUTTON_NEXT);
-                }
-
-                waitUntilShellActive("New Java Project");
-                final SWTBotShell newProjectDialog = delegate.activeShell();
-
-                setTextWithLabel("Project name:", projectName);
-                clickButton(SarosConstant.BUTTON_FINISH);
-                waitUntilShellCloses(newProjectDialog);
-
-                if (isShellActive("Open Associated Perspective?")) {
-                    clickButton(SarosConstant.BUTTON_YES);
-                    waitUntilShellCloses("Open Associated Perspective?");
-                }
-            }
-            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-                .getRoot();
-            IProject project = root.getProject(baseName);
-            try {
-                project.copy(new Path(projectName), true, null);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't copy project " + baseName, e);
-            }
+            delegate.menu("File").menu("New").menu("Java Project").click();
+            SWTBotShell shell = delegate.shell("New Java Project");
+            shell.activate();
+            delegate.textWithLabel("Project name:").setText(projectName);
+            delegate.button("Finish").click();
+            delegate.waitUntil(Conditions.shellCloses(shell));
+            delegate.sleep(50);
+            // // TODO version without timeout
+            // final String baseName = projectName + "_base";
+            // if (!isJavaProjectExist(projectName)) {
+            // activateEclipseShell();
+            // try {
+            // // New Java Project
+            // clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+            // SarosConstant.MENU_TITLE_NEW,
+            // SarosConstant.MENU_TITLE_JAVA_PROJECT);
+            // } catch (WidgetNotFoundException e) {
+            // // New Project...
+            // clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+            // SarosConstant.MENU_TITLE_NEW,
+            // SarosConstant.MENU_TITLE_PROJECT);
+            // // Java Project
+            // confirmWindowWithTreeWithFilterText(
+            // SarosConstant.SHELL_TITLE_NEW_PROJECT,
+            // SarosConstant.CATEGORY_JAVA,
+            // SarosConstant.NODE_JAVA_PROJECT,
+            // SarosConstant.BUTTON_NEXT);
+            // }
+            //
+            // waitUntilShellActive("New Java Project");
+            // final SWTBotShell newProjectDialog = delegate.activeShell();
+            //
+            // setTextWithLabel("Project name:", projectName);
+            // clickButton(SarosConstant.BUTTON_FINISH);
+            // waitUntilShellCloses(newProjectDialog);
+            //
+            // if (isShellActive("Open Associated Perspective?")) {
+            // clickButton(SarosConstant.BUTTON_YES);
+            // waitUntilShellCloses("Open Associated Perspective?");
+            // }
+            // }
+            // // final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
+            // // .getRoot();
+            // // IProject project = root.getProject(baseName);
+            // // try {
+            // // project.copy(new Path(projectName), true, null);
+            // // root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            // // } catch (CoreException e) {
+            // // log.debug("Couldn't copy project " + baseName, e);
+            // // }
+            // delegate.sleep(100);
         }
     }
 
@@ -336,30 +344,39 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         throws RemoteException {
         if (!isClassExist(projectName, pkg, className))
             try {
-                activateEclipseShell();
-                clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
-                    SarosConstant.MENU_TITLE_NEW,
-                    SarosConstant.MENU_TITLE_CLASS);
-                waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
-                activateShellWithMatchText(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
-                // FIXME WidgetNotFoundException in TestEditDuringInvitation
-                final SWTBotShell newClassDialog = delegate.activeShell();
-                setTextWithLabel("Source folder:", projectName + "/src");
-                setTextWithLabel("Package:", pkg);
-                setTextWithLabel("Name:", className);
-                // implementsInterface("java.lang.Runnable");
-                // delegate.checkBox("Inherited abstract methods").click();
-                clickCheckBox("Inherited abstract methods");
-                waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-                clickButton(SarosConstant.BUTTON_FINISH);
-                waitUntilShellCloses(newClassDialog);
-                // openJavaFileWithEditor(projectName, pkg, className +
-                // ".java");
-                // delegate.sleep(sleepTime);
-                // editor.navigateTo(2, 0);
-                // editor.quickfix("Add unimplemented methods");
-                // editor.save();
-                // delegate.sleep(750);
+                delegate.menu("File").menu("New").menu("Class").click();
+                SWTBotShell shell = delegate.shell("New Java Class");
+                shell.activate();
+                delegate.textWithLabel("Source folder:").setText(
+                    projectName + "/src");
+                delegate.textWithLabel("Package:").setText(pkg);
+                delegate.textWithLabel("Name:").setText(className);
+                delegate.button("Finish").click();
+                delegate.waitUntil(Conditions.shellCloses(shell));
+                // activateEclipseShell();
+                // clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+                // SarosConstant.MENU_TITLE_NEW,
+                // SarosConstant.MENU_TITLE_CLASS);
+                // waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
+                // activateShellWithMatchText(SarosConstant.SHELL_TITLE_NEW_JAVA_CLASS);
+                // // FIXME WidgetNotFoundException in TestEditDuringInvitation
+                // final SWTBotShell newClassDialog = delegate.activeShell();
+                // setTextWithLabel("Source folder:", projectName + "/src");
+                // setTextWithLabel("Package:", pkg);
+                // setTextWithLabel("Name:", className);
+                // // implementsInterface("java.lang.Runnable");
+                // // delegate.checkBox("Inherited abstract methods").click();
+                // clickCheckBox("Inherited abstract methods");
+                // waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+                // clickButton(SarosConstant.BUTTON_FINISH);
+                // waitUntilShellCloses(newClassDialog);
+                // // openJavaFileWithEditor(projectName, pkg, className +
+                // // ".java");
+                // // delegate.sleep(sleepTime);
+                // // editor.navigateTo(2, 0);
+                // // editor.quickfix("Add unimplemented methods");
+                // // editor.save();
+                // // delegate.sleep(750);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
                 log.error(cause, e);

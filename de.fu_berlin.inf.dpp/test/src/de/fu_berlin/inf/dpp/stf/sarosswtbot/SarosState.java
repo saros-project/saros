@@ -80,6 +80,7 @@ public class SarosState implements ISarosState {
     }
 
     public boolean existSession() {
+        log.debug("existSession() == " + sessionManager.getSarosSession() != null);
         return sessionManager.getSarosSession() != null;
     }
 

@@ -203,4 +203,20 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWizard(String inviter,
+        String projectname) throws RemoteException;
+
+    public void confirmSessionInvitationWizardUsingExistProject(String inviter,
+        String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
+        String inviter, String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
+        String inviter, String projectName) throws RemoteException;
+
+    public void confirmInvitationWindow(String invitee) throws RemoteException;
+
+    public void confirmContact() throws RemoteException;
 }
