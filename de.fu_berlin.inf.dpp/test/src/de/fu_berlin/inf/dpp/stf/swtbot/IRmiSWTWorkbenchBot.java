@@ -656,4 +656,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void renamePkg(String newName, String... texts)
         throws RemoteException;
 
+    public boolean activateEclipseShell() throws RemoteException;
+
 }

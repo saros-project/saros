@@ -22,9 +22,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.ui.RosterView;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -88,10 +90,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             SarosConstant.BUTTON_OK);
     }
 
-    public void confirmInvitationWindow(String invitee) throws RemoteException {
+    public void confirmInvitationWindow(String... invitees)
+        throws RemoteException {
         activateShellWithText(SarosConstant.SHELL_TITLE_INVITATION);
         confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_INVITATION,
-            SarosConstant.BUTTON_FINISH, invitee);
+            SarosConstant.BUTTON_FINISH, invitees);
     }
 
     public void confirmSessionInvitationWizard(String inviter,
@@ -572,14 +575,13 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     /*************** is... ******************/
 
-    // public boolean isInFollowMode(String participantJID, String sufix)
-    // throws RemoteException {
-    // openSessionView();
-    // activateSharedSessionView();
-    // return isContextMenuOfTableItemInViewExist(
-    // BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
-    // SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
-    // }
+    /**
+     * This method returns true if {@link SarosState} and the GUI
+     * {@link RosterView} having the connected state.
+     */
+    public boolean isConnectedByXMPP() throws RemoteException {
+        return state.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
+    }
 
     public boolean isFollowing() throws RemoteException {
         return state.isFollowing();
@@ -838,4 +840,89 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         return selectTreeWithLabelsInView(SarosConstant.VIEW_TITLE_ROSTER,
             "Buddies", contact);
     }
+
+    public void giveDriverRole(String inviteeJID) throws RemoteException {
+        openSessionView();
+        activateSharedSessionView();
+        clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
+            inviteeJID, SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
+    }
+
+    public void inviteUser(String inviteeJID, String projectName)
+        throws RemoteException {
+        clickTBOpenInvitationInterfaceInSPSView();
+        waitUntilShellActive("Invitation");
+        confirmWindowWithCheckBox("Invitation", SarosConstant.BUTTON_FINISH,
+            inviteeJID);
+    }
+
+    public void xmppConnect(JID jid, String password) throws RemoteException {
+
+        log.trace("connectedByXMPP");
+        boolean connectedByXMPP = isConnectedByXMPP();
+        if (!connectedByXMPP) {
+            log.trace("clickTBConnectInRosterView");
+            clickTBConnectInRosterView();
+            sleep(100);// wait a bit to check if shell pops up
+            log.trace("isShellActive");
+            boolean shellActive = isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
+            if (shellActive) {
+                log.trace("confirmSarosConfigurationWindow");
+                confirmSarosConfigurationWindow(jid.getDomain(), jid.getName(),
+                    password);
+            }
+            waitUntilConnected();
+        }
+
+    }
+
+    public void xmppDisconnect() throws RemoteException {
+        if (isConnectedByXMPP()) {
+            clickTBDisconnectInRosterView();
+            waitUntilDisConnected();
+        }
+    }
+
+    public void creatNewAccount(JID jid, String password)
+        throws RemoteException {
+        clickMenuWithTexts("Saros", "Create Account");
+        confirmCreateNewUserAccountWindow(jid.getDomain(), jid.getName(),
+            password);
+    }
+
+    public boolean hasContactWith(JID jid) throws RemoteException {
+        return state.hasContactWith(jid) && hasContactWith(jid.getBase());
+    }
+
+    public void openSarosViews() throws RemoteException {
+        openRosterView();
+        openSessionView();
+        openChatView();
+        openRemoteScreenView();
+    }
+
+    // public void leaveSession(JID jid) throws RemoteException {
+    // // Need to check for isDriver before leaving.
+    // final boolean isDriver = state.isDriver(jid);
+    // clickTBLeaveTheSessionInSPSView();
+    // if (!isDriver) {
+    // confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
+    // SarosConstant.BUTTON_YES);
+    // } else {
+    // Util.runSafeAsync(log, new Runnable() {
+    // public void run() {
+    // try {
+    // confirmWindow("Confirm Closing Session",
+    // SarosConstant.BUTTON_YES);
+    // } catch (RemoteException e) {
+    // // no popup
+    // }
+    // }
+    // });
+    // if (isShellActive("Confirm Closing Session"))
+    // confirmWindow("Confirm Closing Session",
+    // SarosConstant.BUTTON_YES);
+    // }
+    // waitUntilSessionCloses();
+    // }
 }

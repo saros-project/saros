@@ -68,11 +68,11 @@ public class TestEditDuringInvitation {
 
     @AfterClass
     public static void cleanup() throws RemoteException {
-        carl.xmppDisconnect();
+        carl.bot.xmppDisconnect();
         carl.bot.deleteProject(PROJECT);
-        bob.xmppDisconnect();
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(PROJECT);
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(PROJECT);
     }
 
@@ -85,17 +85,16 @@ public class TestEditDuringInvitation {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.buildSession(bob, PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.CREATE_NEW_PROJECT);
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
-        alice.giveDriverRole(bob);
+        alice.bot.giveDriverRole(bob.getPlainJid());
 
         assertTrue(bob.state.isDriver(alice.jid));
 
         log.trace("alice.inviteUser(carl");
-        alice.inviteUser(carl, PROJECT);
+        alice.bot.inviteUser(carl.getPlainJid(), PROJECT);
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);

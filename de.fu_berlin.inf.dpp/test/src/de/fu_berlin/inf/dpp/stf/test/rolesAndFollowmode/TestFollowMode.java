@@ -42,21 +42,20 @@ public class TestFollowMode {
             BotConfiguration.PORT_BOB);
         bob.initBot();
 
-        alice.buildSession(bob, PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.CREATE_NEW_PROJECT);
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
     }
 
     @AfterClass
     public static void cleanupBob() throws RemoteException {
-        bob.xmppDisconnect();
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(PROJECT);
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(PROJECT);
     }
 
@@ -80,7 +79,9 @@ public class TestFollowMode {
 
         String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG,
             CLS1);
-        bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
+
+        bob.bot.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
+        // bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
         String textFormInvitee = bob.bot
             .getTextOfJavaEditor(PROJECT, PKG, CLS1);
         assertTrue(textFromInviter.equals(textFormInvitee));

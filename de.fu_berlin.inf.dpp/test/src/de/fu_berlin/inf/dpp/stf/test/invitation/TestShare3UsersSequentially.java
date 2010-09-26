@@ -17,14 +17,14 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 
-public class TestShareProject3Users {
+public class TestShare3UsersSequentially {
     // bots
     protected static Musician alice;
     protected static Musician carl;
     protected static Musician bob;
 
     @BeforeClass
-    public static void configurePeer1() throws RemoteException,
+    public static void configureCarl() throws RemoteException,
         NotBoundException {
         carl = new Musician(new JID(BotConfiguration.JID_CARL),
             BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
@@ -33,8 +33,7 @@ public class TestShareProject3Users {
     }
 
     @BeforeClass
-    public static void configurePeer2() throws RemoteException,
-        NotBoundException {
+    public static void configureBob() throws RemoteException, NotBoundException {
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
@@ -42,7 +41,7 @@ public class TestShareProject3Users {
     }
 
     @BeforeClass
-    public static void configureHost() throws RemoteException,
+    public static void configureAlice() throws RemoteException,
         NotBoundException {
         alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
@@ -54,20 +53,20 @@ public class TestShareProject3Users {
     }
 
     @AfterClass
-    public static void cleanupInvitee1() throws RemoteException {
-        carl.xmppDisconnect();
+    public static void cleanupCarl() throws RemoteException {
+        carl.bot.xmppDisconnect();
         carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
-    public static void cleanupInvitee2() throws RemoteException {
-        bob.xmppDisconnect();
+    public static void cleanupBob() throws RemoteException {
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @After
-    public void cleanupInviter() throws RemoteException {
-        alice.xmppDisconnect();
+    public void cleanupAlice() throws RemoteException {
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
@@ -113,8 +112,8 @@ public class TestShareProject3Users {
         bob.leaveSession();
         assertFalse(bob.state.isParticipant(bob.jid));
 
-        alice.waitUntilOtherLeaveSession(carl);
-        alice.waitUntilOtherLeaveSession(bob);
+        // alice.waitUntilOtherLeaveSession(carl);
+        // alice.waitUntilOtherLeaveSession(bob);
         alice.leaveSession();
         assertFalse(alice.state.isParticipant(alice.jid));
 

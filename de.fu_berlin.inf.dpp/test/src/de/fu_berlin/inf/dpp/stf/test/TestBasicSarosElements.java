@@ -33,8 +33,8 @@ public class TestBasicSarosElements {
     }
 
     @AfterClass
-    public static void afterClass() {
-        alice.xmppDisconnect();
+    public static void afterClass() throws RemoteException {
+        alice.bot.xmppDisconnect();
     }
 
     @Test
@@ -76,21 +76,21 @@ public class TestBasicSarosElements {
     @Test
     public void testXmppConnect() throws RemoteException {
         log.trace("xmppDisconnect");
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         log.trace("xmppConnect");
-        alice.xmppConnect();
+        alice.bot.xmppConnect(alice.jid, alice.password);
         log.trace("captureScreenshot");
         alice.bot
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.isConnectedByXMPP());
+        assertEquals(true, alice.bot.isConnectedByXMPP());
     }
 
     @Test
     public void testXmppDisconnect() throws RemoteException {
-        alice.xmppConnect();
-        alice.xmppDisconnect();
+        alice.bot.xmppConnect(alice.jid, alice.password);
+        alice.bot.xmppDisconnect();
         alice.bot
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.isConnectedByXMPP());
+        assertEquals(false, alice.bot.isConnectedByXMPP());
     }
 }

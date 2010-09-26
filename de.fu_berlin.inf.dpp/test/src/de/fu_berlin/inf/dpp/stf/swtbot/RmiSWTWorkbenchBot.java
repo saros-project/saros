@@ -268,6 +268,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isJavaProjectExist(projectName)) {
+            activateEclipseShell();
             delegate.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = delegate.shell("New Java Project");
             shell.activate();
@@ -1287,7 +1288,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /*********************** activate widget *******************/
 
-    private boolean activateEclipseShell() throws RemoteException {
+    public boolean activateEclipseShell() throws RemoteException {
         return activateShellWithMatchText(".+? - .+");
     }
 

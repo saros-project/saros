@@ -37,13 +37,13 @@ public class TestHandleContacts {
     }
 
     @After
-    public void cleanupRespondent() {
-        alice.xmppDisconnect();
+    public void cleanupRespondent() throws RemoteException {
+        alice.bot.xmppDisconnect();
     }
 
     @After
-    public void cleanupQuestioner() {
-        bob.xmppDisconnect();
+    public void cleanupQuestioner() throws RemoteException {
+        bob.bot.xmppDisconnect();
     }
 
     // FIXME these testAddContact assumes that testRemoveContact succeeds
@@ -51,17 +51,15 @@ public class TestHandleContacts {
 
     @Test
     public void testRemoveContact() throws RemoteException {
-        assertTrue(alice.hasContactWith(bob));
+        assertTrue(alice.bot.hasContactWith(bob.jid));
         bob.bot.deleteContact(alice.jid.getBase());
         alice.bot
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
         alice.bot.confirmWindow(
             SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
             SarosConstant.BUTTON_OK);
-        bob.waitUntilHasNoContactWith(alice);
-        assertFalse(bob.hasContactWith(alice));
-        alice.waitUntilHasNoContactWith(bob);
-        assertFalse(alice.hasContactWith(bob));
+        assertFalse(bob.bot.hasContactWith(alice.jid));
+        assertFalse(alice.bot.hasContactWith(bob.jid));
     }
 
     @Test
@@ -69,9 +67,7 @@ public class TestHandleContacts {
         bob.bot.addContact(alice.getPlainJid());
         alice.bot.confirmContact();
         bob.bot.confirmContact();
-        bob.waitUntilHasContactWith(alice);
-        assertTrue(bob.hasContactWith(alice));
-        alice.waitUntilHasContactWith(bob);
-        assertTrue(alice.hasContactWith(bob));
+        assertTrue(bob.bot.hasContactWith(alice.jid));
+        assertTrue(alice.bot.hasContactWith(bob.jid));
     }
 }

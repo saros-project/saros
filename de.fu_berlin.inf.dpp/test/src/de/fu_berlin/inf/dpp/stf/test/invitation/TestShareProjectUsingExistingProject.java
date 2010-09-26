@@ -73,16 +73,16 @@ public class TestShareProjectUsingExistingProject {
 
     @AfterClass
     public static void cleanup() throws RemoteException {
-        bob.xmppDisconnect();
-        alice.xmppDisconnect();
+        bob.bot.xmppDisconnect();
+        alice.bot.xmppDisconnect();
     }
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
         assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
-        alice.buildSession(bob, PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.USE_EXISTING_PROJECT);
+        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertFalse(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         assertFalse(bob.bot.isJavaProjectExist(PROJECT2));
 
@@ -91,9 +91,9 @@ public class TestShareProjectUsingExistingProject {
     @Test
     public void testShareProjectUsingExistingProjectWithCancelLocalChange()
         throws RemoteException {
-        alice.buildSession(bob, PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE);
+        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.bot
             .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         bob.bot
@@ -110,9 +110,9 @@ public class TestShareProjectUsingExistingProject {
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
-        alice.buildSession(bob, BotConfiguration.PROJECTNAME,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.USE_EXISTING_PROJECT_WITH_COPY);
+        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
+        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.bot.isJavaProjectExist(PROJECT));
         assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
         assertTrue(bob.bot.isJavaProjectExist(PROJECT2));

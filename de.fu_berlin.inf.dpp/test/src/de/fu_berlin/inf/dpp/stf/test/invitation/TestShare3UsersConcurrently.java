@@ -116,7 +116,7 @@ public class TestShare3UsersConcurrently {
             final Musician musician = musicians[i];
             tasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.xmppDisconnect();
+                    musician.bot.xmppDisconnect();
                     final String projectName = BotConfiguration.PROJECTNAME;
                     if (musician.bot.isJavaProjectExist(projectName))
                         musician.bot.deleteProject(projectName);
@@ -193,8 +193,8 @@ public class TestShare3UsersConcurrently {
             assertFalse(w);
 
         log.trace("waitUntilOtherLeaveSession");
-        alice.waitUntilOtherLeaveSession(carl);
-        alice.waitUntilOtherLeaveSession(bob);
+        // alice.waitUntilOtherLeaveSession(carl);
+        // alice.waitUntilOtherLeaveSession(bob);
         alice.leaveSession();
         assertFalse(alice.state.isParticipant(alice.jid));
         log.trace("testShareProjectParallel done");

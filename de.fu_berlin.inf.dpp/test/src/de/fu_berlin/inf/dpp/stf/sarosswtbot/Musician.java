@@ -9,7 +9,6 @@ import java.rmi.registry.Registry;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.RosterView;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -26,6 +25,7 @@ public class Musician {
     public String password;
     public String host;
     public int port;
+    public int typeOfSharingProject = SarosConstant.CREATE_NEW_PROJECT;
 
     public Musician(JID jid, String password, String host, int port) {
         super();
@@ -42,15 +42,15 @@ public class Musician {
         log.trace("initBot enter, initRmi");
         initRmi();
         log.trace("activeEclipseShell");
-        activateEclipseShell();
+        bot.activateEclipseShell();
         log.trace("closeWelcomeView");
         bot.closeWelcomeView();
         log.trace("openJavaPerspective");
         bot.openJavaPerspective();
         log.trace("openSarosViews");
-        openSarosViews();
+        bot.openSarosViews();
         log.trace("xmppConnect");
-        xmppConnect();
+        bot.xmppConnect(jid, password);
         log.trace("initBot leave");
     }
 
@@ -69,15 +69,26 @@ public class Musician {
 
     /*************** Component, which consist of other simple functions ******************/
 
-    // public boolean waitingForPermissionToAddContact(Musician respondent)
-    // throws RemoteException {
-    // return bot.hasContactWith(respondent.getName()
-    // + " (wait for permission)");
-    // }
+    public void buildSessionSequential(String projectName,
+        String shareProjectWith, Musician... invitees) throws RemoteException {
+        clickShareProjectWith(projectName, shareProjectWith);
+        String[] inviteeJIDs = new String[invitees.length];
+        for (int i = 0; i < invitees.length; i++) {
+            inviteeJIDs[i] = invitees[i].getPlainJid();
+        }
+        bot.confirmInvitationWindow(inviteeJIDs);
+        for (Musician invitee : invitees) {
+            confirmSessionUsingNewOrExistProject(invitee, projectName);
+        }
+    }
 
-    public void buildSession(Musician invitee, String projectName,
-        String shareProjectWith, int typeOfSharingProject)
-        throws RemoteException {
+    public void buildSessionConcurrently(String projectName,
+        String shareProjectWith, Musician... invitees) throws RemoteException {
+
+    }
+
+    public void clickShareProjectWith(String projectName,
+        String shareProjectWith) throws RemoteException {
         if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
             bot.clickCMShareProjectInPEView(projectName);
         } else if (shareProjectWith
@@ -88,11 +99,13 @@ public class Musician {
             bot.clickCMShareProjectParticallyInPEView(projectName);
         else
             bot.clickCMAddToSessionInPEView(projectName);
+    }
 
-        bot.confirmInvitationWindow(invitee.getPlainJid());
+    public void confirmSessionUsingNewOrExistProject(Musician invitee,
+        String projectName) throws RemoteException {
         invitee.bot
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        switch (typeOfSharingProject) {
+        switch (invitee.typeOfSharingProject) {
         case SarosConstant.CREATE_NEW_PROJECT:
             invitee.bot.confirmSessionInvitationWizard(this.getPlainJid(),
                 projectName);
@@ -136,63 +149,6 @@ public class Musician {
             bot.followUser(participant.jid.getBase(), " (Driver)");
         else
             bot.followUser(participant.jid.getBase(), "");
-    }
-
-    public void giveDriverRole(Musician invitee) throws RemoteException {
-        bot.openSessionView();
-        activateSharedSessionView();
-        bot.clickContextMenuOfTableInView(BotConfiguration.NAME_SESSION_VIEW,
-            invitee.getPlainJid(), SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
-    }
-
-    public void xmppConnect() {
-        try {
-            log.trace("connectedByXMPP");
-            boolean connectedByXMPP = isConnectedByXMPP();
-            if (!connectedByXMPP) {
-                log.trace("clickTBConnectInRosterView");
-                bot.clickTBConnectInRosterView();
-                bot.sleep(100);// wait a bit to check if shell pops up
-                log.trace("isShellActive");
-                boolean shellActive = bot
-                    .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
-                if (shellActive) {
-                    log.trace("confirmSarosConfigurationWindow");
-                    bot.confirmSarosConfigurationWindow(getXmppServer(),
-                        getName(), password);
-                }
-                bot.waitUntilConnected();
-            }
-        } catch (RemoteException e) {
-            log.error("can't connect!");
-        }
-
-    }
-
-    public void xmppDisconnect() {
-        try {
-            if (isConnectedByXMPP()) {
-                bot.clickTBDisconnectInRosterView();
-                bot.waitUntilDisConnected();
-            }
-        } catch (RemoteException e) {
-            // ignore if no window popped up
-        }
-
-    }
-
-    public void creatNewAccount(String server, String username, String password)
-        throws RemoteException {
-        bot.clickMenuWithTexts("Saros", "Create Account");
-        bot.confirmCreateNewUserAccountWindow(server, username, password);
-    }
-
-    public void inviteUser(Musician invitee, String projectName)
-        throws RemoteException {
-        bot.clickTBOpenInvitationInterfaceInSPSView();
-        bot.waitUntilShellActive("Invitation");
-        bot.confirmWindowWithCheckBox("Invitation",
-            SarosConstant.BUTTON_FINISH, invitee.getPlainJid());
     }
 
     public void leaveSession() throws RemoteException {
@@ -243,169 +199,7 @@ public class Musician {
         return jid.getDomain();
     }
 
-    /************* has *************/
-
-    public boolean hasContactWith(Musician respondent) {
-        try {
-            return state.hasContactWith(respondent.jid)
-                && bot.hasContactWith(respondent.jid.getBase());
-        } catch (RemoteException e) {
-            log.error("Failed to check if the contact was found", e);
-        }
-        return false;
-    }
-
-    /**
-     * Convenient method for opening all views that are needed for tests. The
-     * titles of the views are: "Roster","Shared Project Session" and
-     * "Package Explorer".
-     */
-    public void openSarosViews() throws RemoteException {
-        bot.openRosterView();
-        bot.openSessionView();
-        bot.openChatView();
-        bot.openRemoteScreenView();
-    }
-
-    // public boolean isInFollowMode(Musician participant) throws
-    // RemoteException {
-    //
-    // if (participant.state.isDriver(participant.jid)) {
-    // return bot.isInFollowMode(participant.jid.getBase(), " (Driver)");
-    // } else {
-    // return bot.isInFollowMode(participant.jid.getBase(), "");
-    // }
-    // }
-
-    public boolean isDebugPerspectiveActive() throws RemoteException {
-        return bot.isPerspectiveActive(SarosConstant.PERSPECTIVE_TITLE_DEBUG);
-    }
-
-    public boolean isJavaPerspectiveActive() throws RemoteException {
-        return bot.isPerspectiveActive(SarosConstant.PERSPECTIVE_TITLE_JAVA);
-    }
-
-    /**
-     * This method returns true if {@link SarosState} and the GUI
-     * {@link RosterView} having the connected state.
-     */
-    public boolean isConnectedByXMPP() {
-        try {
-            return state.isConnectedByXMPP() && bot.isConnectedByXmppGuiCheck();
-        } catch (RemoteException e) {
-            log.error("Failed to get the xmpp connection state.", e);
-        }
-        return false;
-    }
-
-    /*
-     * wenn du junitest mehrfach durchführen willst, muss vor den Test den
-     * sarosInstance aktviert werden. Bei Default ist der sarosinstanze nach der
-     * Durchführung von junittest deactiviert.
-     */
-    public boolean activateShellWithMatchText(String matchText) {
-        try {
-            if (bot.activateShellWithMatchText(matchText)) {
-                log.trace("Eclipse shell is active");
-                return true;
-            } else {
-                log.error("Could not activate shell matching " + matchText);
-            }
-        } catch (RemoteException e) {
-            log.error("Could not activate shell matching " + matchText, e);
-            //
-        }
-        return false;
-    }
-
-    public boolean activateEclipseShell() {
-        return activateShellWithMatchText(".+? - .+");
-    }
-
-    // public void activateEditor(String textName, String extension) {
-    // try {
-    // bot.activateEditor(textName + "." + extension);
-    // } catch (RemoteException e) {
-    // log.error("Could not activate the editor with name " + textName
-    // + extension, e);
-    // }
-    // }
-
-    public void activatePackageExplorerView() throws RemoteException {
-        bot.activateViewWithTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-    }
-
-    public void activateRosterView() throws RemoteException {
-        bot.activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
-    }
-
-    public void activateSharedSessionView() throws RemoteException {
-        bot.activateViewWithTitle(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
-    }
-
     /************* wait until *****************/
-
-    public void waitUntilOtherLeaveSession(Musician other)
-        throws RemoteException {
-        while (state.isParticipant(other.jid)) {
-            sleep(100);
-        }
-    }
-
-    public void waitUntilOtherInSession(Musician other) throws RemoteException {
-        int time = 0;
-        while (!state.isParticipant(other.jid) && time < 2000) {
-            sleep(100);
-            time = time + 100;
-        }
-    }
-
-    public void waitUntilIsObserverBy(Musician other) throws RemoteException {
-        while (!other.state.isObserver(this.jid)) {
-            sleep(100);
-        }
-    }
-
-    public void waitUntilFileEqualWithFile(String projectName,
-        String packageName, String className, String file)
-        throws RemoteException {
-
-        // bot.waitUntilFileEqualWithFile(projectName, packageName, className,
-        // file);
-        String myFile = bot.getTextOfJavaEditor(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-        while (!myFile.equals(file)) {
-            sleep(100);
-            myFile = bot.getTextOfJavaEditor(BotConfiguration.PROJECTNAME,
-                BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-        }
-    }
-
-    public void waitUntilHasContactWith(Musician respondent)
-        throws RemoteException {
-        // FIXME infinite loop, replace with wait condition
-        // while (!hasContactWith(respondent)) {
-        // sleep(50);
-        if (!hasContactWith(respondent)) {
-            sleep(500);
-        }
-    }
-
-    public void waitUntilHasNoContactWith(Musician respondent)
-        throws RemoteException {
-        // FIXME infinite loop, replace with wait condition
-        // while (hasContactWith(respondent)) {
-        // sleep(50);
-        if (hasContactWith(respondent)) {
-            sleep(500);
-        }
-    }
-
-    public void clickCMJumpToPositionOfSelectedUserInSPSView(
-        Musician participant) throws RemoteException {
-        bot.clickCMJumpToPositionOfSelectedUserInSPSView(
-            participant.jid.getBase(), "");
-    }
 
     public void clickCMStopfollowingThisUserInSPSView(Musician participant)
         throws RemoteException {
@@ -420,4 +214,5 @@ public class Musician {
     public void sleep(long millis) throws RemoteException {
         bot.sleep(millis);
     }
+
 }

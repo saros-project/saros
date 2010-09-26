@@ -33,22 +33,22 @@ public class TestSVN {
             BotConfiguration.PORT_BOB);
         bob.initBot();
 
-        alice.buildSession(bob, BotConfiguration.PROJECTNAME_SVN_TRUNK,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS,
-            SarosConstant.CREATE_NEW_PROJECT);
-        alice.waitUntilOtherInSession(bob);
+        alice.buildSessionSequential(BotConfiguration.PROJECTNAME_SVN_TRUNK,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        // alice.waitUntilOtherInSession(bob);
+        alice.bot.waitUntilSessionOpenBy(bob.state);
     }
 
     @AfterClass
     public static void tearDownBob() throws Exception {
 
-        bob.xmppDisconnect();
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 
     @AfterClass
     public static void tearDownAlice() throws Exception {
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
 

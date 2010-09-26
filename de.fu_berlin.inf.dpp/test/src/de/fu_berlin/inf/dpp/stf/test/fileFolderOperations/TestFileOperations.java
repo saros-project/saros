@@ -75,11 +75,11 @@ public class TestFileOperations {
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
-        carl.xmppDisconnect();
+        carl.bot.xmppDisconnect();
         carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        bob.xmppDisconnect();
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
         carl.bot.resetWorkbench();
     }

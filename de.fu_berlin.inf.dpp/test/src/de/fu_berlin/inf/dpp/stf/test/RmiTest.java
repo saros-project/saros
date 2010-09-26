@@ -37,7 +37,7 @@ public class RmiTest {
 
     @After
     public void cleanupBot() throws RemoteException {
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.closeRosterView();
         alice.bot.closeChatView();
         alice.bot.closeRemoteScreenView();

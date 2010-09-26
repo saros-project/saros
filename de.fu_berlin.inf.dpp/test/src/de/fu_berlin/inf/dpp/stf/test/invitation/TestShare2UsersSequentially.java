@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
-public class TestShareProject {
-    private static final Logger log = Logger.getLogger(TestShareProject.class);
+public class TestShare2UsersSequentially {
+    private static final Logger log = Logger.getLogger(TestShare2UsersSequentially.class);
 
     // bots
     protected static Musician alice;
@@ -43,18 +43,19 @@ public class TestShareProject {
         alice.initBot();
         String projectName = BotConfiguration.PROJECTNAME;
         alice.bot.newJavaProject(projectName);
-        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        alice.bot.newClass(projectName, BotConfiguration.PACKAGENAME,
+            BotConfiguration.CLASSNAME);
     }
 
     @AfterClass
     public static void cleanupInvitee() throws RemoteException {
-        bob.xmppDisconnect();
+        bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
-        alice.xmppDisconnect();
+        alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
     }
 
@@ -62,9 +63,8 @@ public class TestShareProject {
     public void testShareProject() throws RemoteException {
         log.trace("testShareProject enter");
 
-        alice.buildSession(bob, BotConfiguration.PROJECTNAME,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT,
-            SarosConstant.CREATE_NEW_PROJECT);
+        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         bob.bot
             .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice.bot

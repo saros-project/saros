@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
@@ -216,7 +217,28 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
         String inviter, String projectName) throws RemoteException;
 
-    public void confirmInvitationWindow(String invitee) throws RemoteException;
+    public void confirmInvitationWindow(String... invitee)
+        throws RemoteException;
 
     public void confirmContact() throws RemoteException;
+
+    public void giveDriverRole(String inviteeJID) throws RemoteException;
+
+    public void inviteUser(String inviteeJID, String projectName)
+        throws RemoteException;
+
+    public boolean isConnectedByXMPP() throws RemoteException;
+
+    public void xmppConnect(JID jid, String password) throws RemoteException;
+
+    public void xmppDisconnect() throws RemoteException;
+
+    public void creatNewAccount(JID jid, String password)
+        throws RemoteException;
+
+    public boolean hasContactWith(JID jid) throws RemoteException;
+
+    public void openSarosViews() throws RemoteException;
+
+    // public void leaveSession(JID jid) throws RemoteException;
 }
