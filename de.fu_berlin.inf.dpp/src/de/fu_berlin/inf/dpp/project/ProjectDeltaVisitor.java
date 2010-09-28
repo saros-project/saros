@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -20,26 +21,45 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
- * Visits the resource changes in a shared project.
+ * Visits the resource changes in a shared project.<br>
+ * The visitor is not supposed to be reused for different resourceChanged
+ * events.
  */
 public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
-    protected SharedResourcesManager sharedResourcesManager;
-    protected ISarosSession sarosSession;
+    private static final Logger log = Logger
+        .getLogger(ProjectDeltaVisitor.class);
+    protected final EditorManager editorManager;
+
+    protected final User user;
+
+    protected final ISarosSession sarosSession;
 
     /** The project visited. */
-    protected SharedProject sharedProject;
+    protected final SharedProject sharedProject;
 
-    public ProjectDeltaVisitor(SharedResourcesManager sharedResourcesManager,
+    public ProjectDeltaVisitor(EditorManager editorManager,
         ISarosSession sarosSession, SharedProject sharedProject) {
-        this.sharedResourcesManager = sharedResourcesManager;
-        this.sharedProject = sharedProject;
         this.sarosSession = sarosSession;
+        this.editorManager = editorManager;
+        this.sharedProject = sharedProject;
+        this.user = sarosSession.getLocalUser();
     }
 
     /** Stores activities to be sent due to one change event. */
     protected List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
+    /**
+     * Don't generate activities for a resource if
+     * <code>ignoredPath.isPrefixOf(resource.getFullPath())</code>.
+     */
+    private IPath ignoredPath = null;
+
+    /**
+     * Don't send activities yet.
+     */
+    private boolean postponeSending = false;
 
     public boolean visit(IResourceDelta delta) {
         IResource resource = delta.getResource();
@@ -47,6 +67,11 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return false;
         }
 
+        /*
+         * TODO Refactor this, we don't need to make a distinction here.
+         * Resource is resource. It's just Saros that insists on having separate
+         * activities for files and folders.
+         */
         if (resource instanceof IFile) {
             handleFileDelta(delta);
             return true;
@@ -64,18 +89,18 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         int kind = delta.getKind();
         switch (kind) {
         case IResourceDelta.ADDED:
-            addActivity(new FolderActivity(getUser(),
-                FolderActivity.Type.Created, new SPath(resource)));
+            add(resource);
             return true;
         case IResourceDelta.REMOVED:
-            addActivity(new FolderActivity(getUser(),
-                FolderActivity.Type.Removed, new SPath(resource)));
+            remove(resource);
             // We don't want to visit the children if this folder was removed.
             // The only interesting case is that a file was moved out of this or
             // a child folder, but we're still going to visit the move target.
-            return false;
+            setIgnoreChildren(resource);
+            return true;
         default:
-            return kind != IResourceDelta.NO_CHANGE;
+            final boolean change = kind != IResourceDelta.NO_CHANGE;
+            return change;
         }
     }
 
@@ -83,10 +108,13 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         IResource resource = delta.getResource();
         int kind = delta.getKind();
 
+        IProject project = resource.getProject();
+        boolean contentChange = isContentChange(delta);
         switch (kind) {
         case IResourceDelta.CHANGED:
-            if (isContentChange(delta))
-                addCreatedUnlessOpen(resource);
+            if (contentChange) {
+                contentChanged(resource);
+            }
             return;
 
         case IResourceDelta.ADDED:
@@ -95,18 +123,14 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             if (isMovedFrom(delta)) {
 
                 // Adds have getMovedFrom set:
-                IPath oldPath = delta.getMovedFromPath();
-                IProject oldProject = ProjectDeltaVisitor.getProject(oldPath);
+                IPath oldFullPath = delta.getMovedFromPath();
+                IProject oldProject = ProjectDeltaVisitor
+                    .getProject(oldFullPath);
 
-                if (sarosSession.isShared(oldProject)) {
-                    // Moving inside the shared project
+                if (project.equals(oldProject)) {
+                    // Moving inside this project
                     try {
-                        addActivity(FileActivity.moved(
-                            getUser(),
-                            new SPath(resource),
-                            new SPath(oldProject, oldPath
-                                .removeFirstSegments(1)),
-                            isContentChange(delta)));
+                        move(resource, oldFullPath, oldProject, contentChange);
                         return;
                     } catch (IOException e) {
                         SharedResourcesManager.log
@@ -123,7 +147,8 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
             // usual files adding procedure
 
-            addCreatedUnlessOpen(resource);
+            add(resource);
+
             return;
 
         case IResourceDelta.REMOVED:
@@ -132,8 +157,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 // REMOVED deltas have MovedTo set
                 IPath newPath = delta.getMovedToPath();
                 IProject newProject = ProjectDeltaVisitor.getProject(newPath);
-
-                if (sarosSession.isShared(newProject)) {
+                if (project.equals(newProject)) {
                     // Ignore "REMOVED" while moving into shared project
                     return;
                 }
@@ -141,8 +165,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 // others to delete! Fall-through...
             }
 
-            addActivity(FileActivity.removed(getUser(), new SPath(resource),
-                Purpose.ACTIVITY));
+            remove(resource);
             return;
 
         default:
@@ -150,8 +173,71 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         }
     }
 
-    protected User getUser() {
-        return sarosSession.getLocalUser();
+    /** Indicates not to generate activities for children of the resource. */
+    protected void setIgnoreChildren(IResource resource) {
+        if (!ignoreChildren(resource))
+            ignoredPath = resource.getFullPath();
+    }
+
+    /**
+     * Returns true if we're not supposed to generate activities for children of
+     * the resource.
+     */
+    protected boolean ignoreChildren(IResource resource) {
+        IPath fullPath = resource.getFullPath();
+        return ignoreChildren(fullPath);
+    }
+
+    /**
+     * {@link #ignoreChildren(IResource)}
+     */
+    protected boolean ignoreChildren(IPath fullPath) {
+        if (ignoredPath == null || !ignoredPath.isPrefixOf(fullPath)) {
+            ignoredPath = null;
+            return false;
+        }
+        return true;
+    }
+
+    protected void add(IResource resource) {
+        sharedProject.add(resource);
+        final SPath spath = new SPath(resource);
+        if (ignoreChildren(resource))
+            return;
+
+        if (resource instanceof IFile) {
+            try {
+                addActivity(FileActivity.created(user, spath, Purpose.ACTIVITY));
+            } catch (IOException e) {
+                log.error("Couldn't access file " + spath);
+            }
+        } else {
+            addActivity(new FolderActivity(user, FolderActivity.Type.Created,
+                spath));
+        }
+    }
+
+    protected void move(IResource resource, IPath oldFullPath,
+        IProject oldProject, boolean contentChange) throws IOException {
+        sharedProject.move(resource, oldFullPath);
+        if (!ignoreChildren(resource)) {
+            addActivity(FileActivity.moved(user, new SPath(resource),
+                new SPath(oldProject, oldFullPath.removeFirstSegments(1)),
+                contentChange));
+        }
+    }
+
+    protected void remove(IResource resource) {
+        sharedProject.remove(resource);
+        if (ignoreChildren(resource))
+            return;
+        if (resource instanceof IFile) {
+            addActivity(FileActivity.removed(user, new SPath(resource),
+                Purpose.ACTIVITY));
+        } else {
+            addActivity(new FolderActivity(user, FolderActivity.Type.Removed,
+                new SPath(resource)));
+        }
     }
 
     protected static IProject getProject(IPath newPath) {
@@ -160,8 +246,20 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         return newProject;
     }
 
+    /**
+     * Adds an activity to {@link ProjectDeltaVisitor#pendingActivities}. It
+     * should only be called if ignoreChildren returns false: don't create an
+     * activity if it's not supposed to be sent anyways.
+     */
     protected void addActivity(IResourceActivity activity) {
-        pendingActivities.add(activity);
+        final SPath path = activity.getPath();
+        boolean ignoreActivity = ignoreChildren(path.getFullPath());
+        if (!ignoreActivity) {
+            pendingActivities.add(activity);
+        } else {
+            log.error("Shouldn't create an activity if it's ignored anyways. "
+                + activity);
+        }
     }
 
     /**
@@ -171,15 +269,14 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
      * 
      * @param resource
      */
-    private void addCreatedUnlessOpen(IResource resource) {
+    private void contentChanged(IResource resource) {
         SPath spath = new SPath(resource);
-        if (sharedResourcesManager.editorManager.isOpened(spath)) {
+        if (editorManager.isOpened(spath)) {
             return;
         }
 
         SharedResourcesManager.log.debug("Resource " + resource.getName()
             + " changed");
-        User user = getUser();
         try {
             addActivity(FileActivity.created(user, spath, Purpose.ACTIVITY));
         } catch (IOException e) {
@@ -218,4 +315,11 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     }
 
+    protected void setPostponeSending(boolean value) {
+        postponeSending = value;
+    }
+
+    public boolean postponeSending() {
+        return postponeSending;
+    }
 }

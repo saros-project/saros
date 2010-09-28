@@ -33,10 +33,10 @@ import org.tigris.subversion.svnclientadapter.SVNRevision;
 import org.tigris.subversion.svnclientadapter.SVNUrl;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 
 /**
  * Adapter for Subclipse 1.6.
@@ -396,9 +396,9 @@ class SubclipseAdapter extends VCSAdapter {
 
     @Override
     public ProjectDeltaVisitor getProjectDeltaVisitor(
-        SharedResourcesManager sharedResourcesManager,
-        ISarosSession sarosSession, SharedProject sharedProject) {
-        return new SubclipseProjectDeltaVisitor(sharedResourcesManager,
-            sarosSession, sharedProject);
+        EditorManager editorManager, ISarosSession sarosSession,
+        SharedProject sharedProject) {
+        return new SubclipseProjectDeltaVisitor(editorManager, sarosSession,
+            sharedProject);
     }
 }

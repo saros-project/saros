@@ -1,79 +1,116 @@
 package de.fu_berlin.inf.dpp.vcs;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 
 /**
  * Visits the resource changes in a shared SVN project.<br>
  * <br>
  * When running an SVN operation, Subclipse uses multiple jobs, which results in
  * multiple resourceChanged events. This visitor detects these
- * Subclipse-specific jobs.
+ * Subclipse-specific jobs.<br>
+ * The visitor is not supposed to be reused for multiple different
+ * resourceChanged events.
  */
 public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
+    protected final VCSAdapter vcs;
 
-    public SubclipseProjectDeltaVisitor(
-        SharedResourcesManager sharedResourcesManager,
+    public SubclipseProjectDeltaVisitor(EditorManager editorManager,
         ISarosSession sarosSession, SharedProject sharedProject) {
-        super(sharedResourcesManager, sarosSession, sharedProject);
+        super(editorManager, sarosSession, sharedProject);
+        vcs = sharedProject.getVCSAdapter();
     }
 
+    // Don't ignore 'SyncFileChangeOperation'
     private static final Collection<String> jobNames = Arrays.asList(
         "SVN Update", "SVN Switch", "ResourcesChangedOperation");
 
     @Override
     public boolean visit(IResourceDelta delta) {
         IResource resource = delta.getResource();
-        if (!(resource instanceof IProject)) {
-            return super.visit(delta);
-        }
 
-        IProject project = (IProject) resource;
-        assert project.isOpen();
+        if (resource.isDerived())
+            return false;
 
-        VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        assert vcs != null;
+        assert resource.getProject().isOpen();
+
+        assert vcs != null && vcs.equals(sharedProject.getVCSAdapter());
 
         if (isSync(delta)) {
-            VCSResourceInfo info = vcs.getResourceInfo(project);
-            String url = info.url;
-            if (sharedProject.updateVcsUrl(url)) {
+            VCSResourceInfo info = vcs.getResourceInfo(resource);
+            if (sharedProject.updateVcsUrl(resource, info.url)) {
+                sharedProject.updateRevision(resource, info.revision);
                 // Switch
-                addActivity(VCSActivity.switch_(sarosSession, resource, url,
-                    info.revision));
-                return false;
+                if (!ignoreChildren(resource)) {
+                    addActivity(VCSActivity.switch_(sarosSession, resource,
+                        info.url, info.revision));
+                    setIgnoreChildren(resource);
+                }
+                return true;
             }
 
-            if (sharedProject.updateRevision(info.revision)) {
+            if (sharedProject.updateRevision(resource, info.revision)) {
                 // Update
-                addActivity(VCSActivity.update(sarosSession, resource,
-                    info.revision));
-                return false;
+                if (!ignoreChildren(resource)) {
+                    addActivity(VCSActivity.update(sarosSession, resource,
+                        info.revision));
+                    setIgnoreChildren(resource);
+                }
+                return true;
             }
         }
 
-        // Ignore all the jobs from SVN.
-        IJobManager jobManager = Job.getJobManager();
-        Job currentJob = jobManager.currentJob();
-        if (currentJob != null) {
-            String jobName = currentJob.getName();
-            if (jobNames.contains(jobName)) {
-                return false;
+        if (resource instanceof IProject) {
+            // Ignore all the jobs from SVN.
+            IJobManager jobManager = Job.getJobManager();
+            Job currentJob = jobManager.currentJob();
+            if (currentJob != null) {
+                String jobName = currentJob.getName();
+                if (jobNames.contains(jobName)) {
+                    setPostponeSending(true);
+                }
             }
         }
 
-        return super.visit(delta);
+        final boolean visitChildren = super.visit(delta);
+
+        return visitChildren;
     }
+
+    @Override
+    public void add(IResource resource) {
+        super.add(resource);
+        updateInfo(resource);
+    }
+
+    @Override
+    protected void move(IResource resource, IPath oldPath, IProject oldProject,
+        boolean contentChange) throws IOException {
+        super.move(resource, oldPath, oldProject, contentChange);
+        updateInfo(resource);
+    }
+
+    protected void updateInfo(IResource resource) {
+        VCSResourceInfo info = vcs.getResourceInfo(resource);
+        if (!vcs.isManaged(resource)) {
+            return;
+        }
+        sharedProject.updateVcsUrl(resource, info.url);
+        sharedProject.updateRevision(resource, info.revision);
+    }
+
 }

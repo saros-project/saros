@@ -4,12 +4,15 @@ import static java.text.MessageFormat.format;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.team.core.RepositoryProvider;
@@ -31,7 +34,15 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * between the IProject and the corresponding SharedProject, we know that we
  * need to send activities.
  */
-// TODO Rename to SharedProjectState?
+/*
+ * What if SharedProject became a little smarter, what if SharedProject actually
+ * represented the shared project, not only its state? E.g. if
+ * SharedResourceManager detects that a file was added to the local project, it
+ * notifies the corresponding SharedProject, which then creates and sends a
+ * FileActivity if we're a driver. On peers, the SharedProject would be
+ * responsible for updating the local project upon receiving resource
+ * activities, possibly even reverting changes.
+ */
 public class SharedProject {
     /**
      * A value of type E with a convenient update method to check if the value
@@ -96,13 +107,37 @@ public class SharedProject {
 
         @Override
         public String toString() {
-            return format("R[{0}, {1}]", vcsUrl.toString(),
+            return format("R[{0}@{1}]", vcsUrl.toString(),
                 vcsRevision.toString());
         }
     }
 
     /** Maps the project relative path of a resource. */
-    protected Map<IPath, ResourceInfo> resourceMap = new HashMap<IPath, SharedProject.ResourceInfo>();
+    @SuppressWarnings("serial")
+    protected Map<IPath, ResourceInfo> resourceMap = new HashMap<IPath, SharedProject.ResourceInfo>() {
+        /**
+         * This override is intended for debugging output only.
+         */
+        @Override
+        public String toString() {
+            Map<String, String> sorted = new TreeMap<String, String>();
+            Set<Map.Entry<IPath, ResourceInfo>> entrySet = this.entrySet();
+            for (Map.Entry<IPath, ResourceInfo> entry : entrySet) {
+                sorted.put(entry.getKey().toString(), entry.getValue()
+                    .toString());
+            }
+            String result = "";
+            boolean addNewLine = false;
+            String fullPath = project.getFullPath().toString() + "/";
+            for (Map.Entry<String, String> entry : sorted.entrySet()) {
+                if (addNewLine)
+                    result += "\n";
+                result += fullPath + entry.getKey() + " -> " + entry.getValue();
+                addNewLine = true;
+            }
+            return result;
+        }
+    };
 
     protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
         false);
@@ -122,39 +157,40 @@ public class SharedProject {
     /** Used only for logging. */
     private ISubscriberChangeListener subscriberChangeListener = new ISubscriberChangeListener() {
         public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
-            String s = "subscriberResourceChanged:\n";
+            if (!log.isTraceEnabled())
+                return;
+            String result = "subscriberResourceChanged:\n";
             for (ISubscriberChangeEvent delta : deltas) {
                 int flags = delta.getFlags();
                 boolean syncChanged = (flags & ISubscriberChangeEvent.SYNC_CHANGED) != 0;
                 if (flags == ISubscriberChangeEvent.NO_CHANGE)
-                    s += "0";
+                    result += "0";
                 if (syncChanged)
-                    s += "S";
+                    result += "S";
                 if ((flags & ISubscriberChangeEvent.ROOT_ADDED) != 0)
-                    s += "+";
+                    result += "+";
                 if ((flags & ISubscriberChangeEvent.ROOT_REMOVED) != 0)
-                    s += "-";
+                    result += "-";
                 IResource resource = delta.getResource();
-                s += " " + resource.getFullPath().toPortableString();
+                result += " " + resource.getFullPath().toPortableString();
                 if (syncChanged) {
                     VCSAdapter vcs = VCSAdapter.getAdapter(resource
                         .getProject());
                     if (vcs.isManaged(resource)) {
-                        VCSResourceInfo info = vcs
-                            .getResourceInfo(resource);
-                        s += format(" ({0}:{1})", info.url, info.revision);
+                        VCSResourceInfo info = vcs.getResourceInfo(resource);
+                        result += format(" ({0}:{1})", info.url, info.revision);
                     }
                 }
-                s += "\n";
+                result += "\n";
             }
-            log.trace(s);
+            log.trace(result);
         }
     };
 
     public SharedProject(IProject project, ISarosSession sarosSession) {
         assert sarosSession != null;
         assert project != null;
-        assert project.isOpen();
+        assert project.isAccessible();
 
         this.sarosSession = sarosSession;
         this.project = project;
@@ -175,8 +211,10 @@ public class SharedProject {
             if (isDriver)
                 initializeVCSInfo();
         }
+        assert checkIntegrity();
     }
 
+    /** Initialize the ResourceInfo for every resource in the SharedProject. */
     protected void initializeVCSInfo() {
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
         this.vcs.update(vcs);
@@ -194,8 +232,9 @@ public class SharedProject {
         Set<IPath> paths = resourceMap.keySet();
         for (IPath path : paths) {
             IResource resource = project.findMember(path);
-            assert resource != null : "Resource not found";
+            assert resource != null : "Resource not found at " + path;
             VCSResourceInfo info = vcs.getResourceInfo(resource);
+
             updateVcsUrl(resource, info.url);
             updateRevision(resource, info.revision);
         }
@@ -213,9 +252,9 @@ public class SharedProject {
 
     /** Updates the current VCS URL, and returns true if the value changed. */
     public boolean updateVcsUrl(IResource resource, String newValue) {
+        checkResource(resource);
         IPath path = resource.getProjectRelativePath();
         ResourceInfo resourceInfo = resourceMap.get(path);
-        assert resourceInfo != null : path.toString() + " not found";
         return resourceInfo.vcsUrl.update(newValue);
     }
 
@@ -226,34 +265,50 @@ public class SharedProject {
 
     /** Updates the current VCS revision, and returns true if the value changed. */
     public boolean updateRevision(IResource resource, String newValue) {
+        checkResource(resource);
         IPath path = resource.getProjectRelativePath();
         ResourceInfo resourceInfo = resourceMap.get(path);
-        assert resourceInfo != null : path.toString() + " not found";
         return resourceInfo.vcsRevision.update(newValue);
     }
 
     /**
-     * Updates if the project is currently open, and returns true if the value
-     * changed.
+     * @throws IllegalArgumentException
+     *             if the resource is null or if this shared project doesn't
+     *             contain it.
+     */
+    protected void checkResource(IResource resource) {
+        if (resource == null)
+            throw new IllegalArgumentException("Resource is null");
+        else if (!contains(resource))
+            throw new IllegalArgumentException("Resource not in map "
+                + resource.toString());
+    }
+
+    /**
+     * Updates if the SharedProject is currently open, and returns true if the
+     * value changed.
      */
     public boolean updateProjectIsOpen(boolean newValue) {
         return projectIsOpen.update(newValue);
     }
 
-    /** Removes the resource from the project. */
-    // TODO This name might be confusing since the resource is not actually
-    // deleted.
+    /** Removes the resource from the SharedProject. */
     public void remove(IResource resource) {
-        assert resource.getProject() == project;
+        checkResource(resource);
         IPath path = resource.getProjectRelativePath();
         resourceMap.remove(path);
     }
 
-    /** Adds the resource to the project. */
+    /** Adds the resource to the SharedProject. */
     public void add(IResource resource) {
-        assert resource.getProject() == project;
+        if (resource == null)
+            throw new IllegalArgumentException("Resource is null");
+        if (resource.getProject() != project)
+            throw new IllegalArgumentException(format(
+                "resource {0} is not in project {1}", resource, project));
         ResourceInfo resourceInfo = new ResourceInfo(null, null);
-        resourceMap.put(resource.getProjectRelativePath(), resourceInfo);
+        final IPath path = resource.getProjectRelativePath();
+        resourceMap.put(path, resourceInfo);
     }
 
     /**
@@ -272,12 +327,14 @@ public class SharedProject {
     }
 
     /**
-     * Moves the resource to the project. Does <b>not</b> change the resource
-     * information associated with the resource.
+     * Moves the resource within the shared project. Does <b>not</b> change the
+     * resource information associated with the resource.
      */
-    // TODO Update information associated with the resource?
-    public void move(IPath oldPath, IPath newPath) {
-        resourceMap.put(newPath, resourceMap.remove(oldPath));
+    public void move(IResource resource, IPath oldFullPath) {
+        IPath oldPath = oldFullPath.removeFirstSegments(1);
+        assert containsKey(oldPath);
+        resourceMap.remove(oldPath);
+        add(resource);
     }
 
     /** Returns the current VCSAdapter. */
@@ -290,5 +347,107 @@ public class SharedProject {
      */
     public boolean belongsTo(IProject project) {
         return this.project.equals(project);
+    }
+
+    /**
+     * Returns true if this SharedProject contains the resource.
+     */
+    public boolean contains(IResource resource) {
+        final IPath projectRelativePath = resource.getProjectRelativePath();
+        return containsKey(projectRelativePath);
+    }
+
+    private boolean containsKey(IPath path) {
+        return resourceMap.containsKey(path);
+    }
+
+    /**
+     * Returns true if the SharedProject is in sync with the local project, i.e.
+     * if every resource in the IProject is in the SharedProject and vice versa,
+     * and if the resource information associated with the resources are up to
+     * date.<br>
+     * It's intended for debugging only.<br>
+     * TODO Do unit tests instead
+     */
+    public boolean checkIntegrity() {
+        boolean illegalState = false;
+        Set<Entry<IPath, ResourceInfo>> entrySet = resourceMap.entrySet();
+        final VCSAdapter vcs = this.vcs.getValue();
+        final String projectName = project.getName();
+        for (Entry<IPath, ResourceInfo> entry : entrySet) {
+            IPath path = entry.getKey();
+            IResource resource = project.findMember(path);
+            if (resource == null) {
+                String msg = format("Resource {0} in map doesn't exist"
+                    + " in project {1}.", path, project);
+                logIllegalStateException(msg);
+                illegalState = true;
+                resourceMap.remove(path);
+                continue;
+            }
+            assert resource.exists();
+            if (vcs == null)
+                continue;
+
+            VCSResourceInfo expected = vcs.getResourceInfo(resource);
+            ResourceInfo found = entry.getValue();
+            String foundUrl = found.vcsUrl.getValue();
+            String foundRevision = found.vcsRevision.getValue();
+            if (found.vcsRevision.update(expected.revision)) {
+                String msg = format(
+                    "Revision out of sync on {0} in project {1} - found {2}, expected {3}.",
+                    path, projectName, foundRevision, expected.revision);
+                logIllegalStateException(msg);
+                illegalState = true;
+            }
+            if (found.vcsUrl.update(expected.url)) {
+                String msg = format(
+                    "VCS URL out of sync on {0} in project {1}\n"
+                        + "found \"{2}\"\nexpected \"{3}\".", path,
+                    projectName, foundUrl, expected.url);
+                logIllegalStateException(msg);
+                illegalState = true;
+            }
+        }
+        IResourceVisitor visitor = new IResourceVisitor() {
+            boolean result = false;
+
+            public boolean visit(IResource resource) {
+                if (resource == null)
+                    return result;
+                IPath path = resource.getProjectRelativePath();
+                assert path != null : "Path of " + resource + " is null!";
+                if (!contains(resource)) {
+                    final String msg = format(
+                        "Resource map of {0} doesn't contain {1}.",
+                        projectName, path, new Object());
+                    logIllegalStateException(msg);
+                    result = true;
+                    add(resource);
+                    if (vcs != null) {
+                        final VCSResourceInfo info = vcs
+                            .getResourceInfo(resource);
+                        updateRevision(resource, info.revision);
+                        updateVcsUrl(resource, info.url);
+                    }
+                }
+                return true;
+            }
+        };
+        try {
+            project.accept(visitor, IResource.DEPTH_INFINITE,
+                IContainer.EXCLUDE_DERIVED);
+            illegalState = illegalState || visitor.visit(null);
+        } catch (CoreException e) {
+            return false;
+        }
+        return !illegalState;
+    }
+
+    private void logIllegalStateException(final String msg) {
+        // Should never happen.
+        final IllegalStateException e = new IllegalStateException();
+        log.error(msg, e);
+        // throw e;
     }
 }

@@ -12,10 +12,10 @@ import org.eclipse.team.core.subscribers.Subscriber;
 import org.eclipse.team.core.synchronize.SyncInfo;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 
 /**
  * Interface to an adapter for a Version Control System (Team Provider).
@@ -205,9 +205,9 @@ public abstract class VCSAdapter {
     }
 
     public ProjectDeltaVisitor getProjectDeltaVisitor(
-        SharedResourcesManager sharedResourcesManager,
-        ISarosSession sarosSession, SharedProject sharedProject) {
-        return new ProjectDeltaVisitor(sharedResourcesManager, sarosSession,
+        EditorManager editorManager, ISarosSession sarosSession,
+        SharedProject sharedProject) {
+        return new ProjectDeltaVisitor(editorManager, sarosSession,
             sharedProject);
     }
 }

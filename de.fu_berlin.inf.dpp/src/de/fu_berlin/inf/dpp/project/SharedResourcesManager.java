@@ -19,12 +19,16 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import static java.text.MessageFormat.format;
+
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -74,8 +78,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * handled by the EditorManager, that is for changes that aren't done by
  * entering text in an text editor. It creates and executes file, folder, and
  * VCS activities.<br>
- * TODO Add the ability to track information on every file/folder in the
- * project, dispatch move/copy/delete of resources to the SharedProject.<br>
+ * TODO Extract AbstractActivityProvider functionality in another class
+ * ResourceActivityProvider, rename to SharedResourceChangeListener.
  */
 /*
  * For a good introduction to Eclipse's resource change notification mechanisms
@@ -173,6 +177,98 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     };
 
+    private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
+
+    protected static class ResourceActivityFilter {
+        private List<IResourceActivity> enteredActivities = new ArrayList<IResourceActivity>();
+
+        public void enterAll(List<? extends IResourceActivity> activities) {
+            enteredActivities.addAll(activities);
+        }
+
+        public void enter(IResourceActivity activity) {
+            enteredActivities.add(activity);
+        }
+
+        public boolean isEmpty() {
+            return enteredActivities.isEmpty();
+        }
+
+        /**
+         * Returns the filtered activities in order and clears the list of
+         * collectedActivities. If the The order is: VCS activities, folder
+         * creations, file activities, folder removals.
+         * 
+         * haferburg: Sorting is not necessary, because activities are already
+         * sorted enough (activity on parent comes before activity on child).
+         * All we need to do is make sure that folders are created first and
+         * deleted last. The sorting stuff was introduced with 1742 (1688).
+         */
+        public List<IResourceActivity> retrieveAll() {
+            List<IResourceActivity> vcsActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
+
+            // Split all collectedActivities.
+            for (IResourceActivity activity : enteredActivities) {
+
+                if (activity instanceof VCSActivity) {
+                    vcsActivities.add(activity);
+                } else if (activity instanceof FileActivity) {
+                    fileActivities.add(activity);
+                } else if (activity instanceof FolderActivity) {
+                    FolderActivity.Type tFolder = ((FolderActivity) activity)
+                        .getType();
+                    if (tFolder == FolderActivity.Type.Created)
+                        folderCreateActivities.add(activity);
+                    else if (tFolder == FolderActivity.Type.Removed)
+                        folderRemoveActivities.add(activity);
+                } else {
+                    otherActivities.add(activity);
+                }
+            }
+            /*
+             * TODO This might be SVN specific. The SVN jobs update sync info on
+             * child before parent, so by reversing the list we know: If i<j
+             * then !vcsActivities.get(j).includes(vcsActivities.get(i)).
+             */
+            Collections.reverse(vcsActivities);
+
+            // Add activities to the result.
+            List<IResourceActivity> result = new ArrayList<IResourceActivity>();
+            result.addAll(vcsActivities);
+            result.addAll(folderCreateActivities);
+            result.addAll(fileActivities);
+            result.addAll(folderRemoveActivities);
+            result.addAll(otherActivities);
+
+            // Note: This iteration relies on result starting with
+            // vcsActivities.
+            for (int i = 0; i < vcsActivities.size(); i++) {
+                VCSActivity vcsActivity = (VCSActivity) (vcsActivities.get(i));
+                if (!result.contains(vcsActivity))
+                    continue;
+                // Iterate in reverse order so that we can safely remove items.
+                for (int j = result.size() - 1; j > i; j--) {
+                    IResourceActivity otherActivity = result.get(j);
+                    if (result.contains(otherActivity)
+                        && vcsActivity.includes(otherActivity)) {
+                        log.debug("Ignoring redundant activity "
+                            + otherActivity);
+                        result.remove(j);
+                    }
+                }
+            }
+
+            enteredActivities.clear();
+
+            return result;
+        }
+
+    }
+
     public SharedResourcesManager(ISessionManager sessionManager,
         StopManager stopManager) {
         this.sessionManager = sessionManager;
@@ -236,19 +332,18 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         assert delta.getResource() instanceof IWorkspaceRoot;
 
         // Iterate over all projects.
+        boolean postpone = false;
         IResourceDelta[] projectDeltas = delta.getAffectedChildren();
-        List<IResourceActivity> pendingActivities = new ArrayList<IResourceActivity>();
         for (IResourceDelta projectDelta : projectDeltas) {
-            IResource resource = projectDelta.getResource();
-            assert resource instanceof IProject;
-            IProject project = (IProject) resource;
+            assert projectDelta.getResource() instanceof IProject;
+            IProject project = (IProject) projectDelta.getResource();
             if (!sarosSession.isShared(project))
                 continue;
 
             if (!checkOpenClosed(project))
                 continue;
 
-            if (!checkVCSConnection(project, pendingActivities))
+            if (!checkVCSConnection(project))
                 continue;
 
             SharedProject sharedProject = sarosSession
@@ -257,23 +352,35 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             VCSAdapter vcs = VCSAdapter.getAdapter(project);
             ProjectDeltaVisitor visitor;
             if (vcs == null) {
-                visitor = new ProjectDeltaVisitor(this, sarosSession,
+                visitor = new ProjectDeltaVisitor(editorManager, sarosSession,
                     sharedProject);
             } else {
-                visitor = vcs.getProjectDeltaVisitor(this, sarosSession,
-                    sharedProject);
+                visitor = vcs.getProjectDeltaVisitor(editorManager,
+                    sarosSession, sharedProject);
             }
             try {
-                projectDelta.accept(visitor);
+                projectDelta.accept(visitor, IContainer.INCLUDE_HIDDEN);
             } catch (CoreException e) {
-                // The Eclipse documentation doesn't specify when CoreExceptions
-                // can occur.
-                log.debug("ProjectDeltaVisitor of project " + project.getName()
-                    + " failed for some reason.", e);
+                // The Eclipse documentation doesn't specify when
+                // CoreExceptions can occur.
+                log.debug(format("ProjectDeltaVisitor of project {0} "
+                    + "failed for some reason.", project.getName()), e);
             }
-            pendingActivities.addAll(visitor.pendingActivities);
+            if (visitor.postponeSending()) {
+                postpone = true;
+            }
+            log.trace("Adding new activities " + visitor.pendingActivities);
+            pendingActivities.enterAll(visitor.pendingActivities);
+
+            assert postpone || sharedProject.checkIntegrity();
+            log.trace("sharedProject.resourceMap: \n"
+                + sharedProject.resourceMap);
         }
-        orderAndFire(pendingActivities);
+        if (!postpone) {
+            fireActivities();
+        } else if (!pendingActivities.isEmpty()) {
+            log.debug("Postponing sending the activities");
+        }
     }
 
     protected boolean checkOpenClosed(IProject project) {
@@ -298,8 +405,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         return true;
     }
 
-    protected boolean checkVCSConnection(IProject project,
-        List<IResourceActivity> pendingActivities) {
+    /**
+     * Returns false if the VCS changed.
+     * 
+     * @param project
+     * @return
+     */
+    protected boolean checkVCSConnection(IProject project) {
         SharedProject sharedProject = sarosSession.getSharedProject(project);
 
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
@@ -312,13 +424,12 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                     || !oldVcs.hasLocalCache(project);
                 VCSActivity activity = VCSActivity.disconnect(sarosSession,
                     project, deleteContent);
-                pendingActivities.add(activity);
+                pendingActivities.enter(activity);
                 sharedProject.updateRevision(null);
                 sharedProject.updateVcsUrl(null);
             } else {
                 // Connect
-                VCSResourceInfo info = vcs
-                    .getResourceInfo(project);
+                VCSResourceInfo info = vcs.getResourceInfo(project);
                 String repositoryString = vcs.getRepositoryString(project);
                 if (repositoryString == null || info.url == null) {
                     // HACK For some reason, Subclipse returns null values
@@ -333,7 +444,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 VCSActivity activity = VCSActivity.connect(sarosSession,
                     project, repositoryString, directory,
                     vcs.getProviderID(project));
-                pendingActivities.add(activity);
+                pendingActivities.enter(activity);
                 sharedProject.updateVcsUrl(info.url);
                 sharedProject.updateRevision(info.revision);
 
@@ -348,10 +459,12 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     /**
      * Fires the ordered activities. To be run before change event ends.
      */
-    protected void orderAndFire(List<IResourceActivity> pendingActivities) {
+    protected void fireActivities() {
         if (pendingActivities.isEmpty())
             return;
-        final List<IResourceActivity> orderedActivities = getOrderedActivities(pendingActivities);
+        final List<IResourceActivity> orderedActivities = pendingActivities
+            .retrieveAll();
+        log.trace("Sending activities " + orderedActivities.toString());
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 for (final IActivity activity : orderedActivities) {
@@ -359,51 +472,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 }
             }
         });
-        log.trace("Sending activities " + orderedActivities.toString());
-    }
-
-    /**
-     * Returns the activities in the order: folder creations, file activities,
-     * folder removals, then everything else.
-     * 
-     * haferburg: Sorting is not necessary, because activities are already
-     * sorted enough (activity on parent comes before activity on child). All we
-     * need to do is make sure that folders are created first and deleted last.
-     * The sorting stuff was introduced with 1742 (1688).
-     */
-    protected List<IResourceActivity> getOrderedActivities(
-        List<IResourceActivity> activities) {
-        List<IResourceActivity> fileActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
-        List<IResourceActivity> otherActivities = new ArrayList<IResourceActivity>();
-
-        /**
-         * Split all pendingActivities.
-         */
-        for (IResourceActivity activity : activities) {
-
-            if (activity instanceof FileActivity) {
-                fileActivities.add(activity);
-            } else if (activity instanceof FolderActivity) {
-                FolderActivity.Type tFolder = ((FolderActivity) activity)
-                    .getType();
-                if (tFolder == FolderActivity.Type.Created)
-                    folderCreateActivities.add(activity);
-                else if (tFolder == FolderActivity.Type.Removed)
-                    folderRemoveActivities.add(activity);
-            } else {
-                otherActivities.add(activity);
-            }
-        }
-
-        // Add activities to the result.
-        List<IResourceActivity> result = folderCreateActivities;
-        result.addAll(fileActivities);
-        result.addAll(folderRemoveActivities);
-        result.addAll(otherActivities);
-
-        return result;
     }
 
     /*
@@ -613,9 +681,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             });
             pmdShell.dispose();
         } catch (InvocationTargetException e) {
-            assert false; // TODO We can't get here, right?
+            // TODO We can't get here, right?
+            throw new IllegalStateException(e);
         } catch (InterruptedException e) {
-            assert false; // We can't get here
+            log.error("Code not designed to be interrupted!");
         }
     }
 }

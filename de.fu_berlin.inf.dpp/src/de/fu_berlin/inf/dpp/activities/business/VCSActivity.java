@@ -177,4 +177,52 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         result += ")";
         return result;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result
+            + ((directory == null) ? 0 : directory.hashCode());
+        result = prime * result + ((param1 == null) ? 0 : param1.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ((url == null) ? 0 : url.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        VCSActivity other = (VCSActivity) obj;
+        if (directory == null) {
+            if (other.directory != null)
+                return false;
+        } else if (!directory.equals(other.directory))
+            return false;
+        if (param1 == null) {
+            if (other.param1 != null)
+                return false;
+        } else if (!param1.equals(other.param1))
+            return false;
+        if (path == null) {
+            if (other.path != null)
+                return false;
+        } else if (!path.equals(other.path))
+            return false;
+        if (type != other.type)
+            return false;
+        if (url == null) {
+            if (other.url != null)
+                return false;
+        } else if (!url.equals(other.url))
+            return false;
+        return true;
+    }
+
 }

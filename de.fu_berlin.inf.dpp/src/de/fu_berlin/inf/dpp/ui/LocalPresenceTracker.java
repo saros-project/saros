@@ -48,8 +48,13 @@ public class LocalPresenceTracker {
             }
         });
 
-        IWorkbench bench = PlatformUI.getWorkbench();
-
+        IWorkbench bench;
+        try {
+            bench = PlatformUI.getWorkbench();
+        } catch (IllegalStateException e) {
+            log.warn("Workbench not found, assuming headless test");
+            return;
+        }
         if (bench == null) {
             log.error("Could not get IWorkbench!");
             return;
