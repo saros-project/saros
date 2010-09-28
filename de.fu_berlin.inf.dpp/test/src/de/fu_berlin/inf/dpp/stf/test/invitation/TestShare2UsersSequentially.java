@@ -17,7 +17,8 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestShare2UsersSequentially {
-    private static final Logger log = Logger.getLogger(TestShare2UsersSequentially.class);
+    private static final Logger log = Logger
+        .getLogger(TestShare2UsersSequentially.class);
 
     // bots
     protected static Musician alice;
@@ -51,12 +52,14 @@ public class TestShare2UsersSequentially {
     public static void cleanupInvitee() throws RemoteException {
         bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.resetWorkbench();
     }
 
     @AfterClass
     public static void cleanupInviter() throws RemoteException {
         alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.resetWorkbench();
     }
 
     @Test
@@ -75,7 +78,7 @@ public class TestShare2UsersSequentially {
             BotConfiguration.CLASSNAME);
 
         log.trace("invitee.openFile");
-        bob.bot.openJavaFileWithEditor(BotConfiguration.PROJECTNAME,
+        bob.bot.openClass(BotConfiguration.PROJECTNAME,
             BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
 
         // invitee.sleep(2000);

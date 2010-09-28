@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +42,6 @@ public class TestSVN {
 
     @AfterClass
     public static void tearDownBob() throws Exception {
-
         bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
     }
@@ -50,6 +50,12 @@ public class TestSVN {
     public static void tearDownAlice() throws Exception {
         alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
+    }
+
+    @After
+    public void reset() throws RemoteException {
+        alice.bot.resetWorkbench();
+        bob.bot.resetWorkbench();
     }
 
     @Test

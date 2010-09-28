@@ -65,6 +65,8 @@ public class TestFollowMode {
             bob.clickCMStopfollowingThisUserInSPSView(alice);
         if (alice.state.isFollowing())
             alice.clickCMStopfollowingThisUserInSPSView(bob);
+        bob.bot.resetWorkbench();
+        alice.bot.resetWorkbench();
 
     }
 

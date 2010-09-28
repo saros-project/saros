@@ -69,6 +69,8 @@ public class TestShareProjectUsingExistingProject {
         alice.leaveSession();
         alice.bot.deleteProject(PROJECT);
         bob.bot.deleteProject(PROJECT);
+        bob.bot.resetWorkbench();
+        alice.bot.resetWorkbench();
     }
 
     @AfterClass

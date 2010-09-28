@@ -74,6 +74,9 @@ public class TestEditDuringInvitation {
         bob.bot.deleteProject(PROJECT);
         alice.bot.xmppDisconnect();
         alice.bot.deleteProject(PROJECT);
+        carl.bot.resetWorkbench();
+        bob.bot.resetWorkbench();
+        alice.bot.resetWorkbench();
     }
 
     private static final Logger log = Logger

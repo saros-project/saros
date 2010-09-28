@@ -30,7 +30,6 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -41,9 +40,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.swtbot.helpers.TableObject;
+import de.fu_berlin.inf.dpp.stf.swtbot.helpers.ToolbarObject;
+import de.fu_berlin.inf.dpp.stf.swtbot.helpers.TreeObject;
+import de.fu_berlin.inf.dpp.stf.swtbot.helpers.WaitUntilObject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -58,7 +60,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     private static final boolean SCREENSHOTS = true;
 
-    protected static transient SarosSWTWorkbenchBot delegate;
+    public static transient SarosSWTWorkbenchBot delegate;
 
     private static transient RmiSWTWorkbenchBot self;
 
@@ -71,6 +73,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     protected transient String myName;
 
     public int sleepTime = 750;
+
+    public WaitUntilObject wUntilObject = new WaitUntilObject(this);
+    public TableObject tableObject = new TableObject(this);
+    public ToolbarObject tBarObject = new ToolbarObject(this);
+    public TreeObject treeObject = new TreeObject(this);
 
     /** RmiSWTWorkbenchBot is a singleton */
     public static RmiSWTWorkbenchBot getInstance() {
@@ -146,23 +153,315 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
-    /*********************** high-level RMI exported Methods *******************/
+    /*******************************************************************************
+     * 
+     * Package Explorer View Page
+     * 
+     *******************************************************************************/
+    public void activatePackageExplorerView() throws RemoteException {
+        activateViewWithTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+    }
 
     /**
-     * Throws WidgetException if given project does not exist in Package
-     * Explorer.
+     * Delete the selected project in view "Package Explorer" using GUI-method
+     * 
+     * 1. if view "Package Explorer" isn't open, open it.
+     * 
+     * 2. if view "Package Explorer" isn't active, activate it.
+     * 
+     * 3. select the project,which you want to delete, and then click the menu
+     * Edit->Delete.
+     * 
+     * 4. confirm the popup-window "Delete Resources" and make sure the checkbox
+     * is clicked.
+     * 
+     * 5. delegate wait so long until the popup-window is closed.
+     * 
+     * @param projectName
+     *            the treeitem's name of the tree in view "Package Explorer"
      */
-
-    public void sleep(long millis) throws RemoteException {
-        delegate.sleep(millis);
+    public void deleteProjectGui(String projectName) throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        SWTBotTree tree = treeObject
+            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        tree.select(projectName);
+        clickMenuWithTexts("Edit", "Delete");
+        confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_DELETE_RESOURCE,
+            SarosConstant.BUTTON_OK, true);
+        waitUntilShellCloses(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
     }
 
-    public void captureScreenshot(String filename) throws RemoteException {
-        if (SCREENSHOTS)
-            delegate.captureScreenshot(filename);
+    /**
+     * Delete the project using FileUntil.delete(resource). This delete-method
+     * costs less time than the previous version.
+     * 
+     * @param projectName
+     *            name of the project, which you want to delete.
+     */
+    public void deleteProject(String projectName) throws RemoteException {
+        IPath path = new Path(projectName);
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + projectName, e);
+            }
+        }
     }
 
-    /**************** import project *********************/
+    /**
+     * Delete the selected file in view "Package Explorer" using GUI-method
+     * 
+     * 1. if view "Package Explorer" isn't open, open it.
+     * 
+     * 2. if view "Package Explorer" isn't active, activate it.
+     * 
+     * 3. select the file,which you want to delete, and then click the menu
+     * Edit->Delete.
+     * 
+     * 4. confirm the popup-window "Confirm Delete".
+     * 
+     * 5. delegate wait so long until the popup-window is closed.
+     * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     */
+    public void deleteFileGui(String... nodes) throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        delegate.tree().expandNode(nodes);
+        treeObject.selectTreeWithLabelsInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nodes);
+        clickMenuWithTexts(SarosConstant.MENU_TITLE_EDIT,
+            SarosConstant.MENU_TITLE_DELETE);
+        waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
+        confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
+            SarosConstant.BUTTON_OK);
+
+    }
+
+    /**
+     * Delete a package of the specified java project using
+     * FileUntil.delete(resource).
+     * 
+     * @param projectName
+     *            name of the project, which package you want to delete.
+     * @param pkg
+     *            name of the package, which you want to delete.
+     */
+    public void deletePkg(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/"));
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + projectName, e);
+            }
+        }
+    }
+
+    /**
+     * Delete a class of the specified java project using
+     * FileUntil.delete(resource).
+     * 
+     * @param projectName
+     *            name of the project, which class you want to delete.
+     * @param pkg
+     *            name of the package, which class you want to delete.
+     * @param className
+     *            name of the class, which you want to delete.
+     */
+    public void deleteClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + className + ".java", e);
+            }
+        }
+    }
+
+    /**
+     * Open a class
+     * 
+     * 1. if the class file is already open, return.
+     * 
+     * 2. select the class file.
+     * 
+     * 3. then click the context menu open.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo-Saros.
+     * @param packageName
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     */
+    public void openClass(String projectName, String packageName,
+        String className) throws RemoteException {
+        if (!isClassOpen(className)) {
+            openFileInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+                projectName, "src", packageName, className + ".java");
+            delegate.sleep(sleepTime);
+        }
+    }
+
+    /**
+     * This method is only a helper method for "openClass". Later you can define
+     * e.g. openXml, openText, openTHML using it. Make sure, the path is
+     * completely defined, e.g. in openClass you should pass parameter "nodes"
+     * such as Foo_Saros, src, my.pkg, MyClass.java to the method.
+     * 
+     * @param viewName
+     *            e.g. Package Explorer view or Resource Explorer view
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    protected void openFileInView(String viewName, String... nodes)
+        throws RemoteException {
+        treeObject.clickContextMenuOfTreeInView(viewName,
+            SarosConstant.CONTEXT_MENU_OPEN, nodes);
+    }
+
+    public void moveClassTo(String projectName, String pkg, String className,
+        String targetProject, String targetPkg) throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(projectName, "src", pkg, className);
+        log.info("matchTexts: " + matchTexts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Move...");
+        waitUntilShellActive("Move");
+        confirmWindowWithTree("Move", SarosConstant.BUTTON_OK, targetProject,
+            "src", targetPkg);
+
+    }
+
+    public void disConnectSVN() throws RemoteException {
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Disconnect...");
+        confirmWindow("Confirm Disconnect from SVN", SarosConstant.BUTTON_YES);
+    }
+
+    public void connectSVN() throws RemoteException {
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Share Project...");
+        confirmWindowWithTable("Share Project", "SVN",
+            SarosConstant.BUTTON_NEXT);
+        clickButton(SarosConstant.BUTTON_FINISH);
+    }
+
+    public void switchToOtherRevision() throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickCheckBox("Switch to HEAD revision");
+        setTextWithLabel("Revision:", "115");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
+    public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+
+        String[] matchTexts = CLS_PATH.split("/");
+        for (int i = 0; i < matchTexts.length; i++) {
+            matchTexts[i] = matchTexts[i] + ".*";
+        }
+        // String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickCheckBox("Switch to HEAD revision");
+        setTextWithLabel("Revision:", "116");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
+    public void revert() throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Revert...");
+        confirmWindow("Revert", SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("Revert");
+    }
+
+    public void renameFile(String newName, String... texts)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(texts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Rename...");
+        activateShellWithText("Rename Compilation Unit");
+        setTextWithLabel("New name:", newName);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        clickButton(SarosConstant.BUTTON_FINISH);
+    }
+
+    public void renamePkg(String newName, String... texts)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = changeToRegex(texts);
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
+            "Rename...");
+        activateShellWithText("Rename Package");
+        setTextWithLabel("New name:", newName);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("Rename Package");
+    }
+
+    public void switchToTag() throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+        clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
+            "Switch to another Branch/Tag/Revision...");
+        waitUntilShellActive("Switch");
+        clickButton("Select...");
+        confirmWindowWithTree("Repository Browser", SarosConstant.BUTTON_OK,
+            "tags", "eclipsecon2009");
+        clickButton(SarosConstant.BUTTON_OK);
+        waitUntilShellCloses("SVN Switch");
+    }
+
     public void importProjectFromSVN(String path) throws RemoteException {
         activateEclipseShell();
         clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
@@ -186,86 +485,56 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilShellCloses(shell2);
     }
 
-    /****************** delete widget ********************/
+    /*******************************************************************************
+     * 
+     * main menu page
+     * 
+     *******************************************************************************/
 
-    public void deleteProjectGui(String projectName) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        SWTBotTree tree = getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-        tree.select(projectName);
-        clickMenuWithTexts("Edit", "Delete");
-        confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_DELETE_RESOURCE,
-            SarosConstant.BUTTON_OK, true);
-        waitUntilShellCloses(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
-    }
-
-    public void deleteFileGui(String... labels) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        selectTreeWithLabelsInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            labels);
-        clickMenuWithTexts(SarosConstant.MENU_TITLE_EDIT,
-            SarosConstant.MENU_TITLE_DELETE);
-        waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-        confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
-            SarosConstant.BUTTON_OK);
-
-    }
-
-    public void deletePkg(String projectName, String pkg)
-        throws RemoteException {
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/"));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + projectName, e);
-            }
-        }
-    }
-
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + className + ".java", e);
-            }
-        }
-    }
-
-    public void deleteProject(String projectName) throws RemoteException {
-        IPath path = new Path(projectName);
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + projectName, e);
-            }
-        }
-    }
-
-    /************* new widget ******************/
-
+    /**
+     * Create a java project and a class in the project. The combination with
+     * function newJavaProject and newClass is used very often, so i put them
+     * together to simplify the junit-tests.
+     * 
+     * Attention: after creating a project delegate need to sleep a moment until
+     * he is allowed to create class. so if you want to create a project with a
+     * class, please use this mothde, otherwise you should get
+     * WidgetNotfoundException.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     */
     public void newJavaProjectWithClass(String projectName, String pkg,
         String className) throws RemoteException {
         newJavaProject(projectName);
+        delegate.sleep(50);
         newClass(projectName, pkg, className);
     }
 
+    /**
+     * Create a java project. The name of the method is defined the same as the
+     * menu names. The name "newJavaProject" then means: hello guys, please
+     * click main menus File -> New -> JavaProject.
+     * 
+     * 1. if the java project already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus File -> New -> JavaProject.
+     * 
+     * 4. confirm the pop-up window "New Java Project"
+     * 
+     * 5. delegate wait so long until the pop-up window is closed.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * 
+     */
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isJavaProjectExist(projectName)) {
             activateEclipseShell();
@@ -323,7 +592,30 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
-    public void newPkg(String projectName, String pkg) throws RemoteException {
+    /**
+     * Create a new package. The name of the method is defined the same as the
+     * menu names. The name "newPackage" then means: hello guys, please click
+     * main menus File -> New -> Package.
+     * 
+     * 1. if the package already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus File -> New -> Package.
+     * 
+     * 4. confirm the pop-up window "New Java Package"
+     * 
+     * 5. delegate wait so long until the pop-up window is closed.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * 
+     */
+    public void newPackage(String projectName, String pkg)
+        throws RemoteException {
         if (!isPkgExist(projectName, pkg))
             try {
                 activateEclipseShell();
@@ -341,10 +633,35 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
     }
 
+    /**
+     * Create a new package. The name of the method is defined the same as the
+     * menu names. The name "newClass" then means: hello guys, please click main
+     * menus File -> New -> Class.
+     * 
+     * 1. if the package already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus File -> New -> Class.
+     * 
+     * 4. confirm the pop-up window "New Java Class"
+     * 
+     * 5. delegate wait so long until the pop-up window is closed.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     * 
+     */
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
         if (!isClassExist(projectName, pkg, className))
             try {
+                activateEclipseShell();
                 delegate.menu("File").menu("New").menu("Class").click();
                 SWTBotShell shell = delegate.shell("New Java Class");
                 shell.activate();
@@ -385,71 +702,104 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
     }
 
-    /******************** open Widget *************************/
-
-    public void openViewWithName(String viewTitle, String category,
-        String nodeName) throws RemoteException {
-        if (!isViewOpen(viewTitle)) {
-            activateEclipseShell();
-            clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
-                SarosConstant.MENU_TITLE_SHOW_VIEW,
-                SarosConstant.MENU_TITLE_OTHER);
-            confirmWindowWithTreeWithFilterText(
-                SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
-                SarosConstant.BUTTON_OK);
-        }
-    }
-
-    public void openPackageExplorerView() throws RemoteException {
+    /**
+     * Open the view "Package Explorer". The name of the method is defined the
+     * same as the menu names. The name "showViewPackageExplorer" then means:
+     * hello guy, please click main menus Window -> Show view ->
+     * PackageExplorer.
+     * 
+     */
+    public void showViewPackageExplorer() throws RemoteException {
         openViewWithName(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, "Java",
             "Package Explorer");
     }
 
-    public void openProblemsView() throws RemoteException {
+    /**
+     * Open the view "Problems". The name of the method is defined the same as
+     * the menu names. The name "showViewProblem" then means: hello guy, please
+     * click main menus Window -> Show view -> Problems.
+     * 
+     */
+    public void showViewProblems() throws RemoteException {
         openViewWithName("Problems", "General", "Problems");
     }
 
-    public void openProjectExplorerView() throws RemoteException {
+    /**
+     * Open the view "Project Explorer". The name of the method is defined the
+     * same as the menu names. The name "showViewProblem" then means: hello guy,
+     * please click main menus Window -> Show view -> Project Explorer.
+     * 
+     */
+    public void showViewProjectExplorer() throws RemoteException {
         openViewWithName("Project Explorer", "General", "Project Explorer");
     }
 
-    protected void openPerspectiveWithName(String nodeName)
-        throws RemoteException {
-        if (!isPerspectiveActive(nodeName)) {
-            activateEclipseShell();
-            clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
-                SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE,
-                SarosConstant.MENU_TITLE_OTHER);
-            confirmWindowWithTable(SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE,
-                nodeName, SarosConstant.BUTTON_OK);
-        }
-    }
-
-    public void openJavaPerspective() throws RemoteException {
+    /**
+     * Open the perspective "Java". The name of the method is defined the same
+     * as the menu names. The name "openPerspectiveJava" then means: hello guy,
+     * please click main menus Window -> Open perspective -> Java.
+     * 
+     */
+    public void openPerspectiveJava() throws RemoteException {
         openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_JAVA);
     }
 
-    public void openDebugPerspective() throws RemoteException {
+    /**
+     * Open the perspective "Debug". The name of the method is defined the same
+     * as the menu names. The name "openPerspectiveDebug" then means: hello guy,
+     * please click main menus Window -> Open perspective -> Debug.
+     * 
+     */
+    public void openPerspectiveDebug() throws RemoteException {
         openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_DEBUG);
     }
 
-    protected void openFileWithEditorInView(String viewName, String... names)
-        throws RemoteException {
-        clickContextMenuOfTreeInView(viewName, SarosConstant.CONTEXT_MENU_OPEN,
-            names);
-    }
-
-    public void openJavaFileWithEditor(String projectName, String packageName,
-        String className) throws RemoteException {
-        if (!isEditorOpen(className)) {
-            openFileWithEditorInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-                projectName, "src", packageName, className + ".java");
-            delegate.sleep(sleepTime);
+    /*******************************************************************************
+     * 
+     * window page
+     * 
+     *******************************************************************************/
+    public boolean activateShellWithText(String title) throws RemoteException {
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().equals(title)) {
+                log.debug("shell found");
+                if (!shell.isActive()) {
+                    shell.activate();
+                }
+                return true;
+            }
         }
+        log.error("No shell found matching \"" + title + "\"!");
+        return false;
     }
 
-    /******************** confirm window *************************/
+    public boolean activateShellWithMatchText(String matchText)
+        throws RemoteException {
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(matchText)) {
+                log.debug("shell found matching \"" + matchText + "\"");
+                if (!shell.isActive()) {
+                    shell.activate();
+                }
+                return shell.isActive();
+            }
+        }
+        final String message = "No shell found matching \"" + matchText + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
 
+    /**
+     * confirm a pop-up window.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @throws RemoteException
+     */
     public void confirmWindow(String title, String buttonText)
         throws RemoteException {
         // waitUntilShellActive(title);
@@ -459,6 +809,17 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
+    /**
+     * confirm a pop-up window with a checkbox.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @param isChecked
+     *            if the checkbox selected or not.
+     * @throws RemoteException
+     */
     public void confirmWindowWithCheckBox(String title, String buttonText,
         boolean isChecked) throws RemoteException {
         activateShellWithText(title);
@@ -468,9 +829,20 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.sleep(sleepTime);
     }
 
-    public void confirmWindowWithCheckBox(String shellName, String buttonText,
+    /**
+     * confirm a pop-up window with more than one checkbox.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @param itemNames
+     *            the labels of the checkboxs, which you want to select.
+     * @throws RemoteException
+     */
+    public void confirmWindowWithCheckBox(String title, String buttonText,
         String... itemNames) throws RemoteException {
-        waitUntilShellActive(shellName);
+        waitUntilShellActive(title);
         for (String itemName : itemNames) {
             selectCheckBoxWithText(itemName);
         }
@@ -479,85 +851,109 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         // waitUntilShellCloses(shellName);
     }
 
-    public void confirmWindowWithTable(String shellName, String itemName,
-        String buttonName) throws RemoteException {
+    /**
+     * confirm a pop-up window with a table. You should first select a table
+     * item and then confirm with button.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @param itemName
+     *            the name of the table item, which you want to select.
+     * @throws RemoteException
+     */
+    public void confirmWindowWithTable(String title, String itemName,
+        String buttonText) throws RemoteException {
         // waitUntilShellActive(shellName);
         try {
             delegate.table().select(itemName);
-            waitUntilButtonEnabled(buttonName);
-            clickButton(buttonName);
+            waitUntilButtonEnabled(buttonText);
+            clickButton(buttonText);
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
             log.error("tableItem" + itemName + "can not be fund!");
         }
     }
 
-    public void confirmWindowWithTree(String shellName, String buttonName,
-        String... itemNames) throws RemoteException {
+    /**
+     * confirm a pop-up window with a tree. You should first select a tree node
+     * and then confirm with button.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void confirmWindowWithTree(String title, String buttonText,
+        String... nodes) throws RemoteException {
         // waitUntilShellActive(shellName);
         SWTBotTree tree = delegate.tree();
         log.info("allItems " + tree.getAllItems().length);
-        selectTreeWithLabels(tree, itemNames);
-        waitUntilButtonEnabled(buttonName);
-        clickButton(buttonName);
+        selectTreeWithLabels(tree, nodes);
+        waitUntilButtonEnabled(buttonText);
+        clickButton(buttonText);
         // waitUntilShellCloses(shellName);
     }
 
-    public void confirmWindowWithTreeWithFilterText(String shellName,
-        String NameOfParentTree, String treeName, String buttonName)
+    /**
+     * confirm a pop-up window with a tree using filter text. You should first
+     * input a filter text in the text field and then select a tree node,
+     * confirm with button.
+     * 
+     * @param title
+     *            title of the window
+     * @param buttonText
+     *            text of the button
+     * @param teeNode
+     *            tree node, which you want to select.
+     * @param rootOfTreeNode
+     *            root of the tree node.
+     * @throws RemoteException
+     */
+    public void confirmWindowWithTreeWithFilterText(String title,
+        String rootOfTreeNode, String teeNode, String buttonText)
         throws RemoteException {
         // waitUntilShellActive(shellName);
-        setTextWithoutLabel(SarosConstant.TEXT_FIELD_TYPE_FILTER_TEXT, treeName);
-        waitUntilTreeExisted(delegate.tree(), NameOfParentTree);
-        SWTBotTreeItem treeItem = delegate.tree(0)
-            .getTreeItem(NameOfParentTree);
-        waitUntilTreeNodeExisted(treeItem, treeName);
-        treeItem.getNode(treeName).select();
-        waitUntilButtonEnabled(buttonName);
-        clickButton(buttonName);
+        setTextWithoutLabel(SarosConstant.TEXT_FIELD_TYPE_FILTER_TEXT, teeNode);
+        waitUntilTreeExisted(delegate.tree(), rootOfTreeNode);
+        SWTBotTreeItem treeItem = delegate.tree(0).getTreeItem(rootOfTreeNode);
+        waitUntilTreeNodeExisted(treeItem, teeNode);
+        treeItem.getNode(teeNode).select();
+        waitUntilButtonEnabled(buttonText);
+        clickButton(buttonText);
         // waitUntilShellCloses(shellName);
     }
 
-    /******************** is... **************************/
+    /*******************************************************************************
+     * 
+     * exported helper methods
+     * 
+     *******************************************************************************/
 
-    public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
-        String... regexs) throws RemoteException {
-        SWTBotTreeItem item = null;
-        for (String regex : regexs) {
-            boolean exist = false;
-            if (item == null) {
-                for (int i = 0; i < tree.getAllItems().length; i++) {
-                    log.info("treeItem'name: "
-                        + tree.getAllItems()[i].getText());
-                    if (tree.getAllItems()[i].getText().matches(regex)) {
-                        item = tree.getAllItems()[i].expand();
-                        exist = true;
-                    }
-                }
-            } else {
-                for (String nodeName : item.getNodes()) {
-                    log.info("node'name: " + nodeName);
-                    if (nodeName.matches(regex)) {
-                        item = item.getNode(nodeName).expand();
-                        exist = true;
-                    }
-                }
-            }
-            if (!exist) {
-                return false;
-            }
-        }
-        return item != null;
+    public void sleep(long millis) throws RemoteException {
+        delegate.sleep(millis);
+    }
+
+    public void captureScreenshot(String filename) throws RemoteException {
+        if (SCREENSHOTS)
+            delegate.captureScreenshot(filename);
     }
 
     public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
         String[] matchTexts, String... contexts) throws RemoteException {
         try {
-            SWTBotTree tree = getViewWithText(
-                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+            SWTBotTree tree = treeObject
+                .getViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER)
+                .bot().tree();
             // you should first select the project,whose context you want to
             // click.
-            SWTBotTreeItem treeItem = getTreeItemWithMatchText(tree, contexts);
+            SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
+                contexts);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
         } catch (WidgetNotFoundException e) {
@@ -615,21 +1011,22 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
         activateEclipseShell();
-        openPackageExplorerView();
+        showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-        return isTreeItemWithMatchTextExist(tree, matchTexts);
+        SWTBotTree tree = treeObject
+            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        return treeObject.isTreeItemWithMatchTextExist(tree, matchTexts);
     }
 
-    // FIXME If the file doesn't exist, this method hits the
-    // SWTBotPreferences.TIMEOUT (5000ms) while waiting on a tree node.
-    public boolean isJavaClassExistInGui(String projectName, String pkg,
-        String className) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            projectName, "src", pkg, className + ".java");
-    }
+    // // FIXME If the file doesn't exist, this method hits the
+    // // SWTBotPreferences.TIMEOUT (5000ms) while waiting on a tree node.
+    // public boolean isJavaClassExistInGui(String projectName, String pkg,
+    // String className) throws RemoteException {
+    // showViewPackageExplorer();
+    // activatePackageExplorerView();
+    // return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+    // projectName, "src", pkg, className + ".java");
+    // }
 
     public boolean isTextWithLabelEqualWithText(String label, String text)
         throws RemoteException {
@@ -690,7 +1087,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         // }
     }
 
-    public boolean isJavaEditorOpen(String className) throws RemoteException {
+    public boolean isClassOpen(String className) throws RemoteException {
         return isEditorOpen(className + ".java");
     }
 
@@ -706,7 +1103,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isJavaEditorActive(String className) throws RemoteException {
-        if (!isJavaEditorOpen(className))
+        if (!isClassOpen(className))
             return false;
         return isEditorActive(className + ".java");
     }
@@ -747,7 +1144,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isContextMenuOfTreeItemInViewExist(String viewName,
         String contextName, String... labels) throws RemoteException {
         activateViewWithTitle(viewName);
-        SWTBotTreeItem item = selectTreeWithLabelsInView(viewName, labels);
+        SWTBotTreeItem item = treeObject.selectTreeWithLabelsInView(viewName,
+            labels);
         try {
             item.contextMenu(contextName);
             return true;
@@ -771,7 +1169,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public boolean isTreeItemExist(String viewTitle, String... paths)
         throws RemoteException {
 
-        SWTBotTree tree = getViewWithText(viewTitle).bot().tree();
+        SWTBotTree tree = treeObject.getViewWithText(viewTitle).bot().tree();
         try {
             tree.expandNode(paths);
             return true;
@@ -885,46 +1283,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     // }
     // }
 
-    /************* get widget **************************/
-
-    public SWTBotShell getEclipseShell() throws RemoteException {
-        SWTBotShell[] shells = delegate.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(".+? - .+")) {
-                log.debug("shell found matching \"" + ".+? - .+" + "\"");
-
-                return shell;
-            }
-        }
-        final String message = "No shell found matching \"" + ".+? - .+"
-            + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
-    }
-
-    public List<String> getAllProjects() throws RemoteException {
-        SWTBotTree tree = getViewWithText(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
-        List<String> projectNames = new ArrayList<String>();
-        for (int i = 0; i < tree.getAllItems().length; i++) {
-            projectNames.add(tree.getAllItems()[i].getText());
-        }
-        return projectNames;
-    }
-
-    public SWTBotTable getTableInView(String viewName) throws RemoteException {
-        return getViewWithText(viewName).bot().table();
-    }
-
-    public SWTBotTable getTableInShell(String shellName) throws RemoteException {
-        SWTBotShell shell = getShellWithText(shellName);
-        return shell.bot().table();
-    }
-
-    public SWTBotTree getTreeInView(String viewName) throws RemoteException {
-        return getViewWithText(viewName).bot().tree();
-    }
-
     public String getURLOfRemoteResource(String fullPath)
         throws RemoteException {
         IPath path = new Path(fullPath);
@@ -959,37 +1317,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return info.revision;
     }
 
-    public SWTBotTreeItem getTreeWithLabels(SWTBotTree tree, String... labels) {
-        // SWTBotTreeItem selectedTreeItem = null;
-        // for (String label : labels) {
-        // try {
-        // if (selectedTreeItem == null) {
-        // selectedTreeItem = tree.getTreeItem(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // } else {
-        // selectedTreeItem = selectedTreeItem.getNode(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // }
-        // } catch (WidgetNotFoundException e) {
-        // log.error("treeitem \"" + label + "\" not found");
-        // }
-        // }
-        // return selectedTreeItem;
-        try {
-            return tree.expandNode(labels);
-        } catch (WidgetNotFoundException e) {
-            log.warn("table item not found.", e);
-            return null;
-        }
-
-    }
-
-    public SWTBotView getViewWithText(String title) throws RemoteException {
-        SWTBotView view = delegate.viewByTitle(title);
-        view.show();
-        return view;
-    }
-
     public SWTBotShell getShellWithText(String text) throws RemoteException {
         return delegate.shell(text);
     }
@@ -1006,45 +1333,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return list;
     }
 
-    public List<String> getPerspectiveTitles() throws RemoteException {
-        ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotPerspective perspective : delegate.perspectives())
-            list.add(perspective.getLabel());
-        return list;
-    }
-
-    public List<String> getEditorTitles() throws RemoteException {
-        ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotEditor editor : delegate.editors())
-            list.add(editor.getTitle());
-        return list;
-    }
-
-    protected List<String> getAllItemsOftreeInView() {
-        SWTBotTree tree = delegate.tree();
-        List<String> list = new ArrayList<String>();
-        for (int i = 0; i < tree.getAllItems().length; i++) {
-            list.add(tree.getAllItems()[i].getText());
-            log.info("existed TreeItem in Tree:  " + list.get(i));
-        }
-        return list;
-    }
-
-    protected List<String> getAllItemsOfTreeItemInView(String... paths) {
-        SWTBotTree tree = delegate.tree();
-        SWTBotTreeItem item = getTreeWithLabels(tree, paths);
-        List<String> list = new ArrayList<String>();
-
-        for (int i = 0; i < item.getItems().length; i++) {
-            list.add(item.getItems()[i].getText());
-            log.info("existed item In TreeItem:  " + list.get(i));
-        }
-        return list;
-    }
-
     public String getJavaTextOnLine(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        openJavaFileWithEditor(projectName, packageName, className);
+        openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return getTextOnLine(getJavaEditor(className), line);
     }
@@ -1067,28 +1358,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public RGB getJavaLineBackground(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        openJavaFileWithEditor(projectName, packageName, className);
+        openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return getLineBackground(getJavaEditor(className), line);
     }
 
     protected RGB getLineBackground(SWTBotEclipseEditor editor, int line) {
         return editor.getLineBackground(line);
-    }
-
-    protected SWTBotEclipseEditor getTextEditor(String fileName) {
-        SWTBotEditor editor;
-        editor = delegate.editorByTitle(fileName);
-        SWTBotEclipseEditor e = editor.toTextEditor();
-        // try {
-        // editor = delegate.editorByTitle(className + ".java");
-        // } catch (WidgetNotFoundException e) {
-        // openFile(projectName, packageName, className + ".java");
-        // editor = delegate.editorByTitle(className + ".java");
-        // }
-        // SWTBotEclipseEditor e = editor.toTextEditor();
-        // delegate.cTabItem(className + ".java").activate();
-        return e;
     }
 
     public SWTBotEclipseEditor getJavaEditor(String className)
@@ -1159,28 +1435,29 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     // return null;
     // }
 
+    /*******************************************************************************
+     * 
+     * Editor page
+     * 
+     *******************************************************************************/
+    protected void activateEditor(String name) {
+        try {
+            delegate.cTabItem(name).activate();
+        } catch (WidgetNotFoundException e) {
+            log.warn("tableItem not found '", e);
+        }
+        // waitUntilEditorActive(name);
+    }
+
+    public void activateJavaEditor(String className) throws RemoteException {
+        activateEditor(className + ".java");
+    }
+
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        openJavaFileWithEditor(projectName, packageName, className);
+        openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return getTextEditor(className + ".java").getText();
-    }
-
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
-        String viewName, String buttonTooltip) throws RemoteException {
-        for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle(viewName)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
-                return toolbarButton;
-            }
-        }
-        return null;
-    }
-
-    /***************** select tree ******************/
-
-    public SWTBotTree selectTreeWithLabel(String label) throws RemoteException {
-        return delegate.treeWithLabel(label);
     }
 
     public void selectLineInJavaEditor(int line, String fileName)
@@ -1188,76 +1465,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         selectLineInEditor(line, fileName + ".java");
     }
 
-    protected void selectLineInEditor(int line, String fileName) {
-        getTextEditor(fileName).selectLine(line);
-    }
-
-    public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
-        String... labels) throws RemoteException {
-        SWTBotTreeItem selectedTreeItem = null;
-        for (String label : labels) {
-            try {
-                if (selectedTreeItem == null) {
-                    waitUntilTreeExisted(tree, label);
-                    selectedTreeItem = tree.expandNode(label);
-                    log.info("treeItem name: " + selectedTreeItem.getText());
-                } else {
-                    waitUntilTreeNodeExisted(selectedTreeItem, label);
-                    selectedTreeItem = selectedTreeItem.expandNode(label);
-                    log.info("treeItem name: " + selectedTreeItem.getText());
-                }
-            } catch (WidgetNotFoundException e) {
-                log.error("treeitem \"" + label + "\" not found");
-            }
-        }
-        if (selectedTreeItem != null) {
-            log.info("treeItem name: " + selectedTreeItem.getText());
-            selectedTreeItem.select();
-            selectedTreeItem.click();
-            return selectedTreeItem;
-        }
-        return null;
-    }
-
-    /**
-     * @param viewName
-     *            the title of the specified view
-     * @param labels
-     *            all labels on the widget
-     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
-     */
-
-    public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
-        String... labels) throws RemoteException {
-        // SWTBotView view =
-        // getViewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-        //
-        // Composite composite = (Composite) view.getWidget();
-        // Tree swtTree = delegate.widget(WidgetMatcherFactory
-        // .widgetOfType(Tree.class), composite);
-        //
-        // SWTBotTree tree = new SWTBotTree(swtTree);
-        return selectTreeWithLabels(getTreeInView(viewName), labels);
-    }
-
-    public SWTBotTableItem selectTableItemWithLabel(SWTBotTable table,
-        String label) throws RemoteException {
-        try {
-            waitUntilTableItemExisted(table, label);
-            return table.getTableItem(label);
-
-        } catch (WidgetNotFoundException e) {
-            log.warn("table item " + label + " not found.", e);
-        }
-        return null;
-    }
-
     public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
         String label) throws RemoteException {
         try {
-            SWTBotView view = getViewWithText(viewName);
+            SWTBotView view = treeObject.getViewWithText(viewName);
             SWTBotTable table = view.bot().table();
-            return selectTableItemWithLabel(table, label).select();
+            return tableObject.selectTableItemWithLabel(table, label).select();
         } catch (WidgetNotFoundException e) {
             log.warn(" table item " + label + " on View " + viewName
                 + " not found.", e);
@@ -1288,64 +1501,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /*********************** activate widget *******************/
 
-    public boolean activateEclipseShell() throws RemoteException {
-        return activateShellWithMatchText(".+? - .+");
-    }
-
-    public void activateJavaEditor(String className) throws RemoteException {
-        activateEditor(className + ".java");
-    }
-
-    public boolean activateShellWithText(String title) throws RemoteException {
-        SWTBotShell[] shells = delegate.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().equals(title)) {
-                log.debug("shell found");
-                if (!shell.isActive()) {
-                    shell.activate();
-                }
-                return true;
-            }
-        }
-        log.error("No shell found matching \"" + title + "\"!");
-        return false;
-    }
-
-    public boolean activateShellWithMatchText(String matchText)
-        throws RemoteException {
-        SWTBotShell[] shells = delegate.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(matchText)) {
-                log.debug("shell found matching \"" + matchText + "\"");
-                if (!shell.isActive()) {
-                    shell.activate();
-                }
-                return shell.isActive();
-            }
-        }
-        final String message = "No shell found matching \"" + matchText + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
-    }
-
-    /**
-     * Should be only called if View is open
-     */
-    public void activateViewWithTitle(String title) throws RemoteException {
-        try {
-            if (!isViewActive(title)) {
-                delegate.viewByTitle(title).setFocus();
-                // waitUntil(SarosConditions.isViewActive(delegate, title));
-            }
-        } catch (WidgetNotFoundException e) {
-            log.warn("Widget not found '" + title + "'", e);
-        }
-    }
-
-    public void activatePackageExplorerView() throws RemoteException {
-        activateViewWithTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-    }
-
     public void activateRosterView() throws RemoteException {
         activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
@@ -1362,26 +1517,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         activateViewWithTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
     }
 
-    protected void activateEditor(String name) {
-        try {
-            delegate.cTabItem(name).activate();
-        } catch (WidgetNotFoundException e) {
-            log.warn("tableItem not found '", e);
-        }
-        // waitUntilEditorActive(name);
-    }
-
     /************* click ********************/
 
     public void clickMenusOfContextMenuOfTreeItemInView(String viewTitle,
         String[] matchTexts, String... contexts) throws RemoteException {
 
         try {
-            SWTBotTree tree = getViewWithText(
-                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot().tree();
+            SWTBotTree tree = treeObject
+                .getViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER)
+                .bot().tree();
             // you should first select the project,whose context you want to
             // click.
-            SWTBotTreeItem treeItem = getTreeItemWithMatchText(tree, matchTexts);
+            SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
+                matchTexts);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
         } catch (WidgetNotFoundException e) {
@@ -1431,22 +1579,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             selectedmenu.click();
     }
 
-    public void clickContextMenuOfTreeInView(String viewName, String context,
-        String... itemNames) throws RemoteException {
-        SWTBotTreeItem treeItem = selectTreeWithLabelsInView(viewName,
-            itemNames);
-        if (treeItem == null) {
-            log.error("Tree item not found " + itemNames.toString());
-            return;
-        }
-        final SWTBotMenu contextMenu = treeItem.contextMenu(context);
-        if (contextMenu == null) {
-            log.error("Context menu \"" + context + "\" not found");
-            return;
-        }
-        contextMenu.click();
-    }
-
     // public void clickMenuByName(List<String> names) throws RemoteException {
     // SWTBotMenu parentMenu = delegate.menu(names.remove(0));
     // for (String name : names) {
@@ -1469,42 +1601,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     // throw new RemoteException("Button with text '" + buttonText
     // + "' was not found on view with title '" + title + "'");
     // }
-
-    public SWTBotToolbarButton clickToolbarButtonWithTooltipInView(
-        String viewName, String buttonTooltip) throws RemoteException {
-        // return
-        // delegate.viewByTitle(title).toolbarButton(buttonTooltip).click();
-        for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle(viewName)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
-                return toolbarButton.click();
-            }
-        }
-        // SWTBotToolbarButton button =
-        // getToolbarButtonWithTooltipInViewWithTitle(
-        // title, buttonTooltip);
-        // if (button != null) {
-        // // waitUntilButtonEnabled(button.getText());
-        //
-        // button.click();
-        // delegate.sleep(sleepTime);
-        // return button;
-        // }
-        return null;
-
-        // throw new RemoteException("Button with tooltip '" + buttonTooltip
-        // + "' was not found on view with title '" + title + "'");
-    }
-
-    public void clickToolbarPushButtonWithTooltipInView(String viewName,
-        String tooltip) throws RemoteException {
-        delegate.viewByTitle(viewName).toolbarPushButton(tooltip).click();
-    }
-
-    public void clickCheckBox(String title) throws RemoteException {
-        delegate.checkBox(title).click();
-        delegate.sleep(sleepTime);
-    }
 
     public void clickRadio(String title) throws RemoteException {
         delegate.radio(title).click();
@@ -1540,24 +1636,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         if (isEditorOpen(text)) {
             delegate.editorByTitle(text).close();
         }
-    }
-
-    /**************** set... *******************/
-    public void setTextWithLabel(String label, String text)
-        throws RemoteException {
-        delegate.textWithLabel(label).setText(text);
-    }
-
-    public void setTextWithoutLabel(String match, String replace)
-        throws RemoteException {
-        delegate.text(match).setText(replace);
-    }
-
-    public void setTextinEditor(String contents, String fileName)
-        throws RemoteException {
-        SWTBotEclipseEditor e = getTextEditor(fileName);
-        e.setText(contents);
-        e.save();
     }
 
     // public void setTextInJavaEditor(String contents, String projectName,
@@ -1603,53 +1681,54 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void waitUntilPkgExist(String projectName, String pkg)
         throws RemoteException {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
-        waitUntil(SarosConditions.isResourceExist(path));
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(path));
     }
 
     public void waitUntilPkgNotExist(String projectName, String pkg)
         throws RemoteException {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
-        waitUntil(SarosConditions.isResourceNotExist(path));
+        wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
     public void waitUntilClassExist(String projectName, String pkg,
         String className) throws RemoteException {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
             + className + ".java";
-        waitUntil(SarosConditions.isResourceExist(path));
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(path));
     }
 
     public void waitUntilClassNotExist(String projectName, String pkg,
         String className) throws RemoteException {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
             + className + ".java";
-        waitUntil(SarosConditions.isResourceNotExist(path));
+        wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
-        waitUntil(SarosConditions.isNotInSVN(projectName));
+        wUntilObject.waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
-        waitUntil(SarosConditions.isInSVN(projectName));
+        wUntilObject.waitUntil(SarosConditions.isInSVN(projectName));
     }
 
     public void waitUntilFileEqualWithFile(String projectName,
         String packageName, String className, String file)
         throws RemoteException {
-        waitUntil(SarosConditions.isFilesEqual(this, projectName, packageName,
-            className, file));
+        wUntilObject.waitUntil(SarosConditions.isFilesEqual(this, projectName,
+            packageName, className, file));
     }
 
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException {
-        waitUntil(shellCloses(shell));
+        wUntilObject.waitUntil(shellCloses(shell));
         delegate.sleep(10);
     }
 
     public void waitUntilShellCloses(String shellText) throws RemoteException {
-        waitUntil(SarosConditions.isShellClosed(delegate, shellText));
+        wUntilObject.waitUntil(SarosConditions.isShellClosed(delegate,
+            shellText));
         delegate.sleep(10);
     }
 
@@ -1659,31 +1738,34 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void waitUntilEditorActive(String name) {
-        waitUntil(SarosConditions.isEditorActive(delegate, name));
+        wUntilObject.waitUntil(SarosConditions.isEditorActive(delegate, name));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        waitUntil(tableHasRows(delegate.table(), row));
+        wUntilObject.waitUntil(tableHasRows(delegate.table(), row));
     }
 
     public void waitUntilTableItemExisted(SWTBotTable table,
         String tableItemName) throws RemoteException {
-        waitUntil(SarosConditions.existTableItem(table, tableItemName));
+        wUntilObject.waitUntil(SarosConditions.existTableItem(table,
+            tableItemName));
     }
 
     public void waitUntilTreeNodeExisted(SWTBotTreeItem treeItem,
         String nodeName) {
-        waitUntil(SarosConditions.existTreeItem(treeItem, nodeName));
+        wUntilObject.waitUntil(SarosConditions
+            .existTreeItem(treeItem, nodeName));
     }
 
     public void waitUntilTreeExisted(SWTBotTree tree, String nodeName)
         throws RemoteException {
-        waitUntil(SarosConditions.existTree(tree, nodeName));
+        wUntilObject.waitUntil(SarosConditions.existTree(tree, nodeName));
     }
 
     public void waitUntilButtonEnabled(String mnemonicText)
         throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(delegate.button(mnemonicText)));
+        wUntilObject.waitUntil(Conditions.widgetIsEnabled(delegate
+            .button(mnemonicText)));
         // try {
         // while (!delegate.button(mnemonicText).isEnabled()) {
         // delegate.sleep(100);
@@ -1695,26 +1777,26 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void waitUnitButtonWithTooltipTextEnabled(String tooltipText)
         throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(delegate
+        wUntilObject.waitUntil(Conditions.widgetIsEnabled(delegate
             .buttonWithTooltip(tooltipText)));
     }
 
     public void waitUntilContextMenuOfTableItemEnabled(
         SWTBotTableItem tableItem, String context) throws RemoteException {
-        waitUntil(SarosConditions.ExistContextMenuOfTableItem(tableItem,
-            context));
+        wUntilObject.waitUntil(SarosConditions.ExistContextMenuOfTableItem(
+            tableItem, context));
     }
 
     public void waitUntilShellActive(String title) throws RemoteException {
-        waitUntil(SarosConditions.ShellActive(delegate, title));
+        wUntilObject.waitUntil(SarosConditions.ShellActive(delegate, title));
         if (!isShellActive(title))
             throw new RemoteException("Couldn't activate shell \"" + title
                 + "\"");
     }
 
-    protected void waitUntil(ICondition condition) throws TimeoutException {
-        delegate.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
-    }
+    // protected void waitUntil(ICondition condition) throws TimeoutException {
+    // delegate.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
+    // }
 
     // public void activeJavaEditor(String className) throws RemoteException {
     // activeEditor(className, ".java");
@@ -1734,7 +1816,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     /************************* component **************************/
     public void setBreakPoint(int line, String projectName, String packageName,
         String className) throws RemoteException {
-        openJavaFileWithEditor(projectName, packageName, className);
+        openClass(projectName, packageName, className);
         activateJavaEditor(className);
         selectLineInJavaEditor(line, className);
         clickMenuWithTexts("Run", "Toggle Breakpoint");
@@ -1743,7 +1825,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void debugJavaFile(String projectName, String packageName,
         String className) throws RemoteException {
-        openJavaFileWithEditor(projectName, packageName, className);
+        openClass(projectName, packageName, className);
         activateJavaEditor(className);
         clickMenuWithTexts("Debug");
         if (isShellActive("Confirm Perspective Switch"))
@@ -1752,154 +1834,273 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         openPerspectiveWithName("Debug");
     }
 
-    public void switchToTag() throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Switch to another Branch/Tag/Revision...");
-        waitUntilShellActive("Switch");
-        clickButton("Select...");
-        confirmWindowWithTree("Repository Browser", SarosConstant.BUTTON_OK,
-            "tags", "eclipsecon2009");
-        clickButton(SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("SVN Switch");
+    /*******************************************************************************
+     * 
+     * main page
+     * 
+     *******************************************************************************/
+    public boolean activateEclipseShell() throws RemoteException {
+        return activateShellWithMatchText(".+? - .+");
     }
 
-    public SWTBotTreeItem getTreeItemWithMatchText(SWTBotTree tree,
-        String... regexs) throws RemoteException {
-        try {
-            SWTBotTreeItem item = null;
-            for (String regex : regexs) {
-                if (item == null) {
-                    for (int i = 0; i < tree.getAllItems().length; i++) {
-                        log.info("treeItem'name: "
-                            + tree.getAllItems()[i].getText());
-                        if (tree.getAllItems()[i].getText().matches(regex)) {
-                            item = tree.getAllItems()[i].expand();
-                        }
-                    }
-                } else {
-                    for (String nodeName : item.getNodes()) {
-                        log.info("node'name: " + nodeName);
-                        if (nodeName.matches(regex)) {
-                            item = item.getNode(nodeName).expand();
-                        }
-                    }
-                }
+    public SWTBotShell getEclipseShell() throws RemoteException {
+        SWTBotShell[] shells = delegate.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(".+? - .+")) {
+                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+
+                return shell;
             }
-            return item;
+        }
+        final String message = "No shell found matching \"" + ".+? - .+"
+            + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
+
+    public void resetWorkbench() throws RemoteException {
+        List<? extends SWTBotEditor> editors = delegate.editors();
+        for (SWTBotEditor editor : editors) {
+            editor.close();
+        }
+        for (int i = 0; i < delegate.shells().length; i++) {
+            SWTBotShell shell = delegate.shells()[i];
+            if (!shell.getText().matches(".+? - .+")) {
+                shell.close();
+            }
+        }
+
+        // page.resetPerspective();
+        // String defaultPerspectiveId = workbench.getPerspectiveRegistry()
+        // .getDefaultPerspective();
+        // workbench.showPerspective(defaultPerspectiveId, workbenchWindow);
+        // page.resetPerspective();
+
+    }
+
+    /*******************************************************************************
+     * 
+     * un-exported Helper methods
+     * 
+     *******************************************************************************/
+
+    protected SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
+        String... labels) throws RemoteException {
+        SWTBotTreeItem selectedTreeItem = null;
+        for (String label : labels) {
+            try {
+                if (selectedTreeItem == null) {
+                    waitUntilTreeExisted(tree, label);
+                    selectedTreeItem = tree.expandNode(label);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                } else {
+                    waitUntilTreeNodeExisted(selectedTreeItem, label);
+                    selectedTreeItem = selectedTreeItem.expandNode(label);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                }
+            } catch (WidgetNotFoundException e) {
+                log.error("treeitem \"" + label + "\" not found");
+            }
+        }
+        if (selectedTreeItem != null) {
+            log.info("treeItem name: " + selectedTreeItem.getText());
+            selectedTreeItem.select();
+            selectedTreeItem.click();
+            return selectedTreeItem;
+        }
+        return null;
+    }
+
+    protected void selectLineInEditor(int line, String fileName) {
+        getTextEditor(fileName).selectLine(line);
+    }
+
+    protected SWTBotTree selectTreeWithLabel(String label) {
+        return delegate.treeWithLabel(label);
+    }
+
+    protected SWTBotToolbarButton getToolbarButtonWithTooltipInView(
+        String viewName, String buttonTooltip) {
+        for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle(viewName)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
+                return toolbarButton;
+            }
+        }
+        return null;
+    }
+
+    protected SWTBotEclipseEditor getTextEditor(String fileName) {
+        SWTBotEditor editor;
+        editor = delegate.editorByTitle(fileName);
+        SWTBotEclipseEditor e = editor.toTextEditor();
+        // try {
+        // editor = delegate.editorByTitle(className + ".java");
+        // } catch (WidgetNotFoundException e) {
+        // openFile(projectName, packageName, className + ".java");
+        // editor = delegate.editorByTitle(className + ".java");
+        // }
+        // SWTBotEclipseEditor e = editor.toTextEditor();
+        // delegate.cTabItem(className + ".java").activate();
+        return e;
+    }
+
+    protected List<String> getAllItemsOftreeInView() {
+        SWTBotTree tree = delegate.tree();
+        List<String> list = new ArrayList<String>();
+        for (int i = 0; i < tree.getAllItems().length; i++) {
+            list.add(tree.getAllItems()[i].getText());
+            log.info("existed TreeItem in Tree:  " + list.get(i));
+        }
+        return list;
+    }
+
+    protected List<String> getAllItemsOfTreeItemInView(String... paths) {
+        SWTBotTree tree = delegate.tree();
+        SWTBotTreeItem item = getTreeWithLabels(tree, paths);
+        List<String> list = new ArrayList<String>();
+
+        for (int i = 0; i < item.getItems().length; i++) {
+            list.add(item.getItems()[i].getText());
+            log.info("existed item In TreeItem:  " + list.get(i));
+        }
+        return list;
+    }
+
+    protected List<String> getEditorTitles() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotEditor editor : delegate.editors())
+            list.add(editor.getTitle());
+        return list;
+    }
+
+    protected List<String> getPerspectiveTitles() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotPerspective perspective : delegate.perspectives())
+            list.add(perspective.getLabel());
+        return list;
+    }
+
+    protected SWTBotTreeItem getTreeWithLabels(SWTBotTree tree,
+        String... labels) {
+        // SWTBotTreeItem selectedTreeItem = null;
+        // for (String label : labels) {
+        // try {
+        // if (selectedTreeItem == null) {
+        // selectedTreeItem = tree.getTreeItem(label);
+        // log.info("treeItem name: " + selectedTreeItem.getText());
+        // } else {
+        // selectedTreeItem = selectedTreeItem.getNode(label);
+        // log.info("treeItem name: " + selectedTreeItem.getText());
+        // }
+        // } catch (WidgetNotFoundException e) {
+        // log.error("treeitem \"" + label + "\" not found");
+        // }
+        // }
+        // return selectedTreeItem;
+        try {
+            return tree.expandNode(labels);
         } catch (WidgetNotFoundException e) {
-            log.error("gematched Context menu can't be found!", e);
+            log.warn("table item not found.", e);
             return null;
         }
+
     }
 
-    public void disConnectSVN() throws RemoteException {
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Disconnect...");
-        confirmWindow("Confirm Disconnect from SVN", SarosConstant.BUTTON_YES);
+    protected SWTBotTable getTableInView(String viewName) {
+        return treeObject.getViewWithText(viewName).bot().table();
     }
 
-    public void connectSVN() throws RemoteException {
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Share Project...");
-        confirmWindowWithTable("Share Project", "SVN",
-            SarosConstant.BUTTON_NEXT);
-        clickButton(SarosConstant.BUTTON_FINISH);
+    protected SWTBotTable getTableInShell(String shellName)
+        throws RemoteException {
+        SWTBotShell shell = getShellWithText(shellName);
+        return shell.bot().table();
     }
 
-    public void switchToOtherRevision() throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Switch to another Branch/Tag/Revision...");
-        waitUntilShellActive("Switch");
-        clickCheckBox("Switch to HEAD revision");
-        setTextWithLabel("Revision:", "115");
-        clickButton(SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("SVN Switch");
-    }
-
-    public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-
-        String[] matchTexts = CLS_PATH.split("/");
-        for (int i = 0; i < matchTexts.length; i++) {
-            matchTexts[i] = matchTexts[i] + ".*";
+    protected List<String> getAllProjects() {
+        SWTBotTree tree = treeObject
+            .getViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot()
+            .tree();
+        List<String> projectNames = new ArrayList<String>();
+        for (int i = 0; i < tree.getAllItems().length; i++) {
+            projectNames.add(tree.getAllItems()[i].getText());
         }
-        // String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Switch to another Branch/Tag/Revision...");
-        waitUntilShellActive("Switch");
-        clickCheckBox("Switch to HEAD revision");
-        setTextWithLabel("Revision:", "116");
-        clickButton(SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("SVN Switch");
+        return projectNames;
     }
 
-    public void revert() throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Revert...");
-        confirmWindow("Revert", SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("Revert");
-    }
-
-    public void renameFile(String newName, String... texts)
+    /**
+     * Open a perspective using Window->Open Perspective->Other... The method is
+     * defined as helper method for other openPerspective* methods and should
+     * not be exported using rmi.
+     * 
+     * 1. if the perspective already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus Window -> Open perspective -> Other....
+     * 
+     * 4. confirm the pop-up window "Open Perspective".
+     * 
+     * @param nodeName
+     *            example: "Java"
+     */
+    protected void openPerspectiveWithName(String nodeName)
         throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = changeToRegex(texts);
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
-            "Rename...");
-        activateShellWithText("Rename Compilation Unit");
-        setTextWithLabel("New name:", newName);
-        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-        clickButton(SarosConstant.BUTTON_FINISH);
+        if (!isPerspectiveActive(nodeName)) {
+            activateEclipseShell();
+            clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
+                SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE,
+                SarosConstant.MENU_TITLE_OTHER);
+            confirmWindowWithTable(SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE,
+                nodeName, SarosConstant.BUTTON_OK);
+        }
     }
 
-    public void renamePkg(String newName, String... texts)
-        throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = changeToRegex(texts);
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
-            "Rename...");
-        activateShellWithText("Rename Package");
-        setTextWithLabel("New name:", newName);
-        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
-        clickButton(SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("Rename Package");
+    /**
+     * Open a view using Window->Show View->Other... The method is defined as
+     * helper method for other showView* methods and should not be exported
+     * using rmi.
+     * 
+     * 1. if the view already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus Window -> Show View -> Other....
+     * 
+     * 4. confirm the pop-up window "Show View"
+     * 
+     * @param category
+     *            example: "General"
+     * @param nodeName
+     *            example: "Console"
+     */
+    protected void openViewWithName(String viewTitle, String category,
+        String nodeName) throws RemoteException {
+        if (!isViewOpen(viewTitle)) {
+            activateEclipseShell();
+            clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
+                SarosConstant.MENU_TITLE_SHOW_VIEW,
+                SarosConstant.MENU_TITLE_OTHER);
+            confirmWindowWithTreeWithFilterText(
+                SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
+                SarosConstant.BUTTON_OK);
+        }
     }
 
-    public void moveClassTo(String projectName, String pkg, String className,
-        String targetProject, String targetPkg) throws RemoteException {
-        openPackageExplorerView();
-        activatePackageExplorerView();
-        String[] matchTexts = changeToRegex(projectName, "src", pkg, className);
-        log.info("matchTexts: " + matchTexts);
-        clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
-            "Move...");
-        waitUntilShellActive("Move");
-        confirmWindowWithTree("Move", SarosConstant.BUTTON_OK, targetProject,
-            "src", targetPkg);
-
+    /**
+     * Should be only called if View is open
+     */
+    protected void activateViewWithTitle(String title) throws RemoteException {
+        try {
+            if (!isViewActive(title)) {
+                delegate.viewByTitle(title).setFocus();
+                // waitUntil(SarosConditions.isViewActive(delegate, title));
+            }
+        } catch (WidgetNotFoundException e) {
+            log.warn("Widget not found '" + title + "'", e);
+        }
     }
 
     protected String[] changeToRegex(String... texts) {
@@ -1910,24 +2111,22 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return matchTexts;
     }
 
-    public void resetWorkbench() throws RemoteException {
-        List<? extends SWTBotEditor> editors = delegate.editors();
-        for (SWTBotEditor editor : editors) {
-            editor.close();
-        }
+    protected void setTextWithLabel(String label, String text) {
+        delegate.textWithLabel(label).setText(text);
+    }
 
-        // if (delegate.activeShell() != null) {
-        // SWTBotShell activeShell = delegate.activeShell();
-        // if (activeShell != getEclipseShell()) {
-        // activeShell.close();
-        // }
-        // }
+    protected void setTextWithoutLabel(String match, String replace) {
+        delegate.text(match).setText(replace);
+    }
 
-        // page.resetPerspective();
-        // String defaultPerspectiveId = workbench.getPerspectiveRegistry()
-        // .getDefaultPerspective();
-        // workbench.showPerspective(defaultPerspectiveId, workbenchWindow);
-        // page.resetPerspective();
+    protected void setTextinEditor(String contents, String fileName) {
+        SWTBotEclipseEditor e = getTextEditor(fileName);
+        e.setText(contents);
+        e.save();
+    }
+
+    protected void clickCheckBox(String title) {
+        delegate.checkBox(title).click();
 
     }
 }

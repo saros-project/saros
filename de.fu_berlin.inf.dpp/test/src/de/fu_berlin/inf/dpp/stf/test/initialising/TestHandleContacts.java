@@ -7,7 +7,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -17,33 +18,40 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestHandleContacts {
     // bots
-    protected Musician bob;
-    protected Musician alice;
+    protected static Musician bob;
+    protected static Musician alice;
 
-    @Before
-    public void configureRespondent() throws RemoteException, NotBoundException {
+    @BeforeClass
+    public static void configureAlice() throws RemoteException,
+        NotBoundException {
         alice = new Musician(new JID(BotConfiguration.JID_ALICE),
             BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
             BotConfiguration.PORT_ALICE);
         alice.initBot();
     }
 
-    @Before
-    public void configureQuestioner() throws RemoteException, NotBoundException {
+    @BeforeClass
+    public static void configureBob() throws RemoteException, NotBoundException {
         bob = new Musician(new JID(BotConfiguration.JID_BOB),
             BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
             BotConfiguration.PORT_BOB);
         bob.initBot();
     }
 
-    @After
-    public void cleanupRespondent() throws RemoteException {
+    @AfterClass
+    public static void cleanupAlice() throws RemoteException {
         alice.bot.xmppDisconnect();
     }
 
-    @After
-    public void cleanupQuestioner() throws RemoteException {
+    @AfterClass
+    public static void cleanupBob() throws RemoteException {
         bob.bot.xmppDisconnect();
+    }
+
+    @After
+    public void reset() throws RemoteException {
+        alice.bot.resetWorkbench();
+        bob.bot.resetWorkbench();
     }
 
     // FIXME these testAddContact assumes that testRemoveContact succeeds

@@ -56,18 +56,21 @@ public class TestShare3UsersSequentially {
     public static void cleanupCarl() throws RemoteException {
         carl.bot.xmppDisconnect();
         carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        carl.bot.resetWorkbench();
     }
 
     @AfterClass
     public static void cleanupBob() throws RemoteException {
         bob.bot.xmppDisconnect();
         bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        bob.bot.resetWorkbench();
     }
 
     @After
     public void cleanupAlice() throws RemoteException {
         alice.bot.xmppDisconnect();
         alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
+        alice.bot.resetWorkbench();
     }
 
     @Test
@@ -114,6 +117,8 @@ public class TestShare3UsersSequentially {
 
         // alice.waitUntilOtherLeaveSession(carl);
         // alice.waitUntilOtherLeaveSession(bob);
+        alice.bot.waitUntilSessionCloses(carl.state);
+        alice.bot.waitUntilSessionCloses(bob.state);
         alice.leaveSession();
         assertFalse(alice.state.isParticipant(alice.jid));
 

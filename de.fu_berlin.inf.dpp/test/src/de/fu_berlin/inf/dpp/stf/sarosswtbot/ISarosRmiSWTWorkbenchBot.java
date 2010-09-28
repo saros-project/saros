@@ -240,5 +240,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void openSarosViews() throws RemoteException;
 
-    // public void leaveSession(JID jid) throws RemoteException;
+    public void renameContact(String contact, String newName)
+        throws RemoteException;
+
+    public boolean isContactInSessionView(String Contact)
+        throws RemoteException;
 }

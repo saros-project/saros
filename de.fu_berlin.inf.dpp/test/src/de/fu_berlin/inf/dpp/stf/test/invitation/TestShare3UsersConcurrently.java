@@ -120,6 +120,7 @@ public class TestShare3UsersConcurrently {
                     final String projectName = BotConfiguration.PROJECTNAME;
                     if (musician.bot.isJavaProjectExist(projectName))
                         musician.bot.deleteProject(projectName);
+                    musician.bot.resetWorkbench();
                     return null;
                 }
             });

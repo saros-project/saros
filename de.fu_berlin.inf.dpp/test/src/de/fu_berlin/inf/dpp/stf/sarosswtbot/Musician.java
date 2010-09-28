@@ -46,7 +46,7 @@ public class Musician {
         log.trace("closeWelcomeView");
         bot.closeWelcomeView();
         log.trace("openJavaPerspective");
-        bot.openJavaPerspective();
+        bot.openPerspectiveJava();
         log.trace("openSarosViews");
         bot.openSarosViews();
         log.trace("xmppConnect");

@@ -107,7 +107,7 @@ public class TestFileOperations {
 
     @Test
     public void testNewPkgAndClass() throws RemoteException {
-        alice.bot.newPkg(PROJECT, PKG2);
+        alice.bot.newPackage(PROJECT, PKG2);
         bob.bot.waitUntilPkgExist(PROJECT, PKG2);
         carl.bot.waitUntilPkgExist(PROJECT, PKG2);
         assertTrue(bob.bot.isPkgExist(PROJECT, PKG2));
@@ -119,9 +119,9 @@ public class TestFileOperations {
         assertTrue(bob.bot.isClassExist(PROJECT, PKG2, CLS));
         assertTrue(carl.bot.isClassExist(PROJECT, PKG2, CLS));
 
-        carl.bot.openJavaFileWithEditor(PROJECT, PKG2, CLS);
+        carl.bot.openClass(PROJECT, PKG2, CLS);
         carl.bot.waitUntilJavaEditorActive(CLS);
-        bob.bot.openJavaFileWithEditor(PROJECT, PKG2, CLS);
+        bob.bot.openClass(PROJECT, PKG2, CLS);
         bob.bot.waitUntilJavaEditorActive(CLS);
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
             PKG2, CLS);
@@ -137,7 +137,7 @@ public class TestFileOperations {
 
     @Test
     public void testMoveClass() throws RemoteException {
-        alice.bot.newPkg(PROJECT, PKG2);
+        alice.bot.newPackage(PROJECT, PKG2);
         alice.bot.newClass(PROJECT, PKG2, CLS2);
         alice.bot.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
         bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
