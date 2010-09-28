@@ -183,7 +183,8 @@ public class TestShare3UsersConcurrently {
             final Musician musician = peers.get(i);
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
-                    musician.leaveSession();
+                    // Need to check for isDriver before leaving.
+                    musician.bot.leaveSession(musician.jid);
                     return musician.state.isParticipant(musician.jid);
                 }
             });
@@ -196,7 +197,8 @@ public class TestShare3UsersConcurrently {
         log.trace("waitUntilOtherLeaveSession");
         // alice.waitUntilOtherLeaveSession(carl);
         // alice.waitUntilOtherLeaveSession(bob);
-        alice.leaveSession();
+        // Need to check for isDriver before leaving.
+        alice.bot.leaveSession(alice.jid);
         assertFalse(alice.state.isParticipant(alice.jid));
         log.trace("testShareProjectParallel done");
     }

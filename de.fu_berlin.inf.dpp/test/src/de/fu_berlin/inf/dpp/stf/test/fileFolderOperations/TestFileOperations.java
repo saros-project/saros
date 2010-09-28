@@ -57,7 +57,7 @@ public class TestFileOperations {
             BotConfiguration.PROJECTNAME);
         bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
             BotConfiguration.PROJECTNAME);
-        carl.followUser(alice);
+        carl.bot.followUser(alice.state, alice.jid);
     }
 
     @Before

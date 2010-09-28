@@ -2,14 +2,11 @@ package de.fu_berlin.inf.dpp.stf.swtbot;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
@@ -76,14 +73,14 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     // public boolean isTreeItemExist(SWTBotTree tree, String... labels)
     // throws RemoteException;
 
-    public boolean istableItemInViewExist(String viewName, String itemName)
-        throws RemoteException;
+    // public boolean istableItemInViewExist(String viewName, String itemName)
+    // throws RemoteException;
 
-    public boolean isTableItemInWindowExist(String title, String label)
-        throws RemoteException;
+    // public boolean isTableItemInWindowExist(String title, String label)
+    // throws RemoteException;
 
-    public boolean isTableItemExist(SWTBotTable table, String itemName)
-        throws RemoteException;
+    // public boolean isTableItemExist(SWTBotTable table, String itemName)
+    // throws RemoteException;
 
     // /**
     // * Returns true if the given projectName was found on the {@link
@@ -146,7 +143,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#activeShell()};
      * </pre>
      */
-    public String getCurrentActiveShell() throws RemoteException;
+    // public String getCurrentActiveShell() throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -155,7 +152,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#shell(String)}.activate();
      * </pre>
      */
-    public boolean activateShellWithText(String text) throws RemoteException;
+    // public boolean activateShellWithText(String text) throws RemoteException;
 
     public boolean activateShellWithMatchText(String matchText)
         throws RemoteException;
@@ -168,7 +165,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#button()}.click();
      * </pre>
      */
-    public void clickButton() throws RemoteException;
+    // public void clickButton() throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -178,7 +175,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * button.click();
      * </pre>
      */
-    public void clickButton(int num) throws RemoteException;
+    // public void clickButton(int num) throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -188,7 +185,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * button.click();
      * </pre>
      */
-    public void clickButton(String name) throws RemoteException;
+    // public void clickButton(String name) throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -198,7 +195,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * menu.click();
      * </pre>
      */
-    public void clickMenuWithText(String text) throws RemoteException;
+    // public void clickMenuWithText(String text) throws RemoteException;
 
     /**
      * Traverse a list of {@link SWTBotMenu} identified by the given list of
@@ -210,7 +207,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot}.menu(s1).menu(s2).menu(s3).click();
      * </pre>
      */
-    public void clickMenuWithTexts(String... names) throws RemoteException;
+    // public void clickMenuWithTexts(String... names) throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -269,7 +266,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * view.close();
      * </pre>
      */
-    public void closeViewWithText(String title) throws RemoteException;
+    // public void closeViewWithText(String title) throws RemoteException;
 
     /**
      * Returns a list of {@link String} from {@link SWTBotView} titles got by:
@@ -278,7 +275,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#views()};
      * </pre>
      */
-    public List<String> getViewTitles() throws RemoteException;
+    // public List<String> getViewTitles() throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -288,7 +285,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * button.isEnabled();
      * </pre>
      */
-    public boolean isButtonEnabled(int num) throws RemoteException;
+    // public boolean isButtonEnabled(int num) throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -298,7 +295,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * button.isEnabled();
      * </pre>
      */
-    public boolean isButtonEnabled(String name) throws RemoteException;
+    // public boolean isButtonEnabled(String name) throws RemoteException;
 
     /**
      * Returns true a {@link SWTBotShell} with the given title is open.
@@ -308,9 +305,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     /**
      * Returns true if a {@link SWTBotView} with the given title is visible.
      */
-    public boolean isViewOpen(String title) throws RemoteException;
+    // public boolean isViewOpen(String title) throws RemoteException;
 
-    public boolean isViewActive(String title) throws RemoteException;
+    // public boolean isViewActive(String title) throws RemoteException;
 
     /**
      * This is the same as the following method chain:
@@ -368,7 +365,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      */
     public void captureScreenshot(String filename) throws RemoteException;
 
-    public boolean isPerspectiveActive(String title) throws RemoteException;
+    // public boolean isPerspectiveActive(String title) throws RemoteException;
 
     public void waitUntilShellCloses(String shellText) throws RemoteException;
 
@@ -401,8 +398,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isTextWithLabelEqualWithText(String label, String text)
         throws RemoteException;
 
-    public void clickContextMenuOfTableInView(String viewName, String itemName,
-        String contextName) throws RemoteException;
+    // public void clickContextMenuOfTableInView(String viewName, String
+    // itemName,
+    // String contextName) throws RemoteException;
 
     // public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String
     // title,
@@ -417,7 +415,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     // public SWTBotView getViewWithText(String title) throws RemoteException;
 
-    public void clickCheckBox() throws RemoteException;
+    // public void clickCheckBox() throws RemoteException;
 
     // public void clickContextMenuOfTreeInView(String viewName,
     // String contextName, String... itemNames) throws RemoteException;
@@ -440,10 +438,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void waitUnitButtonWithTooltipTextEnabled(String tooltipText)
         throws RemoteException;
 
-    public void clickRadio(String title) throws RemoteException;
+    // public void clickRadio(String title) throws RemoteException;
 
-    public boolean isContextMenuOfTableItemInViewExist(String viewName,
-        String itemName, String contextName) throws RemoteException;
+    // public boolean isContextMenuOfTableItemInViewExist(String viewName,
+    // String itemName, String contextName) throws RemoteException;
 
     public void importProjectFromSVN(String path) throws RemoteException;
 
@@ -466,17 +464,17 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     // public SWTBotTreeItem selectTreeWithLabelsInView(String viewTitle,
     // String... itemNames) throws RemoteException;
 
-    public SWTBotShell getShellWithText(String text) throws RemoteException;
+    // public SWTBotShell getShellWithText(String text) throws RemoteException;
 
-    public SWTBotTableItem selectTableItemWithLabelInView(String viewTitle,
-        String label) throws RemoteException;
+    // public SWTBotTableItem selectTableItemWithLabelInView(String viewTitle,
+    // String label) throws RemoteException;
 
     // public void waitUntilEditorActive(String name) throws RemoteException;
 
-    public void selectCheckBoxWithText(String invitee) throws RemoteException;
+    // public void selectCheckBoxInTable(String invitee) throws RemoteException;
 
-    public void selectCheckBoxWithList(List<String> invitees)
-        throws RemoteException;
+    // public void selectCheckBoxsInTable(List<String> invitees)
+    // throws RemoteException;
 
     public void confirmWindowWithCheckBox(String shellName, String buttonName,
         String... itemNames) throws RemoteException;
@@ -487,24 +485,24 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void confirmWindowWithTree(String shellName, String buttonName,
         String... itemNames) throws RemoteException;
 
-    public boolean isPerspectiveOpen(String title) throws RemoteException;
+    // public boolean isPerspectiveOpen(String title) throws RemoteException;
 
     public boolean isShellOpen(String title) throws RemoteException;
 
-    public boolean isEditorOpen(String name) throws RemoteException;
+    // public boolean isEditorOpen(String name) throws RemoteException;
 
     // public void setTextinEditor(String contents, String fileName)
     // throws RemoteException;
 
-    public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label)
-        throws RemoteException;
+    // public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label)
+    // throws RemoteException;
 
     public void waitUntilFileEqualWithFile(String projectName,
         String packageName, String className, String file)
         throws RemoteException;
 
-    public boolean isTreeItemExist(String viewTitle, String... paths)
-        throws RemoteException;
+    // public boolean isTreeItemExist(String viewTitle, String... paths)
+    // throws RemoteException;
 
     // public SWTBotTreeItem getTreeWithLabels(SWTBotTree tree, String...
     // labels)
@@ -530,8 +528,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void activateJavaEditor(String className) throws RemoteException;
 
-    public void debugJavaFile(String projectName, String packageName,
-        String className) throws RemoteException;
+    // public void debugJavaFile(String projectName, String packageName,
+    // String className) throws RemoteException;
 
     public int getJavaCursorLinePosition(String projectName,
         String packageName, String className) throws RemoteException;
@@ -572,11 +570,12 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     // public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
     // String... regexs) throws RemoteException;
 
-    public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
-        String[] matchTexts, String... contexts) throws RemoteException;
+    // public boolean isMenusOfContextMenuOfTreeItemInViewExist(String
+    // viewTitle,
+    // String[] matchTexts, String... contexts) throws RemoteException;
 
-    public void clickMenusOfContextMenuOfTreeItemInView(String viewName,
-        String[] matchTexts, String... contexts) throws RemoteException;
+    // public void clickMenusOfContextMenuOfTreeItemInView(String viewName,
+    // String[] matchTexts, String... contexts) throws RemoteException;
 
     public void disConnectSVN() throws RemoteException;
 

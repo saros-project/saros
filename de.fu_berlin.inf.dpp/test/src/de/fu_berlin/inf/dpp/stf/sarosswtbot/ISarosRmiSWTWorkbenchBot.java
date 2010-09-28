@@ -93,7 +93,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean clickTBDisconnectInRosterView() throws RemoteException;
 
-    public void followUser(String participantJID, String sufix)
+    public void followUser(ISarosState participantState, JID participatnJid)
         throws RemoteException;
 
     // public void clickCMgiveDriverRoleInSPSView(String inviteeJID)
@@ -135,8 +135,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void clickCMgiveExclusiveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException;
 
-    public void clickCMStopFollowingThisUserInSPSView(String participantJID,
-        String sufix) throws RemoteException;
+    public void clickCMStopFollowingThisUserInSPSView(ISarosState state, JID jid)
+        throws RemoteException;
 
     public void clickCMJumpToPositionOfSelectedUserInSPSView(
         String participantJID, String sufix) throws RemoteException;
@@ -245,4 +245,13 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean isContactInSessionView(String Contact)
         throws RemoteException;
+
+    public void leaveSession(JID jid) throws RemoteException;
+
+    public void clickShareProjectWith(String projectName,
+        String shareProjectWith) throws RemoteException;
+
+    public void confirmSessionUsingNewOrExistProject(
+        ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
+        String projectName, int typeOfSharingProject) throws RemoteException;
 }

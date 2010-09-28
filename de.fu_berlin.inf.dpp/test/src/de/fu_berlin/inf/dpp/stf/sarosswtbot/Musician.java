@@ -9,7 +9,6 @@ import java.rmi.registry.Registry;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -71,110 +70,21 @@ public class Musician {
 
     public void buildSessionSequential(String projectName,
         String shareProjectWith, Musician... invitees) throws RemoteException {
-        clickShareProjectWith(projectName, shareProjectWith);
         String[] inviteeJIDs = new String[invitees.length];
         for (int i = 0; i < invitees.length; i++) {
             inviteeJIDs[i] = invitees[i].getPlainJid();
         }
+        bot.clickShareProjectWith(projectName, shareProjectWith);
+
         bot.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
-            confirmSessionUsingNewOrExistProject(invitee, projectName);
+            bot.confirmSessionUsingNewOrExistProject(invitee.bot, this.jid,
+                projectName, invitee.typeOfSharingProject);
         }
     }
 
     public void buildSessionConcurrently(String projectName,
         String shareProjectWith, Musician... invitees) throws RemoteException {
-
-    }
-
-    public void clickShareProjectWith(String projectName,
-        String shareProjectWith) throws RemoteException {
-        if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
-            bot.clickCMShareProjectInPEView(projectName);
-        } else if (shareProjectWith
-            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS))
-            bot.clickCMShareprojectWithVCSSupportInPEView(projectName);
-        else if (shareProjectWith
-            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY))
-            bot.clickCMShareProjectParticallyInPEView(projectName);
-        else
-            bot.clickCMAddToSessionInPEView(projectName);
-    }
-
-    public void confirmSessionUsingNewOrExistProject(Musician invitee,
-        String projectName) throws RemoteException {
-        invitee.bot
-            .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        switch (invitee.typeOfSharingProject) {
-        case SarosConstant.CREATE_NEW_PROJECT:
-            invitee.bot.confirmSessionInvitationWizard(this.getPlainJid(),
-                projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT:
-            invitee.bot.confirmSessionInvitationWizardUsingExistProject(
-                this.getPlainJid(), projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
-            invitee.bot
-                .confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
-                    this.getPlainJid(), projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
-            invitee.bot
-                .confirmSessionInvitationWizardUsingExistProjectWithCopy(
-                    this.getPlainJid(), projectName);
-            break;
-        default:
-            break;
-        }
-    }
-
-    public void shareScreenWithUser(Musician respondent) throws RemoteException {
-        bot.openRemoteScreenView();
-        if (respondent.state.isDriver(respondent.jid)) {
-            bot.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondent.jid.getBase() + " (Driver)");
-
-        } else {
-            bot.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondent.jid.getBase());
-        }
-        bot.clickShareYourScreenWithSelectedUserInSPSView();
-    }
-
-    public void followUser(Musician participant) throws RemoteException {
-        if (participant.state.isDriver(participant.jid))
-            bot.followUser(participant.jid.getBase(), " (Driver)");
-        else
-            bot.followUser(participant.jid.getBase(), "");
-    }
-
-    public void leaveSession() throws RemoteException {
-        // Need to check for isDriver before leaving.
-        final boolean isDriver = this.state.isDriver(this.jid);
-        bot.clickTBLeaveTheSessionInSPSView();
-        if (!isDriver) {
-            bot.confirmWindow(
-                SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
-                SarosConstant.BUTTON_YES);
-        } else {
-            Util.runSafeAsync(log, new Runnable() {
-                public void run() {
-                    try {
-                        bot.confirmWindow("Confirm Closing Session",
-                            SarosConstant.BUTTON_YES);
-                    } catch (RemoteException e) {
-                        // no popup
-                    }
-                }
-            });
-            if (bot.isShellActive("Confirm Closing Session"))
-                bot.confirmWindow("Confirm Closing Session",
-                    SarosConstant.BUTTON_YES);
-        }
-        bot.waitUntilSessionCloses();
     }
 
     public String getName() {
@@ -197,22 +107,6 @@ public class Musician {
 
     public String getXmppServer() {
         return jid.getDomain();
-    }
-
-    /************* wait until *****************/
-
-    public void clickCMStopfollowingThisUserInSPSView(Musician participant)
-        throws RemoteException {
-        if (participant.state.isDriver(participant.jid))
-            bot.clickCMStopFollowingThisUserInSPSView(
-                participant.jid.getBase(), " (Driver)");
-        else
-            bot.clickCMStopFollowingThisUserInSPSView(
-                participant.jid.getBase(), "");
-    }
-
-    public void sleep(long millis) throws RemoteException {
-        bot.sleep(millis);
     }
 
 }

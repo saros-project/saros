@@ -95,13 +95,15 @@ public class TestShare2UsersSequentially {
         // TODO make tests independent of each other
         // @Test
         // public void testLeaveSession() throws RemoteException {
-        bob.leaveSession();
+        // Need to check for isDriver before leaving.
+        bob.bot.leaveSession(bob.jid);
         log.trace("invitee.leave");
         assertFalse(bob.state.isParticipant(bob.jid));
 
         bob.bot.waitUntilSessionCloses(bob.state);
         // TODO Dialog "Do you really want to close" pops up
-        alice.leaveSession();
+        // Need to check for isDriver before leaving.
+        alice.bot.leaveSession(alice.jid);
         log.trace("inviter.leave");
         assertFalse(alice.state.isParticipant(alice.jid));
         // invitee.waitUntilSessionClosesBy(inviter);

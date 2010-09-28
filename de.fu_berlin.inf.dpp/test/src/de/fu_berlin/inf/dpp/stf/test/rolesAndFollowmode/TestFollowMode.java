@@ -62,9 +62,11 @@ public class TestFollowMode {
     @After
     public void StopFollowMode() throws RemoteException {
         if (bob.state.isFollowing())
-            bob.clickCMStopfollowingThisUserInSPSView(alice);
+            bob.bot.clickCMStopFollowingThisUserInSPSView(alice.state,
+            alice.jid);
         if (alice.state.isFollowing())
-            alice.clickCMStopfollowingThisUserInSPSView(bob);
+            alice.bot.clickCMStopFollowingThisUserInSPSView(bob.state,
+            bob.jid);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
 
@@ -74,7 +76,7 @@ public class TestFollowMode {
     public void testBobFollowAlice() throws RemoteException {
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
             PKG, CLS1);
-        bob.followUser(alice);
+        bob.bot.followUser(alice.state, alice.jid);
         bob.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.state.isFollowing());
         assertTrue(bob.bot.isJavaEditorActive(CLS1));
@@ -92,13 +94,13 @@ public class TestFollowMode {
         bob.bot.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.bot.isJavaEditorActive(CLS2));
 
-        alice.followUser(bob);
+        alice.bot.followUser(bob.state, bob.jid);
         bob.bot.activateJavaEditor(CLS1);
         alice.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(alice.state.isFollowing());
         assertTrue(alice.bot.isJavaEditorActive(CLS1));
 
-        bob.followUser(alice);
+        bob.bot.followUser(alice.state, alice.jid);
         alice.bot.newClass(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT,

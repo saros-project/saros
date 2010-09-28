@@ -143,10 +143,10 @@ public class TestSVN {
         // Alice reverts the project "test".
         // Make sure Bob has the file Main.java.
         alice.bot.deleteProject(CLS_PATH);
-        bob.sleep(1000);
+        bob.bot.sleep(1000);
         assertFalse(bob.bot.isResourceExist(CLS_PATH));
         alice.bot.revert();
-        bob.sleep(1000);
+        bob.bot.sleep(1000);
         assertTrue(bob.bot.isResourceExist(CLS_PATH));
     }
 }

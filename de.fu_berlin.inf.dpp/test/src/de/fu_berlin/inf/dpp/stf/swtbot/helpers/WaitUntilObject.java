@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.swtbot.helpers;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -17,7 +18,8 @@ import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
 public class WaitUntilObject {
-
+    private static final transient Logger log = Logger
+        .getLogger(WaitUntilObject.class);
     private RmiSWTWorkbenchBot rmiBot;
     private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
 
@@ -34,10 +36,6 @@ public class WaitUntilObject {
     public void waitUntilShellCloses(String shellText) {
         waitUntil(SarosConditions.isShellClosed(bot, shellText));
         bot.sleep(10);
-    }
-
-    public void waitUntilJavaEditorActive(String className) {
-        waitUntilEditorActive(className + ".java");
     }
 
     public void waitUntilEditorActive(String name) {
@@ -74,8 +72,8 @@ public class WaitUntilObject {
     }
 
     public void waitUnitButtonWithTooltipTextEnabled(String tooltipText) {
-        waitUntil(Conditions.widgetIsEnabled(bot
-            .buttonWithTooltip(tooltipText)));
+        waitUntil(Conditions
+            .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
     }
 
     public void waitUntilContextMenuOfTableItemEnabled(

@@ -65,8 +65,10 @@ public class TestShareProjectUsingExistingProject {
 
     @After
     public void cleanupAliceAndBob() throws RemoteException {
-        bob.leaveSession();
-        alice.leaveSession();
+        // Need to check for isDriver before leaving.
+        bob.bot.leaveSession(bob.jid);
+        // Need to check for isDriver before leaving.
+        alice.bot.leaveSession(alice.jid);
         alice.bot.deleteProject(PROJECT);
         bob.bot.deleteProject(PROJECT);
         bob.bot.resetWorkbench();
