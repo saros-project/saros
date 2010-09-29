@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -19,62 +20,85 @@ import de.fu_berlin.inf.dpp.stf.swtbot.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
+/**
+ * Screen object that represents the operations that can be performed on a view.
+ * 
+ * @author Lin
+ */
 public class ViewObject {
+
     private static final transient Logger log = Logger
         .getLogger(ViewObject.class);
+
     private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
     private TableObject tableObject;
     private MenuObject menuObject;
     private TreeObject treeObject;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
 
+    /**
+     * Creates an instance of a viewObject.<br/>
+     * ViewObject should be instanced in {@link RmiSWTWorkbenchBot}.
+     * 
+     * @param rmiBot
+     *            delegates to {@link SWTWorkbenchBot} to implement an java.rmi
+     *            interface for {@link SWTWorkbenchBot}. Using it
+     *            {@link ViewObject} can access other screen objects.
+     */
     public ViewObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
-        this.wUntil = rmiBot.wUntilObject;
         this.tableObject = rmiBot.tableObject;
         this.menuObject = rmiBot.menuObject;
         this.treeObject = rmiBot.treeObject;
     }
 
     /**
-     * Should be only called if View is open
+     * activate the specified view. It should be only called if View is open.
+     * 
+     * @param title
+     *            the view title.
+     * @see SWTBotView#setFocus()
      */
     public void activateViewWithTitle(String title) {
         try {
             if (!isViewActive(title)) {
                 bot.viewByTitle(title).setFocus();
-                // waitUntil(SarosConditions.isViewActive(delegate, title));
             }
         } catch (WidgetNotFoundException e) {
             log.warn("Widget not found '" + title + "'", e);
         }
     }
 
+    /**
+     * test, if the specified view is active.
+     * 
+     * @param title
+     *            the view title
+     * @return <tt>true</tt> if here is a active view with the same title.
+     */
     public boolean isViewActive(String title) {
         if (!isViewOpen(title))
             return false;
         return bot.activeView().getTitle().equals(title);
-        // SWTBotView activeView;
-        // try {
-        // activeView = delegate.activeView();
-        // } catch (WidgetNotFoundException e) {
-        // // no active view
-        // return false;
-        // }
-        // return activeView.getTitle().equals(title);
     }
 
+    /**
+     * test, if the specified view is open.
+     * 
+     * @param title
+     *            the view title.
+     * @return <tt>true</tt> if all the opened views contains the specified view
+     *         with the title.
+     * @see ViewObject#getViewTitles()
+     */
     public boolean isViewOpen(String title) {
         return getViewTitles().contains(title);
-        // try {
-        // return delegate.viewByTitle(title) != null;
-        // } catch (WidgetNotFoundException e) {
-        // log.info("view " + title + "can not be fund!");
-        // return false;
-        // }
     }
 
+    /**
+     * @return the name list of the views which are opened currently.
+     * @see SWTWorkbenchBot#views()
+     */
     public List<String> getViewTitles() {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotView view : bot.views())
@@ -83,23 +107,27 @@ public class ViewObject {
     }
 
     /**
-     * Open a view using Window->Show View->Other... The method is defined as
-     * helper method for other showView* methods and should not be exported
-     * using rmi.
-     * 
-     * 1. if the view already exist, return.
-     * 
-     * 2. activate the saros-instance-window(alice / bob / carl). If the
-     * workbench isn't active, delegate can't find the main menus.
-     * 
-     * 3. click main menus Window -> Show View -> Other....
-     * 
-     * 4. confirm the pop-up window "Show View"
+     * Open a view using menus Window->Show View->Other... The method is defined
+     * as helper method for other showView* methods in
+     * {@link RmiSWTWorkbenchBot} and should not be exported by rmi. <br/>
+     * Operational steps:
+     * <ol>
+     * <li>if the view already exist, return.</li>
+     * <li>activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.</li>
+     * <li>click main menus Window -> Show View -> Other....</li>
+     * <li>confirm the pop-up window "Show View".</li>
+     * </ol>
      * 
      * @param category
      *            example: "General"
      * @param nodeName
      *            example: "Console"
+     * @see RmiSWTWorkbenchBot#activateEclipseShell()
+     * @see MenuObject#clickMenuWithTexts(String...)
+     * @see RmiSWTWorkbenchBot#confirmWindowWithTreeWithFilterText(String,
+     *      String, String, String)
+     * 
      */
     public void openViewWithName(String viewTitle, String category,
         String nodeName) throws RemoteException {
@@ -114,14 +142,34 @@ public class ViewObject {
         }
     }
 
+    /**
+     * 
+     * @param viewName
+     *            the view title
+     * @return a {@link SWTBotTree} with the specified <code>none</code> in
+     *         specified view.
+     */
     public SWTBotTree getTreeInView(String viewName) {
         return bot.viewByTitle(viewName).bot().tree();
     }
 
+    /**
+     * 
+     * @param viewName
+     *            the view title
+     * @returna {@link SWTBotTable} with the specified <code>none</code> in
+     *          specified view.
+     */
     public SWTBotTable getTableInView(String viewName) {
         return bot.viewByTitle(viewName).bot().table();
     }
 
+    /**
+     * @param viewName
+     * @param buttonTooltip
+     * @return the toolbar_button, whose name is matched with one of the
+     *         currently visible toolbar_buttons.
+     */
     public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
         String viewName, String buttonTooltip) {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
@@ -133,12 +181,34 @@ public class ViewObject {
         return null;
     }
 
+    /**
+     * close the specified view
+     * 
+     * @param title
+     */
     public void closeViewWithText(String title) {
         if (isViewOpen(title)) {
             bot.viewByTitle(title).close();
         }
     }
 
+    /**
+     * Click a context menu of the selected table item. The method is defined as
+     * helper method for other clickTB*In*View methods in
+     * {@link SarosSWTWorkbenchBot} and should not be exported by rmi. <br/>
+     * Operational steps:
+     * <ol>
+     * <li>select a table item</li>
+     * 
+     * <li>then click the specified context menu on it</li>
+     * </ol>
+     * 
+     * @param viewName
+     * 
+     * @param itemName
+     *            the table item' name, whose context menu you want to click.
+     * @see #selectTableItemWithLabelInView(String, String)
+     */
     public void clickContextMenuOfTableInView(String viewName, String itemName,
         String contextName) {
         try {
@@ -151,11 +221,20 @@ public class ViewObject {
         }
     }
 
+    /**
+     * Select a table item in a view. The method is defined as helper method for
+     * other selectTB*In*View methods in {@link SarosSWTWorkbenchBot} and should
+     * not be exported by rmi. <br/>
+     * 
+     * @param viewName
+     * 
+     * @param label
+     *            the table item' name, which you want to select.
+     */
     public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
         String label) {
         try {
-            SWTBotView view = bot.viewByTitle(viewName);
-            SWTBotTable table = view.bot().table();
+            SWTBotTable table = getTableInView(viewName);
             return tableObject.selectTableItemWithLabel(table, label).select();
         } catch (WidgetNotFoundException e) {
             log.warn(" table item " + label + " on View " + viewName
@@ -164,17 +243,26 @@ public class ViewObject {
         return null;
     }
 
+    /**
+     * This method is very useful, if you want to click a submenu of the context
+     * menu of a selected treeitem.e.g. the context menu "Team->Commit...". You
+     * should first select the project that his context menu you want to click.
+     * 
+     * @param viewTitle
+     *            the view title
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{"Foo-saros",
+     *            "my.pkg", "myClass.java"}
+     * @param contexts
+     *            all context menus'name.e.g. {"Team", "Commit..."}
+     */
     public void clickMenusOfContextMenuOfTreeItemInView(String viewTitle,
-        String[] matchTexts, String... contexts) {
-
+        String[] nodes, String... contexts) {
         try {
-            SWTBotTree tree = bot
-                .viewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot()
-                .tree();
-            // you should first select the project,whose context you want to
-            // click.
+            SWTBotTree tree = treeObject.getTreeInView(viewTitle);
             SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
-                matchTexts);
+                nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
         } catch (WidgetNotFoundException e) {
@@ -182,10 +270,26 @@ public class ViewObject {
         }
     }
 
-    public boolean istableItemInViewExist(String viewName, String itemName) {
+    /**
+     * @param viewName
+     *            the view title.
+     * @return <tt>true</tt> if the specified table item exists.
+     * 
+     */
+    public boolean isTableItemInViewExist(String viewName, String itemName) {
         return tableObject.isTableItemExist(getTableInView(viewName), itemName);
     }
 
+    /**
+     * 
+     * @param viewName
+     *            the view title.
+     * @param itemName
+     *            the table item name.
+     * @param contextName
+     * @return <tt>true</tt> if the specified context menu of the select table
+     *         item exists.
+     */
     public boolean isContextMenuOfTableItemInViewExist(String viewName,
         String itemName, String contextName) {
         activateViewWithTitle(viewName);
@@ -199,11 +303,23 @@ public class ViewObject {
         }
     }
 
+    /**
+     * 
+     * @param viewName
+     * @param contextName
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{"Foo-saros",
+     *            "my.pkg", "myClass.java"}
+     * @return <tt>true</tt> if the specified context menu of the select tree
+     *         item exists.
+     * @throws RemoteException
+     */
     public boolean isContextMenuOfTreeItemInViewExist(String viewName,
-        String contextName, String... labels) throws RemoteException {
+        String contextName, String... nodes) throws RemoteException {
         activateViewWithTitle(viewName);
         SWTBotTreeItem item = treeObject.selectTreeWithLabelsInView(viewName,
-            labels);
+            nodes);
         try {
             item.contextMenu(contextName);
             return true;
@@ -212,16 +328,26 @@ public class ViewObject {
         }
     }
 
+    /**
+     * @param viewTitle
+     *            the view title
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{"Foo-saros",
+     *            "my.pkg", "myClass.java"}.
+     * @param contexts
+     *            all context menus'name.e.g. {"Team", "Commit..."}.
+     * @return <tt>true</tt>, if the submenus of the selected treeitem's context
+     *         exists.
+     */
     public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
-        String[] matchTexts, String... contexts) {
+        String[] nodes, String... contexts) {
         try {
-            SWTBotTree tree = bot
-                .viewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot()
-                .tree();
+            SWTBotTree tree = treeObject.getTreeInView(viewTitle);
             // you should first select the project,whose context you want to
             // click.
             SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
-                contexts);
+                nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
         } catch (WidgetNotFoundException e) {
@@ -249,10 +375,16 @@ public class ViewObject {
             SarosConstant.CONTEXT_MENU_OPEN, nodes);
     }
 
+    /**
+     * click toolbar button in view. e.g. connect. if you don't know the tooltip
+     * exactly, please use this method.
+     * 
+     * @param viewName
+     * @param buttonTooltip
+     * @return
+     */
     public SWTBotToolbarButton clickToolbarButtonWithTooltipInView(
         String viewName, String buttonTooltip) {
-        // return
-        // delegate.viewByTitle(title).toolbarButton(buttonTooltip).click();
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
             .getToolbarButtons()) {
             if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
@@ -260,11 +392,15 @@ public class ViewObject {
             }
         }
         return null;
-
-        // throw new RemoteException("Button with tooltip '" + buttonTooltip
-        // + "' was not found on view with title '" + title + "'");
     }
 
+    /**
+     * click toolbar button in view. e.g. connect. You need to pass the full
+     * name of the tooltip. exactly.
+     * 
+     * @param viewName
+     * @param tooltip
+     */
     public void clickToolbarPushButtonWithTooltipInView(String viewName,
         String tooltip) {
         bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
