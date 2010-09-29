@@ -7,12 +7,16 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -27,6 +31,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.test.chatview.Comperator;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -949,30 +954,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         openRemoteScreenView();
     }
 
-    // public void leaveSession(JID jid) throws RemoteException {
-    // // Need to check for isDriver before leaving.
-    // final boolean isDriver = state.isDriver(jid);
-    // clickTBLeaveTheSessionInSPSView();
-    // if (!isDriver) {
-    // confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
-    // SarosConstant.BUTTON_YES);
-    // } else {
-    // Util.runSafeAsync(log, new Runnable() {
-    // public void run() {
-    // try {
-    // confirmWindow("Confirm Closing Session",
-    // SarosConstant.BUTTON_YES);
-    // } catch (RemoteException e) {
-    // // no popup
-    // }
-    // }
-    // });
-    // if (isShellActive("Confirm Closing Session"))
-    // confirmWindow("Confirm Closing Session",
-    // SarosConstant.BUTTON_YES);
-    // }
-    // waitUntilSessionCloses();
-    // }
+    public void sendChatMessage(String message) throws RemoteException {
+        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        SWTBotView view = delegate.activeView();
+        SWTBot bot = view.bot();
+        SWTBotText text = bot.text();
+        text.setText(message);
+        text.pressShortcut(0, SWT.CR);
+    }
+
+    public boolean compareChatMessage(String jid, String message)
+        throws RemoteException {
+        SWTBotView view = delegate.activeView();
+        SWTBot bot = view.bot();
+        SWTBotStyledText text = bot.styledText();
+        return Comperator.compareStrings("[" + jid, message, text.getLines());
+    }
 
     public void activateRosterView() throws RemoteException {
         viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);

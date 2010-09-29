@@ -254,4 +254,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void confirmSessionUsingNewOrExistProject(
         ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
         String projectName, int typeOfSharingProject) throws RemoteException;
+
+    public void sendChatMessage(String string) throws RemoteException;
+
+    public boolean compareChatMessage(String jid, String string)
+        throws RemoteException;
 }
