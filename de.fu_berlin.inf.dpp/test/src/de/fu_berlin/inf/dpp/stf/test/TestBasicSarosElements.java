@@ -2,39 +2,28 @@ package de.fu_berlin.inf.dpp.stf.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 
 public class TestBasicSarosElements {
     private static final Logger log = Logger
         .getLogger(TestBasicSarosElements.class);
-    // bots
-    protected static Musician alice;
-
-    @BeforeClass
-    public static void configureInvitee() throws RemoteException,
-        NotBoundException {
-        log.debug("configureInvitee start");
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        log.debug("initBot");
-        alice.initBot();
-        log.debug("configureInvitee end");
-    }
+    private static Musician alice = InitMusician.newAlice();
 
     @AfterClass
     public static void afterClass() throws RemoteException {
-        alice.bot.xmppDisconnect();
+        alice.bot.resetSaros();
+    }
+
+    @After
+    public void cleanup() throws RemoteException {
+        alice.bot.resetWorkbench();
     }
 
     @Test

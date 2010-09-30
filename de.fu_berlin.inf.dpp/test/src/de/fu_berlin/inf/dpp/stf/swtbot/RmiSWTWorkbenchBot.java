@@ -978,6 +978,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
+    public void deleteAllProjects() throws RemoteException {
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IProject[] projects = root.getProjects();
+        for (int i = 0; i < projects.length; i++) {
+            try {
+                FileUtil.delete(projects[i]);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete files ", e);
+            }
+        }
+    }
+
     public boolean isInSVN() throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(BotConfiguration.PROJECTNAME_SVN);

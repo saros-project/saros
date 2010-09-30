@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.test.rolesAndFollowmode;
 
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
@@ -10,10 +9,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestFollowMode {
     private static final String CLS1 = BotConfiguration.CLASSNAME;
@@ -22,26 +21,12 @@ public class TestFollowMode {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
 
-    // bots
-    protected static Musician alice;
-    protected static Musician bob;
+    protected static Musician alice = InitMusician.newAlice();
+    protected static Musician bob = InitMusician.newBob();
 
     @BeforeClass
-    public static void configureInvitee() throws RemoteException,
-        NotBoundException {
-
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
-        alice.bot.newJavaProject(PROJECT);
-        alice.bot.newClass(PROJECT, PKG, CLS1);
-
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-
+    public static void configureInvitee() throws RemoteException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS1);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
@@ -49,27 +34,23 @@ public class TestFollowMode {
 
     @AfterClass
     public static void cleanupBob() throws RemoteException {
-        bob.bot.xmppDisconnect();
-        bob.bot.deleteProject(PROJECT);
+        bob.bot.resetSaros();
     }
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
-        alice.bot.xmppDisconnect();
-        alice.bot.deleteProject(PROJECT);
+        alice.bot.resetSaros();
     }
 
     @After
     public void StopFollowMode() throws RemoteException {
         if (bob.state.isFollowing())
             bob.bot.clickCMStopFollowingThisUserInSPSView(alice.state,
-            alice.jid);
+                alice.jid);
         if (alice.state.isFollowing())
-            alice.bot.clickCMStopFollowingThisUserInSPSView(bob.state,
-            bob.jid);
+            alice.bot.clickCMStopFollowingThisUserInSPSView(bob.state, bob.jid);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
-
     }
 
     @Test

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.test.invitation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,83 +12,59 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestShare3UsersSequentially {
-    // bots
-    protected static Musician alice;
-    protected static Musician carl;
-    protected static Musician bob;
+    private static final String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String CLS = BotConfiguration.CLASSNAME;
+    private static final String PKG = BotConfiguration.PACKAGENAME;
+    private static Musician carl = InitMusician.newCarl();
+    private static Musician alice = InitMusician.newAlice();
+    private static Musician bob = InitMusician.newBob();
 
     @BeforeClass
-    public static void configureCarl() throws RemoteException,
-        NotBoundException {
-        carl = new Musician(new JID(BotConfiguration.JID_CARL),
-            BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
-            BotConfiguration.PORT_CARL);
-        carl.initBot();
-    }
-
-    @BeforeClass
-    public static void configureBob() throws RemoteException, NotBoundException {
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-    }
-
-    @BeforeClass
-    public static void configureAlice() throws RemoteException,
-        NotBoundException {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
-        String projectName = BotConfiguration.PROJECTNAME;
-        alice.bot.newJavaProjectWithClass(projectName,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+    public static void configureAlice() throws RemoteException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
     public static void cleanupCarl() throws RemoteException {
-        carl.bot.xmppDisconnect();
-        carl.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        carl.bot.resetWorkbench();
+        carl.bot.resetSaros();
     }
 
     @AfterClass
     public static void cleanupBob() throws RemoteException {
-        bob.bot.xmppDisconnect();
-        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        bob.bot.resetWorkbench();
+        bob.bot.resetSaros();
+    }
+
+    @AfterClass
+    public static void cleanupAlice() throws RemoteException {
+        alice.bot.resetSaros();
     }
 
     @After
-    public void cleanupAlice() throws RemoteException {
-        alice.bot.xmppDisconnect();
-        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
+    public void reset() throws RemoteException {
+        carl.bot.resetWorkbench();
+        bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
     @Test
     public void testShareProject() throws RemoteException {
-
         List<String> musicians = new LinkedList<String>();
         musicians.add(carl.getPlainJid());
         musicians.add(bob.getPlainJid());
 
-        // alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME,
+        // alice.bot.shareProjectParallel(PROJECT,
         // musicians);
-        alice.bot.clickCMShareProjectInPEView(BotConfiguration.PROJECTNAME);
+        alice.bot.clickCMShareProjectInPEView(PROJECT);
         alice.bot
             .confirmInvitationWindow(carl.getPlainJid(), bob.getPlainJid());
-        carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-            BotConfiguration.PROJECTNAME);
+        carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(), PROJECT);
         // FIXME if this times out, cancel the invitation!
-        bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-            BotConfiguration.PROJECTNAME);
+        bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(), PROJECT);
 
         assertTrue(carl.state.isParticipant(carl.jid));
         assertTrue(carl.state.isObserver(carl.jid));

@@ -10,50 +10,39 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestSVN {
-    protected static Musician alice;
-    protected static Musician bob;
+
+    protected static Musician alice = InitMusician.newAlice();
+    protected static Musician bob = InitMusician.newBob();
+    protected static String PROJECT = BotConfiguration.PROJECTNAME_SVN;
     private static final String CLS_PATH = BotConfiguration.PROJECTNAME_SVN
         + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
         alice.bot.importProjectFromSVN(BotConfiguration.SVN_URL);
-
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME_SVN_TRUNK,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        // alice.waitUntilOtherInSession(bob);
         alice.bot.waitUntilSessionOpenBy(bob.state);
     }
 
     @AfterClass
-    public static void tearDownBob() throws Exception {
-        bob.bot.xmppDisconnect();
-        bob.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
+    public static void tearDownBob() throws RemoteException {
+        bob.bot.resetSaros();
     }
 
     @AfterClass
-    public static void tearDownAlice() throws Exception {
-        alice.bot.xmppDisconnect();
-        alice.bot.deleteProject(BotConfiguration.PROJECTNAME_SVN);
+    public static void tearDownAlice() throws RemoteException {
+        alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void resetWorkbench() throws RemoteException {
         alice.bot.resetWorkbench();
         bob.bot.resetWorkbench();
     }
@@ -64,7 +53,6 @@ public class TestSVN {
         // Bob accepts invitation, new project "examples".
         // Make sure Bob has joined the session.
         // Make sure Bob has checked out project test from SVN.
-
         alice.state.isDriver(alice.jid);
         alice.state.isParticipant(bob.jid);
         bob.state.isObserver(bob.jid);

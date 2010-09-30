@@ -3,24 +3,22 @@ package de.fu_berlin.inf.dpp.stf.test.invitation;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestShareProjectUsingExistingProject {
-    // bots
-    protected static Musician alice;
-    protected static Musician bob;
+
+    private static Musician alice = InitMusician.newAlice();
+    private static Musician bob = InitMusician.newBob();
 
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
@@ -32,26 +30,6 @@ public class TestShareProjectUsingExistingProject {
         + CLS2 + ".java";
     private static final String CLS_PATH_IN_PROJECT2 = PROJECT2
         + "/src/my/pkg/" + CLS + ".java";
-
-    @BeforeClass
-    public static void configureAlice() throws RemoteException,
-        NotBoundException {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initRmi();
-        alice.initBot();
-
-    }
-
-    @BeforeClass
-    public static void configureBob() throws RemoteException, NotBoundException {
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initRmi();
-        bob.initBot();
-    }
 
     @Before
     public void setUpAlice() throws RemoteException {
@@ -77,8 +55,8 @@ public class TestShareProjectUsingExistingProject {
 
     @AfterClass
     public static void cleanup() throws RemoteException {
-        bob.bot.xmppDisconnect();
-        alice.bot.xmppDisconnect();
+        bob.bot.resetSaros();
+        alice.bot.resetSaros();
     }
 
     @Test

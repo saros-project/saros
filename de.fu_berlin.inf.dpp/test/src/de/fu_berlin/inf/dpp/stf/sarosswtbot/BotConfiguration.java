@@ -41,14 +41,11 @@ public class BotConfiguration {
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
     public final static String CONTENTPATH3 = "test/STF/" + CLASSNAME3
         + ".java";
-
     public final static String NAME_ROSTER_VIEW = "ROSTER";
     public final static String NAME_SESSION_VIEW = "Shared Project Session";
     public final static String NAME_CHAT_VIEW = "Chat View";
 
     public final static String SVN_URL = "http://swtbot-examples.googlecode.com/svn";
-    // public final static String SVN_URL =
-    // "https://dpp.svn.sourceforge.net/svnroot/dpp";
 
     /**
      * VM test accounts

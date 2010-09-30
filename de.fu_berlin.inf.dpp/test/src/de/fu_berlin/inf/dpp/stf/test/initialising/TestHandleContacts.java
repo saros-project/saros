@@ -3,49 +3,29 @@ package de.fu_berlin.inf.dpp.stf.test.initialising;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestHandleContacts {
-    // bots
-    protected static Musician bob;
-    protected static Musician alice;
 
-    @BeforeClass
-    public static void configureAlice() throws RemoteException,
-        NotBoundException {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
-    }
-
-    @BeforeClass
-    public static void configureBob() throws RemoteException, NotBoundException {
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-    }
+    protected static Musician bob = InitMusician.newBob();
+    protected static Musician alice = InitMusician.newAlice();
 
     @AfterClass
     public static void cleanupAlice() throws RemoteException {
-        alice.bot.xmppDisconnect();
+        alice.bot.resetSaros();
     }
 
     @AfterClass
     public static void cleanupBob() throws RemoteException {
-        bob.bot.xmppDisconnect();
+        bob.bot.resetSaros();
     }
 
     @After

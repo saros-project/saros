@@ -259,4 +259,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean compareChatMessage(String jid, String string)
         throws RemoteException;
+
+    public void resetSaros() throws RemoteException;
 }

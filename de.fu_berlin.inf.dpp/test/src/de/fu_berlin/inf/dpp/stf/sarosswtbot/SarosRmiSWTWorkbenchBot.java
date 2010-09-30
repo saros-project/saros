@@ -977,4 +977,16 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         editorObject.setTextinEditor(contents, className + ".java");
     }
 
+    /*******************************************************************************
+     * 
+     * saros main page
+     * 
+     *******************************************************************************/
+
+    public void resetSaros() throws RemoteException {
+        xmppDisconnect();
+        deleteAllProjects();
+        resetWorkbench();
+    }
+
 }

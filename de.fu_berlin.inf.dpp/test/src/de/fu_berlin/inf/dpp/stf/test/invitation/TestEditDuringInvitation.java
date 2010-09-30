@@ -1,23 +1,22 @@
 package de.fu_berlin.inf.dpp.stf.test.invitation;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestEditDuringInvitation {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
+
     /**
      * Steps: 1. Alice invites Bob 2. Bob accepts the invitation 3. Alice gives
      * Bob driver capability 4. Alice invites Carl 5. Bob changes data during
@@ -26,44 +25,19 @@ public class TestEditDuringInvitation {
      * Expected Results: All changes that Bob has done should be on Carl's side.
      * There should not be an inconsistency.
      */
-    // bots
-    protected static Musician alice;
-    protected static Musician bob;
-    protected static Musician carl;
+    private static final Logger log = Logger
+        .getLogger(TestEditDuringInvitation.class);
+    private static final String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String CLS = BotConfiguration.CLASSNAME;
+    private static final String PKG = BotConfiguration.PACKAGENAME;
+    private static Musician carl = InitMusician.newCarl();
+    private static Musician alice = InitMusician.newAlice();
+    private static Musician bob = InitMusician.newBob();
 
     @BeforeClass
-    public static void configureCarl() throws RemoteException,
-        NotBoundException {
-        carl = new Musician(new JID(BotConfiguration.JID_CARL),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_CARL,
-            BotConfiguration.PORT_CARL);
-        carl.initBot();
-        if (carl.bot.isJavaProjectExist(PROJECT))
-            carl.bot.deleteProject(PROJECT);
-        assertFalse(carl.bot.isJavaProjectExist(PROJECT));
-    }
-
-    @BeforeClass
-    public static void configureBob() throws RemoteException, NotBoundException {
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-        if (bob.bot.isJavaProjectExist(PROJECT))
-            bob.bot.deleteProject(PROJECT);
-        assertFalse(bob.bot.isJavaProjectExist(PROJECT));
-    }
-
-    @BeforeClass
-    public static void configureInviter() throws RemoteException,
-        NotBoundException {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
+    public static void configureInviter() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
-        alice.bot.newClass(PROJECT, BotConfiguration.PACKAGENAME,
-            BotConfiguration.CLASSNAME);
+        alice.bot.newClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -79,8 +53,12 @@ public class TestEditDuringInvitation {
         alice.bot.resetWorkbench();
     }
 
-    private static final Logger log = Logger
-        .getLogger(TestEditDuringInvitation.class);
+    @After
+    public void reset() throws RemoteException {
+        carl.bot.resetWorkbench();
+        bob.bot.resetWorkbench();
+        alice.bot.resetWorkbench();
+    }
 
     /**
      * @throws RemoteException
@@ -104,18 +82,15 @@ public class TestEditDuringInvitation {
         carl.bot.confirmSessionInvitationWindowStep1(alice.getPlainJid());
 
         log.trace("bob.setTextInJavaEditor");
-        bob.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        bob.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT, PKG,
+            CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.bot
-            .confirmSessionInvitationWindowStep2UsingNewproject(BotConfiguration.PACKAGENAME);
+        carl.bot.confirmSessionInvitationWindowStep2UsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.bot.getTextOfJavaEditor(PROJECT,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
-        String textFormAlice = alice.bot.getTextOfJavaEditor(PROJECT,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+        String textFromCarl = carl.bot.getTextOfJavaEditor(PROJECT, PKG, CLS);
+        String textFormAlice = alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS);
         assertTrue(textFromCarl.equals(textFormAlice));
 
         log.trace("testEditDuringInvitation done");

@@ -3,18 +3,18 @@ package de.fu_berlin.inf.dpp.stf.test.chatview;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 /**
  * Precondition:
@@ -39,47 +39,34 @@ public class TestChatViewFunctions {
 
     String message = "Hello Bob";
 
-    static Musician alice;
-    static Musician bob;
+    private static final String CLS = BotConfiguration.CLASSNAME;
+    private static final String PKG = BotConfiguration.PACKAGENAME;
+    private static final String PROJECT = BotConfiguration.PROJECTNAME;
+
+    protected static Musician alice = InitMusician.newAlice();
+    protected static Musician bob = InitMusician.newBob();
 
     @BeforeClass
-    public static void configureAlice() throws AccessException,
-        RemoteException, NotBoundException {
-        alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
-        alice.initBot();
-        alice.bot.newJavaProject(BotConfiguration.PROJECTNAME);
-
-        alice.bot.newClass(BotConfiguration.PROJECTNAME,
-            BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME);
+    public static void configureAlice() throws AccessException, RemoteException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
-    @BeforeClass
-    public static void configureBob() throws AccessException, RemoteException,
-        NotBoundException {
-        bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
-        bob.initBot();
-        if (bob.bot.isJavaProjectExist(BotConfiguration.PROJECTNAME))
-            bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        bob.bot.xmppConnect(bob.jid, bob.password);
+    @AfterClass
+    public static void afterClass() throws RemoteException {
+        bob.bot.resetSaros();
+        alice.bot.resetSaros();
     }
 
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.xmppDisconnect();
-        bob.bot.deleteProject(BotConfiguration.PROJECTNAME);
-        alice.bot.xmppDisconnect();
-        alice.bot.deleteProject(BotConfiguration.PROJECTNAME);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
+
     }
 
     @Before
     public void shareProjekt() throws RemoteException {
-        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+        alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 

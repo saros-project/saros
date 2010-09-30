@@ -27,7 +27,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     /**
      * Convenient method for
-     * {@link IRmiSWTWorkbenchBot#openViewWithName(String, String, String)} to
+     * {@link IRmiSWTWorkbenchBot#shoViewWithName(String, String, String)} to
      * add the View called "Package Explorer".
      */
     public void showViewPackageExplorer() throws RemoteException;
@@ -661,4 +661,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void closeWelcomeView() throws RemoteException;
 
     public void closePackageExplorerView() throws RemoteException;
+
+    public void deleteAllProjects() throws RemoteException;
 }
