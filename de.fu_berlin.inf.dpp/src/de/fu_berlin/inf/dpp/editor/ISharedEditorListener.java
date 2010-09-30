@@ -124,4 +124,5 @@ public interface ISharedEditorListener {
     public void viewportGenerated(IEditorPart part, ILineRange viewport,
         SPath path);
 
+    public void colorChanged();
 }

@@ -39,4 +39,6 @@ public interface IActivityReceiver {
     void receive(ProgressActivity progressActivity);
 
     void receive(VCSActivity activity);
+
+    void receive(ChangeColorActivity changeColorActivity);
 }

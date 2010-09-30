@@ -39,4 +39,6 @@ public interface IActivityConsumer {
     boolean consume(ProgressActivity progressActivity);
 
     boolean consume(VCSActivity vcsActivity);
+
+    boolean consume(ChangeColorActivity changeColorActivity);
 }

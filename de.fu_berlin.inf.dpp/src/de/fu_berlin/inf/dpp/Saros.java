@@ -144,6 +144,7 @@ import de.fu_berlin.inf.dpp.project.PingPongCentral;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
+import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
@@ -297,6 +298,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(DispatchThreadContext.class);
 
         // Core Managers
+        this.container.addComponent(ChangeColorManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
         this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(DataTransferManager.class);

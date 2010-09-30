@@ -13,6 +13,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
@@ -26,6 +27,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 public class SessionViewContextMenu {
 
     public SessionViewContextMenu(ViewPart sessionView, TableViewer viewer,
+        final ChangeColorAction changedColourAction,
         final JumpToDriverPositionAction jumpAction,
         final RemoveDriverRoleAction removeDriverAction,
         final GiveExclusiveDriverRoleAction exclusiveDriverAction,
@@ -46,6 +48,9 @@ public class SessionViewContextMenu {
                 manager.add(followAction);
                 manager.add(jumpAction);
 
+                manager.add(new Separator());
+                manager.add(changedColourAction);
+                
                 // Other plug-ins can contribute their actions here
                 manager.add(new Separator(
                     IWorkbenchActionConstants.MB_ADDITIONS));

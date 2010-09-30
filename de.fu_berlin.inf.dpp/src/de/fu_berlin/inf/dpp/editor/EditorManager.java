@@ -908,6 +908,10 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
     }
+    
+    protected void execColorChanged(){
+        editorListener.colorChanged();
+    }
 
     /**
      * Called when the local user opened an editor part.
@@ -1765,6 +1769,10 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     public Set<SPath> getRemoteOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
+    }
+    
+    public void colorChangend(){
+        this.execColorChanged();
     }
 
 }

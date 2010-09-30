@@ -63,6 +63,10 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
+    public void receive(ChangeColorActivity changeColorActivity) {
+        // do nothing
+    }
+
     /**
      * Returns a IActivityConsumer from the given IActivityReceiver which
      * returns the given value for all calls to consume after calling receive on
@@ -140,6 +144,11 @@ public class AbstractActivityReceiver implements IActivityReceiver {
 
             public boolean consume(VCSActivity activity) {
                 receiver.receive(activity);
+                return consume;
+            }
+
+            public boolean consume(ChangeColorActivity changeColorActivity) {
+                receiver.receive(changeColorActivity);
                 return consume;
             }
         };

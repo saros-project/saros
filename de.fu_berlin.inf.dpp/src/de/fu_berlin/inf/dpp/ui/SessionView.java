@@ -42,6 +42,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -72,6 +73,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
@@ -343,6 +345,11 @@ public class SessionView extends ViewPart {
         public void followModeChanged(User user) {
             viewer.refresh();
         }
+   
+        @Override
+        public void colorChanged(){
+            viewer.refresh();
+        }
     };
 
     @Inject
@@ -450,6 +457,7 @@ public class SessionView extends ViewPart {
         container.addComponent(SendFileAction.class);
         container.addComponent(VoIPAction.class);
         container.addComponent(StoppedAction.class);
+        container.addComponent(ChangeColorAction.class);
         container.addComponent(ConsistencyAction.class);
         container.addComponent(GiveExclusiveDriverRoleAction.class);
         container.addComponent(GiveDriverRoleAction.class);

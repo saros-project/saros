@@ -52,4 +52,8 @@ public abstract class AbstractSharedEditorListener implements
         // does nothing
 
     }
+
+    public void colorChanged() {
+        // does nothing
+    }
 }

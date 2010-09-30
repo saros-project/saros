@@ -85,4 +85,10 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
             listener.viewportGenerated(part, viewport, path);
         }
     }
+    
+    public void colorChanged() {
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.colorChanged();
+        }
+    }
 }

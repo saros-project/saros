@@ -11,6 +11,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Abstract base class for {@link Annotation}s.
@@ -20,7 +21,7 @@ import de.fu_berlin.inf.dpp.User;
 public abstract class SarosAnnotation extends Annotation {
 
     @SuppressWarnings("unused")
-    private Logger log = Logger.getLogger(SarosAnnotation.class);
+    private static Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
      * Source of this annotation (jabber id).
@@ -57,30 +58,77 @@ public abstract class SarosAnnotation extends Annotation {
     }
 
     public static Color getUserColor(User user) {
+        
+        int colorID = user.getColorID();
+    
+            // TODO This should not depend on the SelectionAnnotation, but be
+            // configurable like all colors!
+            String annotationType = SelectionAnnotation.TYPE + "."
+                + String.valueOf(colorID + 1);
+    
+            AnnotationPreferenceLookup lookup = EditorsUI
+                .getAnnotationPreferenceLookup();
+            AnnotationPreference ap = lookup
+                .getAnnotationPreference(annotationType);
+            if (ap == null) {
+                return null;
+            }
 
+            RGB rgb;
+            try {
+                rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
+                    ap.getColorPreferenceKey());
+            } catch (RuntimeException e) {
+                return null;
+            }
+    
+            return new Color(Display.getDefault(), rgb);
+    }
+    
+    public static void setUserColor(User user, final RGB userRGB) {
         int colorID = user.getColorID();
 
         // TODO This should not depend on the SelectionAnnotation, but be
         // configurable like all colors!
-        String annotationType = SelectionAnnotation.TYPE + "."
-            + String.valueOf(colorID + 1);
-
+        String annotationType = SelectionAnnotation.TYPE + "." + String.valueOf(colorID + 1);
+        String annotationTypeForViewPort = ViewportAnnotation.TYPE + "." + String.valueOf(colorID + 1);
+        String annotationTypeForContribution = ContributionAnnotation.TYPE + "." + String.valueOf(colorID + 1);
+        
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
-        AnnotationPreference ap = lookup
+        
+        final AnnotationPreference ap = lookup
             .getAnnotationPreference(annotationType);
+        
+        final AnnotationPreference apForViewPort = lookup
+        .getAnnotationPreference(annotationTypeForViewPort);
+        
+        final AnnotationPreference apForContribution = lookup
+        .getAnnotationPreference(annotationTypeForContribution);
+
         if (ap == null) {
-            return null;
+            return;
         }
 
-        RGB rgb;
+        if (apForViewPort == null) {
+            return;
+        }
+        
+        if (apForContribution == null) {
+            return;
+        }
+
         try {
-            rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
-                ap.getColorPreferenceKey());
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    EditorsUI.getPreferenceStore().setValue(ap.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
+                    EditorsUI.getPreferenceStore().setValue(apForViewPort.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
+                    EditorsUI.getPreferenceStore().setValue(apForContribution.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
+                }
+            });
+            
         } catch (RuntimeException e) {
-            return null;
+            return;
         }
-
-        return new Color(Display.getDefault(), rgb);
     }
 }
