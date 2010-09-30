@@ -61,10 +61,11 @@ public class InvitationWizard extends Wizard {
     @Override
     public boolean performFinish() {
         ArrayList<JID> usersToInvite = userSelection.getSelectedUsers();
+
         for (JID user : usersToInvite) {
-            sessionManager.invite(user,
-                "You have been invited to a Saros session by "
-                    + sarosSession.getHost().getJID().getBase());
+            sessionManager.invite(user, sarosSession.getHost().getJID()
+                .getBase()
+                + " has invited you to a Saros shared project session");
         }
         return true;
     }
