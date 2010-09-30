@@ -100,7 +100,7 @@ public class TestShare2UsersSequentially {
         log.trace("invitee.leave");
         assertFalse(bob.state.isParticipant(bob.jid));
 
-        bob.bot.waitUntilSessionCloses(bob.state);
+        bob.bot.waitUntilSessionClosedBy(bob.state);
         // TODO Dialog "Do you really want to close" pops up
         // Need to check for isDriver before leaving.
         alice.bot.leaveSession(alice.jid);

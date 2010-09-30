@@ -80,8 +80,11 @@ public class TestShare3UsersSequentially {
         musicians.add(carl.getPlainJid());
         musicians.add(bob.getPlainJid());
 
-        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
-
+        // alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME,
+        // musicians);
+        alice.bot.clickCMShareProjectInPEView(BotConfiguration.PROJECTNAME);
+        alice.bot
+            .confirmInvitationWindow(carl.getPlainJid(), bob.getPlainJid());
         carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
             BotConfiguration.PROJECTNAME);
         // FIXME if this times out, cancel the invitation!
@@ -119,8 +122,8 @@ public class TestShare3UsersSequentially {
 
         // alice.waitUntilOtherLeaveSession(carl);
         // alice.waitUntilOtherLeaveSession(bob);
-        alice.bot.waitUntilSessionCloses(carl.state);
-        alice.bot.waitUntilSessionCloses(bob.state);
+        alice.bot.waitUntilSessionClosedBy(carl.state);
+        alice.bot.waitUntilSessionClosedBy(bob.state);
         // Need to check for isDriver before leaving.
         alice.bot.leaveSession(alice.jid);
         assertFalse(alice.state.isParticipant(alice.jid));

@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,6 +14,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class TestFileOperations {
     protected static Musician alice;
@@ -49,14 +48,14 @@ public class TestFileOperations {
             BotConfiguration.PORT_CARL);
         carl.initBot();
 
-        List<String> musicians = new LinkedList<String>();
-        musicians.add(carl.getPlainJid());
-        musicians.add(bob.getPlainJid());
-        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, musicians);
-        carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-            BotConfiguration.PROJECTNAME);
-        bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-            BotConfiguration.PROJECTNAME);
+        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
+        // alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME,
+        // musicians);
+        // carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+        // BotConfiguration.PROJECTNAME);
+        // bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
+        // BotConfiguration.PROJECTNAME);
         carl.bot.followUser(alice.state, alice.jid);
     }
 

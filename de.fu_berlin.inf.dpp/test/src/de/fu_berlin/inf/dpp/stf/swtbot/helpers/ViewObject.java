@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -14,6 +15,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.swtbot.ContextMenuHelper;
@@ -404,6 +411,39 @@ public class ViewObject {
     public void clickToolbarPushButtonWithTooltipInView(String viewName,
         String tooltip) {
         bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
+    }
+
+    public void hideViewById(final String viewId) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                final IViewPart view = page.findView(viewId);
+                if (view != null) {
+                    page.hideView(view);
+                }
+            }
+        });
+    }
+
+    public void showViewById(final String viewId) {
+        try {
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    final IWorkbench wb = PlatformUI.getWorkbench();
+                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                    IWorkbenchPage page = win.getActivePage();
+                    try {
+                        page.showView(viewId);
+                    } catch (PartInitException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            log.debug("Couldn't initialize " + viewId, e.getCause());
+        }
     }
 
 }

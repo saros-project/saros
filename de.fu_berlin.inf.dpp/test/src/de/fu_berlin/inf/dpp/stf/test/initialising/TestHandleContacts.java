@@ -73,8 +73,8 @@ public class TestHandleContacts {
     @Test
     public void testAddContact() throws RemoteException {
         bob.bot.addContact(alice.getPlainJid());
-        alice.bot.confirmContact();
-        bob.bot.confirmContact();
+        alice.bot.confirmRequestOfSubscriptionReceivedWindow();
+        bob.bot.confirmRequestOfSubscriptionReceivedWindow();
         assertTrue(bob.bot.hasContactWith(alice.jid));
         assertTrue(alice.bot.hasContactWith(bob.jid));
     }

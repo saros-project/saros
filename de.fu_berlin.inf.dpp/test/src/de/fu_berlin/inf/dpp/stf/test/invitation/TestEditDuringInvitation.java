@@ -97,7 +97,7 @@ public class TestEditDuringInvitation {
         assertTrue(bob.state.isDriver(alice.jid));
 
         log.trace("alice.inviteUser(carl");
-        alice.bot.inviteUser(carl.getPlainJid(), PROJECT);
+        alice.bot.comfirmInvitationWindow(carl.getPlainJid(), PROJECT);
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);

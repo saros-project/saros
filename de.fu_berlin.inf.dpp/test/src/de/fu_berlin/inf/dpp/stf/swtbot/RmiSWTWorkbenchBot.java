@@ -163,6 +163,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      *******************************************************************************/
 
+    public void closePackageExplorerView() throws RemoteException {
+        viewObject.closeViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+    }
+
+    public void closeWelcomeView() throws RemoteException {
+        viewObject.closeViewWithText(SarosConstant.VIEW_TITLE_WELCOME);
+    }
+
     public void activatePackageExplorerView() throws RemoteException {
         viewObject
             .activateViewWithTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
@@ -685,7 +693,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /*******************************************************************************
      * 
-     * window page
+     * popup window page
      * 
      *******************************************************************************/
 
@@ -1045,6 +1053,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * Editor page
      * 
      *******************************************************************************/
+
     public boolean isClassOpen(String className) throws RemoteException {
         return editorObject.isEditorOpen(className + ".java");
     }

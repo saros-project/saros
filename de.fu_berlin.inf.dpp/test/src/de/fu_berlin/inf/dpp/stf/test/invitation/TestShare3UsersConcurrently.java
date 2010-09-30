@@ -141,7 +141,7 @@ public class TestShare3UsersConcurrently {
         peersName.add(bob.getPlainJid());
 
         log.trace("alice.shareProjectParallel");
-        alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME, peersName);
+        alice.bot.shareProject(BotConfiguration.PROJECTNAME, peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.size(); i++) {

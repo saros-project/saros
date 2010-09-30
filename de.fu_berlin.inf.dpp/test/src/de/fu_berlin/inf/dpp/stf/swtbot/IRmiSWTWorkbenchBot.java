@@ -658,4 +658,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public boolean activateEclipseShell() throws RemoteException;
 
+    public void closeWelcomeView() throws RemoteException;
+
+    public void closePackageExplorerView() throws RemoteException;
 }
