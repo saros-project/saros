@@ -72,8 +72,8 @@ public class InviteAction extends SelectionProviderAction {
     public InviteAction(SessionManager sessionManager, Saros saros,
         ISelectionProvider provider, DiscoveryManager discoManager,
         InvitationProcessObservable invitationProcesses) {
-        super(provider, "Invite user to shared project..");
-        setToolTipText("Invite user to shared project..");
+        super(provider, "Invite user to current session...");
+        setToolTipText("Invites the selected users to the current Saros session.");
 
         setImageDescriptor(SarosUI.getImageDescriptor("icons/invites.png"));
 
