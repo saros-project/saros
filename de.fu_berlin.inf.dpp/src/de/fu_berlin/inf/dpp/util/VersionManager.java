@@ -132,11 +132,12 @@ public class VersionManager {
      * compatibility should be listed.
      */
     static {
+
         /**
-         * Version 10.9.24.DEVEL
+         * Version 10.10.01.r2552
          */
-        compatibilityChart.put(new Version("10.9.24.DEVEL"), Arrays.asList(
-            new Version("10.9.24.DEVEL"), new Version("10.8.27.r2333"),
+        compatibilityChart.put(new Version("10.10.01.r2552"), Arrays.asList(
+            new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
             new Version("10.7.30.r2310")));
 
         /**
