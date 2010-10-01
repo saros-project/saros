@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -310,16 +311,23 @@ public class RosterView extends ViewPart {
 
         public Image getImage() {
             final Presence presence = roster.getPresence(jid);
+            boolean rqPeer = false;
 
-            // check if saros feature is supported. returns null if unsupported
-            JID rqPeer = discoveryManager.getSupportingPresence(getJID(),
-                Saros.NAMESPACE);
+            // Check cache for Saros-support.
+            try {
+                rqPeer = discoveryManager.isSupportedNonBlock(getJID(),
+                    Saros.NAMESPACE);
+            } catch (CacheMissException e) {
+                // Saros support wasn't in cache. Force the discovery manager.
+                // TODO: Come back to this after release 10.10.01
+                // rqPeer = discoveryManager.isSarosSupported(getJID());
+            }
 
             if (presence.isAvailable() && saros.isConnected()) {
                 if (presence.isAway()) {
                     return personAwayImage;
                 } else {
-                    return rqPeer == null ? personImage : personImage_saros;
+                    return rqPeer == false ? personImage : personImage_saros;
                 }
             } else {
                 return personOfflineImage;

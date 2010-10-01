@@ -50,11 +50,11 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
@@ -103,10 +103,10 @@ import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
@@ -796,8 +796,8 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, cause);
 
             if (cause instanceof SaslException) {
-                Util.popUpFailureMessage("Error Connecting via SASL", cause
-                    .getMessage(), failSilently);
+                Util.popUpFailureMessage("Error Connecting via SASL",
+                    cause.getMessage(), failSilently);
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
@@ -857,8 +857,8 @@ public class Saros extends AbstractUIPlugin {
 
         String server = uri.getHost();
         if (server == null) {
-            throw new URISyntaxException(prefStore
-                .getString(PreferenceConstants.SERVER),
+            throw new URISyntaxException(
+                prefStore.getString(PreferenceConstants.SERVER),
                 "The XMPP server address is invalid: " + serverString);
         }
 
@@ -866,13 +866,13 @@ public class Saros extends AbstractUIPlugin {
         ConnectionConfiguration conConfig = null;
 
         if (uri.getPort() < 0) {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
-                .getHost()) : new ConnectionConfiguration(uri.getHost(),
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(
+                uri.getHost()) : new ConnectionConfiguration(uri.getHost(),
                 proxyInfo);
         } else {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
-                .getHost(), uri.getPort()) : new ConnectionConfiguration(uri
-                .getHost(), uri.getPort(), proxyInfo);
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(
+                uri.getHost(), uri.getPort()) : new ConnectionConfiguration(
+                uri.getHost(), uri.getPort(), proxyInfo);
         }
 
         /*
@@ -927,11 +927,11 @@ public class Saros extends AbstractUIPlugin {
 
         for (IProxyData pd : ips.getProxyDataForHost(host)) {
             if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
-                    .getUserId(), pd.getPassword());
+                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
             } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(), pd
-                    .getUserId(), pd.getPassword());
+                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
             }
         }
 
@@ -1088,7 +1088,8 @@ public class Saros extends AbstractUIPlugin {
              */
             if (jid.equals(getMyJID())) {
                 monitor.worked(1);
-                throw new XMPPException("You can't add yourself to the Roster.");
+                throw new XMPPException(
+                    "You can't add yourself to your own roster.");
             }
             monitor.worked(1);
 
@@ -1282,13 +1283,12 @@ public class Saros extends AbstractUIPlugin {
 
                 Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
-                        MessageDialog
-                            .openError(
-                                EditorAPI.getShell(),
-                                "Connection error",
-                                "You have been disconnected from Jabber, because of a resource conflict.\n"
-                                    + "This indicates that you might have logged on again using the same Jabber account"
-                                    + " and XMPP resource, for instance using Saros or an other instant messaging client.");
+                        MessageDialog.openError(
+                            EditorAPI.getShell(),
+                            "Connection error",
+                            "You have been disconnected from Jabber, because of a resource conflict.\n"
+                                + "This indicates that you might have logged on again using the same Jabber account"
+                                + " and XMPP resource, for instance using Saros or an other instant messaging client.");
                     }
                 });
                 return;
@@ -1333,8 +1333,7 @@ public class Saros extends AbstractUIPlugin {
                             Thread.currentThread().interrupt();
                             return;
                         } catch (UnknownHostException e) {
-                            log
-                                .info("Could not get localhost, maybe the network interface is down.");
+                            log.info("Could not get localhost, maybe the network interface is down.");
                         }
                     }
 
