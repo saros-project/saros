@@ -33,12 +33,17 @@ public class BotConfiguration {
     public final static String PROJECTNAME_SVN_TRUNK = "examples [trunk/examples]";
     public final static String PROJECTNAME_SVN_TAG = "examples [tags/eclipsecon2009]";
     public final static String PROJECTNAME = "Foo_Saros";
+    public final static String PROJECTNAME2 = "Foo_Saros2";
+    public final static String PROJECTNAME3 = "Foo_Saros3";
     public final static String CLASSNAME = "MyClass";
     public final static String CLASSNAME2 = "MyClass2";
     public final static String CLASSNAME3 = "MyClass3";
     public final static String PACKAGENAME = "my.pkg";
     public final static String PACKAGENAME2 = "my.pkg2";
+    public final static String PACKAGENAME3 = "my.pkg3";
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
+    public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
+        + ".java";
     public final static String CONTENTPATH3 = "test/STF/" + CLASSNAME3
         + ".java";
     public final static String NAME_ROSTER_VIEW = "ROSTER";
