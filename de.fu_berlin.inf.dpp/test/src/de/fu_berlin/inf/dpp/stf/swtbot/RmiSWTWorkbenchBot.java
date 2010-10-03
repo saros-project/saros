@@ -10,7 +10,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -22,9 +21,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -32,6 +32,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
@@ -197,7 +201,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void deleteProjectGui(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = treeObject
+        SWTBotTree tree = viewObject
             .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
         tree.select(projectName);
         menuObject.clickMenuWithTexts("Edit", "Delete");
@@ -228,7 +232,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         showViewPackageExplorer();
         activatePackageExplorerView();
         delegate.tree().expandNode(nodes);
-        treeObject.selectTreeWithLabelsInView(
+        viewObject.selectTreeWithLabelsInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nodes);
         menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_EDIT,
             SarosConstant.MENU_TITLE_DELETE);
@@ -242,7 +246,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = treeObject
+        SWTBotTree tree = viewObject
             .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
         return treeObject.isTreeItemWithMatchTextExist(tree, matchTexts);
     }
@@ -696,6 +700,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * popup window page
      * 
      *******************************************************************************/
+    public void closeShell(String title) throws RemoteException {
+        delegate.shell(title).close();
+    }
 
     public boolean isShellOpen(String title) throws RemoteException {
         SWTBotShell[] shells = delegate.shells();
@@ -833,7 +840,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         // waitUntilShellActive(shellName);
         SWTBotTree tree = delegate.tree();
         log.info("allItems " + tree.getAllItems().length);
-        treeObject.selectTreeWithLabels(tree, nodes);
+        treeObject.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
         waitUntilButtonEnabled(buttonText);
         delegate.button(buttonText).click();
         // waitUntilShellCloses(shellName);
@@ -1254,7 +1261,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      *******************************************************************************/
     public boolean activateEclipseShell() throws RemoteException {
-        return activateShellWithMatchText(".+? - .+");
+        // return activateShellWithMatchText(".+? - .+");
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                win.getShell().setActive();
+            }
+        });
+        return true;
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -1273,24 +1288,20 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void resetWorkbench() throws RemoteException {
-        List<? extends SWTBotEditor> editors = delegate.editors();
-        for (SWTBotEditor editor : editors) {
-            editor.close();
-        }
-        for (int i = 0; i < delegate.shells().length; i++) {
-            SWTBotShell shell = delegate.shells()[i];
-            if (!shell.getText().matches(".+? - .+")) {
-                shell.close();
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                Shell activateShell = Display.getCurrent().getActiveShell();
+                if (activateShell != win.getShell()) {
+                    activateShell.close();
+                }
+                page.closeAllEditors(false);
+
             }
-        }
-        // page.resetPerspective();
-        // String defaultPerspectiveId = workbench.getPerspectiveRegistry()
-        // .getDefaultPerspective();
-        // workbench.showPerspective(defaultPerspectiveId, workbenchWindow);
-        // page.resetPerspective();
-
+        });
     }
-
     // private void implementsInterface(String interfaceClass)
     // throws WidgetNotFoundException {
     // delegate.button("Add...").click();

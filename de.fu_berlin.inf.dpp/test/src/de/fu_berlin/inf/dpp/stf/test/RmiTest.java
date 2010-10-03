@@ -61,7 +61,6 @@ public class RmiTest {
     @Ignore
     // this test fails, but it doesn't really matter...
     public void testIsFileExistWithGUI() throws RemoteException {
-
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
         assertTrue(alice.bot.isClassExistGUI(PROJECT, "pkg", "Cls"));

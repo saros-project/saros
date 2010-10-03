@@ -24,6 +24,7 @@ public class TestBasicSarosElements {
     @After
     public void cleanup() throws RemoteException {
         alice.bot.resetWorkbench();
+        alice.bot.xmppDisconnect();
     }
 
     @Test
@@ -64,8 +65,9 @@ public class TestBasicSarosElements {
 
     @Test
     public void testXmppConnect() throws RemoteException {
-        log.trace("xmppDisconnect");
-        alice.bot.xmppDisconnect();
+        // log.trace("xmppDisconnect");
+        // alice.bot.xmppDisconnect();
+        // assertEquals(false, alice.bot.isConnectedByXMPP());
         log.trace("xmppConnect");
         alice.bot.xmppConnect(alice.jid, alice.password);
         log.trace("captureScreenshot");

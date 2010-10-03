@@ -663,4 +663,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void closePackageExplorerView() throws RemoteException;
 
     public void deleteAllProjects() throws RemoteException;
+
+    public void closeShell(String title) throws RemoteException;
 }

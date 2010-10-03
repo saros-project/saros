@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -25,72 +24,6 @@ public class TreeObject {
         this.rmiBot = rmiBot;
         this.wUntil = rmiBot.wUntilObject;
         this.viewObject = rmiBot.viewObject;
-    }
-
-    /**
-     * This method is a helper method and should not be exported by rmi. it is
-     * very helpful, when you want to click a context menu of a tree node in a
-     * view.e.g.
-     * 
-     * in Package Explorer View: click context menu "open" of the class file
-     * "MyClass", in this case, you should pass the
-     * parameters("Package Explorer", "open", "Foo_Saros","src", "my.pkg",
-     * "MyClass.java".
-     * 
-     * in Roster View: click context menu "rename.." of a user
-     * "lin@saros-con.imp.fu-berlin.de" in buddies. In this case, you shuld pass
-     * the parameter ("Roster", "rename...", "Buddies",
-     * "lin@saros-con.imp.fu-berlin.de").
-     * 
-     * 1. select the tree node that context menu you want to click.
-     * 
-     * 2. then click the context menu.
-     * 
-     * @param viewName
-     *            e.g. Package Explorer view or Resource Explorer view
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void clickContextMenuOfTreeInView(String viewName, String context,
-        String... nodes) throws RemoteException {
-        SWTBotTreeItem treeItem = selectTreeWithLabelsInView(viewName, nodes);
-        if (treeItem == null) {
-            log.error("Tree item not found " + nodes.toString());
-            return;
-        }
-        final SWTBotMenu contextMenu = treeItem.contextMenu(context);
-        if (contextMenu == null) {
-            log.error("Context menu \"" + context + "\" not found");
-            return;
-        }
-        contextMenu.click();
-    }
-
-    /**
-     * @param viewName
-     *            the title of the specified view
-     * @param labels
-     *            all labels on the widget
-     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
-     */
-
-    public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
-        String... labels) throws RemoteException {
-        // SWTBotView view =
-        // getViewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
-        //
-        // Composite composite = (Composite) view.getWidget();
-        // Tree swtTree = delegate.widget(WidgetMatcherFactory
-        // .widgetOfType(Tree.class), composite);
-        //
-        // SWTBotTree tree = new SWTBotTree(swtTree);
-        return selectTreeWithLabels(getTreeInView(viewName), labels);
-    }
-
-    public SWTBotTree getTreeInView(String viewName) {
-        return RmiSWTWorkbenchBot.delegate.viewByTitle(viewName).bot().tree();
     }
 
     /**
@@ -156,8 +89,8 @@ public class TreeObject {
         }
     }
 
-    public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
-        String... labels) throws RemoteException {
+    public SWTBotTreeItem selectTreeWithLabelsWithWaitungExpand(
+        SWTBotTree tree, String... labels) throws RemoteException {
         SWTBotTreeItem selectedTreeItem = null;
         for (String label : labels) {
             try {
@@ -177,28 +110,13 @@ public class TreeObject {
         if (selectedTreeItem != null) {
             log.info("treeItem name: " + selectedTreeItem.getText());
             selectedTreeItem.select();
-            selectedTreeItem.click();
             return selectedTreeItem;
         }
         return null;
     }
 
-    public SWTBotTreeItem getTreeWithLabels(SWTBotTree tree, String... labels) {
-        // SWTBotTreeItem selectedTreeItem = null;
-        // for (String label : labels) {
-        // try {
-        // if (selectedTreeItem == null) {
-        // selectedTreeItem = tree.getTreeItem(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // } else {
-        // selectedTreeItem = selectedTreeItem.getNode(label);
-        // log.info("treeItem name: " + selectedTreeItem.getText());
-        // }
-        // } catch (WidgetNotFoundException e) {
-        // log.error("treeitem \"" + label + "\" not found");
-        // }
-        // }
-        // return selectedTreeItem;
+    public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
+        String... labels) {
         try {
             return tree.expandNode(labels);
         } catch (WidgetNotFoundException e) {
@@ -210,7 +128,7 @@ public class TreeObject {
 
     public List<String> getAllItemsOfTreeItem(String... paths) {
         SWTBotTree tree = bot.tree();
-        SWTBotTreeItem item = getTreeWithLabels(tree, paths);
+        SWTBotTreeItem item = selectTreeWithLabels(tree, paths);
         List<String> list = new ArrayList<String>();
 
         for (int i = 0; i < item.getItems().length; i++) {

@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -267,7 +268,7 @@ public class ViewObject {
     public void clickMenusOfContextMenuOfTreeItemInView(String viewTitle,
         String[] nodes, String... contexts) {
         try {
-            SWTBotTree tree = treeObject.getTreeInView(viewTitle);
+            SWTBotTree tree = getTreeInView(viewTitle);
             SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
                 nodes);
             treeItem.select();
@@ -325,8 +326,7 @@ public class ViewObject {
     public boolean isContextMenuOfTreeItemInViewExist(String viewName,
         String contextName, String... nodes) throws RemoteException {
         activateViewWithTitle(viewName);
-        SWTBotTreeItem item = treeObject.selectTreeWithLabelsInView(viewName,
-            nodes);
+        SWTBotTreeItem item = selectTreeWithLabelsInView(viewName, nodes);
         try {
             item.contextMenu(contextName);
             return true;
@@ -350,7 +350,7 @@ public class ViewObject {
     public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
         String[] nodes, String... contexts) {
         try {
-            SWTBotTree tree = treeObject.getTreeInView(viewTitle);
+            SWTBotTree tree = getTreeInView(viewTitle);
             // you should first select the project,whose context you want to
             // click.
             SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
@@ -378,8 +378,8 @@ public class ViewObject {
      */
     public void openFileInView(String viewName, String... nodes)
         throws RemoteException {
-        treeObject.clickContextMenuOfTreeInView(viewName,
-            SarosConstant.CONTEXT_MENU_OPEN, nodes);
+        clickContextMenuOfTreeInView(viewName, SarosConstant.CONTEXT_MENU_OPEN,
+            nodes);
     }
 
     /**
@@ -444,6 +444,66 @@ public class ViewObject {
         } catch (IllegalArgumentException e) {
             log.debug("Couldn't initialize " + viewId, e.getCause());
         }
+    }
+
+    /**
+     * @param viewName
+     *            the title of the specified view
+     * @param labels
+     *            all labels on the widget
+     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
+     */
+
+    public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
+        String... labels) {
+        return treeObject.selectTreeWithLabels(getTreeInView(viewName), labels);
+    }
+
+    public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
+        String viewName, String... labels) throws RemoteException {
+        return treeObject.selectTreeWithLabelsWithWaitungExpand(
+            getTreeInView(viewName), labels);
+    }
+
+    /**
+     * This method is a helper method and should not be exported by rmi. it is
+     * very helpful, when you want to click a context menu of a tree node in a
+     * view.e.g.
+     * 
+     * in Package Explorer View: click context menu "open" of the class file
+     * "MyClass", in this case, you should pass the
+     * parameters("Package Explorer", "open", "Foo_Saros","src", "my.pkg",
+     * "MyClass.java".
+     * 
+     * in Roster View: click context menu "rename.." of a user
+     * "lin@saros-con.imp.fu-berlin.de" in buddies. In this case, you shuld pass
+     * the parameter ("Roster", "rename...", "Buddies",
+     * "lin@saros-con.imp.fu-berlin.de").
+     * 
+     * 1. select the tree node that context menu you want to click.
+     * 
+     * 2. then click the context menu.
+     * 
+     * @param viewName
+     *            e.g. Package Explorer view or Resource Explorer view
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void clickContextMenuOfTreeInView(String viewName, String context,
+        String... nodes) throws RemoteException {
+        SWTBotTreeItem treeItem = selectTreeWithLabelsInView(viewName, nodes);
+        if (treeItem == null) {
+            log.error("Tree item not found " + nodes.toString());
+            return;
+        }
+        final SWTBotMenu contextMenu = treeItem.contextMenu(context);
+        if (contextMenu == null) {
+            log.error("Context menu \"" + context + "\" not found");
+            return;
+        }
+        contextMenu.click();
     }
 
 }

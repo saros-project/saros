@@ -58,7 +58,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
      */
     public boolean isConnectedByXmppGuiCheck() throws RemoteException;
 
-    public boolean hasContactWith(String contact) throws RemoteException;
+    // public boolean hasContactWith(String contact) throws RemoteException;
 
     // public boolean isContactOnline(String contact) throws RemoteException;
 
@@ -75,7 +75,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void leaveSession() throws RemoteException;
 
-    public void deleteContact(String name) throws RemoteException;
+    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException;
 
     // /**
     // * It shares a project, but cancel the interface popped up
@@ -159,7 +160,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean isRemoteScreenViewOpen() throws RemoteException;
 
-    public void addContact(String plainJID) throws RemoteException;
+    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException;
 
     public void setTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException;
@@ -261,4 +263,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         throws RemoteException;
 
     public void resetSaros() throws RemoteException;
+
+    public void activateRosterView() throws RemoteException;
+
+    public void confirmNewContactWindow(String plainJID) throws RemoteException;
 }

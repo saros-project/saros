@@ -82,6 +82,14 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * popup window page
      * 
      *******************************************************************************/
+    public void confirmNewContactWindow(String plainJID) throws RemoteException {
+        waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+        delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
+            plainJID);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        delegate.button(SarosConstant.BUTTON_FINISH).click();
+    }
+
     public void comfirmInvitationWindow(String inviteeJID, String projectName)
         throws RemoteException {
         clickTBOpenInvitationInterfaceInSPSView();
@@ -155,9 +163,9 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public void confirmSessionInvitationWindowStep1(String inviter)
         throws RemoteException {
-        if (!isTextWithLabelEqualWithText(SarosConstant.TEXT_LABEL_INVITER,
-            inviter))
-            log.warn("inviter does not match: " + inviter);
+        // if (!isTextWithLabelEqualWithText(SarosConstant.TEXT_LABEL_INVITER,
+        // inviter))
+        // log.warn("inviter does not match: " + inviter);
         captureScreenshot(TEMPDIR + "/acknowledge_project1.png");
         waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
         delegate.button(SarosConstant.BUTTON_NEXT).click();
@@ -278,8 +286,20 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Roster view page
      * 
      *******************************************************************************/
+    public void openRosterView() throws RemoteException {
+        viewObject.showViewById(SarosConstant.ID_ROSTER_VIEW);
+    }
+
+    public boolean isRosterViewOpen() throws RemoteException {
+        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
+    }
+
     public void activateRosterView() throws RemoteException {
         viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
+    }
+
+    public void closeRosterView() throws RemoteException {
+        viewObject.hideViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public void xmppDisconnect() throws RemoteException {
@@ -290,18 +310,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public SWTBotTreeItem selectBuddy(String contact) throws RemoteException {
-        return treeObject.selectTreeWithLabelsInView(
+        return viewObject.selectTreeWithLabelsInView(
             SarosConstant.VIEW_TITLE_ROSTER, "Buddies", contact);
     }
 
-    public boolean isRosterViewOpen() throws RemoteException {
-        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
-    }
-
-    public boolean hasContactWith(String contact) throws RemoteException {
-        if (!isConnectedByXmppGuiCheck())
-            return false;
-        return isBuddyExist(contact);
+    public boolean isBuddyExist(String contact) {
+        SWTBotTree tree = viewObject
+            .getTreeInView(SarosConstant.VIEW_TITLE_ROSTER);
+        return treeObject.isTreeItemWithMatchTextExist(tree,
+            SarosConstant.BUDDIES, contact + ".*");
     }
 
     public boolean isConnectedByXmppGuiCheck() throws RemoteException {
@@ -318,27 +335,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    public boolean isBuddyExist(String contact) throws RemoteException {
-        SWTBotTree tree = delegate.viewByTitle(SarosConstant.VIEW_TITLE_ROSTER)
-            .bot().tree();
-        return treeObject.isTreeItemWithMatchTextExist(tree,
-            SarosConstant.BUDDIES, contact + ".*");
-    }
-
     /**
      * This method returns true if {@link SarosState} and the GUI
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
         return state.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
-    }
-
-    public void closeRosterView() throws RemoteException {
-        viewObject.hideViewById("de.fu_berlin.inf.dpp.ui.RosterView");
-    }
-
-    public void openRosterView() throws RemoteException {
-        viewObject.showViewById("de.fu_berlin.inf.dpp.ui.RosterView");
     }
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {
@@ -565,9 +567,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        treeObject.clickContextMenuOfTreeInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, projectName);
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT);
+        // viewObject.clickContextMenuOfTreeInView(
+        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, projectName);
 
     }
 
@@ -575,27 +583,44 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        treeObject.clickContextMenuOfTreeInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, projectName);
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
+
+        // viewObject.clickContextMenuOfTreeInView(
+        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, projectName);
     }
 
     public void clickCMShareProjectParticallyInPEView(String projectName)
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        viewObject.clickContextMenuOfTableInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY, projectName);
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
+        // viewObject.clickContextMenuOfTableInView(
+        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY, projectName);
     }
 
     public void clickCMAddToSessionInPEView(String projectName)
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        viewObject.clickContextMenuOfTableInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            SarosConstant.CONTEXT_MENU_ADD_TO_SESSION, projectName);
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);
+
+        // viewObject.clickContextMenuOfTableInView(
+        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
+        // SarosConstant.CONTEXT_MENU_ADD_TO_SESSION, projectName);
     }
 
     /*******************************************************************************
@@ -850,7 +875,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return state.hasContactWith(jid) && hasContactWith(jid.getBase());
+        return state.hasContactWith(jid) && isBuddyExist(jid.getBase());
     }
 
     public void renameContact(String contact, String newName)
@@ -868,20 +893,26 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * Remove given contact from Roster, if contact was added before.
      */
-    public void deleteContact(String contact) throws RemoteException {
-        if (!hasContactWith(contact))
+    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException {
+        if (!hasContactWith(jid))
             return;
         try {
-            treeObject.clickContextMenuOfTreeInView(
+            viewObject.clickContextMenuOfTreeInView(
                 SarosConstant.VIEW_TITLE_ROSTER,
                 SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
-                contact);
+                jid.getBase());
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
-            delegate.sleep(sleepTime);
+            participant
+                .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
+            participant.confirmWindow(
+                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
+                SarosConstant.BUTTON_OK);
+
         } catch (WidgetNotFoundException e) {
-            log.info("Contact not found: " + contact, e);
+            log.info("Contact not found: " + jid.getBase(), e);
         }
     }
 
@@ -921,16 +952,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     // return null;
     // }
 
-    public void addContact(String plainJID) throws RemoteException {
-        openRosterView();
-        activateRosterView();
-        clickTBAddANewContactInRosterView();
-        waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-        // activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-        delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
-            plainJID);
-        waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-        delegate.button(SarosConstant.BUTTON_FINISH).click();
+    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException {
+        if (!hasContactWith(jid)) {
+            openRosterView();
+            activateRosterView();
+            clickTBAddANewContactInRosterView();
+            waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+            // activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+            delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
+                jid.getBase());
+            waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+            delegate.button(SarosConstant.BUTTON_FINISH).click();
+            participant.confirmRequestOfSubscriptionReceivedWindow();
+            confirmRequestOfSubscriptionReceivedWindow();
+        }
+
     }
 
     /*******************************************************************************
@@ -940,11 +977,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      *******************************************************************************/
 
     public void waitUntilConnected() {
-        wUntilObject.waitUntil(SarosConditions.isConnect(delegate));
+        wUntilObject.waitUntil(SarosConditions.isConnect(state));
     }
 
     public void waitUntilDisConnected() {
-        wUntilObject.waitUntil(SarosConditions.isDisConnected(delegate));
+        wUntilObject.waitUntil(SarosConditions.isDisConnected(state));
     }
 
     public void waitUntilSessionCloses() throws RemoteException {

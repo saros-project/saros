@@ -1,18 +1,16 @@
 package de.fu_berlin.inf.dpp.stf.conditions;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
 
 public class isDisConnected extends DefaultCondition {
 
-    private SWTWorkbenchBot bot1;
+    private ISarosState state;
 
-    isDisConnected(SWTWorkbenchBot bot) {
+    isDisConnected(ISarosState state) {
 
-        this.bot1 = bot;
+        this.state = state;
     }
 
     public String getFailureMessage() {
@@ -21,15 +19,18 @@ public class isDisConnected extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
+        if (state.isConnectedByXMPP())
+            return false;
+        else
+            return true;
 
-        for (SWTBotToolbarButton toolbarButton : bot1.viewByTitle(
-            SarosConstant.VIEW_TITLE_ROSTER).getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches("Connect")) {
-                return true;
-            }
-        }
-
-        return false;
+        // for (SWTBotToolbarButton toolbarButton : bot1.viewByTitle(
+        // SarosConstant.VIEW_TITLE_ROSTER).getToolbarButtons()) {
+        // if (toolbarButton.getToolTipText().matches("Connect")) {
+        // return true;
+        // }
+        // }
+        //
+        // return false;
     }
-
 }
