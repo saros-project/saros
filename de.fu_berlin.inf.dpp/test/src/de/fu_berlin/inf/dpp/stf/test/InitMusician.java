@@ -3,6 +3,9 @@ package de.fu_berlin.inf.dpp.stf.test;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
@@ -79,6 +82,56 @@ public class InitMusician {
             log.debug("", e);
         }
         return carl;
+    }
+
+    public static class MusicianConfiguration {
+        public MusicianConfiguration(String jidString, String password,
+            String host, int port) {
+            this.jidString = jidString;
+            this.password = password;
+            this.host = host;
+            this.port = port;
+        }
+
+        public String jidString;
+        public String password;
+        public String host;
+        public int port;
+    }
+
+    public static List<Musician> initAliceBobCarlConcurrently()
+        throws InterruptedException {
+        // pool = Executors.newFixedThreadPool(3);
+        List<Callable<Musician>> initTasks = new ArrayList<Callable<Musician>>();
+        initTasks.add(newAliceCallable());
+        initTasks.add(newBobCallable());
+        initTasks.add(newCarlCallable());
+        return MakeOperationConcurrently.workAll(initTasks);
+
+    }
+
+    public static Callable<Musician> newAliceCallable() {
+        return new Callable<Musician>() {
+            public Musician call() throws Exception {
+                return newAlice();
+            }
+        };
+    }
+
+    public static Callable<Musician> newBobCallable() {
+        return new Callable<Musician>() {
+            public Musician call() throws Exception {
+                return newBob();
+            }
+        };
+    }
+
+    public static Callable<Musician> newCarlCallable() {
+        return new Callable<Musician>() {
+            public Musician call() throws Exception {
+                return newCarl();
+            }
+        };
     }
 
 }

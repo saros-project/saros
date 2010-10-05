@@ -5,10 +5,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.test.MakeOperationConcurrently;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -84,7 +89,31 @@ public class Musician {
     }
 
     public void buildSessionConcurrently(String projectName,
-        String shareProjectWith, Musician... invitees) throws RemoteException {
+        String shareProjectWith, Musician... invitees) throws RemoteException,
+        InterruptedException {
+        List<Musician> peers = new LinkedList<Musician>();
+        List<String> peersName = new LinkedList<String>();
+        for (Musician invitee : invitees) {
+            peers.add(invitee);
+            peersName.add(invitee.getPlainJid());
+        }
+
+        log.trace("alice.shareProjectParallel");
+        this.bot.shareProject(BotConfiguration.PROJECTNAME, peersName);
+
+        List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < peers.size(); i++) {
+            final Musician musician = peers.get(i);
+            joinSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.bot.confirmSessionInvitationWizard(getPlainJid(),
+                        BotConfiguration.PROJECTNAME);
+                    return null;
+                }
+            });
+        }
+        log.trace("workAll(joinSessionTasks)");
+        MakeOperationConcurrently.workAll(joinSessionTasks);
     }
 
     public String getName() {
