@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.conditions;
 
+import java.util.List;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
@@ -8,6 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 
@@ -83,5 +86,10 @@ public class SarosConditions extends Conditions {
 
     public static ICondition isResourceNotExist(String resourcePath) {
         return new ExistNoResource(resourcePath);
+    }
+
+    public static ICondition existNoParticipant(ISarosState state,
+        List<JID> jids) {
+        return new ExistNoParticipants(state, jids);
     }
 }

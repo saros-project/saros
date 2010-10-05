@@ -42,11 +42,9 @@ public class TestShareProjectUsingExistingProject {
     }
 
     @After
-    public void cleanupAliceAndBob() throws RemoteException {
-        // Need to check for isDriver before leaving.
-        bob.bot.leaveSession(bob.jid);
-        // Need to check for isDriver before leaving.
-        alice.bot.leaveSession(alice.jid);
+    public void cleanupAliceAndBob() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionFirst(bob);
         alice.bot.deleteProject(PROJECT);
         bob.bot.deleteProject(PROJECT);
         bob.bot.resetWorkbench();

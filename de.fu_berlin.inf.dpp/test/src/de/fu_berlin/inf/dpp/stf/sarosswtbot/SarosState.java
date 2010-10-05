@@ -133,6 +133,13 @@ public class SarosState implements ISarosState {
         return sarosSession.getDrivers().contains(user);
     }
 
+    public boolean isHost(JID jid) throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        log.debug("isHost(" + jid.toString() + ") == "
+            + sarosSession.getUser(jid) != null);
+        return sarosSession.getUser(jid) != null;
+    }
+
     public boolean isIncomingConnectionIBB(JID destJid) throws RemoteException {
         return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.IBB);

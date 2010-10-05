@@ -50,13 +50,14 @@ public class MakeOperationConcurrently {
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.bot.leaveSession(musician.jid);
+                    musician.bot.leaveSessionByPeer();
                     return musician.state.isParticipant(musician.jid);
                 }
             });
         }
         log.trace("workAll(leaveTasks)");
         final List<Boolean> workAll = workAll(leaveTasks);
+
         return workAll;
     }
 }

@@ -744,28 +744,28 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * 
      *******************************************************************************/
 
-    public void leaveSession(JID jid) throws RemoteException {
+    public void leaveSessionByPeer() throws RemoteException {
         // Need to check for isDriver before leaving.
-        final boolean isDriver = state.isDriver(jid);
         clickTBLeaveTheSessionInSPSView();
-        if (!isDriver) {
-            confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
-                SarosConstant.BUTTON_YES);
-        } else {
-            Util.runSafeAsync(log, new Runnable() {
-                public void run() {
-                    try {
-                        confirmWindow("Confirm Closing Session",
-                            SarosConstant.BUTTON_YES);
-                    } catch (RemoteException e) {
-                        // no popup
-                    }
+        confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
+            SarosConstant.BUTTON_YES);
+        waitUntilSessionCloses();
+    }
+
+    public void leaveSessionByHost() throws RemoteException {
+        clickTBLeaveTheSessionInSPSView();
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                try {
+                    confirmWindow("Confirm Closing Session",
+                        SarosConstant.BUTTON_YES);
+                } catch (RemoteException e) {
+                    // no popup
                 }
-            });
-            if (isShellActive("Confirm Closing Session"))
-                confirmWindow("Confirm Closing Session",
-                    SarosConstant.BUTTON_YES);
-        }
+            }
+        });
+        if (isShellActive("Confirm Closing Session"))
+            confirmWindow("Confirm Closing Session", SarosConstant.BUTTON_YES);
         waitUntilSessionCloses();
     }
 
@@ -994,6 +994,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isSessionClosed(state));
         delegate.sleep(sleepTime);
+    }
+
+    public void waitUntilAllPeersLeaveSession(List<JID> jids)
+        throws RemoteException {
+        wUntilObject.waitUntil(SarosConditions.existNoParticipant(state, jids));
     }
 
     public void waitUntilSessionOpen() throws RemoteException {

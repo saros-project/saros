@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package de.fu_berlin.inf.dpp.stf.test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,11 +15,10 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
-public class TestShare3UsersConcurrently {
+public class TestShareProjectConcurrently {
     private static final Logger log = Logger
-        .getLogger(TestShare3UsersConcurrently.class);
+        .getLogger(TestShareProjectConcurrently.class);
 
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
@@ -78,9 +77,12 @@ public class TestShare3UsersConcurrently {
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(alice.state.isObserver(bob.jid));
 
-        alice.leaveSessionFirstByPeers(bob, carl);
-        assertFalse(bob.state.isParticipant(bob.jid));
-        assertFalse(carl.state.isParticipant(carl.jid));
+        List<Boolean> workAll = MakeOperationConcurrently
+            .leaveSessionConcurrently(bob, carl);
+        for (Boolean w : workAll)
+            assertFalse(w);
+        alice.bot.leaveSessionByPeer();
         assertFalse(alice.state.isParticipant(alice.jid));
     }
+
 }

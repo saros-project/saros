@@ -116,6 +116,77 @@ public class Musician {
         MakeOperationConcurrently.workAll(joinSessionTasks);
     }
 
+    /**
+     * Define the leave session with the following steps.
+     * <ol>
+     * <li>The host(alice) leave session first.</li>
+     * <li>Then confirm the windonws "Closing the Session" for musicians carl
+     * and bob concurrently</li>
+     * </ol>
+     * 
+     * @param musicians
+     *            bob and carl.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public void leaveSessionFirst(Musician... musicians)
+        throws RemoteException, InterruptedException {
+        bot.clickTBLeaveTheSessionInSPSView();
+        bot.confirmWindow("Confirm Closing Session", SarosConstant.BUTTON_YES);
+        bot.waitUntilSessionCloses();
+        List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < musicians.length; i++) {
+            final Musician musician = musicians[i];
+            closeSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    // Need to check for isDriver before leaving.
+                    musician.bot.waitUntilShellActive("Closing the Session");
+                    musician.bot.confirmWindow("Closing the Session",
+                        SarosConstant.BUTTON_OK);
+                    musician.bot.waitUntilShellCloses("Closing the Session");
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(closeSessionTasks);
+    }
+
+    /**
+     * Define the leave session with the following steps.
+     * <ol>
+     * <li>The musicians bob and carl leave the session first.(concurrently)</li>
+     * <li>wait until bob and carl are really not in the session using
+     * "waitUntilAllPeersLeaveSession", then leave the host alice.</li>
+     * </ol>
+     * make sure,
+     * 
+     * @param musicians
+     *            bob and carl
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public void leaveSessionFirstByPeers(Musician... musicians)
+        throws RemoteException, InterruptedException {
+        List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < musicians.length; i++) {
+            final Musician musician = musicians[i];
+            leaveTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.bot.leaveSessionByPeer();
+                    return null;
+                }
+            });
+        }
+        List<JID> peerJIDs = new ArrayList<JID>();
+        for (Musician musician : musicians) {
+            peerJIDs.add(musician.jid);
+        }
+        MakeOperationConcurrently.workAll(leaveTasks);
+        bot.waitUntilAllPeersLeaveSession(peerJIDs);
+        bot.clickTBLeaveTheSessionInSPSView();
+        bot.waitUntilSessionCloses();
+    }
+
     public String getName() {
         return jid.getName();
     }

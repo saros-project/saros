@@ -135,4 +135,6 @@ public interface ISarosState extends Remote {
 
     public boolean isFollowing() throws RemoteException;
 
+    public boolean isHost(JID jid) throws RemoteException;
+
 }

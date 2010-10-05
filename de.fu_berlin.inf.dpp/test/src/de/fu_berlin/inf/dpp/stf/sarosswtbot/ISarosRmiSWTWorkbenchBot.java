@@ -248,7 +248,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public boolean isContactInSessionView(String Contact)
         throws RemoteException;
 
-    public void leaveSession(JID jid) throws RemoteException;
+    public void leaveSessionByPeer() throws RemoteException;
 
     public void clickShareProjectWith(String projectName,
         String shareProjectWith) throws RemoteException;
@@ -267,4 +267,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void activateRosterView() throws RemoteException;
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException;
+
+    public void leaveSessionByHost() throws RemoteException;
+
+    public void waitUntilAllPeersLeaveSession(List<JID> jids)
+        throws RemoteException;
 }

@@ -88,11 +88,11 @@ public class TestShare3UsersSequentially {
         assertTrue(alice.state.isObserver(bob.jid));
 
         // Need to check for isDriver before leaving.
-        carl.bot.leaveSession(carl.jid);
+        carl.bot.leaveSessionByPeer();
         assertFalse(carl.state.isParticipant(carl.jid));
 
         // Need to check for isDriver before leaving.
-        bob.bot.leaveSession(bob.jid);
+        bob.bot.leaveSessionByPeer();
         assertFalse(bob.state.isParticipant(bob.jid));
 
         // alice.waitUntilOtherLeaveSession(carl);
@@ -100,7 +100,7 @@ public class TestShare3UsersSequentially {
         alice.bot.waitUntilSessionClosedBy(carl.state);
         alice.bot.waitUntilSessionClosedBy(bob.state);
         // Need to check for isDriver before leaving.
-        alice.bot.leaveSession(alice.jid);
+        alice.bot.leaveSessionByHost();
         assertFalse(alice.state.isParticipant(alice.jid));
 
         // invitee1.sleep(1000);

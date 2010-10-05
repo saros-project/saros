@@ -79,14 +79,14 @@ public class TestShare2UsersSequentially {
         // @Test
         // public void testLeaveSession() throws RemoteException {
         // Need to check for isDriver before leaving.
-        bob.bot.leaveSession(bob.jid);
+        bob.bot.leaveSessionByPeer();
         log.trace("invitee.leave");
         assertFalse(bob.state.isParticipant(bob.jid));
 
         bob.bot.waitUntilSessionClosedBy(bob.state);
         // TODO Dialog "Do you really want to close" pops up
         // Need to check for isDriver before leaving.
-        alice.bot.leaveSession(alice.jid);
+        alice.bot.leaveSessionByHost();
         log.trace("inviter.leave");
         assertFalse(alice.state.isParticipant(alice.jid));
         // invitee.waitUntilSessionClosesBy(inviter);
