@@ -319,8 +319,7 @@ public class RosterView extends ViewPart {
                     Saros.NAMESPACE);
             } catch (CacheMissException e) {
                 // Saros support wasn't in cache. Force the discovery manager.
-                // TODO: Come back to this after release 10.10.01
-                // rqPeer = discoveryManager.isSarosSupported(getJID());
+                rqPeer = discoveryManager.isSarosSupported(getJID());
             }
 
             if (presence.isAvailable() && saros.isConnected()) {
