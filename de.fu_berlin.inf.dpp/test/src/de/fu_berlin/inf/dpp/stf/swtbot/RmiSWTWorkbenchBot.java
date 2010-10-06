@@ -475,6 +475,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isJavaProjectExist(projectName)) {
             activateEclipseShell();
+            getEclipseShell().activate().setFocus();
             delegate.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = delegate.shell("New Java Project");
             shell.activate();

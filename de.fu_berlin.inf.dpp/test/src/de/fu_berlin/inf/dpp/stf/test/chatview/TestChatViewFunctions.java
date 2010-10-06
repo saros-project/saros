@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -57,13 +56,6 @@ public class TestChatViewFunctions {
         alice.bot.resetSaros();
     }
 
-    @After
-    public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
-
-    }
-
     @Before
     public void shareProjekt() throws RemoteException {
         alice.buildSessionSequential(PROJECT,
@@ -72,11 +64,8 @@ public class TestChatViewFunctions {
 
     @Test
     public void testChat() throws RemoteException {
-        alice.bot.openChatView();
         assertTrue(alice.bot.compareChatMessage("You", "joined the chat."));
         alice.bot.sendChatMessage(message);
-        bob.bot.openChatView();
-        // wait until the chat message arrived
         bob.bot.sleep(1000);
         assertTrue(bob.bot.compareChatMessage(alice.getName(), message));
 

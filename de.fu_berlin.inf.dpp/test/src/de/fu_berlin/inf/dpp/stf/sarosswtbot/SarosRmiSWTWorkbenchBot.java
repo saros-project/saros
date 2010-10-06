@@ -701,6 +701,9 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void sendChatMessage(String message) throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         SWTBotView view = delegate.activeView();
         SWTBot bot = view.bot();
@@ -711,6 +714,9 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public boolean compareChatMessage(String jid, String message)
         throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
         SWTBotView view = delegate.activeView();
         SWTBot bot = view.bot();
         SWTBotStyledText text = bot.styledText();
@@ -1028,7 +1034,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void resetSaros() throws RemoteException {
         xmppDisconnect();
         deleteAllProjects();
-        resetWorkbench();
     }
 
 }
