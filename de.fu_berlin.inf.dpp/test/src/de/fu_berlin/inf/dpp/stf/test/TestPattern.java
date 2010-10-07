@@ -37,13 +37,43 @@ public class TestPattern {
      * 
      * @throws AccessException
      * @throws RemoteException
+     * @throws InterruptedException
      */
     @BeforeClass
-    public static void initMusican() throws AccessException, RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        carl = InitMusician.newCarl();
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+    public static void initMusican() throws AccessException, RemoteException,
+        InterruptedException {
+        /*
+         * initialize the musicians simultaneously
+         */
+        // List<Musician> musicians =
+        // InitMusician.initAliceBobCarlConcurrently();
+        // alice = musicians.get(0);
+        // bob = musicians.get(1);
+        // carl = musicians.get(2);
+
+        /*
+         * or initialize the musicians sequentially
+         */
+        // alice = InitMusician.newAlice();
+        // bob = InitMusician.newBob();
+        // carl = InitMusician.newCarl();
+
+        /*
+         * create a java project, in which there are a class.
+         */
+        // alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+
+        /*
+         * build session with bob and carl simultaneously
+         */
+        // alice.buildSessionConcurrently(PROJECT,
+        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl);
+
+        /*
+         * or build session with bob and carl sequentially
+         */
+        // alice.buildSessionSequential(PROJECT,
+        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl);
     }
 
     /**
@@ -74,17 +104,44 @@ public class TestPattern {
     }
 
     /**
-     * please describe the test and change the test'name.
+     * please describe the test using the following form and change the
+     * test'name. /** Steps:
+     * <ol>
+     * <li>step1.</li>
+     * <li>step2.</li>
+     * <li>step3.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>result1.</li>
+     * <li>result2.</li>
+     * <li>result3.</li>
+     * </ol>
      * 
      * @throws RemoteException
      */
+
     @Test
     public void test1() throws RemoteException {
 
     }
 
     /**
-     * please describe the test and change the test'name.
+     * please describe the test using the following form and change the
+     * test'name. /** Steps:
+     * <ol>
+     * <li>step1.</li>
+     * <li>step2.</li>
+     * <li>step3.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>result1.</li>
+     * <li>result2.</li>
+     * <li>result3.</li>
+     * </ol>
      * 
      * @throws RemoteException
      */

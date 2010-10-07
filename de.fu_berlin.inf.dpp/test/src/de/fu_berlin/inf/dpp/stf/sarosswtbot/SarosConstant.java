@@ -7,6 +7,7 @@ public class SarosConstant {
     public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
     public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
     public final static String VIEW_TITLE_ROSTER = "Roster";
+    public final static String VIEW_TITLE_PROGRESS = "Progress";
     public final static String VIEW_TITLE_CHAT_VIEW = "Chat View";
     public final static String VIEW_TITLE_SHARED_PROJECT_SESSION = "Shared Project Session";
     public final static String VIEW_TITLE_PACKAGE_EXPLORER = "Package Explorer";

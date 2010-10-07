@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -29,10 +30,13 @@ public class TestParallelInvitationWithTerminationByHost {
     protected static ArrayList<String> invitees = new ArrayList<String>();
 
     @BeforeClass
-    public static void initMusicians() throws AccessException, RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        carl = InitMusician.newCarl();
+    public static void initMusicians() throws AccessException, RemoteException,
+        InterruptedException {
+        // initialize the musicians simultaneously
+        List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
+        alice = musicians.get(0);
+        bob = musicians.get(1);
+        carl = musicians.get(2);
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         invitees.add(bob.getPlainJid());
         invitees.add(carl.getPlainJid());
@@ -66,13 +70,22 @@ public class TestParallelInvitationWithTerminationByHost {
     }
 
     /**
-     * 1. Alice invites Bob and Carl simultaneously. 2. Carl accepts the
-     * invitation but does not choose a target project. 3. Alice opens the
-     * Progress View and cancels Bob's invitation before Bob accepts. 4. Alice
-     * opens the Progress View and cancels Carl's invitation before Carl
-     * accepts. Result: 1. Bob is notified of Alice's canceling the invitation.
-     * 2. Carl is notified of Alice's canceling the invitation. 3. Carl and Bob
-     * are not in session
+     * Steps:
+     * <ol>
+     * <li>Alice invites Bob and Carl simultaneously.</li>
+     * <li>Carl accepts the invitation but does not choose a target project.</li>
+     * <li>Alice opens the Progress View and cancels Bob's invitation before Bob
+     * accepts.</li>
+     * <li>Alice opens the Progress View and cancels Carl's invitation before
+     * Carl accepts.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Bob is notified of Alice's canceling the invitation.</li>
+     * <li>Carl is notified of Alice's canceling the invitation.</li>
+     * <li>Carl and Bob are not in session</li>
+     * </ol>
      * 
      * @throws RemoteException
      */
@@ -83,18 +96,14 @@ public class TestParallelInvitationWithTerminationByHost {
 
         alice.bot.cancelInvitation();
         bob.bot.waitUntilShellActive("Invitation Cancelled");
-
         assertTrue(bob.bot.isShellActive("Invitation Cancelled"));
-
-        bob.bot.ackErrorDialog();
+        bob.bot.confirmInvitationCancelledWindow();
         alice.bot.removeProgress();
 
         alice.bot.cancelInvitation();
         carl.bot.waitUntilShellActive("Invitation Cancelled");
-
         assertTrue(carl.bot.isShellActive("Invitation Cancelled"));
-
-        carl.bot.ackErrorDialog();
+        carl.bot.confirmInvitationCancelledWindow();
         alice.bot.removeProgress();
 
         assertFalse(bob.bot.isInSession());

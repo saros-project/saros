@@ -300,6 +300,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
+    public void activateProgressView() throws RemoteException {
+        viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_PROGRESS);
+    }
+
     public void closeRosterView() throws RemoteException {
         viewObject.hideViewById(SarosConstant.ID_ROSTER_VIEW);
     }
@@ -1044,7 +1048,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         viewObject.showViewById("org.eclipse.ui.views.ProgressView");
     }
 
+    /**
+     * remove the progress. ie. Click the gray clubs delete icon.
+     */
     public void removeProgress() throws RemoteException {
+        openProgressView();
+        activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
         view.setFocus();
         SWTBot bot = view.bot();
@@ -1052,9 +1061,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         b.click();
     }
 
+    /**
+     * end the invitation process. ie. Click the red stop icon in Progress view.
+     */
     public void cancelInvitation() throws RemoteException {
-        // 1. open ProcessView
         openProgressView();
+        activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
         view.setFocus();
         SWTBot bot = view.bot();
@@ -1066,7 +1078,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         return viewObject.isViewOpen("Progress");
     }
 
-    public void ackErrorDialog() throws RemoteException {
+    public void confirmInvitationCancelledWindow() throws RemoteException {
         SWTBotShell shell = delegate.shell("Invitation Cancelled");
         shell.activate().setFocus();
         SWTBotButton button = shell.bot().button();

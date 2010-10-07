@@ -279,7 +279,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean isProgressViewOpen() throws RemoteException;
 
-    public void ackErrorDialog() throws RemoteException;
+    public void confirmInvitationCancelledWindow() throws RemoteException;
 
     public void removeProgress() throws RemoteException;
 
