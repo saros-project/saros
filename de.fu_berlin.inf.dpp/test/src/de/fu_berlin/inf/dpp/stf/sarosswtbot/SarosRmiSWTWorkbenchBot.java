@@ -12,6 +12,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -1034,6 +1036,39 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void resetSaros() throws RemoteException {
         xmppDisconnect();
         deleteAllProjects();
+    }
+
+    public void openProgressView() throws RemoteException {
+        viewObject.showViewById("org.eclipse.ui.views.ProgressView");
+    }
+
+    public void removeProgress() throws RemoteException {
+        SWTBotView view = delegate.viewByTitle("Progress");
+        view.setFocus();
+        SWTBot bot = view.bot();
+        SWTBotToolbarButton b = bot.toolbarButton();
+        b.click();
+    }
+
+    public void cancelInvitation() throws RemoteException {
+        // 1. open ProcessView
+        openProgressView();
+        SWTBotView view = delegate.viewByTitle("Progress");
+        view.setFocus();
+        SWTBot bot = view.bot();
+        SWTBotToolbarButton b = bot.toolbarButton();
+        b.click();
+    }
+
+    public boolean isProgressViewOpen() throws RemoteException {
+        return viewObject.isViewOpen("Progress");
+    }
+
+    public void ackErrorDialog() throws RemoteException {
+        SWTBotShell shell = delegate.shell("Invitation Cancelled");
+        shell.activate().setFocus();
+        SWTBotButton button = shell.bot().button();
+        button.click();
     }
 
 }

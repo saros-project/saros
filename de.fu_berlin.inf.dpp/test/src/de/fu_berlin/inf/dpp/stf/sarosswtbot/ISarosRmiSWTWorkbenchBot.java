@@ -272,4 +272,14 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void waitUntilAllPeersLeaveSession(List<JID> jids)
         throws RemoteException;
+
+    public void cancelInvitation() throws RemoteException;
+
+    public void openProgressView() throws RemoteException;
+
+    public boolean isProgressViewOpen() throws RemoteException;
+
+    public void ackErrorDialog() throws RemoteException;
+
+    public void removeProgress() throws RemoteException;
 }
