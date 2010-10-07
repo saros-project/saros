@@ -282,4 +282,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void ackErrorDialog() throws RemoteException;
 
     public void removeProgress() throws RemoteException;
+
+    public void waitUntilGetChatMessage(String jid, String message)
+        throws RemoteException;
 }

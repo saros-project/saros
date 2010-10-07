@@ -11,6 +11,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 
@@ -92,4 +93,10 @@ public class SarosConditions extends Conditions {
         List<JID> jids) {
         return new ExistNoParticipants(state, jids);
     }
+
+    public static ICondition isChatMessageExist(ISarosRmiSWTWorkbenchBot bot,
+        String jid, String message) {
+        return new IsChatMessageExist(bot, jid, message);
+    }
+
 }

@@ -20,15 +20,20 @@ import de.fu_berlin.inf.dpp.stf.test.InitMusician;
  * 
  * 2 Users
  * 
- * Users have joined a shared project session Steps: 1. Switch to ChatView 2.
- * User A sends IM to user B (both users should have beep button active by
- * default)
+ * Users have joined a shared project session Steps:
+ * <ol>
+ * <li>Switch to ChatView</li>
+ * <li>User A sends IM to user B (both users should have beep button active by
+ * default)</li>
+ * </ol>
  * 
- * Result: 1. The chat should have automatically connected. You should see
+ * Result:
+ * <ol>
+ * <li>The chat should have automatically connected. You should see
  * "[You (xx:xx)]: has joined chat" in the ChatView and perhaps the log of the
- * MUC if someone is already in the chatroom.
- * 
- * 2. Only user B hears a beep when receiving IM.
+ * MUC if someone is already in the chatroom.</li>
+ * <li>Only user B hears a beep when receiving IM.</li>
+ * </ol>
  * 
  * TODO: replace bob.sleep() by a better condition and do we need the
  * comperator.class for other tests?
@@ -66,7 +71,7 @@ public class TestChatViewFunctions {
     public void testChat() throws RemoteException {
         assertTrue(alice.bot.compareChatMessage("You", "joined the chat."));
         alice.bot.sendChatMessage(message);
-        bob.bot.sleep(1000);
+        bob.bot.waitUntilGetChatMessage(alice.getName(), message);
         assertTrue(bob.bot.compareChatMessage(alice.getName(), message));
 
     }

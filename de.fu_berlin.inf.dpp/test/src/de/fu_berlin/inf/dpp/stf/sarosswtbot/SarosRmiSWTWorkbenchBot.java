@@ -983,6 +983,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * waitUntil
      * 
      *******************************************************************************/
+    public void waitUntilGetChatMessage(String jid, String message)
+        throws RemoteException {
+        wUntilObject.waitUntil(SarosConditions.isChatMessageExist(this, jid,
+            message));
+    }
 
     public void waitUntilConnected() {
         wUntilObject.waitUntil(SarosConditions.isConnect(state));
