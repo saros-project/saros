@@ -590,10 +590,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
-
-        // viewObject.clickContextMenuOfTreeInView(
-        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, projectName);
     }
 
     public void clickCMShareProjectParticallyInPEView(String projectName)

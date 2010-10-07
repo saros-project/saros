@@ -46,7 +46,8 @@ public class TestShare2UsersSequentially {
     }
 
     @Test
-    public void testShareProject2UsersSequentially() throws RemoteException {
+    public void testShareProject2UsersSequentially() throws RemoteException,
+        InterruptedException {
         log.trace("testShareProject enter");
 
         alice.buildSessionSequential(PROJECT,
@@ -73,20 +74,8 @@ public class TestShare2UsersSequentially {
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(alice.state.isObserver(bob.jid));
 
-        // TODO make tests independent of each other
-        // @Test
-        // public void testLeaveSession() throws RemoteException {
-        // Need to check for isDriver before leaving.
-        bob.bot.leaveSessionByPeer();
-        log.trace("invitee.leave");
+        alice.leaveSessionFirstByPeers(bob);
         assertFalse(bob.state.isParticipant(bob.jid));
-
-        bob.bot.waitUntilSessionClosedBy(bob.state);
-        // TODO Dialog "Do you really want to close" pops up
-        // Need to check for isDriver before leaving.
-        alice.bot.leaveSessionByHost();
-        log.trace("inviter.leave");
         assertFalse(alice.state.isParticipant(alice.jid));
-        // invitee.waitUntilSessionClosesBy(inviter);
     }
 }

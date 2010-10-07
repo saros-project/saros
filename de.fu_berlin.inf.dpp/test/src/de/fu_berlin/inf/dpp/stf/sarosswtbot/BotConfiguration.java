@@ -30,8 +30,7 @@ public class BotConfiguration {
     public final static transient String SCREENSHOTDIR = "screenshot";
     /** A small Java Project */
     public final static String PROJECTNAME_SVN = "examples";
-    public final static String PROJECTNAME_SVN_TRUNK = "examples [trunk/examples]";
-    public final static String PROJECTNAME_SVN_TAG = "examples [tags/eclipsecon2009]";
+    public final static String PROJECTNAME_SVN_TRUNK = "examples";
     public final static String PROJECTNAME = "Foo_Saros";
     public final static String PROJECTNAME2 = "Foo_Saros2";
     public final static String PROJECTNAME3 = "Foo_Saros3";

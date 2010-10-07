@@ -21,16 +21,11 @@ public class TestShareProjectUsingExistingProject {
     private static Musician alice;
     private static Musician bob;
 
-    private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String PROJECT2 = BotConfiguration.PROJECTNAME + " 2";
+    private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
     private static final String CLS2 = BotConfiguration.CLASSNAME2;
-    private static final String PROJECT2 = BotConfiguration.PROJECTNAME + " 2";
-
-    private static final String CLS2_PATH_IN_PROJECT = PROJECT + "/src/my/pkg/"
-        + CLS2 + ".java";
-    private static final String CLS_PATH_IN_PROJECT2 = PROJECT2
-        + "/src/my/pkg/" + CLS + ".java";
 
     @BeforeClass
     public static void initMusicians() {
@@ -65,11 +60,11 @@ public class TestShareProjectUsingExistingProject {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
+        assertFalse(bob.bot.isClassExist(PROJECT2, PKG, CLS));
         assertFalse(bob.bot.isJavaProjectExist(PROJECT2));
 
     }
@@ -86,9 +81,9 @@ public class TestShareProjectUsingExistingProject {
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
         assertTrue(bob.bot.isJavaProjectExist(PROJECT));
-        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
         assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
-        assertTrue(bob.bot.isResourceExist(CLS_PATH_IN_PROJECT2));
+        assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
         bob.bot.deleteProject(PROJECT2);
 
     }
@@ -100,9 +95,10 @@ public class TestShareProjectUsingExistingProject {
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.bot.isJavaProjectExist(PROJECT));
-        assertTrue(bob.bot.isResourceExist(CLS2_PATH_IN_PROJECT));
+        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
         assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
-        assertTrue(bob.bot.isResourceExist(CLS_PATH_IN_PROJECT2));
+        assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
+
         bob.bot.deleteProject(PROJECT2);
 
     }
