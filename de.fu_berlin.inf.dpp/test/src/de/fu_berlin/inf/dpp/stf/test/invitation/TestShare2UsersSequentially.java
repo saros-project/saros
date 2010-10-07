@@ -23,32 +23,30 @@ public class TestShare2UsersSequentially {
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
     private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician alice = InitMusician.newAlice();
-    private static Musician bob = InitMusician.newBob();
+    private static Musician alice;
+    private static Musician bob;
 
     @BeforeClass
-    public static void configureInviter() throws RemoteException {
+    public static void initMusicians() throws RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
-    public static void cleanupInvitee() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
-    }
-
-    @AfterClass
-    public static void cleanupInviter() throws RemoteException {
         alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
     @Test
-    public void testShareProject() throws RemoteException {
+    public void testShareProject2UsersSequentially() throws RemoteException {
         log.trace("testShareProject enter");
 
         alice.buildSessionSequential(PROJECT,

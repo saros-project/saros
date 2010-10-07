@@ -20,33 +20,27 @@ public class TestChangingNameInRosterView {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     protected static Musician carl = InitMusician.newCarl();
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
+    protected static Musician alice;
+    protected static Musician bob;
 
     @BeforeClass
-    public static void configureAlice() throws RemoteException {
+    public static void initMusicians() throws RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass
-    public static void cleanupBob() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
-    }
-
-    @AfterClass
-    public static void cleanupAlice() throws RemoteException {
+        carl.bot.resetSaros();
         alice.bot.resetSaros();
     }
 
-    @AfterClass
-    public static void cleanupCarl() throws RemoteException {
-        carl.bot.resetSaros();
-    }
-
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         alice.bot.renameContact(bob.jid.getName(), bob.jid.getBase());
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
@@ -59,7 +53,7 @@ public class TestChangingNameInRosterView {
         alice.bot.renameContact(bob.jid.getBase(), bob.jid.getName());
         assertTrue(alice.state.hasContactWith(bob.jid));
         assertFalse(alice.bot.hasContactWith(bob.jid));
-        // assertTrue(alice.bot.hasContactWith(bob.jid.));ss
+        // assertTrue(alice.bot.hasContactWith(bob.jid.));
         assertTrue(alice.bot.isContactInSessionView(bob.jid.getBase()));
         assertTrue(alice.bot.isContactInSessionView(bob.jid.getName()));
 

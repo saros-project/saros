@@ -27,9 +27,9 @@ public class TestPattern {
     private static final String CP2 = BotConfiguration.CONTENTPATH2;
     private static final String CP3 = BotConfiguration.CONTENTPATH3;
 
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
-    protected static Musician carl = InitMusician.newCarl();
+    protected static Musician alice;
+    protected static Musician bob;
+    protected static Musician carl;
 
     /**
      * make sure, alice create first a java project with a class. if you don't
@@ -39,7 +39,10 @@ public class TestPattern {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void beforeClass() throws AccessException, RemoteException {
+    public static void initMusican() throws AccessException, RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
+        carl = InitMusician.newCarl();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
@@ -51,7 +54,7 @@ public class TestPattern {
      * @throws RemoteException
      */
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         carl.bot.resetSaros();
         alice.bot.resetSaros();

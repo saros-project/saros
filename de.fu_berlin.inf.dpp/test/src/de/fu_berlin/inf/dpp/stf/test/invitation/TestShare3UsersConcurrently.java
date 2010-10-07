@@ -29,8 +29,8 @@ public class TestShare3UsersConcurrently {
     private static Musician carl;
 
     @BeforeClass
-    public static void configure() throws RemoteException, InterruptedException {
-
+    public static void initMusicians() throws RemoteException,
+        InterruptedException {
         List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -39,14 +39,14 @@ public class TestShare3UsersConcurrently {
     }
 
     @AfterClass
-    public static void cleanupInvitee() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         carl.bot.resetSaros();
         alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();

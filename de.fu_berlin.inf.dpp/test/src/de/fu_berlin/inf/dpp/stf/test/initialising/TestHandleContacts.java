@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
@@ -16,17 +17,19 @@ import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestHandleContacts {
 
-    protected static Musician bob = InitMusician.newBob();
-    protected static Musician alice = InitMusician.newAlice();
+    protected static Musician bob;
+    protected static Musician alice;
 
-    @AfterClass
-    public static void cleanupAlice() throws RemoteException {
-        alice.bot.resetSaros();
+    @BeforeClass
+    public static void initMusicians() {
+        bob = InitMusician.newBob();
+        alice = InitMusician.newAlice();
     }
 
     @AfterClass
-    public static void cleanupBob() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
+        alice.bot.resetSaros();
     }
 
     @Before
@@ -36,7 +39,7 @@ public class TestHandleContacts {
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         alice.bot.resetWorkbench();
         bob.bot.resetWorkbench();
     }
@@ -94,7 +97,7 @@ public class TestHandleContacts {
         alice.bot.confirmNewContactWindow(bob.getPlainJid());
         alice.bot.waitUntilShellActive("Contact already added");
         assertTrue(alice.bot.isShellActive("Contact already added"));
-        // alice.bot.closeShell("Contact already added");
+        alice.bot.closeShell("Contact already added");
     }
 
 }

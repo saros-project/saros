@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
+import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,24 +47,28 @@ public class TestChatViewFunctions {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
 
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
+    protected static Musician alice;
+    protected static Musician bob;
 
     @BeforeClass
-    public static void configureAlice() throws AccessException, RemoteException {
+    public static void initMusicans() throws AccessException, RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         alice.bot.resetSaros();
     }
 
-    @Before
-    public void shareProjekt() throws RemoteException {
-        alice.buildSessionSequential(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+    @After
+    public void cleanUp() throws RemoteException {
+        bob.bot.resetWorkbench();
+        alice.bot.resetWorkbench();
     }
 
     @Test

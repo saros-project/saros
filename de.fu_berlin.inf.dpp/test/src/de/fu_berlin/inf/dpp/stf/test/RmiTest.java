@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,11 +18,16 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
 
-    private static Musician alice = InitMusician.newAlice();
+    private static Musician alice;
     private String PROJECT = BotConfiguration.PROJECTNAME;
 
+    @BeforeClass
+    public static void initMusican() {
+        alice = InitMusician.newAlice();
+    }
+
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         alice.bot.resetSaros();
     }
 

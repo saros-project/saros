@@ -28,8 +28,8 @@ public class TestShareProjectConcurrently {
     private static Musician carl;
 
     @BeforeClass
-    public static void configure() throws RemoteException, InterruptedException {
-
+    public static void initMusicans() throws RemoteException,
+        InterruptedException {
         List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -38,14 +38,14 @@ public class TestShareProjectConcurrently {
     }
 
     @AfterClass
-    public static void cleanupInvitee() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         carl.bot.resetSaros();
         alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();
@@ -77,11 +77,7 @@ public class TestShareProjectConcurrently {
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(alice.state.isObserver(bob.jid));
 
-        List<Boolean> workAll = MakeOperationConcurrently
-            .leaveSessionConcurrently(bob, carl);
-        for (Boolean w : workAll)
-            assertFalse(w);
-        alice.bot.leaveSessionByPeer();
+        alice.bot.leaveSessionByHost();
         assertFalse(alice.state.isParticipant(alice.jid));
     }
 

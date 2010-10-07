@@ -21,29 +21,26 @@ public class TestFollowMode {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
 
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
+    protected static Musician alice;
+    protected static Musician bob;
 
     @BeforeClass
-    public static void configureInvitee() throws RemoteException {
+    public static void initMusicians() throws RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS1);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-
     }
 
     @AfterClass
-    public static void cleanupBob() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
-    }
-
-    @AfterClass
-    public static void cleanupAlice() throws RemoteException {
         alice.bot.resetSaros();
     }
 
     @After
-    public void StopFollowMode() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         if (bob.state.isFollowing())
             bob.bot.clickCMStopFollowingThisUserInSPSView(alice.state,
                 alice.jid);

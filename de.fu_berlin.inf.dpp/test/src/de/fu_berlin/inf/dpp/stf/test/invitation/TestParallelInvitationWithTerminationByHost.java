@@ -22,14 +22,17 @@ public class TestParallelInvitationWithTerminationByHost {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
 
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
-    protected static Musician carl = InitMusician.newCarl();
+    protected static Musician alice;
+    protected static Musician bob;
+    protected static Musician carl;
 
     protected static ArrayList<String> invitees = new ArrayList<String>();
 
     @BeforeClass
-    public static void configureAlice() throws AccessException, RemoteException {
+    public static void initMusicians() throws AccessException, RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
+        carl = InitMusician.newCarl();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         invitees.add(bob.getPlainJid());
         invitees.add(carl.getPlainJid());
@@ -43,7 +46,7 @@ public class TestParallelInvitationWithTerminationByHost {
      * @throws RemoteException
      */
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         carl.bot.resetSaros();
         alice.bot.resetSaros();
@@ -74,7 +77,7 @@ public class TestParallelInvitationWithTerminationByHost {
      * @throws RemoteException
      */
     @Test
-    public void test() throws RemoteException {
+    public void testInvitationWithTerminationByHost() throws RemoteException {
         alice.bot.shareProject(PROJECT, invitees);
         carl.bot.confirmSessionInvitationWindowStep1(alice.getPlainJid());
 

@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestFileOperations {
-    protected static Musician alice;
-    protected static Musician bob;
-    protected static Musician carl;
+    private static Musician alice;
+    private static Musician bob;
+    private static Musician carl;
 
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PKG2 = BotConfiguration.PACKAGENAME2;
@@ -29,7 +29,8 @@ public class TestFileOperations {
     private static final String CLS2 = BotConfiguration.CLASSNAME2;
 
     @BeforeClass
-    public static void configure() throws RemoteException, InterruptedException {
+    public static void initMusicians() throws RemoteException,
+        InterruptedException {
         List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -55,14 +56,14 @@ public class TestFileOperations {
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         carl.bot.resetWorkbench();
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
     @AfterClass
-    public static void cleanupAlice() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         carl.bot.resetSaros();
         bob.bot.resetSaros();
         alice.bot.resetSaros();

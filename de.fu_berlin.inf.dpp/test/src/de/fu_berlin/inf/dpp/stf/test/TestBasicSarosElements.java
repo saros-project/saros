@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
@@ -14,15 +15,20 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
 public class TestBasicSarosElements {
     private static final Logger log = Logger
         .getLogger(TestBasicSarosElements.class);
-    private static Musician alice = InitMusician.newAlice();
+    private static Musician alice;
+
+    @BeforeClass
+    public static void initMusican() {
+        alice = InitMusician.newAlice();
+    }
 
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         alice.bot.resetSaros();
     }
 
     @After
-    public void cleanup() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         alice.bot.resetWorkbench();
         alice.bot.xmppDisconnect();
     }
@@ -65,9 +71,6 @@ public class TestBasicSarosElements {
 
     @Test
     public void testXmppConnect() throws RemoteException {
-        // log.trace("xmppDisconnect");
-        // alice.bot.xmppDisconnect();
-        // assertEquals(false, alice.bot.isConnectedByXMPP());
         log.trace("xmppConnect");
         alice.bot.xmppConnect(alice.jid, alice.password);
         log.trace("captureScreenshot");

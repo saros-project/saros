@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
@@ -17,8 +18,8 @@ import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestShareProjectUsingExistingProject {
 
-    private static Musician alice = InitMusician.newAlice();
-    private static Musician bob = InitMusician.newBob();
+    private static Musician alice;
+    private static Musician bob;
 
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
@@ -31,6 +32,12 @@ public class TestShareProjectUsingExistingProject {
     private static final String CLS_PATH_IN_PROJECT2 = PROJECT2
         + "/src/my/pkg/" + CLS + ".java";
 
+    @BeforeClass
+    public static void initMusicians() {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
+    }
+
     @Before
     public void setUpAlice() throws RemoteException {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
@@ -42,8 +49,7 @@ public class TestShareProjectUsingExistingProject {
     }
 
     @After
-    public void cleanupAliceAndBob() throws RemoteException,
-        InterruptedException {
+    public void cleanUp() throws RemoteException, InterruptedException {
         alice.leaveSessionFirst(bob);
         alice.bot.deleteProject(PROJECT);
         bob.bot.deleteProject(PROJECT);
@@ -52,7 +58,7 @@ public class TestShareProjectUsingExistingProject {
     }
 
     @AfterClass
-    public static void cleanup() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         bob.bot.resetSaros();
         alice.bot.resetSaros();
     }

@@ -25,34 +25,29 @@ public class TestShare3UsersSequentially {
     private static Musician bob = InitMusician.newBob();
 
     @BeforeClass
-    public static void configureAlice() throws RemoteException {
+    public static void initMusicians() throws RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
+        carl = InitMusician.newCarl();
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
-    public static void cleanupCarl() throws RemoteException {
+    public static void resetSaros() throws RemoteException {
         carl.bot.resetSaros();
-    }
-
-    @AfterClass
-    public static void cleanupBob() throws RemoteException {
         bob.bot.resetSaros();
-    }
-
-    @AfterClass
-    public static void cleanupAlice() throws RemoteException {
         alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         carl.bot.resetWorkbench();
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
     @Test
-    public void testShareProject() throws RemoteException {
+    public void testShareProject3UsersSequentially() throws RemoteException {
         List<String> musicians = new LinkedList<String>();
         musicians.add(carl.getPlainJid());
         musicians.add(bob.getPlainJid());

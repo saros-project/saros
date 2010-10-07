@@ -30,31 +30,27 @@ public class TestEditDuringInvitation {
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
     private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician carl = InitMusician.newCarl();
-    private static Musician alice = InitMusician.newAlice();
-    private static Musician bob = InitMusician.newBob();
+    private static Musician carl;
+    private static Musician alice;
+    private static Musician bob;
 
     @BeforeClass
-    public static void configureInviter() throws RemoteException {
-        alice.bot.newJavaProject(PROJECT);
-        alice.bot.newClass(PROJECT, PKG, CLS);
+    public static void initMusicians() throws RemoteException {
+        alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
+        carl = InitMusician.newCarl();
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
-    public static void cleanup() throws RemoteException {
-        carl.bot.xmppDisconnect();
-        carl.bot.deleteProject(PROJECT);
-        bob.bot.xmppDisconnect();
-        bob.bot.deleteProject(PROJECT);
-        alice.bot.xmppDisconnect();
-        alice.bot.deleteProject(PROJECT);
-        carl.bot.resetWorkbench();
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+    public static void resetSaros() throws RemoteException {
+        carl.bot.resetSaros();
+        bob.bot.resetSaros();
+        alice.bot.resetSaros();
     }
 
     @After
-    public void reset() throws RemoteException {
+    public void cleanUp() throws RemoteException {
         carl.bot.resetWorkbench();
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
