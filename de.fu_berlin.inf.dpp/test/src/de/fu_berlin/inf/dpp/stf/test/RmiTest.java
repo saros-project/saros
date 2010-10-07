@@ -45,6 +45,9 @@ public class RmiTest {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
         alice.bot.renameClass("Cls2", PROJECT, "pkg", "Cls");
+
+        assertFalse(alice.bot.isClassExist(PROJECT, "pkg", "Cls"));
+        assertTrue(alice.bot.isClassExist(PROJECT, "pkg", "Cls2"));
     }
 
     @Test

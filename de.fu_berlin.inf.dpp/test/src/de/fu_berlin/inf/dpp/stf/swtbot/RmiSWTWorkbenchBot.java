@@ -368,6 +368,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.textWithLabel("New name:").setText(newName);
         waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         delegate.button(SarosConstant.BUTTON_FINISH).click();
+        waitUntilShellCloses("Rename Compilation Unit");
     }
 
     public void renamePkg(String newName, String... texts)
@@ -1315,7 +1316,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                     page.closeAllEditors(false);
                 }
                 Shell activateShell = Display.getCurrent().getActiveShell();
-                if (activateShell != win.getShell()) {
+                if (activateShell != null && activateShell != win.getShell()) {
                     activateShell.close();
                 }
             }
