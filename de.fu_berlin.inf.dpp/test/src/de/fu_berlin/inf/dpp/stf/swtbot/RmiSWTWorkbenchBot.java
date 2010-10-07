@@ -239,7 +239,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
-        getEclipseShell().activate().setFocus();
+        activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
         SWTBotTree tree = viewObject
@@ -477,7 +477,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isJavaProjectExist(projectName)) {
             activateEclipseShell();
-            getEclipseShell().activate().setFocus();
             delegate.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = delegate.shell("New Java Project");
             shell.activate();
@@ -1016,8 +1015,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1026,8 +1025,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
         return project.exists();
     }
 
@@ -1057,8 +1056,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-            path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
         return file.exists();
     }
 
@@ -1277,17 +1276,17 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * main page
      * 
      *******************************************************************************/
-    public boolean activateEclipseShell() throws RemoteException {
+    public void activateEclipseShell() throws RemoteException {
+        getEclipseShell().activate().setFocus();
         // return activateShellWithMatchText(".+? - .+");
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        // Display.getDefault().syncExec(new Runnable() {
+        // public void run() {
+        // final IWorkbench wb = PlatformUI.getWorkbench();
+        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        // win.getShell().setActive();
+        // }
+        // });
 
-                win.getShell().setActive();
-            }
-        });
-        return true;
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {

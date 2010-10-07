@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,9 +18,9 @@ import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestFileOperations {
-    protected static Musician alice = InitMusician.newAlice();
-    protected static Musician bob = InitMusician.newBob();
-    protected static Musician carl = InitMusician.newCarl();
+    protected static Musician alice;
+    protected static Musician bob;
+    protected static Musician carl;
 
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PKG2 = BotConfiguration.PACKAGENAME2;
@@ -28,18 +29,15 @@ public class TestFileOperations {
     private static final String CLS2 = BotConfiguration.CLASSNAME2;
 
     @BeforeClass
-    public static void configureAlice() throws RemoteException {
+    public static void configure() throws RemoteException, InterruptedException {
+        List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
+        alice = musicians.get(0);
+        bob = musicians.get(1);
+        carl = musicians.get(2);
 
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-
-        alice.buildSessionSequential(PROJECT,
+        alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
-        // alice.bot.shareProjectParallel(BotConfiguration.PROJECTNAME,
-        // musicians);
-        // carl.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-        // BotConfiguration.PROJECTNAME);
-        // bob.bot.confirmSessionInvitationWizard(alice.getPlainJid(),
-        // BotConfiguration.PROJECTNAME);
         carl.bot.followUser(alice.state, alice.jid);
     }
 
@@ -73,7 +71,7 @@ public class TestFileOperations {
     @Test
     public void testRenameFile() throws RemoteException {
         // alice.renameFile(
-        alice.bot.renameFile(CLS2, PROJECT, "src", PKG, CLS);
+        alice.bot.renameClass(CLS2, PROJECT, PKG, CLS);
         bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
         carl.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
         assertFalse(bob.bot.isClassExist(PROJECT, PKG, CLS));

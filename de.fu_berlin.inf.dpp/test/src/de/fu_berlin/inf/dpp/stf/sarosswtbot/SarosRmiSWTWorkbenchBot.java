@@ -870,6 +870,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void creatNewAccount(JID jid, String password)
         throws RemoteException {
+        getEclipseShell().activate().setFocus();
         menuObject.clickMenuWithTexts("Saros", "Create Account");
         confirmCreateNewUserAccountWindow(jid.getDomain(), jid.getName(),
             password);

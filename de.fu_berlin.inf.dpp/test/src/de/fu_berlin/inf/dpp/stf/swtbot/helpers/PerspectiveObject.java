@@ -59,7 +59,7 @@ public class PerspectiveObject {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            rmiBot.getEclipseShell().activate().setFocus();
+            rmiBot.activateEclipseShell();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
@@ -75,8 +75,8 @@ public class PerspectiveObject {
                     }
                 });
             } catch (IllegalArgumentException e) {
-                log.debug("Couldn't initialize perspective with ID" + persID, e
-                    .getCause());
+                log.debug("Couldn't initialize perspective with ID" + persID,
+                    e.getCause());
             }
 
         }
