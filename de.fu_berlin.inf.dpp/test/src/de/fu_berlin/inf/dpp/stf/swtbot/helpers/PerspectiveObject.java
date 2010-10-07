@@ -1,16 +1,28 @@
 package de.fu_berlin.inf.dpp.stf.swtbot.helpers;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
+/**
+ * org.eclipse.cdt.ui.CPerspective org.eclipse.debug.ui.DebugPerspective
+ * org.eclipse.jdt.ui.JavaPerspective
+ * org.eclipse.jdt.ui.JavaHierarchyPerspective
+ * org.eclipse.jdt.ui.JavaBrowsingPerspective
+ * org.eclipse.mylyn.tasks.ui.perspectives.planning
+ * org.eclipse.pde.ui.PDEPerspective org.eclipse.team.cvs.ui.cvsPerspective
+ * org.eclipse.team.ui.TeamSynchronizingPerspective
+ * org.eclipse.ui.resourcePerspective
+ * org.tigris.subversion.subclipse.ui.svnPerspective
+ */
 public class PerspectiveObject {
     private static final transient Logger log = Logger
         .getLogger(PerspectiveObject.class);
@@ -41,47 +53,54 @@ public class PerspectiveObject {
      * 
      * 4. confirm the pop-up window "Open Perspective".
      * 
-     * @param nodeName
-     *            example: "Java"
+     * @param persID
+     *            example: "org.eclipse.jdt.ui.JavaPerspective"
      */
-    public void openPerspectiveWithName(String nodeName) throws RemoteException {
-        if (!isPerspectiveActive(nodeName)) {
-            rmiBot.activateEclipseShell();
-            menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
-                SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE,
-                SarosConstant.MENU_TITLE_OTHER);
-            rmiBot.confirmWindowWithTable(
-                SarosConstant.MENU_TITLE_OPEN_PERSPECTIVE, nodeName,
-                SarosConstant.BUTTON_OK);
+    public void openPerspectiveWithId(final String persID)
+        throws RemoteException {
+        if (!isPerspectiveActive(persID)) {
+            rmiBot.getEclipseShell().activate().setFocus();
+            try {
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        final IWorkbench wb = PlatformUI.getWorkbench();
+                        final IWorkbenchWindow win = wb
+                            .getActiveWorkbenchWindow();
+                        try {
+                            wb.showPerspective(persID, win);
+                        } catch (WorkbenchException e) {
+                            log.debug("couldn't open perspective wit ID"
+                                + persID, e);
+                        }
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                log.debug("Couldn't initialize perspective with ID" + persID, e
+                    .getCause());
+            }
+
         }
+
     }
 
-    public boolean isPerspectiveActive(String title) {
-        if (!isPerspectiveOpen(title))
-            return false;
-        return bot.activePerspective().getLabel().equals(title);
-        // try {
-        // return delegate.perspectiveByLabel(title).isActive();
-        // } catch (WidgetNotFoundException e) {
-        // log.warn("perspective '" + title + "' doesn't exist!");
-        // return false;
-        // }
+    public boolean isPerspectiveActive(String id) {
+        return bot.perspectiveById(id).isActive();
     }
 
-    public boolean isPerspectiveOpen(String title) {
-        return getPerspectiveTitles().contains(title);
-        // try {
-        // return delegate.perspectiveByLabel(title) != null;
-        // } catch (WidgetNotFoundException e) {
-        // log.warn("perspective '" + title + "' doesn't exist!");
-        // return false;
-        // }
-    }
+    // public boolean isPerspectiveOpen(String title) {
+    // return getPerspectiveTitles().contains(title);
+    // // try {
+    // // return delegate.perspectiveByLabel(title) != null;
+    // // } catch (WidgetNotFoundException e) {
+    // // log.warn("perspective '" + title + "' doesn't exist!");
+    // // return false;
+    // // }
+    // }
 
-    protected List<String> getPerspectiveTitles() {
-        ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotPerspective perspective : bot.perspectives())
-            list.add(perspective.getLabel());
-        return list;
-    }
+    // protected List<String> getPerspectiveTitles() {
+    // ArrayList<String> list = new ArrayList<String>();
+    // for (SWTBotPerspective perspective : bot.perspectives())
+    // list.add(perspective.getLabel());
+    // return list;
+    // }
 }

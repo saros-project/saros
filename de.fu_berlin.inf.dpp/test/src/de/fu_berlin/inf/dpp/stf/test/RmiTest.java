@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -19,16 +20,31 @@ public class RmiTest {
     private static Musician alice = InitMusician.newAlice();
     private String PROJECT = BotConfiguration.PROJECTNAME;
 
-    @After
-    public void cleanupBot() throws RemoteException {
+    @AfterClass
+    public static void afterClass() throws RemoteException {
         alice.bot.resetSaros();
+    }
+
+    @After
+    public void cleanup() throws RemoteException {
+        alice.bot.resetWorkbench();
+        alice.bot.resetSaros();
+    }
+
+    @Test
+    public void testPerspective() throws RemoteException {
+        assertTrue(alice.bot.isJavaPerspectiveActive());
+        assertFalse(alice.bot.isDebugPerspectiveActive());
+        alice.bot.openPerspectiveDebug();
+        assertFalse(alice.bot.isJavaPerspectiveActive());
+        assertTrue(alice.bot.isDebugPerspectiveActive());
     }
 
     @Test
     public void testRenameFile() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
-        alice.bot.renameFile("Cls2", PROJECT, "pkg", "Cls");
+        alice.bot.renameClass("Cls2", PROJECT, "pkg", "Cls");
     }
 
     @Test
@@ -75,12 +91,6 @@ public class RmiTest {
         alice.bot.openRosterView();
         assertTrue(alice.bot.isRosterViewOpen());
     }
-
-    // @Test
-    // public void test_getCurrentActiveShell() throws RemoteException {
-    // final String currentActiveShell = alice.bot.getCurrentActiveShell();
-    // assertTrue(currentActiveShell != null);
-    // }
 
     @Test
     public void test_newProjectWithClass() throws RemoteException {

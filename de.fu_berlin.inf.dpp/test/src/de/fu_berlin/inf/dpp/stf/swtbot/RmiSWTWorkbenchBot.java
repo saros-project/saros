@@ -231,19 +231,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void deleteFileGui(String... nodes) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        delegate.tree().expandNode(nodes);
-        viewObject.selectTreeWithLabelsInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nodes);
-        menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_EDIT,
-            SarosConstant.MENU_TITLE_DELETE);
+        viewObject.clickContextMenuOfTreeInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, "Delete", nodes);
         waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
         confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
             SarosConstant.BUTTON_OK);
-
     }
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
-        activateEclipseShell();
+        getEclipseShell().activate().setFocus();
         showViewPackageExplorer();
         activatePackageExplorerView();
         SWTBotTree tree = viewObject
@@ -353,6 +349,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             "Revert...");
         confirmWindow("Revert", SarosConstant.BUTTON_OK);
         waitUntilShellCloses("Revert");
+    }
+
+    public void renameClass(String newName, String projectName, String pkg,
+        String className) throws RemoteException {
+        renameFile(newName, projectName, "src", pkg, className);
     }
 
     public void renameFile(String newName, String... texts)
@@ -681,8 +682,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      */
     public void openPerspectiveJava() throws RemoteException {
-        persObject
-            .openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_JAVA);
+        persObject.openPerspectiveWithId(SarosConstant.ID_JAVA_PERSPECTIVE);
+    }
+
+    /**
+     * test, if the java perspective is active.
+     */
+    public boolean isJavaPerspectiveActive() throws RemoteException {
+        return persObject
+            .isPerspectiveActive(SarosConstant.ID_JAVA_PERSPECTIVE);
     }
 
     /**
@@ -692,8 +700,15 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      */
     public void openPerspectiveDebug() throws RemoteException {
-        persObject
-            .openPerspectiveWithName(SarosConstant.PERSPECTIVE_TITLE_DEBUG);
+        persObject.openPerspectiveWithId(SarosConstant.ID_DEBUG_PERSPECTIVE);
+    }
+
+    /**
+     * test, if the debug perspective is active.
+     */
+    public boolean isDebugPerspectiveActive() throws RemoteException {
+        return persObject
+            .isPerspectiveActive(SarosConstant.ID_DEBUG_PERSPECTIVE);
     }
 
     /*******************************************************************************
@@ -1000,8 +1015,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1010,8 +1025,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            projectName);
         return project.exists();
     }
 
@@ -1041,8 +1056,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
+            path);
         return file.exists();
     }
 
@@ -1267,6 +1282,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
                 final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+
                 win.getShell().setActive();
             }
         });
@@ -1289,40 +1305,20 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public void resetWorkbench() throws RemoteException {
+        openPerspectiveJava();
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
                 final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
                 IWorkbenchPage page = win.getActivePage();
+                if (page != null) {
+                    page.closeAllEditors(false);
+                }
                 Shell activateShell = Display.getCurrent().getActiveShell();
                 if (activateShell != win.getShell()) {
                     activateShell.close();
                 }
-                page.closeAllEditors(false);
-
             }
         });
     }
-    // private void implementsInterface(String interfaceClass)
-    // throws WidgetNotFoundException {
-    // delegate.button("Add...").click();
-    // delegate.sleep(750);
-    // delegate.shell("Implemented Interfaces Selection").activate();
-    // delegate.sleep(750);
-    // delegate.textWithLabel("Choose interfaces:").setText(interfaceClass);
-    // delegate.sleep(750);
-    // delegate.waitUntil(Conditions.tableHasRows(delegate.table(), 1));
-    // delegate.button("OK").click();
-    // delegate.sleep(750);
-    // delegate.shell("New Java Class").activate();
-    // }
-
-    // public SWTBotMenu menu(String name) {
-    // try {
-    // return delegate.menu(name);
-    // } catch (WidgetNotFoundException e) {
-    // throw new RuntimeException("Widget " + name + " not found");
-    // }
-    // }
-
 }

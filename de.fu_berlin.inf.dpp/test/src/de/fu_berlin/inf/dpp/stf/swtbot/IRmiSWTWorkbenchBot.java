@@ -618,6 +618,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void renameFile(String newName, String... texts)
         throws RemoteException;
 
+    public void renameClass(String newName, String projectName, String pkg,
+        String className) throws RemoteException;
+
     public void waitUntilClassExist(String projectName, String pkg,
         String className) throws RemoteException;
 
@@ -665,4 +668,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void deleteAllProjects() throws RemoteException;
 
     public void closeShell(String title) throws RemoteException;
+
+    public boolean isJavaPerspectiveActive() throws RemoteException;
+
+    public boolean isDebugPerspectiveActive() throws RemoteException;
 }
