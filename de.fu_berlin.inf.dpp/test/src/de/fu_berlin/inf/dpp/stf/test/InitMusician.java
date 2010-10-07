@@ -31,12 +31,6 @@ public class InitMusician {
         } catch (NotBoundException e) {
             log.debug("", e);
         }
-        try {
-            alice.bot.deleteAllProjects();
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            log.debug("", e);
-        }
         return alice;
     }
 
@@ -51,12 +45,6 @@ public class InitMusician {
         } catch (RemoteException e) {
             log.debug("", e);
         } catch (NotBoundException e) {
-            log.debug("", e);
-        }
-        try {
-            bob.bot.deleteAllProjects();
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             log.debug("", e);
         }
         return bob;
@@ -75,13 +63,39 @@ public class InitMusician {
         } catch (NotBoundException e) {
             log.debug("", e);
         }
+        return carl;
+    }
+
+    public final static Musician newDave() {
+        Musician dave = new Musician(new JID(BotConfiguration.JID_DAVE),
+            BotConfiguration.PASSWORD_DAVE, BotConfiguration.HOST_DAVE,
+            BotConfiguration.PORT_DAVE);
         try {
-            carl.bot.deleteAllProjects();
+            dave.initBot();
+        } catch (AccessException e) {
+            log.debug("", e);
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
+            log.debug("", e);
+        } catch (NotBoundException e) {
             log.debug("", e);
         }
-        return carl;
+        return dave;
+    }
+
+    public final static Musician newEdna() {
+        Musician edna = new Musician(new JID(BotConfiguration.JID_EDNA),
+            BotConfiguration.PASSWORD_EDNA, BotConfiguration.HOST_EDNA,
+            BotConfiguration.PORT_EDNA);
+        try {
+            edna.initBot();
+        } catch (AccessException e) {
+            log.debug("", e);
+        } catch (RemoteException e) {
+            log.debug("", e);
+        } catch (NotBoundException e) {
+            log.debug("", e);
+        }
+        return edna;
     }
 
     public static class MusicianConfiguration {
@@ -110,6 +124,33 @@ public class InitMusician {
 
     }
 
+    public static List<Musician> initMusiciansConcurrently(int... ports)
+        throws InterruptedException {
+        List<Callable<Musician>> initTasks = new ArrayList<Callable<Musician>>();
+        for (int port : ports) {
+            switch (port) {
+            case 12345:
+                initTasks.add(newAliceCallable());
+                break;
+            case 12346:
+                initTasks.add(newBobCallable());
+                break;
+            case 12347:
+                initTasks.add(newCarlCallable());
+                break;
+            case 12348:
+                initTasks.add(newDaveCallable());
+                break;
+            case 12349:
+                initTasks.add(newEdnaCallable());
+                break;
+            default:
+                break;
+            }
+        }
+        return MakeOperationConcurrently.workAll(initTasks);
+    }
+
     public static Callable<Musician> newAliceCallable() {
         return new Callable<Musician>() {
             public Musician call() throws Exception {
@@ -130,6 +171,22 @@ public class InitMusician {
         return new Callable<Musician>() {
             public Musician call() throws Exception {
                 return newCarl();
+            }
+        };
+    }
+
+    public static Callable<Musician> newDaveCallable() {
+        return new Callable<Musician>() {
+            public Musician call() throws Exception {
+                return newDave();
+            }
+        };
+    }
+
+    public static Callable<Musician> newEdnaCallable() {
+        return new Callable<Musician>() {
+            public Musician call() throws Exception {
+                return newEdna();
             }
         };
     }

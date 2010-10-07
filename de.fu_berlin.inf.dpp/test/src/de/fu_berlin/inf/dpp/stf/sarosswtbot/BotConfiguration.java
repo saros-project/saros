@@ -67,24 +67,15 @@ public class BotConfiguration {
     private final static String HOST_CARL_VM = "unconfigured";
     private final static int PORT_CARL_VM = 1099;
 
-    // /**
-    // * Local test accounts
-    // */
-    // private final static String JID_ALICE_LOCAL = ("alice1_fu@jabber.org/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
-    // private final static String HOST_ALICE_LOCAL = "localhost";
-    // private final static int PORT_ALICE_LOCAL = 12345;
-    // private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.org/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
-    // private final static String HOST_BOB_LOCAL = "localhost";
-    // private final static int PORT_BOB_LOCAL = 12346;
-    // private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.org/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
-    // private final static String HOST_CARL_LOCAL = "localhost";
-    // private final static int PORT_CARL_LOCAL = 1099;
+    private final static String JID_DAVE_VM = ("unconfigured");
+    private final static String PASSWORD_DAVE_VM = "unconfigured";
+    private final static String HOST_DAVE_VM = "unconfigured";
+    private final static int PORT_DAVE_VM = 1099;
+
+    private final static String JID_EDNA_VM = ("unconfigured");
+    private final static String PASSWORD_EDNA_VM = "unconfigured";
+    private final static String HOST_EDNA_VM = "unconfigured";
+    private final static int PORT_EDNA_VM = 1099;
 
     /**
      * Local test accounts
@@ -113,6 +104,16 @@ public class BotConfiguration {
     private final static String HOST_CARL_LOCAL = "localhost";
     private final static int PORT_CARL_LOCAL = 12347;
 
+    private final static String JID_DAVE_LOCAL = ("dave1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_DAVE_LOCAL = "dddfffggg";
+    private final static String HOST_DAVE_LOCAL = "localhost";
+    private final static int PORT_DAVE_LOCAL = 12348;
+
+    private final static String JID_EDNA_LOCAL = ("edna1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_EDNA_LOCAL = "dddfffggg";
+    private final static String HOST_EDNA_LOCAL = "localhost";
+    private final static int PORT_EDNA_LOCAL = 12349;
+
     /**
      * test accounts
      */
@@ -120,14 +121,26 @@ public class BotConfiguration {
     public final static String PASSWORD_ALICE;
     public final static String HOST_ALICE;
     public final static int PORT_ALICE;
+
     public final static String JID_BOB;
     public final static String PASSWORD_BOB;
     public final static String HOST_BOB;
     public final static int PORT_BOB;
+
     public final static String JID_CARL;
     public final static String PASSWORD_CARL;
     public final static String HOST_CARL;
     public final static int PORT_CARL;
+
+    public final static String JID_DAVE;
+    public final static String PASSWORD_DAVE;
+    public final static String HOST_DAVE;
+    public final static int PORT_DAVE;
+
+    public final static String JID_EDNA;
+    public final static String PASSWORD_EDNA;
+    public final static String HOST_EDNA;
+    public final static int PORT_EDNA;
 
     static {
         if (DEVELOPMODE) {
@@ -143,6 +156,15 @@ public class BotConfiguration {
             PASSWORD_CARL = PASSWORD_CARL_LOCAL;
             HOST_CARL = HOST_CARL_LOCAL;
             PORT_CARL = PORT_CARL_LOCAL;
+            JID_DAVE = JID_DAVE_LOCAL;
+            PASSWORD_DAVE = PASSWORD_DAVE_LOCAL;
+            HOST_DAVE = HOST_DAVE_LOCAL;
+            PORT_DAVE = PORT_DAVE_LOCAL;
+            JID_EDNA = JID_EDNA_LOCAL;
+            PASSWORD_EDNA = PASSWORD_EDNA_LOCAL;
+            HOST_EDNA = HOST_EDNA_LOCAL;
+            PORT_EDNA = PORT_EDNA_LOCAL;
+
         } else {
             JID_ALICE = JID_ALICE_VM;
             PASSWORD_ALICE = PASSWORD_ALICE_VM;
@@ -156,6 +178,14 @@ public class BotConfiguration {
             PASSWORD_CARL = PASSWORD_CARL_VM;
             HOST_CARL = HOST_CARL_VM;
             PORT_CARL = PORT_CARL_VM;
+            JID_DAVE = JID_DAVE_VM;
+            PASSWORD_DAVE = PASSWORD_DAVE_VM;
+            HOST_DAVE = HOST_DAVE_VM;
+            PORT_DAVE = PORT_DAVE_VM;
+            JID_EDNA = JID_EDNA_VM;
+            PASSWORD_EDNA = PASSWORD_EDNA_VM;
+            HOST_EDNA = HOST_EDNA_VM;
+            PORT_EDNA = PORT_EDNA_VM;
         }
     }
 }
