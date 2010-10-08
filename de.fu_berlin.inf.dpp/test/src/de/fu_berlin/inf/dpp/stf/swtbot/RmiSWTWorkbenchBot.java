@@ -30,6 +30,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IWorkbench;
@@ -642,6 +643,32 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
     }
 
+    public void newClassImplementsRunnable(String projectName, String pkg,
+        String className) throws RemoteException {
+        activateEclipseShell();
+        delegate.menu("File").menu("New").menu("Class").click();
+        SWTBotShell shell = delegate.shell("New Java Class");
+        shell.activate();
+        delegate.textWithLabel("Source folder:").setText(projectName + "/src");
+        delegate.textWithLabel("Package:").setText(pkg);
+        delegate.textWithLabel("Name:").setText(className);
+
+        delegate.button("Add...").click();
+        waitUntilShellActive("Implemented Interfaces Selection");
+        delegate.shell("Implemented Interfaces Selection").activate();
+        SWTBotText text = delegate.textWithLabel("Choose interfaces:");
+        delegate.sleep(2000);
+        text.setText("java.lang.Runnable");
+        waitUntilTableHasRows(1);
+
+        delegate.button("OK").click();
+        delegate.shell("New Java Class").activate();
+
+        delegate.checkBox("Inherited abstract methods").click();
+        delegate.button("Finish").click();
+        delegate.waitUntil(Conditions.shellCloses(shell));
+    }
+
     /**
      * Open the view "Package Explorer". The name of the method is defined the
      * same as the menu names. The name "showViewPackageExplorer" then means:
@@ -1015,8 +1042,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1025,8 +1052,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            projectName);
         return project.exists();
     }
 
@@ -1056,8 +1083,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
+            path);
         return file.exists();
     }
 

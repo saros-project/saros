@@ -20,6 +20,7 @@ public class RmiTest {
 
     private static Musician alice;
     private String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String CP = BotConfiguration.CONTENTPATH;
 
     @BeforeClass
     public static void initMusican() {
@@ -38,6 +39,14 @@ public class RmiTest {
     }
 
     @Test
+    public void testTypeTextInEditor() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newClassImplementsRunnable(PROJECT, "pkg", "Cls");
+        alice.bot.typeTextInJavaEditor(CP, PROJECT, "pkg", "Cls");
+    }
+
+    @Test
+    @Ignore
     public void testPerspective() throws RemoteException {
         assertTrue(alice.bot.isJavaPerspectiveActive());
         assertFalse(alice.bot.isDebugPerspectiveActive());
@@ -47,6 +56,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testRenameFile() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
@@ -57,6 +67,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         assertTrue(alice.bot.isJavaProjectExist(PROJECT));
@@ -65,6 +76,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testDeleteFileUsingGUI() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
@@ -74,6 +86,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testIsFileExist() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, "pkg", "Cls");
@@ -94,6 +107,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testViews() throws RemoteException {
         alice.bot.closeRosterView();
         assertFalse(alice.bot.isRosterViewOpen());
@@ -102,6 +116,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void test_newProjectWithClass() throws RemoteException {
         assertFalse(alice.bot.isJavaProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
@@ -110,6 +125,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void test_newProjectWithClass_2() throws RemoteException {
         assertFalse(alice.bot.isJavaProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
@@ -118,6 +134,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void test_newProjectWithClass_3() throws RemoteException {
         assertFalse(alice.bot.isJavaProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
@@ -126,6 +143,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void test_newJavaClassInProject() throws RemoteException {
         final String pkg = "pkg";
         final String className = "Cls";

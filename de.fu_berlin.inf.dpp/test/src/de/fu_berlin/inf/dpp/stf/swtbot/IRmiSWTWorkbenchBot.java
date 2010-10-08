@@ -672,4 +672,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isJavaPerspectiveActive() throws RemoteException;
 
     public boolean isDebugPerspectiveActive() throws RemoteException;
+
+    public void newClassImplementsRunnable(String projectName, String pkg,
+        String className) throws RemoteException;
 }

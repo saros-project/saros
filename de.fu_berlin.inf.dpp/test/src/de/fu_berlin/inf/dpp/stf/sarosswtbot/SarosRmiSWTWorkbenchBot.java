@@ -408,8 +408,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public boolean isInSession() throws RemoteException {
         viewObject.activateViewWithTitle("Shared Project Session");
-        return delegate.viewByTitle("Shared Project Session")
-            .toolbarButton("Leave the session").isEnabled();
+        return delegate.viewByTitle("Shared Project Session").toolbarButton(
+            "Leave the session").isEnabled();
     }
 
     public boolean isContactInSessionView(String Contact)
@@ -839,13 +839,14 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         openRemoteScreenView();
         if (respondentState.isDriver(respondentJID)) {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase() + " (Driver)");
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
+                    .getBase()
+                    + " (Driver)");
 
         } else {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase());
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
+                    .getBase());
         }
         clickTBShareYourScreenWithSelectedUserInSPSView();
     }
@@ -909,8 +910,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         try {
             viewObject.clickContextMenuOfTreeInView(
                 SarosConstant.VIEW_TITLE_ROSTER,
-                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
-                jid.getBase());
+                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES, jid
+                    .getBase());
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
@@ -1031,6 +1032,14 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         openClass(projectName, packageName, className);
         activateJavaEditor(className);
         editorObject.setTextinEditor(contents, className + ".java");
+    }
+
+    public void typeTextInJavaEditor(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException {
+        String contents = state.getContents(contentPath);
+        openClass(projectName, packageName, className);
+        activateJavaEditor(className);
+        editorObject.typeTextInEditor(contents, className + ".java");
     }
 
     /*******************************************************************************

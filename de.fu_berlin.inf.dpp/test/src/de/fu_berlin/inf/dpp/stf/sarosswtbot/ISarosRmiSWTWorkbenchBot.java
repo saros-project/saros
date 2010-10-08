@@ -285,4 +285,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException;
+
+    public void typeTextInJavaEditor(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException;
 }

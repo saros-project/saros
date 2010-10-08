@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
@@ -27,6 +29,32 @@ public class EditorObject {
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.setText(contents);
         e.save();
+    }
+
+    public void typeTextInEditor(String contents, String fileName) {
+        SWTBotEclipseEditor e = getTextEditor(fileName);
+        e.navigateTo(2, 0);
+        e.pressShortcut(SWT.CTRL, '.');
+        e.quickfix("Add unimplemented methods");
+        e.navigateTo(7, 0);
+        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        e.autoCompleteProposal("sys", "sysout - print to standard out");
+        e.typeText("\"HelloWorld\"");
+        e.navigateTo(3, 0);
+        e.autoCompleteProposal("main", "main - main method");
+        e.typeText("new Thread (new HelloWorld ());");
+
+        // e.typeText("thread.start();\n");
+        // e.typeText("thread.join();");
+        // SWTBotPreferences.KEYBOARD_LAYOUT = "DE_DE";
+        // e.quickfix("Add throws declaration");
+        // e.pressShortcut(SWT.NONE, (char) 27);
+        // e.pressShortcut(SWT.NONE, '\n');
+        //
+        // e.pressShortcut(SWT.CTRL, 's');
+        //
+        // e.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
+        // e.pressShortcut(SWT.NONE, 'j');
     }
 
     public SWTBotEclipseEditor getTextEditor(String fileName) {
