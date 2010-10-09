@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -31,25 +30,33 @@ public class EditorObject {
         e.save();
     }
 
-    public void typeTextInEditor(String contents, String fileName) {
-        SWTBotEclipseEditor e = getTextEditor(fileName);
-        e.navigateTo(2, 0);
-        e.pressShortcut(SWT.CTRL, '.');
-        e.quickfix("Add unimplemented methods");
-        e.navigateTo(7, 0);
+    public void typeTextInEditor(String contents, final String fileName) {
+
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        e.autoCompleteProposal("sys", "sysout - print to standard out");
-        e.typeText("\"HelloWorld\"");
+        SWTBotEclipseEditor e = getTextEditor(fileName);
         e.navigateTo(3, 0);
         e.autoCompleteProposal("main", "main - main method");
-        e.typeText("new Thread (new HelloWorld ());");
+        e.autoCompleteProposal("sys", "sysout - print to standard out");
+        e.typeText("System.currentTimeMillis()");
+
+        // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        // SWTBotEclipseEditor e = getTextEditor(fileName);
+        // e.navigateTo(3, 0);
+        // e.pressShortcut(SWT.CTRL, '.');
+        // e.quickfix("Add unimplemented methods");
+        // e.navigateTo(7, 0);
+        //
+        // e.navigateTo(3, 0);
+        // e.autoCompleteProposal("main", "main - main method");
+        // e.autoCompleteProposal("sys", "sysout - print to standard out");
+        // e.typeText("System.currentTimeMillis()");
 
         // e.typeText("thread.start();\n");
         // e.typeText("thread.join();");
         // SWTBotPreferences.KEYBOARD_LAYOUT = "DE_DE";
         // e.quickfix("Add throws declaration");
         // e.pressShortcut(SWT.NONE, (char) 27);
-        // e.pressShortcut(SWT.NONE, '\n');
+        // e.pressShortcut(SWT.NmainONE, '\n');
         //
         // e.pressShortcut(SWT.CTRL, 's');
         //

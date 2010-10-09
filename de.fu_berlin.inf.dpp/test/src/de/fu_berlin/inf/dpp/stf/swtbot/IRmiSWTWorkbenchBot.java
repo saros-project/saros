@@ -118,6 +118,19 @@ public interface IRmiSWTWorkbenchBot extends Remote {
         throws RemoteException;
 
     /**
+     * Adds a new folder into the src folder of a project.
+     * 
+     * @param projectname
+     *            The project name
+     * @param folderName
+     *            The fully-qualified name of the folder (without the
+     *            projectName prefix)
+     * @throws RemoteException
+     */
+    public void newFolder(String projectName, String folderName)
+        throws RemoteException;
+
+    /**
      * Adds a new Java Project with a random name with prefix
      * 
      * <pre>
@@ -618,6 +631,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void renameFile(String newName, String... texts)
         throws RemoteException;
 
+    public void renameFolder(String project, String oldPath, String newPath)
+        throws RemoteException;
+
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException;
 
@@ -627,7 +643,13 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void waitUntilClassNotExist(String projectName, String pkg,
         String className) throws RemoteException;
 
+    public void waitUntilFolderExist(String projectName, String path)
+        throws RemoteException;
+
     public boolean isPkgExist(String projectName, String pkg)
+        throws RemoteException;
+
+    public boolean isFolderExist(String projectName, String folderName)
         throws RemoteException;
 
     public void newPackage(String projectName, String pkg)

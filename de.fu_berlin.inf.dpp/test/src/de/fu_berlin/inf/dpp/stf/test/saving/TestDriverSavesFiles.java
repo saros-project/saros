@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestDriverSavesFiles {
@@ -66,8 +67,8 @@ public class TestDriverSavesFiles {
         /*
          * build session with bob and carl simultaneously
          */
-        // alice.buildSessionConcurrently(PROJECT,
-        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl, dave, edna);
+        alice.buildSessionConcurrently(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl, dave, edna);
     }
 
     /**

@@ -372,6 +372,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilShellCloses("Rename Compilation Unit");
     }
 
+    public void renameFolder(String projectName, String oldPath, String newPath)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] nodes = { projectName, oldPath };
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nodes, "Refactor",
+            "Rename...");
+        waitUntilShellActive("Rename Resource");
+        delegate.textWithLabel("New name:").setText(newPath);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        delegate.button(SarosConstant.BUTTON_OK).click();
+        waitUntilShellCloses("Rename Resource");
+    }
+
     public void renamePkg(String newName, String... texts)
         throws RemoteException {
         showViewPackageExplorer();
@@ -569,6 +584,40 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 waitUntilShellCloses("New java Package");
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new package";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+    }
+
+    /**
+     * Create a new folder. Via File -> New -> Folder.
+     * 
+     * 1. If the folder already exists, return.
+     * 
+     * 2. Activate saros instance window. If workbench isn't active, delegate
+     * can't find main menus.
+     * 
+     * 3. Click menu: File -> New -> Folder.
+     * 
+     * 4. Confirm pop-up window "New Folder".
+     * 
+     * 
+     */
+    public void newFolder(String projectName, String folderName)
+        throws RemoteException {
+        if (!isFolderExist(projectName, folderName))
+            try {
+                activateEclipseShell();
+                delegate.menu("File").menu("New").menu("Folder").click();
+                SWTBotShell shell = delegate.shell("New Folder");
+                shell.activate();
+                delegate.textWithLabel("Enter or select the parent folder:")
+                    .setText(projectName);
+                delegate.textWithLabel("Folder name:").setText(folderName);
+                delegate.button("Finish").click();
+                delegate.waitUntil(Conditions.shellCloses(shell));
+            } catch (WidgetNotFoundException e) {
+                final String cause = "Error creating new folder";
                 log.error(cause, e);
                 throw new RemoteException(cause, e);
             }
@@ -1042,8 +1091,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1052,8 +1101,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
         return project.exists();
     }
 
@@ -1083,9 +1132,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-            path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
         return file.exists();
+    }
+
+    public boolean isFolderExist(String projectName, String folderPath)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/" + folderPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+
+        if (resource == null)
+            return false;
+
+        return true;
     }
 
     public String getURLOfRemoteResource(String fullPath)
@@ -1206,6 +1267,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
             + className + ".java";
         wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
+    }
+
+    public void waitUntilFolderExist(String projectName, String path)
+        throws RemoteException {
+        String wholePath = projectName + "/" + path;
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(wholePath));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)

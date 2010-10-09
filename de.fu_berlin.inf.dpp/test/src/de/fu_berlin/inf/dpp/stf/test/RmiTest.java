@@ -20,6 +20,7 @@ public class RmiTest {
 
     private static Musician alice;
     private String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String FOLDER = BotConfiguration.FOLDERNAME;
     private static final String CP = BotConfiguration.CONTENTPATH;
 
     @BeforeClass
@@ -39,6 +40,14 @@ public class RmiTest {
     }
 
     @Test
+    public void testFolder() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        if (!alice.bot.isFolderExist(PROJECT, FOLDER))
+            alice.bot.newFolder(PROJECT, FOLDER);
+    }
+
+    @Test
+    @Ignore
     public void testTypeTextInEditor() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClassImplementsRunnable(PROJECT, "pkg", "Cls");
