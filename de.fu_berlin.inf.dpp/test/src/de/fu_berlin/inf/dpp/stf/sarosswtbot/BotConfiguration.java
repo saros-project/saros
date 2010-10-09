@@ -40,6 +40,7 @@ public class BotConfiguration {
     public final static String PACKAGENAME = "my.pkg";
     public final static String PACKAGENAME2 = "my.pkg2";
     public final static String PACKAGENAME3 = "my.pkg3";
+    public final static String FOLDERNAME = "MyFolder";
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
     public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
         + ".java";
@@ -80,27 +81,27 @@ public class BotConfiguration {
     /**
      * Local test accounts
      */
-    private final static String JID_ALICE_LOCAL = ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_ALICE_LOCAL = "lin";
-    // private final static String JID_ALICE_LOCAL = ("alice1_fu@jabber.ccc.de/"
-    // + Saros.RESOURCE);
-    // private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
+    // private final static String JID_ALICE_LOCAL =
+    // ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_ALICE_LOCAL = "lin";
+    private final static String JID_ALICE_LOCAL = ("alice1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
     private final static String HOST_ALICE_LOCAL = "localhost";
     private final static int PORT_ALICE_LOCAL = 12345;
 
-    private final static String JID_BOB_LOCAL = ("lin2@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_BOB_LOCAL = "lin2";
-    // private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
+    // private final static String JID_BOB_LOCAL =
+    // ("lin2@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_BOB_LOCAL = "lin2";
+    private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
     private final static String HOST_BOB_LOCAL = "localhost";
     private final static int PORT_BOB_LOCAL = 12346;
 
-    private final static String JID_CARL_LOCAL = ("lin3@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    private final static String PASSWORD_CARL_LOCAL = "lin3";
-    // private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
-    // private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
+    // private final static String JID_CARL_LOCAL =
+    // ("lin3@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    // private final static String PASSWORD_CARL_LOCAL = "lin3";
+    private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.ccc.de/" + Saros.RESOURCE);
+    private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
     private final static String HOST_CARL_LOCAL = "localhost";
     private final static int PORT_CARL_LOCAL = 12347;
 
@@ -109,7 +110,7 @@ public class BotConfiguration {
     private final static String HOST_DAVE_LOCAL = "localhost";
     private final static int PORT_DAVE_LOCAL = 12348;
 
-    private final static String JID_EDNA_LOCAL = ("edna1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_EDNA_LOCAL = ("edna@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
     private final static String PASSWORD_EDNA_LOCAL = "dddfffggg";
     private final static String HOST_EDNA_LOCAL = "localhost";
     private final static int PORT_EDNA_LOCAL = 12349;
