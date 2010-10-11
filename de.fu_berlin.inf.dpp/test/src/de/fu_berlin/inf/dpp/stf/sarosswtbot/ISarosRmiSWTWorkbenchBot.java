@@ -94,8 +94,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean clickTBDisconnectInRosterView() throws RemoteException;
 
-    public void followUser(ISarosState participantState, JID participatnJid)
-        throws RemoteException;
+    public void followUser(ISarosState stateOfFollowedUser,
+        JID JIDOfFollowedUser) throws RemoteException;
 
     // public void clickCMgiveDriverRoleInSPSView(String inviteeJID)
     // throws RemoteException;
@@ -288,4 +288,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException;
+
+    public void waitUntilNoInvitationProgress() throws RemoteException;
 }

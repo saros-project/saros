@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.swtbot;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -509,10 +511,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     // public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label)
     // throws RemoteException;
-
-    public void waitUntilFileEqualWithFile(String projectName,
-        String packageName, String className, String file)
-        throws RemoteException;
+    public void waitUntilClassContentsSame(String projectName, String pkg,
+        String className, String otherClassContent) throws RemoteException;
 
     // public boolean isTreeItemExist(String viewTitle, String... paths)
     // throws RemoteException;
@@ -697,4 +697,18 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void newClassImplementsRunnable(String projectName, String pkg,
         String className) throws RemoteException;
+
+    public void openClassWith(String whichEditor, String projectName,
+        String packageName, String className) throws RemoteException;
+
+    public void closeJavaEditor(String className) throws RemoteException;
+
+    public String getClassContent(String projectName, String pkg,
+        String className) throws RemoteException, IOException, CoreException;
+
+    public void openClassWithSystemEditor(String projectName, String pkg,
+        String className) throws RemoteException;
+
+    public boolean isClassDirty(String projectName, String pkg, String className)
+        throws RemoteException;
 }

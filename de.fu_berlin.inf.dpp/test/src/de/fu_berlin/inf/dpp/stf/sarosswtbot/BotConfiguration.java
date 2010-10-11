@@ -105,12 +105,12 @@ public class BotConfiguration {
     private final static String HOST_CARL_LOCAL = "localhost";
     private final static int PORT_CARL_LOCAL = 12347;
 
-    private final static String JID_DAVE_LOCAL = ("dave1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_DAVE_LOCAL = ("dave1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_DAVE_LOCAL = "dddfffggg";
     private final static String HOST_DAVE_LOCAL = "localhost";
     private final static int PORT_DAVE_LOCAL = 12348;
 
-    private final static String JID_EDNA_LOCAL = ("edna@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_EDNA_LOCAL = ("edna1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_EDNA_LOCAL = "dddfffggg";
     private final static String HOST_EDNA_LOCAL = "localhost";
     private final static int PORT_EDNA_LOCAL = 12349;

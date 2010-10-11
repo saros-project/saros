@@ -3,9 +3,11 @@ package de.fu_berlin.inf.dpp.stf.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -14,14 +16,28 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
 
     private static Musician alice;
-    private String PROJECT = BotConfiguration.PROJECTNAME;
+
     private static final String FOLDER = BotConfiguration.FOLDERNAME;
+    private static final String PROJECT = BotConfiguration.PROJECTNAME;
+    private static final String PROJECT2 = BotConfiguration.PROJECTNAME2;
+    private static final String PROJECT3 = BotConfiguration.PROJECTNAME3;
+    private static final String PKG = BotConfiguration.PACKAGENAME;
+    private static final String PKG2 = BotConfiguration.PACKAGENAME2;
+    private static final String PKG3 = BotConfiguration.PACKAGENAME3;
+
+    private static final String CLS = BotConfiguration.CLASSNAME;
+    private static final String CLS2 = BotConfiguration.CLASSNAME2;
+    private static final String CLS3 = BotConfiguration.CLASSNAME3;
+
     private static final String CP = BotConfiguration.CONTENTPATH;
+    private static final String CP2 = BotConfiguration.CONTENTPATH2;
+    private static final String CP3 = BotConfiguration.CONTENTPATH3;
 
     @BeforeClass
     public static void initMusican() {
@@ -40,6 +56,40 @@ public class RmiTest {
     }
 
     @Test
+    public void testIsClassDirty() throws RemoteException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        assertFalse(alice.bot.isClassDirty(PROJECT, PKG, CLS));
+        alice.bot.setTextInJavaEditor(CP, PROJECT, PKG, CLS);
+        assertTrue(alice.bot.isClassDirty(PROJECT, PKG, CLS));
+    }
+
+    @Test
+    @Ignore
+    public void testIsClassesSame() throws RemoteException, CoreException,
+        IOException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.bot.newClass(PROJECT, PKG2, CLS);
+        String clsOfPkgProject = alice.bot.getClassContent(PROJECT, PKG, CLS);
+        String clsOfpkg2Project = alice.bot.getClassContent(PROJECT, PKG2, CLS);
+        assertFalse(clsOfPkgProject.equals(clsOfpkg2Project));
+
+        alice.bot.newJavaProjectWithClass(PROJECT2, PKG, CLS);
+        String clsOfPkgProject2 = alice.bot.getClassContent(PROJECT2, PKG, CLS);
+        assertTrue(clsOfPkgProject.equals(clsOfPkgProject2));
+    }
+
+    @Test
+    @Ignore
+    public void testOpenWith() throws RemoteException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.bot.openClassWith(SarosConstant.MENU_TITLE_TEXT_EDITOR, PROJECT,
+            PKG, CLS);
+        alice.bot.openClassWithSystemEditor(PROJECT, PKG, CLS);
+
+    }
+
+    @Test
+    @Ignore
     public void testFolder() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         if (!alice.bot.isFolderExist(PROJECT, FOLDER))

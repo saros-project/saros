@@ -20,7 +20,7 @@ public class MakeOperationConcurrently {
 
     public static <T> List<T> workAll(List<Callable<T>> tasks)
         throws InterruptedException {
-        ExecutorService pool = Executors.newFixedThreadPool(3);
+        ExecutorService pool = Executors.newFixedThreadPool(5);
         final List<Future<T>> futureResult;
         futureResult = pool.invokeAll(tasks);
 

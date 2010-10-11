@@ -433,6 +433,7 @@ public class ViewObject {
                 public void run() {
                     final IWorkbench wb = PlatformUI.getWorkbench();
                     final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+
                     IWorkbenchPage page = win.getActivePage();
                     try {
                         page.showView(viewId);

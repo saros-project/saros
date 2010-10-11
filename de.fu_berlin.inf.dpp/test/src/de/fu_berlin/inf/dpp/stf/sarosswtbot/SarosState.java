@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.sarosswtbot;
 
+import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.jivesoftware.smack.Roster;
 import org.limewire.collection.Tuple;
@@ -12,6 +17,7 @@ import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -155,6 +161,16 @@ public class SarosState implements ISarosState {
         throws RemoteException {
         return dataTransferManager.getTransferMode(destJid).equals(
             NetTransferMode.JINGLEUDP);
+    }
+
+    public boolean isClassDirty(String projectName, String pkg, String className)
+        throws RemoteException, FileNotFoundException {
+
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        return editorManager.isDirty(new SPath(resource));
     }
 
     public boolean isIncomingConnectionSocks5ByteStream(JID destJid)

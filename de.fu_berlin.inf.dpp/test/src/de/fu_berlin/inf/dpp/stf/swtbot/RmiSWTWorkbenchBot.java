@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.swtbot;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
 
+import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -10,6 +11,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -21,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -33,10 +37,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
@@ -272,6 +279,29 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 packageName, className + ".java");
             delegate.sleep(sleepTime);
         }
+    }
+
+    public void openClassWithSystemEditor(String projectName, String pkg,
+        String className) throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        Program.launch(resource.getLocation().toString());
+    }
+
+    public void openClassWith(String whichEditor, String projectName,
+        String packageName, String className) throws RemoteException {
+        SWTBotTree tree = viewObject
+            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        tree.expandNode(projectName, "src", packageName, className + ".java")
+            .select();
+        ContextMenuHelper.clickContextMenu(tree, "Open With", "Other...");
+        waitUntilShellActive("Editor Selection");
+        SWTBotTable table = delegate.table();
+        table.select(whichEditor);
+        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        confirmWindow("Editor Selection", SarosConstant.BUTTON_OK);
     }
 
     public void moveClassTo(String projectName, String pkg, String className,
@@ -1025,6 +1055,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             try {
                 FileUtil.delete(resource);
                 root.refreshLocal(IResource.DEPTH_INFINITE, null);
+
             } catch (CoreException e) {
                 log.debug("Couldn't delete file " + className + ".java", e);
             }
@@ -1110,6 +1141,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(CLS_PATH);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
+
         if (resource == null)
             return false;
         return true;
@@ -1135,6 +1167,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
         return file.exists();
+    }
+
+    public String getClassContent(String projectName, String pkg,
+        String className) throws RemoteException, IOException, CoreException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return mainObject.ConvertStreamToString(file.getContents());
     }
 
     public boolean isFolderExist(String projectName, String folderPath)
@@ -1241,6 +1286,49 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
+    public void closeJavaEditor(String className) throws RemoteException {
+        activateJavaEditor(className);
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                if (page != null) {
+                    page.closeEditor(page.getActiveEditor(), true);
+                }
+            }
+        });
+    }
+
+    public boolean isClassDirty(String projectName, String pkg, String className)
+        throws RemoteException {
+        final List<Boolean> results = new ArrayList<Boolean>();
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+
+                IWorkbenchPage page = win.getActivePage();
+                if (page != null) {
+                    IEditorInput editorInput = new FileEditorInput(file);
+                    try {
+                        page.openEditor(editorInput,
+                            "org.eclipse.jdt.ui.CompilationUnitEditor");
+                    } catch (PartInitException e) {
+                        log.debug("", e);
+                    }
+                    results.add(page.findEditor(editorInput).isDirty());
+                }
+            }
+        });
+        return results.get(0);
+    }
+
     /********************** waitUntil ********************/
 
     public void waitUntilPkgExist(String projectName, String pkg)
@@ -1285,11 +1373,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         wUntilObject.waitUntil(SarosConditions.isInSVN(projectName));
     }
 
-    public void waitUntilFileEqualWithFile(String projectName,
-        String packageName, String className, String file)
-        throws RemoteException {
-        wUntilObject.waitUntil(SarosConditions.isFilesEqual(this, projectName,
-            packageName, className, file));
+    public void waitUntilClassContentsSame(String projectName, String pkg,
+        String className, String otherClassContent) throws RemoteException {
+        wUntilObject.waitUntil(SarosConditions.isClassContentsSame(this,
+            projectName, pkg, className, otherClassContent));
     }
 
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException {
@@ -1415,4 +1502,5 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
         });
     }
+
 }

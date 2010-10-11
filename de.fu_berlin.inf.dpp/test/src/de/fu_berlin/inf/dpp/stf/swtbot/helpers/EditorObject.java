@@ -27,7 +27,7 @@ public class EditorObject {
     public void setTextinEditor(String contents, String fileName) {
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.setText(contents);
-        e.save();
+        // e.save();
     }
 
     public void typeTextInEditor(String contents, final String fileName) {
@@ -35,8 +35,9 @@ public class EditorObject {
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.navigateTo(3, 0);
-        e.autoCompleteProposal("main", "main - main method");
-        e.autoCompleteProposal("sys", "sysout - print to standard out");
+        // e.autoCompleteProposal("main", "main - main method");
+        // e.autoCompleteProposal("sys", "sysout - print to standard out");
+
         e.typeText("System.currentTimeMillis()");
 
         // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";

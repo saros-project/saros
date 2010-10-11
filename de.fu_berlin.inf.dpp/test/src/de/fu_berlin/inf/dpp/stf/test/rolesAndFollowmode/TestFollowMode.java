@@ -2,8 +2,10 @@ package de.fu_berlin.inf.dpp.stf.test.rolesAndFollowmode;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -51,7 +53,7 @@ public class TestFollowMode {
     }
 
     @Test
-    public void testBobFollowAlice() throws RemoteException {
+    public void testBobFollowAlice() throws IOException, CoreException {
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
             PKG, CLS1);
         bob.bot.followUser(alice.state, alice.jid);
@@ -59,14 +61,12 @@ public class TestFollowMode {
         assertTrue(bob.state.isFollowing());
         assertTrue(bob.bot.isJavaEditorActive(CLS1));
 
-        String textFromInviter = alice.bot.getTextOfJavaEditor(PROJECT, PKG,
-            CLS1);
-
-        bob.bot.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
-        // bob.waitUntilFileEqualWithFile(PROJECT, PKG, CLS1, textFromInviter);
-        String textFormInvitee = bob.bot
-            .getTextOfJavaEditor(PROJECT, PKG, CLS1);
-        assertTrue(textFromInviter.equals(textFormInvitee));
+        String clsContentOfAlice = alice.bot
+            .getClassContent(PROJECT, PKG, CLS1);
+        bob.bot.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
+            clsContentOfAlice);
+        String clsContentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS1);
+        assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
         alice.bot.newClass(PROJECT, PKG, CLS2);
         bob.bot.waitUntilJavaEditorActive(CLS2);

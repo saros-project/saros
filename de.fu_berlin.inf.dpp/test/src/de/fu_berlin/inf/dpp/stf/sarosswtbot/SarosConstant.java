@@ -58,6 +58,8 @@ public class SarosConstant {
     public final static String MENU_TITLE_CLASS = "Class";
     public final static String MENU_TITLE_IMPORT = "Import...";
     public final static String MENU_TITLE_JAVA_PROJECT = "Java Project";
+    public final static String MENU_TITLE_SYSTEM_EDITOR = "System Editor";
+    public final static String MENU_TITLE_TEXT_EDITOR = "Text Editor";
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
     public final static String CATEGORY_SAROS = "Saros";

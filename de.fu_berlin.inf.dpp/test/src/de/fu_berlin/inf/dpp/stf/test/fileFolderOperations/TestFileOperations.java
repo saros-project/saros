@@ -3,9 +3,11 @@ package de.fu_berlin.inf.dpp.stf.test.fileFolderOperations;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -91,7 +93,7 @@ public class TestFileOperations {
     }
 
     @Test
-    public void testNewPkgAndClass() throws RemoteException {
+    public void testNewPkgAndClass() throws CoreException, IOException {
         alice.bot.newPackage(PROJECT, PKG2);
         bob.bot.waitUntilPkgExist(PROJECT, PKG2);
         carl.bot.waitUntilPkgExist(PROJECT, PKG2);
@@ -104,20 +106,18 @@ public class TestFileOperations {
         assertTrue(bob.bot.isClassExist(PROJECT, PKG2, CLS));
         assertTrue(carl.bot.isClassExist(PROJECT, PKG2, CLS));
 
-        carl.bot.openClass(PROJECT, PKG2, CLS);
-        carl.bot.waitUntilJavaEditorActive(CLS);
-        bob.bot.openClass(PROJECT, PKG2, CLS);
-        bob.bot.waitUntilJavaEditorActive(CLS);
         alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
             PKG2, CLS);
-        String textFromAlice = alice.bot
-            .getTextOfJavaEditor(PROJECT, PKG2, CLS);
-        carl.bot.waitUntilFileEqualWithFile(PROJECT, PKG2, CLS, textFromAlice);
-        bob.bot.waitUntilFileEqualWithFile(PROJECT, PKG2, CLS, textFromAlice);
-        String textFromCarl = carl.bot.getTextOfJavaEditor(PROJECT, PKG2, CLS);
-        String textFromBob = bob.bot.getTextOfJavaEditor(PROJECT, PKG2, CLS);
-        assertTrue(textFromCarl.equals(textFromAlice));
-        assertTrue(textFromBob.equals(textFromAlice));
+        String clsContentOfAlice = alice.bot
+            .getClassContent(PROJECT, PKG2, CLS);
+        carl.bot.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
+            clsContentOfAlice);
+        bob.bot.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
+            clsContentOfAlice);
+        String clsContentOfBob = bob.bot.getClassContent(PROJECT, PKG2, CLS);
+        String clsContentOfCarl = carl.bot.getClassContent(PROJECT, PKG2, CLS);
+        assertTrue(clsContentOfBob.equals(clsContentOfAlice));
+        assertTrue(clsContentOfCarl.equals(clsContentOfAlice));
     }
 
     @Test

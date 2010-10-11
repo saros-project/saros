@@ -408,8 +408,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public boolean isInSession() throws RemoteException {
         viewObject.activateViewWithTitle("Shared Project Session");
-        return delegate.viewByTitle("Shared Project Session").toolbarButton(
-            "Leave the session").isEnabled();
+        return delegate.viewByTitle("Shared Project Session")
+            .toolbarButton("Leave the session").isEnabled();
     }
 
     public boolean isContactInSessionView(String Contact)
@@ -777,18 +777,18 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         waitUntilSessionCloses();
     }
 
-    public void followUser(ISarosState participantState, JID participatnJid)
-        throws RemoteException {
+    public void followUser(ISarosState stateOfFollowedUser,
+        JID JIDOfFollowedUser) throws RemoteException {
         openSessionView();
         activateSharedSessionView();
-        if (participantState.isDriver(participatnJid))
+        if (stateOfFollowedUser.isDriver(JIDOfFollowedUser))
             viewObject.clickContextMenuOfTableInView(
-                BotConfiguration.NAME_SESSION_VIEW, participatnJid.getBase()
+                BotConfiguration.NAME_SESSION_VIEW, JIDOfFollowedUser.getBase()
                     + " (Driver)", SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER);
 
         else
             viewObject.clickContextMenuOfTableInView(
-                BotConfiguration.NAME_SESSION_VIEW, participatnJid.getBase()
+                BotConfiguration.NAME_SESSION_VIEW, JIDOfFollowedUser.getBase()
                     + "", SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER);
     }
 
@@ -839,14 +839,13 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         openRemoteScreenView();
         if (respondentState.isDriver(respondentJID)) {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
-                    .getBase()
-                    + " (Driver)");
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
+                respondentJID.getBase() + " (Driver)");
 
         } else {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
-                    .getBase());
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
+                respondentJID.getBase());
         }
         clickTBShareYourScreenWithSelectedUserInSPSView();
     }
@@ -910,8 +909,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         try {
             viewObject.clickContextMenuOfTreeInView(
                 SarosConstant.VIEW_TITLE_ROSTER,
-                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES, jid
-                    .getBase());
+                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
+                jid.getBase());
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
@@ -1005,6 +1004,13 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         log.info("wait end " + System.currentTimeMillis());
     }
 
+    public void waitUntilNoInvitationProgress() throws RemoteException {
+        // wUntilObject.waitUntil(SarosConditions
+        // .existNoInvitationProgress(delegate));
+        delegate.waitUntil(SarosConditions.existNoInvitationProgress(delegate),
+            100000);
+    }
+
     public void waitUntilSessionClosedBy(ISarosState state)
         throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isSessionClosed(state));
@@ -1037,6 +1043,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException {
         String contents = state.getContents(contentPath);
+        activateEclipseShell();
         openClass(projectName, packageName, className);
         activateJavaEditor(className);
         editorObject.typeTextInEditor(contents, className + ".java");

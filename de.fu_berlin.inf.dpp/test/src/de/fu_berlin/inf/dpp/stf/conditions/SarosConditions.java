@@ -13,7 +13,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
 public class SarosConditions extends Conditions {
 
@@ -68,9 +69,11 @@ public class SarosConditions extends Conditions {
         return new isViewActive(bot, name);
     }
 
-    public static ICondition isFilesEqual(RmiSWTWorkbenchBot bot,
-        String projectName, String packageName, String className, String name) {
-        return new isFilesEqual(bot, projectName, packageName, className, name);
+    public static ICondition isClassContentsSame(IRmiSWTWorkbenchBot bot,
+        String projectName, String pkg, String className,
+        String otherClassContent) {
+        return new IsClassContentsSame(bot, projectName, pkg, className,
+            otherClassContent);
     }
 
     public static ICondition isNotInSVN(String projectName) {
@@ -99,4 +102,7 @@ public class SarosConditions extends Conditions {
         return new IsChatMessageExist(bot, jid, message);
     }
 
+    public static ICondition existNoInvitationProgress(SarosSWTWorkbenchBot bot) {
+        return new ExistNoInvitationProgress(bot);
+    }
 }

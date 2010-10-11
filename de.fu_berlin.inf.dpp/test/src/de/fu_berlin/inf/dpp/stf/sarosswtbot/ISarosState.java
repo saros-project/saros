@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.sarosswtbot;
 
+import java.io.FileNotFoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -136,5 +137,8 @@ public interface ISarosState extends Remote {
     public boolean isFollowing() throws RemoteException;
 
     public boolean isHost(JID jid) throws RemoteException;
+
+    public boolean isClassDirty(String projectName, String pkg, String className)
+        throws RemoteException, FileNotFoundException;
 
 }
