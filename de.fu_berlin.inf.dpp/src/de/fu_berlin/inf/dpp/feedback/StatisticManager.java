@@ -41,7 +41,7 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     protected static final Random random = new Random();
 
-    public static final String INFO_URL = "https://www.inf.fu-berlin.de/w/SE/DPPFeedback"; //$NON-NLS-1$
+    public static final String INFO_URL = "https://www.saros-project.org/Feedback"; //$NON-NLS-1$
 
     public static final String STATISTIC_FILE_NAME = "session-data";
     public static final String STATISTIC_FILE_EXTENSION = ".txt";
