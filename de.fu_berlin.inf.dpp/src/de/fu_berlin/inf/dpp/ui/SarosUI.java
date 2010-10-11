@@ -46,6 +46,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
@@ -84,6 +85,9 @@ public class SarosUI {
 
     @Inject
     VersionManager manager;
+
+    @Inject
+    XMPPAccountStore accountStore;
 
     protected SessionManager sessionManager;
 
@@ -213,13 +217,17 @@ public class SarosUI {
      *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
     public String getDescription(ConnectionState state) {
+        String activeAccount = "No account detected.";
+        if (accountStore.hasActiveAccount()) {
+            activeAccount = accountStore.getActiveAccount().toString();
+        }
         switch (state) {
         case NOT_CONNECTED:
-            return "Not connected";
+            return activeAccount + " Not connected";
         case CONNECTING:
-            return "Connecting...";
+            return activeAccount + " Connecting...";
         case CONNECTED:
-            return "Connected as " + saros.getConnection().getUser();
+            return " Connected as " + saros.getConnection().getUser();
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
@@ -292,8 +300,8 @@ public class SarosUI {
                             + " canceled the role change");
                         Util.runSafeSWTSync(log, new Runnable() {
                             public void run() {
-                                MessageDialog.openInformation(EditorAPI
-                                    .getAWorkbenchWindow().getShell(),
+                                MessageDialog.openInformation(
+                                    EditorAPI.getAWorkbenchWindow().getShell(),
                                     "Role change failed",
                                     "The role change was canceled. "
                                         + Util.getUserDescription(user));
@@ -308,7 +316,8 @@ public class SarosUI {
             });
         } catch (InvocationTargetException e) {
             log.error("Internal Error: ", e);
-            MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
+            MessageDialog.openError(
+                EditorAPI.getAWorkbenchWindow().getShell(),
                 "Role change failed",
                 "Role change failed because of an internal error. "
                     + Util.getUserDescription(user) + " Please try again.");

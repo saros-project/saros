@@ -77,6 +77,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
@@ -334,6 +335,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(XMPPReceiver.class);
         this.container.addComponent(XMPPTransmitter.class);
         this.container.addComponent(RemoteProgressManager.class);
+        this.container.addComponent(XMPPAccountStore.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);

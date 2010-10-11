@@ -62,6 +62,7 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -80,6 +81,7 @@ import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
@@ -100,9 +102,6 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class RosterView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(RosterView.class);
-
-    @Inject
-    protected DiscoveryManager discoveryManager;
 
     public static final Image groupImage = SarosUI.getImage("icons/group.png");
     public static final Image personImage = SarosUI.getImage("icons/user.png");
@@ -170,6 +169,12 @@ public class RosterView extends ViewPart {
 
     @Inject
     protected InvitationProcessObservable invitationProcesses;
+
+    @Inject
+    protected DiscoveryManager discoveryManager;
+
+    @Inject
+    protected XMPPAccountStore accountStore;
 
     /*
      * TODO Maybe we could only update those elements that have been updated
@@ -624,15 +629,21 @@ public class RosterView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
+
         this.composite = parent;
         this.composite.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
 
         final GridLayout layout = new GridLayout(1, true);
         composite.setLayout(layout);
-
         this.label = new Label(composite, SWT.LEFT);
-        this.label.setText("Not Connected");
+        this.accountStore.loadAccounts();
+        if (this.accountStore.getActiveAccount() != null) {
+            this.label.setText(String.format("%s Not Connected",
+                this.accountStore.getActiveAccount()));
+        } else {
+            this.label.setText("No active account detected!");
+        }
         this.label.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
         this.label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -659,6 +670,14 @@ public class RosterView extends ViewPart {
             saros.getConnectionState());
         rosterListener.rosterChanged(saros.getRoster());
     }
+
+    /*
+     * private String[] createAccountStringArray(List<XMPPAccount> accounts) {
+     * String[] result = new String[accounts.size()]; for (int i = 0; i <
+     * accounts.size(); i++) { // format is username@server String
+     * accountAsString = accounts.get(i).toString(); result[i] =
+     * accountAsString; } return result; }
+     */
 
     @Override
     public void dispose() {
@@ -793,7 +812,8 @@ public class RosterView extends ViewPart {
             sarosUI, saros, bars.getStatusLineManager(), statisticManager,
             errorLogManager, preferenceUtils);
         disposables.add(connectAction);
-        toolBarManager.add(connectAction);
+        toolBarManager.add(new ChangeXMPPAccountAction());
+        // toolBarManager.add(connectAction);
         toolBarManager.add(new NewContactAction(saros));
     }
 
@@ -805,7 +825,6 @@ public class RosterView extends ViewPart {
         manager.add(this.renameContactAction);
         manager.add(this.deleteContactAction);
         manager.add(this.testAction);
-
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
