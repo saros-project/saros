@@ -89,7 +89,7 @@ public class FileListDiff {
                     FileListData fileData = entry.getValue();
                     FileListData otherFileData = target.entries.get(path);
 
-                    if (fileData.equals(otherFileData)) {
+                    if (fileData.checksum == otherFileData.checksum) {
                         result.unaltered.add(path);
                     } else {
                         result.altered.add(path);

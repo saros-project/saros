@@ -220,7 +220,25 @@ class SubclipseAdapter extends VCSAdapter {
             monitor.done();
         }
         try {
-            resource.refreshLocal(IResource.DEPTH_ZERO, null);
+            resource.refreshLocal(IResource.DEPTH_INFINITE, null);
+        } catch (CoreException e) {
+            log.error("Refresh failed", e);
+        }
+    }
+
+    @Override
+    public void revert(IResource resource, SubMonitor monitor) {
+        if (!isManaged(resource))
+            return;
+        ISVNLocalResource svnResource = SVNWorkspaceRoot
+            .getSVNResourceFor(resource);
+        try {
+            svnResource.revert();
+        } catch (SVNException e) {
+            log.error("Couldn't revert " + resource.toString(), e);
+        }
+        try {
+            resource.refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
             log.error("Refresh failed", e);
         }

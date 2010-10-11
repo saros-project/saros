@@ -70,7 +70,7 @@ public class FileList {
 
     protected final boolean useVersionControl;
 
-    /** The actual file list data. */
+    /** The actual file list data. Keys are project relative paths. */
     protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
     /** Identifies the VCS used. */
     protected String vcsProviderID;
@@ -84,40 +84,60 @@ public class FileList {
         /** Checksum of this file. */
         public long checksum;
         /** Identifies the version of this file in the repository. */
-        String vcsRevision;
+        VCSResourceInfo vcsInfo;
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) {
+            if (this == obj)
                 return true;
-            }
-
-            if (!(obj instanceof FileListData)) {
+            if (obj == null)
                 return false;
-            }
+            if (getClass() != obj.getClass())
+                return false;
             FileListData other = (FileListData) obj;
-            return checksum == other.checksum
-                && (vcsRevision == null || vcsRevision
-                    .equals(other.vcsRevision));
+            if (checksum != other.checksum)
+                return false;
+            if (vcsInfo == null) {
+                if (other.vcsInfo != null)
+                    return false;
+            } else if (!vcsInfo.equals(other.vcsInfo))
+                return false;
+            return true;
         }
 
         @Override
         public int hashCode() {
-
-            return super.hashCode();
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (int) (checksum ^ (checksum >>> 32));
+            result = prime * result
+                + ((vcsInfo == null) ? 0 : vcsInfo.hashCode());
+            return result;
         }
 
         @Override
         public String toString() {
-            return "FLD> " + checksum + " " + vcsRevision;
+            return "FLD[" + checksum + ", " + vcsInfo + "]";
         }
+
     }
 
     public String getVCSRevision(IPath path) {
+        if (path.isEmpty())
+            return vcsProjectInfo.revision;
         FileListData fileListData = entries.get(path);
         if (fileListData == null)
             return null;
-        return fileListData.vcsRevision;
+        return fileListData.vcsInfo.revision;
+    }
+
+    public String getVCSUrl(IPath path) {
+        if (path.isEmpty())
+            return vcsProjectInfo.url;
+        FileListData fileListData = entries.get(path);
+        if (fileListData == null)
+            return null;
+        return fileListData.vcsInfo.url;
     }
 
     public static class PathLengthComparator implements Comparator<IPath>,
@@ -401,14 +421,11 @@ public class FileList {
 
     private boolean addVCSInfo(IResource resource, FileListData data,
         VCSAdapter vcs) {
-        String revision = vcs.getRevisionString(resource);
-        if (revision == null)
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        if (info == null)
             return false;
 
-        // TODO ndh: Only add vcs information to tell the client that an update
-        // might be necessary, because this file's revision differs from the
-        // project revision.
-        data.vcsRevision = revision;
+        data.vcsInfo = info;
         return true;
     }
 

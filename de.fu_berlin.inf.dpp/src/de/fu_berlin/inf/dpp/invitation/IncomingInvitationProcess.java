@@ -32,6 +32,7 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -74,6 +75,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * @author rdjemili
@@ -257,6 +259,10 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
         assignLocalProject(baseProject, newProjectName, vcs, monitor);
 
+        if (vcs != null) {
+            initVcState(baseProject, vcs, monitor);
+        }
+
         // TODO joining the session will already send events, which will be
         // rejected by our peers, because they don't know us yet (JoinMessage is
         // sent only later)
@@ -301,6 +307,79 @@ public class IncomingInvitationProcess extends InvitationProcess {
         completeInvitation();
     }
 
+    /**
+     * Recursively synchronizes the version control state (URL and revision) of
+     * each resource in the project with the host by switching or updating when
+     * necessary.<br>
+     * <br>
+     * It's very hard to predict how many resources have to be changed. In the
+     * worst case, every resource has to be changed as many times as the number
+     * of segments in its path. Due to these complications, the monitor is only
+     * used for cancellation and the label, but not for the progress bar.
+     * 
+     * @throws SarosCancellationException
+     */
+    private void initVcState(IResource resource, VCSAdapter vcs,
+        SubMonitor monitor) throws SarosCancellationException {
+        if (monitor.isCanceled())
+            return;
+
+        if (!vcs.isManaged(resource))
+            return;
+
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        final IPath path = resource.getProjectRelativePath();
+        if (resource instanceof IProject) {
+            /*
+             * We have to revert the project first because the invitee could
+             * have deleted a managed resource. Also, we don't want an update or
+             * switch to cause an unresolved conflict here. The revert might
+             * leave some unmanaged files, but these will get cleaned up later;
+             * we're only concerned with managed files here.
+             */
+            vcs.revert(resource, monitor);
+        }
+
+        String url = remoteFileList.getVCSUrl(path);
+        String revision = remoteFileList.getVCSRevision(path);
+        if (url == null || revision == null) {
+            // The resource might have been deleted.
+            return;
+        }
+        if (!info.url.equals(url)) {
+            vcs.switch_(resource, url, revision, monitor);
+        } else if (!info.revision.equals(revision)) {
+            vcs.update(resource, revision, monitor);
+        }
+        if (monitor.isCanceled())
+            return;
+
+        if (resource instanceof IContainer) {
+            // Recurse.
+            try {
+                final IResource[] children = ((IContainer) resource).members();
+                for (IResource child : children) {
+                    initVcState(child, vcs, monitor);
+                    if (monitor.isCanceled())
+                        break;
+                }
+            } catch (CoreException e) {
+                /*
+                 * We shouldn't ever get here. CoreExceptions are thrown e.g. if
+                 * the project is closed or the resource doesn't exist, both of
+                 * which are impossible at this point.
+                 */
+                log.error("Unknown error while trying to initialize the "
+                    + "children of " + resource.toString() + ".", e);
+                localCancel(
+                    "Could not initialize the project's version control state, "
+                        + "please try again without VCS support.",
+                    CancelOption.NOTIFY_PEER);
+                executeCancellation();
+            }
+        }
+    }
+
     private void acceptStream() throws SarosCancellationException {
         try {
             archiveStreamService.startLock.lock();
@@ -323,6 +402,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         InputStream in = newSession.getInputStream(0);
         ZipInputStream zin = new ZipInputStream(in);
         try {
+
             ZipEntry ze = null;
             monitor.beginTask("Receiving project files...", 100);
 
@@ -433,25 +513,6 @@ public class IncomingInvitationProcess extends InvitationProcess {
             return new FileList();
         }
 
-        if (vcs != null) {
-            // Update files if necessary.
-            List<IPath> modifiedPaths = filesToSynchronize.getAlteredPaths();
-            for (IPath path : modifiedPaths) {
-                String targetRevision = this.remoteFileList
-                    .getVCSRevision(path);
-                String currentRevision = localFileList.getVCSRevision(path);
-                if (currentRevision == null
-                    || currentRevision.equals(targetRevision))
-                    continue;
-
-                IFile file = this.localProject.getFile(path);
-                vcs.update(file, targetRevision, monitor);
-                long updatedChecksum = FileUtil.checksum(file);
-                long targetChecksum = this.remoteFileList.getChecksum(path);
-                if (updatedChecksum == targetChecksum)
-                    missingFiles.remove(path);
-            }
-        }
         return new FileList(missingFiles);
     }
 
@@ -460,10 +521,6 @@ public class IncomingInvitationProcess extends InvitationProcess {
      * Use baseProject if it's not null. Otherwise check out from VCS if
      * possible. Otherwise create a new project.
      * 
-     * @param baseProject
-     * @param newProjectName
-     * @param vcs
-     * @param monitor
      * @throws LocalCancellationException
      */
     private void assignLocalProject(final IProject baseProject,
@@ -471,8 +528,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         throws LocalCancellationException {
         if (newProjectName == null) {
             this.localProject = baseProject;
+            // TODO the project could be managed by a different Team provider
             if (vcs != null && !vcs.isManaged(localProject)) {
-                // TODO This should be handled with a VCSActivity.
                 String repositoryRoot = remoteFileList.getRepositoryRoot();
                 final String url = remoteFileList.getProjectInfo().url;
                 String directory = url.substring(repositoryRoot.length());

@@ -119,6 +119,13 @@ public abstract class VCSAdapter {
         String revision, IProgressMonitor monitor);
 
     /**
+     * Reverts the local changes to the resource.
+     * 
+     * @param monitor
+     */
+    public abstract void revert(IResource resource, SubMonitor monitor);
+
+    /**
      * Creates VCS specific information for the resource.
      * 
      * @param resource
