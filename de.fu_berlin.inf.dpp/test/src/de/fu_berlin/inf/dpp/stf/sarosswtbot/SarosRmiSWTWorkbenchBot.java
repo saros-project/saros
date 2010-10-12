@@ -312,6 +312,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (isConnectedByXMPP()) {
             clickTBDisconnectInRosterView();
             waitUntilDisConnected();
+            // sleep(200);
         }
     }
 
@@ -991,11 +992,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void waitUntilConnected() {
-        wUntilObject.waitUntil(SarosConditions.isConnect(state));
+        wUntilObject.waitUntil(SarosConditions.isConnect(delegate));
     }
 
     public void waitUntilDisConnected() {
-        wUntilObject.waitUntil(SarosConditions.isDisConnected(state));
+        wUntilObject.waitUntil(SarosConditions.isDisConnected(delegate));
     }
 
     public void waitUntilSessionCloses() throws RemoteException {

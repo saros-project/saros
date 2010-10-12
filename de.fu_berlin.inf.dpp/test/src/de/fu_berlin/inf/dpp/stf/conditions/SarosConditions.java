@@ -19,12 +19,12 @@ import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
 public class SarosConditions extends Conditions {
 
-    public static ICondition isConnect(ISarosState state) {
-        return new IsConnect(state);
+    public static ICondition isConnect(SarosSWTWorkbenchBot bot) {
+        return new IsConnect(bot);
     }
 
-    public static ICondition isDisConnected(ISarosState state) {
-        return new isDisConnected(state);
+    public static ICondition isDisConnected(SarosSWTWorkbenchBot bot) {
+        return new isDisConnected(bot);
     }
 
     public static ICondition existTreeItem(SWTBotTreeItem treeItem,
