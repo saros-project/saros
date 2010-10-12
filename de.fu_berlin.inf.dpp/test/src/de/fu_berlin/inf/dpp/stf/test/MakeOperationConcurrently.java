@@ -18,9 +18,9 @@ public class MakeOperationConcurrently {
     private final static Logger log = Logger
         .getLogger(MakeOperationConcurrently.class);
 
-    public static <T> List<T> workAll(List<Callable<T>> tasks)
-        throws InterruptedException {
-        ExecutorService pool = Executors.newFixedThreadPool(5);
+    public static <T> List<T> workAll(List<Callable<T>> tasks,
+        int numberOfThread) throws InterruptedException {
+        ExecutorService pool = Executors.newFixedThreadPool(numberOfThread);
         final List<Future<T>> futureResult;
         futureResult = pool.invokeAll(tasks);
 
@@ -56,7 +56,7 @@ public class MakeOperationConcurrently {
             });
         }
         log.trace("workAll(leaveTasks)");
-        final List<Boolean> workAll = workAll(leaveTasks);
+        final List<Boolean> workAll = workAll(leaveTasks, leaveTasks.size());
 
         return workAll;
     }

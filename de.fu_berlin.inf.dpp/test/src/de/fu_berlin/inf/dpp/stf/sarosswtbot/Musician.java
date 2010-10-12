@@ -113,7 +113,8 @@ public class Musician {
             });
         }
         log.trace("workAll(joinSessionTasks)");
-        MakeOperationConcurrently.workAll(joinSessionTasks);
+        MakeOperationConcurrently.workAll(joinSessionTasks,
+            joinSessionTasks.size());
     }
 
     /**
@@ -148,7 +149,8 @@ public class Musician {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(closeSessionTasks);
+        MakeOperationConcurrently.workAll(closeSessionTasks,
+            closeSessionTasks.size());
     }
 
     /**
@@ -181,7 +183,7 @@ public class Musician {
         for (Musician musician : musicians) {
             peerJIDs.add(musician.jid);
         }
-        MakeOperationConcurrently.workAll(leaveTasks);
+        MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         bot.waitUntilAllPeersLeaveSession(peerJIDs);
         bot.clickTBLeaveTheSessionInSPSView();
         bot.waitUntilSessionCloses();

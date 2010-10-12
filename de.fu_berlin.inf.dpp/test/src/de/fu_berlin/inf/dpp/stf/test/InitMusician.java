@@ -120,7 +120,7 @@ public class InitMusician {
         initTasks.add(newAliceCallable());
         initTasks.add(newBobCallable());
         initTasks.add(newCarlCallable());
-        return MakeOperationConcurrently.workAll(initTasks);
+        return MakeOperationConcurrently.workAll(initTasks, 3);
 
     }
 
@@ -148,7 +148,7 @@ public class InitMusician {
                 break;
             }
         }
-        return MakeOperationConcurrently.workAll(initTasks);
+        return MakeOperationConcurrently.workAll(initTasks, initTasks.size());
     }
 
     public static void addContacts(List<Musician> musicians)
