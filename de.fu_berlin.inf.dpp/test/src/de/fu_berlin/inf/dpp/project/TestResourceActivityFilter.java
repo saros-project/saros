@@ -24,8 +24,8 @@ import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class TestSharedResourcesManager {
-    private SharedResourcesManager.ResourceActivityFilter collector;
+public class TestResourceActivityFilter {
+    private ResourceActivityFilter filter;
     private VCSActivity switch_p;
     private VCSActivity switch_p_a;
     private VCSActivity switch_p_b;
@@ -58,7 +58,7 @@ public class TestSharedResourcesManager {
         switch_p_a = switch_(source, newSPath("/p/a"));
         switch_p_b = switch_(source, newSPath("/p/b"));
 
-        collector = new SharedResourcesManager.ResourceActivityFilter();
+        filter = new ResourceActivityFilter();
     }
 
     public @After
@@ -68,29 +68,29 @@ public class TestSharedResourcesManager {
 
     public @Test
     void init() throws Exception {
-        final List<IResourceActivity> collected = collector.retrieveAll();
+        final List<IResourceActivity> collected = filter.retrieveAll();
         assertTrue(collected != null);
         assertTrue(collected != null && collected.isEmpty());
     }
 
     public @Test
     void addRemove() throws Exception {
-        collector.enter(add_p_a);
-        final List<IResourceActivity> collected = collector.retrieveAll();
+        filter.enter(add_p_a);
+        final List<IResourceActivity> collected = filter.retrieveAll();
         assertEquals(1, collected.size());
         // Don't use equals() here.
         assertTrue(add_p_a == collected.get(0));
-        assertTrue(collector.retrieveAll().isEmpty());
+        assertTrue(filter.retrieveAll().isEmpty());
     }
 
     public @Test
     void filterIncludedActivity() throws Exception {
         assertTrue(switch_p.includes(add_p_a));
 
-        collector.enter(add_p_a);
-        collector.enter(switch_p);
+        filter.enter(add_p_a);
+        filter.enter(switch_p);
 
-        final List<IResourceActivity> collected = collector.retrieveAll();
+        final List<IResourceActivity> collected = filter.retrieveAll();
         assertEquals(1, collected.size());
         // Don't use equals() here.
         assertTrue(switch_p == collected.get(0));
@@ -101,10 +101,10 @@ public class TestSharedResourcesManager {
         assertFalse(switch_p_b.includes(switch_p_a));
         assertFalse(switch_p_a.includes(switch_p_b));
 
-        collector.enter(switch_p_a);
-        collector.enter(switch_p_b);
+        filter.enter(switch_p_a);
+        filter.enter(switch_p_b);
 
-        final List<IResourceActivity> collected = collector.retrieveAll();
+        final List<IResourceActivity> collected = filter.retrieveAll();
         assertEquals(2, collected.size());
         IResourceActivity c0 = collected.get(0);
         IResourceActivity c1 = collected.get(1);
