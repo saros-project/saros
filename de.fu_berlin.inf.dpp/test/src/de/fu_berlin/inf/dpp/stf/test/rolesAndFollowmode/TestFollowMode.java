@@ -54,7 +54,7 @@ public class TestFollowMode {
 
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT,
             PKG, CLS1);
         bob.bot.followUser(alice.state, alice.jid);
         bob.bot.waitUntilJavaEditorActive(CLS1);
@@ -63,6 +63,7 @@ public class TestFollowMode {
 
         String clsContentOfAlice = alice.bot
             .getClassContent(PROJECT, PKG, CLS1);
+
         bob.bot.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
             clsContentOfAlice);
         String clsContentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS1);
@@ -81,7 +82,7 @@ public class TestFollowMode {
         bob.bot.followUser(alice.state, alice.jid);
         alice.bot.newClass(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH3, PROJECT,
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3, PROJECT,
             PKG, CLS3);
         alice.bot.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,

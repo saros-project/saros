@@ -151,6 +151,18 @@ public class InitMusician {
         return MakeOperationConcurrently.workAll(initTasks);
     }
 
+    public static void addContacts(List<Musician> musicians)
+        throws RemoteException {
+        for (int i = 0; i < musicians.size(); i++) {
+            Musician musican = musicians.get(i);
+            for (int j = i + 1; j < musicians.size(); j++) {
+                Musician addedMuscian = musicians.get(j);
+                if (!musican.bot.hasContactWith(addedMuscian.jid))
+                    musican.bot.addContact(addedMuscian.jid, addedMuscian.bot);
+            }
+        }
+    }
+
     public static Callable<Musician> newAliceCallable() {
         return new Callable<Musician>() {
             public Musician call() throws Exception {

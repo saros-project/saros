@@ -56,11 +56,36 @@ public class RmiTest {
     }
 
     @Test
+    public void testCloseEditorWithSave() throws IOException, CoreException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        String dirtyClsContentOfAlice = alice.bot.getTextOfJavaEditor(PROJECT2,
+            PKG, CLS);
+        alice.bot.closeJavaEditorWithSave(CLS);
+        String clsContentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
+        assertTrue(dirtyClsContentOfAlice.equals(clsContentOfAlice));
+    }
+
+    @Test
+    public void testCloseEditorWithoutSave() throws IOException, CoreException {
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        String dirtyClsContentOfAlice = alice.bot.getTextOfJavaEditor(PROJECT2,
+            PKG, CLS);
+        alice.bot.closejavaEditorWithoutSave(CLS);
+        String clsContentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
+        assertFalse(dirtyClsContentOfAlice.equals(clsContentOfAlice));
+    }
+
+    @Test
+    @Ignore
     public void testIsClassDirty() throws RemoteException {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        assertFalse(alice.bot.isClassDirty(PROJECT, PKG, CLS));
-        alice.bot.setTextInJavaEditor(CP, PROJECT, PKG, CLS);
-        assertTrue(alice.bot.isClassDirty(PROJECT, PKG, CLS));
+        assertFalse(alice.bot.isClassDirty(PROJECT, PKG, CLS,
+            SarosConstant.ID_JAVA_EDITOR));
+        alice.bot.setTextInJavaEditorWithSave(CP, PROJECT, PKG, CLS);
+        assertTrue(alice.bot.isClassDirty(PROJECT, PKG, CLS,
+            SarosConstant.ID_JAVA_EDITOR));
     }
 
     @Test

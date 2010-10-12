@@ -106,7 +106,7 @@ public class TestFileOperations {
         assertTrue(bob.bot.isClassExist(PROJECT, PKG2, CLS));
         assertTrue(carl.bot.isClassExist(PROJECT, PKG2, CLS));
 
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT,
             PKG2, CLS);
         String clsContentOfAlice = alice.bot
             .getClassContent(PROJECT, PKG2, CLS);

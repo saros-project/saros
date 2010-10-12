@@ -78,7 +78,7 @@ public class TestEditDuringInvitation {
         carl.bot.confirmSessionInvitationWindowStep1(alice.getPlainJid());
 
         log.trace("bob.setTextInJavaEditor");
-        bob.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT, PKG,
+        bob.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT, PKG,
             CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");

@@ -1004,9 +1004,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         log.info("wait end " + System.currentTimeMillis());
     }
 
+    /**
+     * For some tests a host need to invite many peers concurrently and some
+     * operations should not be performed if the invitation processes aren't
+     * finished yet. In this case, you can use this method to guarantee, that
+     * host wait so long until all the invitation Processes are finished.
+     */
     public void waitUntilNoInvitationProgress() throws RemoteException {
-        // wUntilObject.waitUntil(SarosConditions
-        // .existNoInvitationProgress(delegate));
+        openProgressView();
+        activateProgressView();
         delegate.waitUntil(SarosConditions.existNoInvitationProgress(delegate),
             100000);
     }
@@ -1032,12 +1038,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     /******************************/
-    public void setTextInJavaEditor(String contentPath, String projectName,
-        String packageName, String className) throws RemoteException {
+    public void setTextInJavaEditorWithSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
         String contents = state.getContents(contentPath);
         openClass(projectName, packageName, className);
         activateJavaEditor(className);
-        editorObject.setTextinEditor(contents, className + ".java");
+        editorObject.setTextinEditorWithSave(contents, className + ".java");
+    }
+
+    public void setTextInJavaEditorWithoutSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
+        String contents = state.getContents(contentPath);
+        openClass(projectName, packageName, className);
+        activateJavaEditor(className);
+        editorObject.setTextinEditorWithoutSave(contents, className + ".java");
     }
 
     public void typeTextInJavaEditor(String contentPath, String projectName,

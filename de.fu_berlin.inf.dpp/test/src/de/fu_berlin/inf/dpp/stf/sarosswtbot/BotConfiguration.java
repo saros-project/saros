@@ -44,6 +44,9 @@ public class BotConfiguration {
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
     public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
         + ".java";
+
+    public final static String CONTENTCHANGEPATH2 = "test/STF/" + CLASSNAME2
+        + "Change" + ".java";
     public final static String CONTENTPATH3 = "test/STF/" + CLASSNAME3
         + ".java";
     public final static String NAME_ROSTER_VIEW = "ROSTER";

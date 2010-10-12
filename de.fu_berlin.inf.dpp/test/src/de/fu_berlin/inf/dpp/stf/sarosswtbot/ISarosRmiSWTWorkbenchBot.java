@@ -163,8 +163,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
         throws RemoteException;
 
-    public void setTextInJavaEditor(String contentPath, String projectName,
-        String packageName, String className) throws RemoteException;
+    public void setTextInJavaEditorWithSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException;
 
     // public boolean isConnectedByXMPP() throws RemoteException;
 
@@ -290,4 +291,10 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         String packageName, String className) throws RemoteException;
 
     public void waitUntilNoInvitationProgress() throws RemoteException;
+
+    public void setTextInJavaEditorWithoutSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException;
+
+    public void activateProgressView() throws RemoteException;
 }

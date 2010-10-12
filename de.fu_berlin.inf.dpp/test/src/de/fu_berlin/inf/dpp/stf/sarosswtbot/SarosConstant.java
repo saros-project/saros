@@ -110,4 +110,7 @@ public class SarosConstant {
     public final static String ID_CVS_PERSPECTIVE = "org.eclipse.team.cvs.ui.cvsPerspective";
     public final static String ID_RESOURCE_PERSPECTIVE = "org.eclipse.ui.resourcePerspective";
     public final static String ID_SVN_PERSPECTIVE = "org.tigris.subversion.subclipse.ui.svnPerspective";
+
+    public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
+    public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
 }

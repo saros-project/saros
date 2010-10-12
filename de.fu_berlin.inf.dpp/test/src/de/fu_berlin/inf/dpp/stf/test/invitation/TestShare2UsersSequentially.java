@@ -57,7 +57,7 @@ public class TestShare2UsersSequentially {
         alice.bot
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.bot.setTextInJavaEditor(BotConfiguration.CONTENTPATH, PROJECT,
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT,
             PKG, CLS);
 
         log.trace("invitee.openFile");

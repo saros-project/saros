@@ -1169,6 +1169,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return file.exists();
     }
 
+    /**
+     * get the content of the class file, which is saved.
+     */
     public String getClassContent(String projectName, String pkg,
         String className) throws RemoteException, IOException, CoreException {
         IPath path = new Path(projectName + "/src/"
@@ -1265,6 +1268,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         editorObject.activateEditor(className + ".java");
     }
 
+    /**
+     * get content of a class file, which may be not saved.
+     */
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
         openClass(projectName, packageName, className);
@@ -1286,22 +1292,47 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
-    public void closeJavaEditor(String className) throws RemoteException {
+    public void closeJavaEditorWithSave(String className)
+        throws RemoteException {
         activateJavaEditor(className);
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                IWorkbenchPage page = win.getActivePage();
-                if (page != null) {
-                    page.closeEditor(page.getActiveEditor(), true);
-                }
-            }
-        });
+        getJavaEditor(className).save();
+        getJavaEditor(className).close();
+        // Display.getDefault().syncExec(new Runnable() {
+        // public void run() {
+        // final IWorkbench wb = PlatformUI.getWorkbench();
+        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        // IWorkbenchPage page = win.getActivePage();
+        // if (page != null) {
+        // page.closeEditor(page.getActiveEditor(), true);
+        // Shell activateShell = Display.getCurrent().getActiveShell();
+        // activateShell.close();
+        //
+        // }
+        // }
+        // });
     }
 
-    public boolean isClassDirty(String projectName, String pkg, String className)
+    public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
+        activateJavaEditor(className);
+        getJavaEditor(className).close();
+        confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+    }
+
+    /**
+     * Returns whether the contents of this class file have changed since the
+     * last save operation.
+     * <p>
+     * <b>Note:</b> if the class file isn't open, it will be opened first using
+     * the defined editor (parameter: idOfEditor).
+     * </p>
+     * 
+     * @return <code>true</code> if the contents have been modified and need
+     *         saving, and <code>false</code> if they have not changed since the
+     *         last save
+     */
+    public boolean isClassDirty(String projectName, String pkg,
+        String className, final String idOfEditor) throws RemoteException {
         final List<Boolean> results = new ArrayList<Boolean>();
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
@@ -1317,8 +1348,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 if (page != null) {
                     IEditorInput editorInput = new FileEditorInput(file);
                     try {
-                        page.openEditor(editorInput,
-                            "org.eclipse.jdt.ui.CompilationUnitEditor");
+                        page.openEditor(editorInput, idOfEditor);
                     } catch (PartInitException e) {
                         log.debug("", e);
                     }
@@ -1373,9 +1403,44 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         wUntilObject.waitUntil(SarosConditions.isInSVN(projectName));
     }
 
+    /**
+     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
+     * file, which is modified by another peer (e.g. Alice). Because of data
+     * transfer delay Bob need to wait a minute to see the changes . So it will
+     * be a good idea that you give bob some time before you compare the two
+     * files from Alice and Bob.
+     * 
+     * <p>
+     * <b>Note:</b> the mothod is different from
+     * {@link #waitUntilEditorContentSame(String, String, String, String)}. this
+     * method compare only the contents of the class files which is saved.
+     * </p>
+     * * *
+     */
     public void waitUntilClassContentsSame(String projectName, String pkg,
         String className, String otherClassContent) throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isClassContentsSame(this,
+            projectName, pkg, className, otherClassContent));
+    }
+
+    /**
+     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
+     * file, which is modified by another peer (e.g. Alice). Because of data
+     * transfer delay Bob need to wait a minute to see the changes . So it will
+     * be a good idea that you give bob some time before you compare the two
+     * files from Alice and Bob.
+     * 
+     * <p>
+     * <b>Note:</b> the mothod is different from
+     * {@link #waitUntilClassContentsSame(String, String, String, String)}. this
+     * method compare only the contents of the class files which may be not
+     * saved.
+     * </p>
+     * * *
+     */
+    public void waitUntilEditorContentSame(String projectName, String pkg,
+        String className, String otherClassContent) throws RemoteException {
+        wUntilObject.waitUntil(SarosConditions.isEditorContentsSame(this,
             projectName, pkg, className, otherClassContent));
     }
 

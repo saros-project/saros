@@ -701,7 +701,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void openClassWith(String whichEditor, String projectName,
         String packageName, String className) throws RemoteException;
 
-    public void closeJavaEditor(String className) throws RemoteException;
+    public void closeJavaEditorWithSave(String className)
+        throws RemoteException;
 
     public String getClassContent(String projectName, String pkg,
         String className) throws RemoteException, IOException, CoreException;
@@ -709,6 +710,12 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException;
 
-    public boolean isClassDirty(String projectName, String pkg, String className)
+    public boolean isClassDirty(String projectName, String pkg,
+        String className, String idOfEditor) throws RemoteException;
+
+    public void waitUntilEditorContentSame(String projectName, String pkg,
+        String className, String otherClassContent) throws RemoteException;
+
+    public void closejavaEditorWithoutSave(String className)
         throws RemoteException;
 }

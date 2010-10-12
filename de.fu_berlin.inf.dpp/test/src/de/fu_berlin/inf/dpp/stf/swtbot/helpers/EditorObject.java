@@ -24,10 +24,15 @@ public class EditorObject {
         this.wUntil = rmiBot.wUntilObject;
     }
 
-    public void setTextinEditor(String contents, String fileName) {
+    public void setTextinEditorWithSave(String contents, String fileName) {
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.setText(contents);
-        // e.save();
+        e.save();
+    }
+
+    public void setTextinEditorWithoutSave(String contents, String fileName) {
+        SWTBotEclipseEditor e = getTextEditor(fileName);
+        e.setText(contents);
     }
 
     public void typeTextInEditor(String contents, final String fileName) {

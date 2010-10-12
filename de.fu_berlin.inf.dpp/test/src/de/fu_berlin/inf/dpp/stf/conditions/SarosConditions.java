@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
 import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
 
 public class SarosConditions extends Conditions {
@@ -104,5 +105,12 @@ public class SarosConditions extends Conditions {
 
     public static ICondition existNoInvitationProgress(SarosSWTWorkbenchBot bot) {
         return new ExistNoInvitationProgress(bot);
+    }
+
+    public static ICondition isEditorContentsSame(RmiSWTWorkbenchBot bot,
+        String projectName, String packageName, String className,
+        String otherContent) {
+        return new IsEditorContentsSame(bot, projectName, packageName,
+            className, otherContent);
     }
 }
