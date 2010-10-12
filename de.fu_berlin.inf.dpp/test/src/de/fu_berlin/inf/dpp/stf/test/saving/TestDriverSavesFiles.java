@@ -256,7 +256,8 @@ public class TestDriverSavesFiles {
         String contentChangeOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS2);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.bot.waitUntilClassContentsSame(PROJECT, PKG, CLS2,
+        carl.bot.openClass(PROJECT, PKG, CLS2);
+        carl.bot.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
         String contentOfCarl = carl.bot.getTextOfJavaEditor(PROJECT, PKG, CLS2);
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
