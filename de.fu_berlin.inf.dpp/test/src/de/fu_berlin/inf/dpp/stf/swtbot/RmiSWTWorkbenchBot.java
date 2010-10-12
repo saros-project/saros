@@ -29,12 +29,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -167,6 +170,42 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             log.error("Failed", e);
         }
 
+    }
+
+    /*******************************************************************************
+     * 
+     * Progress View Page
+     * 
+     *******************************************************************************/
+    public void openProgressView() throws RemoteException {
+        viewObject.showViewById("org.eclipse.ui.views.ProgressView");
+    }
+
+    public void activateProgressView() throws RemoteException {
+        viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_PROGRESS);
+    }
+
+    public boolean existPorgress() throws RemoteException {
+        openProgressView();
+        activateProgressView();
+        SWTBotView view = delegate.viewByTitle("Progress");
+        view.setFocus();
+        view.toolbarButton("Remove All Finished Operations").click();
+        SWTBot bot = view.bot();
+        try {
+            SWTBotToolbarButton b = bot.toolbarButton();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+
+        // if (b == null)
+        // return false;
+        // else
+        // return true;
+        // if (bot.text().getText().matches("No operations to display.*"))
+        // return false;
+        // return true;
     }
 
     /*******************************************************************************
@@ -1122,8 +1161,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1132,8 +1171,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
+            projectName);
         return project.exists();
     }
 
@@ -1164,8 +1203,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
+            path);
         return file.exists();
     }
 
@@ -1177,8 +1216,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
+            path);
 
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
@@ -1336,8 +1375,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         final List<Boolean> results = new ArrayList<Boolean>();
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
+            path);
 
         Display.getDefault().syncExec(new Runnable() {
             public void run() {

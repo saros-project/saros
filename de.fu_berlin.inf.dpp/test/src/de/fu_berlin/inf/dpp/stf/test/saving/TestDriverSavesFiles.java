@@ -71,11 +71,12 @@ public class TestDriverSavesFiles {
         alice.bot.newClass(PROJECT, PKG, CLS3);
 
         /*
-         * build session with bob and carl simultaneously
+         * build session with bob, carl, dave and edna simultaneously
          */
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, edna, bob, carl, dave);
         alice.bot.waitUntilNoInvitationProgress();
+
         dave.bot.followUser(alice.state, alice.jid);
         edna.bot.followUser(alice.state, alice.jid);
     }

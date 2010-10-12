@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -243,22 +242,23 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         delegate.sleep(sleepTime);
         delegate.textWithLabel(SarosConstant.TEXT_LABEL_PASSWORD).setText(
             password);
-        delegate.sleep(sleepTime);
+        delegate.textWithLabel("Confirm:").setText(password);
+        delegate.button(SarosConstant.BUTTON_FINISH).click();
 
-        while (delegate.button("Next >").isEnabled()) {
-            delegate.button("Next >").click();
-            log.debug("click Next > Button.");
-            delegate.sleep(sleepTime);
-        }
-
-        if (delegate.button(SarosConstant.BUTTON_FINISH).isEnabled()) {
-            delegate.button(SarosConstant.BUTTON_FINISH).click();
-            return;
-        } else {
-            System.out.println("can't click finish button");
-        }
-        throw new NotImplementedException(
-            "only set text fields and click Finish is implemented.");
+        // while (delegate.button("Next >").isEnabled()) {
+        // delegate.button("Next >").click();
+        // log.debug("click Next > Button.");
+        // delegate.sleep(sleepTime);
+        // }
+        //
+        // if (delegate.button(SarosConstant.BUTTON_FINISH).isEnabled()) {
+        // delegate.button(SarosConstant.BUTTON_FINISH).click();
+        // return;
+        // } else {
+        // System.out.println("can't click finish button");
+        // }
+        // throw new NotImplementedException(
+        // "only set text fields and click Finish is implemented.");
     }
 
     // public void addNewContact(String name) throws RemoteException {
@@ -298,10 +298,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void activateRosterView() throws RemoteException {
         viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
-    }
-
-    public void activateProgressView() throws RemoteException {
-        viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_PROGRESS);
     }
 
     public void closeRosterView() throws RemoteException {
@@ -409,8 +405,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     public boolean isInSession() throws RemoteException {
         viewObject.activateViewWithTitle("Shared Project Session");
-        return delegate.viewByTitle("Shared Project Session")
-            .toolbarButton("Leave the session").isEnabled();
+        return delegate.viewByTitle("Shared Project Session").toolbarButton(
+            "Leave the session").isEnabled();
     }
 
     public boolean isContactInSessionView(String Contact)
@@ -840,13 +836,14 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         openRemoteScreenView();
         if (respondentState.isDriver(respondentJID)) {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase() + " (Driver)");
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
+                    .getBase()
+                    + " (Driver)");
 
         } else {
             viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase());
+                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, respondentJID
+                    .getBase());
         }
         clickTBShareYourScreenWithSelectedUserInSPSView();
     }
@@ -910,8 +907,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         try {
             viewObject.clickContextMenuOfTreeInView(
                 SarosConstant.VIEW_TITLE_ROSTER,
-                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
-                jid.getBase());
+                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES, jid
+                    .getBase());
             waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
             confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
@@ -939,12 +936,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     // menu.click();
     // }
 
-    public void shareProject(String projectName, List<String> invitees)
+    public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException {
         clickCMShareProjectInPEView(projectName);
         waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
-        tableObject.selectCheckBoxsInTable(invitees);
+        tableObject.selectCheckBoxsInTable(inviteeJIDS);
         captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
         waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         delegate.button(SarosConstant.BUTTON_FINISH).click();
@@ -1075,10 +1072,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void resetSaros() throws RemoteException {
         xmppDisconnect();
         deleteAllProjects();
-    }
-
-    public void openProgressView() throws RemoteException {
-        viewObject.showViewById("org.eclipse.ui.views.ProgressView");
     }
 
     /**

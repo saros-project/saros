@@ -87,7 +87,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void clickCMShareProjectInPEView(String projectName)
         throws RemoteException;
 
-    public void shareProject(String projectName, List<String> invitees)
+    public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException;
 
     public void clickTBConnectInRosterView() throws RemoteException;
@@ -296,5 +296,4 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         String projectName, String packageName, String className)
         throws RemoteException;
 
-    public void activateProgressView() throws RemoteException;
 }

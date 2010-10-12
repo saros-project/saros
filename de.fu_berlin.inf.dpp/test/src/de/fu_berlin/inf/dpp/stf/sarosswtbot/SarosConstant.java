@@ -31,11 +31,11 @@ public class SarosConstant {
     public final static String TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
     public final static String TOOL_TIP_TEXT_LEAVE_THE_SESSION = "Leave the session";
 
-    public final static String SAROS_CONFI_SHELL_TITLE = "Saros Configuration";
-    public final static String TEXT_LABEL_JABBER_SERVER = "Jabber Server";
+    public final static String SAROS_CONFI_SHELL_TITLE = "Create XMPP-Account";
+    public final static String TEXT_LABEL_JABBER_SERVER = "Server";
     public final static String TEXT_LABEL_JABBER_ID = "Jabber ID";
-    public final static String TEXT_LABEL_USER_NAME = "Username";
-    public final static String TEXT_LABEL_PASSWORD = "Password";
+    public final static String TEXT_LABEL_USER_NAME = "Username:";
+    public final static String TEXT_LABEL_PASSWORD = "Password:";
     public final static String TEXT_LABEL_INVITER = "Inviter";
     public final static String BUTTON_NEXT = "Next >";
     public final static String BUTTON_FINISH = "Finish";

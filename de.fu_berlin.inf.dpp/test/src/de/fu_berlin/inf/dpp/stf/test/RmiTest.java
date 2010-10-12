@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
@@ -22,6 +24,7 @@ public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
 
     private static Musician alice;
+    private static Musician bob;
 
     private static final String FOLDER = BotConfiguration.FOLDERNAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
@@ -42,20 +45,37 @@ public class RmiTest {
     @BeforeClass
     public static void initMusican() {
         alice = InitMusician.newAlice();
+        bob = InitMusician.newBob();
     }
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
         alice.bot.resetSaros();
+        bob.bot.resetSaros();
     }
 
     @After
     public void cleanup() throws RemoteException {
         alice.bot.resetWorkbench();
         alice.bot.resetSaros();
+        bob.bot.resetWorkbench();
     }
 
     @Test
+    public void testExistProgress() throws RemoteException {
+        assertFalse(alice.bot.existPorgress());
+        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        List<String> inviteeJIDs = new ArrayList<String>();
+        inviteeJIDs.add(bob.getPlainJid());
+        alice.bot.shareProject(PROJECT, inviteeJIDs);
+        assertTrue(alice.bot.existPorgress());
+
+        alice.bot.leaveSessionByHost();
+
+    }
+
+    @Test
+    @Ignore
     public void testCloseEditorWithSave() throws IOException, CoreException {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
@@ -67,6 +87,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testCloseEditorWithoutSave() throws IOException, CoreException {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);

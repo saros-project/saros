@@ -718,4 +718,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException;
+
+    public void openProgressView() throws RemoteException;
+
+    public void activateProgressView() throws RemoteException;
+
+    public boolean existPorgress() throws RemoteException;
 }
