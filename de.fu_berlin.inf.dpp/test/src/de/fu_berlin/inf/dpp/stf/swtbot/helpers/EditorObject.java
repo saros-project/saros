@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
@@ -37,11 +36,12 @@ public class EditorObject {
 
     public void typeTextInEditor(String contents, final String fileName) {
 
-        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.navigateTo(3, 0);
-        // e.autoCompleteProposal("main", "main - main method");
-        // e.autoCompleteProposal("sys", "sysout - print to standard out");
+
+        e.autoCompleteProposal("main", "main - main method");
+        e.autoCompleteProposal("sys", "sysout - print to standard out");
 
         e.typeText("System.currentTimeMillis()");
 

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.conditions;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
@@ -23,9 +24,12 @@ public class ExistNoInvitationProgress extends DefaultCondition {
         view.setFocus();
         view.toolbarButton("Remove All Finished Operations").click();
         SWTBot bot = view.bot();
-        if (bot.text().getText().matches("No operations to display.*"))
+        try {
+            bot.toolbarButton();
+            return false;
+        } catch (WidgetNotFoundException e) {
             return true;
+        }
 
-        return false;
     }
 }

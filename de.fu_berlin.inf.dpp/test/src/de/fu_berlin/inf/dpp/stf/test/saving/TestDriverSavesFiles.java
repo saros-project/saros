@@ -75,7 +75,7 @@ public class TestDriverSavesFiles {
          */
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, edna, bob, carl, dave);
-        alice.bot.waitUntilNoInvitationProgress();
+        // alice.bot.waitUntilNoInvitationProgress();
 
         dave.bot.followUser(alice.state, alice.jid);
         edna.bot.followUser(alice.state, alice.jid);
@@ -234,6 +234,7 @@ public class TestDriverSavesFiles {
      * @throws CoreException
      * @throws IOException
      */
+
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
