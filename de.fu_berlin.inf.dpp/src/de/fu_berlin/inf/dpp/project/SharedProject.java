@@ -378,8 +378,8 @@ public class SharedProject {
             IPath path = entry.getKey();
             IResource resource = project.findMember(path);
             if (resource == null) {
-                String msg = format("Resource {0} in map doesn't exist"
-                    + " in project {1}.", path, project);
+                String msg = format("Resource {0} in map doesn''t exist"
+                    + " in project {1}.", path, project.getName());
                 logIllegalStateException(msg);
                 illegalState = true;
                 resourceMap.remove(path);
@@ -419,8 +419,8 @@ public class SharedProject {
                 assert path != null : "Path of " + resource + " is null!";
                 if (!contains(resource)) {
                     final String msg = format(
-                        "Resource map of {0} doesn't contain {1}.",
-                        projectName, path, new Object());
+                        "Resource map of {0} doesn''t contain {1}.",
+                        projectName, path.toString());
                     logIllegalStateException(msg);
                     result = true;
                     add(resource);
