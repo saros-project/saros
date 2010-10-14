@@ -724,4 +724,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void activateProgressView() throws RemoteException;
 
     public boolean existPorgress() throws RemoteException;
+
+    public void newTextFileLineDelimiter(String OS) throws RemoteException;
+
+    public void preference() throws RemoteException;
+
+    public String getTextFileLineDelimiter() throws RemoteException;
 }

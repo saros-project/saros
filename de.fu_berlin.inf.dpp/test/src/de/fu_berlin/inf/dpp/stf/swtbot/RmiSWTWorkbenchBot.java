@@ -33,6 +33,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
@@ -513,7 +514,53 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      * main menu page
      * 
+     * @throws RemoteException
+     * 
      *******************************************************************************/
+
+    public void preference() throws RemoteException {
+        activateEclipseShell();
+        menuObject.clickMenuWithTexts("Window", "Preferences");
+    }
+
+    public void newTextFileLineDelimiter(String OS) throws RemoteException {
+        preference();
+        SWTBotTree tree = delegate.tree();
+        tree.expandNode("General").select("Workspace");
+
+        if (OS.equals("Default")) {
+            delegate.radioInGroup("Default", "New text file line delimiter")
+                .click();
+        } else {
+            delegate.radioInGroup("Other:", "New text file line delimiter")
+                .click();
+            delegate.comboBoxInGroup("New text file line delimiter")
+                .setSelection(OS);
+        }
+        delegate.button("Apply").click();
+        delegate.button("OK").click();
+        waitUntilShellCloses("Preferences");
+    }
+
+    public String getTextFileLineDelimiter() throws RemoteException {
+        preference();
+        SWTBotTree tree = delegate.tree();
+        tree.expandNode("General").select("Workspace");
+        if (delegate.radioInGroup("Default", "New text file line delimiter")
+            .isSelected()) {
+            closeShell("Preferences");
+            return "Default";
+        } else if (delegate.radioInGroup("Other:",
+            "New text file line delimiter").isSelected()) {
+            SWTBotCombo combo = delegate
+                .comboBoxInGroup("New text file line delimiter");
+            String itemName = combo.items()[combo.selectionIndex()];
+            closeShell("Preferences");
+            return itemName;
+        }
+        closeShell("Preferences");
+        return "";
+    }
 
     /**
      * Create a java project and a class in the project. The combination with
@@ -1161,8 +1208,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     public boolean isInSVN() throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            BotConfiguration.PROJECTNAME_SVN);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(BotConfiguration.PROJECTNAME_SVN);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
@@ -1171,8 +1218,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public boolean isJavaProjectExist(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(
-            projectName);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
         return project.exists();
     }
 
@@ -1203,8 +1250,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-            path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
         return file.exists();
     }
 
@@ -1216,8 +1263,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-            path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
 
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
@@ -1375,8 +1422,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         final List<Boolean> results = new ArrayList<Boolean>();
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(
-            path);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
 
         Display.getDefault().syncExec(new Runnable() {
             public void run() {

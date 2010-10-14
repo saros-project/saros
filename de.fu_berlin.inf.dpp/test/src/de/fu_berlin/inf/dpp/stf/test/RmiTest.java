@@ -62,6 +62,14 @@ public class RmiTest {
     }
 
     @Test
+    public void testNewTextFileLineDelimiter() throws RemoteException {
+        alice.bot.newTextFileLineDelimiter("Unix");
+        System.out.println(alice.bot.getTextFileLineDelimiter());
+        assertTrue(alice.bot.getTextFileLineDelimiter().equals("Unix"));
+    }
+
+    @Test
+    @Ignore
     public void testExistProgress() throws RemoteException {
         assertFalse(alice.bot.existPorgress());
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
