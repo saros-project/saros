@@ -260,7 +260,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         assignLocalProject(baseProject, newProjectName, vcs, monitor);
 
         if (vcs != null) {
-            initVcState(baseProject, vcs, monitor);
+            initVcState(localProject, vcs, monitor);
         }
 
         // TODO joining the session will already send events, which will be
