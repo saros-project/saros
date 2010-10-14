@@ -736,4 +736,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void newFile(String fileName, String... folders)
         throws RemoteException;
+
+    public void waitUntilFileExist(String fileName, String... folders)
+        throws RemoteException;
 }

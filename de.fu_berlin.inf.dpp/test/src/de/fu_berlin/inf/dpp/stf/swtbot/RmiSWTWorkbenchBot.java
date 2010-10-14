@@ -1493,6 +1493,16 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
+    public void waitUntilFileExist(String fileName, String... folders)
+        throws RemoteException {
+        String filepath = "";
+        for (String folder : folders) {
+            filepath += folder + "/";
+        }
+        filepath += fileName;
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(filepath));
+    }
+
     public void waitUntilClassExist(String projectName, String pkg,
         String className) throws RemoteException {
         String path = projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
