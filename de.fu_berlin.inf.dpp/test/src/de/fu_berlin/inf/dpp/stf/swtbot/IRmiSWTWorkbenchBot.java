@@ -730,4 +730,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void preference() throws RemoteException;
 
     public String getTextFileLineDelimiter() throws RemoteException;
+
+    public boolean isFileExist(String fileName, String... folders)
+        throws RemoteException;
+
+    public void newFile(String fileName, String... folders)
+        throws RemoteException;
 }

@@ -26,10 +26,13 @@ public class RmiTest {
     private static Musician alice;
     private static Musician bob;
 
-    private static final String FOLDER = BotConfiguration.FOLDERNAME;
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String PROJECT2 = BotConfiguration.PROJECTNAME2;
     private static final String PROJECT3 = BotConfiguration.PROJECTNAME3;
+
+    private static final String FOLDER = BotConfiguration.FOLDERNAME;
+    private static final String FILE = BotConfiguration.FILENAME;
+
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PKG2 = BotConfiguration.PACKAGENAME2;
     private static final String PKG3 = BotConfiguration.PACKAGENAME3;
@@ -62,6 +65,16 @@ public class RmiTest {
     }
 
     @Test
+    public void testNewFile() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newFolder(PROJECT, FOLDER);
+        alice.bot.newFile(FILE, PROJECT, FOLDER);
+        assertTrue(alice.bot.isFolderExist(PROJECT, FOLDER));
+        assertTrue(alice.bot.isFileExist(FILE, PROJECT, FOLDER));
+    }
+
+    @Test
+    @Ignore
     public void testNewTextFileLineDelimiter() throws RemoteException {
         alice.bot.newTextFileLineDelimiter("Unix");
         System.out.println(alice.bot.getTextFileLineDelimiter());

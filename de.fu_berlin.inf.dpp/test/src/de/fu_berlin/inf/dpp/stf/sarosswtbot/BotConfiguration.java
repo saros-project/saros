@@ -34,13 +34,17 @@ public class BotConfiguration {
     public final static String PROJECTNAME = "Foo_Saros";
     public final static String PROJECTNAME2 = "Foo_Saros2";
     public final static String PROJECTNAME3 = "Foo_Saros3";
+
+    public final static String FILENAME = "MyFile";
+    public final static String FOLDERNAME = "MyFolder";
+
     public final static String CLASSNAME = "MyClass";
     public final static String CLASSNAME2 = "MyClass2";
     public final static String CLASSNAME3 = "MyClass3";
     public final static String PACKAGENAME = "my.pkg";
     public final static String PACKAGENAME2 = "my.pkg2";
     public final static String PACKAGENAME3 = "my.pkg3";
-    public final static String FOLDERNAME = "MyFolder";
+
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
     public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
         + ".java";

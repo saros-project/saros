@@ -739,6 +739,26 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
     }
 
+    public void newFile(String fileName, String... folders)
+        throws RemoteException {
+        if (!isFileExist(fileName, folders))
+            try {
+                activateEclipseShell();
+                delegate.menu("File").menu("New").menu("File").click();
+                SWTBotShell shell = delegate.shell("New File");
+                shell.activate();
+                if (folders.length > 0)
+                    delegate.tree().expandNode(folders).select();
+                delegate.textWithLabel("File name:").setText(fileName);
+                delegate.button("Finish").click();
+                delegate.waitUntil(Conditions.shellCloses(shell));
+            } catch (WidgetNotFoundException e) {
+                final String cause = "error creating new file.";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+    }
+
     /**
      * Create a new package. The name of the method is defined the same as the
      * menu names. The name "newClass" then means: hello guys, please click main
@@ -1250,6 +1270,20 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
         log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        return file.exists();
+    }
+
+    public boolean isFileExist(String fileName, String... folders)
+        throws RemoteException {
+        String filepath = "";
+        for (String folder : folders) {
+            filepath += folder + "/";
+        }
+        filepath += fileName;
+        log.info("Checking existence of file \"" + filepath + "\"");
+        IPath path = new Path(filepath);
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
         return file.exists();
