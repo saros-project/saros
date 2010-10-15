@@ -120,17 +120,14 @@ public interface IRmiSWTWorkbenchBot extends Remote {
         throws RemoteException;
 
     /**
-     * Adds a new folder into the src folder of a project.
+     * Adds a new folder into a project.
      * 
-     * @param projectname
-     *            The project name
-     * @param folderName
-     *            The fully-qualified name of the folder (without the
-     *            projectName prefix)
+     * @param folderPath
+     *            The fully-qualified name of the folder. e.g. {Foo_Saros,
+     *            myFolder, subFolder}
      * @throws RemoteException
      */
-    public void newFolder(String projectName, String folderName)
-        throws RemoteException;
+    public void newFolder(String... folderPath) throws RemoteException;
 
     /**
      * Adds a new Java Project with a random name with prefix
@@ -609,7 +606,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void revert() throws RemoteException;
 
-    public boolean isResourceExist(String fullPath) throws RemoteException;
+    public boolean isResourceExist(String resourcePath) throws RemoteException;
 
     // public List<String> getAllProjects() throws RemoteException;
 
@@ -642,13 +639,13 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void waitUntilClassNotExist(String projectName, String pkg,
         String className) throws RemoteException;
 
-    public void waitUntilFolderExist(String projectName, String path)
+    public void waitUntilFolderExist(String... folderPath)
         throws RemoteException;
 
     public boolean isPkgExist(String projectName, String pkg)
         throws RemoteException;
 
-    public boolean isFolderExist(String... folders) throws RemoteException;
+    public boolean isFolderExist(String... folderPath) throws RemoteException;
 
     public void newPackage(String projectName, String pkg)
         throws RemoteException;
@@ -729,14 +726,11 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public String getTextFileLineDelimiter() throws RemoteException;
 
-    public boolean isFileExist(String fileName, String... folders)
-        throws RemoteException;
+    public boolean isFileExist(String... filePath) throws RemoteException;
 
-    public void newFile(String fileName, String... folders)
-        throws RemoteException;
+    public void newFile(String... filepath) throws RemoteException;
 
-    public void waitUntilFileExist(String fileName, String... folders)
-        throws RemoteException;
+    public void waitUntilFileExist(String... filePath) throws RemoteException;
 
     public void deleteFolder(String... folders) throws RemoteException;
 

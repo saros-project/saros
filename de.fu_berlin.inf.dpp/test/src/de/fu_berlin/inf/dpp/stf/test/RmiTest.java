@@ -86,9 +86,9 @@ public class RmiTest {
         alice.bot.newFolder(PROJECT, FOLDER);
         bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
         assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
-        alice.bot.newFile(FILE, PROJECT, FOLDER);
-        bob.bot.waitUntilFileExist(FILE, PROJECT, FOLDER);
-        assertTrue(bob.bot.isFileExist(FILE, PROJECT, FOLDER));
+        alice.bot.newFile(PROJECT, FOLDER, FILE);
+        bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
+        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
     }
 
     @Test
@@ -106,9 +106,9 @@ public class RmiTest {
     public void testNewFile() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newFolder(PROJECT, FOLDER);
-        alice.bot.newFile(FILE, PROJECT, FOLDER);
+        alice.bot.newFile(PROJECT, FOLDER, FILE);
         assertTrue(alice.bot.isFolderExist(PROJECT, FOLDER));
-        assertTrue(alice.bot.isFileExist(FILE, PROJECT, FOLDER));
+        assertTrue(alice.bot.isFileExist(PROJECT, FOLDER, FILE));
     }
 
     @Test

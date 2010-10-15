@@ -671,6 +671,26 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
+    /**
+     * Create a project. The name of the method is defined the same as the menu
+     * names. The name "newProject" then means: hello guys, please click main
+     * menus File -> New -> Project.
+     * 
+     * 1. if the project already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus File -> New -> Project.
+     * 
+     * 4. confirm the pop-up window "New Project"
+     * 
+     * 5. delegate wait so long until the pop-up window is closed.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * 
+     */
     public void newProject(String projectName) throws RemoteException {
         if (!isProjectExist(projectName)) {
             activateEclipseShell();
@@ -740,19 +760,28 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      * 4. Confirm pop-up window "New Folder".
      * 
-     * 
+     * @param folderPath
+     *            the path of the new folder. e.g. {Foo_Saros, myFolder,
+     *            subFolder}
      */
-    public void newFolder(String projectName, String folderName)
-        throws RemoteException {
-        if (!isFolderExist(projectName, folderName))
+    public void newFolder(String... folderPath) throws RemoteException {
+        if (!isFolderExist(folderPath))
             try {
+                String projectName = "";
+                String folders = "";
+                for (int i = 0; i < folderPath.length; i++) {
+                    if (i == 0)
+                        projectName = folderPath[i];
+                    else
+                        folders += folderPath[i] + "/";
+                }
                 activateEclipseShell();
                 delegate.menu("File").menu("New").menu("Folder").click();
                 SWTBotShell shell = delegate.shell("New Folder");
                 shell.activate();
                 delegate.textWithLabel("Enter or select the parent folder:")
                     .setText(projectName);
-                delegate.textWithLabel("Folder name:").setText(folderName);
+                delegate.textWithLabel("Folder name:").setText(folders);
                 delegate.button("Finish").click();
                 delegate.waitUntil(Conditions.shellCloses(shell));
             } catch (WidgetNotFoundException e) {
@@ -762,10 +791,17 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             }
     }
 
-    public void newFile(String fileName, String... folders)
-        throws RemoteException {
-        if (!isFileExist(fileName, folders))
+    public void newFile(String... filePath) throws RemoteException {
+        if (!isFileExist(filePath))
             try {
+                String[] folders = new String[filePath.length - 1];
+                String fileName = "";
+                for (int i = 0; i < filePath.length; i++) {
+                    if (i == filePath.length - 1)
+                        fileName = filePath[i];
+                    else
+                        folders[i] = filePath[i];
+                }
                 activateEclipseShell();
                 delegate.menu("File").menu("New").menu("File").click();
                 SWTBotShell shell = delegate.shell("New File");
@@ -1290,14 +1326,24 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return true;
     }
 
+    /**
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     */
     public boolean isProjectExist(String projectName) throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
         return project.exists();
     }
 
-    public boolean isResourceExist(String CLS_PATH) throws RemoteException {
-        IPath path = new Path(CLS_PATH);
+    /**
+     * @param resourcePath
+     *            full path of the resource, e.g.
+     *            Foo_Saros/src/my/pkg/myClass.java.
+     *            Foo_Saros/myFolder/myFile.xml.
+     */
+    public boolean isResourceExist(String resourcePath) throws RemoteException {
+        IPath path = new Path(resourcePath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
 
@@ -1306,6 +1352,12 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return true;
     }
 
+    /**
+     * @param projectName
+     *            name of the java project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     */
     public boolean isPkgExist(String projectName, String pkg)
         throws RemoteException {
         IPath path = new Path(projectName + "/src/"
@@ -1318,6 +1370,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return true;
     }
 
+    /**
+     * @param projectName
+     *            name of the java project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myclass.
+     */
     public boolean isClassExist(String projectName, String pkg, String className)
         throws RemoteException {
         IPath path = new Path(projectName + "/src/"
@@ -1328,15 +1388,22 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return file.exists();
     }
 
-    public boolean isFileExist(String fileName, String... folders)
-        throws RemoteException {
-        String filepath = "";
-        for (String folder : folders) {
-            filepath += folder + "/";
+    /**
+     * @param filePath
+     *            path of the file, e.g. {Foo_Saros, myFolder, myFile.xml}.
+     * 
+     */
+    public boolean isFileExist(String... filePath) throws RemoteException {
+        String fullpath = "";
+        for (int i = 0; i < filePath.length; i++) {
+            if (i == filePath.length - 1)
+                fullpath += filePath[i];
+            else
+                fullpath += filePath[i] + "/";
         }
-        filepath += fileName;
-        log.info("Checking existence of file \"" + filepath + "\"");
-        IPath path = new Path(filepath);
+
+        log.info("Checking existence of file \"" + fullpath + "\"");
+        IPath path = new Path(fullpath);
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
         return file.exists();
@@ -1358,13 +1425,17 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return mainObject.ConvertStreamToString(file.getContents());
     }
 
-    public boolean isFolderExist(String... folders) throws RemoteException {
+    /**
+     * @param folderPath
+     *            the path of the folder. e.g. {FOO_Saros, myFolder}
+     */
+    public boolean isFolderExist(String... folderPath) throws RemoteException {
         String folderpath = "";
-        for (int i = 0; i < folders.length; i++) {
-            if (i == folders.length - 1) {
-                folderpath += folders[i];
+        for (int i = 0; i < folderPath.length; i++) {
+            if (i == folderPath.length - 1) {
+                folderpath += folderPath[i];
             } else
-                folderpath += folders[i] + "/";
+                folderpath += folderPath[i] + "/";
         }
 
         IPath path = new Path(folderpath);
@@ -1568,14 +1639,19 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
-    public void waitUntilFileExist(String fileName, String... folders)
-        throws RemoteException {
-        String filepath = "";
-        for (String folder : folders) {
-            filepath += folder + "/";
+    /**
+     * @param filePath
+     *            the path of the file. e.g. {Foo_Saros, myFolder, myFile.xml}
+     */
+    public void waitUntilFileExist(String... filePath) throws RemoteException {
+        String fullPath = "";
+        for (int i = 0; i < filePath.length; i++) {
+            if (i == filePath.length - 1)
+                fullPath += filePath[i];
+            else
+                fullPath += filePath[i] + "/";
         }
-        filepath += fileName;
-        wUntilObject.waitUntil(SarosConditions.isResourceExist(filepath));
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilClassExist(String projectName, String pkg,
@@ -1592,10 +1668,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         wUntilObject.waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
-    public void waitUntilFolderExist(String projectName, String path)
+    /**
+     * @param folderPath
+     *            the path of the new folder. e.g. {Foo_Saros, myFolder,
+     *            subFolder}
+     */
+    public void waitUntilFolderExist(String... folderPath)
         throws RemoteException {
-        String wholePath = projectName + "/" + path;
-        wUntilObject.waitUntil(SarosConditions.isResourceExist(wholePath));
+        String fullPath = "";
+        for (int i = 0; i < folderPath.length; i++) {
+            if (i == folderPath.length - 1)
+                fullPath += folderPath[i];
+            else
+                fullPath += folderPath[i] + "/";
+        }
+        wUntilObject.waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)

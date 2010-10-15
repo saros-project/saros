@@ -125,11 +125,11 @@ public class TestCreatingNewFile {
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
         carl.bot.newFolder(PROJECT, FOLDER);
-        carl.bot.newFile(FILE, PROJECT, FOLDER);
-        alice.bot.waitUntilFileExist(FILE, PROJECT, FOLDER);
-        assertTrue(alice.bot.isFileExist(FILE, PROJECT, FOLDER));
-        bob.bot.waitUntilFileExist(FILE, PROJECT, FOLDER);
-        assertTrue(bob.bot.isFileExist(FILE, PROJECT, FOLDER));
+        carl.bot.newFile(PROJECT, FOLDER, FILE);
+        alice.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
+        assertTrue(alice.bot.isFileExist(PROJECT, FOLDER, FILE));
+        bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
+        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
     }
 
     /**
@@ -166,11 +166,11 @@ public class TestCreatingNewFile {
         assertTrue(bob.state.isDriver(alice.jid));
 
         carl.bot.newFolder(PROJECT, FOLDER);
-        carl.bot.newFile(FILE, PROJECT, FOLDER);
+        carl.bot.newFile(PROJECT, FOLDER, FILE);
         alice.bot.sleep(500);
-        assertFalse(alice.bot.isFileExist(FILE, PROJECT, FOLDER));
+        assertFalse(alice.bot.isFileExist(PROJECT, FOLDER, FILE));
         bob.bot.sleep(500);
-        assertFalse(bob.bot.isFileExist(FILE, PROJECT, FOLDER));
+        assertFalse(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
 
         if (!carl.state.isFollowedUser(alice.getPlainJid()))
             carl.bot.followUser(alice.state, alice.jid);
@@ -178,12 +178,12 @@ public class TestCreatingNewFile {
             bob.bot.followUser(alice.state, alice.jid);
 
         alice.bot.newFolder(PROJECT, FOLDER2);
-        alice.bot.newFile(FILE2, PROJECT, FOLDER2);
+        alice.bot.newFile(PROJECT, FOLDER2, FILE2);
 
-        carl.bot.waitUntilFileExist(FILE2, PROJECT, FOLDER2);
-        assertTrue(carl.bot.isFileExist(FILE2, PROJECT, FOLDER2));
-        bob.bot.waitUntilFileExist(FILE2, PROJECT, FOLDER2);
-        assertTrue(bob.bot.isFileExist(FILE2, PROJECT, FOLDER2));
+        carl.bot.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
+        assertTrue(carl.bot.isFileExist(PROJECT, FOLDER2, FILE2));
+        bob.bot.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
+        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER2, FILE2));
 
         alice.bot.setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
 
