@@ -83,6 +83,7 @@ public class SarosConstant {
     public final static String SHELL_TITLE_IMPORT = "Import";
 
     public final static String CONTEXT_MENU_GIVE_DRIVER_ROLE = "Give driver role";
+    public final static String CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
     public final static String CONTEXT_MENU__DRIVER_ROLE = "Give exclusive driver role";
     public final static String CONTEXT_MENU_REMOVE_DRIVER_ROLE = "Remove driver role";
     public final static String CONTEXT_MENU_OPEN = "Open";

@@ -141,4 +141,8 @@ public interface ISarosState extends Remote {
     public boolean isClassDirty(String projectName, String pkg, String className)
         throws RemoteException, FileNotFoundException;
 
+    public String getFollowedUser() throws RemoteException;
+
+    public boolean isFollowedUser(String plainJID) throws RemoteException;
+
 }

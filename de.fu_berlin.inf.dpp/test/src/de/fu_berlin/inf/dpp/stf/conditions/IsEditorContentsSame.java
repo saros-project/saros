@@ -7,29 +7,22 @@ import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 public class IsEditorContentsSame extends DefaultCondition {
 
     private RmiSWTWorkbenchBot bot1;
-    private String file;
-    private String projectName;
-    private String packageName;
-    private String className;
+    private String otherContent;
+    private String[] filePath;
 
-    IsEditorContentsSame(RmiSWTWorkbenchBot bot, String projectName,
-        String packageName, String className, String otherConent) {
-
+    IsEditorContentsSame(RmiSWTWorkbenchBot bot, String otherConent,
+        String... filePath) {
         this.bot1 = bot;
-        this.file = otherConent;
-        this.projectName = projectName;
-        this.packageName = packageName;
-        this.className = className;
+        this.otherContent = otherConent;
+        this.filePath = filePath;
 
     }
 
     public String getFailureMessage() {
-
         return null;
     }
 
     public boolean test() throws Exception {
-        return bot1.getTextOfJavaEditor(projectName, packageName, className)
-            .equals(file);
+        return bot1.getTextOfEditor(filePath).equals(otherContent);
     }
 }

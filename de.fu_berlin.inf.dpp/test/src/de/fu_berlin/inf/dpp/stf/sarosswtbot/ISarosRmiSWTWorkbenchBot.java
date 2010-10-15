@@ -296,4 +296,9 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         String projectName, String packageName, String className)
         throws RemoteException;
 
+    public void giveExclusiveDriverRole(String inviteePlainJID)
+        throws RemoteException;
+
+    public void setTextInEditorWithSave(String contentPath, String... filePath)
+        throws RemoteException;
 }

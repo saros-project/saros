@@ -65,7 +65,7 @@ public class TestShareProjectUsingExistingProject {
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertFalse(bob.bot.isClassExist(PROJECT2, PKG, CLS));
-        assertFalse(bob.bot.isJavaProjectExist(PROJECT2));
+        assertFalse(bob.bot.isProjectExist(PROJECT2));
 
     }
 
@@ -80,9 +80,9 @@ public class TestShareProjectUsingExistingProject {
         bob.bot
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
-        assertTrue(bob.bot.isJavaProjectExist(PROJECT));
+        assertTrue(bob.bot.isProjectExist(PROJECT));
         assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
+        assertTrue(bob.bot.isProjectExist(PROJECT2));
         assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
         bob.bot.deleteProject(PROJECT2);
 
@@ -94,9 +94,9 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.bot.isJavaProjectExist(PROJECT));
+        assertTrue(bob.bot.isProjectExist(PROJECT));
         assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.isJavaProjectExist(PROJECT2));
+        assertTrue(bob.bot.isProjectExist(PROJECT2));
         assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
 
         bob.bot.deleteProject(PROJECT2);

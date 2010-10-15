@@ -31,7 +31,9 @@ public class RmiTest {
     private static final String PROJECT3 = BotConfiguration.PROJECTNAME3;
 
     private static final String FOLDER = BotConfiguration.FOLDERNAME;
+    private static final String FOLDER2 = BotConfiguration.FOLDERNAME2;
     private static final String FILE = BotConfiguration.FILENAME;
+    private static final String FILE2 = BotConfiguration.FILENAME2;
 
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String PKG2 = BotConfiguration.PACKAGENAME2;
@@ -53,8 +55,8 @@ public class RmiTest {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        alice.bot.resetSaros();
         bob.bot.resetSaros();
+        alice.bot.resetSaros();
     }
 
     @After
@@ -65,6 +67,42 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
+    public void testNewFolderInEmptyJavaProject() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.bot.newFolder(PROJECT, FOLDER);
+        bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
+        assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
+    }
+
+    @Test
+    public void testNewFileNewFolderInEmptyProject() throws RemoteException {
+        alice.bot.newProject(PROJECT);
+        assertTrue(alice.bot.isProjectExist(PROJECT));
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.bot.newFolder(PROJECT, FOLDER);
+        bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
+        assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
+        alice.bot.newFile(FILE, PROJECT, FOLDER);
+        bob.bot.waitUntilFileExist(FILE, PROJECT, FOLDER);
+        assertTrue(bob.bot.isFileExist(FILE, PROJECT, FOLDER));
+    }
+
+    @Test
+    @Ignore
+    public void testDeleteFolder() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        alice.bot.newFolder(PROJECT, FOLDER);
+        assertTrue(alice.bot.isFolderExist(PROJECT, FOLDER));
+        alice.bot.deleteFolder(PROJECT, FOLDER);
+        assertFalse(alice.bot.isFolderExist(PROJECT, FOLDER));
+    }
+
+    @Test
+    @Ignore
     public void testNewFile() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newFolder(PROJECT, FOLDER);
@@ -196,9 +234,9 @@ public class RmiTest {
     @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
-        assertTrue(alice.bot.isJavaProjectExist(PROJECT));
+        assertTrue(alice.bot.isProjectExist(PROJECT));
         alice.bot.deleteProjectGui(PROJECT);
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
     }
 
     @Test
@@ -244,27 +282,27 @@ public class RmiTest {
     @Test
     @Ignore
     public void test_newProjectWithClass() throws RemoteException {
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
-        assertTrue(alice.bot.isJavaProjectExist(PROJECT));
+        assertTrue(alice.bot.isProjectExist(PROJECT));
         assertTrue(alice.bot.isClassExist(PROJECT, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_2() throws RemoteException {
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
-        assertTrue(alice.bot.isJavaProjectExist(PROJECT));
+        assertTrue(alice.bot.isProjectExist(PROJECT));
         assertTrue(alice.bot.isClassExist(PROJECT, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_3() throws RemoteException {
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
         alice.bot.newJavaProjectWithClass(PROJECT, "pkg", "Cls");
-        assertTrue(alice.bot.isJavaProjectExist(PROJECT));
+        assertTrue(alice.bot.isProjectExist(PROJECT));
         assertTrue(alice.bot.isClassExist(PROJECT, "pkg", "Cls"));
     }
 
@@ -275,13 +313,13 @@ public class RmiTest {
         final String className = "Cls";
 
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
         log.trace("alice.newProjectWithClass()");
 
         alice.bot.newJavaProject(PROJECT);
         alice.bot.newClass(PROJECT, pkg, className);
         log.trace("alice.isJavaProjectExist()");
-        assertTrue(alice.bot.isJavaProjectExist(PROJECT));
+        assertTrue(alice.bot.isProjectExist(PROJECT));
         log.trace("alice.isJavaClassExist()");
         assertTrue(alice.bot.isClassExist(PROJECT, pkg, className));
 
@@ -297,6 +335,6 @@ public class RmiTest {
         log.trace("deleteResource()");
         alice.bot.deleteProject(PROJECT);
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.bot.isJavaProjectExist(PROJECT));
+        assertFalse(alice.bot.isProjectExist(PROJECT));
     }
 }

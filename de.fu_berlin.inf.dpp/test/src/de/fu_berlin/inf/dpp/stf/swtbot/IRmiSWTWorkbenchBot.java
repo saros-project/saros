@@ -562,8 +562,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void activatePackageExplorerView() throws RemoteException;
 
-    public boolean isJavaProjectExist(String projectName)
-        throws RemoteException;
+    public boolean isProjectExist(String projectName) throws RemoteException;
 
     public boolean isClassExist(String projectName, String pkg, String className)
         throws RemoteException;
@@ -649,8 +648,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isPkgExist(String projectName, String pkg)
         throws RemoteException;
 
-    public boolean isFolderExist(String projectName, String folderName)
-        throws RemoteException;
+    public boolean isFolderExist(String... folders) throws RemoteException;
 
     public void newPackage(String projectName, String pkg)
         throws RemoteException;
@@ -713,8 +711,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public boolean isClassDirty(String projectName, String pkg,
         String className, String idOfEditor) throws RemoteException;
 
-    public void waitUntilEditorContentSame(String projectName, String pkg,
-        String className, String otherClassContent) throws RemoteException;
+    public void waitUntilEditorContentSame(String otherClassContent,
+        String... filePath) throws RemoteException;
 
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException;
@@ -739,4 +737,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void waitUntilFileExist(String fileName, String... folders)
         throws RemoteException;
+
+    public void deleteFolder(String... folders) throws RemoteException;
+
+    public String getTextOfEditor(String... filepath) throws RemoteException;
+
+    public void newProject(String projectName) throws RemoteException;
 }

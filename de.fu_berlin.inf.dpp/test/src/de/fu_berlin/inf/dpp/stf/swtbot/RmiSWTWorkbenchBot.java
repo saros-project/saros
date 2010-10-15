@@ -321,6 +321,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
+    public void openFile(String... filePath) throws RemoteException {
+        if (!isFileOpen(filePath[filePath.length - 1])) {
+            viewObject.openFileInView(
+                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, filePath);
+            delegate.sleep(sleepTime);
+        }
+    }
+
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException {
         IPath path = new Path(projectName + "/src/"
@@ -607,7 +615,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      */
     public void newJavaProject(String projectName) throws RemoteException {
-        if (!isJavaProjectExist(projectName)) {
+        if (!isProjectExist(projectName)) {
             activateEclipseShell();
             delegate.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = delegate.shell("New Java Project");
@@ -660,6 +668,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             // // log.debug("Couldn't copy project " + baseName, e);
             // // }
             // delegate.sleep(100);
+        }
+    }
+
+    public void newProject(String projectName) throws RemoteException {
+        if (!isProjectExist(projectName)) {
+            activateEclipseShell();
+            delegate.menu("File").menu("New").menu("Project...").click();
+            SWTBotShell shell = delegate.shell("New Project");
+            shell.activate();
+            delegate.tree().expandNode("General").select("Project");
+            delegate.button(SarosConstant.BUTTON_NEXT).click();
+            delegate.textWithLabel("Project name:").setText(projectName);
+            delegate.button("Finish").click();
+            delegate.waitUntil(Conditions.shellCloses(shell));
+            delegate.sleep(50);
         }
     }
 
@@ -1177,6 +1200,37 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * @param pkg
      *            name of the package, which you want to delete.
      */
+    public void deleteFolder(String... folders) throws RemoteException {
+        String folderpath = "";
+        for (int i = 0; i < folders.length; i++) {
+            if (i == folders.length - 1) {
+                folderpath += folders[i];
+            } else
+                folderpath += folders[i] + "/";
+        }
+
+        IPath path = new Path(folderpath);
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete folder " + folderpath, e);
+            }
+        }
+    }
+
+    /**
+     * Delete a package of the specified java project using
+     * FileUntil.delete(resource).
+     * 
+     * @param projectName
+     *            name of the project, which package you want to delete.
+     * @param pkg
+     *            name of the package, which you want to delete.
+     */
     public void deletePkg(String projectName, String pkg)
         throws RemoteException {
         IPath path = new Path(projectName + "/src/"
@@ -1236,8 +1290,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return true;
     }
 
-    public boolean isJavaProjectExist(String projectName)
-        throws RemoteException {
+    public boolean isProjectExist(String projectName) throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
         return project.exists();
@@ -1305,9 +1358,16 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return mainObject.ConvertStreamToString(file.getContents());
     }
 
-    public boolean isFolderExist(String projectName, String folderPath)
-        throws RemoteException {
-        IPath path = new Path(projectName + "/" + folderPath);
+    public boolean isFolderExist(String... folders) throws RemoteException {
+        String folderpath = "";
+        for (int i = 0; i < folders.length; i++) {
+            if (i == folders.length - 1) {
+                folderpath += folders[i];
+            } else
+                folderpath += folders[i] + "/";
+        }
+
+        IPath path = new Path(folderpath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
 
@@ -1350,6 +1410,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         return editorObject.isEditorOpen(className + ".java");
     }
 
+    public boolean isFileOpen(String fileName) throws RemoteException {
+        return editorObject.isEditorOpen(fileName);
+    }
+
     public boolean isJavaEditorActive(String className) throws RemoteException {
         if (!isClassOpen(className))
             return false;
@@ -1388,6 +1452,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         editorObject.activateEditor(className + ".java");
     }
 
+    public void activateEditor(String fileName) throws RemoteException {
+        editorObject.activateEditor(fileName);
+    }
+
     /**
      * get content of a class file, which may be not saved.
      */
@@ -1396,6 +1464,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return editorObject.getTextEditor(className + ".java").getText();
+    }
+
+    public String getTextOfEditor(String... filepath) throws RemoteException {
+        openFile(filepath);
+        String fileName = filepath[filepath.length - 1];
+        activateEditor(fileName);
+        return editorObject.getTextEditor(fileName).getText();
     }
 
     public void selectLineInJavaEditor(int line, String fileName)
@@ -1568,10 +1643,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * </p>
      * * *
      */
-    public void waitUntilEditorContentSame(String projectName, String pkg,
-        String className, String otherClassContent) throws RemoteException {
+    public void waitUntilEditorContentSame(String otherClassContent,
+        String... filePath) throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isEditorContentsSame(this,
-            projectName, pkg, className, otherClassContent));
+            otherClassContent, filePath));
     }
 
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException {

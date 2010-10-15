@@ -35,8 +35,10 @@ public class BotConfiguration {
     public final static String PROJECTNAME2 = "Foo_Saros2";
     public final static String PROJECTNAME3 = "Foo_Saros3";
 
-    public final static String FILENAME = "MyFile";
+    public final static String FILENAME = "MyFile.xml";
+    public final static String FILENAME2 = "MyFile2.xml";
     public final static String FOLDERNAME = "MyFolder";
+    public final static String FOLDERNAME2 = "MyFolder2";
 
     public final static String CLASSNAME = "MyClass";
     public final static String CLASSNAME2 = "MyClass2";

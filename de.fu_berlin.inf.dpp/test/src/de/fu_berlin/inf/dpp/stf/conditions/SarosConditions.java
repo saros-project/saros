@@ -107,10 +107,15 @@ public class SarosConditions extends Conditions {
         return new ExistNoInvitationProgress(bot);
     }
 
-    public static ICondition isEditorContentsSame(RmiSWTWorkbenchBot bot,
+    public static ICondition isJavaEditorContentsSame(RmiSWTWorkbenchBot bot,
         String projectName, String packageName, String className,
         String otherContent) {
-        return new IsEditorContentsSame(bot, projectName, packageName,
+        return new IsJavaEditorContentsSame(bot, projectName, packageName,
             className, otherContent);
+    }
+
+    public static ICondition isEditorContentsSame(RmiSWTWorkbenchBot bot,
+        String otherContent, String... filePath) {
+        return new IsEditorContentsSame(bot, otherContent, filePath);
     }
 }

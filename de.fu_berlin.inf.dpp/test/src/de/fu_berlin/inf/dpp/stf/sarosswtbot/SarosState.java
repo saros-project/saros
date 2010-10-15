@@ -131,6 +131,14 @@ public class SarosState implements ISarosState {
         return editorManager.isFollowing();
     }
 
+    public String getFollowedUser() throws RemoteException {
+        return editorManager.getFollowedUser().getJID().getBase();
+    }
+
+    public boolean isFollowedUser(String plainJID) throws RemoteException {
+        return getFollowedUser().equals(plainJID);
+    }
+
     public boolean isDriver(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         User user = sarosSession.getUser(jid);
