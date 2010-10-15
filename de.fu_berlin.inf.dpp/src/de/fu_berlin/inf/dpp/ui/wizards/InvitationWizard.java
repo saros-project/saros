@@ -1,9 +1,12 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.wizard.Wizard;
@@ -62,10 +65,26 @@ public class InvitationWizard extends Wizard {
     public boolean performFinish() {
         ArrayList<JID> usersToInvite = userSelection.getSelectedUsers();
 
+        StringBuilder projectString = new StringBuilder();
+        Set<IProject> projectSet = sarosSession.getProjects();
+
+        if (projectSet != null) {
+            Iterator<IProject> projectSetIterator = projectSet.iterator();
+
+            while (projectSetIterator.hasNext()) {
+                IProject p = projectSetIterator.next();
+                projectString.append("- " + p.getName());
+                if (projectSetIterator.hasNext())
+                    projectString.append("\n");
+            }
+        }
+
         for (JID user : usersToInvite) {
-            sessionManager.invite(user, sarosSession.getHost().getJID()
-                .getBase()
-                + " has invited you to a Saros shared project session");
+            String hostName = sarosSession.getHost().getJID().getBase();
+            sessionManager.invite(user, hostName
+                + " has invited you to a Saros session"
+                + " on the following project(s): " + "\n\n" + projectString);
+
         }
         return true;
     }

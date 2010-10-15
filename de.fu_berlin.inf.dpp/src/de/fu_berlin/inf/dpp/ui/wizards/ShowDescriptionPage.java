@@ -71,10 +71,7 @@ class ShowDescriptionPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        Label inviterLabel = new Label(composite, SWT.NONE);
-        inviterLabel.setText("Invitation message: ");
-
-        Label inviterText = new Label(composite, SWT.NONE);
+        Label inviterText = new Label(composite, SWT.WRAP);
         inviterText.setText(this.joinSessionWizard.process.getDescription());
 
         setControl(composite);
