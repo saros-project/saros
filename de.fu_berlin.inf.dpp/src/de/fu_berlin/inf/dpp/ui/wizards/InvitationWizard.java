@@ -90,6 +90,17 @@ public class InvitationWizard extends Wizard {
     }
 
     @Override
+    public boolean performCancel() {
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                sessionManager.stopSarosSession();
+            }
+        });
+
+        return true;
+    }
+
+    @Override
     public void addPages() {
         userSelection = new InvitationWizardUserSelection(saros, sarosSession,
             rosterTracker, discoveryManager, invitationProcesses);

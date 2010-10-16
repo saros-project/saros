@@ -44,10 +44,10 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
+import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
@@ -90,6 +90,8 @@ public class VideoSharing {
     protected SarosUI sarosUI;
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
+    @Inject
+    protected VideoSessionObservable videoSharingSessionObservable;
 
     protected Saros saros;
     protected IPreferenceStore preferences;
@@ -98,12 +100,6 @@ public class VideoSharing {
      * Flag which prevents setting up a session several times
      */
     protected boolean requestingSession = false;
-
-    /**
-     * Current session when not set to <code>null</code>
-     */
-    protected ObservableValue<VideoSharingSession> videoSharingSessionObservable = new ObservableValue<VideoSharingSession>(
-        null);
 
     public VideoSharing(Saros saros, VideoSharingService videoSharingService) {
         this.saros = saros;
@@ -234,10 +230,6 @@ public class VideoSharing {
         }
 
         return null;
-    }
-
-    public ObservableValue<VideoSharingSession> getSession() {
-        return this.videoSharingSessionObservable;
     }
 
     /* some getters for the base settings */
@@ -721,7 +713,8 @@ public class VideoSharing {
 
             // inform the other user
             try {
-                SessionErrorVideoActivity sessionError = new SessionErrorVideoActivity(e);
+                SessionErrorVideoActivity sessionError = new SessionErrorVideoActivity(
+                    e);
                 if (mode.equals(Mode.HOST) || mode.equals(Mode.LOCAL)) {
 
                     connectionFactory.getHostErrorOut().writeObject(

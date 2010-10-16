@@ -64,9 +64,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -74,9 +74,9 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity;
-import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity.Button;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseWheeledVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity.Button;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
 
@@ -91,8 +91,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     protected VideoSharing videoSharing;
     @Inject
     protected Saros saros;
-
-    protected ObservableValue<VideoSharingSession> videoSharingSessionObservable;
+    @Inject
+    protected VideoSessionObservable videoSharingSessionObservable;
 
     protected IPreferenceStore preferences;
     protected boolean resample = false;
@@ -138,7 +138,6 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             }
         });
 
-        this.videoSharingSessionObservable = videoSharing.getSession();
         this.videoSharingSessionObservable
             .add(new ValueChangeListener<VideoSharingSession>() {
 
@@ -313,7 +312,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             public void run() {
                 if (!parent.isDisposed()) {
                     fps.setText(String.valueOf(lastShownStatus.getFps()));
-                    bitrate.setText(Util.formatByte(lastShownStatus.getBytes()));
+                    bitrate
+                        .setText(Util.formatByte(lastShownStatus.getBytes()));
                     delay.setText(String.valueOf(lastShownStatus.getDelay()));
                 }
             }
@@ -491,8 +491,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             }
             paintInProgress = true;
 
-            lastImageDimension = new Dimension(tile.getWidth(),
-                tile.getHeight());
+            lastImageDimension = new Dimension(tile.getWidth(), tile
+                .getHeight());
             Dimension size = new Dimension(clientArea.width, clientArea.height);
 
             setSize(size);
@@ -586,8 +586,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
                     return;
 
                 sendActivity(new MouseWheeledVideoActivity(e.getX(), e.getY(),
-                    lastImageDimension.width, lastImageDimension.height,
-                    e.getWheelRotation()));
+                    lastImageDimension.width, lastImageDimension.height, e
+                        .getWheelRotation()));
             }
 
         }

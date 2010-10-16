@@ -136,6 +136,7 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -345,6 +346,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SessionIDObservable.class);
         this.container.addComponent(SarosSessionObservable.class);
         this.container.addComponent(VoIPSessionObservable.class);
+        this.container.addComponent(VideoSessionObservable.class);
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);

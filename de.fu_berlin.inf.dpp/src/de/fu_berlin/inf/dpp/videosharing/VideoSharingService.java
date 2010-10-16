@@ -19,14 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.videosharing;
 
-import java.util.concurrent.Callable;
-
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -70,22 +66,9 @@ public class VideoSharingService extends StreamService {
     public boolean sessionRequest(final User from, Object initial) {
         if (!videoSharing.ready())
             return false; // TODO reason to initiator
-        Callable<Boolean> askUser = new Callable<Boolean>() {
-            public Boolean call() throws Exception {
-                return (MessageDialog.openQuestion(
-                    EditorAPI.getShell(),
-                    "Incoming screensharing session",
-                    "Accept screensharing request from "
-                        + from.getHumanReadableName() + " ?"));
-            }
-        };
-
-        try {
-            return Util.runSWTSync(askUser);
-        } catch (Exception e) {
-            log.error("Unexpected exception: ", e);
-            return false;
-        }
+        return Util.popUpYesNoQuestion("Incoming screensharing session",
+            "Accept screensharing request from " + from.getHumanReadableName()
+                + " ?", false);
     }
 
     @Override

@@ -25,15 +25,15 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -42,113 +42,104 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 /**
  * @author s-lau
  */
+
 @Component(module = "action")
 public class VideoSharingAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(VideoSharingAction.class);
 
-    public static final String ACTION_ID = VideoSharingAction.class.getName();
+    protected static final String ACTION_ID = VideoSharingAction.class
+        .getName();
+    protected static final String TOOLTIP_START_SESSION = "Share your screen with selected user";
+    protected static final String TOOLTIP_STOP_SESSION = "Stop session with user ";
 
-    public static final String TOOLTIP_START_SESSION = "Share your screen with selected user";
-    public static final String TOOLTIP_STOP_SESSION = "Stop session with user ";
-
+    @Inject
     protected VideoSharing videoSharing;
-    protected SessionManager sessionManager;
+    @Inject
+    protected VideoSessionObservable sessionObservable;
 
+    protected SessionViewTableViewer viewer;
     protected User selectedUser = null;
 
-    public VideoSharingAction(SessionViewTableViewer sessionTable,
-        VideoSharing videoSharing, SessionManager sessionManager) {
+    public VideoSharingAction(SessionViewTableViewer viewer) {
+        super();
+        Saros.reinject(this);
         setId(ACTION_ID);
-
-        this.videoSharing = videoSharing;
-        this.sessionManager = sessionManager;
-
-        sessionTable
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-
-                public void selectionChanged(SelectionChangedEvent event) {
-                    ISelection selection = event.getSelection();
-
-                    if (selection instanceof StructuredSelection) {
-                        StructuredSelection users = (StructuredSelection) selection;
-                        if (users.size() == 1)
-                            selectedUser = (User) users.getFirstElement();
-
-                        updateState();
-                    }
-                }
-            });
-
-        videoSharing.getSession().add(
-            new ValueChangeListener<VideoSharingSession>() {
-
-                public void setValue(VideoSharingSession newValue) {
-                    updateState();
-                }
-            });
-
-        updateState();
-
+        changeButton();
+        setEnabled(false);
+        this.viewer = viewer;
+        viewer.addSelectionChangedListener(selectionListener);
+        sessionObservable.add(changeListener);
     }
 
-    protected void updateState() {
-        VideoSharingSession videoSharingSession = videoSharing.getSession()
-            .getValue();
-
-        if (videoSharingSession != null) {
-            setToolTipText(TOOLTIP_STOP_SESSION
-                + videoSharingSession.getRemoteUser());
-            setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/monitor_stop.png"));
-            setEnabled(true);
-        } else {
-            setToolTipText(TOOLTIP_START_SESSION);
-            setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/monitor_go.png"));
-            setEnabled(selectedUser != null);
+    protected ValueChangeListener<VideoSharingSession> changeListener = new ValueChangeListener<VideoSharingSession>() {
+        public void setValue(VideoSharingSession newValue) {
+            changeButton();
         }
+    };
+
+    protected ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+        public void selectionChanged(SelectionChangedEvent event) {
+            ISelection selection = event.getSelection();
+            if (selection instanceof StructuredSelection) {
+                StructuredSelection users = (StructuredSelection) selection;
+                if (users.isEmpty())
+                    selectedUser = null;
+                if (users.size() == 1)
+                    selectedUser = (User) users.getFirstElement();
+                setEnabled(shouldEnable());
+            }
+
+        }
+    };
+
+    protected boolean shouldEnable() {
+        return (selectedUser != null && !selectedUser.isLocal());
     }
 
     @Override
     public void run() {
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                VideoSharingSession videoSharingSession = videoSharing
-                    .getSession().getValue();
-                if (videoSharingSession == null && videoSharing.ready()) {
-                    if (selectedUser != null)
-                        try {
-                            videoSharing.startSharing(selectedUser);
-                        } catch (final SarosCancellationException e) {
-                            Util.runSafeSWTAsync(log, new Runnable() {
-                                public void run() {
-                                    EclipseUtils.openInformationMessageDialog(
-                                        EditorAPI.getShell(),
-                                        "Remote user rejected", e.getMessage());
-                                }
-                            });
-
-                            log.error("Could not establish screensharing: ", e);
-                        }
-                } else {
-                    if (videoSharingSession != null) {
-                        switch (videoSharingSession.getMode()) {
-                        case LOCAL:
-                        case HOST: //$FALL-THROUGH$
-                            videoSharingSession.dispose();
-                            break;
-                        case CLIENT:
-                            videoSharingSession.requestStop();
-                            break;
-                        }
-                        videoSharingSession.dispose();
+                VideoSharingSession videoSharingSession = sessionObservable
+                    .getValue();
+                if (videoSharing.ready()) {
+                    try {
+                        setEnabled(false);
+                        videoSharing.startSharing(selectedUser);
+                    } catch (final SarosCancellationException e) {
+                        Util.popUpFailureMessage(
+                            "Could not establish screensharing",
+                            e.getMessage(), false);
+                        log.error("Could not establish screensharing: ", e);
                     }
+                } else {
+                    switch (videoSharingSession.getMode()) {
+                    case LOCAL:
+                    case HOST: // $FALL-THROUGH$
+                        break;
+                    case CLIENT:
+                        videoSharingSession.requestStop();
+                        break;
+                    }
+                    videoSharingSession.dispose();
                 }
-                updateState();
+                setEnabled(shouldEnable());
+                changeButton();
             }
         });
+    }
+
+    protected void changeButton() {
+        if (sessionObservable.getValue() != null) {
+            setImageDescriptor(SarosUI
+                .getImageDescriptor("icons/monitor_stop.png"));
+            setToolTipText(TOOLTIP_STOP_SESSION);
+            return;
+        }
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/monitor_go.png"));
+        setToolTipText(TOOLTIP_START_SESSION);
     }
 
 }
