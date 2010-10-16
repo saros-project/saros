@@ -118,28 +118,28 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void confirmSessionInvitationWizard(String inviter,
         String projectname) throws RemoteException {
         waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep1();
         confirmSessionInvitationWindowStep2UsingNewproject(projectname);
     }
 
     public void confirmSessionInvitationWizardUsingExistProject(String inviter,
         String projectName) throws RemoteException {
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep1();
         confirmSessionInvitationWindowStep2UsingExistProject(projectName);
     }
 
     public void confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
         String inviter, String projectName) throws RemoteException {
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep1();
         confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(projectName);
     }
 
     public void confirmSessionInvitationWizardUsingExistProjectWithCopy(
         String inviter, String projectName) throws RemoteException {
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        confirmSessionInvitationWindowStep1(inviter);
+        confirmSessionInvitationWindowStep1();
         confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(projectName);
     }
 
@@ -162,8 +162,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * 
      * This method captures two screenshots as side effect.
      */
-    public void confirmSessionInvitationWindowStep1(String inviter)
-        throws RemoteException {
+    public void confirmSessionInvitationWindowStep1() throws RemoteException {
         // if (!isTextWithLabelEqualWithText(SarosConstant.TEXT_LABEL_INVITER,
         // inviter))
         // log.warn("inviter does not match: " + inviter);
@@ -1115,6 +1114,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         view.setFocus();
         SWTBot bot = view.bot();
         SWTBotToolbarButton b = bot.toolbarButton();
+        b.click();
+    }
+
+    public void cancelInvitation(JID canceleduserJID,
+        JID... otherInvitedUserJIDs) throws RemoteException {
+        int i = 0;
+        for (JID jid : otherInvitedUserJIDs) {
+            if (canceleduserJID.getName().compareTo(jid.getName()) > 0)
+                i++;
+        }
+        openProgressView();
+        activateProgressView();
+        SWTBotView view = delegate.viewByTitle("Progress");
+        view.setFocus();
+        SWTBot bot = view.bot();
+        SWTBotToolbarButton b = bot.toolbarButton(i);
         b.click();
     }
 

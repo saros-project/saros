@@ -92,7 +92,7 @@ public class TestParallelInvitationWithTerminationByHost {
     @Test
     public void testInvitationWithTerminationByHost() throws RemoteException {
         alice.bot.shareProject(PROJECT, invitees);
-        carl.bot.confirmSessionInvitationWindowStep1(alice.getPlainJid());
+        carl.bot.confirmSessionInvitationWindowStep1();
 
         alice.bot.cancelInvitation();
         bob.bot.waitUntilShellActive("Invitation Cancelled");

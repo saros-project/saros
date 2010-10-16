@@ -1860,4 +1860,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         });
     }
 
+    public void clickButton(String mnemonicText) throws RemoteException {
+        delegate.button(mnemonicText).click();
+    }
 }

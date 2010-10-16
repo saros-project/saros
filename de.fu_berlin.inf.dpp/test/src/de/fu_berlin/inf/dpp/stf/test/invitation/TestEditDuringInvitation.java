@@ -75,11 +75,11 @@ public class TestEditDuringInvitation {
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        carl.bot.confirmSessionInvitationWindowStep1(alice.getPlainJid());
+        carl.bot.confirmSessionInvitationWindowStep1();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT, PKG,
-            CLS);
+        bob.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
         carl.bot.confirmSessionInvitationWindowStep2UsingNewproject(PKG);

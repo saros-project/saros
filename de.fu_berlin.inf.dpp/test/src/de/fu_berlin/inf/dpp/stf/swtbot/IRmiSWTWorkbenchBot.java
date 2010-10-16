@@ -737,4 +737,6 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public String getTextOfEditor(String... filepath) throws RemoteException;
 
     public void newProject(String projectName) throws RemoteException;
+
+    public void clickButton(String mnemonicText) throws RemoteException;
 }

@@ -25,8 +25,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     /**
      * First acknowledge of a new Session initiated by the given inviter.
      */
-    public void confirmSessionInvitationWindowStep1(String inviter)
-        throws RemoteException;
+    public void confirmSessionInvitationWindowStep1() throws RemoteException;
 
     /**
      * Acknowledge the given Project creating a new Project in your workspace
@@ -301,4 +300,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void setTextInEditorWithSave(String contentPath, String... filePath)
         throws RemoteException;
+
+    public void cancelInvitation(JID canceleduserJID,
+        JID... otherInvitedUserJIDs) throws RemoteException;
 }
