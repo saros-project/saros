@@ -172,9 +172,9 @@ public class TestCreatingNewFile {
         bob.bot.sleep(500);
         assertFalse(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
 
-        if (!carl.state.isFollowedUser(alice.getPlainJid()))
+        if (!carl.state.isFollowingUser(alice.getPlainJid()))
             carl.bot.followUser(alice.state, alice.jid);
-        if (!bob.state.isFollowedUser(alice.getPlainJid()))
+        if (!bob.state.isFollowingUser(alice.getPlainJid()))
             bob.bot.followUser(alice.state, alice.jid);
 
         alice.bot.newFolder(PROJECT, FOLDER2);

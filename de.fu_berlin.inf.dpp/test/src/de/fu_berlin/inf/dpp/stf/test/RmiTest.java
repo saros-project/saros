@@ -68,6 +68,17 @@ public class RmiTest {
     }
 
     @Test
+    public void testGiveExclusiveRole() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        alice.buildSessionSequential(PROJECT,
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.bot.giveExclusiveDriverRole(bob.getPlainJid());
+        assertTrue(bob.state.isExclusiveDriver());
+        assertFalse(alice.state.isDriver(alice.jid));
+    }
+
+    @Test
+    @Ignore
     public void testCancelInvitationByPeer() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
         List<String> peersName = new LinkedList<String>();
