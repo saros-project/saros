@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -67,6 +68,21 @@ public class RmiTest {
     }
 
     @Test
+    public void testCancelInvitationByPeer() throws RemoteException {
+        alice.bot.newJavaProject(PROJECT);
+        List<String> peersName = new LinkedList<String>();
+        peersName.add(bob.getPlainJid());
+        alice.bot.shareProject(PROJECT, peersName);
+        bob.bot.waitUntilShellActive("Session Invitation");
+        bob.bot.confirmSessionInvitationWindowStep1();
+        bob.bot.clickButton(SarosConstant.BUTTON_CANCEL);
+        alice.bot.waitUntilShellActive("Problem Occurred");
+        assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
+            bob.getName() + ".*"));
+        alice.bot.clickButton(SarosConstant.BUTTON_OK);
+    }
+
+    @Test
     @Ignore
     public void testNewFolderInEmptyJavaProject() throws RemoteException {
         alice.bot.newJavaProject(PROJECT);
@@ -78,6 +94,7 @@ public class RmiTest {
     }
 
     @Test
+    @Ignore
     public void testNewFileNewFolderInEmptyProject() throws RemoteException {
         alice.bot.newProject(PROJECT);
         assertTrue(alice.bot.isProjectExist(PROJECT));

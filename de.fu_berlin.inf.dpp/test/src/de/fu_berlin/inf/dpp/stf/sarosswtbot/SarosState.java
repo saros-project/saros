@@ -63,6 +63,7 @@ public class SarosState implements ISarosState {
             try {
                 ISarosSession sarosSession = sessionManager.getSarosSession();
                 User user = sarosSession.getUser(jid);
+
                 result &= sarosSession.getDrivers().contains(user);
             } catch (Exception e) {
                 return false;

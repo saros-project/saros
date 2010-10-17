@@ -1863,4 +1863,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public void clickButton(String mnemonicText) throws RemoteException {
         delegate.button(mnemonicText).click();
     }
+
+    public String getSecondLabelOfProblemOccurredWindow() throws RemoteException {
+        SWTBotShell activeShell = delegate.activeShell();
+        return activeShell.bot().label(2).getText();
+    }
 }

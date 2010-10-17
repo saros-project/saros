@@ -83,6 +83,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * popup window page
      * 
      *******************************************************************************/
+
+    public void confirmProblemOccurredWindow(String plainJID)
+        throws RemoteException {
+        waitUntilShellActive("Problem Occurred");
+        delegate.text().getText().matches("*." + plainJID + ".*");
+        waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        delegate.button(SarosConstant.BUTTON_OK).click();
+    }
+
     public void confirmNewContactWindow(String plainJID) throws RemoteException {
         waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
         delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
@@ -1117,20 +1126,21 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         b.click();
     }
 
-    public void cancelInvitation(JID canceleduserJID,
-        JID... otherInvitedUserJIDs) throws RemoteException {
-        int i = 0;
-        for (JID jid : otherInvitedUserJIDs) {
-            if (canceleduserJID.getName().compareTo(jid.getName()) > 0)
-                i++;
-        }
+    public void cancelInvitation(int index) throws RemoteException {
         openProgressView();
         activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
+        view.toolbarButton("Remove All Finished Operations").click();
         view.setFocus();
         SWTBot bot = view.bot();
-        SWTBotToolbarButton b = bot.toolbarButton(i);
+        SWTBotToolbarButton b = bot.toolbarButton(index);
         b.click();
+    }
+
+    public void cancelInivtationInSessionInvitationWindow()
+        throws RemoteException {
+        SWTBotShell shell = delegate.activeShell();
+        shell.bot().toolbarButton().click();
     }
 
     public boolean isProgressViewOpen() throws RemoteException {

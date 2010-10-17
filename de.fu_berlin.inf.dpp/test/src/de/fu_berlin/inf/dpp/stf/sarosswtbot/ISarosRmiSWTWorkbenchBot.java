@@ -301,6 +301,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void setTextInEditorWithSave(String contentPath, String... filePath)
         throws RemoteException;
 
-    public void cancelInvitation(JID canceleduserJID,
-        JID... otherInvitedUserJIDs) throws RemoteException;
+    public void cancelInvitation(int index) throws RemoteException;
+
+    public void cancelInivtationInSessionInvitationWindow()
+        throws RemoteException;
 }
