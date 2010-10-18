@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -42,7 +43,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -51,7 +51,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
@@ -110,6 +112,42 @@ public class SessionView extends ViewPart {
         .getImage("icons/user_observer.png");
 
     protected IRosterListener rosterListener;
+
+    IPartListener2 viewPartListener = new IPartListener2() {
+        public void partVisible(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partOpened(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partInputChanged(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partHidden(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partDeactivated(IWorkbenchPartReference partRef) {
+            // Ensure the user in the session view is deselected when this
+            // view loses focus.
+            viewer.setSelection(new StructuredSelection());
+        }
+
+        public void partClosed(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+
+        public void partActivated(IWorkbenchPartReference partRef) {
+            // Do nothing
+        }
+    };
 
     /**
      * This RosterListener is responsible to trigger updates to our table
@@ -345,9 +383,9 @@ public class SessionView extends ViewPart {
         public void followModeChanged(User user) {
             viewer.refresh();
         }
-   
+
         @Override
-        public void colorChanged(){
+        public void colorChanged() {
             viewer.refresh();
         }
     };
@@ -485,6 +523,8 @@ public class SessionView extends ViewPart {
         updateEnablement();
 
         setPartName("Shared Project Session");
+
+        getViewSite().getPage().addPartListener(viewPartListener);
     }
 
     /**
