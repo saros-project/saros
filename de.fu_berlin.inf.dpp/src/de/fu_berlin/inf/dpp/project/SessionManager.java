@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -168,18 +169,18 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
             this.transferManager, dispatchThreadContext, myJID, stopManager,
             new DateTime(), useVersionControl);
+        // TODO Add project after starting the session.
         sarosSession.addSharedProject(project, project.getName());
 
         this.sarosSessionObservable.setValue(sarosSession);
 
         sarosSession.start();
-
         for (ISessionListener listener : this.listeners) {
             listener.sessionStarted(sarosSession);
         }
+        SessionManager.log.info("Session started");
 
         openInviteDialog(preferenceUtils.getAutoInviteUsers());
-        SessionManager.log.info("Session started");
     }
 
     /**
@@ -271,7 +272,19 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public void addSessionListener(ISessionListener listener) {
         if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
+            /*
+             * HACK PreferencesManager relies on the fact that a project is
+             * added only when a session is started, and it might create a new
+             * file ".settings/org.eclipse.core.resources.prefs" for the project
+             * specific settings. Adding PreferencesManager as the last listener
+             * makes sure that the file creation is registered by the
+             * SharedResourcesManager.
+             */
+            if (listener instanceof PreferenceManager) {
+                this.listeners.add(listener);
+            } else {
+                this.listeners.add(0, listener);
+            }
         }
     }
 
@@ -398,10 +411,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         protected OutgoingInvitationProcess process;
         protected String peer;
         protected ISessionListener cancelListener = new ISessionListener() {
-
-            public void invitationReceived(IncomingInvitationProcess invitation) {
-                // Nothing to do here
-            }
 
             public void sessionEnded(ISarosSession oldSharedProject) {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
