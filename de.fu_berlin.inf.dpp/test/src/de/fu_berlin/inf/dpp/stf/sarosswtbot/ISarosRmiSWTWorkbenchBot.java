@@ -305,4 +305,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void cancelInivtationInSessionInvitationWindow()
         throws RemoteException;
+
+    public void stopFollowUser(ISarosState stateOfFollowedUser,
+        JID JIDOfFollowedUser) throws RemoteException;
 }

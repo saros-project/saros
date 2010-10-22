@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -64,6 +65,11 @@ public class PerspectiveObject {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
                         final IWorkbench wb = PlatformUI.getWorkbench();
+                        IPerspectiveDescriptor[] descriptors = wb
+                            .getPerspectiveRegistry().getPerspectives();
+                        for (IPerspectiveDescriptor per : descriptors) {
+                            log.debug("installed perspective id:" + per.getId());
+                        }
                         final IWorkbenchWindow win = wb
                             .getActiveWorkbenchWindow();
                         try {

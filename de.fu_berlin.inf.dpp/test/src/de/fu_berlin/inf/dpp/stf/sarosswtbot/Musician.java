@@ -189,6 +189,55 @@ public class Musician {
         bot.waitUntilSessionCloses();
     }
 
+    /**
+     * the local user can be concurrently followed by many other users.
+     * 
+     * @param musicians
+     *            the list of the remote Users who want to follow the local
+     *            user.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public void followedBy(Musician... musicians) throws RemoteException,
+        InterruptedException {
+        List<Callable<Void>> followTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < musicians.length; i++) {
+            final Musician musician = musicians[i];
+            followTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.bot.followUser(state, jid);
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(followTasks, followTasks.size());
+    }
+
+    /**
+     * stop the follow-mode of the remote users who are following the local
+     * user.
+     * 
+     * @param musicians
+     *            the list of the remote Users who are following the local user.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public void stopFollowedBy(Musician... musicians) throws RemoteException,
+        InterruptedException {
+        List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < musicians.length; i++) {
+            final Musician musician = musicians[i];
+            stopFollowTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.bot.stopFollowUser(state, jid);
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(stopFollowTasks,
+            stopFollowTasks.size());
+    }
+
     public String getName() {
         return jid.getName();
     }

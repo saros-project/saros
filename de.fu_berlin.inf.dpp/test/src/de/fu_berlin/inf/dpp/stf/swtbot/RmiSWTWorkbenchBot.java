@@ -1558,6 +1558,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
+    public void closeAllOpenedEditors() throws RemoteException {
+        delegate.closeAllEditors();
+    }
+
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {
         activateJavaEditor(className);
@@ -1864,7 +1868,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.button(mnemonicText).click();
     }
 
-    public String getSecondLabelOfProblemOccurredWindow() throws RemoteException {
+    public String getSecondLabelOfProblemOccurredWindow()
+        throws RemoteException {
         SWTBotShell activeShell = delegate.activeShell();
         return activeShell.bot().label(2).getText();
     }

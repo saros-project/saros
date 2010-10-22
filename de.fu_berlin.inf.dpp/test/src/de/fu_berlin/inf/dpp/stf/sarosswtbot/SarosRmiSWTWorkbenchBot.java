@@ -807,6 +807,22 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
                     + "", SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER);
     }
 
+    public void stopFollowUser(ISarosState stateOfFollowedUser,
+        JID JIDOfFollowedUser) throws RemoteException {
+        openSessionView();
+        activateSharedSessionView();
+        if (stateOfFollowedUser.isDriver(JIDOfFollowedUser))
+            viewObject.clickContextMenuOfTableInView(
+                BotConfiguration.NAME_SESSION_VIEW, JIDOfFollowedUser.getBase()
+                    + " (Driver)",
+                SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
+
+        else
+            viewObject.clickContextMenuOfTableInView(
+                BotConfiguration.NAME_SESSION_VIEW, JIDOfFollowedUser.getBase()
+                    + "", SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
+    }
+
     public void clickShareProjectWith(String projectName,
         String shareProjectWith) throws RemoteException {
         if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {

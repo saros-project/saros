@@ -740,5 +740,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void clickButton(String mnemonicText) throws RemoteException;
 
-    public String getSecondLabelOfProblemOccurredWindow() throws RemoteException;
+    public String getSecondLabelOfProblemOccurredWindow()
+        throws RemoteException;
+
+    public void closeAllOpenedEditors() throws RemoteException;
 }
