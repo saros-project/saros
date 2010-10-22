@@ -24,11 +24,20 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -72,8 +81,8 @@ public class InviteAction extends SelectionProviderAction {
     public InviteAction(SessionManager sessionManager, Saros saros,
         ISelectionProvider provider, DiscoveryManager discoManager,
         InvitationProcessObservable invitationProcesses) {
-        super(provider, "Invite user to current session...");
-        setToolTipText("Invites the selected users to the current Saros session.");
+        super(provider, "Invite user...");
+        setToolTipText("Invites the selected users to a Saros session. A new session will be started if none exists.");
 
         setImageDescriptor(SarosUI.getImageDescriptor("icons/invites.png"));
 
@@ -91,13 +100,47 @@ public class InviteAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
-            public void run() {
-                sessionManager.invite(getSelected(), sessionManager
-                    .getSarosSession().getHost().getJID().getBase()
-                    + " has invited you to a Saros shared project session");
+        ISarosSession currentSession = sessionManager.getSarosSession();
+
+        if (currentSession == null) {
+            // We are not in a session. We start a new session with the selected
+            // user.
+
+            // Choose project to share
+            ContainerSelectionDialog dialog = new ContainerSelectionDialog(
+                EditorAPI.getShell(), null, false, "Select project to share");
+
+            dialog.open();
+            Object[] result = dialog.getResult();
+
+            IProject chosenProject = ResourcesPlugin.getWorkspace().getRoot()
+                .findMember((Path) result[0]).getProject();
+
+            // Start new Saros session, invite selected user
+            try {
+                sessionManager.startSession(chosenProject, null, false);
+                sessionManager.invite(getSelected(), makeDescription());
+            } catch (final XMPPException e) {
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        ErrorDialog.openError(EditorAPI.getShell(),
+                            "Error Starting Session",
+                            "Session could not be started", new Status(
+                                IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                                IStatus.ERROR, e.getMessage(), e));
+                    }
+                });
             }
-        });
+
+        } else {
+            // We are in an existing session. We are adding the user.
+
+            Util.runSafeSync(log, new Runnable() {
+                public void run() {
+                    sessionManager.invite(getSelected(), makeDescription());
+                }
+            });
+        }
     }
 
     @Override
@@ -130,32 +173,52 @@ public class InviteAction extends SelectionProviderAction {
         return selected;
     }
 
+    /**
+     * Checks if it is possible to invite the user currently selected in the
+     * RosterView. Checks if peer:
+     * <ol>
+     * <li>is available
+     * <li>is not the session (if a session exists)
+     * <li>has Saros installed
+     * <li>is not currently in an invitation
+     * </ol>
+     * 
+     * @return true if the participant
+     */
     public boolean canInviteSelected() {
 
         ISarosSession sarosSession = sessionManager.getSarosSession();
+        List<JID> usersSelected = getSelected();
 
-        List<JID> selected = getSelected();
-
-        if (sarosSession == null || !sarosSession.isHost()
-            || selected.isEmpty()) {
+        if (usersSelected.isEmpty())
             return false;
-        }
 
-        for (JID jid : selected) {
-
-            // Participant needs to be...
-            // ...available
-            // ...not in a session already
-            // ...to have saros
-            // ...not currently in a invitation
+        // Test if each user is reachable and available
+        for (JID jid : usersSelected) {
             if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
-                || sarosSession.getResourceQualifiedJID(jid) != null
                 || !discoManager.isSarosSupported(jid)
                 || invitationProcesses.getInvitationProcess(jid) != null)
                 return false;
+        }
 
+        if (sarosSession != null) {
+            // Make sure I am host
+            if (!sarosSession.isHost())
+                return false;
+
+            // Make sure none of them are already in the session
+            for (JID jid : usersSelected) {
+                if (sarosSession.getResourceQualifiedJID(jid) != null)
+                    return false;
+            }
         }
 
         return true;
+    }
+
+    private String makeDescription() {
+        return sessionManager.getSarosSession().getHost().getJID().getBase()
+            + " has invited you to a Saros shared project session";
+
     }
 }

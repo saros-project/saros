@@ -38,6 +38,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -58,6 +59,9 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
 
     public GeneralNewSessionAction() {
         super();
@@ -80,9 +84,12 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
             }
             if (running) {
                 sessionManager.openInviteDialog(null);
-            } else
+            } else {
                 sessionManager.startSession(this.selectedProject, resource,
                     useVersionControl);
+                sessionManager.openInviteDialog(preferenceUtils
+                    .getAutoInviteUsers());
+            }
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {

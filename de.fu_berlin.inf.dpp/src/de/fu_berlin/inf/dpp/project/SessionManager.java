@@ -67,7 +67,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -109,9 +108,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     @Inject
     protected SessionIDObservable sessionID;
-
-    @Inject
-    protected PreferenceUtils preferenceUtils;
 
     @Inject
     protected StopManager stopManager;
@@ -179,8 +175,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.sessionStarted(sarosSession);
         }
         SessionManager.log.info("Session started");
-
-        openInviteDialog(preferenceUtils.getAutoInviteUsers());
     }
 
     /**
