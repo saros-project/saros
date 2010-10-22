@@ -1558,9 +1558,9 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     }
 
-    public void closeAllOpenedEditors() throws RemoteException {
-        delegate.closeAllEditors();
-    }
+    // public void closeAllOpenedEditors() throws RemoteException {
+    // delegate.closeAllEditors();
+    // }
 
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {

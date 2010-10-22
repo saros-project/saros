@@ -136,7 +136,7 @@ public class TestChangingDriverWhileOtherFollow {
         // dave.bot.followUser(carl.state, carl.jid);
         // carl.stopFollowedBy(alice, bob, dave);
         // carl.followedBy(alice, bob, dave);
-        carl.bot.closeAllOpenedEditors();
+        // carl.bot.closeAllOpenedEditors();
         carl.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         String dirtyClsContentOfCarl = carl.bot.getTextOfJavaEditor(PROJECT,
             PKG, CLS);
