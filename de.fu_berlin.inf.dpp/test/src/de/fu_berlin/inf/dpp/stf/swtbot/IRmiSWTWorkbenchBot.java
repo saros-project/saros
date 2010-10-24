@@ -743,5 +743,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public String getSecondLabelOfProblemOccurredWindow()
         throws RemoteException;
 
+    public void waitUntilJavaEditorContentSame(String otherClassContent,
+        String projectName, String pkg, String className)
+        throws RemoteException;
     // public void closeAllOpenedEditors() throws RemoteException;
 }

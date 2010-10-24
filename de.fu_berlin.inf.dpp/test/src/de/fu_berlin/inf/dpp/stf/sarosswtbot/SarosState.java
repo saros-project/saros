@@ -103,8 +103,7 @@ public class SarosState implements ISarosState {
     }
 
     public boolean existSession() {
-        log
-            .debug("existSession() == " + sessionManager.getSarosSession() != null);
+        log.debug("existSession() == " + sessionManager.getSarosSession() != null);
         return sessionManager.getSarosSession() != null;
     }
 
@@ -136,11 +135,17 @@ public class SarosState implements ISarosState {
     }
 
     public boolean isFollowingUser(String plainJID) throws RemoteException {
-        return getFollowedUser().equals(plainJID);
+        if (getFollowedUserPlainJID() == null)
+            return false;
+        else
+            return getFollowedUserPlainJID().equals(plainJID);
     }
 
-    public String getFollowedUser() throws RemoteException {
-        return editorManager.getFollowedUser().getJID().getBase();
+    public String getFollowedUserPlainJID() throws RemoteException {
+        if (editorManager.getFollowedUser() != null)
+            return editorManager.getFollowedUser().getJID().getBase();
+        else
+            return null;
     }
 
     public boolean isDriver(JID jid) throws RemoteException {

@@ -118,4 +118,8 @@ public class SarosConditions extends Conditions {
         String otherContent, String... filePath) {
         return new IsEditorContentsSame(bot, otherContent, filePath);
     }
+
+    public static ICondition isFollowingUser(ISarosState state, String plainJID) {
+        return new IsFollowingUser(state, plainJID);
+    }
 }

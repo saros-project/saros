@@ -48,6 +48,8 @@ public class BotConfiguration {
     public final static String PACKAGENAME3 = "my.pkg3";
 
     public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
+    public final static String CONTENTCHANGEPATH = "test/STF/" + CLASSNAME
+        + "Change" + ".java";
     public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
         + ".java";
 

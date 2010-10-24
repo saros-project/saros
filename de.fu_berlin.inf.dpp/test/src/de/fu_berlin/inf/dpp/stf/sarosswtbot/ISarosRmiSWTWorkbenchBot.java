@@ -308,4 +308,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void stopFollowUser(ISarosState stateOfFollowedUser,
         JID JIDOfFollowedUser) throws RemoteException;
+
+    public void waitUntilFollowed(String plainJID) throws RemoteException;
 }

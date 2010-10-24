@@ -141,7 +141,7 @@ public interface ISarosState extends Remote {
     // className)
     // throws RemoteException, FileNotFoundException;
 
-    public String getFollowedUser() throws RemoteException;
+    public String getFollowedUserPlainJID() throws RemoteException;
 
     public boolean isFollowingUser(String plainJID) throws RemoteException;
 

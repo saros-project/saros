@@ -1015,6 +1015,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * waitUntil
      * 
      *******************************************************************************/
+    public void waitUntilFollowed(String plainJID) throws RemoteException {
+        wUntilObject
+            .waitUntil(SarosConditions.isFollowingUser(state, plainJID));
+    }
+
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isChatMessageExist(this, jid,

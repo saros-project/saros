@@ -23,6 +23,7 @@ public class TestChangingDriverWhileOtherFollow {
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
     private static final String CP = BotConfiguration.CONTENTPATH;
+    private static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
 
     private static Musician alice;
     private static Musician bob;
@@ -36,6 +37,7 @@ public class TestChangingDriverWhileOtherFollow {
      * <li>Bob (Observer)</li>
      * <li>Carl (Observer)</li>
      * <li>Dave (Observer)</li>
+     * <li>All observers enable followmode</li>
      * </ol>
      * 
      * @throws AccessException
@@ -64,6 +66,9 @@ public class TestChangingDriverWhileOtherFollow {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
+        /*
+         * bob, carl and dave follow alice.
+         */
         alice.followedBy(bob, carl, dave);
 
     }
@@ -98,25 +103,21 @@ public class TestChangingDriverWhileOtherFollow {
     /**
      * Steps:
      * <ol>
-     * <li>Alice invites everyone else simultaneously.</li>
-     * <li>Alice opens the Progress View and cancels Bob's invitation before Bob
-     * accepts.</li>
-     * <li>Carl accepts the invitation but does not choose a target project.</li>
-     * <li>Alice opens the Progress View and cancels Carl's invitation before
-     * Carl accepts</li>
-     * <li>Dave accepts the invitation and chooses a target project.</li>
-     * <li>Alice opens the Progress View and cancels Dave 's invitation during
-     * the synchronisation.</li>
+     * <li>alice makes carl exclusive driver.</li>
+     * <li>Observer are in follow mode.</li>
+     * <li>carl opens a file and edit it.</li>
+     * <li>Observers leave follow mode after they saw the opened file.</li>
+     * <li>carl continue to edit the opened file, but doesn't save</li>
      * </ol>
      * 
      * Result:
      * <ol>
      * <li></li>
-     * <li>Bob is notified of Alice's canceling the invitation.</li>
      * <li></li>
-     * <li>Carl is notified of Alice's canceling the invitation.</li>
+     * <li>Observers saw the opened file and the dirty flag of the file,</li>
      * <li></li>
-     * <li>Dave is notified of Alice's canceling the invitation.</li>
+     * <li></li>
+     * <li>Edited file is opened and not saved at every observer</li>
      * </ol>
      * 
      * @throws CoreException
@@ -125,41 +126,78 @@ public class TestChangingDriverWhileOtherFollow {
      */
 
     @Test
-    public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
-        throws IOException, CoreException, InterruptedException {
+    public void testChanginDriverWhileOtherFollow() throws IOException,
+        CoreException, InterruptedException {
         alice.bot.giveExclusiveDriverRole(carl.getPlainJid());
-        // if (!alice.state.isFollowingUser(carl.getPlainJid()))
-        // alice.bot.followUser(carl.state, carl.jid);
-        // if (!bob.state.isFollowingUser(carl.getPlainJid()))
-        // bob.bot.followUser(carl.state, carl.jid);
-        // if (!dave.state.isFollowingUser(carl.getPlainJid()))
-        // dave.bot.followUser(carl.state, carl.jid);
-        // carl.stopFollowedBy(alice, bob, dave);
-        // carl.followedBy(alice, bob, dave);
-        // carl.bot.closeAllOpenedEditors();
+        alice.bot.waitUntilFollowed(carl.getPlainJid());
+        bob.bot.waitUntilFollowed(carl.getPlainJid());
+        dave.bot.waitUntilFollowed(carl.getPlainJid());
+
         carl.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         String dirtyClsContentOfCarl = carl.bot.getTextOfJavaEditor(PROJECT,
             PKG, CLS);
 
-        alice.bot.waitUntilEditorContentSame(PROJECT, PKG, CLS,
-            dirtyClsContentOfCarl);
+        alice.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
+            PROJECT, PKG, CLS);
         assertTrue(alice.bot.isJavaEditorActive(CLS));
         assertTrue(alice.bot.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        bob.bot.waitUntilEditorContentSame(PROJECT, PKG, CLS,
-            dirtyClsContentOfCarl);
+        bob.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl, PROJECT,
+            PKG, CLS);
         assertTrue(bob.bot.isJavaEditorActive(CLS));
         assertTrue(bob.bot.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        dave.bot.waitUntilEditorContentSame(PROJECT, PKG, CLS,
-            dirtyClsContentOfCarl);
+        dave.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl, PROJECT,
+            PKG, CLS);
         assertTrue(dave.bot.isJavaEditorActive(CLS));
         assertTrue(dave.bot.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
         carl.stopFollowedBy(alice, bob, dave);
+        carl.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
+        carl.bot.closeJavaEditorWithSave(CLS);
+        String dirtyClsChangeContentOfCarl = carl.bot.getTextOfJavaEditor(
+            PROJECT, PKG, CLS);
+
+        assertTrue(alice.bot.isJavaEditorActive(CLS));
+        /*
+         * TODO alice can still see the changes maded by carl, although she
+         * already leave follow mode. There is a bug here (see Bug 3094186)and
+         * it should be fixed, so that asserts that the following condition is
+         * false
+         * 
+         * 
+         * With Saros Version 10.10.29.DEVEL.
+         */
+        // assertFalse(alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+        // dirtyClsChangeContentOfCarl));
+
+        assertTrue(bob.bot.isJavaEditorActive(CLS));
+
+        /*
+         * TODO bob can still see the changes maded by carl, although he already
+         * leave follow mode. There is a bug here (see Bug 3094186) and it
+         * should be fixed, so that asserts that the following condition is
+         * false.
+         * 
+         * With Saros Version 10.10.29.DEVEL.
+         */
+        // assertFalse(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+        // dirtyClsChangeContentOfCarl));
+
+        assertTrue(dave.bot.isJavaEditorActive(CLS));
+
+        /*
+         * TODO dave can still see the changes , although he already leave
+         * follow mode. There is a bug here (see Bug 3094186) and it should be
+         * fixed, so that asserts that the following condition is false.
+         * 
+         * With Saros Version 10.10.29.DEVEL.
+         */
+        // assertFalse(dave.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+        // dirtyClsChangeContentOfCarl));
 
     }
 }

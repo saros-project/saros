@@ -1740,6 +1740,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             otherClassContent, filePath));
     }
 
+    public void waitUntilJavaEditorContentSame(String otherClassContent,
+        String projectName, String pkg, String className)
+        throws RemoteException {
+        wUntilObject.waitUntil(SarosConditions.isEditorContentsSame(this,
+            otherClassContent, projectName, "src", pkg, className + ".java"));
+    }
+
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException {
         wUntilObject.waitUntil(shellCloses(shell));
         delegate.sleep(10);
