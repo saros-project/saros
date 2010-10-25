@@ -1763,6 +1763,24 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         waitUntilEditorActive(className + ".java");
     }
 
+    public void waitUntilJavaEditorOpen(String className)
+        throws RemoteException {
+        waitUntilEditorOpen(className + ".java");
+    }
+
+    public void waitUntilJavaEditorClosed(String className)
+        throws RemoteException {
+        waitUntilEditorClosed(className + ".java");
+    }
+
+    public void waitUntilEditorClosed(String name) {
+        wUntilObject.waitUntil(SarosConditions.isEditorClosed(this, name));
+    }
+
+    public void waitUntilEditorOpen(String name) {
+        wUntilObject.waitUntil(SarosConditions.isEditorOpen(this, name));
+    }
+
     public void waitUntilEditorActive(String name) {
         wUntilObject.waitUntil(SarosConditions.isEditorActive(delegate, name));
     }

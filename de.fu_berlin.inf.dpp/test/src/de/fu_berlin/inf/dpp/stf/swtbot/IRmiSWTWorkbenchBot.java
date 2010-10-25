@@ -746,5 +746,15 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     public void waitUntilJavaEditorContentSame(String otherClassContent,
         String projectName, String pkg, String className)
         throws RemoteException;
+
+    public boolean isClassOpen(String className) throws RemoteException;
+
+    public boolean isFileOpen(String fileName) throws RemoteException;
+
+    public void waitUntilJavaEditorOpen(String className)
+        throws RemoteException;
+
+    public void waitUntilJavaEditorClosed(String className)
+        throws RemoteException;
     // public void closeAllOpenedEditors() throws RemoteException;
 }

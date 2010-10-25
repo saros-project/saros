@@ -54,6 +54,14 @@ public class SarosConditions extends Conditions {
         return new isEditorActive(bot, name);
     }
 
+    public static ICondition isEditorOpen(IRmiSWTWorkbenchBot bot, String name) {
+        return new IsEditorOpen(bot, name);
+    }
+
+    public static ICondition isEditorClosed(IRmiSWTWorkbenchBot bot, String name) {
+        return new IsEditorClosed(bot, name);
+    }
+
     public static ICondition isSessionClosed(ISarosState state) {
         return new isSessionclosed(state);
     }
