@@ -30,11 +30,10 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
- * instance for the use in a Saros session.
+ * instance for the use in one Saros session.
  * 
  * A user object always has the following immutable characteristics: He/she
- * belongs to a single ISarosSession, has a final color, and fixed
- * JID.
+ * belongs to a single ISarosSession, has a final color, and fixed JID.
  * 
  * There is one user who is the host, all others are clients.
  * 

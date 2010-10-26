@@ -21,8 +21,10 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -34,15 +36,20 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.ChatStatusManager;
+import de.fu_berlin.inf.dpp.MultiUserChatManager;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -58,6 +65,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  * @author ahaferburg
+ * @author mariaspg
  */
 @Component(module = "net")
 public class MessagingManager implements IConnectionListener,
@@ -67,11 +75,13 @@ public class MessagingManager implements IConnectionListener,
      * Listener for incoming chat messages.
      */
     public interface IChatListener {
-        public void chatMessageAdded(String sender, String message);
+        public void chatMessageAdded(User sender, String message);
 
-        public void chatJoined();
+        public void chatStateUpdated(User sender, ChatState state);
 
-        public void chatLeft();
+        public void chatJoined(User joinedUser);
+
+        public void chatLeft(User leftUser);
     }
 
     private static final Logger log = Logger.getLogger(MessagingManager.class);
@@ -80,18 +90,20 @@ public class MessagingManager implements IConnectionListener,
 
     protected SessionManager sessionManager;
 
+    protected ChatStatusManager chatStatusManager;
+
     @Inject
     protected CommunicationNegotiatingManager comNegotiatingManager;
 
     /** True iff we're in a Saros session. */
-    private boolean sessionStarted = false;
+    private boolean sarosSessionRunning = false;
 
     /** True iff we're currently in the chat room. */
     private boolean chatJoined = false;
 
     private final List<IChatListener> chatListeners = new ArrayList<IChatListener>();
 
-    private MultiChatSession session;
+    private MultiChatSession mucSession;
 
     /** Stores the last connection used so that we know if it changes. */
     private Connection currentConnection;
@@ -109,13 +121,13 @@ public class MessagingManager implements IConnectionListener,
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            sessionStarted = false;
+            sarosSessionRunning = false;
             checkChatState();
         }
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            sessionStarted = true;
+            sarosSessionRunning = true;
             // If the [possibly user specified] chat server is unreachable,
             // checkChatState() will block, causing a ~5s delay when using the
             // "Share project" command.
@@ -137,11 +149,39 @@ public class MessagingManager implements IConnectionListener,
 
         public String getName();
 
-        public void sendMessage(String msg);
+        /**
+         * Sends a message and/ or a state to all other participants in the
+         * multi user chat.
+         * 
+         * @param msg
+         *            message to send to other chat participants; can be null
+         * @param state
+         *            current state send to other participants; can be null
+         */
+        public void sendMessage(String msg, ChatState state);
+    }
+
+    /**
+     * Events for state changes of a user in a multi user chat.
+     * 
+     * @author mariaspg
+     */
+    public interface ChatStatusListener {
+
+        /**
+         * Fired when the state of a user changes.
+         * 
+         * @param sender
+         *            the sender who changed the state.
+         * @param state
+         *            the new state of the sender.
+         */
+        void stateChanged(String sender, ChatState state);
+
     }
 
     public class MultiChatSession implements SessionProvider, PacketListener,
-        MessageListener {
+        MessageListener, ChatStatusListener {
         private final Logger logCH = Logger.getLogger(MultiChatSession.class
             .getName());
 
@@ -150,7 +190,9 @@ public class MessagingManager implements IConnectionListener,
         private final List<ChatLine> history = new ArrayList<ChatLine>();
 
         /** The chat room corresponding to the current session. */
-        private MultiUserChat muc;
+        private MultiUserChatManager muc;
+
+        private Set<User> chatUsers = new HashSet<User>();
 
         public MultiChatSession() {
             name = "Multi User Chat (" + saros.getMyJID().getName() + ")";
@@ -168,12 +210,18 @@ public class MessagingManager implements IConnectionListener,
             logCH.debug("processPacket called");
 
             final Message message = (Message) packet;
-
-            if (message.getBody() == null) {
+            if (message.getBody() == null || message.getBody().equals("")) {
                 return;
             }
 
-            chatMessageAdded(message);
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            JID jid = getJID(message.getFrom());
+            User user = sarosSession.getUser(jid);
+
+            if (user == null)
+                return;
+
+            chatMessageAdded(user, message.getBody());
         }
 
         public void processMessage(Chat chat, Message message) {
@@ -181,25 +229,66 @@ public class MessagingManager implements IConnectionListener,
             processPacket(message);
         }
 
-        /*
+        /**
          * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
          */
-        public void sendMessage(String text) {
-
+        public void sendMessage(String text, ChatState state) {
             if (muc == null) {
                 logCH.error("MUC does not exist");
                 return;
             }
 
             try {
-                Message msg = muc.createMessage();
-                msg.setBody(text);
-                muc.sendMessage(msg);
+                /*
+                 * Sends a message if there is one. If a message was composed
+                 * then the ChatState is always active.
+                 */
+                chatStatusManager.setCurrentState(
+                    (state == null) ? ChatState.active : state, muc);
+                if (text != null) {
+                    Message msg = muc.createMessage();
+                    msg.setBody(text);
+                    muc.sendMessage(msg);
+                }
             } catch (Exception e1) {
                 e1.printStackTrace();
                 addChatLine("error",
                     "Couldn't send message (" + e1.getMessage() + ")");
             }
+        }
+
+        /**
+         * Fired when the state of another user changes.
+         * 
+         * @see ChatStatusListener
+         */
+        public void stateChanged(String sender, ChatState state) {
+            logCH.debug("stateChanged got fired with state: "
+                + state.toString());
+
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            JID jid = getJID(sender);
+            User user = sarosSession.getUser(jid);
+
+            if (!chatUsers.contains(user) && state == ChatState.active) {
+                chatUsers.add(user);
+                /*
+                 * Manually notified on local user in connectMultiUserChat.
+                 */
+                if (!user.equals(sarosSession.getLocalUser()))
+                    notifyChatJoined(user);
+            }
+
+            if (chatUsers.contains(user) && state == ChatState.gone) {
+                chatUsers.remove(user);
+                /*
+                 * TODO: Remove notification as soon as TODO in
+                 * disconnectMultiUserChat is fixed
+                 */
+                notifyChatLeft(user);
+            }
+
+            chatStateUpdated(user, state);
         }
 
         private void addChatLine(String sender, String text) {
@@ -210,9 +299,21 @@ public class MessagingManager implements IConnectionListener,
 
             this.history.add(chatLine);
 
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            JID jid = getJID(sender);
+            User user = sarosSession.getUser(jid);
+
             for (IChatListener chatListener : MessagingManager.this.chatListeners) {
-                chatListener.chatMessageAdded(sender, text);
+                chatListener.chatMessageAdded(user, text);
             }
+        }
+
+        /*
+         * Gets User who sent the message.
+         */
+        private JID getJID(String sender) {
+            return new JID(sender.substring(sender.indexOf('/') + 1,
+                sender.length()));
         }
 
         /**
@@ -234,7 +335,8 @@ public class MessagingManager implements IConnectionListener,
             String host = comPrefs.chatroom + "@" + comPrefs.chatserver;
 
             // Create a MultiUserChat using an XMPPConnection for a room
-            MultiUserChat muc = new MultiUserChat(connection, host);
+            MultiUserChatManager muc = new MultiUserChatManager(connection,
+                host);
 
             // try to join to room
             boolean joined = false;
@@ -258,7 +360,7 @@ public class MessagingManager implements IConnectionListener,
                 }
             }
 
-            if (sessionManager.getSarosSession().isHost()) {
+            if (createdRoom) {
                 try {
                     // Get the the room's configuration form
                     Form form = muc.getConfigurationForm();
@@ -306,7 +408,6 @@ public class MessagingManager implements IConnectionListener,
         public void disconnect() {
             assert muc != null;
             if (muc.isJoined() && currentConnection.isConnected()) {
-                session.sendMessage("left the chat.");
                 muc.leave();
             }
             muc = null;
@@ -316,8 +417,9 @@ public class MessagingManager implements IConnectionListener,
             XMPPConnection connection = saros.getConnection();
             String user = connection.getUser();
             initMUC(connection, user);
+            // listen to changes of users ChatState
+            chatStatusManager = ChatStatusManager.getInstance(connection, muc);
         }
-
     }
 
     public MessagingManager(Saros saros, SessionManager sessionManager) {
@@ -335,8 +437,8 @@ public class MessagingManager implements IConnectionListener,
         ConnectionState newState) {
         checkChatState();
 
-        if (newState == ConnectionState.ERROR && session != null) {
-            session = null;
+        if (newState == ConnectionState.ERROR && mucSession != null) {
+            mucSession = null;
             log.debug("Session interrupted, will reconnect chat later.");
         }
 
@@ -370,16 +472,49 @@ public class MessagingManager implements IConnectionListener,
      * @return The current chat session.
      */
     public SessionProvider getSession() {
-        return this.session;
+        return this.mucSession;
+    }
+
+    /**
+     * Notifies local listeners that a user has joined the session.
+     * 
+     * @param user
+     */
+    public void notifyChatJoined(User user) {
+        for (IChatListener listener : chatListeners) {
+            listener.chatJoined(user);
+        }
+    }
+
+    /**
+     * Notifies local listeners that a user has left the session.
+     * 
+     * @param user
+     */
+    public void notifyChatLeft(User user) {
+        for (IChatListener listener : chatListeners) {
+            listener.chatLeft(user);
+        }
+    }
+
+    /**
+     * Notifies all chat state listeners of the changed state.
+     */
+    private void chatStateUpdated(final User sender, final ChatState state) {
+        log.debug("Notifying Listeners.");
+        for (IChatListener l : chatListeners) {
+            l.chatStateUpdated(sender, state);
+            log.debug("Notified Listener.");
+        }
     }
 
     /**
      * Notifies all chat listeners of a new message.
      */
-    private void chatMessageAdded(final Message message) {
+    private void chatMessageAdded(final User sender, final String message) {
         log.debug("Notifying Listeners.");
         for (IChatListener l : chatListeners) {
-            l.chatMessageAdded(message.getFrom(), message.getBody());
+            l.chatMessageAdded(sender, message);
             log.debug("Notified Listener.");
         }
     }
@@ -429,13 +564,13 @@ public class MessagingManager implements IConnectionListener,
      */
     private void checkChatState() {
         if (chatJoined) {
-            if (!sessionStarted || chatListeners.isEmpty()
+            if (!sarosSessionRunning || chatListeners.isEmpty()
                 || currentConnection == null
                 || !currentConnection.isConnected()) {
                 disconnectMultiUserChat();
             }
         } else {
-            if (sessionStarted && !chatListeners.isEmpty()
+            if (sarosSessionRunning && !chatListeners.isEmpty()
                 && saros.isConnected() && getComPrefs() != null) {
                 connectMultiUserChat();
             }
@@ -445,15 +580,20 @@ public class MessagingManager implements IConnectionListener,
     /**
      * Ends the current chat session. Sends a leave message to the room if
      * that's still possible.
+     * 
+     * TODO: Saros session end should wait for the termination of the chat room
+     * to really all participants get notified of a left chat room.
      */
     private void disconnectMultiUserChat() {
         log.debug("Leaving chat.");
-        assert session != null;
-        session.disconnect();
+        assert mucSession != null;
+
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        notifyChatLeft(sarosSession.getLocalUser());
+
+        mucSession.sendMessage(null, ChatState.gone);
+        mucSession.disconnect();
         chatJoined = false;
-        for (IChatListener listener : chatListeners) {
-            listener.chatLeft();
-        }
     }
 
     /**
@@ -466,22 +606,22 @@ public class MessagingManager implements IConnectionListener,
         }
         log.debug("Joining chat.");
         XMPPConnection connection = saros.getConnection();
-        if (session == null || !connection.equals(currentConnection)) {
+        if (mucSession == null || !connection.equals(currentConnection)) {
             log.debug("Creating MUC session.");
-            session = new MultiChatSession();
+            mucSession = new MultiChatSession();
             currentConnection = connection;
             initMultiChatListener();
         }
         try {
-            session.connect();
+            mucSession.connect();
         } catch (XMPPException e) {
             log.error("Couldn't join chat.", e);
             return;
         }
-        session.sendMessage("joined the chat.");
         chatJoined = true;
-        for (IChatListener listener : chatListeners) {
-            listener.chatJoined();
-        }
+
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        notifyChatJoined(sarosSession.getLocalUser());
+        mucSession.sendMessage(null, ChatState.active);
     }
 }

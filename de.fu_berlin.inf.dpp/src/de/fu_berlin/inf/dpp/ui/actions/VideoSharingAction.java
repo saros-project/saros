@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -51,8 +51,8 @@ public class VideoSharingAction extends Action {
 
     protected static final String ACTION_ID = VideoSharingAction.class
         .getName();
-    protected static final String TOOLTIP_START_SESSION = "Share your screen with selected user";
-    protected static final String TOOLTIP_STOP_SESSION = "Stop session with user ";
+    public static final String TOOLTIP_START_SESSION = "Share your screen with selected user";
+    public static final String TOOLTIP_STOP_SESSION = "Stop session with user ";
 
     @Inject
     protected VideoSharing videoSharing;

@@ -20,9 +20,9 @@
             name="Saros Session"/>
       <view
             category="Saros"
-            class="de.fu_berlin.inf.dpp.ui.ChatView"
+            class="de.fu_berlin.inf.dpp.ui.chat.ChatView"
             icon="icons/comment.png"
-            id="de.fu_berlin.inf.dpp.ui.ChatView"
+            id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
             name="Chat View"/>
      <view
             category="Saros"
@@ -47,7 +47,7 @@
                relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
          <view
-               id="de.fu_berlin.inf.dpp.ui.ChatView"
+               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
                relationship="stack"
                relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
@@ -67,7 +67,7 @@
                relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
          <view
-               id="de.fu_berlin.inf.dpp.ui.ChatView"
+               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
                minimized="false"
                relationship="stack"
                relative="de.fu_berlin.inf.dpp.ui.RosterView">
@@ -88,7 +88,7 @@
                relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
          <view
-               id="de.fu_berlin.inf.dpp.ui.ChatView"
+               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
                minimized="false"
                relationship="stack"
                relative="de.fu_berlin.inf.dpp.ui.RosterView">

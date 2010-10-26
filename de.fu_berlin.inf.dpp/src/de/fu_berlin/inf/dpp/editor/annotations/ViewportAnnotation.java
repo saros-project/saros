@@ -14,6 +14,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.util.ColorUtil;
 
 /**
  * The annotation that shows the viewports of the drivers.
@@ -55,8 +56,11 @@ public class ViewportAnnotation extends SarosAnnotation implements
             annotationPreference.getColorPreferenceKey());
 
         Display display = Display.getDefault();
-        strokeColor = new Color(display, scaleColor(rgb, STROKE_SCALE));
-        fillColor = new Color(display, scaleColor(rgb, FILL_SCALE));
+        strokeColor = new Color(display,
+            ColorUtil.scaleColor(rgb, STROKE_SCALE));
+        // FIXME: dispose strokeColor somewhere
+        fillColor = new Color(display, ColorUtil.scaleColor(rgb, FILL_SCALE));
+        // FIXME: dispose fillColor somewhere
     }
 
     public void paint(GC gc, Canvas canvas, Rectangle bounds) {
@@ -86,12 +90,5 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     public int getLayer() {
         return IAnnotationPresentation.DEFAULT_LAYER;
-    }
-
-    protected static RGB scaleColor(RGB rgb, double scale) {
-        int red = (int) ((1.0 - scale) * rgb.red + 255 * scale);
-        int green = (int) ((1.0 - scale) * rgb.green + 255 * scale);
-        int blue = (int) ((1.0 - scale) * rgb.blue + 255 * scale);
-        return new RGB(red, green, blue);
     }
 }

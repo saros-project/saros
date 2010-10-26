@@ -11,6 +11,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.util.ColorUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -19,8 +20,12 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Configuration of the annotations is done in the plugin-xml.
  */
 public abstract class SarosAnnotation extends Annotation {
+    /**
+     * The ratio by which a light color is lighter than it's corresponding
+     * normal color.
+     */
+    public static final double LIGHT_COLOR_SCALE = 0.75;
 
-    @SuppressWarnings("unused")
     private static Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
@@ -57,54 +62,66 @@ public abstract class SarosAnnotation extends Annotation {
         return this.source;
     }
 
+    /**
+     * Returns the color that corresponds to a user.
+     * <p>
+     * <b>Important notice:</b> Every returned color instance allocates OS
+     * resources that need to be disposed with {@link Color#dispose()}!
+     * 
+     * @param user
+     * @return the corresponding color
+     */
     public static Color getUserColor(User user) {
-        
-        int colorID = user.getColorID();
-    
-            // TODO This should not depend on the SelectionAnnotation, but be
-            // configurable like all colors!
-            String annotationType = SelectionAnnotation.TYPE + "."
-                + String.valueOf(colorID + 1);
-    
-            AnnotationPreferenceLookup lookup = EditorsUI
-                .getAnnotationPreferenceLookup();
-            AnnotationPreference ap = lookup
-                .getAnnotationPreference(annotationType);
-            if (ap == null) {
-                return null;
-            }
 
-            RGB rgb;
-            try {
-                rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
-                    ap.getColorPreferenceKey());
-            } catch (RuntimeException e) {
-                return null;
-            }
-    
-            return new Color(Display.getDefault(), rgb);
+        int colorID = user.getColorID();
+
+        // TODO This should not depend on the SelectionAnnotation, but be
+        // configurable like all colors!
+        String annotationType = SelectionAnnotation.TYPE + "."
+            + String.valueOf(colorID + 1);
+
+        AnnotationPreferenceLookup lookup = EditorsUI
+            .getAnnotationPreferenceLookup();
+        AnnotationPreference ap = lookup
+            .getAnnotationPreference(annotationType);
+        if (ap == null) {
+            return null;
+        }
+
+        RGB rgb;
+        try {
+            rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
+                ap.getColorPreferenceKey());
+        } catch (RuntimeException e) {
+            return null;
+        }
+
+        return new Color(Display.getDefault(), rgb);
     }
-    
+
     public static void setUserColor(User user, final RGB userRGB) {
         int colorID = user.getColorID();
 
         // TODO This should not depend on the SelectionAnnotation, but be
         // configurable like all colors!
-        String annotationType = SelectionAnnotation.TYPE + "." + String.valueOf(colorID + 1);
-        String annotationTypeForViewPort = ViewportAnnotation.TYPE + "." + String.valueOf(colorID + 1);
-        String annotationTypeForContribution = ContributionAnnotation.TYPE + "." + String.valueOf(colorID + 1);
-        
+        String annotationType = SelectionAnnotation.TYPE + "."
+            + String.valueOf(colorID + 1);
+        String annotationTypeForViewPort = ViewportAnnotation.TYPE + "."
+            + String.valueOf(colorID + 1);
+        String annotationTypeForContribution = ContributionAnnotation.TYPE
+            + "." + String.valueOf(colorID + 1);
+
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
-        
+
         final AnnotationPreference ap = lookup
             .getAnnotationPreference(annotationType);
-        
+
         final AnnotationPreference apForViewPort = lookup
-        .getAnnotationPreference(annotationTypeForViewPort);
-        
+            .getAnnotationPreference(annotationTypeForViewPort);
+
         final AnnotationPreference apForContribution = lookup
-        .getAnnotationPreference(annotationTypeForContribution);
+            .getAnnotationPreference(annotationTypeForContribution);
 
         if (ap == null) {
             return;
@@ -113,7 +130,7 @@ public abstract class SarosAnnotation extends Annotation {
         if (apForViewPort == null) {
             return;
         }
-        
+
         if (apForContribution == null) {
             return;
         }
@@ -121,14 +138,37 @@ public abstract class SarosAnnotation extends Annotation {
         try {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    EditorsUI.getPreferenceStore().setValue(ap.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
-                    EditorsUI.getPreferenceStore().setValue(apForViewPort.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
-                    EditorsUI.getPreferenceStore().setValue(apForContribution.getColorPreferenceKey(), userRGB.red+","+userRGB.green+","+userRGB.blue);
+                    EditorsUI.getPreferenceStore().setValue(
+                        ap.getColorPreferenceKey(),
+                        userRGB.red + "," + userRGB.green + "," + userRGB.blue);
+                    EditorsUI.getPreferenceStore().setValue(
+                        apForViewPort.getColorPreferenceKey(),
+                        userRGB.red + "," + userRGB.green + "," + userRGB.blue);
+                    EditorsUI.getPreferenceStore().setValue(
+                        apForContribution.getColorPreferenceKey(),
+                        userRGB.red + "," + userRGB.green + "," + userRGB.blue);
                 }
             });
-            
+
         } catch (RuntimeException e) {
             return;
         }
+    }
+
+    /**
+     * Returns the light version of the color that corresponds to a user.
+     * <p>
+     * <b>Important notice:</b> Every returned color instance allocates OS
+     * resources that need to be disposed with {@link Color#dispose()}!
+     * 
+     * @param user
+     * @return the corresponding color
+     */
+    public static Color getLightUserColor(User user) {
+        Color userColor = SarosAnnotation.getUserColor(user);
+        Color userLightColor = ColorUtil.scaleColor(userColor,
+            LIGHT_COLOR_SCALE);
+
+        return userLightColor;
     }
 }

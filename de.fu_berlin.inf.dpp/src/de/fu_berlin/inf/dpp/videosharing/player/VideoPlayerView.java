@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.ViewPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -67,6 +66,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanatoryComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -74,17 +76,19 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity;
+import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity.Button;
 import de.fu_berlin.inf.dpp.videosharing.activities.MouseWheeledVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
-import de.fu_berlin.inf.dpp.videosharing.activities.MouseClickedVideoActivity.Button;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
 
 /**
  * @author s-lau
+ * @author bkahlert (ExplanatoryViewPart)
  */
 @Component(module = "ui")
-public class VideoPlayerView extends ViewPart implements VideoDisplay {
+public class VideoPlayerView extends ExplanatoryViewPart implements
+    VideoDisplay {
     private static Logger log = Logger.getLogger(VideoPlayerView.class);
 
     @Inject
@@ -98,6 +102,10 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     protected boolean resample = false;
     protected boolean keepAspectRatio = true;
 
+    /* howto */
+    protected ExplanationComposite howToExplanation;
+
+    /* content */
     protected Composite parent;
     protected Canvas canvas = null;
     protected VideoCanvas videoCanvas = null;
@@ -165,7 +173,14 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createContentPartControl(
+        ExplanatoryComposite explanatoryComposite, Composite parent) {
+        /* explanation */
+        this.howToExplanation = new VideoSharingHowTo(explanatoryComposite,
+            SWT.NONE);
+        this.showExplanation(this.howToExplanation);
+
+        /* content */
         this.parent = parent;
         GridLayout layout = new GridLayout();
         parent.setLayout(layout);
@@ -278,12 +293,14 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
         if (videoCanvas == null && !canvas.isDisposed())
             videoCanvas = new VideoCanvas(SWT_AWT.new_Frame(canvas));
         canvas.update();
+        this.hideExplanation();
     }
 
     /**
      * @swt
      */
     public void reset() {
+        this.showExplanation(this.howToExplanation);
         if (videoCanvas != null)
             videoCanvas.parentFrame.dispose();
         videoCanvas = null;
@@ -312,8 +329,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             public void run() {
                 if (!parent.isDisposed()) {
                     fps.setText(String.valueOf(lastShownStatus.getFps()));
-                    bitrate
-                        .setText(Util.formatByte(lastShownStatus.getBytes()));
+                    bitrate.setText(Util.formatByte(lastShownStatus.getBytes()));
                     delay.setText(String.valueOf(lastShownStatus.getDelay()));
                 }
             }
@@ -491,8 +507,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
             }
             paintInProgress = true;
 
-            lastImageDimension = new Dimension(tile.getWidth(), tile
-                .getHeight());
+            lastImageDimension = new Dimension(tile.getWidth(),
+                tile.getHeight());
             Dimension size = new Dimension(clientArea.width, clientArea.height);
 
             setSize(size);
@@ -586,8 +602,8 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
                     return;
 
                 sendActivity(new MouseWheeledVideoActivity(e.getX(), e.getY(),
-                    lastImageDimension.width, lastImageDimension.height, e
-                        .getWheelRotation()));
+                    lastImageDimension.width, lastImageDimension.height,
+                    e.getWheelRotation()));
             }
 
         }
