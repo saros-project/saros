@@ -1898,4 +1898,5 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         SWTBotShell activeShell = delegate.activeShell();
         return activeShell.bot().label(2).getText();
     }
+
 }

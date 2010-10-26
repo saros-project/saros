@@ -507,4 +507,9 @@ public class ViewObject {
         contextMenu.click();
     }
 
+    public boolean isToolbarInViewEnabled(String viewName, String buttonTooltip) {
+        return getToolbarButtonWithTooltipInView(viewName, buttonTooltip)
+            .isEnabled();
+    }
+
 }

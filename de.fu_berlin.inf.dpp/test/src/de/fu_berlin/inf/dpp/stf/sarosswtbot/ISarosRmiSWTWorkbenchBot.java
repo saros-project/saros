@@ -151,7 +151,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void openRemoteScreenView() throws RemoteException;
 
-    public void openSessionView() throws RemoteException;
+    public void openSharedSessionView() throws RemoteException;
 
     public void openRosterView() throws RemoteException;
 
@@ -312,4 +312,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void waitUntilFollowed(String plainJID) throws RemoteException;
 
     public void invitateUser(String inviteeJID) throws RemoteException;
+
+    public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
 }

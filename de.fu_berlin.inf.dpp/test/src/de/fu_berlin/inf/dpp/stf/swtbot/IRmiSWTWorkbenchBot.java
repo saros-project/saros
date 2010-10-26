@@ -756,5 +756,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void waitUntilJavaEditorClosed(String className)
         throws RemoteException;
+
     // public void closeAllOpenedEditors() throws RemoteException;
+
 }
