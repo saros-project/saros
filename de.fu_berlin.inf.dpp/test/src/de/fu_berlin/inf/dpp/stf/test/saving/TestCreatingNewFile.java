@@ -82,8 +82,7 @@ public class TestCreatingNewFile {
     }
 
     /**
-     * make sure,all opened popup windows and editor should be closed. if you
-     * need some more after condition for your tests, please add it.
+     * make sure,all opened pop up windows and editor should be closed.
      * 
      * @throws RemoteException
      */

@@ -226,7 +226,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void giveDriverRole(String inviteeJID) throws RemoteException;
 
-    public void comfirmInvitationWindow(String inviteeJID, String projectName)
+    public void comfirmInvitationWindow(String inviteeJID)
         throws RemoteException;
 
     public boolean isConnectedByXMPP() throws RemoteException;
@@ -310,4 +310,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         JID JIDOfFollowedUser) throws RemoteException;
 
     public void waitUntilFollowed(String plainJID) throws RemoteException;
+
+    public void invitateUser(String inviteeJID) throws RemoteException;
 }

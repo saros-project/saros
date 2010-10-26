@@ -100,9 +100,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
 
-    public void comfirmInvitationWindow(String inviteeJID, String projectName)
+    public void comfirmInvitationWindow(String inviteeJID)
         throws RemoteException {
-        clickTBOpenInvitationInterfaceInSPSView();
         waitUntilShellActive("Invitation");
         confirmWindowWithCheckBox("Invitation", SarosConstant.BUTTON_FINISH,
             inviteeJID);
@@ -207,6 +206,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
         confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_YES);
+        if (isShellActive("Save Resource"))
+            confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
         waitUntilShellCloses(delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
@@ -1132,6 +1133,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         SWTBot bot = view.bot();
         SWTBotToolbarButton b = bot.toolbarButton();
         b.click();
+    }
+
+    public void invitateUser(String inviteeJID) throws RemoteException {
+        clickTBOpenInvitationInterfaceInSPSView();
+        comfirmInvitationWindow(inviteeJID);
     }
 
     /**
