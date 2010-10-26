@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
@@ -151,6 +152,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     protected InvitationInfo.InvitationExtensionProvider invExtProv;
 
     @Inject
+    protected InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv;
+
+    @Inject
     protected FileListRequestExtensionProvider fileListRequestExtProv;
 
     @Inject
@@ -204,12 +208,36 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         return installReceiver(filter);
     }
 
+    public boolean receivedInvitationAcknowledgment(String invitationID,
+        SubMonitor monitor) throws LocalCancellationException {
+
+        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
+            invAcknowledgementExtProv, sessionID, invitationID);
+        SarosPacketCollector collector = installReceiver(filter);
+
+        try {
+            receive(monitor, collector, INVITATION_ACKNOWLEDGEMENT_TIMEOUT,
+                false);
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
+    }
+
     public DefaultInvitationInfo receiveFileListRequest(
         SarosPacketCollector collector, String invitationID, SubMonitor monitor)
         throws LocalCancellationException, IOException {
 
         Packet result = receive(monitor, collector, 500, true);
         return fileListRequestExtProv.getPayload(result);
+    }
+
+    public void sendInvitationAcknowledgement(JID to, String invitationID) {
+        log.trace("Sending invitation acknowledgment to " + Util.prefix(to));
+        sendMessageToUser(to,
+            invAcknowledgementExtProv.create(new DefaultInvitationInfo(
+                sessionID, invitationID)));
     }
 
     public void sendFileListRequest(JID to, String invitationID) {

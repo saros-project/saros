@@ -301,6 +301,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
+                process.acknowledgeInvitation();
                 sarosUI.showIncomingInvitationUI(process);
                 sarosUI.openSarosViews();
             }

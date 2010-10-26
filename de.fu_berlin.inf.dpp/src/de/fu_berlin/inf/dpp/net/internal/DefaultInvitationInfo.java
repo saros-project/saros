@@ -18,6 +18,13 @@ public class DefaultInvitationInfo extends DefaultSessionInfo {
      * content, but are based on the DefaultInvitationInfo e.g. simple requests
      */
 
+    public static class InvitationAcknowledgementExtensionProvider extends
+        XStreamExtensionProvider<DefaultInvitationInfo> {
+        public InvitationAcknowledgementExtensionProvider() {
+            super("invitationAcknowledgment", DefaultInvitationInfo.class);
+        }
+    }
+
     public static class FileListRequestExtensionProvider extends
         XStreamExtensionProvider<DefaultInvitationInfo> {
         public FileListRequestExtensionProvider() {

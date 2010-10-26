@@ -42,8 +42,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -57,6 +57,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  */
 @Component(module = "net")
 public interface ITransmitter {
+
+    public static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 3000;
 
     /* ---------- invitations --------- */
 
@@ -123,6 +125,20 @@ public interface ITransmitter {
      */
     public void sendFileList(JID jid, String invitationID, FileList fileList,
         SubMonitor monitor) throws IOException, SarosCancellationException;
+
+    /**
+     * 
+     * @param invitationID
+     *            ID of the ivitation process
+     * @param monitor
+     *            a monitor to which progress will be reported and which is
+     *            queried for cancellation.
+     * @return whether a invitation acknowledgment got received in
+     *         {@link #INVITATION_ACKNOWLEDGEMENT_TIMEOUT} or not
+     * @throws LocalCancellationException
+     */
+    public boolean receivedInvitationAcknowledgment(String invitationID,
+        SubMonitor monitor) throws LocalCancellationException;
 
     /**
      * @throws IOException
@@ -369,6 +385,15 @@ public interface ITransmitter {
 
     public SarosPacketCollector getInvitationCollector(String invitationID,
         FileTransferType filelistTransfer);
+
+    /**
+     * @param to
+     *            peer that invited this user and where to send the
+     *            acknowledgment to
+     * @param invitationID
+     *            the ID of the invitation
+     */
+    public void sendInvitationAcknowledgement(JID to, String invitationID);
 
     public void receiveInvitationCompleteConfirmation(SubMonitor monitor,
         SarosPacketCollector collector) throws LocalCancellationException,

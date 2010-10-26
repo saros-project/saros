@@ -120,6 +120,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
@@ -370,6 +371,8 @@ public class Saros extends AbstractUIPlugin {
             .addComponent(InvitationInfo.InvitationExtensionProvider.class);
         this.container
             .addComponent(IncomingTransferObjectExtensionProvider.class);
+        this.container
+            .addComponent(InvitationAcknowledgementExtensionProvider.class);
         this.container
             .addComponent(DefaultInvitationInfo.FileListRequestExtensionProvider.class);
         this.container.addComponent(UserListInfo.JoinExtensionProvider.class);

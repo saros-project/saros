@@ -194,6 +194,10 @@ public class IncomingInvitationProcess extends InvitationProcess {
         }
     }
 
+    public void acknowledgeInvitation() {
+        transmitter.sendInvitationAcknowledgement(peer, invitationID);
+    }
+
     public void accept(IProject baseProject, String newProjectName,
         boolean skipSync, SubMonitor monitor) throws SarosCancellationException {
 

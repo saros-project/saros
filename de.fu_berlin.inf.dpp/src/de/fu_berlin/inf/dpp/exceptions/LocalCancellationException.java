@@ -10,8 +10,15 @@ public class LocalCancellationException extends SarosCancellationException {
     private static final long serialVersionUID = 3663315740957551184L;
     protected CancelOption cancelOption;
 
+    /**
+     * Standard constructor.
+     * 
+     * If no {@link CancelOption} is specified {@link CancelOption#NOTIFY_PEER}
+     * is set.
+     */
     public LocalCancellationException() {
         super();
+        this.cancelOption = CancelOption.NOTIFY_PEER;
     }
 
     public LocalCancellationException(String msg, CancelOption cancelOption) {

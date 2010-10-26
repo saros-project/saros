@@ -113,6 +113,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected SarosCancellationException cancellationCause;
     protected SarosPacketCollector invitationCompleteCollector;
 
+    protected boolean peerAdvertisesSarosSupport = true;
+
     // Should the archive be sent using a StreamSession?
     protected boolean doStream = false;
 
@@ -161,7 +163,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             completeInvitation(monitor.newChild(3));
         } catch (LocalCancellationException e) {
-            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
+            localCancel(e.getMessage(), e.getCancelOption());
             executeCancellation();
         } catch (RemoteCancellationException e) {
             remoteCancel(e.getMessage());
@@ -223,6 +225,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
              * RQ-JID.
              */
             rqPeer = new JID(peer.getBareJID() + "/" + Saros.RESOURCE);
+            peerAdvertisesSarosSupport = false;
         } else {
             log.debug("Inv" + Util.prefix(peer) + ": Saros is supported.");
         }
@@ -300,9 +303,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         hostVersionInfo.version = versionManager.getVersion();
 
-        SarosPacketCollector fileListRequestCollector = transmitter
-            .getFileListRequestCollector(invitationID);
-
         CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
         transmitter.sendInvitation(sarosSession.getProjectID(this.project),
             peer, description, colorID, hostVersionInfo, invitationID,
@@ -311,6 +311,20 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         subMonitor.worked(25);
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
+
+        if (!transmitter.receivedInvitationAcknowledgment(invitationID,
+            subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS))) {
+            throw new LocalCancellationException(
+                peerAdvertisesSarosSupport ? "No invitation acknowledgement received."
+                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
+        }
+
+        subMonitor.worked(2);
+        subMonitor
+            .setTaskName("Invitation acknowledged. Waiting for file list request...");
+
+        SarosPacketCollector fileListRequestCollector = transmitter
+            .getFileListRequestCollector(invitationID);
 
         transmitter.receiveFileListRequest(fileListRequestCollector,
             invitationID,
@@ -785,7 +799,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
                 cancelMessage = "Invitation was cancelled locally"
                     + " because of an error: " + errorMsg;
                 log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
-                monitor.setTaskName("Invitation failed.");
+                monitor.setTaskName("Invitation failed. (" + errorMsg + ")");
             } else {
                 cancelMessage = "Invitation was cancelled by local user.";
                 log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);

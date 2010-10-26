@@ -102,13 +102,11 @@ public class SarosPacketCollector implements PacketListener {
      *            packet.
      * @return the next available packet.
      */
-    public synchronized Packet nextResult(long timeout) {
-
-        if (!resultQueue.isEmpty()) {
-            // There's already a packet waiting, so return it.
-            return resultQueue.poll();
-        }
-
+    /*
+     * Note: Don't make this method synchronized. ProcessPacket() will block
+     * then and resultQueue.poll() will time out at least once if empty.
+     */
+    public Packet nextResult(long timeout) {
         try {
             return resultQueue.poll(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ie) {
