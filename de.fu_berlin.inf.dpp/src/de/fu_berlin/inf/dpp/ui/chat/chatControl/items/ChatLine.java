@@ -27,4 +27,8 @@ public class ChatLine extends Composite {
         super.setBackground(color);
         this.label.setBackground(color);
     }
+
+    public String getText() {
+        return this.label.getText();
+    }
 }

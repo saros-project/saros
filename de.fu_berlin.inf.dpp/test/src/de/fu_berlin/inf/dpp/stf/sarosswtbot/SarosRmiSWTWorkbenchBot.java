@@ -13,9 +13,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -24,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.test.chatview.Comperator;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -707,11 +704,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void openChatView() throws RemoteException {
-        viewObject.showViewById("de.fu_berlin.inf.dpp.ui.ChatView");
+        viewObject.showViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public void closeChatView() throws RemoteException {
-        viewObject.hideViewById("de.fu_berlin.inf.dpp.ui.ChatView");
+        viewObject.hideViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
@@ -723,11 +720,24 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
             openChatView();
         activateChatView();
         SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        SWTBotView view = delegate.activeView();
-        SWTBot bot = view.bot();
-        SWTBotText text = bot.text();
-        text.setText(message);
-        text.pressShortcut(0, SWT.CR);
+        SWTBotChatInput chatInput = delegate.chatInput();
+        chatInput.setText(message);
+        log.debug("inerted message in chat view: " + chatInput.getText());
+        delegate.sleep(100);
+        chatInput.pressShortcut(0, SWT.CR);
+
+        // SWTBotText text = delegate.text();
+        // text.setText(message);
+        // text.pressShortcut(0, SWT.CR);
+    }
+
+    public String getTextOfLastChatLine() throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("text of the lastChatLine: "
+            + delegate.lastChatLine().getText());
+        return delegate.lastChatLine().getText();
     }
 
     public boolean compareChatMessage(String jid, String message)
@@ -735,10 +745,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (!isChatViewOpen())
             openChatView();
         activateChatView();
-        SWTBotView view = delegate.activeView();
-        SWTBot bot = view.bot();
-        SWTBotStyledText text = bot.styledText();
-        return Comperator.compareStrings("[" + jid, message, text.getLines());
+        log.debug("chatLine: " + delegate.lastChatLine());
+        // log.debug("text of the lastChatLine: "
+        // + delegate.lastChatLine().widget.getText());
+        log.debug("text of the lastChatLine: "
+            + delegate.lastChatLine().getText());
+        String text = delegate.lastChatLine().getText();
+        return text.equals(message);
+
+        // return Comperator.compareStrings(jid, message, text);
     }
 
     // public boolean isContactOnline(String contact) {

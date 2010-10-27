@@ -41,6 +41,7 @@ public class SarosState implements ISarosState {
         this.sessionManager = sessionManager;
         this.dataTransferManager = dataTransferManager;
         this.editorManager = editorManager;
+        // this.messageManager = messageManger;
     }
 
     protected transient Saros saros;

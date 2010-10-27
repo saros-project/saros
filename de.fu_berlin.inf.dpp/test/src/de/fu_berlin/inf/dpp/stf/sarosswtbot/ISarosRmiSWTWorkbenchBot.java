@@ -314,4 +314,6 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void invitateUser(String inviteeJID) throws RemoteException;
 
     public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
+
+    public String getTextOfLastChatLine() throws RemoteException;
 }

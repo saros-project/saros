@@ -104,7 +104,7 @@ public class SarosConstant {
     public final static String ID_ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
     public final static String ID_SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
     public final static String ID_REMOTE_SCREEN_VIEW = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
-    public final static String ID_CHAT_VIEW = "de.fu_berlin.inf.dpp.ui.ChatView";
+    public final static String ID_CHAT_VIEW = "de.fu_berlin.inf.dpp.ui.chat.ChatView";
 
     public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
     public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
