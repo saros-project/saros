@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
 
 public class MakeOperationConcurrently {
     private final static Logger log = Logger

@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.stf.swtbot.helpers;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class WindowObject {
     private static final transient Logger log = Logger
@@ -12,7 +12,7 @@ public class WindowObject {
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
     private TableObject tableObject;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private static SarosSWTBot bot = new SarosSWTBot();
 
     public WindowObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;

@@ -4,15 +4,15 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class MenuObject {
     private static final transient Logger log = Logger
         .getLogger(MenuObject.class);
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private static SarosSWTBot bot = new SarosSWTBot();
 
     public MenuObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;

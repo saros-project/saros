@@ -5,13 +5,13 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class ExistNoInvitationProgress extends DefaultCondition {
 
-    private SarosSWTWorkbenchBot bot;
+    private SarosSWTBot bot;
 
-    ExistNoInvitationProgress(SarosSWTWorkbenchBot bot) {
+    ExistNoInvitationProgress(SarosSWTBot bot) {
         this.bot = bot;
     }
 

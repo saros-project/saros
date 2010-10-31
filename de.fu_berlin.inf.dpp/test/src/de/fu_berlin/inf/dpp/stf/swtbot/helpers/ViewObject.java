@@ -23,10 +23,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.swtbot.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.ContextMenuHelper;
 
 /**
  * Screen object that represents the operations that can be performed on a view.
@@ -42,7 +42,7 @@ public class ViewObject {
     private TableObject tableObject;
     private MenuObject menuObject;
     private TreeObject treeObject;
-    private SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private SarosSWTBot bot = new SarosSWTBot();
 
     /**
      * Creates an instance of a viewObject.<br/>
@@ -203,7 +203,7 @@ public class ViewObject {
     /**
      * Click a context menu of the selected table item. The method is defined as
      * helper method for other clickTB*In*View methods in
-     * {@link SarosSWTWorkbenchBot} and should not be exported by rmi. <br/>
+     * {@link SarosSWTBot} and should not be exported by rmi. <br/>
      * Operational steps:
      * <ol>
      * <li>select a table item</li>
@@ -231,7 +231,7 @@ public class ViewObject {
 
     /**
      * Select a table item in a view. The method is defined as helper method for
-     * other selectTB*In*View methods in {@link SarosSWTWorkbenchBot} and should
+     * other selectTB*In*View methods in {@link SarosSWTBot} and should
      * not be exported by rmi. <br/>
      * 
      * @param viewName

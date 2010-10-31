@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.ISarosState;
 
 public class ExistNoParticipants extends DefaultCondition {
 

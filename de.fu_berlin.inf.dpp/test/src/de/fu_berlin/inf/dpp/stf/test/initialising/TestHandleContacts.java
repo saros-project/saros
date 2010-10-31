@@ -11,8 +11,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.test.InitMusician;
 
 public class TestHandleContacts {

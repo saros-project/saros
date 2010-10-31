@@ -7,16 +7,17 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class EditorObject {
     private static final transient Logger log = Logger
         .getLogger(EditorObject.class);
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private static SarosSWTBot bot = new SarosSWTBot();
 
     public EditorObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
@@ -25,6 +26,11 @@ public class EditorObject {
 
     public void setTextinEditorWithSave(String contents, String fileName) {
         SWTBotEclipseEditor e = getTextEditor(fileName);
+        e.setFocus();
+        e.typeText("hallo wie geht es dir ");
+        bot.sleep(2000);
+        e.pressShortcut(Keystrokes.LF);
+        bot.sleep(2000);
         e.setText(contents);
         e.save();
     }

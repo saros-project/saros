@@ -8,8 +8,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
 
 public class TestPattern {
     private static final String PROJECT = BotConfiguration.PROJECTNAME;

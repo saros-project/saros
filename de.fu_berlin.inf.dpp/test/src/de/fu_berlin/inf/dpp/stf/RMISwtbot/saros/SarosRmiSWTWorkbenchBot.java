@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.sarosswtbot;
+package de.fu_berlin.inf.dpp.stf.RMISwtbot.saros;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -6,22 +6,28 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -48,13 +54,13 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (delegate != null && self != null)
             return self;
 
-        SarosSWTWorkbenchBot swtwbb = new SarosSWTWorkbenchBot();
+        SarosSWTBot swtwbb = new SarosSWTBot();
         self = new SarosRmiSWTWorkbenchBot(swtwbb);
         return self;
     }
 
     /** RmiSWTWorkbenchBot is a singleton, but inheritance is possible */
-    protected SarosRmiSWTWorkbenchBot(SarosSWTWorkbenchBot bot) {
+    protected SarosRmiSWTWorkbenchBot(SarosSWTBot bot) {
         super(bot);
     }
 
@@ -719,25 +725,81 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (!isChatViewOpen())
             openChatView();
         activateChatView();
-        SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        SWTBotChatInput chatInput = delegate.chatInput();
+        SarosSWTBotChatInput chatInput = delegate.chatInput();
         chatInput.setText(message);
+        delegate.text();
         log.debug("inerted message in chat view: " + chatInput.getText());
-        delegate.sleep(100);
-        chatInput.pressShortcut(0, SWT.CR);
+        chatInput.pressEnterKey();
+    }
 
-        // SWTBotText text = delegate.text();
-        // text.setText(message);
-        // text.pressShortcut(0, SWT.CR);
+    public String getUserNameOnChatLinePartnerChangeSeparator()
+        throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("user name of the first chat line partner change separator: "
+            + delegate.chatLinePartnerChangeSeparator().getPlainID());
+        return delegate.chatLinePartnerChangeSeparator().getPlainID();
+    }
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
+        throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("user name of the chat line partner change separator with the index"
+            + index
+            + ": "
+            + delegate.chatLinePartnerChangeSeparator(index).getPlainID());
+        return delegate.chatLinePartnerChangeSeparator(index).getPlainID();
+    }
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
+        throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("user name of the chat line partner change separator with the plainID "
+            + plainID
+            + ": "
+            + delegate.chatLinePartnerChangeSeparator(plainID).getPlainID());
+        return delegate.chatLinePartnerChangeSeparator(plainID).getPlainID();
+    }
+
+    public String getTextOfChatLine() throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("text of the first chat line: "
+            + delegate.chatLine().getText());
+        return delegate.chatLine().getText();
+    }
+
+    public String getTextOfChatLine(int index) throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("text of the chat line with the index " + index + ": "
+            + delegate.chatLine(index).getText());
+        return delegate.chatLine(index).getText();
     }
 
     public String getTextOfLastChatLine() throws RemoteException {
         if (!isChatViewOpen())
             openChatView();
         activateChatView();
-        log.debug("text of the lastChatLine: "
+        log.debug("text of the last chat line: "
             + delegate.lastChatLine().getText());
         return delegate.lastChatLine().getText();
+    }
+
+    public String getTextOfChatLine(String regex) throws RemoteException {
+        if (!isChatViewOpen())
+            openChatView();
+        activateChatView();
+        log.debug("text of the chat line with the specifed regex: "
+            + delegate.chatLine(regex).getText());
+        return delegate.chatLine(regex).getText();
     }
 
     public boolean compareChatMessage(String jid, String message)
@@ -1094,9 +1156,34 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         String projectName, String packageName, String className)
         throws RemoteException {
         String contents = state.getContents(contentPath);
+        // activateEclipseShell();
+
         openClass(projectName, packageName, className);
         activateJavaEditor(className);
-        editorObject.setTextinEditorWithSave(contents, className + ".java");
+        SWTBotEditor editor;
+        editor = delegate.editorByTitle(className + ".java");
+        SWTBotEclipseEditor e = editor.toTextEditor();
+
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                log.debug("shell name: " + win.getShell().getText());
+                win.getShell().forceActive();
+                win.getShell().forceFocus();
+            }
+        });
+        e.setFocus();
+        e.setText(contents);
+        e.typeText("hallo wie geht es dir ");
+        e.pressShortcut(Keystrokes.LF);
+        e.typeText("mir geht es gut!");
+        delegate.sleep(2000);
+
+        delegate.sleep(2000);
+
+        e.save();
+        // editorObject.setTextinEditorWithSave(contents, className + ".java");
     }
 
     public void setTextInEditorWithSave(String contentPath, String... filePath)

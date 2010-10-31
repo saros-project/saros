@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.IRmiSWTWorkbenchBot;
 
 public class IsEditorClosed extends DefaultCondition {
 

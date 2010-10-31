@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.sarosswtbot;
+package de.fu_berlin.inf.dpp.stf.RMISwtbot.saros;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.IRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 /**
@@ -316,4 +316,20 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
 
     public String getTextOfLastChatLine() throws RemoteException;
+
+    public String getTextOfChatLine(String regex) throws RemoteException;
+
+    public String getTextOfChatLine() throws RemoteException;
+
+    public String getTextOfChatLine(int index) throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator()
+        throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
+        throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
+        throws RemoteException;
+
 }

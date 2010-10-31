@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.sarosswtbot;
+package de.fu_berlin.inf.dpp.stf.RMISwtbot.saros;
 
 import de.fu_berlin.inf.dpp.Saros;
 

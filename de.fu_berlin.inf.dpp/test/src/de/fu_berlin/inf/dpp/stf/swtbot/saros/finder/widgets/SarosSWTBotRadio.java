@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.swtbot;
+package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -10,11 +10,20 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.hamcrest.SelfDescribing;
 
+/**
+ * There are a bug in the SWTBotRadio. Problem is in SWTBotRadio.click().
+ * SWTBotRadio.click() doesn't notify deselected button listeners. The current
+ * SWTBotRadio.click() was providing a notify(SWT.selection) for the selected
+ * button, but not for any button that was automatically deselected.
+ * <p>
+ * To fix the bug i need to rewrite the class SWTBotRadio.
+ * 
+ * @author lchen
+ */
 public class SarosSWTBotRadio extends SWTBotRadio {
 
     public SarosSWTBotRadio(Button w) throws WidgetNotFoundException {
         super(w);
-        // TODO Auto-generated constructor stub
     }
 
     public SarosSWTBotRadio(Button w, SelfDescribing description)
@@ -53,6 +62,7 @@ public class SarosSWTBotRadio extends SWTBotRadio {
                         && hasStyle(widget, SWT.RADIO)
                         && ((Button) widget).getSelection() == true) {
                         ((Button) widget).setSelection(false);
+
                         widget.notifyListeners(SWT.Selection, createEvent());
                     }
                 }

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.swtbot;
+package de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse;
 
 import java.io.IOException;
 import java.rmi.Remote;

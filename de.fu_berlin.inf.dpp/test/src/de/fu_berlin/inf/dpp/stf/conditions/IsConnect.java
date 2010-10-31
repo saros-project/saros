@@ -3,13 +3,13 @@ package de.fu_berlin.inf.dpp.stf.conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class IsConnect extends DefaultCondition {
 
-    private SarosSWTWorkbenchBot bot;
+    private SarosSWTBot bot;
 
-    IsConnect(SarosSWTWorkbenchBot bot) {
+    IsConnect(SarosSWTBot bot) {
         this.bot = bot;
     }
 

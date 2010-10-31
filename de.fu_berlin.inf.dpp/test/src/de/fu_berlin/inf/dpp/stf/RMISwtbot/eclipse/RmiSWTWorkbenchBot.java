@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.swtbot;
+package de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse;
 
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
@@ -49,9 +49,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.EditorObject;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.MainObject;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.MenuObject;
@@ -62,6 +62,8 @@ import de.fu_berlin.inf.dpp.stf.swtbot.helpers.TreeObject;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.ViewObject;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.WaitUntilObject;
 import de.fu_berlin.inf.dpp.stf.swtbot.helpers.WindowObject;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -76,7 +78,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     private static final boolean SCREENSHOTS = true;
 
-    public static transient SarosSWTWorkbenchBot delegate;
+    public static transient SarosSWTBot delegate;
 
     private static transient RmiSWTWorkbenchBot self;
 
@@ -111,11 +113,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     protected RmiSWTWorkbenchBot() {
-        this(new SarosSWTWorkbenchBot());
+        this(new SarosSWTBot());
     }
 
     /** RmiSWTWorkbenchBot is a singleton, but inheritance is possible */
-    protected RmiSWTWorkbenchBot(SarosSWTWorkbenchBot bot) {
+    protected RmiSWTWorkbenchBot(SarosSWTBot bot) {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;

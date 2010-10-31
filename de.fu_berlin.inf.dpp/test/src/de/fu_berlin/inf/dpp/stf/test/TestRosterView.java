@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
 
 public class TestRosterView {
     private static final Logger log = Logger

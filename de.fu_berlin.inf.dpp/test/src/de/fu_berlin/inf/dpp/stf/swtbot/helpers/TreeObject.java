@@ -9,8 +9,8 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class TreeObject {
     private static final transient Logger log = Logger
@@ -18,7 +18,7 @@ public class TreeObject {
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
     private ViewObject viewObject;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private static SarosSWTBot bot = new SarosSWTBot();
 
     public TreeObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;

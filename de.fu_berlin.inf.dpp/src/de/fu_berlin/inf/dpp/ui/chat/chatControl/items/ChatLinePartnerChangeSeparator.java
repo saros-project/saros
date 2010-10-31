@@ -36,4 +36,7 @@ public class ChatLinePartnerChangeSeparator extends SimpleRoundedComposite {
         setTexts(new String[] { username, receivedOn });
     }
 
+    public String getPlainID() {
+        return usedText[0];
+    }
 }

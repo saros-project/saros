@@ -12,16 +12,16 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.conditions.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class WaitUntilObject {
     private static final transient Logger log = Logger
         .getLogger(WaitUntilObject.class);
     private RmiSWTWorkbenchBot rmiBot;
-    private static SarosSWTWorkbenchBot bot = new SarosSWTWorkbenchBot();
+    private static SarosSWTBot bot = new SarosSWTBot();
 
     public WaitUntilObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;

@@ -11,19 +11,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.ISarosState;
-import de.fu_berlin.inf.dpp.stf.swtbot.IRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.SarosSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.ISarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.ISarosState;
+import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 
 public class SarosConditions extends Conditions {
 
-    public static ICondition isConnect(SarosSWTWorkbenchBot bot) {
+    public static ICondition isConnect(SarosSWTBot bot) {
         return new IsConnect(bot);
     }
 
-    public static ICondition isDisConnected(SarosSWTWorkbenchBot bot) {
+    public static ICondition isDisConnected(SarosSWTBot bot) {
         return new isDisConnected(bot);
     }
 
@@ -111,7 +111,7 @@ public class SarosConditions extends Conditions {
         return new IsChatMessageExist(bot, jid, message);
     }
 
-    public static ICondition existNoInvitationProgress(SarosSWTWorkbenchBot bot) {
+    public static ICondition existNoInvitationProgress(SarosSWTBot bot) {
         return new ExistNoInvitationProgress(bot);
     }
 

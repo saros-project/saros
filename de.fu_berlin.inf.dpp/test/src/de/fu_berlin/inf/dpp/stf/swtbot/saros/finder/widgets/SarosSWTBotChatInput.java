@@ -1,5 +1,6 @@
-package de.fu_berlin.inf.dpp.stf.sarosswtbot;
+package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.ReferenceBy;
 import org.eclipse.swtbot.swt.finder.SWTBotWidget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -11,8 +12,17 @@ import org.hamcrest.SelfDescribing;
 
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
 
+/**
+ * Represents a {@link ChatInput}widget in chat view. GUI peoples have changed
+ * the chat view's looks using self defined SWT-components, which are obviously
+ * not supported by SWTBot. So i need to define a corresponding SWTBot[widget
+ * name](in this case, SWTBbotInput) class to access every chat widgets.
+ * 
+ * 
+ * @author lchen
+ */
 @SWTBotWidget(clasz = ChatInput.class, preferredName = "chatInput", referenceBy = { ReferenceBy.TEXT })
-public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
+public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
 
     /**
      * Constructs a new instance of this object.
@@ -23,7 +33,7 @@ public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
      *             if the widget is <code>null</code> or widget has been
      *             disposed.
      */
-    public SWTBotChatInput(ChatInput w) throws WidgetNotFoundException {
+    public SarosSWTBotChatInput(ChatInput w) throws WidgetNotFoundException {
         this(w, null);
     }
 
@@ -39,7 +49,7 @@ public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
      *             if the widget is <code>null</code> or widget has been
      *             disposed.
      */
-    public SWTBotChatInput(ChatInput w, SelfDescribing description)
+    public SarosSWTBotChatInput(ChatInput w, SelfDescribing description)
         throws WidgetNotFoundException {
         super(w, description);
     }
@@ -51,13 +61,25 @@ public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
      *            the text to be set.
      * @return the same instance.
      */
-    public SWTBotChatInput setText(final String text) {
+    public SarosSWTBotChatInput setText(final String text) {
         waitForEnabled();
         asyncExec(new VoidResult() {
             public void run() {
                 widget.setText(text);
             }
         });
+        return this;
+    }
+
+    public SarosSWTBotChatInput pressEnterKey() {
+        waitForEnabled();
+        asyncExec(new VoidResult() {
+            public void run() {
+                widget.setFocus();
+                keyboard().pressShortcut(SWT.CR, SWT.LF);
+            }
+        });
+        // pressShortcut(Keystrokes.LF);
         return this;
     }
 
@@ -69,7 +91,7 @@ public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
      * @return the same instance.
      * @since 1.2
      */
-    public SWTBotChatInput typeText(final String text) {
+    public SarosSWTBotChatInput typeText(final String text) {
         return typeText(text, SWTBotPreferences.TYPE_INTERVAL);
     }
 
@@ -83,7 +105,7 @@ public class SWTBotChatInput extends AbstractSWTBot<ChatInput> {
      * @return the same instance.
      * @since 1.2
      */
-    public SWTBotChatInput typeText(final String text, int interval) {
+    public SarosSWTBotChatInput typeText(final String text, int interval) {
         log.debug(MessageFormat.format(
             "Inserting text:{0} into text {1}", text, this)); //$NON-NLS-1$
         setFocus();

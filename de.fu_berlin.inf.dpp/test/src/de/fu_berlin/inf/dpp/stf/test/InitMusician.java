@@ -10,8 +10,8 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
 
 public class InitMusician {
     private final static Logger log = Logger.getLogger(InitMusician.class);

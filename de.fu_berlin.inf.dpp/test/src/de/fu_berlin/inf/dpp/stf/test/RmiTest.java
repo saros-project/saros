@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
@@ -17,15 +14,15 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.Musician;
-import de.fu_berlin.inf.dpp.stf.sarosswtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.Musician;
+import de.fu_berlin.inf.dpp.stf.RMISwtbot.saros.SarosConstant;
 
 public class RmiTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
 
     private static Musician alice;
-    private static Musician bob;
+    // private static Musician bob;
 
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String PROJECT2 = BotConfiguration.PROJECTNAME2;
@@ -51,12 +48,12 @@ public class RmiTest {
     @BeforeClass
     public static void initMusican() {
         alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
+        // bob = InitMusician.newBob();
     }
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
+        // bob.bot.resetSaros();
         alice.bot.resetSaros();
     }
 
@@ -64,60 +61,60 @@ public class RmiTest {
     public void cleanup() throws RemoteException {
         alice.bot.resetWorkbench();
         alice.bot.resetSaros();
-        bob.bot.resetWorkbench();
+        // bob.bot.resetWorkbench();
     }
 
-    @Test
-    public void testGiveExclusiveRole() throws RemoteException {
-        alice.bot.newJavaProject(PROJECT);
-        alice.buildSessionSequential(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.bot.giveExclusiveDriverRole(bob.getPlainJid());
-        assertTrue(bob.state.isExclusiveDriver());
-        assertFalse(alice.state.isDriver(alice.jid));
-    }
-
-    @Test
-    @Ignore
-    public void testCancelInvitationByPeer() throws RemoteException {
-        alice.bot.newJavaProject(PROJECT);
-        List<String> peersName = new LinkedList<String>();
-        peersName.add(bob.getPlainJid());
-        alice.bot.shareProject(PROJECT, peersName);
-        bob.bot.waitUntilShellActive("Session Invitation");
-        bob.bot.confirmSessionInvitationWindowStep1();
-        bob.bot.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.bot.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
-            bob.getName() + ".*"));
-        alice.bot.clickButton(SarosConstant.BUTTON_OK);
-    }
-
-    @Test
-    @Ignore
-    public void testNewFolderInEmptyJavaProject() throws RemoteException {
-        alice.bot.newJavaProject(PROJECT);
-        alice.buildSessionSequential(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.bot.newFolder(PROJECT, FOLDER);
-        bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
-        assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
-    }
-
-    @Test
-    @Ignore
-    public void testNewFileNewFolderInEmptyProject() throws RemoteException {
-        alice.bot.newProject(PROJECT);
-        assertTrue(alice.bot.isProjectExist(PROJECT));
-        alice.buildSessionSequential(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.bot.newFolder(PROJECT, FOLDER);
-        bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
-        assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
-        alice.bot.newFile(PROJECT, FOLDER, FILE);
-        bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
-        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
-    }
+    // @Test
+    // public void testGiveExclusiveRole() throws RemoteException {
+    // alice.bot.newJavaProject(PROJECT);
+    // alice.buildSessionSequential(PROJECT,
+    // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+    // alice.bot.giveExclusiveDriverRole(bob.getPlainJid());
+    // assertTrue(bob.state.isExclusiveDriver());
+    // assertFalse(alice.state.isDriver(alice.jid));
+    // }
+    //
+    // @Test
+    // @Ignore
+    // public void testCancelInvitationByPeer() throws RemoteException {
+    // alice.bot.newJavaProject(PROJECT);
+    // List<String> peersName = new LinkedList<String>();
+    // peersName.add(bob.getPlainJid());
+    // alice.bot.shareProject(PROJECT, peersName);
+    // bob.bot.waitUntilShellActive("Session Invitation");
+    // bob.bot.confirmSessionInvitationWindowStep1();
+    // bob.bot.clickButton(SarosConstant.BUTTON_CANCEL);
+    // alice.bot.waitUntilShellActive("Problem Occurred");
+    // assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
+    // bob.getName() + ".*"));
+    // alice.bot.clickButton(SarosConstant.BUTTON_OK);
+    // }
+    //
+    // @Test
+    // @Ignore
+    // public void testNewFolderInEmptyJavaProject() throws RemoteException {
+    // alice.bot.newJavaProject(PROJECT);
+    // alice.buildSessionSequential(PROJECT,
+    // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+    // alice.bot.newFolder(PROJECT, FOLDER);
+    // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
+    // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
+    // }
+    //
+    // @Test
+    // @Ignore
+    // public void testNewFileNewFolderInEmptyProject() throws RemoteException {
+    // alice.bot.newProject(PROJECT);
+    // assertTrue(alice.bot.isProjectExist(PROJECT));
+    // alice.buildSessionSequential(PROJECT,
+    // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+    // alice.bot.newFolder(PROJECT, FOLDER);
+    // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
+    // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
+    // alice.bot.newFile(PROJECT, FOLDER, FILE);
+    // bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
+    // assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
+    // }
 
     @Test
     @Ignore
@@ -147,19 +144,19 @@ public class RmiTest {
         assertTrue(alice.bot.getTextFileLineDelimiter().equals("Unix"));
     }
 
-    @Test
-    @Ignore
-    public void testExistProgress() throws RemoteException {
-        assertFalse(alice.bot.existPorgress());
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        List<String> inviteeJIDs = new ArrayList<String>();
-        inviteeJIDs.add(bob.getPlainJid());
-        alice.bot.shareProject(PROJECT, inviteeJIDs);
-        assertTrue(alice.bot.existPorgress());
-
-        alice.bot.leaveSessionByHost();
-
-    }
+    // @Test
+    // @Ignore
+    // public void testExistProgress() throws RemoteException {
+    // assertFalse(alice.bot.existPorgress());
+    // alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+    // List<String> inviteeJIDs = new ArrayList<String>();
+    // inviteeJIDs.add(bob.getPlainJid());
+    // alice.bot.shareProject(PROJECT, inviteeJIDs);
+    // assertTrue(alice.bot.existPorgress());
+    //
+    // alice.bot.leaveSessionByHost();
+    //
+    // }
 
     @Test
     @Ignore
@@ -186,7 +183,6 @@ public class RmiTest {
     }
 
     @Test
-    @Ignore
     public void testIsClassDirty() throws RemoteException {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         assertFalse(alice.bot.isClassDirty(PROJECT, PKG, CLS,

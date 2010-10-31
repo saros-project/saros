@@ -1,12 +1,24 @@
-package de.fu_berlin.inf.dpp.stf.sarosswtbot;
+package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets;
 
+import org.eclipse.swtbot.swt.finder.ReferenceBy;
+import org.eclipse.swtbot.swt.finder.SWTBotWidget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.hamcrest.SelfDescribing;
 
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
 
-public class SWTBotChatLine extends AbstractSWTBot<ChatLine> {
+/**
+ * This represents a {@link ChatLine} widget in chat view. GUI peoples have
+ * changed the chat view's looks using self defined SWT-components, which are
+ * obviously not supported by SWTBot. So i need to define a corresponding
+ * SWTBot[widget name](in this case, SWTBbotLine) class to access every chat
+ * widgets.
+ * 
+ * @author lchen
+ */
+@SWTBotWidget(clasz = ChatLine.class, preferredName = "chatLine", referenceBy = { ReferenceBy.LABEL })
+public class SarosSWTBotChatLine extends AbstractSWTBot<ChatLine> {
 
     /**
      * Constructs a new instance of this object.
@@ -17,7 +29,7 @@ public class SWTBotChatLine extends AbstractSWTBot<ChatLine> {
      *             if the widget is <code>null</code> or widget has been
      *             disposed.
      */
-    public SWTBotChatLine(ChatLine w) throws WidgetNotFoundException {
+    public SarosSWTBotChatLine(ChatLine w) throws WidgetNotFoundException {
         this(w, null);
     }
 
@@ -33,7 +45,7 @@ public class SWTBotChatLine extends AbstractSWTBot<ChatLine> {
      *             if the widget is <code>null</code> or widget has been
      *             disposed.
      */
-    public SWTBotChatLine(ChatLine w, SelfDescribing description)
+    public SarosSWTBotChatLine(ChatLine w, SelfDescribing description)
         throws WidgetNotFoundException {
         super(w, description);
     }
