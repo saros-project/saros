@@ -66,9 +66,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanatoryComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanatoryViewPart;
+import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -87,7 +87,7 @@ import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
  * @author bkahlert (ExplanatoryViewPart)
  */
 @Component(module = "ui")
-public class VideoPlayerView extends ExplanatoryViewPart implements
+public class VideoPlayerView extends ListExplanatoryViewPart implements
     VideoDisplay {
     private static Logger log = Logger.getLogger(VideoPlayerView.class);
 
@@ -103,7 +103,13 @@ public class VideoPlayerView extends ExplanatoryViewPart implements
     protected boolean keepAspectRatio = true;
 
     /* howto */
-    protected ExplanationComposite howToExplanation;
+    protected ListExplanation howTo = new ListExplanation(
+        SWT.ICON_INFORMATION,
+        "In order to share your screen with a session participant please do the following steps:",
+        "Open Shared Project Session",
+        "Select a participant with whom you want to share your screen",
+        "Click on the \"" + VideoSharingAction.TOOLTIP_START_SESSION
+            + "\" button in the view's toolbar");
 
     /* content */
     protected Composite parent;
@@ -173,14 +179,9 @@ public class VideoPlayerView extends ExplanatoryViewPart implements
     }
 
     @Override
-    public void createContentPartControl(
-        ExplanatoryComposite explanatoryComposite, Composite parent) {
-        /* explanation */
-        this.howToExplanation = new VideoSharingHowTo(explanatoryComposite,
-            SWT.NONE);
-        this.showExplanation(this.howToExplanation);
+    public void createContentPartControl(Composite parent) {
+        this.showExplanation(this.howTo);
 
-        /* content */
         this.parent = parent;
         GridLayout layout = new GridLayout();
         parent.setLayout(layout);
@@ -300,7 +301,7 @@ public class VideoPlayerView extends ExplanatoryViewPart implements
      * @swt
      */
     public void reset() {
-        this.showExplanation(this.howToExplanation);
+        this.showExplanation(this.howTo);
         if (videoCanvas != null)
             videoCanvas.parentFrame.dispose();
         videoCanvas = null;

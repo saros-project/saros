@@ -93,10 +93,13 @@ public class ExplanationComposite extends Composite {
          */
         this.addPaintListener(new PaintListener() {
             public void paintControl(PaintEvent e) {
-                final Image explanationImage = ExplanationComposite.this.explanationImage;
-                final Rectangle cachedClientArea = ExplanationComposite.this.cachedClientArea;
+                Image explanationImage = ExplanationComposite.this.explanationImage;
                 if (explanationImage == null)
                     return;
+
+                Rectangle clientArea = ExplanationComposite.this.cachedClientArea;
+                if (clientArea == null)
+                    clientArea = getClientArea();
 
                 Rectangle bounds = ExplanationComposite.this.getBounds();
                 int x, y = 0;
@@ -104,7 +107,7 @@ public class ExplanationComposite extends Composite {
                     x = (bounds.width - explanationImage.getBounds().width) / 2;
                     y = (bounds.height - explanationImage.getBounds().height) / 2;
                 } else {
-                    x = cachedClientArea.x - explanationImage.getBounds().width
+                    x = clientArea.x - explanationImage.getBounds().width
                         - SPACING;
                     y = (bounds.height - explanationImage.getBounds().height) / 2;
                 }

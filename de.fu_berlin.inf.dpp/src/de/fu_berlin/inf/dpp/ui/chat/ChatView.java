@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.ui.chat.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanatoryViewPart;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**

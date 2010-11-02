@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.explanation;
+package de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory;
 
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.PaintEvent;
@@ -6,6 +6,9 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
+
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.exceptions.ContentControlInvalidException;
 
 
 /**

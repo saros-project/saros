@@ -1,8 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.widgets.explanation;
+package de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
 
 public abstract class ExplanatoryViewPart extends ViewPart {
     protected ExplanatoryComposite explanatoryComposite;

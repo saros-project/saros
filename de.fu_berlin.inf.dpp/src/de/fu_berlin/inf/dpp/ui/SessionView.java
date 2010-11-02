@@ -55,7 +55,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
@@ -90,6 +89,8 @@ import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
@@ -99,7 +100,7 @@ import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
  * follow mode.
  */
 @Component(module = "ui")
-public class SessionView extends ViewPart {
+public class SessionView extends ListExplanatoryViewPart {
 
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
@@ -112,6 +113,12 @@ public class SessionView extends ViewPart {
         .getImage("icons/user_observer.png");
 
     protected IRosterListener rosterListener;
+
+    protected ListExplanation howTo = new ListExplanation(
+        SWT.ICON_INFORMATION,
+        "To begin a Saros session you can either:",
+        "Right-click on a project in the Package Explorer and select \"Share project\" in the Saros sub-menu.",
+        "Sign into the Roster, right-click on the invitee(s) and select \"Invite user\".");
 
     IPartListener2 viewPartListener = new IPartListener2() {
         public void partVisible(IWorkbenchPartReference partRef) {
@@ -451,7 +458,8 @@ public class SessionView extends ViewPart {
      * it.
      */
     @Override
-    public void createPartControl(Composite parent) {
+    public void createContentPartControl(Composite parent) {
+        this.showExplanation(true);
 
         // TODO Add 5 pixels of padding
         this.viewer = new SessionViewTableViewer(parent, SWT.MULTI
@@ -535,6 +543,13 @@ public class SessionView extends ViewPart {
         this.viewer.getControl().setFocus();
     }
 
+    private void showExplanation(boolean show) {
+        if (show)
+            this.showExplanation(this.howTo);
+        else
+            this.hideExplanation();
+    }
+
     /**
      * Needs to be called from the UI thread.
      */
@@ -548,6 +563,7 @@ public class SessionView extends ViewPart {
         public void sessionStarted(final ISarosSession newSarosSession) {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
+                    showExplanation(false);
                     viewer.setInput(newSarosSession);
                 }
             });
@@ -559,6 +575,7 @@ public class SessionView extends ViewPart {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     viewer.setInput(null);
+                    showExplanation(true);
                 }
             });
             sarosSession = null;

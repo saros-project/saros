@@ -1,9 +1,10 @@
-package de.fu_berlin.inf.dpp.ui.widgets.explanation;
+package de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 /**
