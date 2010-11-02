@@ -526,6 +526,7 @@ public class SessionView extends ListExplanatoryViewPart {
         sessionManager.addSessionListener(sessionListener);
         if (sessionManager.getSarosSession() != null) {
             this.viewer.setInput(sessionManager.getSarosSession());
+            showExplanation(false);
         }
 
         updateEnablement();
@@ -563,8 +564,8 @@ public class SessionView extends ListExplanatoryViewPart {
         public void sessionStarted(final ISarosSession newSarosSession) {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    showExplanation(false);
                     viewer.setInput(newSarosSession);
+                    showExplanation(false);
                 }
             });
         }
@@ -574,8 +575,8 @@ public class SessionView extends ListExplanatoryViewPart {
             assert sarosSession == oldSarosSession;
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    viewer.setInput(null);
                     showExplanation(true);
+                    viewer.setInput(null);
                 }
             });
             sarosSession = null;
