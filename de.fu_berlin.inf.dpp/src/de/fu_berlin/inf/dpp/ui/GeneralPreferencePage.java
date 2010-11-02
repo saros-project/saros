@@ -386,7 +386,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     protected void createMultiDriverPreferences() {
-        Composite group = createGroupWithGridLayout(1, "Follow Mode");
+        Composite group = createGroupWithGridLayout(1, "Multi Driver");
         addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
             MULTI_DRIVER_SUPPORT_TEXT, group));
         addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
