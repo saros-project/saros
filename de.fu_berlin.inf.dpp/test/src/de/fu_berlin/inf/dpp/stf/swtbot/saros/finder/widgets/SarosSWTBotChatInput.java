@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swtbot.swt.finder.ReferenceBy;
 import org.eclipse.swtbot.swt.finder.SWTBotWidget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -76,7 +76,8 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
         asyncExec(new VoidResult() {
             public void run() {
                 widget.setFocus();
-                keyboard().pressShortcut(SWT.CR, SWT.LF);
+                // keyboard().pressShortcut(SWT.CR, SWT.LF);
+                keyboard().pressShortcut(Keystrokes.LF);
             }
         });
         // pressShortcut(Keystrokes.LF);

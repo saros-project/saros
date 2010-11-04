@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
 
 public class PopUpWindowObject implements IPopUpWindowObject {
@@ -26,17 +27,18 @@ public class PopUpWindowObject implements IPopUpWindowObject {
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException {
         rmiBot.waitUntilShellActive("Problem Occurred");
-        rmiBot.delegate.text().getText().matches("*." + plainJID + ".*");
+        RmiSWTWorkbenchBot.delegate.text().getText()
+            .matches("*." + plainJID + ".*");
         rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
-        rmiBot.delegate.button(SarosConstant.BUTTON_OK).click();
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_OK).click();
     }
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException {
         rmiBot.waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-        rmiBot.delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID)
-            .setText(plainJID);
+        RmiSWTWorkbenchBot.delegate.textWithLabel(
+            SarosConstant.TEXT_LABEL_JABBER_ID).setText(plainJID);
         rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
 
     public void comfirmInvitationWindow(String inviteeJID)
@@ -97,11 +99,16 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         try {
             rmiBot.windowObject
                 .activateShellWithText("Create New User Account");
-            rmiBot.delegate.textWithLabel("Jabber Server").setText(server);
-            rmiBot.delegate.textWithLabel("Username").setText(username);
-            rmiBot.delegate.textWithLabel("Password").setText(password);
-            rmiBot.delegate.textWithLabel("Repeat Password").setText(password);
-            rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+            RmiSWTWorkbenchBot.delegate.textWithLabel("Jabber Server").setText(
+                server);
+            RmiSWTWorkbenchBot.delegate.textWithLabel("Username").setText(
+                username);
+            RmiSWTWorkbenchBot.delegate.textWithLabel("Password").setText(
+                password);
+            RmiSWTWorkbenchBot.delegate.textWithLabel("Repeat Password")
+                .setText(password);
+            RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH)
+                .click();
         } catch (WidgetNotFoundException e) {
             log.error("widget not found while accountBySarosMenu", e);
         }
@@ -116,10 +123,12 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         // if (!isTextWithLabelEqualWithText(SarosConstant.TEXT_LABEL_INVITER,
         // inviter))
         // log.warn("inviter does not match: " + inviter);
-        rmiBot.captureScreenshot(rmiBot.TEMPDIR + "/acknowledge_project1.png");
+        // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
+        // "/acknowledge_project1.png");
         rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
-        rmiBot.delegate.button(SarosConstant.BUTTON_NEXT).click();
-        rmiBot.captureScreenshot(rmiBot.TEMPDIR + "/acknowledge_project2.png");
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_NEXT).click();
+        // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
+        // "/acknowledge_project2.png");
         rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
     }
 
@@ -130,52 +139,54 @@ public class PopUpWindowObject implements IPopUpWindowObject {
      */
     public void confirmSessionInvitationWindowStep2UsingNewproject(
         String projectName) throws RemoteException {
-        rmiBot.delegate.radio(SarosConstant.RADIO_LABEL_CREATE_NEW_PROJECT)
-            .click();
-        rmiBot.captureScreenshot(rmiBot.TEMPDIR + "/acknowledge_project3.png");
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
-        rmiBot.captureScreenshot(rmiBot.TEMPDIR + "/acknowledge_project4.png");
-        rmiBot.waitUntilShellCloses(rmiBot.delegate
+        RmiSWTWorkbenchBot.delegate.radio(
+            SarosConstant.RADIO_LABEL_CREATE_NEW_PROJECT).click();
+        // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
+        // "/acknowledge_project3.png");
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
+        // "/acknowledge_project4.png");
+        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProject(
         String projectName) throws RemoteException {
-        rmiBot.delegate.radio("Use existing project").click();
-        rmiBot.delegate.button("Browse").click();
+        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
+        RmiSWTWorkbenchBot.delegate.button("Browse").click();
         rmiBot.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
 
         rmiBot.confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_YES);
         if (rmiBot.isShellActive("Save Resource"))
             rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
-        rmiBot.waitUntilShellCloses(rmiBot.delegate
+        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException {
-        rmiBot.delegate.radio("Use existing project").click();
-        rmiBot.delegate.button("Browse").click();
+        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
+        RmiSWTWorkbenchBot.delegate.button("Browse").click();
         rmiBot.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
         rmiBot.confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_NO);
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
         String projectName) throws RemoteException {
-        rmiBot.delegate.radio("Use existing project").click();
-        rmiBot.delegate.button("Browse").click();
+        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
+        RmiSWTWorkbenchBot.delegate.button("Browse").click();
         rmiBot.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        rmiBot.delegate.checkBox(
+        RmiSWTWorkbenchBot.delegate.checkBox(
             "Create copy for working distributed. New project name:").click();
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
-        rmiBot.waitUntilShellCloses(rmiBot.delegate
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
@@ -187,16 +198,16 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         String password) throws RemoteException {
         rmiBot.windowObject
             .activateShellWithText(SarosConstant.SAROS_CONFI_SHELL_TITLE);
-        rmiBot.delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_SERVER)
-            .setText(xmppServer);
-        rmiBot.delegate.sleep(rmiBot.sleepTime);
-        rmiBot.delegate.textWithLabel(SarosConstant.TEXT_LABEL_USER_NAME)
-            .setText(jid);
-        rmiBot.delegate.sleep(rmiBot.sleepTime);
-        rmiBot.delegate.textWithLabel(SarosConstant.TEXT_LABEL_PASSWORD)
-            .setText(password);
-        rmiBot.delegate.textWithLabel("Confirm:").setText(password);
-        rmiBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        RmiSWTWorkbenchBot.delegate.textWithLabel(
+            SarosConstant.TEXT_LABEL_JABBER_SERVER).setText(xmppServer);
+        RmiSWTWorkbenchBot.delegate.sleep(rmiBot.sleepTime);
+        RmiSWTWorkbenchBot.delegate.textWithLabel(
+            SarosConstant.TEXT_LABEL_USER_NAME).setText(jid);
+        RmiSWTWorkbenchBot.delegate.sleep(rmiBot.sleepTime);
+        RmiSWTWorkbenchBot.delegate.textWithLabel(
+            SarosConstant.TEXT_LABEL_PASSWORD).setText(password);
+        RmiSWTWorkbenchBot.delegate.textWithLabel("Confirm:").setText(password);
+        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
 
         // while (delegate.button("Next >").isEnabled()) {
         // delegate.button("Next >").click();

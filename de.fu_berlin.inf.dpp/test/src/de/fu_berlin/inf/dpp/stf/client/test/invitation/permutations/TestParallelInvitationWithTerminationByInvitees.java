@@ -141,7 +141,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
         carl.bot.waitUntilShellActive("Session Invitation");
-        carl.window.confirmSessionInvitationWindowStep1();
+        carl.popupWindow.confirmSessionInvitationWindowStep1();
         carl.bot.clickButton(SarosConstant.BUTTON_CANCEL);
         alice.bot.waitUntilShellActive("Problem Occurred");
         assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
@@ -149,7 +149,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
         dave.bot.waitUntilShellActive("Session Invitation");
-        dave.window.confirmSessionInvitationWindowStep1();
+        dave.popupWindow.confirmSessionInvitationWindowStep1();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         dave.bot.clickButton(SarosConstant.BUTTON_CANCEL);
         alice.bot.waitUntilShellActive("Problem Occurred");
@@ -158,8 +158,8 @@ public class TestParallelInvitationWithTerminationByInvitees {
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
         edna.bot.waitUntilShellActive("Session Invitation");
-        edna.window.confirmSessionInvitationWindowStep1();
-        edna.window.confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
+        edna.popupWindow.confirmSessionInvitationWindowStep1();
+        edna.popupWindow.confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
         edna.bot.leaveSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }

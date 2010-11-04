@@ -42,7 +42,7 @@ public class ViewObject {
     private TableObject tableObject;
     private MenuObject menuObject;
     private TreeObject treeObject;
-    private SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     /**
      * Creates an instance of a viewObject.<br/>
@@ -55,6 +55,7 @@ public class ViewObject {
      */
     public ViewObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
         this.tableObject = rmiBot.tableObject;
         this.menuObject = rmiBot.menuObject;
         this.treeObject = rmiBot.treeObject;

@@ -24,10 +24,11 @@ public class MainObject {
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
     private ViewObject viewObject;
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public MainObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
         this.wUntil = rmiBot.wUntilObject;
         this.viewObject = rmiBot.viewObject;
     }

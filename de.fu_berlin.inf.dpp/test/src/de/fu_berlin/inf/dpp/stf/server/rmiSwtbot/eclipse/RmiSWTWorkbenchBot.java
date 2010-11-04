@@ -92,16 +92,16 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public int sleepTime = 750;
 
-    public WaitUntilObject wUntilObject = new WaitUntilObject(this);
-    public TableObject tableObject = new TableObject(this);
-    public ToolbarObject tBarObject = new ToolbarObject(this);
-    public TreeObject treeObject = new TreeObject(this);
-    public ViewObject viewObject = new ViewObject(this);
-    public PerspectiveObject persObject = new PerspectiveObject(this);
-    public EditorObject editorObject = new EditorObject(this);
-    public MainObject mainObject = new MainObject(this);
-    public MenuObject menuObject = new MenuObject(this);
-    public WindowObject windowObject = new WindowObject(this);
+    public WaitUntilObject wUntilObject;
+    public TableObject tableObject;
+    public ToolbarObject tBarObject;
+    public TreeObject treeObject;
+    public ViewObject viewObject;
+    public PerspectiveObject persObject;
+    public EditorObject editorObject;
+    public MainObject mainObject;
+    public MenuObject menuObject;
+    public WindowObject windowObject;
 
     /** RmiSWTWorkbenchBot is a singleton */
     public static RmiSWTWorkbenchBot getInstance() {
@@ -121,6 +121,16 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;
+        wUntilObject = new WaitUntilObject(this);
+        tableObject = new TableObject(this);
+        tBarObject = new ToolbarObject(this);
+        treeObject = new TreeObject(this);
+        viewObject = new ViewObject(this);
+        persObject = new PerspectiveObject(this);
+        editorObject = new EditorObject(this);
+        mainObject = new MainObject(this);
+        menuObject = new MenuObject(this);
+        windowObject = new WindowObject(this);
     }
 
     /**

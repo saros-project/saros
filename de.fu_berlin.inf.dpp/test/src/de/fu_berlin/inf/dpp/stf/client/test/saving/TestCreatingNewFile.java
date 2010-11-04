@@ -157,7 +157,7 @@ public class TestCreatingNewFile {
     @Test
     public void testCarlGiveExclusiveDriverRole() throws IOException,
         CoreException {
-        carl.bot.giveExclusiveDriverRole(alice.getPlainJid());
+        carl.sessionV.giveExclusiveDriverRole(alice.getPlainJid());
 
         assertFalse(carl.state.isDriver(carl.jid));
         assertTrue(alice.state.isDriver(alice.jid));

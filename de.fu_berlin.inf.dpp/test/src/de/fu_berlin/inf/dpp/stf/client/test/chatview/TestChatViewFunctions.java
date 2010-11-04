@@ -121,13 +121,15 @@ public class TestChatViewFunctions {
     @Test
     public void testChat() throws RemoteException {
         alice.bot.sendChatMessage(message);
-        System.out.println(alice.bot
-            .getUserNameOnChatLinePartnerChangeSeparator());
-        System.out.println(alice.bot.getTextOfChatLine());
+        // System.out.println(alice.bot
+        // .getUserNameOnChatLinePartnerChangeSeparator());
+        // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
+        alice.bot.sleep(2000);
         System.out.println(alice.bot.getTextOfLastChatLine());
-        System.out.println(bob.bot.getTextOfLastChatLine());
+
         bob.bot.sleep(2000);
+        System.out.println(bob.bot.getTextOfLastChatLine());
         System.out.println(bob.bot
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getPlainJid()));
 

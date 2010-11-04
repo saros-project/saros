@@ -21,10 +21,11 @@ public class WaitUntilObject {
     private static final transient Logger log = Logger
         .getLogger(WaitUntilObject.class);
     private RmiSWTWorkbenchBot rmiBot;
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public WaitUntilObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
 
     }
 

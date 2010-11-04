@@ -15,10 +15,11 @@ public class TableObject {
         .getLogger(TableObject.class);
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public TableObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
         this.wUntil = rmiBot.wUntilObject;
 
     }

@@ -12,10 +12,11 @@ public class WindowObject {
     private RmiSWTWorkbenchBot rmiBot;
     private WaitUntilObject wUntil;
     private TableObject tableObject;
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public WindowObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
         this.wUntil = rmiBot.wUntilObject;
         this.tableObject = rmiBot.tableObject;
     }

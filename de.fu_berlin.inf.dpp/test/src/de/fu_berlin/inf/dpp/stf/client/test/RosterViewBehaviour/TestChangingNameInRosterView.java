@@ -54,8 +54,8 @@ public class TestChangingNameInRosterView {
         assertTrue(alice.state.hasContactWith(bob.jid));
         assertFalse(alice.bot.hasContactWith(bob.jid));
         // assertTrue(alice.bot.hasContactWith(bob.jid.));
-        assertTrue(alice.bot.isContactInSessionView(bob.jid.getBase()));
-        assertTrue(alice.bot.isContactInSessionView(bob.jid.getName()));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getBase()));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getName()));
 
     }
 }

@@ -9,10 +9,10 @@ public class ToolbarObject {
     private static final transient Logger log = Logger
         .getLogger(ToolbarObject.class);
     private RmiSWTWorkbenchBot rmiBot;
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public ToolbarObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
     }
-
 }

@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 public class RosterViewObject implements IRosterViewObject {
+
     private transient static final Logger log = Logger
         .getLogger(RosterViewObject.class);
 
@@ -84,7 +85,8 @@ public class RosterViewObject implements IRosterViewObject {
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return rmiBot.state.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
+        return rmiBot.stateObject.isConnectedByXMPP()
+            && isConnectedByXmppGuiCheck();
     }
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {

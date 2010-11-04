@@ -145,8 +145,8 @@ public class TestHostAsDriverInvitesBelatedly {
 
         alice.bot.invitateUser(bob.getPlainJid());
 
-        bob.window.confirmSessionInvitationWindowStep1();
-        bob.window
+        bob.popupWindow.confirmSessionInvitationWindowStep1();
+        bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProject(PROJECT);
 
         String CLSContentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);

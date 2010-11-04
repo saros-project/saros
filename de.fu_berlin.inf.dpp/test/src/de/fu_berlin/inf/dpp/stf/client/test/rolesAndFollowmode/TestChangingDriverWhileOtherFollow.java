@@ -128,7 +128,7 @@ public class TestChangingDriverWhileOtherFollow {
     @Test
     public void testChanginDriverWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.bot.giveExclusiveDriverRole(carl.getPlainJid());
+        alice.sessionV.giveExclusiveDriverRole(carl.getPlainJid());
         alice.bot.waitUntilFollowed(carl.getPlainJid());
         bob.bot.waitUntilFollowed(carl.getPlainJid());
         dave.bot.waitUntilFollowed(carl.getPlainJid());

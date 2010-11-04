@@ -44,18 +44,19 @@ public class TestFollowMode {
     @After
     public void cleanUp() throws RemoteException {
         if (bob.state.isFollowing())
-            bob.bot.clickCMStopFollowingThisUserInSPSView(alice.state,
+            bob.sessionV.clickCMStopFollowingThisUserInSPSView(alice.state,
                 alice.jid);
         if (alice.state.isFollowing())
-            alice.bot.clickCMStopFollowingThisUserInSPSView(bob.state, bob.jid);
+            alice.sessionV.clickCMStopFollowingThisUserInSPSView(bob.state,
+                bob.jid);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT,
-            PKG, CLS1);
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG, CLS1);
         bob.bot.followUser(alice.state, alice.jid);
         bob.bot.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.state.isFollowing());
@@ -82,8 +83,8 @@ public class TestFollowMode {
         bob.bot.followUser(alice.state, alice.jid);
         alice.bot.newClass(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3, PROJECT,
-            PKG, CLS3);
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3,
+            PROJECT, PKG, CLS3);
         alice.bot.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);

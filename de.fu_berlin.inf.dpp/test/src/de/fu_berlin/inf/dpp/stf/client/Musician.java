@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IPopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -32,7 +33,8 @@ public class Musician {
     public ISarosRmiSWTWorkbenchBot bot;
     public ISarosState state;
     public IRosterViewObject rosterV;
-    public IPopUpWindowObject window;
+    public IPopUpWindowObject popupWindow;
+    public ISessionViewObject sessionV;
     public JID jid;
     public String password;
     public String host;
@@ -78,7 +80,8 @@ public class Musician {
 
         state = (ISarosState) registry.lookup("state");
         rosterV = (IRosterViewObject) registry.lookup("rosterView");
-        window = (IPopUpWindowObject) registry.lookup("popUpWindow");
+        popupWindow = (IPopUpWindowObject) registry.lookup("popUpWindow");
+        sessionV = (ISessionViewObject) registry.lookup("sessionView");
     }
 
     /*************** Component, which consist of other simple functions ******************/
@@ -91,7 +94,7 @@ public class Musician {
         }
         bot.clickShareProjectWith(projectName, shareProjectWith);
 
-        window.confirmInvitationWindow(inviteeJIDs);
+        popupWindow.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
             bot.confirmSessionUsingNewOrExistProject(invitee.bot, this.jid,
                 projectName, invitee.typeOfSharingProject);
@@ -116,7 +119,7 @@ public class Musician {
             final Musician musician = peers.get(i);
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.window.confirmSessionInvitationWizard(
+                    musician.popupWindow.confirmSessionInvitationWizard(
                         getPlainJid(), BotConfiguration.PROJECTNAME);
                     return null;
                 }
@@ -142,7 +145,7 @@ public class Musician {
      */
     public void leaveSessionFirst(Musician... musicians)
         throws RemoteException, InterruptedException {
-        bot.clickTBLeaveTheSessionInSPSView();
+        sessionV.clickTBLeaveTheSessionInSPSView();
         bot.confirmWindow("Confirm Closing Session", SarosConstant.BUTTON_YES);
         bot.waitUntilSessionCloses();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
@@ -195,7 +198,7 @@ public class Musician {
         }
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         bot.waitUntilAllPeersLeaveSession(peerJIDs);
-        bot.clickTBLeaveTheSessionInSPSView();
+        sessionV.clickTBLeaveTheSessionInSPSView();
         bot.waitUntilSessionCloses();
     }
 

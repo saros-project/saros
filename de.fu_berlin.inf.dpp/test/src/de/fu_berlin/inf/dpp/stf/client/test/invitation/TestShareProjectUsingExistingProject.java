@@ -77,7 +77,7 @@ public class TestShareProjectUsingExistingProject {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.bot
             .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
-        bob.window
+        bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
         assertTrue(bob.bot.isProjectExist(PROJECT));

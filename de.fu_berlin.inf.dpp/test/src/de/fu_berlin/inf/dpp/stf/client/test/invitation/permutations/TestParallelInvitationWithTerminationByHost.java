@@ -137,14 +137,14 @@ public class TestParallelInvitationWithTerminationByHost {
         bob.bot.closeShell("Invitation Cancelled");
 
         carl.bot.waitUntilShellActive("Session Invitation");
-        carl.window.confirmSessionInvitationWindowStep1();
+        carl.popupWindow.confirmSessionInvitationWindowStep1();
         alice.bot.cancelInvitation(0);
         carl.bot.waitUntilShellActive("Invitation Cancelled");
         assertTrue(carl.bot.isShellActive("Invitation Cancelled"));
         carl.bot.closeShell("Invitation Cancelled");
 
         dave.bot.waitUntilShellActive("Session Invitation");
-        dave.window.confirmSessionInvitationWindowStep1();
+        dave.popupWindow.confirmSessionInvitationWindowStep1();
         dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         alice.bot.cancelInvitation(0);
         dave.bot.waitUntilShellActive("Invitation Cancelled");

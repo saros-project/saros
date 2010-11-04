@@ -95,7 +95,7 @@ public class TestEditDuringInvitation {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
-        alice.bot.giveDriverRole(bob.getPlainJid());
+        alice.sessionV.giveDriverRole(bob.getPlainJid());
 
         assertTrue(bob.state.isDriver(alice.jid));
 
@@ -104,14 +104,14 @@ public class TestEditDuringInvitation {
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        carl.window.confirmSessionInvitationWindowStep1();
+        carl.popupWindow.confirmSessionInvitationWindowStep1();
 
         log.trace("bob.setTextInJavaEditor");
         bob.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
             PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.window.confirmSessionInvitationWindowStep2UsingNewproject(PKG);
+        carl.popupWindow.confirmSessionInvitationWindowStep2UsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");
         String textFromCarl = carl.bot.getTextOfJavaEditor(PROJECT, PKG, CLS);

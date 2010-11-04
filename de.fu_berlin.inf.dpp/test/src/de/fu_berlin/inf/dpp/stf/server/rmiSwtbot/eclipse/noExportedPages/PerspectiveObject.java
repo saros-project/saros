@@ -31,10 +31,11 @@ public class PerspectiveObject {
     private WaitUntilObject wUntil;
     private MenuObject menuObject;
 
-    private static SarosSWTBot bot = new SarosSWTBot();
+    private SarosSWTBot bot;
 
     public PerspectiveObject(RmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+        this.bot = RmiSWTWorkbenchBot.delegate;
         this.wUntil = rmiBot.wUntilObject;
         this.menuObject = rmiBot.menuObject;
 
