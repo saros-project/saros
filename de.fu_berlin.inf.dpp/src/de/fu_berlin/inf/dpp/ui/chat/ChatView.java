@@ -51,7 +51,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
     private static Logger log = Logger.getLogger(ChatView.class);
 
-    protected SimpleExplanation howToExplanation = new SimpleExplanation(
+    protected SimpleExplanation howTo = new SimpleExplanation(
         SWT.ICON_INFORMATION,
         "To use this chat you need to be connected to a Saros session.");
 
@@ -93,7 +93,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
                     User localUser = sessionManager.getSarosSession()
                         .getLocalUser();
                     if (localUser.equals(leftUser))
-                        ChatView.this.showExplanation(howToExplanation);
+                        ChatView.this.showExplanation(howTo);
                 }
             });
         }
@@ -194,7 +194,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
                 }
             });
 
-        this.showExplanation(howToExplanation);
+        this.showExplanation(howTo);
 
         // Register the chat listener.
         // Run a possible join() in a separate thread to prevent the opening of
