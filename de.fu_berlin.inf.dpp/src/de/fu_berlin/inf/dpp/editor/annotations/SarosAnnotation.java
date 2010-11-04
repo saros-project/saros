@@ -169,6 +169,9 @@ public abstract class SarosAnnotation extends Annotation {
         Color userLightColor = ColorUtil.scaleColor(userColor,
             LIGHT_COLOR_SCALE);
 
+        // The temporarily created color needs to be disposed
+        userColor.dispose();
+
         return userLightColor;
     }
 }
