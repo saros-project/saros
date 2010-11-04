@@ -15,10 +15,10 @@ public class IntroductoryTextOnlyListExplanationCompositeDemo extends Demo {
 
 	@Override
 	public void createPartControls(Composite parent) {
-		ListExplanationComposite simpleExplanationComposite = new ListExplanationComposite(
+		ListExplanationComposite listExplanationComposite = new ListExplanationComposite(
 				parent, SWT.NONE);
 		ListExplanation listItemExplanation = new ListExplanation(
 				SWT.ICON_INFORMATION, "I'm the introductory text...");
-		simpleExplanationComposite.setExplanation(listItemExplanation);
+		listExplanationComposite.setExplanation(listItemExplanation);
 	}
 }

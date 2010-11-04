@@ -15,10 +15,10 @@ public class ItemsOnlyListExplanationCompositeDemo extends Demo {
 
 	@Override
 	public void createPartControls(Composite parent) {
-		ListExplanationComposite simpleExplanationComposite = new ListExplanationComposite(
+		ListExplanationComposite listExplanationComposite = new ListExplanationComposite(
 				parent, SWT.NONE);
 		ListExplanation listItemExplanation = new ListExplanation(
 				SWT.ICON_INFORMATION, null, "List item 1", "List item 2", "List item 3");
-		simpleExplanationComposite.setExplanation(listItemExplanation);
+		listExplanationComposite.setExplanation(listItemExplanation);
 	}
 }
