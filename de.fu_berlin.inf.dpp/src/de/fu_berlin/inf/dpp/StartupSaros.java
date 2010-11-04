@@ -22,6 +22,9 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.RosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.SessionViewObject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -128,6 +131,19 @@ public class StartupSaros implements IStartup {
                     SarosState.classVariable = new SarosState(saros,
                         sessionManager, dataTransferManager, editorManager);
                     bot.exportState(SarosState.classVariable, "state");
+
+                    RosterViewObject.classVariable = new RosterViewObject(bot);
+                    bot.exportRosterView(RosterViewObject.classVariable,
+                        "rosterView");
+
+                    PopUpWindowObject.classVariable = new PopUpWindowObject(bot);
+                    bot.exportPopUpWindow(PopUpWindowObject.classVariable,
+                        "popUpWindow");
+
+                    SessionViewObject.classVariable = new SessionViewObject(bot);
+                    bot.exportSessionView(SessionViewObject.classVariable,
+                        "sessionView");
+
                     bot.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);
