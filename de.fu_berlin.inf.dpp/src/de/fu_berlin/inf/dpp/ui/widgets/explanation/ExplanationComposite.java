@@ -88,8 +88,7 @@ public class ExplanationComposite extends Composite {
         this.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
         /*
-         * Updates the rounded rectangle background image every time the
-         * composite gets resized.
+         * Adds the explanation icon to the left of the explanation.
          */
         this.addPaintListener(new PaintListener() {
             public void paintControl(PaintEvent e) {
@@ -104,12 +103,16 @@ public class ExplanationComposite extends Composite {
                 Rectangle bounds = ExplanationComposite.this.getBounds();
                 int x, y = 0;
                 if (ExplanationComposite.this.getChildren().length == 0) {
+                    // If no child elements exist, place the icon in the center
+                    // of the canvas
                     x = (bounds.width - explanationImage.getBounds().width) / 2;
                     y = (bounds.height - explanationImage.getBounds().height) / 2;
                 } else {
+                    // If child elements exist, place the icon to their left
                     x = clientArea.x - explanationImage.getBounds().width
                         - SPACING;
-                    y = (bounds.height - explanationImage.getBounds().height) / 2;
+                    y = clientArea.y + clientArea.height / 2
+                        - explanationImage.getBounds().height / 2;
                 }
                 e.gc.drawImage(explanationImage, x, y);
             }
