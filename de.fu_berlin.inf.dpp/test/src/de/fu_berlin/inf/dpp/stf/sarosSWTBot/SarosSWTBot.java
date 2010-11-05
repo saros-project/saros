@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder;
+package de.fu_berlin.inf.dpp.stf.sarosSWTBot;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
@@ -17,10 +17,10 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.hamcrest.Matcher;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotChatInput;
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotChatLine;
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotRadio;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatLine;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotRadio;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;

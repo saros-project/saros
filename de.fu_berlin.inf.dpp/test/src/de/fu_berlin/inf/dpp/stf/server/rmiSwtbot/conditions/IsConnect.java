@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 
 public class IsConnect extends DefaultCondition {
 

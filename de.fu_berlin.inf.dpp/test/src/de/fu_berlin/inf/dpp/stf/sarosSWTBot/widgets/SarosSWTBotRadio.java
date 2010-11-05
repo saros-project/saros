@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets;
+package de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;

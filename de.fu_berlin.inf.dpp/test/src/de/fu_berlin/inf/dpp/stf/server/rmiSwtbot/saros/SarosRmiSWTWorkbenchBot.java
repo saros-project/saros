@@ -24,6 +24,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -36,8 +38,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.PopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.RosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.SessionViewObject;
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
