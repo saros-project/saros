@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.test.MakeOperationConcurrently;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.ISarosRmiSWTWorkbenchBot;
