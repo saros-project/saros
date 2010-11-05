@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 
 /**
  * The goal of this class is to gather state and provide an RMI interface for

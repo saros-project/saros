@@ -24,8 +24,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;

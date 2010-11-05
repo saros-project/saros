@@ -14,8 +14,8 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IPopUpWindowObject;

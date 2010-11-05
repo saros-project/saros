@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestFollowMode {
     private static final String CLS1 = BotConfiguration.CLASSNAME;

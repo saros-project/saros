@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.swtbot.saros.finder.widgets.ContextMenuHelper;

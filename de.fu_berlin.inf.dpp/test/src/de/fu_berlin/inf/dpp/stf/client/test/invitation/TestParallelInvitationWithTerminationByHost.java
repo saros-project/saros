@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 
 public class TestParallelInvitationWithTerminationByHost {
 

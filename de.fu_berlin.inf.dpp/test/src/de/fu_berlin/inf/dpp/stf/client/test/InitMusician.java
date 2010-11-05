@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 
 public class InitMusician {
     private final static Logger log = Logger.getLogger(InitMusician.class);

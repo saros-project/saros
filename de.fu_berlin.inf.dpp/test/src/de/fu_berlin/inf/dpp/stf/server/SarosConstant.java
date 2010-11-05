@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot;
+package de.fu_berlin.inf.dpp.stf.server;
 
 public class SarosConstant {
 
