@@ -24,6 +24,10 @@ public class TableObject {
 
     }
 
+    public void clickContextMenuOfTable(String itemName, String contextName) {
+        bot.table().getTableItem(itemName).contextMenu(contextName).click();
+    }
+
     public SWTBotTableItem selectTableItemWithLabel(SWTBotTable table,
         String label) {
         try {

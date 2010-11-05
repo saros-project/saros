@@ -19,7 +19,7 @@ public class IsInSession extends DefaultCondition {
 
     public boolean test() throws Exception {
 
-        if (state.existSession())
+        if (state.isInSession())
             return true;
 
         return false;

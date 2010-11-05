@@ -157,7 +157,7 @@ public class Musician {
                     musician.bot.waitUntilShellActive("Closing the Session");
                     musician.bot.confirmWindow("Closing the Session",
                         SarosConstant.BUTTON_OK);
-                    musician.bot.waitUntilShellCloses("Closing the Session");
+                    musician.bot.waitUntilShellClosed("Closing the Session");
                     return null;
                 }
             });

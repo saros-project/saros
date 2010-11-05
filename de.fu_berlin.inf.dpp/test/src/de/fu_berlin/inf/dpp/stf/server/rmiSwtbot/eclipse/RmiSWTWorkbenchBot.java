@@ -267,7 +267,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         menuObject.clickMenuWithTexts("Edit", "Delete");
         confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_DELETE_RESOURCE,
             SarosConstant.BUTTON_OK, true);
-        waitUntilShellCloses(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
+        waitUntilShellClosed(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
     }
 
     /**
@@ -409,7 +409,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.checkBox("Switch to HEAD revision").click();
         delegate.textWithLabel("Revision:").setText("115");
         delegate.button(SarosConstant.BUTTON_OK).click();
-        waitUntilShellCloses("SVN Switch");
+        waitUntilShellClosed("SVN Switch");
     }
 
     public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
@@ -428,7 +428,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.checkBox("Switch to HEAD revision").click();
         delegate.textWithLabel("Revision:").setText("116");
         delegate.button(SarosConstant.BUTTON_OK).click();
-        waitUntilShellCloses("SVN Switch");
+        waitUntilShellClosed("SVN Switch");
     }
 
     public void revert() throws RemoteException {
@@ -439,7 +439,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Revert...");
         confirmWindow("Revert", SarosConstant.BUTTON_OK);
-        waitUntilShellCloses("Revert");
+        waitUntilShellClosed("Revert");
     }
 
     public void renameClass(String newName, String projectName, String pkg,
@@ -459,7 +459,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.textWithLabel("New name:").setText(newName);
         waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         delegate.button(SarosConstant.BUTTON_FINISH).click();
-        waitUntilShellCloses("Rename Compilation Unit");
+        waitUntilShellClosed("Rename Compilation Unit");
     }
 
     public void renameFolder(String projectName, String oldPath, String newPath)
@@ -474,7 +474,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.textWithLabel("New name:").setText(newPath);
         waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
         delegate.button(SarosConstant.BUTTON_OK).click();
-        waitUntilShellCloses("Rename Resource");
+        waitUntilShellClosed("Rename Resource");
     }
 
     public void renamePkg(String newName, String... texts)
@@ -489,7 +489,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.textWithLabel("New name:").setText(newName);
         waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
         delegate.button(SarosConstant.BUTTON_OK).click();
-        waitUntilShellCloses("Rename Package");
+        waitUntilShellClosed("Rename Package");
     }
 
     public void switchToTag() throws RemoteException {
@@ -504,7 +504,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         confirmWindowWithTree("Repository Browser", SarosConstant.BUTTON_OK,
             "tags", "eclipsecon2009");
         delegate.button(SarosConstant.BUTTON_OK).click();
-        waitUntilShellCloses("SVN Switch");
+        waitUntilShellClosed("SVN Switch");
     }
 
     public void importProjectFromSVN(String path) throws RemoteException {
@@ -559,7 +559,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
         delegate.button("Apply").click();
         delegate.button("OK").click();
-        waitUntilShellCloses("Preferences");
+        waitUntilShellClosed("Preferences");
     }
 
     public String getTextFileLineDelimiter() throws RemoteException {
@@ -752,7 +752,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                     (projectName + "/src"));
                 delegate.textWithLabel("Name:").setText(pkg);
                 delegate.button(SarosConstant.BUTTON_FINISH).click();
-                waitUntilShellCloses("New java Package");
+                waitUntilShellClosed("New java Package");
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new package";
                 log.error(cause, e);
@@ -1764,7 +1764,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         delegate.sleep(10);
     }
 
-    public void waitUntilShellCloses(String shellText) throws RemoteException {
+    public void waitUntilShellClosed(String shellText) throws RemoteException {
         wUntilObject.waitUntil(SarosConditions.isShellClosed(delegate,
             shellText));
         delegate.sleep(10);

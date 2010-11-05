@@ -15,4 +15,5 @@ public class ToolbarObject {
         this.rmiBot = rmiBot;
         this.bot = RmiSWTWorkbenchBot.delegate;
     }
+
 }

@@ -67,8 +67,59 @@ public interface ISessionViewObject extends Remote {
      */
     public void setFocusOnSessionView() throws RemoteException;
 
+    /**
+     * Using this function host can perform the action "Give driver Role" which
+     * should be activated by clicking the context menu "Give driver Role" of
+     * the tableItem with itemText "inviteeJID" in session view.
+     * <p>
+     * <b>Attention:</b> <br>
+     * Make sure, the session view is open and active. <br>
+     * Waits until the shell "Progress Information" is closed. It guarantee that
+     * the "Give driver Role" action is completely done.
+     * 
+     * @param inviteeJID
+     *            itemText of the tableItem which you want to selected
+     * @throws RemoteException
+     */
     public void giveDriverRole(String inviteeJID) throws RemoteException;
 
+    /**
+     * Using this function host can perform the action
+     * "Give exclusive driver Role" which should be activated by clicking the
+     * context menu "Give exclusive driver Role" of the tableItem with itemText
+     * "inviteeJID" in session view.
+     * <p>
+     * <b>Attention:</b> <br>
+     * Make sure, the session view is open and active. <br>
+     * Waits until the shell "Progress Information" is closed. It guarantee that
+     * the "Give driver Role" action is completely done.
+     * 
+     * @param inviteeJID
+     *            itemText of the tableItem which you want to selected
+     * @throws RemoteException
+     */
+    public void giveExclusiveDriverRole(String inviteeJID)
+        throws RemoteException;
+
+    /**
+     * Test if you are now in a session. <br>
+     * This function check if the tool bar button "Leave the session" in the
+     * session view is enabled. You can also use another function
+     * {@link ISarosState#isInSession()}, which test the session state without
+     * GUI.
+     * 
+     * <p>
+     * <b>Attention:</b> <br>
+     * Make sure, the session view is open and active. <br>
+     * Try to use the {@link ISessionViewObject#isInSession()} and
+     * {@link ISarosState#isInSession()} together in your junittests.
+     * 
+     * 
+     * @return <tt>true</tt> if the tool bar button "Leave the session" is
+     *         enabled.
+     * 
+     * @throws RemoteException
+     */
     public boolean isInSession() throws RemoteException;
 
     public boolean isContactInSessionView(String Contact)
@@ -109,9 +160,6 @@ public interface ISessionViewObject extends Remote {
         throws RemoteException;
 
     public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
-        throws RemoteException;
-
-    public void giveExclusiveDriverRole(String inviteePlainJID)
         throws RemoteException;
 
 }

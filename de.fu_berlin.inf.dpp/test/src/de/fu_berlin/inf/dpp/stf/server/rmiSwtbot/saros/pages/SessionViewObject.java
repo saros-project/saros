@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
@@ -12,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 
 /**
- *This implementation of {@link ISessionViewObject}
+ * This implementation of {@link ISessionViewObject}
  * 
  * @author Lin
  */
@@ -33,7 +34,7 @@ public class SessionViewObject implements ISessionViewObject {
     }
 
     /**
-     *constructs a SessionViewObject, which would only be created in class
+     * constructs a SessionViewObject, which would only be created in class
      * {@links StartupSaros} and then exported by
      * {@link SarosRmiSWTWorkbenchBot} on our local RMI Registry.
      * 
@@ -66,47 +67,36 @@ public class SessionViewObject implements ISessionViewObject {
         rmiBot.viewObject.setFocusOnViewByTitle(viewName);
     }
 
-    /**
-     * 
-     */
     public void giveDriverRole(String inviteeJID) throws RemoteException {
         openSessionView();
         setFocusOnSessionView();
-        rmiBot.viewObject.clickContextMenuOfTableInView(
-            BotConfiguration.NAME_SESSION_VIEW, inviteeJID,
+        rmiBot.tableObject.clickContextMenuOfTable(inviteeJID,
             SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
-        rmiBot.waitUntilShellCloses("Progress Information");
+        rmiBot.waitUntilShellClosed("Progress Information");
     }
 
     public void giveExclusiveDriverRole(String inviteePlainJID)
         throws RemoteException {
         openSessionView();
         setFocusOnSessionView();
-        rmiBot.viewObject.clickContextMenuOfTableInView(
-            BotConfiguration.NAME_SESSION_VIEW, inviteePlainJID,
+        rmiBot.tableObject.clickContextMenuOfTable(inviteePlainJID,
             SarosConstant.CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE);
-        rmiBot.waitUntilShellCloses("Progress Information");
+        rmiBot.waitUntilShellClosed("Progress Information");
     }
 
-    public boolean isSharedSessionViewOpen() throws RemoteException {
-        return rmiBot.viewObject
-            .isViewOpen(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
-    }
-
-    /**
-     * "Shared Project Session" View must be open
-     */
     public boolean isInSession() throws RemoteException {
-        rmiBot.viewObject.setFocusOnViewByTitle("Shared Project Session");
-        return rmiBot.delegate.viewByTitle("Shared Project Session")
-            .toolbarButton("Leave the session").isEnabled();
+        openSessionView();
+        setFocusOnSessionView();
+        SWTBotToolbarButton toolbarButton = rmiBot.viewObject
+            .getToolbarButtonWithTooltipInView(viewName, "Leave the session");
+        return toolbarButton.isEnabled();
     }
 
     public boolean isContactInSessionView(String Contact)
         throws RemoteException {
+        openSessionView();
         setFocusOnSessionView();
-        SWTBotTable table = rmiBot.viewObject
-            .getTableInView(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
+        SWTBotTable table = rmiBot.viewObject.getTableInView(viewName);
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().matches(".*" + Contact + ".*"))
                 return true;

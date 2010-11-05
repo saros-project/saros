@@ -19,8 +19,8 @@ public class isSessionclosed extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        System.out.println("existSession() == " + state.existSession());
-        if (state.existSession()) {
+        System.out.println("existSession() == " + state.isInSession());
+        if (state.isInSession()) {
             return false;
         }
         return true;

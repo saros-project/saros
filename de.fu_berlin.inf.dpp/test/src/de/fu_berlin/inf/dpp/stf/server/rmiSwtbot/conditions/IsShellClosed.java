@@ -16,7 +16,7 @@ public class IsShellClosed extends DefaultCondition {
 
     public String getFailureMessage() {
 
-        return null;
+        return "Can't find the shell " + title;
     }
 
     public boolean test() throws Exception {

@@ -379,7 +379,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     // public boolean isPerspectiveActive(String title) throws RemoteException;
 
-    public void waitUntilShellCloses(String shellText) throws RemoteException;
+    public void waitUntilShellClosed(String shellText) throws RemoteException;
 
     // public void openPerspectiveWithName(String nodeName) throws
     // RemoteException;

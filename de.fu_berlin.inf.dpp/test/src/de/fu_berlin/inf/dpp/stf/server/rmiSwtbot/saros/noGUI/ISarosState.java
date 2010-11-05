@@ -11,8 +11,10 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
 
 /**
  * This is used to check the state of {@link Saros} from the inside. Use this
@@ -20,7 +22,25 @@ import de.fu_berlin.inf.dpp.stf.client.Musician;
  */
 public interface ISarosState extends Remote {
 
-    public boolean existSession() throws RemoteException;
+    /**
+     * Test if you are now in a session. <br>
+     * You can also use another function
+     * {@link ISessionViewObject#isInSession()}, which test the session state
+     * with GUI.
+     * 
+     * <p>
+     * <b>Attention:</b> <br>
+     * Try to use the {@link ISessionViewObject#isInSession()} and
+     * {@link ISarosState#isInSession()} together in your junittests.
+     * 
+     * 
+     * @return <tt>true</tt> if {@link SessionManager#getSarosSession()} is not
+     *         null.
+     * 
+     * @throws RemoteException
+     * @see SessionManager#getSarosSession()
+     */
+    public boolean isInSession() throws RemoteException;
 
     /**
      * Returns true if all given jids are drivers of the project.

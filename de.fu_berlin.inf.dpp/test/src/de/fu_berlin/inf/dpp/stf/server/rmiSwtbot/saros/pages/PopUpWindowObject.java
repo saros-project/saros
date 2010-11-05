@@ -160,10 +160,10 @@ public class PopUpWindowObject implements IPopUpWindowObject {
 
         rmiBot.confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_YES);
-        if (rmiBot.isShellActive("Save Resource"))
-            rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
-        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
-            .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+        // if (rmiBot.isShellActive("Save Resource"))
+        // rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+        // rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        // .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(

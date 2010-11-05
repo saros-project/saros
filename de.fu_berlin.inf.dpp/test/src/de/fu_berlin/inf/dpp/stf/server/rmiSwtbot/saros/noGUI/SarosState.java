@@ -104,8 +104,8 @@ public class SarosState implements ISarosState {
         return result;
     }
 
-    public boolean existSession() {
-        log.debug("existSession() == " + sessionManager.getSarosSession() != null);
+    public boolean isInSession() {
+        log.debug("isInSession() == " + sessionManager.getSarosSession() != null);
         return sessionManager.getSarosSession() != null;
     }
 
