@@ -4,15 +4,70 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.test.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 
+/**
+ * This interface contains convenience API to perform a action using widgets in
+ * session view. then you can start off as follows:
+ * <ol>
+ * <li>
+ * At first you need to create a {@link Musician} object in your junit-test.
+ * (How to do it please look at the javadoc in class {@link TestPattern} or read
+ * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * <li>
+ * then you can use the object sessionV initialized in {@link Musician} to
+ * access all the useful API to do what you want :), e.g.
+ * 
+ * <pre>
+ * alice.sessionV.openSharedSessionView();
+ * bot.button(&quot;hello world&quot;).click();
+ * </pre>
+ * 
+ * </li>
+ * 
+ * @author Lin
+ */
 public interface ISessionViewObject extends Remote {
 
-    public void activateSharedSessionView() throws RemoteException;
+    /**
+     * @throws RemoteException
+     * @see ViewObject#closeViewById(String)
+     */
+    public void closeSessionView() throws RemoteException;
+
+    /**
+     * @return <tt>true</tt> if session view is active.
+     * 
+     * @throws RemoteException
+     * @see ViewObject#isViewActive(String)
+     */
+    public boolean isSessionViewActive() throws RemoteException;
+
+    /**
+     * 
+     * @return <tt>true</tt> if all the opened views contains the session view.
+     * 
+     * @throws RemoteException
+     * @see ViewObject#isViewOpen(String)
+     */
+    public boolean isSessionViewOpen() throws RemoteException;
+
+    /**
+     * @throws RemoteException
+     * @see ViewObject#openViewById(String)
+     */
+    public void openSessionView() throws RemoteException;
+
+    /**
+     * @see ViewObject#setFocusOnViewByTitle(String)
+     * @throws RemoteException
+     */
+    public void setFocusOnSessionView() throws RemoteException;
 
     public void giveDriverRole(String inviteeJID) throws RemoteException;
-
-    public boolean isSharedSessionViewOpen() throws RemoteException;
 
     public boolean isInSession() throws RemoteException;
 
@@ -20,10 +75,6 @@ public interface ISessionViewObject extends Remote {
         throws RemoteException;
 
     public boolean isFollowing() throws RemoteException;
-
-    public void openSharedSessionView() throws RemoteException;
-
-    public void closeSessionView() throws RemoteException;
 
     public void clickTBShareYourScreenWithSelectedUserInSPSView()
         throws RemoteException;
@@ -62,4 +113,5 @@ public interface ISessionViewObject extends Remote {
 
     public void giveExclusiveDriverRole(String inviteePlainJID)
         throws RemoteException;
+
 }

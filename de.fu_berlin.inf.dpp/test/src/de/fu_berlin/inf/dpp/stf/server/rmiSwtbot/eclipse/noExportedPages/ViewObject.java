@@ -62,13 +62,14 @@ public class ViewObject {
     }
 
     /**
-     * activate the specified view. It should be only called if View is open.
+     * set focus on the specified view. It should be only called if View is
+     * open.
      * 
      * @param title
      *            the view title.
      * @see SWTBotView#setFocus()
      */
-    public void activateViewWithTitle(String title) {
+    public void setFocusOnViewByTitle(String title) {
         try {
             if (!isViewActive(title)) {
                 bot.viewByTitle(title).setFocus();
@@ -301,7 +302,7 @@ public class ViewObject {
      */
     public boolean isContextMenuOfTableItemInViewExist(String viewName,
         String itemName, String contextName) {
-        activateViewWithTitle(viewName);
+        setFocusOnViewByTitle(viewName);
         SWTBotTableItem item = selectTableItemWithLabelInView(viewName,
             itemName);
         try {
@@ -326,7 +327,7 @@ public class ViewObject {
      */
     public boolean isContextMenuOfTreeItemInViewExist(String viewName,
         String contextName, String... nodes) throws RemoteException {
-        activateViewWithTitle(viewName);
+        setFocusOnViewByTitle(viewName);
         SWTBotTreeItem item = selectTreeWithLabelsInView(viewName, nodes);
         try {
             item.contextMenu(contextName);
@@ -414,7 +415,7 @@ public class ViewObject {
         bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
     }
 
-    public void hideViewById(final String viewId) {
+    public void closeViewById(final String viewId) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
@@ -428,7 +429,7 @@ public class ViewObject {
         });
     }
 
-    public void showViewById(final String viewId) {
+    public void openViewById(final String viewId) {
         try {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {

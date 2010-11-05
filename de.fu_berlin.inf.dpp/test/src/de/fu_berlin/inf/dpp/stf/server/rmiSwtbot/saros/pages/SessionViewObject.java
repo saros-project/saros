@@ -11,30 +11,67 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 
+/**
+ *This implementation of {@link ISessionViewObject}
+ * 
+ * @author Lin
+ */
 public class SessionViewObject implements ISessionViewObject {
 
     private transient static final Logger log = Logger
         .getLogger(SessionViewObject.class);
 
-    private static transient SarosRmiSWTWorkbenchBot rmiBot;
+    private SarosRmiSWTWorkbenchBot rmiBot;
+
     public static SessionViewObject classVariable;
+
+    private String viewName = SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION;
+    private String viewID = SarosConstant.ID_SESSION_VIEW;
 
     public SessionViewObject() {
         // Default constructor needed for RMI
     }
 
+    /**
+     *constructs a SessionViewObject, which would only be created in class
+     * {@links StartupSaros} and then exported by
+     * {@link SarosRmiSWTWorkbenchBot} on our local RMI Registry.
+     * 
+     * @param rmiBot
+     *            controls Saros from the GUI perspective and manage all
+     *            exported rmi-objects.
+     */
     public SessionViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
     }
 
-    public void activateSharedSessionView() throws RemoteException {
-        rmiBot.viewObject
-            .activateViewWithTitle(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
+    public boolean isSessionViewActive() throws RemoteException {
+        return rmiBot.viewObject.isViewActive(viewName);
     }
 
+    public boolean isSessionViewOpen() throws RemoteException {
+        return rmiBot.viewObject.isViewOpen(viewName);
+    }
+
+    public void closeSessionView() throws RemoteException {
+        rmiBot.viewObject.closeViewById(viewID);
+    }
+
+    public void openSessionView() throws RemoteException {
+        if (!isSessionViewOpen())
+            rmiBot.viewObject.openViewById(viewID);
+    }
+
+    public void setFocusOnSessionView() throws RemoteException {
+        rmiBot.viewObject.setFocusOnViewByTitle(viewName);
+    }
+
+    /**
+     * 
+     */
     public void giveDriverRole(String inviteeJID) throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickContextMenuOfTableInView(
             BotConfiguration.NAME_SESSION_VIEW, inviteeJID,
             SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
@@ -43,8 +80,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void giveExclusiveDriverRole(String inviteePlainJID)
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickContextMenuOfTableInView(
             BotConfiguration.NAME_SESSION_VIEW, inviteePlainJID,
             SarosConstant.CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE);
@@ -60,14 +97,14 @@ public class SessionViewObject implements ISessionViewObject {
      * "Shared Project Session" View must be open
      */
     public boolean isInSession() throws RemoteException {
-        rmiBot.viewObject.activateViewWithTitle("Shared Project Session");
+        rmiBot.viewObject.setFocusOnViewByTitle("Shared Project Session");
         return rmiBot.delegate.viewByTitle("Shared Project Session")
             .toolbarButton("Leave the session").isEnabled();
     }
 
     public boolean isContactInSessionView(String Contact)
         throws RemoteException {
-        activateSharedSessionView();
+        setFocusOnSessionView();
         SWTBotTable table = rmiBot.viewObject
             .getTableInView(SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION);
         for (int i = 0; i < table.rowCount(); i++) {
@@ -81,18 +118,10 @@ public class SessionViewObject implements ISessionViewObject {
         return rmiBot.stateObject.isFollowing();
     }
 
-    public void openSharedSessionView() throws RemoteException {
-        rmiBot.viewObject.showViewById("de.fu_berlin.inf.dpp.ui.SessionView");
-    }
-
-    public void closeSessionView() throws RemoteException {
-        rmiBot.viewObject.hideViewById("de.fu_berlin.inf.dpp.ui.SessionView");
-    }
-
     public void clickTBShareYourScreenWithSelectedUserInSPSView()
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER);
@@ -102,8 +131,8 @@ public class SessionViewObject implements ISessionViewObject {
         throws RemoteException {
         // selectTableItemWithLabelInViewWithTitle(
         // SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, name);
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_STOP_SESSION_WITH_USER + " " + name);
@@ -111,8 +140,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickTBSendAFileToSelectedUserInSPSView(String inviteeJID)
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.selectTableItemWithLabelInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, inviteeJID);
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
@@ -122,32 +151,32 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickTBOpenInvitationInterfaceInSPSView()
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarPushButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_OPEN_INVITATION_INTERFACE);
     }
 
     public void clickTBStartAVoIPSessionInSPSView() throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_START_VOIP_SESSION);
     }
 
     public void clickTBNoInconsistenciesInSPSView() throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_NO_INCONSISTENCIES);
     }
 
     public void clickTBRemoveAllRriverRolesInSPSView() throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_REMOVE_ALL_DRIVER_ROLES);
@@ -155,16 +184,16 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickTBEnableDisableFollowModeInSPSView()
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE);
     }
 
     public void clickTBLeaveTheSessionInSPSView() throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
             SarosConstant.TOOL_TIP_TEXT_LEAVE_THE_SESSION);
@@ -172,8 +201,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickCMJumpToPositionOfSelectedUserInSPSView(
         String participantJID, String sufix) throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickContextMenuOfTableInView(
             BotConfiguration.NAME_SESSION_VIEW, participantJID + sufix,
             SarosConstant.CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER);
@@ -181,8 +210,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickCMStopFollowingThisUserInSPSView(ISarosState state, JID jid)
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         if (state.isDriver(jid))
             rmiBot.viewObject.clickContextMenuOfTableInView(
                 BotConfiguration.NAME_SESSION_VIEW,
@@ -197,8 +226,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickCMgiveExclusiveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickContextMenuOfTableInView(
             BotConfiguration.NAME_SESSION_VIEW, inviteeJID,
             SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE);
@@ -206,8 +235,8 @@ public class SessionViewObject implements ISessionViewObject {
 
     public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
         throws RemoteException {
-        openSharedSessionView();
-        activateSharedSessionView();
+        openSessionView();
+        setFocusOnSessionView();
         rmiBot.viewObject.clickContextMenuOfTableInView(
             BotConfiguration.NAME_SESSION_VIEW, inviteeJID,
             SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE);

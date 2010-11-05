@@ -30,20 +30,21 @@ public class RosterViewObject implements IRosterViewObject {
     }
 
     public void openRosterView() throws RemoteException {
-        rmiBot.viewObject.showViewById(SarosConstant.ID_ROSTER_VIEW);
+        if (!isRosterViewOpen())
+            rmiBot.viewObject.openViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
         return rmiBot.viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
-    public void activateRosterView() throws RemoteException {
+    public void setFocusOnRosterView() throws RemoteException {
         rmiBot.viewObject
-            .activateViewWithTitle(SarosConstant.VIEW_TITLE_ROSTER);
+            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     public void closeRosterView() throws RemoteException {
-        rmiBot.viewObject.hideViewById(SarosConstant.ID_ROSTER_VIEW);
+        rmiBot.viewObject.closeViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public void xmppDisconnect() throws RemoteException {
@@ -69,7 +70,7 @@ public class RosterViewObject implements IRosterViewObject {
     public boolean isConnectedByXmppGuiCheck() throws RemoteException {
         try {
             openRosterView();
-            activateRosterView();
+            setFocusOnRosterView();
             SWTBotToolbarButton toolbarButton = rmiBot.viewObject
                 .getToolbarButtonWithTooltipInView(
                     SarosConstant.VIEW_TITLE_ROSTER,
@@ -91,7 +92,7 @@ public class RosterViewObject implements IRosterViewObject {
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {
         openRosterView();
-        activateRosterView();
+        setFocusOnRosterView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_ADD_A_NEW_CONTACT);
@@ -102,7 +103,7 @@ public class RosterViewObject implements IRosterViewObject {
      */
     public void clickTBConnectInRosterView() throws RemoteException {
         openRosterView();
-        activateRosterView();
+        setFocusOnRosterView();
         rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_CONNECT);
@@ -113,7 +114,7 @@ public class RosterViewObject implements IRosterViewObject {
      */
     public boolean clickTBDisconnectInRosterView() throws RemoteException {
         openRosterView();
-        activateRosterView();
+        setFocusOnRosterView();
         return rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_DISCONNECT) != null;

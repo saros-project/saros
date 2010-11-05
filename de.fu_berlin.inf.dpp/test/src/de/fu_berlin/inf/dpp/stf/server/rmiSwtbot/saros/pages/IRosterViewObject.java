@@ -11,7 +11,7 @@ public interface IRosterViewObject extends Remote {
 
     public boolean isRosterViewOpen() throws RemoteException;
 
-    public void activateRosterView() throws RemoteException;
+    public void setFocusOnRosterView() throws RemoteException;
 
     public void closeRosterView() throws RemoteException;
 

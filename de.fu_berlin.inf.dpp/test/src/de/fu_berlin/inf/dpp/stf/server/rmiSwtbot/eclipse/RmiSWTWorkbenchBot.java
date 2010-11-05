@@ -191,11 +191,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      *******************************************************************************/
     public void openProgressView() throws RemoteException {
-        viewObject.showViewById("org.eclipse.ui.views.ProgressView");
+        viewObject.openViewById("org.eclipse.ui.views.ProgressView");
     }
 
     public void activateProgressView() throws RemoteException {
-        viewObject.activateViewWithTitle(SarosConstant.VIEW_TITLE_PROGRESS);
+        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_PROGRESS);
     }
 
     public boolean existPorgress() throws RemoteException {
@@ -237,7 +237,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public void activatePackageExplorerView() throws RemoteException {
         viewObject
-            .activateViewWithTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
     }
 
     /**
