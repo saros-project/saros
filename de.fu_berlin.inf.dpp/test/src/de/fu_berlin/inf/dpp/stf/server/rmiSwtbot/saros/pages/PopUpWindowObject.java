@@ -160,10 +160,39 @@ public class PopUpWindowObject implements IPopUpWindowObject {
 
         rmiBot.confirmWindow("Warning: Local changes will be deleted",
             SarosConstant.BUTTON_YES);
-        // if (rmiBot.isShellActive("Save Resource"))
-        // rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
-        // rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
-        // .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+
+        /*
+         * if there are some files locally, which are not saved yet, you will
+         * get a popup window with the title "Save Resource" after you comfirm
+         * the window "Warning: Local changes will be deleted" with YES.
+         */
+        if (rmiBot.isShellActive("Save Resource")) {
+            rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+            /*
+             * it take some more time for the session invitation if you don't
+             * save your files locally. So rmiBot need to wait until the
+             * invitation is finished.
+             */
+            rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+                .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+        }
+
+        /*
+         * after the release 10.10.28 the time of sharing project has become so
+         * fast, that the pop up window "Session Invitation" is immediately
+         * disappeared after you confirm the window ""Warning: Local changes
+         * will be deleted".
+         * 
+         * So i have to check first,whether the window "Session Invitation" is
+         * still open at all before i run the waitUntilShellCloses(it guarantees
+         * that rmiBot wait until the invitation is finished). Otherwise you may
+         * get the WidgetNotfoundException.
+         */
+        if (rmiBot.isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION)) {
+            rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+                .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+        }
+
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(

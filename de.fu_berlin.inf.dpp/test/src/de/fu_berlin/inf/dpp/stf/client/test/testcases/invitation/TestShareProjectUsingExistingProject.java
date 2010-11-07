@@ -60,12 +60,12 @@ public class TestShareProjectUsingExistingProject {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.bot.isClassExist(PROJECT2, PKG, CLS));
-        assertFalse(bob.bot.isProjectExist(PROJECT2));
+        assertFalse(bob.bot.existsClass(PROJECT2, PKG, CLS));
+        assertFalse(bob.bot.existsProject(PROJECT2));
 
     }
 
@@ -80,10 +80,10 @@ public class TestShareProjectUsingExistingProject {
         bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
-        assertTrue(bob.bot.isProjectExist(PROJECT));
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.isProjectExist(PROJECT2));
-        assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
+        assertTrue(bob.bot.existsProject(PROJECT));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.bot.existsProject(PROJECT2));
+        assertTrue(bob.bot.existsClass(PROJECT2, PKG, CLS));
         bob.bot.deleteProject(PROJECT2);
 
     }
@@ -94,10 +94,10 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.bot.isProjectExist(PROJECT));
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.isProjectExist(PROJECT2));
-        assertTrue(bob.bot.isClassExist(PROJECT2, PKG, CLS));
+        assertTrue(bob.bot.existsProject(PROJECT));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.bot.existsProject(PROJECT2));
+        assertTrue(bob.bot.existsClass(PROJECT2, PKG, CLS));
 
         bob.bot.deleteProject(PROJECT2);
 

@@ -70,7 +70,7 @@ public class ContextMenuHelper {
         });
     }
 
-    private static MenuItem show(final Menu menu, final Matcher<?> matcher) {
+    public static MenuItem show(final Menu menu, final Matcher<?> matcher) {
         if (menu != null) {
             menu.notifyListeners(SWT.Show, new Event());
             MenuItem[] items = menu.getItems();
@@ -84,7 +84,7 @@ public class ContextMenuHelper {
         return null;
     }
 
-    private static void click(final MenuItem menuItem) {
+    public static void click(final MenuItem menuItem) {
         final Event event = new Event();
         event.time = (int) System.currentTimeMillis();
         event.widget = menuItem;
@@ -98,7 +98,7 @@ public class ContextMenuHelper {
         });
     }
 
-    private static void hide(final Menu menu) {
+    public static void hide(final Menu menu) {
         menu.notifyListeners(SWT.Hide, new Event());
         if (menu.getParentMenu() != null) {
             hide(menu.getParentMenu());

@@ -125,6 +125,10 @@ public class TestStrictSequentialInvitationWithoutTermination {
             + "delimiter by bob: " + delimiterByBob + "delimiter by carl: "
             + delimiterByCarl);
 
+        /*
+         * TODO there are some bugs in saros... need to be fixed. Now you will
+         * get AssertionError here.
+         */
         assertTrue(delimiterByAlice.equals(delimiterByCarl));
         assertTrue(delimiterByAlice.equals(delimiterByBob));
 

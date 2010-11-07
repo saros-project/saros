@@ -28,8 +28,7 @@ public class WindowObject {
 
     public boolean isTableItemInWindowExist(String title, String label) {
         activateShellWithText(title);
-        return tableObject.isTableItemExist(bot.shell(title).bot().table(),
-            label);
+        return tableObject.existTableItem(label);
     }
 
     public boolean activateShellWithText(String title) {

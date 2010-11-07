@@ -38,8 +38,8 @@ public class TestParallelInvitationWithTerminationByHost {
         bob = musicians.get(1);
         carl = musicians.get(2);
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        invitees.add(bob.getPlainJid());
-        invitees.add(carl.getPlainJid());
+        invitees.add(bob.getBaseJid());
+        invitees.add(carl.getBaseJid());
     }
 
     /**

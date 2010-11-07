@@ -627,7 +627,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      */
     public void newJavaProject(String projectName) throws RemoteException {
-        if (!isProjectExist(projectName)) {
+        if (!existsProject(projectName)) {
             activateEclipseShell();
             delegate.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = delegate.shell("New Java Project");
@@ -704,7 +704,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * 
      */
     public void newProject(String projectName) throws RemoteException {
-        if (!isProjectExist(projectName)) {
+        if (!existsProject(projectName)) {
             activateEclipseShell();
             delegate.menu("File").menu("New").menu("Project...").click();
             SWTBotShell shell = delegate.shell("New Project");
@@ -856,7 +856,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      */
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
-        if (!isClassExist(projectName, pkg, className))
+        if (!existsClass(projectName, pkg, className))
             try {
                 activateEclipseShell();
                 delegate.menu("File").menu("New").menu("Class").click();
@@ -1342,7 +1342,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * @param projectName
      *            name of the project, e.g. Foo_Saros.
      */
-    public boolean isProjectExist(String projectName) throws RemoteException {
+    public boolean existsProject(String projectName) throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
         return project.exists();
@@ -1390,7 +1390,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * @param className
      *            name of the class, e.g. myclass.
      */
-    public boolean isClassExist(String projectName, String pkg, String className)
+    public boolean existsClass(String projectName, String pkg, String className)
         throws RemoteException {
         IPath path = new Path(projectName + "/src/"
             + pkg.replaceAll("\\.", "/") + "/" + className + ".java");

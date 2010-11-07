@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 
@@ -33,18 +34,32 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
 public interface ISessionViewObject extends Remote {
 
     /**
-     * @throws RemoteException
-     * @see ViewObject#closeViewById(String)
-     */
-    public void closeSessionView() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt> if session view is active.
+     * Test if you are now in a session. <br>
+     * This function check if the tool bar button "Leave the session" in the
+     * session view is enabled. You can also use another function
+     * {@link ISarosState#isInSession()}, which test the session state without
+     * GUI.
+     * 
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * <li>Try to use the {@link ISessionViewObject#isInSession()} and
+     * {@link ISarosState#isInSession()} together in your junittests.</li>
+     * </ol>
+     * 
+     * @return <tt>true</tt> if the tool bar button "Leave the session" is
+     *         enabled.
      * 
      * @throws RemoteException
-     * @see ViewObject#isViewActive(String)
      */
-    public boolean isSessionViewActive() throws RemoteException;
+    public boolean isInSession() throws RemoteException;
+
+    /**
+     * @throws RemoteException
+     * @see ViewObject#openViewById(String)
+     */
+    public void openSessionView() throws RemoteException;
 
     /**
      * 
@@ -56,110 +71,247 @@ public interface ISessionViewObject extends Remote {
     public boolean isSessionViewOpen() throws RemoteException;
 
     /**
-     * @throws RemoteException
-     * @see ViewObject#openViewById(String)
-     */
-    public void openSessionView() throws RemoteException;
-
-    /**
      * @see ViewObject#setFocusOnViewByTitle(String)
      * @throws RemoteException
      */
     public void setFocusOnSessionView() throws RemoteException;
 
     /**
-     * Using this function host can perform the action "Give driver Role" which
-     * should be activated by clicking the context menu "Give driver Role" of
-     * the tableItem with itemText "inviteeJID" in session view.
-     * <p>
-     * <b>Attention:</b> <br>
-     * Make sure, the session view is open and active. <br>
-     * Waits until the shell "Progress Information" is closed. It guarantee that
-     * the "Give driver Role" action is completely done.
+     * @return <tt>true</tt> if session view is active.
      * 
-     * @param inviteeJID
-     *            itemText of the tableItem which you want to selected
+     * @throws RemoteException
+     * @see ViewObject#isViewActive(String)
+     */
+    public boolean isSessionViewActive() throws RemoteException;
+
+    /**
+     * @throws RemoteException
+     * @see ViewObject#closeViewById(String)
+     */
+    public void closeSessionView() throws RemoteException;
+
+    /**
+     * Test if a contact exists in the contact list in the session view.
+     * 
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param contactName
+     *            the name, which listed in the session view. e.g. "You" or
+     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     * @return <tt>true</tt> if the passed contactName is in the contact list in
+     *         the session view.
      * @throws RemoteException
      */
-    public void giveDriverRole(String inviteeJID) throws RemoteException;
+    public boolean isContactInSessionView(String contactName)
+        throws RemoteException;
+
+    /**
+     * Perform the action "Give driver Role" which should be activated by
+     * clicking the context menu "Give driver Role" of the tableItem with
+     * itemText e.g. "bob1_fu@jabber.ccc.de" in the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * <li>Waits until the shell "Progress Information" is closed. It guarantee
+     * that the "Give driver Role" action is completely done.</li>
+     * <li>There are same function {@link Musician#giveDriverRole(Musician)}
+     * defined In the {@link Musician} class, which reference to this. The goal
+     * is to see, Whether the passed parameter is correct, if not, throws a
+     * runtimeException. So for your tests you should only need to use the
+     * function: {@link Musician#giveDriverRole(Musician)}.</li>
+     * </ol>
+     * 
+     * @param inviteeBaseJID
+     *            the {@link JID#getBase()} of the user whom you want to give
+     *            drive role.
+     * @throws RemoteException
+     */
+    public void giveDriverRole(String inviteeBaseJID) throws RemoteException;
 
     /**
      * Using this function host can perform the action
      * "Give exclusive driver Role" which should be activated by clicking the
      * context menu "Give exclusive driver Role" of the tableItem with itemText
-     * "inviteeJID" in session view.
+     * e.g. "bob1_fu@jabber.ccc.de" in the session view.
      * <p>
-     * <b>Attention:</b> <br>
-     * Make sure, the session view is open and active. <br>
-     * Waits until the shell "Progress Information" is closed. It guarantee that
-     * the "Give driver Role" action is completely done.
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * <li>Waits until the shell "Progress Information" is closed. It guarantee
+     * that the "Give exclusive driver Role" action is completely done.</li>
+     * <li>There are same function
+     * {@link Musician#giveExclusiveDriverRole(Musician)} defined In the
+     * {@link Musician} class, which reference to this. The goal is to see,
+     * Whether the passed parameter is correct, if not, throws a
+     * runtimeException. So for your tests you should only need to use the
+     * function: {@link Musician#giveExclusiveDriverRole(Musician)}.</li>
+     * </ol>
      * 
-     * @param inviteeJID
-     *            itemText of the tableItem which you want to selected
+     * @param inviteeBaseJID
+     *            the {@link JID#getBase()} of the user whom you want to give
+     *            exclusive drive role.
      * @throws RemoteException
      */
-    public void giveExclusiveDriverRole(String inviteeJID)
+    public void giveExclusiveDriverRole(String inviteeBaseJID)
         throws RemoteException;
 
     /**
-     * Test if you are now in a session. <br>
-     * This function check if the tool bar button "Leave the session" in the
-     * session view is enabled. You can also use another function
-     * {@link ISarosState#isInSession()}, which test the session state without
-     * GUI.
+     * Using this function host can perform the action "Remove driver Role"
+     * which should be activated by clicking the context menu
+     * "Remove driver Role" of the tableItem with itemText e.g.
+     * "bob1_fu@jabber.ccc.de (Driver)" in the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * <li>Waits until the shell "Progress Information" is closed. It guarantee
+     * that the "Remove driver Role" action is completely done.</li>
+     * <li>There are same function {@link Musician#removeDriverRole(Musician)}
+     * defined In the {@link Musician} class, which reference to this. The goal
+     * is to see, Whether the passed parameter is correct, if not, throws a
+     * runtimeException. So for your tests you should only need to use the
+     * function: {@link Musician#removeDriverRole(Musician)}.</li>
+     * </ol>
+     * 
+     * @param inviteeBaseJID
+     *            the {@link JID#getBase()} of the user whose drive role you
+     *            want to remove.
+     * @throws RemoteException
+     */
+    public void removeDriverRole(String inviteeBaseJID) throws RemoteException;
+
+    /**
+     * Using this function host can perform the action "Follow this user" which
+     * should be activated by clicking the context menu "Follow this user" of
+     * the tableItem with itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in
+     * the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param stateOfFollowedUser
+     *            the {@link ISarosState} of the user whom you want to follow.
+     * @throws RemoteException
+     */
+    public void followThisUser(ISarosState stateOfFollowedUser)
+        throws RemoteException;
+
+    /**
+     * Test if you are in follow mode. <br>
+     * This function check if the context menu "Stop following this user" of
+     * every contact listed in the session view exists and is enabled. You can
+     * also use another function {@link ISarosState#isInFollowMode()}, which
+     * test the following state without GUI.
      * 
      * <p>
-     * <b>Attention:</b> <br>
-     * Make sure, the session view is open and active. <br>
-     * Try to use the {@link ISessionViewObject#isInSession()} and
-     * {@link ISarosState#isInSession()} together in your junittests.
-     * 
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * <li>Try to use only the function{@link ISarosState#isInSession()} for
+     * your junittests, because the method
+     * {@link TableObject#existContextOfTableItem(String, String)} need to be
+     * still optimized.</li>
+     * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
      *         enabled.
      * 
      * @throws RemoteException
      */
-    public boolean isInSession() throws RemoteException;
+    public boolean isInFollowMode() throws RemoteException;
 
-    public boolean isContactInSessionView(String Contact)
+    /**
+     * This function do same as the
+     * {@link ISessionViewObject#stopFollowingThisUser(ISarosState)} except you
+     * don't need to pass the {@link ISarosState} of the user followed by you to
+     * the function. It is very useful, if you don't exactly know whom you are
+     * now following. Instead, we get the followed user JID using the method
+     * {@link ISarosState#getFollowedUserJID()}.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
+    public void stopFollowing() throws RemoteException;
+
+    /**
+     * Using this function host can perform the action
+     * "Stop following this user" which should be activated by clicking the
+     * context menu "Stop following this user" of the tableItem with itemText
+     * e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param stateOfFollowedUser
+     *            the {@link ISarosState} of the user whom you want to stop
+     *            following.
+     * @throws RemoteException
+     */
+    public void stopFollowingThisUser(ISarosState stateOfFollowedUser)
         throws RemoteException;
 
-    public boolean isFollowing() throws RemoteException;
-
-    public void clickTBShareYourScreenWithSelectedUserInSPSView()
+    /**
+     * check if the context menu "Stop following this user" of a contact listed
+     * in the session view is enabled. It would be used by
+     * {@link SessionViewObject#isInFollowMode()}.
+     * 
+     * @param contactName
+     *            the name, which listed in the session view. e.g. "You" or
+     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     * @return <tt>true</tt> if the context menu "Following this user" of the
+     *         passed contactName listed in the session view is enabled.
+     * @throws RemoteException
+     */
+    public boolean isStopFollowingThisUserEnabled(String contactName)
         throws RemoteException;
 
-    public void clickTBStopSessionWithUserInSPSView(String name)
+    /**
+     * check if the context menu "Stop following this user" of a contact listed
+     * in the session view is visible.
+     * 
+     * @param contactName
+     *            the name, which listed in the session view. e.g. "You" or
+     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     * @return <tt>true</tt> if the context menu "Following this user" of the
+     *         passed contactName listed in the session view is visible.
+     * @throws RemoteException
+     */
+    public boolean isStopFollowingThisUserVisible(String contactName)
         throws RemoteException;
 
-    public void clickTBSendAFileToSelectedUserInSPSView(String inviteeJID)
+    public void shareYourScreenWithSelectedUser() throws RemoteException;
+
+    public void stopSessionWithUser(String name) throws RemoteException;
+
+    public void sendAFileToSelectedUser(String inviteeJID)
         throws RemoteException;
 
-    public void clickTBOpenInvitationInterfaceInSPSView()
-        throws RemoteException;
+    public void openInvitationInterface() throws RemoteException;
 
-    public void clickTBStartAVoIPSessionInSPSView() throws RemoteException;
+    public void startAVoIPSession() throws RemoteException;
 
-    public void clickTBNoInconsistenciesInSPSView() throws RemoteException;
+    public void noInconsistencies() throws RemoteException;
 
-    public void clickTBRemoveAllRriverRolesInSPSView() throws RemoteException;
+    public void removeAllRriverRoles() throws RemoteException;
 
-    public void clickTBEnableDisableFollowModeInSPSView()
-        throws RemoteException;
+    public void enableDisableFollowMode() throws RemoteException;
 
-    public void clickTBLeaveTheSessionInSPSView() throws RemoteException;
+    public void leaveTheSession() throws RemoteException;
 
-    public void clickCMJumpToPositionOfSelectedUserInSPSView(
-        String participantJID, String sufix) throws RemoteException;
-
-    public void clickCMStopFollowingThisUserInSPSView(ISarosState state, JID jid)
-        throws RemoteException;
-
-    public void clickCMgiveExclusiveDriverRoleInSPSView(String inviteeJID)
-        throws RemoteException;
-
-    public void clickCMRemoveDriverRoleInSPSView(String inviteeJID)
+    public void jumpToPositionOfSelectedUser(String participantJID, String sufix)
         throws RemoteException;
 
 }

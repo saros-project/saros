@@ -43,23 +43,28 @@ public class TestFollowMode {
 
     @After
     public void cleanUp() throws RemoteException {
-        if (bob.state.isFollowing())
-            bob.sessionV.clickCMStopFollowingThisUserInSPSView(alice.state,
-                alice.jid);
-        if (alice.state.isFollowing())
-            alice.sessionV.clickCMStopFollowingThisUserInSPSView(bob.state,
-                bob.jid);
+        if (bob.state.isInFollowMode())
+            bob.sessionV.stopFollowingThisUser(alice.state);
+        if (alice.state.isInFollowMode())
+            alice.sessionV.stopFollowingThisUser(bob.state);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
 
+    /**
+     * TODO: It exists still some bugs in saros by giving exclusive driver role,
+     * so you may get exception by perform this test.
+     * 
+     * @throws IOException
+     * @throws CoreException
+     */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
             PROJECT, PKG, CLS1);
-        bob.bot.followUser(alice.state, alice.jid);
+        bob.sessionV.followThisUser(alice.state);
         bob.bot.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.state.isFollowing());
+        assertTrue(bob.state.isInFollowMode());
         assertTrue(bob.bot.isJavaEditorActive(CLS1));
 
         String clsContentOfAlice = alice.bot
@@ -74,13 +79,19 @@ public class TestFollowMode {
         bob.bot.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.bot.isJavaEditorActive(CLS2));
 
-        alice.bot.followUser(bob.state, bob.jid);
+        /*
+         * After new release 10.10.28 all of the observer is automatically in
+         * follow mode(are the observers really in follow mode???) when host
+         * give someone a exclusive driver role. So the following line have to
+         * comment out, otherwise you should get WidgetNotFoundException.
+         */
+        // alice.sessionV.followThisUser(bob.state);
         bob.bot.activateJavaEditor(CLS1);
         alice.bot.waitUntilJavaEditorActive(CLS1);
-        assertTrue(alice.state.isFollowing());
+        assertTrue(alice.state.isInFollowMode());
         assertTrue(alice.bot.isJavaEditorActive(CLS1));
 
-        bob.bot.followUser(alice.state, alice.jid);
+        bob.sessionV.followThisUser(alice.state);
         alice.bot.newClass(PROJECT, PKG, CLS3);
         alice.bot.waitUntilJavaEditorActive(CLS3);
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3,

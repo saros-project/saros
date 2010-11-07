@@ -41,14 +41,14 @@ public class TestFileOperations {
         alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
-        carl.bot.followUser(alice.state, alice.jid);
+        carl.sessionV.followThisUser(alice.state);
     }
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.bot.isClassExist(PROJECT, PKG, CLS))
+        if (!alice.bot.existsClass(PROJECT, PKG, CLS))
             alice.bot.newClass(PROJECT, PKG, CLS);
-        if (alice.bot.isClassExist(PROJECT, PKG, CLS2))
+        if (alice.bot.existsClass(PROJECT, PKG, CLS2))
             alice.bot.deleteClass(PROJECT, PKG, CLS2);
         if (alice.bot.isPkgExist(PROJECT, PKG2))
             alice.bot.deletePkg(PROJECT, PKG2);
@@ -77,19 +77,19 @@ public class TestFileOperations {
         alice.bot.renameClass(CLS2, PROJECT, PKG, CLS);
         bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
         carl.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertFalse(bob.bot.isClassExist(PROJECT, PKG, CLS));
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertFalse(carl.bot.isClassExist(PROJECT, PKG, CLS));
-        assertTrue(carl.bot.isClassExist(PROJECT, PKG, CLS2));
+        assertFalse(bob.bot.existsClass(PROJECT, PKG, CLS));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(carl.bot.existsClass(PROJECT, PKG, CLS));
+        assertTrue(carl.bot.existsClass(PROJECT, PKG, CLS2));
     }
 
     @Test
     public void testDeleteFile() throws RemoteException {
         alice.bot.deleteClass(PROJECT, PKG, CLS);
         bob.bot.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(bob.bot.isClassExist(PROJECT, PKG, CLS));
+        assertFalse(bob.bot.existsClass(PROJECT, PKG, CLS));
         carl.bot.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(carl.bot.isClassExist(PROJECT, PKG, CLS));
+        assertFalse(carl.bot.existsClass(PROJECT, PKG, CLS));
     }
 
     @Test
@@ -103,11 +103,11 @@ public class TestFileOperations {
         alice.bot.newClass(PROJECT, PKG2, CLS);
         bob.bot.waitUntilClassExist(PROJECT, PKG2, CLS);
         carl.bot.waitUntilClassExist(PROJECT, PKG2, CLS);
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG2, CLS));
-        assertTrue(carl.bot.isClassExist(PROJECT, PKG2, CLS));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG2, CLS));
+        assertTrue(carl.bot.existsClass(PROJECT, PKG2, CLS));
 
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH, PROJECT,
-            PKG2, CLS);
+        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG2, CLS);
         String clsContentOfAlice = alice.bot
             .getClassContent(PROJECT, PKG2, CLS);
         carl.bot.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
@@ -127,10 +127,10 @@ public class TestFileOperations {
         alice.bot.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
         bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
         carl.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertTrue(bob.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertFalse(bob.bot.isClassExist(PROJECT, PKG2, CLS2));
-        assertTrue(carl.bot.isClassExist(PROJECT, PKG, CLS2));
-        assertFalse(carl.bot.isClassExist(PROJECT, PKG2, CLS2));
+        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(bob.bot.existsClass(PROJECT, PKG2, CLS2));
+        assertTrue(carl.bot.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(carl.bot.existsClass(PROJECT, PKG2, CLS2));
     }
 
     @Test

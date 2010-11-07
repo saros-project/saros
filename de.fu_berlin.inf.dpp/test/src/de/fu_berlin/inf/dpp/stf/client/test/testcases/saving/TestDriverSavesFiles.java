@@ -77,8 +77,8 @@ public class TestDriverSavesFiles {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
-        dave.bot.followUser(alice.state, alice.jid);
-        edna.bot.followUser(alice.state, alice.jid);
+        dave.sessionV.followThisUser(alice.state);
+        edna.sessionV.followThisUser(alice.state);
     }
 
     /**

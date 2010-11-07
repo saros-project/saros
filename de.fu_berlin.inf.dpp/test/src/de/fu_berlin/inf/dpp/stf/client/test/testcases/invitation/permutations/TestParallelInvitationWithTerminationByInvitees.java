@@ -126,10 +126,10 @@ public class TestParallelInvitationWithTerminationByInvitees {
          * build session with bob, carl and dave simultaneously
          */
         List<String> peersName = new LinkedList<String>();
-        peersName.add(bob.getPlainJid());
-        peersName.add(dave.getPlainJid());
-        peersName.add(carl.getPlainJid());
-        peersName.add(edna.getPlainJid());
+        peersName.add(bob.getBaseJid());
+        peersName.add(dave.getBaseJid());
+        peersName.add(carl.getBaseJid());
+        peersName.add(edna.getBaseJid());
 
         alice.bot.shareProject(PROJECT, peersName);
 

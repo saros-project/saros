@@ -71,8 +71,6 @@ public class TestDriverResetsFiles {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
-        dave.bot.followUser(alice.state, alice.jid);
-        edna.bot.followUser(alice.state, alice.jid);
     }
 
     /**
@@ -129,6 +127,8 @@ public class TestDriverResetsFiles {
 
     @Test
     public void testAliceResetsFile() throws IOException, CoreException {
+        dave.sessionV.followThisUser(alice.state);
+        edna.sessionV.followThisUser(alice.state);
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
 
         alice.bot.closejavaEditorWithoutSave(CLS);
@@ -139,10 +139,13 @@ public class TestDriverResetsFiles {
         edna.bot.confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
 
         String contentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
-
+        System.out.println("alice's class content" + contentOfAlice);
         String contentOfDave = dave.bot.getClassContent(PROJECT, PKG, CLS);
+        System.out.println("dave's class content" + contentOfDave);
         String contentOfEdna = edna.bot.getClassContent(PROJECT, PKG, CLS);
+        System.out.println("dave's class content" + contentOfDave);
         String contentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS);
+        System.out.println("bob's class content" + contentOfBob);
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));
         assertTrue(contentOfAlice.equals(contentOfBob));

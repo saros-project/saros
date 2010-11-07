@@ -44,7 +44,7 @@ public class TestFolderOperations {
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.bot.isClassExist(PROJECT, PKG, CLS))
+        if (!alice.bot.existsClass(PROJECT, PKG, CLS))
             alice.bot.newClass(PROJECT, PKG, CLS);
         if (!alice.bot.isFolderExist(PROJECT, FOLDER))
             alice.bot.newFolder(PROJECT, FOLDER);

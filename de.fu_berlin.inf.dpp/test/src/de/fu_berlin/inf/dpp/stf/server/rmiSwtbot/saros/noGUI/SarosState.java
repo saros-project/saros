@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
  */
 public class SarosState implements ISarosState {
 
+    private JID jid;
     private transient static final Logger log = Logger
         .getLogger(SarosState.class);
 
@@ -58,6 +59,7 @@ public class SarosState implements ISarosState {
         for (JID jid : jids) {
             try {
                 ISarosSession sarosSession = sessionManager.getSarosSession();
+
                 User user = sarosSession.getUser(jid);
                 result &= sarosSession.getDrivers().contains(user);
             } catch (Exception e) {
@@ -132,20 +134,20 @@ public class SarosState implements ISarosState {
         return saros.isConnected();
     }
 
-    public boolean isFollowing() throws RemoteException {
+    public boolean isInFollowMode() throws RemoteException {
         return editorManager.isFollowing();
     }
 
     public boolean isFollowingUser(String plainJID) throws RemoteException {
-        if (getFollowedUserPlainJID() == null)
+        if (getFollowedUserJID() == null)
             return false;
         else
-            return getFollowedUserPlainJID().equals(plainJID);
+            return getFollowedUserJID().getBase().equals(plainJID);
     }
 
-    public String getFollowedUserPlainJID() throws RemoteException {
+    public JID getFollowedUserJID() throws RemoteException {
         if (editorManager.getFollowedUser() != null)
-            return editorManager.getFollowedUser().getJID().getBase();
+            return editorManager.getFollowedUser().getJID();
         else
             return null;
     }
@@ -156,6 +158,18 @@ public class SarosState implements ISarosState {
         log.debug("isDriver(" + jid.toString() + ") == "
             + sarosSession.getDrivers().contains(user));
         return sarosSession.getDrivers().contains(user);
+    }
+
+    public boolean isDriver() throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        User user = sarosSession.getUser(this.jid);
+        if (user == null) {
+            // TODO here need to throw Exception.
+            return false;
+        }
+        boolean isDriver = sarosSession.getDrivers().contains(user);
+        log.debug("isDriver(" + this.jid.toString() + ") == " + isDriver);
+        return isDriver;
     }
 
     public boolean isHost(JID jid) throws RemoteException {
@@ -263,6 +277,18 @@ public class SarosState implements ISarosState {
         Bundle bundle = saros.getBundle();
         return bundle.getLocation().substring(16)
             + BotConfiguration.SCREENSHOTDIR;
+    }
+
+    public void setJID(JID jid) throws RemoteException {
+        this.jid = jid;
+    }
+
+    public JID getJID() throws RemoteException {
+        return this.jid;
+    }
+
+    public boolean isSameUser(JID otherJID) throws RemoteException {
+        return this.jid.equals(otherJID);
     }
 
 }

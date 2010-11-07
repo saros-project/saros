@@ -559,9 +559,9 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     public void activatePackageExplorerView() throws RemoteException;
 
-    public boolean isProjectExist(String projectName) throws RemoteException;
+    public boolean existsProject(String projectName) throws RemoteException;
 
-    public boolean isClassExist(String projectName, String pkg, String className)
+    public boolean existsClass(String projectName, String pkg, String className)
         throws RemoteException;
 
     public boolean isInSVN() throws RemoteException;

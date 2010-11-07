@@ -124,6 +124,11 @@ public class TestAllParticipantsFollowDriver {
 
     }
 
+    /**
+     * TODO it takes a lot of time to run the test, codes need to be optimized.
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);

@@ -81,6 +81,7 @@ public class SarosConstant {
     public final static String SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
     public final static String SHELL_TITLE_CONFIRM_LEAVING_SESSION = "Confirm Leaving Session";
     public final static String SHELL_TITLE_IMPORT = "Import";
+    public final static String SHELL_TITLE_PROGRESS_INFORMATION = "Progress Information";
 
     public final static String CONTEXT_MENU_GIVE_DRIVER_ROLE = "Give driver role";
     public final static String CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
@@ -114,4 +115,7 @@ public class SarosConstant {
 
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
     public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
+
+    public final static String ROLENAME = " (Driver)";
+    public final static String OWNCONTACTNAME = "You";
 }

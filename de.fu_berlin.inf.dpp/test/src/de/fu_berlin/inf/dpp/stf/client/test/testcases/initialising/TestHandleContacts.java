@@ -94,7 +94,7 @@ public class TestHandleContacts {
     @Test
     public void testAddExistedContact() throws RemoteException {
         alice.rosterV.clickTBAddANewContactInRosterView();
-        alice.popupWindow.confirmNewContactWindow(bob.getPlainJid());
+        alice.popupWindow.confirmNewContactWindow(bob.getBaseJid());
         alice.bot.waitUntilShellActive("Contact already added");
         assertTrue(alice.bot.isShellActive("Contact already added"));
         alice.bot.closeShell("Contact already added");

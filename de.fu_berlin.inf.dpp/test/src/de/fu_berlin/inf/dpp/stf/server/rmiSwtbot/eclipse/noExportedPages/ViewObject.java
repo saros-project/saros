@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -26,6 +25,8 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
 /**
@@ -33,16 +34,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
  * 
  * @author Lin
  */
-public class ViewObject {
-
-    private static final transient Logger log = Logger
-        .getLogger(ViewObject.class);
-
-    private RmiSWTWorkbenchBot rmiBot;
-    private TableObject tableObject;
-    private MenuObject menuObject;
-    private TreeObject treeObject;
-    private SarosSWTBot bot;
+public class ViewObject extends NoExportedObject {
 
     /**
      * Creates an instance of a viewObject.<br/>
@@ -54,11 +46,7 @@ public class ViewObject {
      *            {@link ViewObject} can access other screen objects.
      */
     public ViewObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.tableObject = rmiBot.tableObject;
-        this.menuObject = rmiBot.menuObject;
-        this.treeObject = rmiBot.treeObject;
+        super(rmiBot);
     }
 
     /**
@@ -71,9 +59,7 @@ public class ViewObject {
      */
     public void setFocusOnViewByTitle(String title) {
         try {
-            if (!isViewActive(title)) {
-                bot.viewByTitle(title).setFocus();
-            }
+            bot.viewByTitle(title).setFocus();
         } catch (WidgetNotFoundException e) {
             log.warn("Widget not found '" + title + "'", e);
         }
@@ -287,7 +273,7 @@ public class ViewObject {
      * 
      */
     public boolean isTableItemInViewExist(String viewName, String itemName) {
-        return tableObject.isTableItemExist(getTableInView(viewName), itemName);
+        return tableObject.existTableItem(itemName);
     }
 
     /**
@@ -512,6 +498,18 @@ public class ViewObject {
     public boolean isToolbarInViewEnabled(String viewName, String buttonTooltip) {
         return getToolbarButtonWithTooltipInView(viewName, buttonTooltip)
             .isEnabled();
+    }
+
+    /**
+     * 
+     * Waits until the {@link SarosSWTBotPreferences#SAROS_TIMEOUT} is reached
+     * or the view is active.
+     * 
+     * @param viewName
+     *            name of the view, which should be active.
+     */
+    public void waitUntilViewActive(String viewName) {
+        waitUntil(SarosConditions.isViewActive(bot, viewName));
     }
 
 }

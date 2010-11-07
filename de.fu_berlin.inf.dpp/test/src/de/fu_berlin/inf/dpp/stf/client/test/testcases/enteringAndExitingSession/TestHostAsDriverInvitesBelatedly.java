@@ -143,7 +143,7 @@ public class TestHostAsDriverInvitesBelatedly {
         alice.bot.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG, CLS2);
         bob.bot.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT, PKG, CLS2);
 
-        alice.bot.invitateUser(bob.getPlainJid());
+        alice.bot.invitateUser(bob.getBaseJid());
 
         bob.popupWindow.confirmSessionInvitationWindowStep1();
         bob.popupWindow

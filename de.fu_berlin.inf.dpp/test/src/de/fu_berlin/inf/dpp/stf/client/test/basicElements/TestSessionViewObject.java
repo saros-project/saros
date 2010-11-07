@@ -21,6 +21,8 @@ public class TestSessionViewObject {
     private static final String PROJECT = BotConfiguration.PROJECTNAME;
     private static final String PKG = BotConfiguration.PACKAGENAME;
     private static final String CLS = BotConfiguration.CLASSNAME;
+    private static final String ROLENAME = SarosConstant.ROLENAME;
+    private static final String OWNCONTACTNAME = SarosConstant.OWNCONTACTNAME;
 
     private static final Logger log = Logger
         .getLogger(TestSessionViewObject.class);
@@ -53,13 +55,19 @@ public class TestSessionViewObject {
             alice.buildSessionSequential(PROJECT,
                 SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         }
+        if (bob.state.isDriver()) {
+            alice.removeDriverRole(bob);
+        }
+        if (!alice.state.isDriver()) {
+            alice.giveDriverRole(alice);
+        }
+
     }
 
     @After
     public void cleanUp() throws RemoteException {
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
-
     }
 
     @Test
@@ -94,9 +102,59 @@ public class TestSessionViewObject {
 
     @Test
     public void testGiveDriverRole() throws RemoteException {
-        log.trace("alice give bob the driver role.");
-        alice.sessionV.giveDriverRole(bob.getPlainJid());
-        assertTrue(alice.state.isDriver(alice.jid));
-        assertTrue(bob.state.isDriver(bob.jid));
+        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
+            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
+        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
+            + ROLENAME));
+
+        log.trace("alice give bob driver role.");
+        alice.giveDriverRole(bob);
+        assertTrue(alice.state.isDriver());
+        assertTrue(bob.state.isDriver());
+
+        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
+            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
+            + ROLENAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME
+            + ROLENAME));
+        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
+            + ROLENAME));
+
+    }
+
+    @Test
+    public void testGiveExclusiveDriverRole() throws RemoteException {
+        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
+            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
+        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
+            + ROLENAME));
+
+        log.trace("alice give bob exclusive driver role.");
+        alice.giveExclusiveDriverRole(bob);
+        assertFalse(alice.state.isDriver());
+        assertTrue(bob.state.isDriver());
+
+        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
+            + ROLENAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME
+            + ROLENAME));
+        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()));
+    }
+
+    @Test
+    public void testIsInFollowMode() throws RemoteException {
+        assertFalse(alice.state.isInFollowMode());
+        assertFalse(bob.state.isInFollowMode());
+        bob.sessionV.followThisUser(alice.state);
+        assertTrue(bob.state.isInFollowMode());
+        alice.sessionV.followThisUser(bob.state);
+        assertTrue(alice.state.isInFollowMode());
+
     }
 }

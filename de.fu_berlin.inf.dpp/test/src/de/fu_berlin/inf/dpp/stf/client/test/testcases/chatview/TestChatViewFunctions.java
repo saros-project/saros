@@ -131,7 +131,7 @@ public class TestChatViewFunctions {
         bob.bot.sleep(2000);
         System.out.println(bob.bot.getTextOfLastChatLine());
         System.out.println(bob.bot
-            .getUserNameOnChatLinePartnerChangeSeparator(alice.getPlainJid()));
+            .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
 
         // bob.bot.waitUntilGetChatMessage(alice.getName(), message);
         // assertTrue(bob.bot.compareChatMessage(alice.getName(), message));

@@ -84,7 +84,7 @@ public class TestDriverChangeAndImmediateWrite {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        alice.sessionV.giveDriverRole(bob.getPlainJid());
+        alice.giveDriverRole(bob);
         bob.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         bob.bot.sleep(5000);
         assertFalse(bob.bot.isToolbarNoInconsistenciesEnabled());

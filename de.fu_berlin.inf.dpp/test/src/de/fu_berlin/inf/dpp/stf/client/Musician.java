@@ -68,7 +68,7 @@ public class Musician {
         log.trace("initBot leave");
     }
 
-    public void initRmi() throws RemoteException, NotBoundException,
+    private void initRmi() throws RemoteException, NotBoundException,
         AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
@@ -79,6 +79,13 @@ public class Musician {
         }
 
         state = (ISarosState) registry.lookup("state");
+        /*
+         * TODO i am not sure, if i can pass the local value to remote object.
+         * It worked for the local tests, but i don't know if it work for the
+         * remote tests too.
+         */
+        state.setJID(jid);
+
         rosterV = (IRosterViewObject) registry.lookup("rosterView");
         popupWindow = (IPopUpWindowObject) registry.lookup("popUpWindow");
         sessionV = (ISessionViewObject) registry.lookup("sessionView");
@@ -90,7 +97,7 @@ public class Musician {
         String shareProjectWith, Musician... invitees) throws RemoteException {
         String[] inviteeJIDs = new String[invitees.length];
         for (int i = 0; i < invitees.length; i++) {
-            inviteeJIDs[i] = invitees[i].getPlainJid();
+            inviteeJIDs[i] = invitees[i].getBaseJid();
         }
         bot.clickShareProjectWith(projectName, shareProjectWith);
 
@@ -108,7 +115,7 @@ public class Musician {
         List<String> peersName = new LinkedList<String>();
         for (Musician invitee : invitees) {
             peers.add(invitee);
-            peersName.add(invitee.getPlainJid());
+            peersName.add(invitee.getBaseJid());
         }
 
         log.trace("alice.shareProjectParallel");
@@ -120,7 +127,7 @@ public class Musician {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.popupWindow.confirmSessionInvitationWizard(
-                        getPlainJid(), BotConfiguration.PROJECTNAME);
+                        getBaseJid(), BotConfiguration.PROJECTNAME);
                     return null;
                 }
             });
@@ -145,7 +152,7 @@ public class Musician {
      */
     public void leaveSessionFirst(Musician... musicians)
         throws RemoteException, InterruptedException {
-        sessionV.clickTBLeaveTheSessionInSPSView();
+        sessionV.leaveTheSession();
         bot.confirmWindow("Confirm Closing Session", SarosConstant.BUTTON_YES);
         bot.waitUntilSessionCloses();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
@@ -198,7 +205,7 @@ public class Musician {
         }
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         bot.waitUntilAllPeersLeaveSession(peerJIDs);
-        sessionV.clickTBLeaveTheSessionInSPSView();
+        sessionV.leaveTheSession();
         bot.waitUntilSessionCloses();
     }
 
@@ -218,7 +225,7 @@ public class Musician {
             final Musician musician = musicians[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.bot.followUser(state, jid);
+                    musician.sessionV.followThisUser(state);
                     return null;
                 }
             });
@@ -242,7 +249,7 @@ public class Musician {
             final Musician musician = musicians[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.bot.stopFollowUser(state, jid);
+                    musician.sessionV.stopFollowingThisUser(state);
                     return null;
                 }
             });
@@ -251,19 +258,62 @@ public class Musician {
             stopFollowTasks.size());
     }
 
+    public void giveDriverRole(Musician invitee) throws RemoteException {
+        if (invitee.state.isDriver(invitee.jid)) {
+            throw new RuntimeException(
+                "User \""
+                    + invitee.getBaseJid()
+                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
+        }
+        if (invitee.equals(this))
+            sessionV.giveDriverRole(SarosConstant.OWNCONTACTNAME);
+        else
+            sessionV.giveDriverRole(invitee.getBaseJid());
+    }
+
+    public void giveExclusiveDriverRole(Musician invitee)
+        throws RemoteException {
+        if (invitee.state.isDriver(invitee.jid)) {
+            throw new RuntimeException(
+                "User \""
+                    + invitee.getBaseJid()
+                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
+        }
+        if (invitee.equals(this))
+            sessionV.giveExclusiveDriverRole(SarosConstant.OWNCONTACTNAME);
+        else
+            sessionV.giveExclusiveDriverRole(invitee.getBaseJid());
+    }
+
+    public void removeDriverRole(Musician driver) throws RemoteException {
+        if (!driver.state.isDriver()) {
+            throw new RuntimeException(
+                "User \""
+                    + driver.getBaseJid()
+                    + "\" is no driver! Please pass a correct Musician Object to the method.");
+        }
+        if (driver.equals(this))
+            sessionV.removeDriverRole(SarosConstant.OWNCONTACTNAME);
+        else
+            sessionV.removeDriverRole(driver.getBaseJid());
+    }
+
+    /**
+     * @Return the name segment of {@link JID}.
+     */
     public String getName() {
         return jid.getName();
     }
 
     /**
-     * Returns the plain {@link JID}.
+     * @Return the Jabber ID without resource qualifier.
      */
-    public String getPlainJid() {
+    public String getBaseJid() {
         return jid.getBase();
     }
 
     /**
-     * Returns the resource qualified {@link JID}.
+     * @Return the resource qualified {@link JID}.
      */
     public String getRQjid() {
         return jid.toString();

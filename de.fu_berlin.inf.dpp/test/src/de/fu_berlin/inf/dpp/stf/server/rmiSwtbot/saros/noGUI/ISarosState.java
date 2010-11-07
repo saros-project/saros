@@ -7,6 +7,7 @@ import java.util.List;
 import org.limewire.collection.Tuple;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
@@ -154,7 +155,12 @@ public interface ISarosState extends Remote {
 
     public String getPathToScreenShot() throws RemoteException;
 
-    public boolean isFollowing() throws RemoteException;
+    /**
+     * @return <tt>true</tt>, if you are currently following another user.
+     * @throws RemoteException
+     * @see EditorManager#isFollowing
+     */
+    public boolean isInFollowMode() throws RemoteException;
 
     public boolean isHost(JID jid) throws RemoteException;
 
@@ -162,9 +168,17 @@ public interface ISarosState extends Remote {
     // className)
     // throws RemoteException, FileNotFoundException;
 
-    public String getFollowedUserPlainJID() throws RemoteException;
+    public JID getFollowedUserJID() throws RemoteException;
 
     public boolean isFollowingUser(String plainJID) throws RemoteException;
 
     public boolean isExclusiveDriver() throws RemoteException;
+
+    public boolean isDriver() throws RemoteException;
+
+    public void setJID(JID jid) throws RemoteException;
+
+    public JID getJID() throws RemoteException;
+
+    public boolean isSameUser(JID otherJID) throws RemoteException;
 }

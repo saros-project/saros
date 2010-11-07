@@ -157,7 +157,7 @@ public class TestCreatingNewFile {
     @Test
     public void testCarlGiveExclusiveDriverRole() throws IOException,
         CoreException {
-        carl.sessionV.giveExclusiveDriverRole(alice.getPlainJid());
+        carl.sessionV.giveExclusiveDriverRole(alice.getBaseJid());
 
         assertFalse(carl.state.isDriver(carl.jid));
         assertTrue(alice.state.isDriver(alice.jid));
@@ -171,10 +171,10 @@ public class TestCreatingNewFile {
         bob.bot.sleep(500);
         assertFalse(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
 
-        if (!carl.state.isFollowingUser(alice.getPlainJid()))
-            carl.bot.followUser(alice.state, alice.jid);
-        if (!bob.state.isFollowingUser(alice.getPlainJid()))
-            bob.bot.followUser(alice.state, alice.jid);
+        if (!carl.state.isFollowingUser(alice.getBaseJid()))
+            carl.sessionV.followThisUser(alice.state);
+        if (!bob.state.isFollowingUser(alice.getBaseJid()))
+            bob.sessionV.followThisUser(alice.state);
 
         alice.bot.newFolder(PROJECT, FOLDER2);
         alice.bot.newFile(PROJECT, FOLDER2, FILE2);

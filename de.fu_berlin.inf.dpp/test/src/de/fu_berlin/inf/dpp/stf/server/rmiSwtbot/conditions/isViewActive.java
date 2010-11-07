@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 public class isViewActive extends DefaultCondition {
@@ -21,12 +20,13 @@ public class isViewActive extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        try {
-            return bot1.viewByTitle(name).isActive();
-
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+        return bot1.activeView().getTitle().equals(name);
+        // try {
+        // return bot1.viewByTitle(name).isActive();
+        //
+        // } catch (WidgetNotFoundException e) {
+        // return false;
+        // }
 
     }
 

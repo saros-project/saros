@@ -95,12 +95,12 @@ public class TestEditDuringInvitation {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
-        alice.sessionV.giveDriverRole(bob.getPlainJid());
+        alice.giveDriverRole(bob);
 
         assertTrue(bob.state.isDriver(alice.jid));
 
         log.trace("alice.inviteUser(carl");
-        alice.bot.invitateUser(carl.getPlainJid());
+        alice.bot.invitateUser(carl.getBaseJid());
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
