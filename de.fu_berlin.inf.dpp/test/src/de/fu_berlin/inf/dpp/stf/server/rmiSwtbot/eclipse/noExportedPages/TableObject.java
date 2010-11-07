@@ -57,6 +57,17 @@ public class TableObject {
             .isEnabled();
     }
 
+    public SWTBotTableItem selectTableItemWithLabel(String label) {
+        try {
+            SWTBotTable table = bot.table();
+            wUntil.waitUntilTableItemExisted(table, label);
+            return table.getTableItem(label);
+        } catch (WidgetNotFoundException e) {
+            log.warn("table item " + label + " not found.", e);
+        }
+        return null;
+    }
+
     public SWTBotTableItem selectTableItemWithLabel(SWTBotTable table,
         String label) {
         try {

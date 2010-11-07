@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -10,8 +10,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 
 /**
  * This implementation of {@link ISessionViewObject}
@@ -97,9 +97,17 @@ public class SessionViewObject implements ISessionViewObject {
         return false;
     }
 
-    public void giveDriverRole(String inviteeBaseJID) throws RemoteException {
+    public void giveDriverRole(ISarosState stateOfInvitee)
+        throws RemoteException {
+        JID InviteeJID = stateOfInvitee.getJID();
+        if (stateOfInvitee.isDriver(InviteeJID)) {
+            throw new RuntimeException(
+                "User \""
+                    + InviteeJID.getBase()
+                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
+        }
         precondition();
-        rmiBot.tableObject.clickContextMenuOfTable(inviteeBaseJID,
+        rmiBot.tableObject.clickContextMenuOfTable(InviteeJID.getBase(),
             SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE);
         rmiBot.waitUntilShellClosed(progressShellName);
     }
@@ -157,14 +165,20 @@ public class SessionViewObject implements ISessionViewObject {
     }
 
     public void stopFollowing() throws RemoteException {
-        JID followedUserBaseJID = rmiBot.stateObject.getFollowedUserJID();
-        if (rmiBot.stateObject.isDriver(followedUserBaseJID))
+        JID followedUserJID = rmiBot.stateObject.getFollowedUserJID();
+        if (followedUserJID == null) {
+            log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
+            return;
+        }
+        log.debug(" JID of the followed user: " + followedUserJID.getBase());
+        precondition();
+        if (rmiBot.stateObject.isDriver(followedUserJID))
             rmiBot.tableObject.clickContextMenuOfTable(
-                followedUserBaseJID.getBase() + roleName,
+                followedUserJID.getBase() + roleName,
                 SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
         else
             rmiBot.tableObject.clickContextMenuOfTable(
-                followedUserBaseJID.getBase(),
+                followedUserJID.getBase(),
                 SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
     }
 
@@ -172,6 +186,14 @@ public class SessionViewObject implements ISessionViewObject {
         throws RemoteException {
         precondition();
         JID followedUserJID = stateOfFollowedUser.getJID();
+        if (!rmiBot.stateObject.isInFollowMode()) {
+            log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
+            return;
+        }
+        if (rmiBot.stateObject.isSameUser(followedUserJID)) {
+            throw new RuntimeException(
+                "Hi guy, you can't stop following youself, it makes no sense! Please pass a correct parameter to the method.");
+        }
         if (stateOfFollowedUser.isDriver(followedUserJID))
             rmiBot.tableObject.clickContextMenuOfTable(
                 followedUserJID.getBase() + roleName,
@@ -194,11 +216,22 @@ public class SessionViewObject implements ISessionViewObject {
             SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
     }
 
-    public void shareYourScreenWithSelectedUser() throws RemoteException {
+    public void shareYourScreenWithSelectedUser(ISarosState respondentState)
+        throws RemoteException {
+        JID respondentJID = respondentState.getJID();
+        if (rmiBot.stateObject.isSameUser(respondentJID)) {
+            throw new RuntimeException(
+                "Hi guy, you can't share screen with youself, it makes no sense! Please pass a correct parameter to the method.");
+        }
         precondition();
-        rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-            SarosConstant.TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER);
+        if (respondentState.isDriver(respondentJID)) {
+            rmiBot.tableObject.selectTableItemWithLabel(respondentJID.getBase()
+                + roleName);
+        } else {
+            rmiBot.tableObject
+                .selectTableItemWithLabel(respondentJID.getBase());
+        }
+        clickToolbarButtonWithTooltip(SarosConstant.TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER);
     }
 
     public void stopSessionWithUser(String name) throws RemoteException {
@@ -302,5 +335,10 @@ public class SessionViewObject implements ISessionViewObject {
             allContactsName.add(table.getTableItem(i).getText());
         }
         return allContactsName;
+    }
+
+    private void clickToolbarButtonWithTooltip(String tooltip) {
+        rmiBot.viewObject
+            .clickToolbarButtonWithTooltipInView(viewName, tooltip);
     }
 }

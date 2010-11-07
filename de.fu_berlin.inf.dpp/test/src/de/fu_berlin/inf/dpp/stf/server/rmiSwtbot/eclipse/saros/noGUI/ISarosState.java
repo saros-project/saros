@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 
 /**
  * This is used to check the state of {@link Saros} from the inside. Use this

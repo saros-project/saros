@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.RemoteException;
 
@@ -7,13 +7,13 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class PopUpWindowObject implements IPopUpWindowObject {
     private transient static final Logger log = Logger
         .getLogger(PopUpWindowObject.class);
 
-    private static transient SarosRmiSWTWorkbenchBot rmiBot;
+    private SarosRmiSWTWorkbenchBot rmiBot;
     public static PopUpWindowObject classVariable;
 
     public PopUpWindowObject() {
@@ -22,6 +22,12 @@ public class PopUpWindowObject implements IPopUpWindowObject {
 
     public PopUpWindowObject(SarosRmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
+    }
+
+    public void IncomingScreensharingSession(String YesOrNot)
+        throws RemoteException {
+        rmiBot.confirmWindow(
+            SarosConstant.SHELL_TITLE_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
     public void confirmProblemOccurredWindow(String plainJID)

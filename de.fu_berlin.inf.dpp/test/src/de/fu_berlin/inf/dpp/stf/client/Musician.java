@@ -16,11 +16,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.ISarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -256,19 +256,6 @@ public class Musician {
         }
         MakeOperationConcurrently.workAll(stopFollowTasks,
             stopFollowTasks.size());
-    }
-
-    public void giveDriverRole(Musician invitee) throws RemoteException {
-        if (invitee.state.isDriver(invitee.jid)) {
-            throw new RuntimeException(
-                "User \""
-                    + invitee.getBaseJid()
-                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
-        }
-        if (invitee.equals(this))
-            sessionV.giveDriverRole(SarosConstant.OWNCONTACTNAME);
-        else
-            sessionV.giveDriverRole(invitee.getBaseJid());
     }
 
     public void giveExclusiveDriverRole(Musician invitee)

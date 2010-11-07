@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 
 import java.rmi.RemoteException;
 import java.util.List;

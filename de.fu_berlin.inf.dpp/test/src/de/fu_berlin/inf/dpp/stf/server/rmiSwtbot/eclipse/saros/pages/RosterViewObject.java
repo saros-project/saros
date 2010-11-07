@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.RemoteException;
 
@@ -9,8 +9,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.SarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 public class RosterViewObject implements IRosterViewObject {

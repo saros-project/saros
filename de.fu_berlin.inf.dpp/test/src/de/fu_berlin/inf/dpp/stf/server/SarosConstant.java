@@ -82,6 +82,7 @@ public class SarosConstant {
     public final static String SHELL_TITLE_CONFIRM_LEAVING_SESSION = "Confirm Leaving Session";
     public final static String SHELL_TITLE_IMPORT = "Import";
     public final static String SHELL_TITLE_PROGRESS_INFORMATION = "Progress Information";
+    public final static String SHELL_TITLE_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
 
     public final static String CONTEXT_MENU_GIVE_DRIVER_ROLE = "Give driver role";
     public final static String CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.IRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 /**

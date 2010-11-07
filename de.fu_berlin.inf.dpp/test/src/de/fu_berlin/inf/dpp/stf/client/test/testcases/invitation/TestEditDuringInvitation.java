@@ -95,7 +95,7 @@ public class TestEditDuringInvitation {
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
-        alice.giveDriverRole(bob);
+        alice.sessionV.giveDriverRole(bob.state);
 
         assertTrue(bob.state.isDriver(alice.jid));
 

@@ -59,7 +59,7 @@ public class TestSessionViewObject {
             alice.removeDriverRole(bob);
         }
         if (!alice.state.isDriver()) {
-            alice.giveDriverRole(alice);
+            alice.sessionV.giveDriverRole(alice.state);
         }
 
     }
@@ -68,6 +68,8 @@ public class TestSessionViewObject {
     public void cleanUp() throws RemoteException {
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
+        // bob.sessionV.stopFollowing();
+        // alice.sessionV.stopFollowing();
     }
 
     @Test
@@ -110,7 +112,7 @@ public class TestSessionViewObject {
             + ROLENAME));
 
         log.trace("alice give bob driver role.");
-        alice.giveDriverRole(bob);
+        alice.sessionV.giveDriverRole(bob.state);
         assertTrue(alice.state.isDriver());
         assertTrue(bob.state.isDriver());
 
@@ -155,6 +157,10 @@ public class TestSessionViewObject {
         assertTrue(bob.state.isInFollowMode());
         alice.sessionV.followThisUser(bob.state);
         assertTrue(alice.state.isInFollowMode());
+    }
 
+    @Test
+    public void testShareYourScreenWithSelectedUser() throws RemoteException {
+        alice.sessionV.shareYourScreenWithSelectedUser(bob.state);
     }
 }

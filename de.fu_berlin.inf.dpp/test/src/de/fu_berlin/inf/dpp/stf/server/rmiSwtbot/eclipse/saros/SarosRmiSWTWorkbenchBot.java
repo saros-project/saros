@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -24,14 +24,14 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.IRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.ISessionViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.PopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages.SessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -508,22 +508,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         default:
             break;
         }
-    }
-
-    public void shareScreenWithUser(ISarosState respondentState,
-        JID respondentJID) throws RemoteException {
-        openRemoteScreenView();
-        if (respondentState.isDriver(respondentJID)) {
-            viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase() + " (Driver)");
-
-        } else {
-            viewObject.selectTableItemWithLabelInView(
-                SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-                respondentJID.getBase());
-        }
-        sessonViewObject.shareYourScreenWithSelectedUser();
     }
 
     public void xmppConnect(JID jid, String password) throws RemoteException {

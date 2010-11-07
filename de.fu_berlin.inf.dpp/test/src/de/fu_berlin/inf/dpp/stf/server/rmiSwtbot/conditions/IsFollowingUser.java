@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 
 public class IsFollowingUser extends DefaultCondition {
 

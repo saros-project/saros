@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

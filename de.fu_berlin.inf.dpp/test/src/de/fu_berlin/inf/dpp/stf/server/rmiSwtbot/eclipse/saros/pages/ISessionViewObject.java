@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -126,12 +126,13 @@ public interface ISessionViewObject extends Remote {
      * function: {@link Musician#giveDriverRole(Musician)}.</li>
      * </ol>
      * 
-     * @param inviteeBaseJID
-     *            the {@link JID#getBase()} of the user whom you want to give
+     * @param stateOfInvitee
+     *            the {@link ISarosState} of the user whom you want to give
      *            drive role.
      * @throws RemoteException
      */
-    public void giveDriverRole(String inviteeBaseJID) throws RemoteException;
+    public void giveDriverRole(ISarosState stateOfInvitee)
+        throws RemoteException;
 
     /**
      * Using this function host can perform the action
@@ -292,7 +293,8 @@ public interface ISessionViewObject extends Remote {
     public boolean isStopFollowingThisUserVisible(String contactName)
         throws RemoteException;
 
-    public void shareYourScreenWithSelectedUser() throws RemoteException;
+    public void shareYourScreenWithSelectedUser(ISarosState respondentState)
+        throws RemoteException;
 
     public void stopSessionWithUser(String name) throws RemoteException;
 
