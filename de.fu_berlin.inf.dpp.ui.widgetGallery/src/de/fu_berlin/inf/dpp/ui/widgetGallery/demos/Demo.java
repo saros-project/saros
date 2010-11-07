@@ -6,8 +6,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-
 public abstract class Demo {
+
+	protected TabItem tabItem;
 
 	public Demo(Composite parent) {
 		Composite root = new Composite(parent, SWT.NONE);
@@ -18,14 +19,18 @@ public abstract class Demo {
 	public Demo(DemoContainer parent, String title) {
 		TabFolder tabFolder = parent.getTabFolder();
 
-		TabItem tabItem = new TabItem(tabFolder, SWT.NULL);
-		tabItem.setText(title);
+		this.tabItem = new TabItem(tabFolder, SWT.NULL);
+		this.tabItem.setText(title);
 
 		Composite root = new Composite(tabFolder, SWT.NONE);
-		tabItem.setControl(root);
+		this.tabItem.setControl(root);
 
 		root.setLayout(new FillLayout());
 		createPartControls(root);
+	}
+
+	public TabItem getTabItem() {
+		return this.tabItem;
 	}
 
 	public abstract void createPartControls(Composite parent);
