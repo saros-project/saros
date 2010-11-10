@@ -58,7 +58,7 @@ public class TestCreatingNewFile {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        carl.bot.newProject(PROJECT);
+        carl.eclipseMainMenu.newProject(PROJECT);
 
         /*
          * build session with bob, and alice simultaneously
@@ -91,18 +91,18 @@ public class TestCreatingNewFile {
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
         carl.bot.resetWorkbench();
-        if (bob.bot.isFolderExist(PROJECT, FOLDER))
-            bob.bot.deleteFolder(PROJECT, FOLDER);
-        if (bob.bot.isFolderExist(PROJECT, FOLDER2))
-            bob.bot.deleteFolder(PROJECT, FOLDER2);
-        if (alice.bot.isFolderExist(PROJECT, FOLDER))
-            alice.bot.deleteFolder(PROJECT, FOLDER);
-        if (alice.bot.isFolderExist(PROJECT, FOLDER2))
-            alice.bot.deleteFolder(PROJECT, FOLDER2);
-        if (carl.bot.isFolderExist(PROJECT, FOLDER))
-            carl.bot.deleteFolder(PROJECT, FOLDER);
-        if (carl.bot.isFolderExist(PROJECT, FOLDER2))
-            carl.bot.deleteFolder(PROJECT, FOLDER2);
+        if (bob.eclipseState.isFolderExist(PROJECT, FOLDER))
+            bob.eclipseState.deleteFolder(PROJECT, FOLDER);
+        if (bob.eclipseState.isFolderExist(PROJECT, FOLDER2))
+            bob.eclipseState.deleteFolder(PROJECT, FOLDER2);
+        if (alice.eclipseState.isFolderExist(PROJECT, FOLDER))
+            alice.eclipseState.deleteFolder(PROJECT, FOLDER);
+        if (alice.eclipseState.isFolderExist(PROJECT, FOLDER2))
+            alice.eclipseState.deleteFolder(PROJECT, FOLDER2);
+        if (carl.eclipseState.isFolderExist(PROJECT, FOLDER))
+            carl.eclipseState.deleteFolder(PROJECT, FOLDER);
+        if (carl.eclipseState.isFolderExist(PROJECT, FOLDER2))
+            carl.eclipseState.deleteFolder(PROJECT, FOLDER2);
 
     }
 
@@ -123,12 +123,12 @@ public class TestCreatingNewFile {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.bot.newFolder(PROJECT, FOLDER);
-        carl.bot.newFile(PROJECT, FOLDER, FILE);
-        alice.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
-        assertTrue(alice.bot.isFileExist(PROJECT, FOLDER, FILE));
-        bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
-        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
+        carl.eclipseMainMenu.newFolder(PROJECT, FOLDER);
+        carl.eclipseMainMenu.newFile(PROJECT, FOLDER, FILE);
+        alice.eclipseState.waitUntilFileExist(PROJECT, FOLDER, FILE);
+        assertTrue(alice.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
+        bob.eclipseState.waitUntilFileExist(PROJECT, FOLDER, FILE);
+        assertTrue(bob.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
     }
 
     /**
@@ -164,40 +164,40 @@ public class TestCreatingNewFile {
         assertTrue(carl.state.isDriver(alice.jid));
         assertTrue(bob.state.isDriver(alice.jid));
 
-        carl.bot.newFolder(PROJECT, FOLDER);
-        carl.bot.newFile(PROJECT, FOLDER, FILE);
+        carl.eclipseMainMenu.newFolder(PROJECT, FOLDER);
+        carl.eclipseMainMenu.newFile(PROJECT, FOLDER, FILE);
         alice.bot.sleep(500);
-        assertFalse(alice.bot.isFileExist(PROJECT, FOLDER, FILE));
+        assertFalse(alice.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
         bob.bot.sleep(500);
-        assertFalse(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
+        assertFalse(bob.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
 
         if (!carl.state.isFollowingUser(alice.getBaseJid()))
             carl.sessionV.followThisUser(alice.state);
         if (!bob.state.isFollowingUser(alice.getBaseJid()))
             bob.sessionV.followThisUser(alice.state);
 
-        alice.bot.newFolder(PROJECT, FOLDER2);
-        alice.bot.newFile(PROJECT, FOLDER2, FILE2);
+        alice.eclipseMainMenu.newFolder(PROJECT, FOLDER2);
+        alice.eclipseMainMenu.newFile(PROJECT, FOLDER2, FILE2);
 
-        carl.bot.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
-        assertTrue(carl.bot.isFileExist(PROJECT, FOLDER2, FILE2));
-        bob.bot.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
-        assertTrue(bob.bot.isFileExist(PROJECT, FOLDER2, FILE2));
+        carl.eclipseState.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
+        assertTrue(carl.eclipseState.isFileExist(PROJECT, FOLDER2, FILE2));
+        bob.eclipseState.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
+        assertTrue(bob.eclipseState.isFileExist(PROJECT, FOLDER2, FILE2));
 
         alice.bot.setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
 
-        String file2ContentOfAlice = alice.bot.getTextOfEditor(PROJECT,
+        String file2ContentOfAlice = alice.eclipseEditor.getTextOfEditor(
+            PROJECT, FOLDER2, FILE2);
+        carl.eclipseEditor.waitUntilEditorContentSame(file2ContentOfAlice,
+            PROJECT, FOLDER2, FILE2);
+        String file2ContentOfCarl = carl.eclipseEditor.getTextOfEditor(PROJECT,
             FOLDER2, FILE2);
-        carl.bot.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT,
-            FOLDER2, FILE2);
-        String file2ContentOfCarl = carl.bot.getTextOfEditor(PROJECT, FOLDER2,
-            FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
 
-        bob.bot.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT,
+        bob.eclipseEditor.waitUntilEditorContentSame(file2ContentOfAlice,
+            PROJECT, FOLDER2, FILE2);
+        String file2ContentOfBob = bob.eclipseEditor.getTextOfEditor(PROJECT,
             FOLDER2, FILE2);
-        String file2ContentOfBob = bob.bot.getTextOfEditor(PROJECT, FOLDER2,
-            FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
 
     }

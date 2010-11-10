@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
@@ -10,7 +9,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
 /**
@@ -24,21 +23,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
  * org.eclipse.ui.resourcePerspective
  * org.tigris.subversion.subclipse.ui.svnPerspective
  */
-public class PerspectiveObject {
-    private static final transient Logger log = Logger
-        .getLogger(PerspectiveObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private MenuObject menuObject;
-
-    private SarosSWTBot bot;
+public class PerspectiveObject extends EclipseObject {
 
     public PerspectiveObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
-        this.menuObject = rmiBot.menuObject;
-
+        super(rmiBot);
     }
 
     /**

@@ -27,7 +27,7 @@ public class TestChangingNameInRosterView {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }

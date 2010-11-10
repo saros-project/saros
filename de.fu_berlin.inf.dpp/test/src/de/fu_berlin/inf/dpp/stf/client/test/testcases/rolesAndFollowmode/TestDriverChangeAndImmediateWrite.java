@@ -40,7 +40,7 @@ public class TestDriverChangeAndImmediateWrite {
     public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }

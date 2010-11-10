@@ -21,7 +21,7 @@ public class IsEditorOpen extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.isFileOpen(name);
+        return bot1.getEclipseEditorObject().isFileOpen(name);
     }
 
 }

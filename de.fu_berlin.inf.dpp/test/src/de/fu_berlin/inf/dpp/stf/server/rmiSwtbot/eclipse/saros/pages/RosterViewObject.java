@@ -2,68 +2,60 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
-public class RosterViewObject implements IRosterViewObject {
+public class RosterViewObject extends SarosObject implements IRosterViewObject {
 
-    private transient static final Logger log = Logger
-        .getLogger(RosterViewObject.class);
-
-    private static transient SarosRmiSWTWorkbenchBot rmiBot;
     public static RosterViewObject classVariable;
 
-    public RosterViewObject() {
-        // Default constructor needed for RMI
-    }
-
-    public RosterViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
+    public RosterViewObject(SarosRmiSWTWorkbenchBot sarosRmiBot) {
+        super(sarosRmiBot);
     }
 
     public void openRosterView() throws RemoteException {
         if (!isRosterViewOpen())
-            rmiBot.viewObject.openViewById(SarosConstant.ID_ROSTER_VIEW);
+            viewObject.openViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
-        return rmiBot.viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
+        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        rmiBot.viewObject
-            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     public void closeRosterView() throws RemoteException {
-        rmiBot.viewObject.closeViewById(SarosConstant.ID_ROSTER_VIEW);
+        viewObject.closeViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public void xmppDisconnect() throws RemoteException {
         if (isConnectedByXMPP()) {
             clickTBDisconnectInRosterView();
-            rmiBot.waitUntilDisConnected();
+            waitUntilDisConnected();
             // sleep(200);
         }
     }
 
     public SWTBotTreeItem selectBuddy(String contact) throws RemoteException {
-        return rmiBot.viewObject.selectTreeWithLabelsInView(
+        return viewObject.selectTreeWithLabelsInView(
             SarosConstant.VIEW_TITLE_ROSTER, "Buddies", contact);
     }
 
     public boolean isBuddyExist(String contact) throws RemoteException {
         SWTBotTree tree = rmiBot.viewObject
             .getTreeInView(SarosConstant.VIEW_TITLE_ROSTER);
-        return rmiBot.treeObject.isTreeItemWithMatchTextExist(tree,
+        return treeObject.isTreeItemWithMatchTextExist(tree,
             SarosConstant.BUDDIES, contact + ".*");
     }
 
@@ -71,7 +63,7 @@ public class RosterViewObject implements IRosterViewObject {
         try {
             openRosterView();
             setFocusOnRosterView();
-            SWTBotToolbarButton toolbarButton = rmiBot.viewObject
+            SWTBotToolbarButton toolbarButton = viewObject
                 .getToolbarButtonWithTooltipInView(
                     SarosConstant.VIEW_TITLE_ROSTER,
                     SarosConstant.TOOL_TIP_TEXT_DISCONNECT);
@@ -86,7 +78,7 @@ public class RosterViewObject implements IRosterViewObject {
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return rmiBot.stateObject.isConnectedByXMPP()
+        return sarosRmiBot.stateObject.isConnectedByXMPP()
             && isConnectedByXmppGuiCheck();
     }
 
@@ -104,7 +96,7 @@ public class RosterViewObject implements IRosterViewObject {
     public void clickTBConnectInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
+        viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_CONNECT);
     }
@@ -115,8 +107,16 @@ public class RosterViewObject implements IRosterViewObject {
     public boolean clickTBDisconnectInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        return rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
+        return viewObject.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_DISCONNECT) != null;
+    }
+
+    public void waitUntilConnected() throws RemoteException {
+        waitUntil(SarosConditions.isConnect(bot));
+    }
+
+    public void waitUntilDisConnected() throws RemoteException {
+        waitUntil(SarosConditions.isDisConnected(bot));
     }
 }

@@ -120,7 +120,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -133,33 +133,34 @@ public class TestParallelInvitationWithTerminationByInvitees {
 
         alice.bot.shareProject(PROJECT, peersName);
 
-        bob.bot.waitUntilShellActive("Session Invitation");
+        bob.eclipseWindow.waitUntilShellActive("Session Invitation");
         bob.bot.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.bot.waitUntilShellActive("Problem Occurred");
+        alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
         assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
             bob.getName() + ".*"));
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
-        carl.bot.waitUntilShellActive("Session Invitation");
+        carl.eclipseWindow.waitUntilShellActive("Session Invitation");
         carl.popupWindow.confirmSessionInvitationWindowStep1();
         carl.bot.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.bot.waitUntilShellActive("Problem Occurred");
+        alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
         assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
             carl.getName() + ".*"));
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
-        dave.bot.waitUntilShellActive("Session Invitation");
+        dave.eclipseWindow.waitUntilShellActive("Session Invitation");
         dave.popupWindow.confirmSessionInvitationWindowStep1();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         dave.bot.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.bot.waitUntilShellActive("Problem Occurred");
+        alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
         assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
             dave.getName() + ".*"));
         alice.bot.clickButton(SarosConstant.BUTTON_OK);
 
-        edna.bot.waitUntilShellActive("Session Invitation");
+        edna.eclipseWindow.waitUntilShellActive("Session Invitation");
         edna.popupWindow.confirmSessionInvitationWindowStep1();
-        edna.popupWindow.confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
+        edna.popupWindow
+            .confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
         edna.bot.leaveSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }

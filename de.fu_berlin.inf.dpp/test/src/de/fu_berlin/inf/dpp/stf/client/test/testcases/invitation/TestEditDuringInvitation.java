@@ -51,7 +51,7 @@ public class TestEditDuringInvitation {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -115,8 +115,10 @@ public class TestEditDuringInvitation {
             .confirmSessionInvitationWindowStep2UsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.bot.getTextOfJavaEditor(PROJECT, PKG, CLS);
-        String textFormAlice = alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS);
+        String textFromCarl = carl.eclipseEditor.getTextOfJavaEditor(PROJECT,
+            PKG, CLS);
+        String textFormAlice = alice.eclipseEditor.getTextOfJavaEditor(PROJECT,
+            PKG, CLS);
         assertTrue(textFromCarl.equals(textFormAlice));
 
         log.trace("testEditDuringInvitation done");

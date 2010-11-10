@@ -11,13 +11,12 @@ import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestEditDuringI
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestShare2UsersSequentially;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestShare3UsersConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestShare3UsersSequentially;
-import de.fu_berlin.inf.dpp.stf.client.test.testcases.rolesAndFollowmode.TestFollowMode;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestBasicSarosElements.class, TestHandleContacts.class,
     TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
     TestShare3UsersConcurrently.class, TestEditDuringInvitation.class,
-    TestFollowMode.class, TestFileOperations.class })
+    TestFileOperations.class })
 public class AllTests {
     /**
      * Run AllTests in the list of SuiteClasses annotation

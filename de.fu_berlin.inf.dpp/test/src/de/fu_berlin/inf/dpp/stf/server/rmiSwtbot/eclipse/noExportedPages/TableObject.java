@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -19,22 +19,15 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.hamcrest.Matcher;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class TableObject {
-    private static final transient Logger log = Logger
-        .getLogger(TableObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private SarosSWTBot bot;
+public class TableObject extends EclipseObject {
 
     public TableObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
-
+        super(rmiBot);
     }
 
     public SWTBotTable getTable() {
@@ -60,7 +53,7 @@ public class TableObject {
     public SWTBotTableItem selectTableItemWithLabel(String label) {
         try {
             SWTBotTable table = bot.table();
-            wUntil.waitUntilTableItemExisted(table, label);
+            waitUntilTableItemExisted(table, label);
             return table.getTableItem(label);
         } catch (WidgetNotFoundException e) {
             log.warn("table item " + label + " not found.", e);
@@ -71,7 +64,7 @@ public class TableObject {
     public SWTBotTableItem selectTableItemWithLabel(SWTBotTable table,
         String label) {
         try {
-            wUntil.waitUntilTableItemExisted(table, label);
+            waitUntilTableItemExisted(table, label);
             return table.getTableItem(label);
 
         } catch (WidgetNotFoundException e) {
@@ -178,4 +171,20 @@ public class TableObject {
             });
         return existContext;
     }
+
+    public void waitUntilTableItemExisted(SWTBotTable table,
+        String tableItemName) {
+        waitUntil(SarosConditions.existTableItem(table, tableItemName));
+    }
+
+    public void waitUntilTableHasRows(int row) {
+        waitUntil(tableHasRows(bot.table(), row));
+    }
+
+    public void waitUntilContextMenuOfTableItemEnabled(
+        SWTBotTableItem tableItem, String context) {
+        waitUntil(SarosConditions.ExistContextMenuOfTableItem(tableItem,
+            context));
+    }
+
 }

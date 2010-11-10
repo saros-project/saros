@@ -62,7 +62,7 @@ public class TestDriverResetsFiles {
         dave = musicians.get(3);
         edna = musicians.get(4);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
@@ -131,20 +131,26 @@ public class TestDriverResetsFiles {
         edna.sessionV.followThisUser(alice.state);
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
 
-        alice.bot.closejavaEditorWithoutSave(CLS);
-        dave.bot.waitUntilShellActive("Save Resource");
-        dave.bot.confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
+        alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
+        dave.eclipseWindow.waitUntilShellActive("Save Resource");
+        dave.eclipseWindow.confirmWindow("Save Resource",
+            SarosConstant.BUTTON_NO);
 
-        edna.bot.waitUntilShellActive("Save Resource");
-        edna.bot.confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
+        edna.eclipseWindow.waitUntilShellActive("Save Resource");
+        edna.eclipseWindow.confirmWindow("Save Resource",
+            SarosConstant.BUTTON_NO);
 
-        String contentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
+        String contentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG, CLS);
         System.out.println("alice's class content" + contentOfAlice);
-        String contentOfDave = dave.bot.getClassContent(PROJECT, PKG, CLS);
+        String contentOfDave = dave.eclipseState.getClassContent(PROJECT, PKG,
+            CLS);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfEdna = edna.bot.getClassContent(PROJECT, PKG, CLS);
+        String contentOfEdna = edna.eclipseState.getClassContent(PROJECT, PKG,
+            CLS);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS);
+        String contentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
+            CLS);
         System.out.println("bob's class content" + contentOfBob);
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

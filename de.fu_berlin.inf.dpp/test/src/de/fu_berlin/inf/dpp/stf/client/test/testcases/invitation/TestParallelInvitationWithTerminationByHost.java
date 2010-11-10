@@ -37,7 +37,7 @@ public class TestParallelInvitationWithTerminationByHost {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         invitees.add(bob.getBaseJid());
         invitees.add(carl.getBaseJid());
     }
@@ -95,14 +95,14 @@ public class TestParallelInvitationWithTerminationByHost {
         carl.popupWindow.confirmSessionInvitationWindowStep1();
 
         alice.bot.cancelInvitation();
-        bob.bot.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(bob.bot.isShellActive("Invitation Cancelled"));
+        bob.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(bob.eclipseWindow.isShellActive("Invitation Cancelled"));
         bob.bot.confirmInvitationCancelledWindow();
         alice.bot.removeProgress();
 
         alice.bot.cancelInvitation();
-        carl.bot.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(carl.bot.isShellActive("Invitation Cancelled"));
+        carl.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(carl.eclipseWindow.isShellActive("Invitation Cancelled"));
         carl.bot.confirmInvitationCancelledWindow();
         alice.bot.removeProgress();
 

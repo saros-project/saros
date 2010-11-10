@@ -35,19 +35,19 @@ public class TestShareProjectUsingExistingProject {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.bot.newJavaProjectWithClass(PROJECT, PKG, CLS2);
+        bob.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS2);
     }
 
     @After
     public void cleanUp() throws RemoteException, InterruptedException {
         alice.leaveSessionFirst(bob);
-        alice.bot.deleteProject(PROJECT);
-        bob.bot.deleteProject(PROJECT);
+        alice.eclipseState.deleteProject(PROJECT);
+        bob.eclipseState.deleteProject(PROJECT);
         bob.bot.resetWorkbench();
         alice.bot.resetWorkbench();
     }
@@ -60,12 +60,12 @@ public class TestShareProjectUsingExistingProject {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG, CLS2));
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.bot.existsClass(PROJECT2, PKG, CLS));
-        assertFalse(bob.bot.existsProject(PROJECT2));
+        assertFalse(bob.eclipseState.existsClass(PROJECT2, PKG, CLS));
+        assertFalse(bob.eclipseState.existsProject(PROJECT2));
 
     }
 
@@ -75,16 +75,16 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.bot
+        assertTrue(bob.eclipseWindow
             .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
-        assertTrue(bob.bot.existsProject(PROJECT));
-        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.existsProject(PROJECT2));
-        assertTrue(bob.bot.existsClass(PROJECT2, PKG, CLS));
-        bob.bot.deleteProject(PROJECT2);
+        assertTrue(bob.eclipseState.existsProject(PROJECT));
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.eclipseState.existsProject(PROJECT2));
+        assertTrue(bob.eclipseState.existsClass(PROJECT2, PKG, CLS));
+        bob.eclipseState.deleteProject(PROJECT2);
 
     }
 
@@ -94,12 +94,12 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.bot.existsProject(PROJECT));
-        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
-        assertTrue(bob.bot.existsProject(PROJECT2));
-        assertTrue(bob.bot.existsClass(PROJECT2, PKG, CLS));
+        assertTrue(bob.eclipseState.existsProject(PROJECT));
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.eclipseState.existsProject(PROJECT2));
+        assertTrue(bob.eclipseState.existsClass(PROJECT2, PKG, CLS));
 
-        bob.bot.deleteProject(PROJECT2);
+        bob.eclipseState.deleteProject(PROJECT2);
 
     }
 }

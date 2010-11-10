@@ -1,30 +1,20 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class TreeObject {
-    private static final transient Logger log = Logger
-        .getLogger(TreeObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private ViewObject viewObject;
-    private SarosSWTBot bot;
+public class TreeObject extends EclipseObject {
 
     public TreeObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
-        this.viewObject = rmiBot.viewObject;
+        super(rmiBot);
     }
 
     /**
@@ -91,16 +81,17 @@ public class TreeObject {
     }
 
     public SWTBotTreeItem selectTreeWithLabelsWithWaitungExpand(
-        SWTBotTree tree, String... labels) throws RemoteException {
+        SWTBotTree tree, String... labels) {
         SWTBotTreeItem selectedTreeItem = null;
         for (String label : labels) {
             try {
                 if (selectedTreeItem == null) {
-                    rmiBot.waitUntilTreeExisted(tree, label);
+                    // treeObject.waitUntilTreeExisted(tree, label);
                     selectedTreeItem = tree.expandNode(label);
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 } else {
-                    rmiBot.waitUntilTreeNodeExisted(selectedTreeItem, label);
+                    // treeObject
+                    // .waitUntilTreeNodeExisted(selectedTreeItem, label);
                     selectedTreeItem = selectedTreeItem.expandNode(label);
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 }
@@ -160,4 +151,17 @@ public class TreeObject {
 
     }
 
+    public void waitUntilTreeItemExisted(SWTBotTreeItem treeItem,
+        String nodeName) {
+        waitUntil(SarosConditions.existTreeItem(treeItem, nodeName));
+    }
+
+    public void waitUntilTreeExisted(SWTBotTree tree, String nodeName) {
+        waitUntil(SarosConditions.existTree(tree, nodeName));
+    }
+
+    public void waitUntilTreeNodeExisted(SWTBotTreeItem treeItem,
+        String nodeName) {
+        waitUntil(SarosConditions.existTreeItem(treeItem, nodeName));
+    }
 }

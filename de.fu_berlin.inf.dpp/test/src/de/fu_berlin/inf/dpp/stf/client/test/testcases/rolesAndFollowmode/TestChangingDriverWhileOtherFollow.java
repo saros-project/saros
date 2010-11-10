@@ -57,7 +57,7 @@ public class TestChangingDriverWhileOtherFollow {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -145,34 +145,34 @@ public class TestChangingDriverWhileOtherFollow {
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
         carl.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        String dirtyClsContentOfCarl = carl.bot.getTextOfJavaEditor(PROJECT,
-            PKG, CLS);
-
-        alice.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
+        String dirtyClsContentOfCarl = carl.eclipseEditor.getTextOfJavaEditor(
             PROJECT, PKG, CLS);
-        assertTrue(alice.bot.isJavaEditorActive(CLS));
-        assertTrue(alice.bot.isClassDirty(PROJECT, PKG, CLS,
+
+        alice.eclipseEditor.waitUntilJavaEditorContentSame(
+            dirtyClsContentOfCarl, PROJECT, PKG, CLS);
+        assertTrue(alice.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(alice.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        bob.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl, PROJECT,
-            PKG, CLS);
-        assertTrue(bob.bot.isJavaEditorActive(CLS));
-        assertTrue(bob.bot.isClassDirty(PROJECT, PKG, CLS,
+        bob.eclipseEditor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
+            PROJECT, PKG, CLS);
+        assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(bob.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        dave.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl, PROJECT,
-            PKG, CLS);
-        assertTrue(dave.bot.isJavaEditorActive(CLS));
-        assertTrue(dave.bot.isClassDirty(PROJECT, PKG, CLS,
+        dave.eclipseEditor.waitUntilJavaEditorContentSame(
+            dirtyClsContentOfCarl, PROJECT, PKG, CLS);
+        assertTrue(dave.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
         carl.stopFollowedBy(alice, bob, dave);
         carl.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
-        carl.bot.closeJavaEditorWithSave(CLS);
-        String dirtyClsChangeContentOfCarl = carl.bot.getTextOfJavaEditor(
-            PROJECT, PKG, CLS);
+        carl.eclipseEditor.closeJavaEditorWithSave(CLS);
+        String dirtyClsChangeContentOfCarl = carl.eclipseEditor
+            .getTextOfJavaEditor(PROJECT, PKG, CLS);
 
-        assertTrue(alice.bot.isJavaEditorActive(CLS));
+        assertTrue(alice.eclipseEditor.isJavaEditorActive(CLS));
         /*
          * TODO alice can still see the changes maded by carl, although she
          * already leave follow mode. There is a bug here (see Bug 3094186)and
@@ -185,7 +185,7 @@ public class TestChangingDriverWhileOtherFollow {
         // assertFalse(alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(bob.bot.isJavaEditorActive(CLS));
+        assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS));
 
         /*
          * TODO bob can still see the changes maded by carl, although he already
@@ -198,7 +198,7 @@ public class TestChangingDriverWhileOtherFollow {
         // assertFalse(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(dave.bot.isJavaEditorActive(CLS));
+        assertTrue(dave.eclipseEditor.isJavaEditorActive(CLS));
 
         /*
          * TODO dave can still see the changes , although he already leave

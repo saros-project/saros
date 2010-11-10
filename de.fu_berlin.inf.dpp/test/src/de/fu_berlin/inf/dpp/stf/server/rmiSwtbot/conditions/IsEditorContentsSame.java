@@ -23,6 +23,7 @@ public class IsEditorContentsSame extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.getTextOfEditor(filePath).equals(otherContent);
+        return bot1.getEclipseEditorObject().getTextOfEditor(filePath)
+            .equals(otherContent);
     }
 }

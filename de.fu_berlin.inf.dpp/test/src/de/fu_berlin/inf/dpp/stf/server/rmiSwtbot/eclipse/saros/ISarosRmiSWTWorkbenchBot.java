@@ -6,8 +6,7 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.IRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 import de.fu_berlin.inf.dpp.ui.RosterView;
@@ -148,10 +147,10 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickCMJumpToPositionOfSelectedUserInSPSView(
     // String participantJID, String sufix) throws RemoteException;
 
-    public void waitUntilSessionCloses() throws RemoteException;
+    // public void waitUntilSessionCloses() throws RemoteException;
 
-    public void waitUntilSessionClosedBy(ISarosState state)
-        throws RemoteException;
+    // public void waitUntilSessionClosedBy(ISarosState state)
+    // throws RemoteException;
 
     public void openChatView() throws RemoteException;
 
@@ -198,16 +197,16 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void closePackageExplorerView() throws RemoteException;
 
-    public void waitUntilConnected() throws RemoteException;
+    // public void waitUntilConnected() throws RemoteException;
 
-    public void waitUntilDisConnected() throws RemoteException;
+    // public void waitUntilDisConnected() throws RemoteException;
 
     // public SWTBotTreeItem selectBuddy(String contact) throws RemoteException;
 
-    public void waitUntilSessionOpenBy(ISarosState state)
-        throws RemoteException;
+    // public void waitUntilSessionOpenBy(ISarosState state)
+    // throws RemoteException;
 
-    public void waitUntilSessionOpen() throws RemoteException;
+    // public void waitUntilSessionOpen() throws RemoteException;
 
     // public void
     // confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
@@ -280,8 +279,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void leaveSessionByHost() throws RemoteException;
 
-    public void waitUntilAllPeersLeaveSession(List<JID> jids)
-        throws RemoteException;
+    // public void waitUntilAllPeersLeaveSession(List<JID> jids)
+    // throws RemoteException;
 
     public void cancelInvitation() throws RemoteException;
 
@@ -293,8 +292,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void removeProgress() throws RemoteException;
 
-    public void waitUntilGetChatMessage(String jid, String message)
-        throws RemoteException;
+    // public void waitUntilGetChatMessage(String jid, String message)
+    // throws RemoteException;
 
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException;
@@ -319,7 +318,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void stopFollowUser(ISarosState stateOfFollowedUser,
     // JID JIDOfFollowedUser) throws RemoteException;
 
-    public void waitUntilFollowed(String plainJID) throws RemoteException;
+    // public void waitUntilFollowed(String plainJID) throws RemoteException;
 
     public void invitateUser(String inviteeJID) throws RemoteException;
 
@@ -344,7 +343,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public IRosterViewObject getRosterViewObject() throws RemoteException;
 
-    public IPopUpWindowObject getPopupWindowObject() throws RemoteException;
+    public ISarosWindowObject getPopupWindowObject() throws RemoteException;
 
     public ISessionViewObject getSessionViewObject() throws RemoteException;
 }

@@ -35,7 +35,7 @@ public class TestShare3UsersConcurrently {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass

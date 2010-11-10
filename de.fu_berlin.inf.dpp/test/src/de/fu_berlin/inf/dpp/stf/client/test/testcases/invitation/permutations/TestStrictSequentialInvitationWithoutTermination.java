@@ -51,7 +51,7 @@ public class TestStrictSequentialInvitationWithoutTermination {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     /**
@@ -76,11 +76,11 @@ public class TestStrictSequentialInvitationWithoutTermination {
     @After
     public void cleanUp() throws RemoteException {
         carl.bot.resetWorkbench();
-        carl.bot.newTextFileLineDelimiter("Default");
+        carl.eclipseMainMenu.newTextFileLineDelimiter("Default");
         bob.bot.resetWorkbench();
-        bob.bot.newTextFileLineDelimiter("Default");
+        bob.eclipseMainMenu.newTextFileLineDelimiter("Default");
         alice.bot.resetWorkbench();
-        alice.bot.newTextFileLineDelimiter("Default");
+        alice.eclipseMainMenu.newTextFileLineDelimiter("Default");
 
     }
 
@@ -112,14 +112,16 @@ public class TestStrictSequentialInvitationWithoutTermination {
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
-        alice.bot.newTextFileLineDelimiter("Unix");
+        alice.eclipseMainMenu.newTextFileLineDelimiter("Unix");
 
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
 
-        String delimiterByAlice = alice.bot.getTextFileLineDelimiter();
-        String delimiterByCarl = carl.bot.getTextFileLineDelimiter();
-        String delimiterByBob = bob.bot.getTextFileLineDelimiter();
+        String delimiterByAlice = alice.eclipseMainMenu
+            .getTextFileLineDelimiter();
+        String delimiterByCarl = carl.eclipseMainMenu
+            .getTextFileLineDelimiter();
+        String delimiterByBob = bob.eclipseMainMenu.getTextFileLineDelimiter();
 
         log.debug("delimiter by alice: " + delimiterByAlice
             + "delimiter by bob: " + delimiterByBob + "delimiter by carl: "

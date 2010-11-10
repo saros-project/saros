@@ -85,9 +85,9 @@ public class TestHandleContacts {
     public void testAddNoValidContact() throws RemoteException {
         alice.rosterV.clickTBAddANewContactInRosterView();
         alice.popupWindow.confirmNewContactWindow("bob@bla");
-        alice.bot.waitUntilShellActive("Contact look-up failed");
-        assertTrue(alice.bot.isShellActive("Contact look-up failed"));
-        alice.bot.confirmWindow("Contact look-up failed",
+        alice.eclipseWindow.waitUntilShellActive("Contact look-up failed");
+        assertTrue(alice.eclipseWindow.isShellActive("Contact look-up failed"));
+        alice.eclipseWindow.confirmWindow("Contact look-up failed",
             SarosConstant.BUTTON_NO);
     }
 
@@ -95,9 +95,9 @@ public class TestHandleContacts {
     public void testAddExistedContact() throws RemoteException {
         alice.rosterV.clickTBAddANewContactInRosterView();
         alice.popupWindow.confirmNewContactWindow(bob.getBaseJid());
-        alice.bot.waitUntilShellActive("Contact already added");
-        assertTrue(alice.bot.isShellActive("Contact already added"));
-        alice.bot.closeShell("Contact already added");
+        alice.eclipseWindow.waitUntilShellActive("Contact already added");
+        assertTrue(alice.eclipseWindow.isShellActive("Contact already added"));
+        alice.eclipseWindow.closeShell("Contact already added");
     }
 
 }

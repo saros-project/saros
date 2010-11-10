@@ -29,10 +29,10 @@ public class TestSVN {
     public static void initMusicians() throws Exception {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.bot.importProjectFromSVN(BotConfiguration.SVN_URL);
+        alice.packageExplorerV.importProjectFromSVN(BotConfiguration.SVN_URL);
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME_SVN_TRUNK,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.bot.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
     }
 
     @AfterClass
@@ -62,7 +62,7 @@ public class TestSVN {
         alice.state.isDriver(alice.jid);
         alice.state.isParticipant(bob.jid);
         bob.state.isObserver(bob.jid);
-        assertTrue(bob.bot.isInSVN());
+        assertTrue(bob.eclipseState.isInSVN());
 
     }
 
@@ -80,10 +80,10 @@ public class TestSVN {
     @Test
     public void testSwitch() throws RemoteException {
 
-        alice.bot.switchToTag();
-        bob.bot.waitUntilShellClosed("Saros running VCS operation");
-        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.bot.getURLOfRemoteResource(CLS_PATH)));
+        alice.packageExplorerV.switchToTag();
+        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
 
     }
 
@@ -100,13 +100,15 @@ public class TestSVN {
      */
     @Test
     public void testDisconnectAndConnect() throws RemoteException {
-        alice.bot.disConnectSVN();
-        bob.bot.waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
-        assertFalse(bob.bot.isInSVN());
+        alice.packageExplorerV.disConnectSVN();
+        bob.eclipseState
+            .waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertFalse(bob.eclipseState.isInSVN());
 
-        alice.bot.connectSVN();
-        bob.bot.waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
-        assertTrue(bob.bot.isInSVN());
+        alice.packageExplorerV.connectSVN();
+        bob.eclipseState
+            .waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertTrue(bob.eclipseState.isInSVN());
     }
 
     /**
@@ -122,10 +124,10 @@ public class TestSVN {
      */
     @Test
     public void testUpdate() throws RemoteException {
-        alice.bot.switchToOtherRevision();
-        bob.bot.waitUntilShellClosed("Saros running VCS operation");
-        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.bot.getURLOfRemoteResource(CLS_PATH)));
+        alice.packageExplorerV.switchToOtherRevision();
+        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
     }
 
     /**
@@ -142,10 +144,10 @@ public class TestSVN {
      */
     @Test
     public void testUpdateSingleFile() throws RemoteException {
-        alice.bot.switchToOtherRevision(CLS_PATH);
-        bob.bot.waitUntilShellClosed("Saros running VCS operation");
-        assertTrue(alice.bot.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.bot.getURLOfRemoteResource(CLS_PATH)));
+        alice.packageExplorerV.switchToOtherRevision(CLS_PATH);
+        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
     }
 
     /**
@@ -163,11 +165,11 @@ public class TestSVN {
      */
     @Test
     public void testRevert() throws RemoteException {
-        alice.bot.deleteProject(CLS_PATH);
+        alice.eclipseState.deleteProject(CLS_PATH);
         bob.bot.sleep(1000);
-        assertFalse(bob.bot.isResourceExist(CLS_PATH));
-        alice.bot.revert();
+        assertFalse(bob.eclipseState.isResourceExist(CLS_PATH));
+        alice.packageExplorerV.revert();
         bob.bot.sleep(1000);
-        assertTrue(bob.bot.isResourceExist(CLS_PATH));
+        assertTrue(bob.eclipseState.isResourceExist(CLS_PATH));
     }
 }

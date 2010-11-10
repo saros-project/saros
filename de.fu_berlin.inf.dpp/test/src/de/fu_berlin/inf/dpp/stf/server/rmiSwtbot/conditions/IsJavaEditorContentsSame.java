@@ -29,7 +29,8 @@ public class IsJavaEditorContentsSame extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.getTextOfJavaEditor(projectName, packageName, className)
+        return bot1.getEclipseEditorObject()
+            .getTextOfJavaEditor(projectName, packageName, className)
             .equals(file);
     }
 }

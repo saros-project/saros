@@ -2,78 +2,74 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class PopUpWindowObject implements IPopUpWindowObject {
-    private transient static final Logger log = Logger
-        .getLogger(PopUpWindowObject.class);
+public class PopUpWindowObject extends SarosObject implements
+    ISarosWindowObject {
 
-    private SarosRmiSWTWorkbenchBot rmiBot;
     public static PopUpWindowObject classVariable;
 
-    public PopUpWindowObject() {
-        // Default constructor needed for RMI
-    }
-
-    public PopUpWindowObject(SarosRmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
+    public PopUpWindowObject(SarosRmiSWTWorkbenchBot sarosRmiBot) {
+        super(sarosRmiBot);
     }
 
     public void IncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        rmiBot.confirmWindow(
+        rmiBot.eclipseWindowObject.confirmWindow(
             SarosConstant.SHELL_TITLE_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException {
-        rmiBot.waitUntilShellActive("Problem Occurred");
+        windowObject.waitUntilShellActive("Problem Occurred");
         RmiSWTWorkbenchBot.delegate.text().getText()
             .matches("*." + plainJID + ".*");
-        rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_OK).click();
     }
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException {
-        rmiBot.waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+        windowObject
+            .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
         RmiSWTWorkbenchBot.delegate.textWithLabel(
             SarosConstant.TEXT_LABEL_JABBER_ID).setText(plainJID);
-        rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
 
     public void comfirmInvitationWindow(String inviteeJID)
         throws RemoteException {
-        rmiBot.waitUntilShellActive("Invitation");
-        rmiBot.confirmWindowWithCheckBox("Invitation",
+        windowObject.waitUntilShellActive("Invitation");
+        rmiBot.eclipseWindowObject.confirmWindowWithCheckBox("Invitation",
             SarosConstant.BUTTON_FINISH, inviteeJID);
     }
 
     public void confirmRequestOfSubscriptionReceivedWindow()
         throws RemoteException {
-        rmiBot
+        windowObject
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        rmiBot.confirmWindow(
+        rmiBot.eclipseWindowObject.confirmWindow(
             SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
             SarosConstant.BUTTON_OK);
     }
 
     public void confirmInvitationWindow(String... invitees)
         throws RemoteException {
-        rmiBot.windowObject
+        windowObject
             .activateShellWithText(SarosConstant.SHELL_TITLE_INVITATION);
-        rmiBot.confirmWindowWithCheckBox(SarosConstant.SHELL_TITLE_INVITATION,
-            SarosConstant.BUTTON_FINISH, invitees);
+        rmiBot.eclipseWindowObject.confirmWindowWithCheckBox(
+            SarosConstant.SHELL_TITLE_INVITATION, SarosConstant.BUTTON_FINISH,
+            invitees);
     }
 
     public void confirmSessionInvitationWizard(String inviter,
         String projectname) throws RemoteException {
-        rmiBot
+        windowObject
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         confirmSessionInvitationWindowStep1();
         confirmSessionInvitationWindowStep2UsingNewproject(projectname);
@@ -103,8 +99,7 @@ public class PopUpWindowObject implements IPopUpWindowObject {
     public void confirmCreateNewUserAccountWindow(String server,
         String username, String password) throws RemoteException {
         try {
-            rmiBot.windowObject
-                .activateShellWithText("Create New User Account");
+            windowObject.activateShellWithText("Create New User Account");
             RmiSWTWorkbenchBot.delegate.textWithLabel("Jabber Server").setText(
                 server);
             RmiSWTWorkbenchBot.delegate.textWithLabel("Username").setText(
@@ -131,11 +126,11 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         // log.warn("inviter does not match: " + inviter);
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project1.png");
-        rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
+        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_NEXT).click();
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project2.png");
-        rmiBot.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
     }
 
     /**
@@ -152,7 +147,7 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project4.png");
-        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
@@ -160,26 +155,27 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         String projectName) throws RemoteException {
         RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
         RmiSWTWorkbenchBot.delegate.button("Browse").click();
-        rmiBot.confirmWindowWithTree("Folder Selection",
+        windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
 
-        rmiBot.confirmWindow("Warning: Local changes will be deleted",
-            SarosConstant.BUTTON_YES);
+        rmiBot.eclipseWindowObject.confirmWindow(
+            "Warning: Local changes will be deleted", SarosConstant.BUTTON_YES);
 
         /*
          * if there are some files locally, which are not saved yet, you will
          * get a popup window with the title "Save Resource" after you comfirm
          * the window "Warning: Local changes will be deleted" with YES.
          */
-        if (rmiBot.isShellActive("Save Resource")) {
-            rmiBot.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+        if (rmiBot.eclipseWindowObject.isShellActive("Save Resource")) {
+            rmiBot.eclipseWindowObject.confirmWindow("Save Resource",
+                SarosConstant.BUTTON_YES);
             /*
              * it take some more time for the session invitation if you don't
              * save your files locally. So rmiBot need to wait until the
              * invitation is finished.
              */
-            rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+            windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
                 .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         }
 
@@ -194,8 +190,9 @@ public class PopUpWindowObject implements IPopUpWindowObject {
          * that rmiBot wait until the invitation is finished). Otherwise you may
          * get the WidgetNotfoundException.
          */
-        if (rmiBot.isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION)) {
-            rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        if (rmiBot.eclipseWindowObject
+            .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION)) {
+            windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
                 .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         }
 
@@ -205,23 +202,23 @@ public class PopUpWindowObject implements IPopUpWindowObject {
         String projectName) throws RemoteException {
         RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
         RmiSWTWorkbenchBot.delegate.button("Browse").click();
-        rmiBot.confirmWindowWithTree("Folder Selection",
+        windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
-        rmiBot.confirmWindow("Warning: Local changes will be deleted",
-            SarosConstant.BUTTON_NO);
+        rmiBot.eclipseWindowObject.confirmWindow(
+            "Warning: Local changes will be deleted", SarosConstant.BUTTON_NO);
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
         String projectName) throws RemoteException {
         RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
         RmiSWTWorkbenchBot.delegate.button("Browse").click();
-        rmiBot.confirmWindowWithTree("Folder Selection",
+        windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
         RmiSWTWorkbenchBot.delegate.checkBox(
             "Create copy for working distributed. New project name:").click();
         RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
-        rmiBot.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 

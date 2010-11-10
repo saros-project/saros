@@ -118,7 +118,7 @@ public class TestParallelInvitationWithTerminationByHost {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -130,26 +130,26 @@ public class TestParallelInvitationWithTerminationByHost {
 
         alice.bot.shareProject(PROJECT, peersName);
 
-        bob.bot.waitUntilShellActive("Session Invitation");
+        bob.eclipseWindow.waitUntilShellActive("Session Invitation");
         alice.bot.cancelInvitation(0);
-        bob.bot.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(bob.bot.isShellActive("Invitation Cancelled"));
-        bob.bot.closeShell("Invitation Cancelled");
+        bob.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(bob.eclipseWindow.isShellActive("Invitation Cancelled"));
+        bob.eclipseWindow.closeShell("Invitation Cancelled");
 
-        carl.bot.waitUntilShellActive("Session Invitation");
+        carl.eclipseWindow.waitUntilShellActive("Session Invitation");
         carl.popupWindow.confirmSessionInvitationWindowStep1();
         alice.bot.cancelInvitation(0);
-        carl.bot.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(carl.bot.isShellActive("Invitation Cancelled"));
-        carl.bot.closeShell("Invitation Cancelled");
+        carl.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(carl.eclipseWindow.isShellActive("Invitation Cancelled"));
+        carl.eclipseWindow.closeShell("Invitation Cancelled");
 
-        dave.bot.waitUntilShellActive("Session Invitation");
+        dave.eclipseWindow.waitUntilShellActive("Session Invitation");
         dave.popupWindow.confirmSessionInvitationWindowStep1();
         dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         alice.bot.cancelInvitation(0);
-        dave.bot.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(dave.bot.isShellActive("Invitation Cancelled"));
-        dave.bot.closeShell("Invitation Cancelled");
+        dave.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(dave.eclipseWindow.isShellActive("Invitation Cancelled"));
+        dave.eclipseWindow.closeShell("Invitation Cancelled");
 
     }
 }

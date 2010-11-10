@@ -59,10 +59,10 @@ public class TestHostAsDriverInvitesBelatedly {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.bot.newClass(PROJECT, PKG, CLS2);
-        bob.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        bob.bot.newClass(PROJECT, PKG, CLS2);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
+        bob.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        bob.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
 
         /*
          * alice build session with carl and is followed by carl.
@@ -149,12 +149,15 @@ public class TestHostAsDriverInvitesBelatedly {
         bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProject(PROJECT);
 
-        String CLSContentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
-        String CLS2ContentOfAlice = alice.bot.getClassContent(PROJECT, PKG,
-            CLS2);
+        String CLSContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG, CLS);
+        String CLS2ContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG, CLS2);
 
-        String CLSContentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS);
-        String CLS2ContentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS2);
+        String CLSContentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
+            CLS);
+        String CLS2ContentOfBob = bob.eclipseState.getClassContent(PROJECT,
+            PKG, CLS2);
 
         assertTrue(CLSContentOfAlice.equals(CLSContentOfBob));
         assertTrue(CLS2ContentOfAlice.equals(CLS2ContentOfBob));

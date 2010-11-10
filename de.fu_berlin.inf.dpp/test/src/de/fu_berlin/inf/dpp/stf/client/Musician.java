@@ -16,10 +16,15 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IPopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 
 /**
@@ -30,11 +35,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionVie
 public class Musician {
     private static final Logger log = Logger.getLogger(Musician.class);
 
+    public IEclipseWindowObject eclipseWindow;
+    public IEclipseState eclipseState;
+    public IEclipseEditorObject eclipseEditor;
+    public IPackageExplorerViewObject packageExplorerV;
+    public IEclipseMainMenuObject eclipseMainMenu;
+
     public ISarosRmiSWTWorkbenchBot bot;
     public ISarosState state;
     public IRosterViewObject rosterV;
-    public IPopUpWindowObject popupWindow;
+    public ISarosWindowObject popupWindow;
     public ISessionViewObject sessionV;
+
     public JID jid;
     public String password;
     public String host;
@@ -58,9 +70,9 @@ public class Musician {
         log.trace("activeEclipseShell");
         bot.activateEclipseShell();
         log.trace("closeWelcomeView");
-        bot.closeWelcomeView();
+        packageExplorerV.closeWelcomeView();
         log.trace("openJavaPerspective");
-        bot.openPerspectiveJava();
+        eclipseMainMenu.openPerspectiveJava();
         log.trace("openSarosViews");
         bot.openSarosViews();
         log.trace("xmppConnect");
@@ -73,22 +85,32 @@ public class Musician {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
             bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
+            state = (ISarosState) registry.lookup("state");
+            /*
+             * TODO i am not sure, if i can pass the local value to remote
+             * object. It worked for the local tests, but i don't know if it
+             * work for the remote tests too.
+             */
+            state.setJID(jid);
+
+            rosterV = (IRosterViewObject) registry.lookup("rosterView");
+            popupWindow = (ISarosWindowObject) registry.lookup("popUpWindow");
+            sessionV = (ISessionViewObject) registry.lookup("sessionView");
+
+            eclipseWindow = (IEclipseWindowObject) registry
+                .lookup("eclipseWindow");
+            eclipseState = (IEclipseState) registry.lookup("eclipseState");
+            eclipseEditor = (IEclipseEditorObject) registry
+                .lookup("eclipseEditor");
+            packageExplorerV = (IPackageExplorerViewObject) registry
+                .lookup("packageExplorerView");
+            eclipseMainMenu = (IEclipseMainMenuObject) registry
+                .lookup("eclipseMainMenu");
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
                 + ", did you start the Eclipse instance?");
         }
 
-        state = (ISarosState) registry.lookup("state");
-        /*
-         * TODO i am not sure, if i can pass the local value to remote object.
-         * It worked for the local tests, but i don't know if it work for the
-         * remote tests too.
-         */
-        state.setJID(jid);
-
-        rosterV = (IRosterViewObject) registry.lookup("rosterView");
-        popupWindow = (IPopUpWindowObject) registry.lookup("popUpWindow");
-        sessionV = (ISessionViewObject) registry.lookup("sessionView");
     }
 
     /*************** Component, which consist of other simple functions ******************/
@@ -153,18 +175,21 @@ public class Musician {
     public void leaveSessionFirst(Musician... musicians)
         throws RemoteException, InterruptedException {
         sessionV.leaveTheSession();
-        bot.confirmWindow("Confirm Closing Session", SarosConstant.BUTTON_YES);
-        bot.waitUntilSessionCloses();
+        eclipseWindow.confirmWindow("Confirm Closing Session",
+            SarosConstant.BUTTON_YES);
+        sessionV.waitUntilSessionCloses();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < musicians.length; i++) {
             final Musician musician = musicians[i];
             closeSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.bot.waitUntilShellActive("Closing the Session");
-                    musician.bot.confirmWindow("Closing the Session",
+                    musician.eclipseWindow
+                        .waitUntilShellActive("Closing the Session");
+                    musician.eclipseWindow.confirmWindow("Closing the Session",
                         SarosConstant.BUTTON_OK);
-                    musician.bot.waitUntilShellClosed("Closing the Session");
+                    musician.eclipseWindow
+                        .waitUntilShellCloses("Closing the Session");
                     return null;
                 }
             });
@@ -204,9 +229,9 @@ public class Musician {
             peerJIDs.add(musician.jid);
         }
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
-        bot.waitUntilAllPeersLeaveSession(peerJIDs);
+        sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
         sessionV.leaveTheSession();
-        bot.waitUntilSessionCloses();
+        sessionV.waitUntilSessionCloses();
     }
 
     /**

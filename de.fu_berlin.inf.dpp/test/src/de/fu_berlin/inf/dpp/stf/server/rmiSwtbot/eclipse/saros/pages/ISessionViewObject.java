@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
@@ -70,6 +71,11 @@ public interface ISessionViewObject extends Remote {
      */
     public boolean isSessionViewOpen() throws RemoteException;
 
+    public void waitUntilSessionOpen() throws RemoteException;
+
+    public void waitUntilSessionOpenBy(ISarosState state)
+        throws RemoteException;
+
     /**
      * @see ViewObject#setFocusOnViewByTitle(String)
      * @throws RemoteException
@@ -89,6 +95,11 @@ public interface ISessionViewObject extends Remote {
      * @see ViewObject#closeViewById(String)
      */
     public void closeSessionView() throws RemoteException;
+
+    public void waitUntilSessionCloses() throws RemoteException;
+
+    public void waitUntilSessionClosedBy(ISarosState state)
+        throws RemoteException;
 
     /**
      * Test if a contact exists in the contact list in the session view.
@@ -293,6 +304,8 @@ public interface ISessionViewObject extends Remote {
     public boolean isStopFollowingThisUserVisible(String contactName)
         throws RemoteException;
 
+    public void waitUntilFollowed(String plainJID) throws RemoteException;
+
     public void shareYourScreenWithSelectedUser(ISarosState respondentState)
         throws RemoteException;
 
@@ -312,6 +325,9 @@ public interface ISessionViewObject extends Remote {
     public void enableDisableFollowMode() throws RemoteException;
 
     public void leaveTheSession() throws RemoteException;
+
+    public void waitUntilAllPeersLeaveSession(List<JID> jids)
+        throws RemoteException;
 
     public void jumpToPositionOfSelectedUser(String participantJID, String sufix)
         throws RemoteException;

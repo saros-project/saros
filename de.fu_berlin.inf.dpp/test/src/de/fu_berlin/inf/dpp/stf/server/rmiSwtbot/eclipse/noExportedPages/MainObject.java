@@ -11,26 +11,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class MainObject {
-    private static final transient Logger log = Logger
-        .getLogger(MainObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private ViewObject viewObject;
-    private SarosSWTBot bot;
+public class MainObject extends EclipseObject {
 
     public MainObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
-        this.viewObject = rmiBot.viewObject;
+        super(rmiBot);
     }
 
     public String[] changeToRegex(String... texts) {

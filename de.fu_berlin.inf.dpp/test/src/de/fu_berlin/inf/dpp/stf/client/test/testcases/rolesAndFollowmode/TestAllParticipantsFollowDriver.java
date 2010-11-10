@@ -59,8 +59,8 @@ public class TestAllParticipantsFollowDriver {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.bot.closejavaEditorWithoutSave(CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -109,18 +109,18 @@ public class TestAllParticipantsFollowDriver {
 
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        assertFalse(bob.bot.isClassOpen(CLS));
-        assertFalse(carl.bot.isClassOpen(CLS));
-        assertFalse(dave.bot.isClassOpen(CLS));
+        assertFalse(bob.eclipseEditor.isClassOpen(CLS));
+        assertFalse(carl.eclipseEditor.isClassOpen(CLS));
+        assertFalse(dave.eclipseEditor.isClassOpen(CLS));
 
-        alice.bot.openClass(PROJECT, PKG, CLS);
-        bob.bot.waitUntilJavaEditorOpen(CLS);
-        carl.bot.waitUntilJavaEditorOpen(CLS);
-        dave.bot.waitUntilJavaEditorOpen(CLS);
+        alice.packageExplorerV.openClass(PROJECT, PKG, CLS);
+        bob.eclipseEditor.waitUntilJavaEditorOpen(CLS);
+        carl.eclipseEditor.waitUntilJavaEditorOpen(CLS);
+        dave.eclipseEditor.waitUntilJavaEditorOpen(CLS);
 
-        assertTrue(bob.bot.isClassOpen(CLS));
-        assertTrue(carl.bot.isClassOpen(CLS));
-        assertTrue(dave.bot.isClassOpen(CLS));
+        assertTrue(bob.eclipseEditor.isClassOpen(CLS));
+        assertTrue(carl.eclipseEditor.isClassOpen(CLS));
+        assertTrue(dave.eclipseEditor.isClassOpen(CLS));
 
     }
 
@@ -132,60 +132,61 @@ public class TestAllParticipantsFollowDriver {
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
         alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        String dirtyClsContentOfAlice = alice.bot.getTextOfJavaEditor(PROJECT,
-            PKG, CLS);
+        String dirtyClsContentOfAlice = alice.eclipseEditor
+            .getTextOfJavaEditor(PROJECT, PKG, CLS);
 
-        bob.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice, PROJECT,
-            PKG, CLS);
-        assertTrue(bob.bot.isJavaEditorActive(CLS));
-        assertTrue(bob.bot.isClassDirty(PROJECT, PKG, CLS,
+        bob.eclipseEditor.waitUntilJavaEditorContentSame(
+            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(bob.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
-            dirtyClsContentOfAlice));
+        assertTrue(bob.eclipseEditor.getTextOfJavaEditor(PROJECT, PKG, CLS)
+            .equals(dirtyClsContentOfAlice));
 
-        carl.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
-            PROJECT, PKG, CLS);
-        assertTrue(carl.bot.isJavaEditorActive(CLS));
-        assertTrue(carl.bot.isClassDirty(PROJECT, PKG, CLS,
+        carl.eclipseEditor.waitUntilJavaEditorContentSame(
+            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        assertTrue(carl.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(carl.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(carl.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
-            dirtyClsContentOfAlice));
+        assertTrue(carl.eclipseEditor.getTextOfJavaEditor(PROJECT, PKG, CLS)
+            .equals(dirtyClsContentOfAlice));
 
-        dave.bot.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
-            PROJECT, PKG, CLS);
-        assertTrue(dave.bot.isJavaEditorActive(CLS));
-        assertTrue(dave.bot.isClassDirty(PROJECT, PKG, CLS,
+        dave.eclipseEditor.waitUntilJavaEditorContentSame(
+            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        assertTrue(dave.eclipseEditor.isJavaEditorActive(CLS));
+        assertTrue(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(dave.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
-            dirtyClsContentOfAlice));
-        bob.bot.closeJavaEditorWithSave(CLS);
-        carl.bot.closeJavaEditorWithSave(CLS);
-        dave.bot.closeJavaEditorWithSave(CLS);
-        alice.bot.closeJavaEditorWithSave(CLS);
+        assertTrue(dave.eclipseEditor.getTextOfJavaEditor(PROJECT, PKG, CLS)
+            .equals(dirtyClsContentOfAlice));
+        bob.eclipseEditor.closeJavaEditorWithSave(CLS);
+        carl.eclipseEditor.closeJavaEditorWithSave(CLS);
+        dave.eclipseEditor.closeJavaEditorWithSave(CLS);
+        alice.eclipseEditor.closeJavaEditorWithSave(CLS);
     }
 
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.bot.openClass(PROJECT, PKG, CLS);
-        bob.bot.waitUntilJavaEditorOpen(CLS);
-        carl.bot.waitUntilJavaEditorOpen(CLS);
-        dave.bot.waitUntilJavaEditorOpen(CLS);
+        alice.packageExplorerV.openClass(PROJECT, PKG, CLS);
+        bob.eclipseEditor.waitUntilJavaEditorOpen(CLS);
+        carl.eclipseEditor.waitUntilJavaEditorOpen(CLS);
+        dave.eclipseEditor.waitUntilJavaEditorOpen(CLS);
         alice.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
 
-        alice.bot.closeJavaEditorWithSave(CLS);
-        String clsContentOfAlice = alice.bot.getClassContent(PROJECT, PKG, CLS);
-        bob.bot.waitUntilJavaEditorClosed(CLS);
-        assertFalse(bob.bot.isClassOpen(CLS));
-        carl.bot.waitUntilJavaEditorClosed(CLS);
-        assertFalse(carl.bot.isClassOpen(CLS));
-        dave.bot.waitUntilJavaEditorClosed(CLS);
-        assertFalse(dave.bot.isClassOpen(CLS));
-        assertTrue(bob.bot.getClassContent(PROJECT, PKG, CLS).equals(
+        alice.eclipseEditor.closeJavaEditorWithSave(CLS);
+        String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG, CLS);
+        bob.eclipseEditor.waitUntilJavaEditorClosed(CLS);
+        assertFalse(bob.eclipseEditor.isClassOpen(CLS));
+        carl.eclipseEditor.waitUntilJavaEditorClosed(CLS);
+        assertFalse(carl.eclipseEditor.isClassOpen(CLS));
+        dave.eclipseEditor.waitUntilJavaEditorClosed(CLS);
+        assertFalse(dave.eclipseEditor.isClassOpen(CLS));
+        assertTrue(bob.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
-        assertTrue(carl.bot.getClassContent(PROJECT, PKG, CLS).equals(
+        assertTrue(carl.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
-        assertTrue(bob.bot.getClassContent(PROJECT, PKG, CLS).equals(
+        assertTrue(bob.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
     }
 }

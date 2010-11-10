@@ -30,7 +30,7 @@ public class TestShare2UsersSequentially {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -61,7 +61,7 @@ public class TestShare2UsersSequentially {
             PROJECT, PKG, CLS);
 
         log.trace("invitee.openFile");
-        bob.bot.openClass(PROJECT, PKG, CLS);
+        bob.packageExplorerV.openClass(PROJECT, PKG, CLS);
 
         // invitee.sleep(2000);
         assertTrue(bob.state.isParticipant(bob.jid));

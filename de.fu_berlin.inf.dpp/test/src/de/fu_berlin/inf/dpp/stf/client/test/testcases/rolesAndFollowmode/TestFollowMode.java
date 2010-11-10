@@ -30,7 +30,7 @@ public class TestFollowMode {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS1);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS1);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -63,21 +63,22 @@ public class TestFollowMode {
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
             PROJECT, PKG, CLS1);
         bob.sessionV.followThisUser(alice.state);
-        bob.bot.waitUntilJavaEditorActive(CLS1);
+        bob.eclipseEditor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.state.isInFollowMode());
-        assertTrue(bob.bot.isJavaEditorActive(CLS1));
+        assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS1));
 
-        String clsContentOfAlice = alice.bot
-            .getClassContent(PROJECT, PKG, CLS1);
+        String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG, CLS1);
 
-        bob.bot.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
+        bob.eclipseState.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
             clsContentOfAlice);
-        String clsContentOfBob = bob.bot.getClassContent(PROJECT, PKG, CLS1);
+        String clsContentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
+            CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.bot.newClass(PROJECT, PKG, CLS2);
-        bob.bot.waitUntilJavaEditorActive(CLS2);
-        assertTrue(bob.bot.isJavaEditorActive(CLS2));
+        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
+        bob.eclipseEditor.waitUntilJavaEditorActive(CLS2);
+        assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS2));
 
         /*
          * After new release 10.10.28 all of the observer is automatically in
@@ -86,17 +87,17 @@ public class TestFollowMode {
          * comment out, otherwise you should get WidgetNotFoundException.
          */
         // alice.sessionV.followThisUser(bob.state);
-        bob.bot.activateJavaEditor(CLS1);
-        alice.bot.waitUntilJavaEditorActive(CLS1);
+        bob.eclipseEditor.activateJavaEditor(CLS1);
+        alice.eclipseEditor.waitUntilJavaEditorActive(CLS1);
         assertTrue(alice.state.isInFollowMode());
-        assertTrue(alice.bot.isJavaEditorActive(CLS1));
+        assertTrue(alice.eclipseEditor.isJavaEditorActive(CLS1));
 
         bob.sessionV.followThisUser(alice.state);
-        alice.bot.newClass(PROJECT, PKG, CLS3);
-        alice.bot.waitUntilJavaEditorActive(CLS3);
+        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS3);
+        alice.eclipseEditor.waitUntilJavaEditorActive(CLS3);
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3,
             PROJECT, PKG, CLS3);
-        alice.bot.setBreakPoint(13, PROJECT, PKG, CLS3);
+        alice.eclipseEditor.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
         // bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);

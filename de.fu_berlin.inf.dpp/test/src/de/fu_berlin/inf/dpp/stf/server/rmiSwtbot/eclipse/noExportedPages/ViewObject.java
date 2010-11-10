@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
 /**
@@ -34,7 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
  * 
  * @author Lin
  */
-public class ViewObject extends NoExportedObject {
+public class ViewObject extends EclipseObject {
 
     /**
      * Creates an instance of a viewObject.<br/>
@@ -132,7 +133,7 @@ public class ViewObject extends NoExportedObject {
             menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            rmiBot.confirmWindowWithTreeWithFilterText(
+            rmiBot.eclipseWindowObject.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }

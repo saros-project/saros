@@ -30,4 +30,8 @@ public interface IRosterViewObject extends Remote {
     public void clickTBConnectInRosterView() throws RemoteException;
 
     public boolean clickTBDisconnectInRosterView() throws RemoteException;
+
+    public void waitUntilConnected() throws RemoteException;
+
+    public void waitUntilDisConnected() throws RemoteException;
 }

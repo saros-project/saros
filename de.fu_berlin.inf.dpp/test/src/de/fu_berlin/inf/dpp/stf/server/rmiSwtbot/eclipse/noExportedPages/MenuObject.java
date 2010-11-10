@@ -1,23 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class MenuObject {
-    private static final transient Logger log = Logger
-        .getLogger(MenuObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private SarosSWTBot bot;
+public class MenuObject extends EclipseObject {
 
     public MenuObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
+        super(rmiBot);
     }
 
     public void clickMenuWithTexts(String... texts) {

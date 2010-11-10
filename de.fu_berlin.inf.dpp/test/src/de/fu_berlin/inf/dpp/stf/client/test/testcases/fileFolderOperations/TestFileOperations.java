@@ -38,7 +38,7 @@ public class TestFileOperations {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
         carl.sessionV.followThisUser(alice.state);
@@ -46,12 +46,12 @@ public class TestFileOperations {
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.bot.existsClass(PROJECT, PKG, CLS))
-            alice.bot.newClass(PROJECT, PKG, CLS);
-        if (alice.bot.existsClass(PROJECT, PKG, CLS2))
-            alice.bot.deleteClass(PROJECT, PKG, CLS2);
-        if (alice.bot.isPkgExist(PROJECT, PKG2))
-            alice.bot.deletePkg(PROJECT, PKG2);
+        if (!alice.eclipseState.existsClass(PROJECT, PKG, CLS))
+            alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS);
+        if (alice.eclipseState.existsClass(PROJECT, PKG, CLS2))
+            alice.eclipseState.deleteClass(PROJECT, PKG, CLS2);
+        if (alice.eclipseState.isPkgExist(PROJECT, PKG2))
+            alice.eclipseState.deletePkg(PROJECT, PKG2);
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();
@@ -74,83 +74,85 @@ public class TestFileOperations {
     @Test
     public void testRenameFile() throws RemoteException {
         // alice.renameFile(
-        alice.bot.renameClass(CLS2, PROJECT, PKG, CLS);
-        bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        carl.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertFalse(bob.bot.existsClass(PROJECT, PKG, CLS));
-        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(carl.bot.existsClass(PROJECT, PKG, CLS));
-        assertTrue(carl.bot.existsClass(PROJECT, PKG, CLS2));
+        alice.packageExplorerV.renameClass(CLS2, PROJECT, PKG, CLS);
+        bob.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);
+        carl.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);
+        assertFalse(bob.eclipseState.existsClass(PROJECT, PKG, CLS));
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(carl.eclipseState.existsClass(PROJECT, PKG, CLS));
+        assertTrue(carl.eclipseState.existsClass(PROJECT, PKG, CLS2));
     }
 
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.bot.deleteClass(PROJECT, PKG, CLS);
-        bob.bot.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(bob.bot.existsClass(PROJECT, PKG, CLS));
-        carl.bot.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(carl.bot.existsClass(PROJECT, PKG, CLS));
+        alice.eclipseState.deleteClass(PROJECT, PKG, CLS);
+        bob.eclipseState.waitUntilClassNotExist(PROJECT, PKG, CLS);
+        assertFalse(bob.eclipseState.existsClass(PROJECT, PKG, CLS));
+        carl.eclipseState.waitUntilClassNotExist(PROJECT, PKG, CLS);
+        assertFalse(carl.eclipseState.existsClass(PROJECT, PKG, CLS));
     }
 
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
-        alice.bot.newPackage(PROJECT, PKG2);
-        bob.bot.waitUntilPkgExist(PROJECT, PKG2);
-        carl.bot.waitUntilPkgExist(PROJECT, PKG2);
-        assertTrue(bob.bot.isPkgExist(PROJECT, PKG2));
-        assertTrue(carl.bot.isPkgExist(PROJECT, PKG2));
+        alice.eclipseMainMenu.newPackage(PROJECT, PKG2);
+        bob.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
+        carl.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
+        assertTrue(bob.eclipseState.isPkgExist(PROJECT, PKG2));
+        assertTrue(carl.eclipseState.isPkgExist(PROJECT, PKG2));
 
-        alice.bot.newClass(PROJECT, PKG2, CLS);
-        bob.bot.waitUntilClassExist(PROJECT, PKG2, CLS);
-        carl.bot.waitUntilClassExist(PROJECT, PKG2, CLS);
-        assertTrue(bob.bot.existsClass(PROJECT, PKG2, CLS));
-        assertTrue(carl.bot.existsClass(PROJECT, PKG2, CLS));
+        alice.eclipseMainMenu.newClass(PROJECT, PKG2, CLS);
+        bob.eclipseState.waitUntilClassExist(PROJECT, PKG2, CLS);
+        carl.eclipseState.waitUntilClassExist(PROJECT, PKG2, CLS);
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG2, CLS));
+        assertTrue(carl.eclipseState.existsClass(PROJECT, PKG2, CLS));
 
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
             PROJECT, PKG2, CLS);
-        String clsContentOfAlice = alice.bot
-            .getClassContent(PROJECT, PKG2, CLS);
-        carl.bot.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
+        String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
+            PKG2, CLS);
+        carl.eclipseState.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
             clsContentOfAlice);
-        bob.bot.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
+        bob.eclipseState.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
             clsContentOfAlice);
-        String clsContentOfBob = bob.bot.getClassContent(PROJECT, PKG2, CLS);
-        String clsContentOfCarl = carl.bot.getClassContent(PROJECT, PKG2, CLS);
+        String clsContentOfBob = bob.eclipseState.getClassContent(PROJECT,
+            PKG2, CLS);
+        String clsContentOfCarl = carl.eclipseState.getClassContent(PROJECT,
+            PKG2, CLS);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
         assertTrue(clsContentOfCarl.equals(clsContentOfAlice));
     }
 
     @Test
     public void testMoveClass() throws RemoteException {
-        alice.bot.newPackage(PROJECT, PKG2);
-        alice.bot.newClass(PROJECT, PKG2, CLS2);
-        alice.bot.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
-        bob.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        carl.bot.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertTrue(bob.bot.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(bob.bot.existsClass(PROJECT, PKG2, CLS2));
-        assertTrue(carl.bot.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(carl.bot.existsClass(PROJECT, PKG2, CLS2));
+        alice.eclipseMainMenu.newPackage(PROJECT, PKG2);
+        alice.eclipseMainMenu.newClass(PROJECT, PKG2, CLS2);
+        alice.packageExplorerV.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
+        bob.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);
+        carl.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);
+        assertTrue(bob.eclipseState.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(bob.eclipseState.existsClass(PROJECT, PKG2, CLS2));
+        assertTrue(carl.eclipseState.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(carl.eclipseState.existsClass(PROJECT, PKG2, CLS2));
     }
 
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.bot.renamePkg(PKG2, PROJECT, "src", PKG);
-        bob.bot.waitUntilPkgExist(PROJECT, PKG2);
-        carl.bot.waitUntilPkgExist(PROJECT, PKG2);
-        assertFalse(bob.bot.isPkgExist(PROJECT, PKG));
-        assertTrue(bob.bot.isPkgExist(PROJECT, PKG2));
-        assertFalse(carl.bot.isPkgExist(PROJECT, PKG));
-        assertTrue(carl.bot.isPkgExist(PROJECT, PKG2));
+        alice.packageExplorerV.renamePkg(PKG2, PROJECT, "src", PKG);
+        bob.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
+        carl.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
+        assertFalse(bob.eclipseState.isPkgExist(PROJECT, PKG));
+        assertTrue(bob.eclipseState.isPkgExist(PROJECT, PKG2));
+        assertFalse(carl.eclipseState.isPkgExist(PROJECT, PKG));
+        assertTrue(carl.eclipseState.isPkgExist(PROJECT, PKG2));
     }
 
     @Test
     public void testDeletePkg() throws RemoteException {
         // alice.renameFile(
-        alice.bot.deletePkg(PROJECT, PKG);
-        bob.bot.waitUntilPkgNotExist(PROJECT, PKG);
-        carl.bot.waitUntilPkgNotExist(PROJECT, PKG);
-        assertFalse(bob.bot.isPkgExist(PROJECT, PKG));
-        assertFalse(carl.bot.isPkgExist(PROJECT, PKG));
+        alice.eclipseState.deletePkg(PROJECT, PKG);
+        bob.eclipseState.waitUntilPkgNotExist(PROJECT, PKG);
+        carl.eclipseState.waitUntilPkgNotExist(PROJECT, PKG);
+        assertFalse(bob.eclipseState.isPkgExist(PROJECT, PKG));
+        assertFalse(carl.eclipseState.isPkgExist(PROJECT, PKG));
     }
 }

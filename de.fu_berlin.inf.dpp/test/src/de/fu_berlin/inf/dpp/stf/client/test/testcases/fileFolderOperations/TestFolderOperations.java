@@ -37,17 +37,17 @@ public class TestFolderOperations {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.bot.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
     }
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.bot.existsClass(PROJECT, PKG, CLS))
-            alice.bot.newClass(PROJECT, PKG, CLS);
-        if (!alice.bot.isFolderExist(PROJECT, FOLDER))
-            alice.bot.newFolder(PROJECT, FOLDER);
+        if (!alice.eclipseState.existsClass(PROJECT, PKG, CLS))
+            alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS);
+        if (!alice.eclipseState.isFolderExist(PROJECT, FOLDER))
+            alice.eclipseMainMenu.newFolder(PROJECT, FOLDER);
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();
@@ -71,9 +71,9 @@ public class TestFolderOperations {
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER + "New";
 
-        alice.bot.renameFolder(PROJECT, FOLDER, newFolderName);
-        bob.bot.waitUntilFolderExist(PROJECT, newFolderName);
-        assertTrue(bob.bot.isFolderExist(PROJECT, newFolderName));
-        assertFalse(bob.bot.isFolderExist(PROJECT, FOLDER));
+        alice.packageExplorerV.renameFolder(PROJECT, FOLDER, newFolderName);
+        bob.eclipseState.waitUntilFolderExist(PROJECT, newFolderName);
+        assertTrue(bob.eclipseState.isFolderExist(PROJECT, newFolderName));
+        assertFalse(bob.eclipseState.isFolderExist(PROJECT, FOLDER));
     }
 }

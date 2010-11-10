@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IPopUpWindowObject extends Remote {
+public interface ISarosWindowObject extends Remote {
 
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException;

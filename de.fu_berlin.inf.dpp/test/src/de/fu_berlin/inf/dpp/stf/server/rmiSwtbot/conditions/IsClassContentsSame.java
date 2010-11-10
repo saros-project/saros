@@ -13,8 +13,8 @@ public class IsClassContentsSame extends DefaultCondition {
     private String className;
     private String otherClassContent;
 
-    IsClassContentsSame(IRmiSWTWorkbenchBot bot, String projectName, String pkg,
-        String className, String otherClassContent) {
+    IsClassContentsSame(IRmiSWTWorkbenchBot bot, String projectName,
+        String pkg, String className, String otherClassContent) {
         this.bot1 = bot;
         this.projectName = projectName;
         this.pkg = pkg;
@@ -29,7 +29,8 @@ public class IsClassContentsSame extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        String classContent = bot1.getClassContent(projectName, pkg, className);
+        String classContent = bot1.getEclipseState().getClassContent(
+            projectName, pkg, className);
         return classContent.equals(otherClassContent);
     }
 }

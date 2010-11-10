@@ -3,26 +3,19 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class EditorObject {
-    private static final transient Logger log = Logger
-        .getLogger(EditorObject.class);
-    private RmiSWTWorkbenchBot rmiBot;
-    private WaitUntilObject wUntil;
-    private SarosSWTBot bot;
+public class EditorObject extends EclipseObject {
 
     public EditorObject(RmiSWTWorkbenchBot rmiBot) {
-        this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
-        this.wUntil = rmiBot.wUntilObject;
+        super(rmiBot);
     }
 
     public void setTextinEditorWithSave(String contents, String fileName) {
@@ -125,4 +118,7 @@ public class EditorObject {
         return bot.activeEditor().getTitle().equals(name);
     }
 
+    public void waitUntilEditorActive(String name) {
+        waitUntil(SarosConditions.isEditorActive(bot, name));
+    }
 }
