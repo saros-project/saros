@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
 
 /**
  * This is used to check the state of {@link Saros} from the inside. Use this
@@ -26,12 +26,12 @@ public interface ISarosState extends Remote {
     /**
      * Test if you are now in a session. <br>
      * You can also use another function
-     * {@link ISessionViewObject#isInSession()}, which test the session state
+     * {@link SessionViewObject#isInSession()}, which test the session state
      * with GUI.
      * 
      * <p>
      * <b>Attention:</b> <br>
-     * Try to use the {@link ISessionViewObject#isInSession()} and
+     * Try to use the {@link SessionViewObject#isInSession()} and
      * {@link ISarosState#isInSession()} together in your junittests.
      * 
      * 

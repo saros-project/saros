@@ -62,9 +62,9 @@ public class TestStrictSequentialInvitationWithoutTermination {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        carl.bot.resetSaros();
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        carl.workbench.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     /**
@@ -75,11 +75,11 @@ public class TestStrictSequentialInvitationWithoutTermination {
      */
     @After
     public void cleanUp() throws RemoteException {
-        carl.bot.resetWorkbench();
+        carl.workbench.resetWorkbench();
         carl.mainMenu.newTextFileLineDelimiter("Default");
-        bob.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
         bob.mainMenu.newTextFileLineDelimiter("Default");
-        alice.bot.resetWorkbench();
+        alice.workbench.resetWorkbench();
         alice.mainMenu.newTextFileLineDelimiter("Default");
 
     }
@@ -117,10 +117,8 @@ public class TestStrictSequentialInvitationWithoutTermination {
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
 
-        String delimiterByAlice = alice.mainMenu
-            .getTextFileLineDelimiter();
-        String delimiterByCarl = carl.mainMenu
-            .getTextFileLineDelimiter();
+        String delimiterByAlice = alice.mainMenu.getTextFileLineDelimiter();
+        String delimiterByCarl = carl.mainMenu.getTextFileLineDelimiter();
         String delimiterByBob = bob.mainMenu.getTextFileLineDelimiter();
 
         log.debug("delimiter by alice: " + delimiterByAlice

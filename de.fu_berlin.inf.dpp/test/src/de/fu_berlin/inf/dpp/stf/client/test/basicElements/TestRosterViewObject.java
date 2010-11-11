@@ -20,14 +20,14 @@ public class TestRosterViewObject {
 
     @AfterClass
     public static void afterClass() throws RemoteException {
-        alice.bot.resetSaros();
-        bob.bot.resetSaros();
+        alice.workbench.resetSaros();
+        bob.workbench.resetSaros();
     }
 
     @After
     public void cleanup() throws RemoteException {
-        alice.bot.resetWorkbench();
-        bob.bot.resetWorkbench();
+        alice.workbench.resetWorkbench();
+        bob.workbench.resetWorkbench();
     }
 
     @Test

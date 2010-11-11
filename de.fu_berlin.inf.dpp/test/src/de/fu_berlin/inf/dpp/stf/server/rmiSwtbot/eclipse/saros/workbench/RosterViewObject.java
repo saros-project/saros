@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -8,7 +8,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 
-public interface IRosterViewObject extends Remote {
+public interface RosterViewObject extends Remote {
 
     public void openRosterView() throws RemoteException;
 
@@ -48,4 +48,6 @@ public interface IRosterViewObject extends Remote {
 
     public void renameContact(String contact, String newName)
         throws RemoteException;
+
+    public void xmppConnect(JID jid, String password) throws RemoteException;
 }

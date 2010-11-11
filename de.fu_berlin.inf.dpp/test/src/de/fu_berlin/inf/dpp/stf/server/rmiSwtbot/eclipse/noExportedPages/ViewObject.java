@@ -128,7 +128,7 @@ public class ViewObject extends EclipseObject {
     public void openViewWithName(String viewTitle, String category,
         String nodeName) throws RemoteException {
         if (!isViewOpen(viewTitle)) {
-            rmiBot.activateEclipseShell();
+            rmiBot.workbench.activateEclipseShell();
             menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);

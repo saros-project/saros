@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IChatViewObject extends Remote {
+public interface ChatViewObject extends Remote {
 
     public void openChatView() throws RemoteException;
 

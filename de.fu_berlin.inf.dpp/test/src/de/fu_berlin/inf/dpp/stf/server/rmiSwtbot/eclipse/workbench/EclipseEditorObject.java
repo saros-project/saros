@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -303,7 +303,7 @@ public class EclipseEditorObject extends EclipseObject implements
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException {
         String contents = SarosState.classVariable.getContents(contentPath);
-        rmiBot.activateEclipseShell();
+        rmiBot.workbench.activateEclipseShell();
         rmiBot.packageExplorerViewObject.openClass(projectName, packageName,
             className);
         activateJavaEditor(className);

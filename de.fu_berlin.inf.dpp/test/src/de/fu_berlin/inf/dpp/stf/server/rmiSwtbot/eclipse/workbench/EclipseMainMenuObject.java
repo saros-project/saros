@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
@@ -21,7 +21,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
     }
 
     public void preference() throws RemoteException {
-        rmiBot.activateEclipseShell();
+        rmiBot.workbench.activateEclipseShell();
         menuObject.clickMenuWithTexts("Window", "Preferences");
     }
 
@@ -108,7 +108,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
      */
     public void newJavaProject(String projectName) throws RemoteException {
         if (!rmiBot.eclipseState.existsProject(projectName)) {
-            rmiBot.activateEclipseShell();
+            rmiBot.workbench.activateEclipseShell();
             bot.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = bot.shell("New Java Project");
             shell.activate();
@@ -185,7 +185,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
      */
     public void newProject(String projectName) throws RemoteException {
         if (!rmiBot.eclipseState.existsProject(projectName)) {
-            rmiBot.activateEclipseShell();
+            rmiBot.workbench.activateEclipseShell();
             bot.menu("File").menu("New").menu("Project...").click();
             SWTBotShell shell = bot.shell("New Project");
             shell.activate();
@@ -224,7 +224,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
         throws RemoteException {
         if (!rmiBot.eclipseState.isPkgExist(projectName, pkg))
             try {
-                rmiBot.activateEclipseShell();
+                rmiBot.workbench.activateEclipseShell();
                 menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                     SarosConstant.MENU_TITLE_NEW, "Package");
                 rmiBot.eclipseWindowObject
@@ -268,7 +268,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
                     else
                         folders += folderPath[i] + "/";
                 }
-                rmiBot.activateEclipseShell();
+                rmiBot.workbench.activateEclipseShell();
                 bot.menu("File").menu("New").menu("Folder").click();
                 SWTBotShell shell = bot.shell("New Folder");
                 shell.activate();
@@ -295,7 +295,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
                     else
                         folders[i] = filePath[i];
                 }
-                rmiBot.activateEclipseShell();
+                rmiBot.workbench.activateEclipseShell();
                 bot.menu("File").menu("New").menu("File").click();
                 SWTBotShell shell = bot.shell("New File");
                 shell.activate();
@@ -339,7 +339,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
         throws RemoteException {
         if (!rmiBot.eclipseState.existsClass(projectName, pkg, className))
             try {
-                rmiBot.activateEclipseShell();
+                rmiBot.workbench.activateEclipseShell();
                 bot.menu("File").menu("New").menu("Class").click();
                 SWTBotShell shell = bot.shell("New Java Class");
                 shell.activate();
@@ -382,7 +382,7 @@ public class EclipseMainMenuObject extends EclipseObject implements
 
     public void newClassImplementsRunnable(String projectName, String pkg,
         String className) throws RemoteException {
-        rmiBot.activateEclipseShell();
+        rmiBot.workbench.activateEclipseShell();
         bot.menu("File").menu("New").menu("Class").click();
         SWTBotShell shell = bot.shell("New Java Class");
         shell.activate();

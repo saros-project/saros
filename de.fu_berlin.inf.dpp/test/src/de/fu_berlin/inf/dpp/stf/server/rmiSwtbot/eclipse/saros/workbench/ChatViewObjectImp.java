@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
@@ -8,11 +8,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class ChatViewObject extends EclipseObject implements IChatViewObject {
+public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
 
-    public static ChatViewObject classVariable;
+    public static ChatViewObjectImp classVariable;
 
-    public ChatViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public ChatViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

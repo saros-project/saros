@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
@@ -16,12 +16,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbe
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
-public class RosterViewObject extends EclipseObject implements
-    IRosterViewObject {
+public class RosterViewObjectImp extends EclipseObject implements
+    RosterViewObject {
 
-    public static RosterViewObject classVariable;
+    public static RosterViewObjectImp classVariable;
 
-    public RosterViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public RosterViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 
@@ -186,6 +186,27 @@ public class RosterViewObject extends EclipseObject implements
         windowObject.waitUntilShellActive("Set new nickname");
         bot.text(contact).setText(newName);
         bot.button(SarosConstant.BUTTON_OK).click();
+    }
+
+    public void xmppConnect(JID jid, String password) throws RemoteException {
+        log.trace("connectedByXMPP");
+        boolean connectedByXMPP = isConnectedByXMPP();
+        if (!connectedByXMPP) {
+            log.trace("clickTBConnectInRosterView");
+            clickTBConnectInRosterView();
+            rmiBot.eclipseBasicObject.sleep(100);// wait a bit to check if shell
+                                                 // pops
+            // up
+            log.trace("isShellActive");
+            boolean shellActive = rmiBot.eclipseWindowObject
+                .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
+            if (shellActive) {
+                log.trace("confirmSarosConfigurationWindow");
+                rmiBot.popupWindowObject.confirmSarosConfigurationWizard(
+                    jid.getDomain(), jid.getName(), password);
+            }
+            waitUntilConnected();
+        }
     }
 
 }

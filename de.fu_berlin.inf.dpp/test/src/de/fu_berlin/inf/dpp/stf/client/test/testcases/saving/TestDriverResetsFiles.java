@@ -82,11 +82,11 @@ public class TestDriverResetsFiles {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        carl.bot.resetSaros();
-        dave.bot.resetSaros();
-        edna.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        carl.workbench.resetSaros();
+        dave.workbench.resetSaros();
+        edna.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     /**
@@ -97,11 +97,11 @@ public class TestDriverResetsFiles {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        dave.bot.resetWorkbench();
-        edna.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        dave.workbench.resetWorkbench();
+        edna.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     /**

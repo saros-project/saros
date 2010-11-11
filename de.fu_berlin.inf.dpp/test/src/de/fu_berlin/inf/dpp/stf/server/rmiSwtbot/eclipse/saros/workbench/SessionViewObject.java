@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState
  * 
  * @author Lin
  */
-public interface ISessionViewObject extends Remote {
+public interface SessionViewObject extends Remote {
 
     /**
      * Test if you are now in a session. <br>
@@ -45,7 +45,7 @@ public interface ISessionViewObject extends Remote {
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use the {@link ISessionViewObject#isInSession()} and
+     * <li>Try to use the {@link SessionViewObject#isInSession()} and
      * {@link ISarosState#isInSession()} together in your junittests.</li>
      * </ol>
      * 
@@ -241,7 +241,7 @@ public interface ISessionViewObject extends Remote {
 
     /**
      * This function do same as the
-     * {@link ISessionViewObject#stopFollowingThisUser(ISarosState)} except you
+     * {@link SessionViewObject#stopFollowingThisUser(ISarosState)} except you
      * don't need to pass the {@link ISarosState} of the user followed by you to
      * the function. It is very useful, if you don't exactly know whom you are
      * now following. Instead, we get the followed user JID using the method
@@ -278,7 +278,7 @@ public interface ISessionViewObject extends Remote {
     /**
      * check if the context menu "Stop following this user" of a contact listed
      * in the session view is enabled. It would be used by
-     * {@link SessionViewObject#isInFollowMode()}.
+     * {@link SessionViewObjectImp#isInFollowMode()}.
      * 
      * @param contactName
      *            the name, which listed in the session view. e.g. "You" or
@@ -335,5 +335,9 @@ public interface ISessionViewObject extends Remote {
     public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
 
     public void invitateUser(String inviteeJID) throws RemoteException;
+
+    public void leaveSessionByHost() throws RemoteException;
+
+    public void leaveSessionByPeer() throws RemoteException;
 
 }

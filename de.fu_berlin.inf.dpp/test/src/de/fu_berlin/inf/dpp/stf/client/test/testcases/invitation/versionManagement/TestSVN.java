@@ -37,14 +37,14 @@ public class TestSVN {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @After
     public void cleanUp() throws RemoteException {
-        alice.bot.resetWorkbench();
-        bob.bot.resetWorkbench();
+        alice.workbench.resetWorkbench();
+        bob.workbench.resetWorkbench();
     }
 
     /**

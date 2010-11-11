@@ -55,13 +55,13 @@ public class RmiTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         // bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @After
     public void cleanup() throws RemoteException {
-        alice.bot.resetWorkbench();
-        alice.bot.resetSaros();
+        alice.workbench.resetWorkbench();
+        alice.workbench.resetSaros();
         // bob.bot.resetWorkbench();
     }
 
@@ -142,8 +142,7 @@ public class RmiTest {
     public void testNewTextFileLineDelimiter() throws RemoteException {
         alice.mainMenu.newTextFileLineDelimiter("Unix");
         System.out.println(alice.mainMenu.getTextFileLineDelimiter());
-        assertTrue(alice.mainMenu.getTextFileLineDelimiter().equals(
-            "Unix"));
+        assertTrue(alice.mainMenu.getTextFileLineDelimiter().equals("Unix"));
     }
 
     // @Test

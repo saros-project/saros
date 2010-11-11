@@ -1,9 +1,12 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ISarosWindowObject extends Remote {
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
+
+public interface PopUpWindowObject extends Remote {
 
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException;
@@ -55,4 +58,8 @@ public interface ISarosWindowObject extends Remote {
 
     public void cancelInivtationInSessionInvitationWindow()
         throws RemoteException;
+
+    public void confirmSessionUsingNewOrExistProject(
+        ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
+        String projectName, int typeOfSharingProject) throws RemoteException;
 }

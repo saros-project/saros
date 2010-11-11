@@ -48,14 +48,14 @@ public class TestShareProjectUsingExistingProject {
         alice.leaveSessionFirst(bob);
         alice.eclipseState.deleteProject(PROJECT);
         bob.eclipseState.deleteProject(PROJECT);
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @Test

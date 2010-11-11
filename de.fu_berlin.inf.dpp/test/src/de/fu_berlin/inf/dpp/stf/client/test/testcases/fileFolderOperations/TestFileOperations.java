@@ -52,23 +52,23 @@ public class TestFileOperations {
             alice.eclipseState.deleteClass(PROJECT, PKG, CLS2);
         if (alice.eclipseState.isPkgExist(PROJECT, PKG2))
             alice.eclipseState.deletePkg(PROJECT, PKG2);
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @After
     public void cleanUp() throws RemoteException {
-        carl.bot.resetWorkbench();
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        carl.bot.resetSaros();
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        carl.workbench.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @Test

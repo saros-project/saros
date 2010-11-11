@@ -21,19 +21,20 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.ProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SarosMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -147,10 +148,10 @@ public class StartupSaros implements IStartup {
                     bot.exportProgressViewObject(
                         ProgressViewObject.classVariable, "progressView");
 
-                    SarosMainMenuObject.classVariable = new SarosMainMenuObject(
+                    SarosMainMenuObjectImp.classVariable = new SarosMainMenuObjectImp(
                         bot);
-                    bot.exportMainMenuObject(SarosMainMenuObject.classVariable,
-                        "sarosMainMenu");
+                    bot.exportMainMenuObject(
+                        SarosMainMenuObjectImp.classVariable, "sarosMainMenu");
 
                     PackageExplorerViewObject.classVariable = new PackageExplorerViewObject(
                         bot);
@@ -176,26 +177,35 @@ public class StartupSaros implements IStartup {
                         sessionManager, dataTransferManager, editorManager);
                     bot.exportState(SarosState.classVariable, "state");
 
-                    RosterViewObject.classVariable = new RosterViewObject(bot);
-                    bot.exportRosterView(RosterViewObject.classVariable,
+                    RosterViewObjectImp.classVariable = new RosterViewObjectImp(
+                        bot);
+                    bot.exportRosterView(RosterViewObjectImp.classVariable,
                         "rosterView");
 
-                    PopUpWindowObject.classVariable = new PopUpWindowObject(bot);
-                    bot.exportPopUpWindow(PopUpWindowObject.classVariable,
+                    PopUpWindowObjectImp.classVariable = new PopUpWindowObjectImp(
+                        bot);
+                    bot.exportPopUpWindow(PopUpWindowObjectImp.classVariable,
                         "popUpWindow");
 
-                    SessionViewObject.classVariable = new SessionViewObject(bot);
-                    bot.exportSessionView(SessionViewObject.classVariable,
+                    SessionViewObjectImp.classVariable = new SessionViewObjectImp(
+                        bot);
+                    bot.exportSessionView(SessionViewObjectImp.classVariable,
                         "sessionView");
 
-                    RemoteScreenViewObject.classVariable = new RemoteScreenViewObject(
+                    RemoteScreenViewObjectImp.classVariable = new RemoteScreenViewObjectImp(
                         bot);
                     bot.exportRemoteScreenView(
-                        RemoteScreenViewObject.classVariable,
+                        RemoteScreenViewObjectImp.classVariable,
                         "remoteScreenView");
 
-                    ChatViewObject.classVariable = new ChatViewObject(bot);
-                    bot.exportChatView(ChatViewObject.classVariable, "chatView");
+                    ChatViewObjectImp.classVariable = new ChatViewObjectImp(bot);
+                    bot.exportChatView(ChatViewObjectImp.classVariable,
+                        "chatView");
+
+                    WorkbenchObjectImp.classVariable = new WorkbenchObjectImp(
+                        bot);
+                    bot.exportWorkbench(WorkbenchObjectImp.classVariable,
+                        "workbench");
 
                     bot.listRmiObjects();
                 } catch (RemoteException e) {

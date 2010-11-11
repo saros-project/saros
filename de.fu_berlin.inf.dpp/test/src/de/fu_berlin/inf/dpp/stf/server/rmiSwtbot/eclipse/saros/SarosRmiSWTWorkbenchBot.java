@@ -6,10 +6,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
@@ -23,17 +21,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObj
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObjectImp;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -53,25 +52,27 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /** RMI exported Saros object */
     public ISarosState stateObject;
 
-    public IRosterViewObject rosterViewObject;
+    public RosterViewObject rosterViewObject;
 
-    public ISarosWindowObject popupWindowObject;
+    public PopUpWindowObject popupWindowObject;
 
-    public ISessionViewObject sessonViewObject;
+    public SessionViewObject sessonViewObject;
 
-    public IRemoteScreenViewObject remoteScreenV;
+    public RemoteScreenViewObject remoteScreenV;
 
-    public IChatViewObject chatV;
+    public ChatViewObject chatV;
 
-    public IRosterViewObject getRosterViewObject() throws RemoteException {
+    public WorkbenchObject workbench;
+
+    public RosterViewObject getRosterViewObject() throws RemoteException {
         return rosterViewObject;
     }
 
-    public ISarosWindowObject getPopupWindowObject() throws RemoteException {
+    public PopUpWindowObject getPopupWindowObject() throws RemoteException {
         return popupWindowObject;
     }
 
-    public ISessionViewObject getSessionViewObject() throws RemoteException {
+    public SessionViewObject getSessionViewObject() throws RemoteException {
         return sessonViewObject;
     }
 
@@ -125,9 +126,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * Export given roster view object by given name on our local RMI Registry.
      */
-    public void exportRosterView(RosterViewObject rosterView, String exportName) {
+    public void exportRosterView(RosterViewObjectImp rosterView,
+        String exportName) {
         try {
-            this.rosterViewObject = (IRosterViewObject) UnicastRemoteObject
+            this.rosterViewObject = (RosterViewObject) UnicastRemoteObject
                 .exportObject(rosterView, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.rosterViewObject);
@@ -144,10 +146,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Export given pop up window object by given name on our local RMI
      * Registry.
      */
-    public void exportPopUpWindow(PopUpWindowObject popUpWindowObject,
+    public void exportPopUpWindow(PopUpWindowObjectImp popUpWindowObject,
         String exportName) {
         try {
-            this.popupWindowObject = (ISarosWindowObject) UnicastRemoteObject
+            this.popupWindowObject = (PopUpWindowObject) UnicastRemoteObject
                 .exportObject(popUpWindowObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.popupWindowObject);
@@ -164,10 +166,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Export given shared session view object by given name on our local RMI
      * Registry.
      */
-    public void exportSessionView(SessionViewObject sharedSessonViewObject,
+    public void exportSessionView(SessionViewObjectImp sharedSessonViewObject,
         String exportName) {
         try {
-            this.sessonViewObject = (ISessionViewObject) UnicastRemoteObject
+            this.sessonViewObject = (SessionViewObject) UnicastRemoteObject
                 .exportObject(sharedSessonViewObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.sessonViewObject);
@@ -185,9 +187,9 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Registry.
      */
     public void exportRemoteScreenView(
-        RemoteScreenViewObject remoteScreenViewObject, String exportName) {
+        RemoteScreenViewObjectImp remoteScreenViewObject, String exportName) {
         try {
-            this.remoteScreenV = (IRemoteScreenViewObject) UnicastRemoteObject
+            this.remoteScreenV = (RemoteScreenViewObject) UnicastRemoteObject
                 .exportObject(remoteScreenViewObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.remoteScreenV);
@@ -203,9 +205,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * Export given chat view object by given name on our local RMI Registry.
      */
-    public void exportChatView(ChatViewObject chatViewObject, String exportName) {
+    public void exportChatView(ChatViewObjectImp chatViewObject,
+        String exportName) {
         try {
-            this.chatV = (IChatViewObject) UnicastRemoteObject.exportObject(
+            this.chatV = (ChatViewObject) UnicastRemoteObject.exportObject(
                 chatViewObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.chatV);
@@ -218,112 +221,23 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    /*******************************************************************************
-     * 
-     * Chat view page
-     * 
-     *******************************************************************************/
-
-    /*******************************************************************************
-     * 
-     * frequently used components
-     * 
-     *******************************************************************************/
-
-    public void leaveSessionByPeer() throws RemoteException {
-        // Need to check for isDriver before leaving.
-        sessonViewObject.leaveTheSession();
-        eclipseWindowObject.confirmWindow(
-            SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
-            SarosConstant.BUTTON_YES);
-        sessonViewObject.waitUntilSessionCloses();
-    }
-
-    public void leaveSessionByHost() throws RemoteException {
-        sessonViewObject.leaveTheSession();
-        Util.runSafeAsync(log, new Runnable() {
-            public void run() {
-                try {
-                    eclipseWindowObject.confirmWindow(
-                        "Confirm Closing Session", SarosConstant.BUTTON_YES);
-                } catch (RemoteException e) {
-                    // no popup
-                }
-            }
-        });
-        if (eclipseWindowObject.isShellActive("Confirm Closing Session"))
-            eclipseWindowObject.confirmWindow("Confirm Closing Session",
-                SarosConstant.BUTTON_YES);
-        sessonViewObject.waitUntilSessionCloses();
-    }
-
-    public void confirmSessionUsingNewOrExistProject(
-        ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
-        String projectName, int typeOfSharingProject) throws RemoteException {
-        inviteeBot.getEclipseWindowObject().waitUntilShellActive(
-            SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        switch (typeOfSharingProject) {
-        case SarosConstant.CREATE_NEW_PROJECT:
-            inviteeBot.getPopupWindowObject().confirmSessionInvitationWizard(
-                inviterJID.getBase(), projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT:
-            inviteeBot.getPopupWindowObject()
-                .confirmSessionInvitationWizardUsingExistProject(
-                    inviterJID.getBase(), projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
-            inviteeBot
-                .getPopupWindowObject()
-                .confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
-                    inviterJID.getBase(), projectName);
-            break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
-            inviteeBot.getPopupWindowObject()
-                .confirmSessionInvitationWizardUsingExistProjectWithCopy(
-                    inviterJID.getBase(), projectName);
-            break;
-        default:
-            break;
+    /**
+     * Export given workbench object by given name on our local RMI Registry.
+     */
+    public void exportWorkbench(WorkbenchObjectImp workbenchObject,
+        String exportName) {
+        try {
+            this.workbench = (WorkbenchObject) UnicastRemoteObject
+                .exportObject(workbenchObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.workbench);
+        } catch (RemoteException e) {
+            log.error("Could not export workbench object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind workbench object, because it is bound already.",
+                e);
         }
-    }
-
-    public void xmppConnect(JID jid, String password) throws RemoteException {
-        log.trace("connectedByXMPP");
-        boolean connectedByXMPP = rosterViewObject.isConnectedByXMPP();
-        if (!connectedByXMPP) {
-            log.trace("clickTBConnectInRosterView");
-            rosterViewObject.clickTBConnectInRosterView();
-            eclipseBasicObject.sleep(100);// wait a bit to check if shell pops
-                                          // up
-            log.trace("isShellActive");
-            boolean shellActive = eclipseWindowObject
-                .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
-            if (shellActive) {
-                log.trace("confirmSarosConfigurationWindow");
-                popupWindowObject.confirmSarosConfigurationWizard(
-                    jid.getDomain(), jid.getName(), password);
-            }
-            rosterViewObject.waitUntilConnected();
-        }
-    }
-
-    public void openSarosViews() throws RemoteException {
-        rosterViewObject.openRosterView();
-        sessonViewObject.openSessionView();
-        chatV.openChatView();
-        remoteScreenV.openRemoteScreenView();
-    }
-
-    /*******************************************************************************
-     * 
-     * saros main page
-     * 
-     *******************************************************************************/
-
-    public void resetSaros() throws RemoteException {
-        rosterViewObject.xmppDisconnect();
-        eclipseState.deleteAllProjects();
     }
 
 }

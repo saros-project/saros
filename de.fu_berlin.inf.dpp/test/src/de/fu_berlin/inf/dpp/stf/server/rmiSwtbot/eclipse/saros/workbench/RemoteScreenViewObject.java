@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IRemoteScreenViewObject extends Remote {
+public interface RemoteScreenViewObject extends Remote {
 
     public void activateRemoteScreenView() throws RemoteException;
 

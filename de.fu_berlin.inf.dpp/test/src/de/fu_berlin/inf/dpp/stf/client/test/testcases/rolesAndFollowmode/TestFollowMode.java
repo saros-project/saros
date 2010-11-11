@@ -37,8 +37,8 @@ public class TestFollowMode {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @After
@@ -47,8 +47,8 @@ public class TestFollowMode {
             bob.sessionV.stopFollowingThisUser(alice.state);
         if (alice.state.isInFollowMode())
             alice.sessionV.stopFollowingThisUser(bob.state);
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     /**

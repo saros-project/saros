@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.IRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
 
 public class SarosConditions extends Conditions {
 
@@ -106,7 +106,7 @@ public class SarosConditions extends Conditions {
         return new ExistNoParticipants(state, jids);
     }
 
-    public static ICondition isChatMessageExist(ChatViewObject chatV,
+    public static ICondition isChatMessageExist(ChatViewObjectImp chatV,
         String jid, String message) {
         return new IsChatMessageExist(chatV, jid, message);
     }

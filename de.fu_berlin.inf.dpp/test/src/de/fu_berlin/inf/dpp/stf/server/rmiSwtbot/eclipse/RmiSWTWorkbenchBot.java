@@ -9,14 +9,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
@@ -31,16 +24,15 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObj
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
 
 /**
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
@@ -68,7 +60,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public IEclipseState eclipseState;
     public IEclipseEditorObject eclipseEditorObject;
     public IPackageExplorerViewObject packageExplorerViewObject;
-    public ISarosMainMenuObject mainMenuObject;
+    public SarosMainMenuObject mainMenuObject;
     public IProgressViewObject progressViewObject;
     public IEclipseBasicObject eclipseBasicObject;
 
@@ -101,7 +93,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;
-      
+
     }
 
     /**
@@ -195,10 +187,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     /**
      * Export give main menu object by given name on our local RMI Registry.
      */
-    public void exportMainMenuObject(ISarosMainMenuObject sarosMainMenuObject,
+    public void exportMainMenuObject(SarosMainMenuObject sarosMainMenuObject,
         String exportName) {
         try {
-            this.mainMenuObject = (ISarosMainMenuObject) UnicastRemoteObject
+            this.mainMenuObject = (SarosMainMenuObject) UnicastRemoteObject
                 .exportObject(sarosMainMenuObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.mainMenuObject);
@@ -295,51 +287,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * main page
      * 
      *******************************************************************************/
-    public void activateEclipseShell() throws RemoteException {
-        getEclipseShell().activate().setFocus();
-        // return activateShellWithMatchText(".+? - .+");
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // win.getShell().setActive();
-        // }
-        // });
-
-    }
-
-    public SWTBotShell getEclipseShell() throws RemoteException {
-        SWTBotShell[] shells = delegate.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(".+? - .+")) {
-                log.debug("shell found matching \"" + ".+? - .+" + "\"");
-
-                return shell;
-            }
-        }
-        final String message = "No shell found matching \"" + ".+? - .+"
-            + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
-    }
-
-    public void resetWorkbench() throws RemoteException {
-        mainMenuObject.openPerspectiveJava();
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                IWorkbenchPage page = win.getActivePage();
-                if (page != null) {
-                    page.closeAllEditors(false);
-                }
-                Shell activateShell = Display.getCurrent().getActiveShell();
-                if (activateShell != null && activateShell != win.getShell()) {
-                    activateShell.close();
-                }
-            }
-        });
-    }
 
     public IEclipseWindowObject getEclipseWindowObject() throws RemoteException {
         return eclipseWindowObject;

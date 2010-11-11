@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
@@ -6,9 +6,9 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class RemoteScreenViewObject extends EclipseObject implements
-    IRemoteScreenViewObject {
-    public static RemoteScreenViewObject classVariable;
+public class RemoteScreenViewObjectImp extends EclipseObject implements
+    RemoteScreenViewObject {
+    public static RemoteScreenViewObjectImp classVariable;
 
     /**
      * constructs a remoteScreenViewObject, which would only be created in class
@@ -19,7 +19,7 @@ public class RemoteScreenViewObject extends EclipseObject implements
      *            controls Saros from the GUI perspective and manage all
      *            exported rmi-objects.
      */
-    public RemoteScreenViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public RemoteScreenViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

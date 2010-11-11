@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
@@ -6,17 +6,19 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class PopUpWindowObject extends EclipseObject implements
-    ISarosWindowObject {
+public class PopUpWindowObjectImp extends EclipseObject implements
+    PopUpWindowObject {
 
-    public static PopUpWindowObject classVariable;
+    public static PopUpWindowObjectImp classVariable;
 
-    public PopUpWindowObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public PopUpWindowObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 
@@ -292,5 +294,36 @@ public class PopUpWindowObject extends EclipseObject implements
         throws RemoteException {
         SWTBotShell shell = bot.activeShell();
         shell.bot().toolbarButton().click();
+    }
+
+    public void confirmSessionUsingNewOrExistProject(
+        ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
+        String projectName, int typeOfSharingProject) throws RemoteException {
+        inviteeBot.getEclipseWindowObject().waitUntilShellActive(
+            SarosConstant.SHELL_TITLE_SESSION_INVITATION);
+        switch (typeOfSharingProject) {
+        case SarosConstant.CREATE_NEW_PROJECT:
+            inviteeBot.getPopupWindowObject().confirmSessionInvitationWizard(
+                inviterJID.getBase(), projectName);
+            break;
+        case SarosConstant.USE_EXISTING_PROJECT:
+            inviteeBot.getPopupWindowObject()
+                .confirmSessionInvitationWizardUsingExistProject(
+                    inviterJID.getBase(), projectName);
+            break;
+        case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
+            inviteeBot
+                .getPopupWindowObject()
+                .confirmSessionInvitationWizardUsingExistProjectWithCancelLocalChange(
+                    inviterJID.getBase(), projectName);
+            break;
+        case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
+            inviteeBot.getPopupWindowObject()
+                .confirmSessionInvitationWizardUsingExistProjectWithCopy(
+                    inviterJID.getBase(), projectName);
+            break;
+        default:
+            break;
+        }
     }
 }

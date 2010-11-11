@@ -48,23 +48,23 @@ public class TestFolderOperations {
             alice.mainMenu.newClass(PROJECT, PKG, CLS);
         if (!alice.eclipseState.isFolderExist(PROJECT, FOLDER))
             alice.mainMenu.newFolder(PROJECT, FOLDER);
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        carl.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        carl.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @Test

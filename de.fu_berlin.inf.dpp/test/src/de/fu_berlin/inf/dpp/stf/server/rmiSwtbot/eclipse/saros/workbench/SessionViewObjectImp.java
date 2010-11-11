@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -13,16 +13,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This implementation of {@link ISessionViewObject}
+ * This implementation of {@link SessionViewObject}
  * 
  * @author Lin
  */
-public class SessionViewObject extends EclipseObject implements
-    ISessionViewObject {
+public class SessionViewObjectImp extends EclipseObject implements
+    SessionViewObject {
 
-    public static SessionViewObject classVariable;
+    public static SessionViewObjectImp classVariable;
 
     private String viewName = SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION;
     private String viewID = SarosConstant.ID_SESSION_VIEW;
@@ -39,7 +40,7 @@ public class SessionViewObject extends EclipseObject implements
      *            controls Saros from the GUI perspective and manage all
      *            exported rmi-objects.
      */
-    public SessionViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public SessionViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 
@@ -354,7 +355,7 @@ public class SessionViewObject extends EclipseObject implements
     /**
      * 
      * It get all contact names listed in the session view and would be used by
-     * {@link SessionViewObject#isInFollowMode}.
+     * {@link SessionViewObjectImp#isInFollowMode}.
      * 
      * @return list, which contain all the contact names.
      * @throws RemoteException
@@ -371,6 +372,33 @@ public class SessionViewObject extends EclipseObject implements
 
     private void clickToolbarButtonWithTooltip(String tooltip) {
         viewObject.clickToolbarButtonWithTooltipInView(viewName, tooltip);
+    }
+
+    public void leaveSessionByPeer() throws RemoteException {
+        // Need to check for isDriver before leaving.
+        leaveTheSession();
+        rmiBot.eclipseWindowObject.confirmWindow(
+            SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
+            SarosConstant.BUTTON_YES);
+        waitUntilSessionCloses();
+    }
+
+    public void leaveSessionByHost() throws RemoteException {
+        leaveTheSession();
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                try {
+                    rmiBot.eclipseWindowObject.confirmWindow(
+                        "Confirm Closing Session", SarosConstant.BUTTON_YES);
+                } catch (RemoteException e) {
+                    // no popup
+                }
+            }
+        });
+        if (rmiBot.eclipseWindowObject.isShellActive("Confirm Closing Session"))
+            rmiBot.eclipseWindowObject.confirmWindow("Confirm Closing Session",
+                SarosConstant.BUTTON_YES);
+        waitUntilSessionCloses();
     }
 
 }

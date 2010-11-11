@@ -33,16 +33,16 @@ public class TestShare3UsersSequentially {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        carl.bot.resetSaros();
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        carl.workbench.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @After
     public void cleanUp() throws RemoteException {
-        carl.bot.resetWorkbench();
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     @Test

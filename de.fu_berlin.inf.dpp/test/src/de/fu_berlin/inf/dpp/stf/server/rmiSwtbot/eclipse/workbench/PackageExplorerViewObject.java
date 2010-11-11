@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -93,7 +93,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     }
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
-        rmiBot.activateEclipseShell();
+        rmiBot.workbench.activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
         SWTBotTree tree = viewObject.getTreeInView(PEViewName);
@@ -301,7 +301,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     }
 
     public void importProjectFromSVN(String path) throws RemoteException {
-        rmiBot.activateEclipseShell();
+        rmiBot.workbench.activateEclipseShell();
         menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
             SarosConstant.MENU_TITLE_IMPORT);
         rmiBot.eclipseWindowObject.confirmWindowWithTreeWithFilterText(

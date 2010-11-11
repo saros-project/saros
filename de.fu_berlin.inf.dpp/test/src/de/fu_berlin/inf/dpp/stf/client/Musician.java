@@ -17,19 +17,20 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IProgressViewObject;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -43,17 +44,18 @@ public class Musician {
     public IEclipseState eclipseState;
     public IEclipseEditorObject eclipseEditor;
     public IPackageExplorerViewObject packageExplorerV;
-    public ISarosMainMenuObject mainMenu;
+    public SarosMainMenuObject mainMenu;
     public IProgressViewObject progressV;
     public IEclipseBasicObject basic;
 
     public ISarosRmiSWTWorkbenchBot bot;
     public ISarosState state;
-    public IRosterViewObject rosterV;
-    public ISarosWindowObject popupWindow;
-    public ISessionViewObject sessionV;
-    public IRemoteScreenViewObject remoteScreenV;
-    public IChatViewObject chatV;
+    public RosterViewObject rosterV;
+    public SessionViewObject sessionV;
+    public RemoteScreenViewObject remoteScreenV;
+    public ChatViewObject chatV;
+    public PopUpWindowObject popupWindow;
+    public WorkbenchObject workbench;
 
     public JID jid;
     public String password;
@@ -76,15 +78,15 @@ public class Musician {
         log.trace("initBot enter, initRmi");
         initRmi();
         log.trace("activeEclipseShell");
-        bot.activateEclipseShell();
+        workbench.activateEclipseShell();
         log.trace("closeWelcomeView");
         packageExplorerV.closeWelcomeView();
         log.trace("openJavaPerspective");
         mainMenu.openPerspectiveJava();
         log.trace("openSarosViews");
-        bot.openSarosViews();
+        workbench.openSarosViews();
         log.trace("xmppConnect");
-        bot.xmppConnect(jid, password);
+        rosterV.xmppConnect(jid, password);
         log.trace("initBot leave");
     }
 
@@ -100,13 +102,13 @@ public class Musician {
              * work for the remote tests too.
              */
             state.setJID(jid);
-
-            chatV = (IChatViewObject) registry.lookup("chatView");
-            rosterV = (IRosterViewObject) registry.lookup("rosterView");
-            sessionV = (ISessionViewObject) registry.lookup("sessionView");
-            remoteScreenV = (IRemoteScreenViewObject) registry
+            workbench = (WorkbenchObject) registry.lookup("workbench");
+            chatV = (ChatViewObject) registry.lookup("chatView");
+            rosterV = (RosterViewObject) registry.lookup("rosterView");
+            sessionV = (SessionViewObject) registry.lookup("sessionView");
+            remoteScreenV = (RemoteScreenViewObject) registry
                 .lookup("remoteScreenView");
-            popupWindow = (ISarosWindowObject) registry.lookup("popUpWindow");
+            popupWindow = (PopUpWindowObject) registry.lookup("popUpWindow");
 
             eclipseWindow = (IEclipseWindowObject) registry
                 .lookup("eclipseWindow");
@@ -115,9 +117,10 @@ public class Musician {
                 .lookup("eclipseEditor");
             packageExplorerV = (IPackageExplorerViewObject) registry
                 .lookup("packageExplorerView");
-            mainMenu = (ISarosMainMenuObject) registry.lookup("sarosMainMenu");
+            mainMenu = (SarosMainMenuObject) registry.lookup("sarosMainMenu");
             progressV = (IProgressViewObject) registry.lookup("progressView");
             basic = (IEclipseBasicObject) registry.lookup("basicObject");
+
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
                 + ", did you start the Eclipse instance?");
@@ -137,8 +140,8 @@ public class Musician {
 
         popupWindow.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
-            bot.confirmSessionUsingNewOrExistProject(invitee.bot, this.jid,
-                projectName, invitee.typeOfSharingProject);
+            popupWindow.confirmSessionUsingNewOrExistProject(invitee.bot,
+                this.jid, projectName, invitee.typeOfSharingProject);
         }
     }
 
@@ -232,7 +235,7 @@ public class Musician {
             final Musician musician = musicians[i];
             leaveTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.bot.leaveSessionByPeer();
+                    musician.sessionV.leaveSessionByPeer();
                     return null;
                 }
             });

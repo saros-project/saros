@@ -55,8 +55,8 @@ public class TestDriverChangeAndImmediateWrite {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     /**
@@ -66,8 +66,8 @@ public class TestDriverChangeAndImmediateWrite {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     /**

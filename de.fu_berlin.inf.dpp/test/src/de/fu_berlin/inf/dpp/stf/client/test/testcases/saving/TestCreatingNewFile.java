@@ -76,9 +76,9 @@ public class TestCreatingNewFile {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
-        carl.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
+        carl.workbench.resetSaros();
     }
 
     /**
@@ -88,9 +88,9 @@ public class TestCreatingNewFile {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
         if (bob.eclipseState.isFolderExist(PROJECT, FOLDER))
             bob.eclipseState.deleteFolder(PROJECT, FOLDER);
         if (bob.eclipseState.isFolderExist(PROJECT, FOLDER2))

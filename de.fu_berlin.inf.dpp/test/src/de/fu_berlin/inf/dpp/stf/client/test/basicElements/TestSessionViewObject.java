@@ -42,14 +42,14 @@ public class TestSessionViewObject {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     @Before
     public void startUp() throws RemoteException {
-        bob.bot.openSarosViews();
-        alice.bot.openSarosViews();
+        bob.workbench.openSarosViews();
+        alice.workbench.openSarosViews();
         if (!alice.state.isInSession()) {
             bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
             alice.buildSessionSequential(PROJECT,
@@ -66,8 +66,8 @@ public class TestSessionViewObject {
 
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
         // bob.sessionV.stopFollowing();
         // alice.sessionV.stopFollowing();
     }

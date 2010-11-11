@@ -4,11 +4,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
 
 /**
  * This Interface is the stub for remote {@link SWTWorkbenchBot}. The
@@ -16,12 +15,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObj
  * delegation.
  */
 public interface IRmiSWTWorkbenchBot extends Remote {
-
-    public SWTBotShell getEclipseShell() throws RemoteException;
-
-    public void resetWorkbench() throws RemoteException;
-
-    public void activateEclipseShell() throws RemoteException;
 
     public IEclipseWindowObject getEclipseWindowObject() throws RemoteException;
 

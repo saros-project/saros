@@ -71,11 +71,11 @@ public class TestParallelInvitationWithTerminationByInvitees {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        carl.bot.resetSaros();
-        dave.bot.resetSaros();
-        edna.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        carl.workbench.resetSaros();
+        dave.workbench.resetSaros();
+        edna.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     /**
@@ -85,11 +85,11 @@ public class TestParallelInvitationWithTerminationByInvitees {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        dave.bot.resetWorkbench();
-        edna.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        dave.workbench.resetWorkbench();
+        edna.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     /**
@@ -161,7 +161,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
         edna.popupWindow.confirmSessionInvitationWindowStep1();
         edna.popupWindow
             .confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
-        edna.bot.leaveSessionByPeer();
+        edna.sessionV.leaveSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }
 }

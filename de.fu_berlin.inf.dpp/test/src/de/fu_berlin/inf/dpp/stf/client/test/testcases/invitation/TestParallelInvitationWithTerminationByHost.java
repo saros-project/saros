@@ -43,7 +43,7 @@ public class TestParallelInvitationWithTerminationByHost {
     }
 
     /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
+     * makes sure, all opened xmppConnects, popup windows and editor should be
      * closed. make sure, all existed projects should be deleted. if you need
      * some more after class condition for your tests, please add it.
      * 
@@ -51,9 +51,9 @@ public class TestParallelInvitationWithTerminationByHost {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.bot.resetSaros();
-        carl.bot.resetSaros();
-        alice.bot.resetSaros();
+        bob.workbench.resetSaros();
+        carl.workbench.resetSaros();
+        alice.workbench.resetSaros();
     }
 
     /**
@@ -64,9 +64,9 @@ public class TestParallelInvitationWithTerminationByHost {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.bot.resetWorkbench();
-        carl.bot.resetWorkbench();
-        alice.bot.resetWorkbench();
+        bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
+        alice.workbench.resetWorkbench();
     }
 
     /**
