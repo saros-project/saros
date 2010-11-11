@@ -142,13 +142,6 @@ public class TreeObject extends EclipseObject {
 
     public boolean isTreeItemOfTreeExisted(SWTBotTree tree, String label) {
         return getAllItemsOftree().contains(label);
-        // try {
-        // tree.getTreeItem(label);
-        // return true;
-        // } catch (WidgetNotFoundException e) {
-        // return false;
-        // }
-
     }
 
     public void waitUntilTreeItemExisted(SWTBotTreeItem treeItem,

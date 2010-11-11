@@ -86,8 +86,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickProjectContextMenu(String projectName,
     // String nameOfContextMenu) throws RemoteException;
 
-    public void clickCMShareProjectInPEView(String projectName)
-        throws RemoteException;
+    // public void clickCMShareProjectInPEView(String projectName)
+    // throws RemoteException;
 
     public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException;
@@ -114,13 +114,14 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickTBStopSessionWithUserInSPSView(String name)
     // throws RemoteException;
 
-    public void clickTBChangeModeOfImageSourceInRSView() throws RemoteException;
+    // public void clickTBChangeModeOfImageSourceInRSView() throws
+    // RemoteException;
 
-    public void clickTBStopRunningSessionInRSView() throws RemoteException;
+    // public void clickTBStopRunningSessionInRSView() throws RemoteException;
 
-    public void clickTBResumeInRSView() throws RemoteException;
+    // public void clickTBResumeInRSView() throws RemoteException;
 
-    public void clickTBPauseInRSView() throws RemoteException;
+    // public void clickTBPauseInRSView() throws RemoteException;
 
     // public void clickTBStartAVoIPSessionInSPSView() throws RemoteException;
 
@@ -154,7 +155,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public void openChatView() throws RemoteException;
 
-    public void openRemoteScreenView() throws RemoteException;
+    // public void openRemoteScreenView() throws RemoteException;
 
     // public void openSharedSessionView() throws RemoteException;
 
@@ -162,7 +163,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     public boolean isChatViewOpen() throws RemoteException;
 
-    public boolean isRemoteScreenViewOpen() throws RemoteException;
+    // public boolean isRemoteScreenViewOpen() throws RemoteException;
 
     public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
         throws RemoteException;
@@ -178,20 +179,20 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void clickTBAddANewContactInRosterView() throws RemoteException;
 
-    public void clickCMShareprojectWithVCSSupportInPEView(String projectName)
-        throws RemoteException;
+    // public void clickCMShareprojectWithVCSSupportInPEView(String projectName)
+    // throws RemoteException;
 
-    public void clickCMShareProjectParticallyInPEView(String projectName)
-        throws RemoteException;
+    // public void clickCMShareProjectParticallyInPEView(String projectName)
+    // throws RemoteException;
 
-    public void clickCMAddToSessionInPEView(String projectName)
-        throws RemoteException;
+    // public void clickCMAddToSessionInPEView(String projectName)
+    // throws RemoteException;
 
     // public void closeRosterView() throws RemoteException;
 
     // public void closeSessionView() throws RemoteException;
 
-    public void closeRemoteScreenView() throws RemoteException;
+    // public void closeRemoteScreenView() throws RemoteException;
 
     public void closeChatView() throws RemoteException;
 

@@ -7,13 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
@@ -29,17 +24,6 @@ public class HelperObject extends EclipseObject {
             matchTexts[i] = texts[i] + ".*";
         }
         return matchTexts;
-    }
-
-    protected List<String> getAllProjects() {
-        SWTBotTree tree = bot
-            .viewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER).bot()
-            .tree();
-        List<String> projectNames = new ArrayList<String>();
-        for (int i = 0; i < tree.getAllItems().length; i++) {
-            projectNames.add(tree.getAllItems()[i].getText());
-        }
-        return projectNames;
     }
 
     public String ConvertStreamToString(InputStream is) throws IOException {

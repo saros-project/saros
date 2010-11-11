@@ -35,7 +35,7 @@ public class TableObject extends EclipseObject {
     }
 
     public void clickContextMenuOfTable(String itemName, String contextName) {
-        bot.table().getTableItem(itemName).contextMenu(contextName).click();
+        getTable().getTableItem(itemName).contextMenu(contextName).click();
     }
 
     public boolean isContextMenuOfTableVisible(String itemName,

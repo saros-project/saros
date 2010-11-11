@@ -64,10 +64,10 @@ public class TestBasicSarosElements {
 
     @Test
     public void testRemoteScreenView() throws RemoteException {
-        alice.bot.closeRemoteScreenView();
-        assertEquals(false, alice.bot.isRemoteScreenViewOpen());
-        alice.bot.openRemoteScreenView();
-        assertEquals(true, alice.bot.isRemoteScreenViewOpen());
+        alice.remoteScreenV.closeRemoteScreenView();
+        assertEquals(false, alice.remoteScreenV.isRemoteScreenViewOpen());
+        alice.remoteScreenV.openRemoteScreenView();
+        assertEquals(true, alice.remoteScreenV.isRemoteScreenViewOpen());
     }
 
     @Test

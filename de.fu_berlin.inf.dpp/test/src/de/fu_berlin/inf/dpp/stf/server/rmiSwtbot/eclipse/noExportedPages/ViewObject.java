@@ -122,8 +122,6 @@ public class ViewObject extends EclipseObject {
      *            example: "Console"
      * @see RmiSWTWorkbenchBot#activateEclipseShell()
      * @see MenuObject#clickMenuWithTexts(String...)
-     * @see RmiSWTWorkbenchBot#confirmWindowWithTreeWithFilterText(String,
-     *      String, String, String)
      * 
      */
     public void openViewWithName(String viewTitle, String category,
@@ -154,8 +152,8 @@ public class ViewObject extends EclipseObject {
      * 
      * @param viewName
      *            the view title
-     * @returna {@link SWTBotTable} with the specified <code>none</code> in
-     *          specified view.
+     * @return {@link SWTBotTable} with the specified <code>none</code> in
+     *         specified view.
      */
     public SWTBotTable getTableInView(String viewName) {
         return bot.viewByTitle(viewName).bot().table();
@@ -450,7 +448,7 @@ public class ViewObject extends EclipseObject {
     }
 
     public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
-        String viewName, String... labels) throws RemoteException {
+        String viewName, String... labels) {
         return treeObject.selectTreeWithLabelsWithWaitungExpand(
             getTreeInView(viewName), labels);
     }
@@ -511,6 +509,15 @@ public class ViewObject extends EclipseObject {
      */
     public void waitUntilViewActive(String viewName) {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
+    }
+
+    protected List<String> getAllProjects() {
+        SWTBotTree tree = getTreeInView(PEViewName);
+        List<String> projectNames = new ArrayList<String>();
+        for (int i = 0; i < tree.getAllItems().length; i++) {
+            projectNames.add(tree.getAllItems()[i].getText());
+        }
+        return projectNames;
     }
 
 }

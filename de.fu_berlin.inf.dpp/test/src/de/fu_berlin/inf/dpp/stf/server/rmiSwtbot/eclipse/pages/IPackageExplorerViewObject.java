@@ -55,4 +55,16 @@ public interface IPackageExplorerViewObject extends Remote {
     public void disConnectSVN() throws RemoteException;
 
     public void switchToTag() throws RemoteException;
+
+    public void addToSession(String projectName)
+        throws RemoteException;
+
+    public void shareProjectPartically(String projectName)
+        throws RemoteException;
+
+    public void shareprojectWithVCSSupport(String projectName)
+        throws RemoteException;
+
+    public void shareProject(String projectName)
+        throws RemoteException;
 }

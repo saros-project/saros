@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerV
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
@@ -50,6 +51,7 @@ public class Musician {
     public IRosterViewObject rosterV;
     public ISarosWindowObject popupWindow;
     public ISessionViewObject sessionV;
+    public IRemoteScreenViewObject remoteScreenV;
 
     public JID jid;
     public String password;
@@ -98,8 +100,10 @@ public class Musician {
             state.setJID(jid);
 
             rosterV = (IRosterViewObject) registry.lookup("rosterView");
-            popupWindow = (ISarosWindowObject) registry.lookup("popUpWindow");
             sessionV = (ISessionViewObject) registry.lookup("sessionView");
+            remoteScreenV = (IRemoteScreenViewObject) registry
+                .lookup("remoteScreenView");
+            popupWindow = (ISarosWindowObject) registry.lookup("popUpWindow");
 
             eclipseWindow = (IEclipseWindowObject) registry
                 .lookup("eclipseWindow");

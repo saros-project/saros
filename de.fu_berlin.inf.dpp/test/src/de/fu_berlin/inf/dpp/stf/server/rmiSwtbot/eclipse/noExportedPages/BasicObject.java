@@ -13,13 +13,6 @@ public class BasicObject extends EclipseObject {
 
     public void waitUntilButtonEnabled(String mnemonicText) {
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
-        // try {
-        // while (!delegate.button(mnemonicText).isEnabled()) {
-        // delegate.sleep(100);
-        // }
-        // } catch (Exception e) {
-        // // next window opened
-        // }
     }
 
     public void waitUnitButtonWithTooltipTextEnabled(String tooltipText) {

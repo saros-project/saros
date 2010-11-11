@@ -21,7 +21,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     }
 
     public void closePackageExplorerView() throws RemoteException {
-        viewObject.closeViewWithText(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        viewObject.closeViewWithText(PEViewName);
     }
 
     public void closeWelcomeView() throws RemoteException {
@@ -29,8 +29,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     }
 
     public void activatePackageExplorerView() throws RemoteException {
-        viewObject
-            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        viewObject.setFocusOnViewByTitle(PEViewName);
     }
 
     /**
@@ -54,8 +53,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     public void deleteProjectGui(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewObject
-            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
         tree.select(projectName);
         menuObject.clickMenuWithTexts("Edit", "Delete");
         rmiBot.eclipseWindowObject.confirmWindowWithCheckBox(
@@ -86,8 +84,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     public void deleteFileGui(String... nodes) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        viewObject.clickContextMenuOfTreeInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, "Delete", nodes);
+        viewObject.clickContextMenuOfTreeInView(PEViewName, "Delete", nodes);
         windowObject
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
         rmiBot.eclipseWindowObject.confirmWindow(
@@ -98,8 +95,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
         rmiBot.activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewObject
-            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
         return treeObject.isTreeItemWithMatchTextExist(tree, matchTexts);
     }
 
@@ -122,8 +118,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
     public void openClass(String projectName, String packageName,
         String className) throws RemoteException {
         if (!rmiBot.eclipseEditorObject.isClassOpen(className)) {
-            viewObject.openFileInView(
-                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, projectName, "src",
+            viewObject.openFileInView(PEViewName, projectName, "src",
                 packageName, className + ".java");
             bot.sleep(rmiBot.sleepTime);
         }
@@ -132,16 +127,14 @@ public class PackageExplorerViewObject extends EclipseObject implements
     public void openFile(String... filePath) throws RemoteException {
         if (!rmiBot.eclipseEditorObject
             .isFileOpen(filePath[filePath.length - 1])) {
-            viewObject.openFileInView(
-                SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, filePath);
+            viewObject.openFileInView(PEViewName, filePath);
             bot.sleep(rmiBot.sleepTime);
         }
     }
 
     public void openClassWith(String whichEditor, String projectName,
         String packageName, String className) throws RemoteException {
-        SWTBotTree tree = viewObject
-            .getTreeInView(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER);
+        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
         tree.expandNode(projectName, "src", packageName, className + ".java")
             .select();
         ContextMenuHelper.clickContextMenu(tree, "Open With", "Other...");
@@ -161,8 +154,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
      * 
      */
     public void showViewPackageExplorer() throws RemoteException {
-        viewObject.openViewWithName(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-            "Java", "Package Explorer");
+        viewObject.openViewWithName(PEViewName, "Java", "Package Explorer");
     }
 
     public void moveClassTo(String projectName, String pkg, String className,
@@ -172,9 +164,8 @@ public class PackageExplorerViewObject extends EclipseObject implements
         String[] matchTexts = mainObject.changeToRegex(projectName, "src", pkg,
             className);
         log.info("matchTexts: " + matchTexts);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
-            "Move...");
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
+            matchTexts, "Refactor", "Move...");
         windowObject.waitUntilShellActive("Move");
         windowObject.confirmWindowWithTree("Move", SarosConstant.BUTTON_OK,
             targetProject, "src", targetPkg);
@@ -182,9 +173,8 @@ public class PackageExplorerViewObject extends EclipseObject implements
 
     public void disConnectSVN() throws RemoteException {
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
-            "Disconnect...");
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
+            matchTexts, "Team", "Disconnect...");
         rmiBot.eclipseWindowObject.confirmWindow("Confirm Disconnect from SVN",
             SarosConstant.BUTTON_YES);
     }
@@ -332,6 +322,51 @@ public class PackageExplorerViewObject extends EclipseObject implements
         windowObject.waitUntilShellActive("SVN Checkout");
         SWTBotShell shell2 = bot.shell("SVN Checkout");
         windowObject.waitUntilShellCloses(shell2);
+    }
+
+    public void shareProject(String projectName)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT);
+    }
+
+    public void shareprojectWithVCSSupport(String projectName)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
+    }
+
+    public void shareProjectPartically(String projectName)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
+    }
+
+    public void addToSession(String projectName)
+        throws RemoteException {
+        showViewPackageExplorer();
+        activatePackageExplorerView();
+        String[] nodes = { projectName };
+        String[] matchTexts = mainObject.changeToRegex(nodes);
+        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
+            SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);
     }
 
 }

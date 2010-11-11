@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.ProgressViewObjec
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -135,9 +136,10 @@ public class StartupSaros implements IStartup {
                      * static references "classVariable" to the object in the
                      * object in the server JVM.
                      */
-                    EclipseBasicObject.classVariable = new EclipseBasicObject(bot);
-                    bot.exportEclipseBasicObject(EclipseBasicObject.classVariable,
-                        "basicObject");
+                    EclipseBasicObject.classVariable = new EclipseBasicObject(
+                        bot);
+                    bot.exportEclipseBasicObject(
+                        EclipseBasicObject.classVariable, "basicObject");
 
                     ProgressViewObject.classVariable = new ProgressViewObject(
                         bot);
@@ -184,6 +186,12 @@ public class StartupSaros implements IStartup {
                     SessionViewObject.classVariable = new SessionViewObject(bot);
                     bot.exportSessionView(SessionViewObject.classVariable,
                         "sessionView");
+
+                    RemoteScreenViewObject.classVariable = new RemoteScreenViewObject(
+                        bot);
+                    bot.exportRemoteScreenView(
+                        RemoteScreenViewObject.classVariable,
+                        "remoteScreenView");
 
                     bot.listRmiObjects();
                 } catch (RemoteException e) {

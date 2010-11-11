@@ -12,17 +12,6 @@ import org.eclipse.ui.WorkbenchException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-/**
- * org.eclipse.cdt.ui.CPerspective org.eclipse.debug.ui.DebugPerspective
- * org.eclipse.jdt.ui.JavaPerspective
- * org.eclipse.jdt.ui.JavaHierarchyPerspective
- * org.eclipse.jdt.ui.JavaBrowsingPerspective
- * org.eclipse.mylyn.tasks.ui.perspectives.planning
- * org.eclipse.pde.ui.PDEPerspective org.eclipse.team.cvs.ui.cvsPerspective
- * org.eclipse.team.ui.TeamSynchronizingPerspective
- * org.eclipse.ui.resourcePerspective
- * org.tigris.subversion.subclipse.ui.svnPerspective
- */
 public class PerspectiveObject extends EclipseObject {
 
     public PerspectiveObject(RmiSWTWorkbenchBot rmiBot) {
@@ -84,12 +73,12 @@ public class PerspectiveObject extends EclipseObject {
 
     // public boolean isPerspectiveOpen(String title) {
     // return getPerspectiveTitles().contains(title);
-    // // try {
-    // // return delegate.perspectiveByLabel(title) != null;
-    // // } catch (WidgetNotFoundException e) {
-    // // log.warn("perspective '" + title + "' doesn't exist!");
-    // // return false;
-    // // }
+    // try {
+    // return delegate.perspectiveByLabel(title) != null;
+    // } catch (WidgetNotFoundException e) {
+    // log.warn("perspective '" + title + "' doesn't exist!");
+    // return false;
+    // }
     // }
 
     // protected List<String> getPerspectiveTitles() {

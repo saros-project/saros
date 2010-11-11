@@ -26,10 +26,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -57,6 +59,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     private ISarosWindowObject popupWindowObject;
 
     private ISessionViewObject sessonViewObject;
+
+    private IRemoteScreenViewObject remoteScreenV;
 
     public IRosterViewObject getRosterViewObject() throws RemoteException {
         return rosterViewObject;
@@ -165,69 +169,24 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    /*******************************************************************************
-     * 
-     * Saros Package explorer page
-     * 
-     *******************************************************************************/
-
     /**
-     * This method captures two screenshots as side effect.
+     * Export given remote screen view object by given name on our local RMI
+     * Registry.
      */
-    public void clickCMShareProjectInPEView(String projectName)
-        throws RemoteException {
-        packageExplorerViewObject.showViewPackageExplorer();
-        packageExplorerViewObject.activatePackageExplorerView();
-        String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
-
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT);
-        // viewObject.clickContextMenuOfTreeInView(
-        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, projectName);
-
-    }
-
-    public void clickCMShareprojectWithVCSSupportInPEView(String projectName)
-        throws RemoteException {
-        packageExplorerViewObject.showViewPackageExplorer();
-        packageExplorerViewObject.activatePackageExplorerView();
-        String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
-    }
-
-    public void clickCMShareProjectParticallyInPEView(String projectName)
-        throws RemoteException {
-        packageExplorerViewObject.showViewPackageExplorer();
-        packageExplorerViewObject.activatePackageExplorerView();
-        String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
-        // viewObject.clickContextMenuOfTableInView(
-        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-        // SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY, projectName);
-    }
-
-    public void clickCMAddToSessionInPEView(String projectName)
-        throws RemoteException {
-        packageExplorerViewObject.showViewPackageExplorer();
-        packageExplorerViewObject.activatePackageExplorerView();
-        String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
-            SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
-            SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);
-
-        // viewObject.clickContextMenuOfTableInView(
-        // SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-        // SarosConstant.CONTEXT_MENU_ADD_TO_SESSION, projectName);
+    public void exportRemoteScreenView(
+        RemoteScreenViewObject remoteScreenViewObject, String exportName) {
+        try {
+            this.remoteScreenV = (IRemoteScreenViewObject) UnicastRemoteObject
+                .exportObject(remoteScreenViewObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.remoteScreenV);
+        } catch (RemoteException e) {
+            log.error("Could not export remote screen view object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind remote screen view object, because it is bound already.",
+                e);
+        }
     }
 
     /*******************************************************************************
@@ -235,57 +194,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * Remote screen view page
      * 
      *******************************************************************************/
-    public void activateRemoteScreenView() throws RemoteException {
-        viewObject
-            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
-    }
-
-    public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
-    }
-
-    public void openRemoteScreenView() throws RemoteException {
-        if (!isRemoteScreenViewOpen())
-            viewObject
-                .openViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
-    }
-
-    public void closeRemoteScreenView() throws RemoteException {
-        viewObject
-            .closeViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
-    }
-
-    public void clickTBChangeModeOfImageSourceInRSView() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        viewObject.clickToolbarButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
-            SarosConstant.TOOL_TIP_TEXT_CHANGE_MODE_IMAGE_SOURCE);
-    }
-
-    public void clickTBStopRunningSessionInRSView() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        viewObject.clickToolbarButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
-            SarosConstant.TOOL_TIP_TEXT_STOP_RUNNING_SESSION);
-    }
-
-    public void clickTBResumeInRSView() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        viewObject.clickToolbarButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
-            SarosConstant.TOOL_TIP_TEXT_RESUME);
-    }
-
-    public void clickTBPauseInRSView() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        viewObject.clickToolbarButtonWithTooltipInView(
-            SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
-            SarosConstant.TOOL_TIP_TEXT_PAUSE);
-    }
 
     /*******************************************************************************
      * 
@@ -464,15 +372,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void clickShareProjectWith(String projectName,
         String shareProjectWith) throws RemoteException {
         if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
-            clickCMShareProjectInPEView(projectName);
+            packageExplorerViewObject.shareProject(projectName);
         } else if (shareProjectWith
             .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS))
-            clickCMShareprojectWithVCSSupportInPEView(projectName);
+            packageExplorerViewObject.shareprojectWithVCSSupport(projectName);
         else if (shareProjectWith
             .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY))
-            clickCMShareProjectParticallyInPEView(projectName);
+            packageExplorerViewObject.shareProjectPartically(projectName);
         else
-            clickCMAddToSessionInPEView(projectName);
+            packageExplorerViewObject.addToSession(projectName);
     }
 
     public void confirmSessionUsingNewOrExistProject(
@@ -538,7 +446,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         rosterViewObject.openRosterView();
         sessonViewObject.openSessionView();
         openChatView();
-        openRemoteScreenView();
+        remoteScreenV.openRemoteScreenView();
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
@@ -601,7 +509,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException {
-        clickCMShareProjectInPEView(projectName);
+        packageExplorerViewObject.shareProject(projectName);
         windowObject.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
         eclipseBasicObject.captureScreenshot(TEMPDIR
             + "/shareProjectStepParallel1.png");
@@ -705,7 +613,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         String fileName = filePath[filePath.length - 1];
         packageExplorerViewObject.openFile(filePath);
         eclipseEditorObject.activateEditor(fileName);
-        editorObject.setTextinEditorWithSave(contents, fileName);
+        editorObject.setTextInEditorWithSave(contents, fileName);
     }
 
     public void setTextInJavaEditorWithoutSave(String contentPath,

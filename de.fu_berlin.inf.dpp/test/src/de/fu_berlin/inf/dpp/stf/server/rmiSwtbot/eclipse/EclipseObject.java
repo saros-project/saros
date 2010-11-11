@@ -5,6 +5,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
@@ -20,7 +21,12 @@ public class EclipseObject {
     protected static final transient Logger log = Logger
         .getLogger(EclipseObject.class);
 
+    protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
+    protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
+
     protected RmiSWTWorkbenchBot rmiBot;
+
+    // No exported objects
     protected TableObject tableObject;
     protected MenuObject menuObject;
     protected TreeObject treeObject;

@@ -18,13 +18,10 @@ public class EditorObject extends EclipseObject {
         super(rmiBot);
     }
 
-    public void setTextinEditorWithSave(String contents, String fileName) {
+    public void setTextInEditorWithSave(String contents, String fileName) {
         SWTBotEclipseEditor e = getTextEditor(fileName);
         e.setFocus();
-        e.typeText("hallo wie geht es dir ");
-        bot.sleep(2000);
         e.pressShortcut(Keystrokes.LF);
-        bot.sleep(2000);
         e.setText(contents);
         e.save();
     }
@@ -34,6 +31,14 @@ public class EditorObject extends EclipseObject {
         e.setText(contents);
     }
 
+    /**
+     * TODO: This function doesn't work exactly. It would be happen that die
+     * text contents isn't typed in the right editor, When your saros-instances
+     * are fresh started.
+     * 
+     * @param contents
+     * @param fileName
+     */
     public void typeTextInEditor(String contents, final String fileName) {
 
         // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
@@ -96,13 +101,6 @@ public class EditorObject extends EclipseObject {
 
     public boolean isEditorOpen(String name) {
         return getEditorTitles().contains(name);
-
-        // try {
-        // return delegate.editorByTitle(name) != null;
-        // } catch (WidgetNotFoundException e) {
-        // log.warn("Editor '" + name + "' doesn't exist!");
-        // return false;
-        // }
     }
 
     public void activateEditor(String name) {
