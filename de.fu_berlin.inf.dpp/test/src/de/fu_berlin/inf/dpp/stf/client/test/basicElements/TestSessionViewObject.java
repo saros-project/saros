@@ -34,7 +34,7 @@ public class TestSessionViewObject {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         log.trace("alice create a new proejct and a new class.");
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         log.trace("alice share session with bob.");
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);

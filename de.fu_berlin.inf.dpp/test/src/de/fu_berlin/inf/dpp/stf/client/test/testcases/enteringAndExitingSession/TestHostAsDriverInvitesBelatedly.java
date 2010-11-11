@@ -59,10 +59,10 @@ public class TestHostAsDriverInvitesBelatedly {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
-        bob.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        bob.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newClass(PROJECT, PKG, CLS2);
+        bob.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        bob.mainMenu.newClass(PROJECT, PKG, CLS2);
 
         /*
          * alice build session with carl and is followed by carl.
@@ -137,13 +137,17 @@ public class TestHostAsDriverInvitesBelatedly {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException {
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        bob.bot.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS);
+        bob.eclipseEditor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG,
+            CLS);
 
-        alice.bot.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG, CLS2);
-        bob.bot.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT, PKG, CLS2);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG,
+            CLS2);
+        bob.eclipseEditor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT,
+            PKG, CLS2);
 
-        alice.bot.invitateUser(bob.getBaseJid());
+        alice.sessionV.invitateUser(bob.getBaseJid());
 
         bob.popupWindow.confirmSessionInvitationWindowStep1();
         bob.popupWindow

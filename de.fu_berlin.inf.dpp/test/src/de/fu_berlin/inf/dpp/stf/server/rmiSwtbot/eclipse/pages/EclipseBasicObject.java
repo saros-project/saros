@@ -3,14 +3,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class EclipseBasicObject extends EclipseObject implements IEclipseBasicObject {
+public class EclipseBasicObject extends EclipseObject implements
+    IEclipseBasicObject {
 
     public static EclipseBasicObject classVariable;
     private static final boolean SCREENSHOTS = true;
 
-    public EclipseBasicObject(RmiSWTWorkbenchBot rmiBot) {
+    public EclipseBasicObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

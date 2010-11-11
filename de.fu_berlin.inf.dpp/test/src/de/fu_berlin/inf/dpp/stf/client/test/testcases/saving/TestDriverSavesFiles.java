@@ -66,9 +66,9 @@ public class TestDriverSavesFiles {
         dave = musicians.get(3);
         edna = musicians.get(4);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
-        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS3);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newClass(PROJECT, PKG, CLS2);
+        alice.mainMenu.newClass(PROJECT, PKG, CLS3);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
@@ -143,7 +143,8 @@ public class TestDriverSavesFiles {
         assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS3,
             SarosConstant.ID_JAVA_EDITOR));
 
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS);
         String dirtyClsContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS);
 
@@ -174,7 +175,8 @@ public class TestDriverSavesFiles {
     @Test
     public void testNoChangeByExternalEditorByBob() throws IOException,
         CoreException {
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS2);
         String dirtyCls2ContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
         String cls2ContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
@@ -201,7 +203,8 @@ public class TestDriverSavesFiles {
      */
     @Test
     public void testChangeByEclipseEditorByCarl() throws RemoteException {
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS2);
         String dirtyCls2ContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
         carl.packageExplorerV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
@@ -238,11 +241,13 @@ public class TestDriverSavesFiles {
 
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS2);
         carl.packageExplorerV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
         carl.eclipseEditor.closeJavaEditorWithSave(CLS2);
 
-        alice.bot.setTextInJavaEditorWithSave(CP2_change, PROJECT, PKG, CLS2);
+        alice.eclipseEditor.setTextInJavaEditorWithSave(CP2_change, PROJECT,
+            PKG, CLS2);
         String dirtyCls2ChangeContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
         dave.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
@@ -290,7 +295,8 @@ public class TestDriverSavesFiles {
         IOException, CoreException {
         String clsConentofBob = bob.eclipseState.getClassContent(PROJECT, PKG,
             CLS);
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS);
         alice.eclipseEditor.closeJavaEditorWithSave(CLS);
         String clsConentOfAlice = alice.eclipseState.getClassContent(PROJECT,
             PKG, CLS);

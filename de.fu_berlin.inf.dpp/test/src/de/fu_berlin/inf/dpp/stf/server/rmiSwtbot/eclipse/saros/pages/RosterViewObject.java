@@ -7,19 +7,22 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
-public class RosterViewObject extends SarosObject implements IRosterViewObject {
+public class RosterViewObject extends EclipseObject implements
+    IRosterViewObject {
 
     public static RosterViewObject classVariable;
 
-    public RosterViewObject(SarosRmiSWTWorkbenchBot sarosRmiBot) {
-        super(sarosRmiBot);
+    public RosterViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+        super(rmiBot);
     }
 
     public void openRosterView() throws RemoteException {
@@ -78,7 +81,7 @@ public class RosterViewObject extends SarosObject implements IRosterViewObject {
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return sarosRmiBot.stateObject.isConnectedByXMPP()
+        return rmiBot.stateObject.isConnectedByXMPP()
             && isConnectedByXmppGuiCheck();
     }
 
@@ -119,4 +122,70 @@ public class RosterViewObject extends SarosObject implements IRosterViewObject {
     public void waitUntilDisConnected() throws RemoteException {
         waitUntil(SarosConditions.isDisConnected(bot));
     }
+
+    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException {
+        if (!hasContactWith(jid)) {
+            openRosterView();
+            setFocusOnRosterView();
+            clickTBAddANewContactInRosterView();
+            windowObject
+                .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+            // activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+            bot.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
+                jid.getBase());
+            basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+            bot.button(SarosConstant.BUTTON_FINISH).click();
+            participant.getPopupWindowObject()
+                .confirmRequestOfSubscriptionReceivedWindow();
+            rmiBot.popupWindowObject
+                .confirmRequestOfSubscriptionReceivedWindow();
+        }
+    }
+
+    public boolean hasContactWith(JID jid) throws RemoteException {
+        return rmiBot.stateObject.hasContactWith(jid)
+            && isBuddyExist(jid.getBase());
+    }
+
+    /**
+     * Remove given contact from Roster, if contact was added before.
+     */
+    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+        throws RemoteException {
+        if (!hasContactWith(jid))
+            return;
+        try {
+            viewObject.clickContextMenuOfTreeInView(
+                SarosConstant.VIEW_TITLE_ROSTER,
+                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
+                jid.getBase());
+            windowObject
+                .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
+            rmiBot.eclipseWindowObject.confirmWindow(
+                SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
+                SarosConstant.BUTTON_YES);
+            participant.getEclipseWindowObject().waitUntilShellActive(
+                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
+            participant.getEclipseWindowObject().confirmWindow(
+                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
+                SarosConstant.BUTTON_OK);
+
+        } catch (WidgetNotFoundException e) {
+            log.info("Contact not found: " + jid.getBase(), e);
+        }
+    }
+
+    public void renameContact(String contact, String newName)
+        throws RemoteException {
+        SWTBotTree tree = bot.viewByTitle(SarosConstant.VIEW_TITLE_ROSTER)
+            .bot().tree();
+        SWTBotTreeItem item = treeObject.getTreeItemWithMatchText(tree,
+            SarosConstant.BUDDIES + ".*", contact + ".*");
+        item.contextMenu("Rename...").click();
+        windowObject.waitUntilShellActive("Set new nickname");
+        bot.text(contact).setText(newName);
+        bot.button(SarosConstant.BUTTON_OK).click();
+    }
+
 }

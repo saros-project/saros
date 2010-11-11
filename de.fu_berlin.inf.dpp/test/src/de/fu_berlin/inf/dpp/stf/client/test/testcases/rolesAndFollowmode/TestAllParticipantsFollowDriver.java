@@ -59,7 +59,7 @@ public class TestAllParticipantsFollowDriver {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
 
         /*
@@ -131,7 +131,8 @@ public class TestAllParticipantsFollowDriver {
      */
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
-        alice.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+            CLS);
         String dirtyClsContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS);
 
@@ -171,7 +172,8 @@ public class TestAllParticipantsFollowDriver {
         bob.eclipseEditor.waitUntilJavaEditorOpen(CLS);
         carl.eclipseEditor.waitUntilJavaEditorOpen(CLS);
         dave.eclipseEditor.waitUntilJavaEditorOpen(CLS);
-        alice.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
+            PKG, CLS);
 
         alice.eclipseEditor.closeJavaEditorWithSave(CLS);
         String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,

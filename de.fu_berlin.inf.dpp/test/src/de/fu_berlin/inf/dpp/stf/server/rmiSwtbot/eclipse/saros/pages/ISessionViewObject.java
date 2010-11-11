@@ -332,4 +332,8 @@ public interface ISessionViewObject extends Remote {
     public void jumpToPositionOfSelectedUser(String participantJID, String sufix)
         throws RemoteException;
 
+    public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
+
+    public void invitateUser(String inviteeJID) throws RemoteException;
+
 }

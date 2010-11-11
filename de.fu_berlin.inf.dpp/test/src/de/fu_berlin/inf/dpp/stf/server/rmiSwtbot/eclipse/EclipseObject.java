@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableOb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class EclipseObject {
     protected static final transient Logger log = Logger
@@ -24,7 +25,7 @@ public class EclipseObject {
     protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
     protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
 
-    protected RmiSWTWorkbenchBot rmiBot;
+    protected SarosRmiSWTWorkbenchBot rmiBot;
 
     // No exported objects
     protected TableObject tableObject;
@@ -47,7 +48,7 @@ public class EclipseObject {
      *            interface for {@link SWTWorkbenchBot}. Using the
      *            {@link EclipseObject} can access other objects.
      */
-    public EclipseObject(RmiSWTWorkbenchBot rmiBot) {
+    public EclipseObject(SarosRmiSWTWorkbenchBot rmiBot) {
         this.rmiBot = rmiBot;
         this.bot = RmiSWTWorkbenchBot.delegate;
         this.tableObject = rmiBot.tableObject;

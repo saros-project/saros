@@ -32,6 +32,6 @@ public class TestRosterViewObject {
 
     @Test
     public void testBuddy() throws RemoteException {
-        assertTrue(alice.bot.hasContactWith(bob.jid));
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
     }
 }

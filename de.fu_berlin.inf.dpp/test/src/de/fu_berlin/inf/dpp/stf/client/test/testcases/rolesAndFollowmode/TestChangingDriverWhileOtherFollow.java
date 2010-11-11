@@ -57,7 +57,7 @@ public class TestChangingDriverWhileOtherFollow {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -144,7 +144,8 @@ public class TestChangingDriverWhileOtherFollow {
         // bob.bot.waitUntilFollowed(carl.getBaseJid());
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
-        carl.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        carl.eclipseEditor
+            .setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         String dirtyClsContentOfCarl = carl.eclipseEditor.getTextOfJavaEditor(
             PROJECT, PKG, CLS);
 
@@ -167,7 +168,8 @@ public class TestChangingDriverWhileOtherFollow {
             SarosConstant.ID_JAVA_EDITOR));
 
         carl.stopFollowedBy(alice, bob, dave);
-        carl.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
+        carl.eclipseEditor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
+            PKG, CLS);
         carl.eclipseEditor.closeJavaEditorWithSave(CLS);
         String dirtyClsChangeContentOfCarl = carl.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS);

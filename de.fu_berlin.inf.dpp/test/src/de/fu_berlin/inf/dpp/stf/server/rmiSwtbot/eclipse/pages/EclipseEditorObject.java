@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -22,13 +23,14 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 
 public class EclipseEditorObject extends EclipseObject implements
     IEclipseEditorObject {
     public static EclipseEditorObject classVariable;
 
-    public EclipseEditorObject(RmiSWTWorkbenchBot rmiBot) {
+    public EclipseEditorObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 
@@ -244,4 +246,67 @@ public class EclipseEditorObject extends EclipseObject implements
         return results.get(0);
     }
 
+    public void setTextInJavaEditorWithSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
+        String contents = SarosState.classVariable.getContents(contentPath);
+        // activateEclipseShell();
+
+        rmiBot.packageExplorerViewObject.openClass(projectName, packageName,
+            className);
+        activateJavaEditor(className);
+        SWTBotEditor editor;
+        editor = bot.editorByTitle(className + ".java");
+        SWTBotEclipseEditor e = editor.toTextEditor();
+
+        // Display.getDefault().syncExec(new Runnable() {
+        // public void run() {
+        // final IWorkbench wb = PlatformUI.getWorkbench();
+        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        // log.debug("shell name: " + win.getShell().getText());
+        // win.getShell().forceActive();
+        // win.getShell().forceFocus();
+        // }
+        // });
+        // e.setFocus();
+        e.setText(contents);
+        // e.typeText("hallo wie geht es dir !%%%");
+        // e.pressShortcut(Keystrokes.LF);
+        // e.typeText("mir geht es gut!");
+        // delegate.sleep(2000);
+        //
+        // delegate.sleep(2000);
+
+        e.save();
+        // editorObject.setTextinEditorWithSave(contents, className + ".java");
+    }
+
+    public void setTextInEditorWithSave(String contentPath, String... filePath)
+        throws RemoteException {
+        String contents = SarosState.classVariable.getContents(contentPath);
+        String fileName = filePath[filePath.length - 1];
+        rmiBot.packageExplorerViewObject.openFile(filePath);
+        activateEditor(fileName);
+        editorObject.setTextInEditorWithSave(contents, fileName);
+    }
+
+    public void setTextInJavaEditorWithoutSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
+        String contents = SarosState.classVariable.getContents(contentPath);
+        rmiBot.packageExplorerViewObject.openClass(projectName, packageName,
+            className);
+        activateJavaEditor(className);
+        editorObject.setTextinEditorWithoutSave(contents, className + ".java");
+    }
+
+    public void typeTextInJavaEditor(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException {
+        String contents = SarosState.classVariable.getContents(contentPath);
+        rmiBot.activateEclipseShell();
+        rmiBot.packageExplorerViewObject.openClass(projectName, packageName,
+            className);
+        activateJavaEditor(className);
+        editorObject.typeTextInEditor(contents, className + ".java");
+    }
 }

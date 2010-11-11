@@ -28,7 +28,7 @@ public class TestShare3UsersSequentially {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         carl = InitMusician.newCarl();
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass

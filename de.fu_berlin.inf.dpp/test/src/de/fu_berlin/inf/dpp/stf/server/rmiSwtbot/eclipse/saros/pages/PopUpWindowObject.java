@@ -3,19 +3,21 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class PopUpWindowObject extends SarosObject implements
+public class PopUpWindowObject extends EclipseObject implements
     ISarosWindowObject {
 
     public static PopUpWindowObject classVariable;
 
-    public PopUpWindowObject(SarosRmiSWTWorkbenchBot sarosRmiBot) {
-        super(sarosRmiBot);
+    public PopUpWindowObject(SarosRmiSWTWorkbenchBot rmiBot) {
+        super(rmiBot);
     }
 
     public void IncomingScreensharingSession(String YesOrNot)
@@ -278,4 +280,17 @@ public class PopUpWindowObject extends SarosObject implements
     // // // ignore, server responds
     // // }
     // }
+
+    public void confirmInvitationCancelledWindow() throws RemoteException {
+        SWTBotShell shell = bot.shell("Invitation Cancelled");
+        shell.activate().setFocus();
+        SWTBotButton button = shell.bot().button();
+        button.click();
+    }
+
+    public void cancelInivtationInSessionInvitationWindow()
+        throws RemoteException {
+        SWTBotShell shell = bot.activeShell();
+        shell.bot().toolbarButton().click();
+    }
 }

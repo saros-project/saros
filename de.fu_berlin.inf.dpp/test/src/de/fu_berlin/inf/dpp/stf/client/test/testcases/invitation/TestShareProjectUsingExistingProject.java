@@ -35,12 +35,12 @@ public class TestShareProjectUsingExistingProject {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS2);
+        bob.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS2);
     }
 
     @After

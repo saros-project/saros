@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -10,13 +11,13 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class PackageExplorerViewObject extends EclipseObject implements
     IPackageExplorerViewObject {
     public static PackageExplorerViewObject classVariable;
 
-    public PackageExplorerViewObject(RmiSWTWorkbenchBot rmiBot) {
+    public PackageExplorerViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 
@@ -324,8 +325,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
         windowObject.waitUntilShellCloses(shell2);
     }
 
-    public void shareProject(String projectName)
-        throws RemoteException {
+    public void shareProject(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
@@ -358,8 +358,7 @@ public class PackageExplorerViewObject extends EclipseObject implements
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
     }
 
-    public void addToSession(String projectName)
-        throws RemoteException {
+    public void addToSession(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
@@ -367,6 +366,29 @@ public class PackageExplorerViewObject extends EclipseObject implements
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);
+    }
+
+    public void clickShareProjectWith(String projectName,
+        String shareProjectWith) throws RemoteException {
+        if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
+            shareProject(projectName);
+        } else if (shareProjectWith
+            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS))
+            shareprojectWithVCSSupport(projectName);
+        else if (shareProjectWith
+            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY))
+            shareProjectPartically(projectName);
+        else
+            addToSession(projectName);
+    }
+
+    public void shareProject(String projectName, List<String> inviteeJIDS)
+        throws RemoteException {
+        shareProject(projectName);
+        windowObject.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
+        tableObject.selectCheckBoxsInTable(inviteeJIDS);
+        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        bot.button(SarosConstant.BUTTON_FINISH).click();
     }
 
 }

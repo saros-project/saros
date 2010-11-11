@@ -34,8 +34,8 @@ public class TestHandleContacts {
 
     @Before
     public void setUp() throws RemoteException {
-        alice.bot.addContact(bob.jid, bob.bot);
-        bob.bot.addContact(alice.jid, alice.bot);
+        alice.rosterV.addContact(bob.jid, bob.bot);
+        bob.rosterV.addContact(alice.jid, alice.bot);
     }
 
     @After
@@ -49,36 +49,36 @@ public class TestHandleContacts {
 
     @Test
     public void testBobRemoveContactAlice() throws RemoteException {
-        assertTrue(alice.bot.hasContactWith(bob.jid));
-        assertTrue(bob.bot.hasContactWith(alice.jid));
-        bob.bot.deleteContact(alice.jid, alice.bot);
-        assertFalse(bob.bot.hasContactWith(alice.jid));
-        assertFalse(alice.bot.hasContactWith(bob.jid));
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
+        assertTrue(bob.rosterV.hasContactWith(alice.jid));
+        bob.rosterV.deleteContact(alice.jid, alice.bot);
+        assertFalse(bob.rosterV.hasContactWith(alice.jid));
+        assertFalse(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test
     public void testAliceRemoveContactBob() throws RemoteException {
-        assertTrue(alice.bot.hasContactWith(bob.jid));
-        assertTrue(bob.bot.hasContactWith(alice.jid));
-        alice.bot.deleteContact(bob.jid, bob.bot);
-        assertFalse(bob.bot.hasContactWith(alice.jid));
-        assertFalse(alice.bot.hasContactWith(bob.jid));
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
+        assertTrue(bob.rosterV.hasContactWith(alice.jid));
+        alice.rosterV.deleteContact(bob.jid, bob.bot);
+        assertFalse(bob.rosterV.hasContactWith(alice.jid));
+        assertFalse(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test
     public void testAliceAddContactBob() throws RemoteException {
-        alice.bot.deleteContact(bob.jid, bob.bot);
-        alice.bot.addContact(bob.jid, bob.bot);
-        assertTrue(bob.bot.hasContactWith(alice.jid));
-        assertTrue(alice.bot.hasContactWith(bob.jid));
+        alice.rosterV.deleteContact(bob.jid, bob.bot);
+        alice.rosterV.addContact(bob.jid, bob.bot);
+        assertTrue(bob.rosterV.hasContactWith(alice.jid));
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test
     public void testBobAddContactAlice() throws RemoteException {
-        bob.bot.deleteContact(alice.jid, alice.bot);
-        bob.bot.addContact(alice.jid, alice.bot);
-        assertTrue(bob.bot.hasContactWith(alice.jid));
-        assertTrue(alice.bot.hasContactWith(bob.jid));
+        bob.rosterV.deleteContact(alice.jid, alice.bot);
+        bob.rosterV.addContact(alice.jid, alice.bot);
+        assertTrue(bob.rosterV.hasContactWith(alice.jid));
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test

@@ -11,14 +11,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class EclipseMainMenuObject extends EclipseObject implements
     IEclipseMainMenuObject {
 
-    public static EclipseMainMenuObject classVariable;
-
-    public EclipseMainMenuObject(RmiSWTWorkbenchBot rmiBot) {
+    public EclipseMainMenuObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

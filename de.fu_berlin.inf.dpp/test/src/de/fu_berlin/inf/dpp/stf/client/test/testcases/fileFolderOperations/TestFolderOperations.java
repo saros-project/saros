@@ -37,7 +37,7 @@ public class TestFolderOperations {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
     }
@@ -45,9 +45,9 @@ public class TestFolderOperations {
     @Before
     public void setup() throws RemoteException {
         if (!alice.eclipseState.existsClass(PROJECT, PKG, CLS))
-            alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS);
+            alice.mainMenu.newClass(PROJECT, PKG, CLS);
         if (!alice.eclipseState.isFolderExist(PROJECT, FOLDER))
-            alice.eclipseMainMenu.newFolder(PROJECT, FOLDER);
+            alice.mainMenu.newFolder(PROJECT, FOLDER);
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();

@@ -101,4 +101,18 @@ public interface IEclipseEditorObject extends Remote {
      */
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException;
+
+    public void setTextInJavaEditorWithSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException;
+
+    public void setTextInEditorWithSave(String contentPath, String... filePath)
+        throws RemoteException;
+
+    public void setTextInJavaEditorWithoutSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException;
+
+    public void typeTextInJavaEditor(String contentPath, String projectName,
+        String packageName, String className) throws RemoteException;
 }

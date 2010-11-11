@@ -9,11 +9,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class TreeObject extends EclipseObject {
 
-    public TreeObject(RmiSWTWorkbenchBot rmiBot) {
+    public TreeObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

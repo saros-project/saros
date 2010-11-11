@@ -37,7 +37,7 @@ public class TestParallelInvitationWithTerminationByHost {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         invitees.add(bob.getBaseJid());
         invitees.add(carl.getBaseJid());
     }
@@ -91,20 +91,20 @@ public class TestParallelInvitationWithTerminationByHost {
      */
     @Test
     public void testInvitationWithTerminationByHost() throws RemoteException {
-        alice.bot.shareProject(PROJECT, invitees);
+        alice.packageExplorerV.shareProject(PROJECT, invitees);
         carl.popupWindow.confirmSessionInvitationWindowStep1();
 
-        alice.bot.cancelInvitation();
+        alice.progressV.cancelInvitation();
         bob.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(bob.eclipseWindow.isShellActive("Invitation Cancelled"));
-        bob.bot.confirmInvitationCancelledWindow();
-        alice.bot.removeProgress();
+        bob.popupWindow.confirmInvitationCancelledWindow();
+        alice.progressV.removeProgress();
 
-        alice.bot.cancelInvitation();
+        alice.progressV.cancelInvitation();
         carl.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(carl.eclipseWindow.isShellActive("Invitation Cancelled"));
-        carl.bot.confirmInvitationCancelledWindow();
-        alice.bot.removeProgress();
+        carl.popupWindow.confirmInvitationCancelledWindow();
+        alice.progressV.removeProgress();
 
         assertFalse(bob.sessionV.isInSession());
         assertFalse(carl.sessionV.isInSession());

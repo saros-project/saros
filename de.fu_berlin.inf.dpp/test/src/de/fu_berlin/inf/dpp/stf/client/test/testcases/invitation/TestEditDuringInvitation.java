@@ -51,7 +51,7 @@ public class TestEditDuringInvitation {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -100,15 +100,15 @@ public class TestEditDuringInvitation {
         assertTrue(bob.state.isDriver(alice.jid));
 
         log.trace("alice.inviteUser(carl");
-        alice.bot.invitateUser(carl.getBaseJid());
+        alice.sessionV.invitateUser(carl.getBaseJid());
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         carl.popupWindow.confirmSessionInvitationWindowStep1();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG, CLS);
+        bob.eclipseEditor.setTextInJavaEditorWithSave(
+            BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
         carl.popupWindow

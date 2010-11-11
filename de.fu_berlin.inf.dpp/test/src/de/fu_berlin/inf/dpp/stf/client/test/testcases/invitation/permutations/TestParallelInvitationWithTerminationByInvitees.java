@@ -120,7 +120,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -131,7 +131,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
         peersName.add(carl.getBaseJid());
         peersName.add(edna.getBaseJid());
 
-        alice.bot.shareProject(PROJECT, peersName);
+        alice.packageExplorerV.shareProject(PROJECT, peersName);
 
         bob.eclipseWindow.waitUntilShellActive("Session Invitation");
         bob.basic.clickButton(SarosConstant.BUTTON_CANCEL);

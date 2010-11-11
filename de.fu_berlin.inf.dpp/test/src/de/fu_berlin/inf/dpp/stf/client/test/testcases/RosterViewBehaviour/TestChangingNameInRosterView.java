@@ -27,7 +27,7 @@ public class TestChangingNameInRosterView {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -41,7 +41,7 @@ public class TestChangingNameInRosterView {
 
     @After
     public void cleanUp() throws RemoteException {
-        alice.bot.renameContact(bob.jid.getName(), bob.jid.getBase());
+        alice.rosterV.renameContact(bob.jid.getName(), bob.jid.getBase());
         bob.bot.resetWorkbench();
         carl.bot.resetWorkbench();
         alice.bot.resetWorkbench();
@@ -49,10 +49,10 @@ public class TestChangingNameInRosterView {
 
     @Test
     public void testReanmeInRosterView() throws RemoteException {
-        assertTrue(alice.bot.hasContactWith(bob.jid));
-        alice.bot.renameContact(bob.jid.getBase(), bob.jid.getName());
+        assertTrue(alice.rosterV.hasContactWith(bob.jid));
+        alice.rosterV.renameContact(bob.jid.getBase(), bob.jid.getName());
         assertTrue(alice.state.hasContactWith(bob.jid));
-        assertFalse(alice.bot.hasContactWith(bob.jid));
+        assertFalse(alice.rosterV.hasContactWith(bob.jid));
         // assertTrue(alice.bot.hasContactWith(bob.jid.));
         assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getBase()));
         assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getName()));

@@ -118,7 +118,7 @@ public class TestParallelInvitationWithTerminationByHost {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -128,17 +128,17 @@ public class TestParallelInvitationWithTerminationByHost {
         peersName.add(dave.getBaseJid());
         peersName.add(carl.getBaseJid());
 
-        alice.bot.shareProject(PROJECT, peersName);
+        alice.packageExplorerV.shareProject(PROJECT, peersName);
 
         bob.eclipseWindow.waitUntilShellActive("Session Invitation");
-        alice.bot.cancelInvitation(0);
+        alice.progressV.cancelInvitation(0);
         bob.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(bob.eclipseWindow.isShellActive("Invitation Cancelled"));
         bob.eclipseWindow.closeShell("Invitation Cancelled");
 
         carl.eclipseWindow.waitUntilShellActive("Session Invitation");
         carl.popupWindow.confirmSessionInvitationWindowStep1();
-        alice.bot.cancelInvitation(0);
+        alice.progressV.cancelInvitation(0);
         carl.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(carl.eclipseWindow.isShellActive("Invitation Cancelled"));
         carl.eclipseWindow.closeShell("Invitation Cancelled");
@@ -146,7 +146,7 @@ public class TestParallelInvitationWithTerminationByHost {
         dave.eclipseWindow.waitUntilShellActive("Session Invitation");
         dave.popupWindow.confirmSessionInvitationWindowStep1();
         dave.basic.clickButton(SarosConstant.BUTTON_FINISH);
-        alice.bot.cancelInvitation(0);
+        alice.progressV.cancelInvitation(0);
         dave.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(dave.eclipseWindow.isShellActive("Invitation Cancelled"));
         dave.eclipseWindow.closeShell("Invitation Cancelled");

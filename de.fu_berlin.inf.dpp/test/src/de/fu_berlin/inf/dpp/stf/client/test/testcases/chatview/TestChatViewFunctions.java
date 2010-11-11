@@ -47,7 +47,7 @@ public class TestChatViewFunctions {
         alice = musicians.get(0);
         bob = musicians.get(1);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * alice build session with bob.

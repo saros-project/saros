@@ -4,11 +4,11 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class MenuObject extends EclipseObject {
 
-    public MenuObject(RmiSWTWorkbenchBot rmiBot) {
+    public MenuObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

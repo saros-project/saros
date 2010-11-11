@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class RemoteScreenViewObject extends SarosObject implements
+public class RemoteScreenViewObject extends EclipseObject implements
     IRemoteScreenViewObject {
     public static RemoteScreenViewObject classVariable;
 

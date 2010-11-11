@@ -10,11 +10,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class PerspectiveObject extends EclipseObject {
 
-    public PerspectiveObject(RmiSWTWorkbenchBot rmiBot) {
+    public PerspectiveObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

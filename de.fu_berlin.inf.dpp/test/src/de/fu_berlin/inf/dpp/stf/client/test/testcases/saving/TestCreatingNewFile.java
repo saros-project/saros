@@ -58,7 +58,7 @@ public class TestCreatingNewFile {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        carl.eclipseMainMenu.newProject(PROJECT);
+        carl.mainMenu.newProject(PROJECT);
 
         /*
          * build session with bob, and alice simultaneously
@@ -123,8 +123,8 @@ public class TestCreatingNewFile {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.eclipseMainMenu.newFolder(PROJECT, FOLDER);
-        carl.eclipseMainMenu.newFile(PROJECT, FOLDER, FILE);
+        carl.mainMenu.newFolder(PROJECT, FOLDER);
+        carl.mainMenu.newFile(PROJECT, FOLDER, FILE);
         alice.eclipseState.waitUntilFileExist(PROJECT, FOLDER, FILE);
         assertTrue(alice.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
         bob.eclipseState.waitUntilFileExist(PROJECT, FOLDER, FILE);
@@ -164,8 +164,8 @@ public class TestCreatingNewFile {
         assertTrue(carl.state.isDriver(alice.jid));
         assertTrue(bob.state.isDriver(alice.jid));
 
-        carl.eclipseMainMenu.newFolder(PROJECT, FOLDER);
-        carl.eclipseMainMenu.newFile(PROJECT, FOLDER, FILE);
+        carl.mainMenu.newFolder(PROJECT, FOLDER);
+        carl.mainMenu.newFile(PROJECT, FOLDER, FILE);
         alice.basic.sleep(500);
         assertFalse(alice.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
         bob.basic.sleep(500);
@@ -176,15 +176,16 @@ public class TestCreatingNewFile {
         if (!bob.state.isFollowingUser(alice.getBaseJid()))
             bob.sessionV.followThisUser(alice.state);
 
-        alice.eclipseMainMenu.newFolder(PROJECT, FOLDER2);
-        alice.eclipseMainMenu.newFile(PROJECT, FOLDER2, FILE2);
+        alice.mainMenu.newFolder(PROJECT, FOLDER2);
+        alice.mainMenu.newFile(PROJECT, FOLDER2, FILE2);
 
         carl.eclipseState.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
         assertTrue(carl.eclipseState.isFileExist(PROJECT, FOLDER2, FILE2));
         bob.eclipseState.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
         assertTrue(bob.eclipseState.isFileExist(PROJECT, FOLDER2, FILE2));
 
-        alice.bot.setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
+        alice.eclipseEditor
+            .setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
 
         String file2ContentOfAlice = alice.eclipseEditor.getTextOfEditor(
             PROJECT, FOLDER2, FILE2);

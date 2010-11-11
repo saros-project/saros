@@ -38,7 +38,7 @@ public class TestFileOperations {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
         carl.sessionV.followThisUser(alice.state);
@@ -47,7 +47,7 @@ public class TestFileOperations {
     @Before
     public void setup() throws RemoteException {
         if (!alice.eclipseState.existsClass(PROJECT, PKG, CLS))
-            alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS);
+            alice.mainMenu.newClass(PROJECT, PKG, CLS);
         if (alice.eclipseState.existsClass(PROJECT, PKG, CLS2))
             alice.eclipseState.deleteClass(PROJECT, PKG, CLS2);
         if (alice.eclipseState.isPkgExist(PROJECT, PKG2))
@@ -94,20 +94,20 @@ public class TestFileOperations {
 
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
-        alice.eclipseMainMenu.newPackage(PROJECT, PKG2);
+        alice.mainMenu.newPackage(PROJECT, PKG2);
         bob.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
         carl.eclipseState.waitUntilPkgExist(PROJECT, PKG2);
         assertTrue(bob.eclipseState.isPkgExist(PROJECT, PKG2));
         assertTrue(carl.eclipseState.isPkgExist(PROJECT, PKG2));
 
-        alice.eclipseMainMenu.newClass(PROJECT, PKG2, CLS);
+        alice.mainMenu.newClass(PROJECT, PKG2, CLS);
         bob.eclipseState.waitUntilClassExist(PROJECT, PKG2, CLS);
         carl.eclipseState.waitUntilClassExist(PROJECT, PKG2, CLS);
         assertTrue(bob.eclipseState.existsClass(PROJECT, PKG2, CLS));
         assertTrue(carl.eclipseState.existsClass(PROJECT, PKG2, CLS));
 
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG2, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithSave(
+            BotConfiguration.CONTENTPATH, PROJECT, PKG2, CLS);
         String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
             PKG2, CLS);
         carl.eclipseState.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
@@ -124,8 +124,8 @@ public class TestFileOperations {
 
     @Test
     public void testMoveClass() throws RemoteException {
-        alice.eclipseMainMenu.newPackage(PROJECT, PKG2);
-        alice.eclipseMainMenu.newClass(PROJECT, PKG2, CLS2);
+        alice.mainMenu.newPackage(PROJECT, PKG2);
+        alice.mainMenu.newClass(PROJECT, PKG2, CLS2);
         alice.packageExplorerV.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
         bob.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);
         carl.eclipseState.waitUntilClassExist(PROJECT, PKG, CLS2);

@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.ProgressViewObject;
@@ -32,6 +31,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SarosMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.SessionViewObject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
@@ -146,10 +146,10 @@ public class StartupSaros implements IStartup {
                     bot.exportProgressViewObject(
                         ProgressViewObject.classVariable, "progressView");
 
-                    EclipseMainMenuObject.classVariable = new EclipseMainMenuObject(
+                    SarosMainMenuObject.classVariable = new SarosMainMenuObject(
                         bot);
-                    bot.exportMainMenuObject(
-                        EclipseMainMenuObject.classVariable, "eclipseMainMenu");
+                    bot.exportMainMenuObject(SarosMainMenuObject.classVariable,
+                        "sarosMainMenu");
 
                     PackageExplorerViewObject.classVariable = new PackageExplorerViewObject(
                         bot);

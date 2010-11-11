@@ -30,7 +30,7 @@ public class TestShare2UsersSequentially {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -57,8 +57,8 @@ public class TestShare2UsersSequentially {
         alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithSave(
+            BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
 
         log.trace("invitee.openFile");
         bob.packageExplorerV.openClass(PROJECT, PKG, CLS);

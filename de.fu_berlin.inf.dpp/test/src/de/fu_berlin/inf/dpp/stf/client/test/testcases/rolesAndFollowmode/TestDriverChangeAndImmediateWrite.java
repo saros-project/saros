@@ -40,7 +40,7 @@ public class TestDriverChangeAndImmediateWrite {
     public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -85,14 +85,15 @@ public class TestDriverChangeAndImmediateWrite {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
         alice.sessionV.giveDriverRole(bob.state);
-        bob.bot.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        bob.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         bob.basic.sleep(5000);
-        assertFalse(bob.bot.isToolbarNoInconsistenciesEnabled());
+        assertFalse(bob.sessionV.isToolbarNoInconsistenciesEnabled());
 
-        alice.bot.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
+        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
+            PKG, CLS);
 
         bob.basic.sleep(5000);
-        assertFalse(bob.bot.isToolbarNoInconsistenciesEnabled());
+        assertFalse(bob.sessionV.isToolbarNoInconsistenciesEnabled());
 
     }
 }

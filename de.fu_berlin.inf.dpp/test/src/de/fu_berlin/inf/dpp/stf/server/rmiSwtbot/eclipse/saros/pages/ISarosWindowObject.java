@@ -50,4 +50,9 @@ public interface ISarosWindowObject extends Remote {
 
     public void confirmSarosConfigurationWizard(String xmppServer, String jid,
         String password) throws RemoteException;
+
+    public void confirmInvitationCancelledWindow() throws RemoteException;
+
+    public void cancelInivtationInSessionInvitationWindow()
+        throws RemoteException;
 }

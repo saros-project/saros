@@ -10,4 +10,14 @@ public interface IProgressViewObject extends Remote {
     public void activateProgressView() throws RemoteException;
 
     public boolean existPorgress() throws RemoteException;
+
+    public void removeProgress() throws RemoteException;
+
+    public boolean isProgressViewOpen() throws RemoteException;
+
+    public void cancelInvitation() throws RemoteException;
+
+    public void cancelInvitation(int index) throws RemoteException;
+
+    public void waitUntilNoInvitationProgress() throws RemoteException;
 }

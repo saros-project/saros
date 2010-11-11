@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObj
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosMainMenuObject;
 
 /**
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
@@ -67,7 +68,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public IEclipseState eclipseState;
     public IEclipseEditorObject eclipseEditorObject;
     public IPackageExplorerViewObject packageExplorerViewObject;
-    public IEclipseMainMenuObject mainMenuObject;
+    public ISarosMainMenuObject mainMenuObject;
     public IProgressViewObject progressViewObject;
     public IEclipseBasicObject eclipseBasicObject;
 
@@ -100,16 +101,7 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;
-        tableObject = new TableObject(this);
-        tBarObject = new ToolbarObject(this);
-        treeObject = new TreeObject(this);
-        viewObject = new ViewObject(this);
-        persObject = new PerspectiveObject(this);
-        editorObject = new EditorObject(this);
-        mainObject = new HelperObject(this);
-        menuObject = new MenuObject(this);
-        windowObject = new WindowObject(this);
-        basicObject = new BasicObject(this);
+      
     }
 
     /**
@@ -165,8 +157,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * Export give eclipse basic object object by given name on our local RMI
      * Registry.
      */
-    public void exportEclipseBasicObject(IEclipseBasicObject eclipseBasicObject,
-        String exportName) {
+    public void exportEclipseBasicObject(
+        IEclipseBasicObject eclipseBasicObject, String exportName) {
         try {
             this.eclipseBasicObject = (IEclipseBasicObject) UnicastRemoteObject
                 .exportObject(eclipseBasicObject, 0);
@@ -203,11 +195,11 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     /**
      * Export give main menu object by given name on our local RMI Registry.
      */
-    public void exportMainMenuObject(
-        IEclipseMainMenuObject eclipseMainMenuObject, String exportName) {
+    public void exportMainMenuObject(ISarosMainMenuObject sarosMainMenuObject,
+        String exportName) {
         try {
-            this.mainMenuObject = (IEclipseMainMenuObject) UnicastRemoteObject
-                .exportObject(eclipseMainMenuObject, 0);
+            this.mainMenuObject = (ISarosMainMenuObject) UnicastRemoteObject
+                .exportObject(sarosMainMenuObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.mainMenuObject);
         } catch (RemoteException e) {

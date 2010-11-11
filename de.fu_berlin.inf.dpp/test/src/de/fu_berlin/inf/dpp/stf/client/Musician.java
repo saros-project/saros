@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
@@ -27,6 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISessionViewObject;
 
@@ -42,7 +42,7 @@ public class Musician {
     public IEclipseState eclipseState;
     public IEclipseEditorObject eclipseEditor;
     public IPackageExplorerViewObject packageExplorerV;
-    public IEclipseMainMenuObject eclipseMainMenu;
+    public ISarosMainMenuObject mainMenu;
     public IProgressViewObject progressV;
     public IEclipseBasicObject basic;
 
@@ -78,7 +78,7 @@ public class Musician {
         log.trace("closeWelcomeView");
         packageExplorerV.closeWelcomeView();
         log.trace("openJavaPerspective");
-        eclipseMainMenu.openPerspectiveJava();
+        mainMenu.openPerspectiveJava();
         log.trace("openSarosViews");
         bot.openSarosViews();
         log.trace("xmppConnect");
@@ -112,8 +112,7 @@ public class Musician {
                 .lookup("eclipseEditor");
             packageExplorerV = (IPackageExplorerViewObject) registry
                 .lookup("packageExplorerView");
-            eclipseMainMenu = (IEclipseMainMenuObject) registry
-                .lookup("eclipseMainMenu");
+            mainMenu = (ISarosMainMenuObject) registry.lookup("sarosMainMenu");
             progressV = (IProgressViewObject) registry.lookup("progressView");
             basic = (IEclipseBasicObject) registry.lookup("basicObject");
         } catch (java.rmi.ConnectException e) {
@@ -131,7 +130,7 @@ public class Musician {
         for (int i = 0; i < invitees.length; i++) {
             inviteeJIDs[i] = invitees[i].getBaseJid();
         }
-        bot.clickShareProjectWith(projectName, shareProjectWith);
+        packageExplorerV.clickShareProjectWith(projectName, shareProjectWith);
 
         popupWindow.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
@@ -151,7 +150,8 @@ public class Musician {
         }
 
         log.trace("alice.shareProjectParallel");
-        this.bot.shareProject(BotConfiguration.PROJECTNAME, peersName);
+        this.packageExplorerV.shareProject(BotConfiguration.PROJECTNAME,
+            peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.size(); i++) {

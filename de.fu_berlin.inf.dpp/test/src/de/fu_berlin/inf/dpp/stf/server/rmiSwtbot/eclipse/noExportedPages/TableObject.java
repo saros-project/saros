@@ -22,11 +22,11 @@ import org.hamcrest.Matcher;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class TableObject extends EclipseObject {
 
-    public TableObject(RmiSWTWorkbenchBot rmiBot) {
+    public TableObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

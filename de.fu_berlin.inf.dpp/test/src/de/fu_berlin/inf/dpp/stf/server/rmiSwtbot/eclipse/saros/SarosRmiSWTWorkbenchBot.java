@@ -3,27 +3,25 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.PerspectiveObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ToolbarObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
@@ -56,7 +54,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     private IRosterViewObject rosterViewObject;
 
-    private ISarosWindowObject popupWindowObject;
+    public ISarosWindowObject popupWindowObject;
 
     private ISessionViewObject sessonViewObject;
 
@@ -91,6 +89,16 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      */
     protected SarosRmiSWTWorkbenchBot(SarosSWTBot bot) {
         super(bot);
+        tableObject = new TableObject(this);
+        tBarObject = new ToolbarObject(this);
+        treeObject = new TreeObject(this);
+        viewObject = new ViewObject(this);
+        persObject = new PerspectiveObject(this);
+        editorObject = new EditorObject(this);
+        mainObject = new HelperObject(this);
+        menuObject = new MenuObject(this);
+        windowObject = new WindowObject(this);
+        basicObject = new BasicObject(this);
 
     }
 
@@ -369,20 +377,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         sessonViewObject.waitUntilSessionCloses();
     }
 
-    public void clickShareProjectWith(String projectName,
-        String shareProjectWith) throws RemoteException {
-        if (shareProjectWith.equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT)) {
-            packageExplorerViewObject.shareProject(projectName);
-        } else if (shareProjectWith
-            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS))
-            packageExplorerViewObject.shareprojectWithVCSSupport(projectName);
-        else if (shareProjectWith
-            .equals(SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY))
-            packageExplorerViewObject.shareProjectPartically(projectName);
-        else
-            packageExplorerViewObject.addToSession(projectName);
-    }
-
     public void confirmSessionUsingNewOrExistProject(
         ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
         String projectName, int typeOfSharingProject) throws RemoteException {
@@ -434,206 +428,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    public void creatNewAccount(JID jid, String password)
-        throws RemoteException {
-        getEclipseShell().activate().setFocus();
-        menuObject.clickMenuWithTexts("Saros", "Create Account");
-        popupWindowObject.confirmCreateNewUserAccountWindow(jid.getDomain(),
-            jid.getName(), password);
-    }
-
     public void openSarosViews() throws RemoteException {
         rosterViewObject.openRosterView();
         sessonViewObject.openSessionView();
         openChatView();
         remoteScreenV.openRemoteScreenView();
-    }
-
-    public boolean hasContactWith(JID jid) throws RemoteException {
-        return stateObject.hasContactWith(jid)
-            && rosterViewObject.isBuddyExist(jid.getBase());
-    }
-
-    public void renameContact(String contact, String newName)
-        throws RemoteException {
-        SWTBotTree tree = delegate.viewByTitle(SarosConstant.VIEW_TITLE_ROSTER)
-            .bot().tree();
-        SWTBotTreeItem item = treeObject.getTreeItemWithMatchText(tree,
-            SarosConstant.BUDDIES + ".*", contact + ".*");
-        item.contextMenu("Rename...").click();
-        windowObject.waitUntilShellActive("Set new nickname");
-        delegate.text(contact).setText(newName);
-        delegate.button(SarosConstant.BUTTON_OK).click();
-    }
-
-    /**
-     * Remove given contact from Roster, if contact was added before.
-     */
-    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException {
-        if (!hasContactWith(jid))
-            return;
-        try {
-            viewObject.clickContextMenuOfTreeInView(
-                SarosConstant.VIEW_TITLE_ROSTER,
-                SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
-                jid.getBase());
-            windowObject
-                .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-            eclipseWindowObject.confirmWindow(
-                SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
-                SarosConstant.BUTTON_YES);
-            participant.getEclipseWindowObject().waitUntilShellActive(
-                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-            participant.getEclipseWindowObject().confirmWindow(
-                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
-                SarosConstant.BUTTON_OK);
-
-        } catch (WidgetNotFoundException e) {
-            log.info("Contact not found: " + jid.getBase(), e);
-        }
-    }
-
-    // /**
-    // * Create a {@link ISarosSession} using context menu off the given project
-    // * on package explorer view.
-    // */
-    // public void clickProjectContextMenu(String projectName,
-    // String nameOfContextMenu) throws RemoteException {
-    // SWTBotView view = delegate.viewByTitle("Package Explorer");
-    // SWTBotTree tree = view.bot().tree().select(projectName);
-    // SWTBotTreeItem item = tree.getTreeItem(projectName).select();
-    // SWTBotMenu menu = item.contextMenu(nameOfContextMenu);
-    // menu.click();
-    // }
-
-    public void shareProject(String projectName, List<String> inviteeJIDS)
-        throws RemoteException {
-        packageExplorerViewObject.shareProject(projectName);
-        windowObject.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
-        eclipseBasicObject.captureScreenshot(TEMPDIR
-            + "/shareProjectStepParallel1.png");
-        tableObject.selectCheckBoxsInTable(inviteeJIDS);
-        eclipseBasicObject.captureScreenshot(TEMPDIR
-            + "/shareProjectStepParallel2.png");
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-        delegate.button(SarosConstant.BUTTON_FINISH).click();
-    }
-
-    // protected SWTBotToolbarButton getXmppDisconnectButton() {
-    // for (SWTBotToolbarButton toolbarButton : delegate.viewByTitle("Roster")
-    // .getToolbarButtons()) {
-    // if (toolbarButton.getToolTipText().matches("Disconnect.*")) {
-    // return toolbarButton;
-    // }
-    //
-    // }
-    //
-    // return null;
-    // }
-
-    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException {
-        if (!hasContactWith(jid)) {
-            rosterViewObject.openRosterView();
-            rosterViewObject.setFocusOnRosterView();
-            rosterViewObject.clickTBAddANewContactInRosterView();
-            windowObject
-                .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-            // activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-            delegate.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
-                jid.getBase());
-            basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-            delegate.button(SarosConstant.BUTTON_FINISH).click();
-            participant.getPopupWindowObject()
-                .confirmRequestOfSubscriptionReceivedWindow();
-            popupWindowObject.confirmRequestOfSubscriptionReceivedWindow();
-        }
-
-    }
-
-    /*******************************************************************************
-     * 
-     * waitUntil
-     * 
-     *******************************************************************************/
-
-    /**
-     * For some tests a host need to invite many peers concurrently and some
-     * operations should not be performed if the invitation processes aren't
-     * finished yet. In this case, you can use this method to guarantee, that
-     * host wait so long until all the invitation Processes are finished.
-     */
-    public void waitUntilNoInvitationProgress() throws RemoteException {
-        progressViewObject.openProgressView();
-        progressViewObject.activateProgressView();
-        delegate.waitUntil(SarosConditions.existNoInvitationProgress(delegate),
-            100000);
-    }
-
-    /******************************/
-    public void setTextInJavaEditorWithSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        // activateEclipseShell();
-
-        packageExplorerViewObject
-            .openClass(projectName, packageName, className);
-        eclipseEditorObject.activateJavaEditor(className);
-        SWTBotEditor editor;
-        editor = delegate.editorByTitle(className + ".java");
-        SWTBotEclipseEditor e = editor.toTextEditor();
-
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // log.debug("shell name: " + win.getShell().getText());
-        // win.getShell().forceActive();
-        // win.getShell().forceFocus();
-        // }
-        // });
-        // e.setFocus();
-        e.setText(contents);
-        // e.typeText("hallo wie geht es dir !%%%");
-        // e.pressShortcut(Keystrokes.LF);
-        // e.typeText("mir geht es gut!");
-        // delegate.sleep(2000);
-        //
-        // delegate.sleep(2000);
-
-        e.save();
-        // editorObject.setTextinEditorWithSave(contents, className + ".java");
-    }
-
-    public void setTextInEditorWithSave(String contentPath, String... filePath)
-        throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        String fileName = filePath[filePath.length - 1];
-        packageExplorerViewObject.openFile(filePath);
-        eclipseEditorObject.activateEditor(fileName);
-        editorObject.setTextInEditorWithSave(contents, fileName);
-    }
-
-    public void setTextInJavaEditorWithoutSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        packageExplorerViewObject
-            .openClass(projectName, packageName, className);
-        eclipseEditorObject.activateJavaEditor(className);
-        editorObject.setTextinEditorWithoutSave(contents, className + ".java");
-    }
-
-    public void typeTextInJavaEditor(String contentPath, String projectName,
-        String packageName, String className) throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        activateEclipseShell();
-        packageExplorerViewObject
-            .openClass(projectName, packageName, className);
-        eclipseEditorObject.activateJavaEditor(className);
-        editorObject.typeTextInEditor(contents, className + ".java");
     }
 
     /*******************************************************************************
@@ -645,73 +444,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void resetSaros() throws RemoteException {
         rosterViewObject.xmppDisconnect();
         eclipseState.deleteAllProjects();
-    }
-
-    /**
-     * remove the progress. ie. Click the gray clubs delete icon.
-     */
-    public void removeProgress() throws RemoteException {
-        progressViewObject.openProgressView();
-        progressViewObject.activateProgressView();
-        SWTBotView view = delegate.viewByTitle("Progress");
-        view.setFocus();
-        SWTBot bot = view.bot();
-        SWTBotToolbarButton b = bot.toolbarButton();
-        b.click();
-    }
-
-    public void invitateUser(String inviteeJID) throws RemoteException {
-        sessonViewObject.openInvitationInterface();
-        popupWindowObject.comfirmInvitationWindow(inviteeJID);
-    }
-
-    /**
-     * end the invitation process. ie. Click the red stop icon in Progress view.
-     */
-    public void cancelInvitation() throws RemoteException {
-        progressViewObject.openProgressView();
-        progressViewObject.activateProgressView();
-        SWTBotView view = delegate.viewByTitle("Progress");
-        view.setFocus();
-        SWTBot bot = view.bot();
-        SWTBotToolbarButton b = bot.toolbarButton();
-        b.click();
-    }
-
-    public void cancelInvitation(int index) throws RemoteException {
-        progressViewObject.openProgressView();
-        progressViewObject.activateProgressView();
-        SWTBotView view = delegate.viewByTitle("Progress");
-        view.toolbarButton("Remove All Finished Operations").click();
-        view.setFocus();
-        SWTBot bot = view.bot();
-        SWTBotToolbarButton b = bot.toolbarButton(index);
-        b.click();
-    }
-
-    public void cancelInivtationInSessionInvitationWindow()
-        throws RemoteException {
-        SWTBotShell shell = delegate.activeShell();
-        shell.bot().toolbarButton().click();
-    }
-
-    public boolean isProgressViewOpen() throws RemoteException {
-        return viewObject.isViewOpen("Progress");
-    }
-
-    public void confirmInvitationCancelledWindow() throws RemoteException {
-        SWTBotShell shell = delegate.shell("Invitation Cancelled");
-        shell.activate().setFocus();
-        SWTBotButton button = shell.bot().button();
-        button.click();
-    }
-
-    public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException {
-        sessonViewObject.openSessionView();
-        sessonViewObject.setFocusOnSessionView();
-        return viewObject.isToolbarInViewEnabled(
-            SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION,
-            SarosConstant.TOOL_TIP_TEXT_NO_INCONSISTENCIES);
     }
 
 }

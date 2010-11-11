@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 /**
  * Screen object that represents the operations that can be performed on a view.
@@ -46,7 +47,7 @@ public class ViewObject extends EclipseObject {
      *            interface for {@link SWTWorkbenchBot}. Using it
      *            {@link ViewObject} can access other screen objects.
      */
-    public ViewObject(RmiSWTWorkbenchBot rmiBot) {
+    public ViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

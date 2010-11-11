@@ -10,11 +10,11 @@ import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class EditorObject extends EclipseObject {
 
-    public EditorObject(RmiSWTWorkbenchBot rmiBot) {
+    public EditorObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

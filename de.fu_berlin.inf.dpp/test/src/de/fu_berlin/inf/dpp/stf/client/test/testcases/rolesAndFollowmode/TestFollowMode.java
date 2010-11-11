@@ -30,7 +30,7 @@ public class TestFollowMode {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.eclipseMainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS1);
+        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS1);
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -60,8 +60,8 @@ public class TestFollowMode {
      */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG, CLS1);
+        alice.eclipseEditor.setTextInJavaEditorWithSave(
+            BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS1);
         bob.sessionV.followThisUser(alice.state);
         bob.eclipseEditor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.state.isInFollowMode());
@@ -76,7 +76,7 @@ public class TestFollowMode {
             CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS2);
+        alice.mainMenu.newClass(PROJECT, PKG, CLS2);
         bob.eclipseEditor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS2));
 
@@ -93,10 +93,10 @@ public class TestFollowMode {
         assertTrue(alice.eclipseEditor.isJavaEditorActive(CLS1));
 
         bob.sessionV.followThisUser(alice.state);
-        alice.eclipseMainMenu.newClass(PROJECT, PKG, CLS3);
+        alice.mainMenu.newClass(PROJECT, PKG, CLS3);
         alice.eclipseEditor.waitUntilJavaEditorActive(CLS3);
-        alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3,
-            PROJECT, PKG, CLS3);
+        alice.eclipseEditor.setTextInJavaEditorWithSave(
+            BotConfiguration.CONTENTPATH3, PROJECT, PKG, CLS3);
         alice.eclipseEditor.setBreakPoint(13, PROJECT, PKG, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);

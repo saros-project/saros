@@ -10,11 +10,11 @@ import java.io.Writer;
 import java.util.Arrays;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
 public class HelperObject extends EclipseObject {
 
-    public HelperObject(RmiSWTWorkbenchBot rmiBot) {
+    public HelperObject(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

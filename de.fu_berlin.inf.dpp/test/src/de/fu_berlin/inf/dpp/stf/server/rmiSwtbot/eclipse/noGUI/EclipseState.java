@@ -16,7 +16,7 @@ import org.eclipse.swt.program.Program;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -25,7 +25,7 @@ public class EclipseState extends EclipseObject implements IEclipseState {
 
     public static EclipseState classVariable;
 
-    public EclipseState(RmiSWTWorkbenchBot rmiBot) {
+    public EclipseState(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
@@ -77,8 +76,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void leaveSession() throws RemoteException;
 
-    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException;
+    // public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+    // throws RemoteException;
 
     // /**
     // * It shares a project, but cancel the interface popped up
@@ -89,8 +88,8 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void clickCMShareProjectInPEView(String projectName)
     // throws RemoteException;
 
-    public void shareProject(String projectName, List<String> inviteeJIDS)
-        throws RemoteException;
+    // public void shareProject(String projectName, List<String> inviteeJIDS)
+    // throws RemoteException;
 
     // public void clickTBConnectInRosterView() throws RemoteException;
 
@@ -165,12 +164,12 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public boolean isRemoteScreenViewOpen() throws RemoteException;
 
-    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException;
+    // public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
+    // throws RemoteException;
 
-    public void setTextInJavaEditorWithSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException;
+    // public void setTextInJavaEditorWithSave(String contentPath,
+    // String projectName, String packageName, String className)
+    // throws RemoteException;
 
     // public boolean isConnectedByXMPP() throws RemoteException;
 
@@ -243,24 +242,24 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     public void xmppConnect(JID jid, String password) throws RemoteException;
 
     // public void xmppDisconnect() throws RemoteException;
+    //
+    // public void creatNewAccount(JID jid, String password)
+    // throws RemoteException;
 
-    public void creatNewAccount(JID jid, String password)
-        throws RemoteException;
-
-    public boolean hasContactWith(JID jid) throws RemoteException;
+    // public boolean hasContactWith(JID jid) throws RemoteException;
 
     public void openSarosViews() throws RemoteException;
 
-    public void renameContact(String contact, String newName)
-        throws RemoteException;
+    // public void renameContact(String contact, String newName)
+    // throws RemoteException;
 
     // public boolean isContactInSessionView(String Contact)
     // throws RemoteException;
 
     public void leaveSessionByPeer() throws RemoteException;
 
-    public void clickShareProjectWith(String projectName,
-        String shareProjectWith) throws RemoteException;
+    // public void clickShareProjectWith(String projectName,
+    // String shareProjectWith) throws RemoteException;
 
     public void confirmSessionUsingNewOrExistProject(
         ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
@@ -283,47 +282,49 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void waitUntilAllPeersLeaveSession(List<JID> jids)
     // throws RemoteException;
 
-    public void cancelInvitation() throws RemoteException;
+    // public void cancelInvitation() throws RemoteException;
 
     // public void openProgressView() throws RemoteException;
 
-    public boolean isProgressViewOpen() throws RemoteException;
+    // public boolean isProgressViewOpen() throws RemoteException;
 
-    public void confirmInvitationCancelledWindow() throws RemoteException;
+    // public void confirmInvitationCancelledWindow() throws RemoteException;
 
-    public void removeProgress() throws RemoteException;
+    // public void removeProgress() throws RemoteException;
 
     // public void waitUntilGetChatMessage(String jid, String message)
     // throws RemoteException;
 
-    public void typeTextInJavaEditor(String contentPath, String projectName,
-        String packageName, String className) throws RemoteException;
+    // public void typeTextInJavaEditor(String contentPath, String projectName,
+    // String packageName, String className) throws RemoteException;
 
-    public void waitUntilNoInvitationProgress() throws RemoteException;
+    // public void waitUntilNoInvitationProgress() throws RemoteException;
 
-    public void setTextInJavaEditorWithoutSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException;
+    // public void setTextInJavaEditorWithoutSave(String contentPath,
+    // String projectName, String packageName, String className)
+    // throws RemoteException;
 
     // public void giveExclusiveDriverRole(String inviteePlainJID)
     // throws RemoteException;
 
-    public void setTextInEditorWithSave(String contentPath, String... filePath)
-        throws RemoteException;
+    // public void setTextInEditorWithSave(String contentPath, String...
+    // filePath)
+    // throws RemoteException;
 
-    public void cancelInvitation(int index) throws RemoteException;
+    // public void cancelInvitation(int index) throws RemoteException;
 
-    public void cancelInivtationInSessionInvitationWindow()
-        throws RemoteException;
+    // public void cancelInivtationInSessionInvitationWindow()
+    // throws RemoteException;
 
     // public void stopFollowUser(ISarosState stateOfFollowedUser,
     // JID JIDOfFollowedUser) throws RemoteException;
 
     // public void waitUntilFollowed(String plainJID) throws RemoteException;
 
-    public void invitateUser(String inviteeJID) throws RemoteException;
+    // public void invitateUser(String inviteeJID) throws RemoteException;
 
-    public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
+    // public boolean isToolbarNoInconsistenciesEnabled() throws
+    // RemoteException;
 
     public String getTextOfLastChatLine() throws RemoteException;
 
