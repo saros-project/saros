@@ -112,24 +112,24 @@ public abstract class InvitationProcess {
     public enum CancelOption {
         /**
          * Use this option if the peer should be notified that the invitation
-         * has been cancelled. He gets a message with the cancellation reason.
+         * has been canceled. He gets a message with the cancellation reason.
          */
         NOTIFY_PEER,
         /**
          * Use this option if the peer should not be notified that the
-         * invitation has been cancelled.
+         * invitation has been canceled.
          */
         DO_NOT_NOTIFY_PEER;
     }
 
     public enum CancelLocation {
         /**
-         * Use this option if the invitation has been cancelled by the local
+         * Use this option if the invitation has been canceled by the local
          * user.
          */
         LOCAL,
         /**
-         * Use this option if the invitation has been cancelled by the remote
+         * Use this option if the invitation has been canceled by the remote
          * user.
          */
         REMOTE;
