@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerVi
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.ProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ChatViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.RosterViewObject;
@@ -192,6 +193,9 @@ public class StartupSaros implements IStartup {
                     bot.exportRemoteScreenView(
                         RemoteScreenViewObject.classVariable,
                         "remoteScreenView");
+
+                    ChatViewObject.classVariable = new ChatViewObject(bot);
+                    bot.exportChatView(ChatViewObject.classVariable, "chatView");
 
                     bot.listRmiObjects();
                 } catch (RemoteException e) {

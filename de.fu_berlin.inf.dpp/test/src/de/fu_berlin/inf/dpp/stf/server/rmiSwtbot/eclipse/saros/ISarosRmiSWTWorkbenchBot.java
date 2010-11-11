@@ -152,7 +152,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public void waitUntilSessionClosedBy(ISarosState state)
     // throws RemoteException;
 
-    public void openChatView() throws RemoteException;
+    // public void openChatView() throws RemoteException;
 
     // public void openRemoteScreenView() throws RemoteException;
 
@@ -160,7 +160,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void openRosterView() throws RemoteException;
 
-    public boolean isChatViewOpen() throws RemoteException;
+    // public boolean isChatViewOpen() throws RemoteException;
 
     // public boolean isRemoteScreenViewOpen() throws RemoteException;
 
@@ -193,7 +193,7 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
 
     // public void closeRemoteScreenView() throws RemoteException;
 
-    public void closeChatView() throws RemoteException;
+    // public void closeChatView() throws RemoteException;
 
     // public void closePackageExplorerView() throws RemoteException;
 
@@ -265,10 +265,10 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
         ISarosRmiSWTWorkbenchBot inviteeBot, JID inviterJID,
         String projectName, int typeOfSharingProject) throws RemoteException;
 
-    public void sendChatMessage(String string) throws RemoteException;
+    // public void sendChatMessage(String string) throws RemoteException;
 
-    public boolean compareChatMessage(String jid, String string)
-        throws RemoteException;
+    // public boolean compareChatMessage(String jid, String string)
+    // throws RemoteException;
 
     public void resetSaros() throws RemoteException;
 
@@ -326,22 +326,22 @@ public interface ISarosRmiSWTWorkbenchBot extends IRmiSWTWorkbenchBot {
     // public boolean isToolbarNoInconsistenciesEnabled() throws
     // RemoteException;
 
-    public String getTextOfLastChatLine() throws RemoteException;
+    // public String getTextOfLastChatLine() throws RemoteException;
 
-    public String getTextOfChatLine(String regex) throws RemoteException;
+    // public String getTextOfChatLine(String regex) throws RemoteException;
 
-    public String getTextOfChatLine() throws RemoteException;
+    // public String getTextOfChatLine() throws RemoteException;
 
-    public String getTextOfChatLine(int index) throws RemoteException;
+    // public String getTextOfChatLine(int index) throws RemoteException;
 
-    public String getUserNameOnChatLinePartnerChangeSeparator()
-        throws RemoteException;
+    // public String getUserNameOnChatLinePartnerChangeSeparator()
+    // throws RemoteException;
 
-    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
-        throws RemoteException;
+    // public String getUserNameOnChatLinePartnerChangeSeparator(int index)
+    // throws RemoteException;
 
-    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
-        throws RemoteException;
+    // public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
+    // throws RemoteException;
 
     public IRosterViewObject getRosterViewObject() throws RemoteException;
 

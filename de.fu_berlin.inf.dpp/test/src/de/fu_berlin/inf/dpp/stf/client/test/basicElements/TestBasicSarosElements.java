@@ -56,10 +56,10 @@ public class TestBasicSarosElements {
 
     @Test
     public void testChatView() throws RemoteException {
-        alice.bot.closeChatView();
-        assertEquals(false, alice.bot.isChatViewOpen());
-        alice.bot.openChatView();
-        assertEquals(true, alice.bot.isChatViewOpen());
+        alice.chatV.closeChatView();
+        assertEquals(false, alice.chatV.isChatViewOpen());
+        alice.chatV.openChatView();
+        assertEquals(true, alice.chatV.isChatViewOpen());
     }
 
     @Test

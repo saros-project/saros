@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerV
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IChatViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosMainMenuObject;
@@ -52,6 +53,7 @@ public class Musician {
     public ISarosWindowObject popupWindow;
     public ISessionViewObject sessionV;
     public IRemoteScreenViewObject remoteScreenV;
+    public IChatViewObject chatV;
 
     public JID jid;
     public String password;
@@ -99,6 +101,7 @@ public class Musician {
              */
             state.setJID(jid);
 
+            chatV = (IChatViewObject) registry.lookup("chatView");
             rosterV = (IRosterViewObject) registry.lookup("rosterView");
             sessionV = (ISessionViewObject) registry.lookup("sessionView");
             remoteScreenV = (IRemoteScreenViewObject) registry

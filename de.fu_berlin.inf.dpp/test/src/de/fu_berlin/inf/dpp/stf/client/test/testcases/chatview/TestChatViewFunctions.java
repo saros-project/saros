@@ -120,17 +120,17 @@ public class TestChatViewFunctions {
 
     @Test
     public void testChat() throws RemoteException {
-        alice.bot.sendChatMessage(message);
+        alice.chatV.sendChatMessage(message);
         // System.out.println(alice.bot
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
         alice.basic.sleep(2000);
-        System.out.println(alice.bot.getTextOfLastChatLine());
+        System.out.println(alice.chatV.getTextOfLastChatLine());
 
         bob.basic.sleep(2000);
-        System.out.println(bob.bot.getTextOfLastChatLine());
-        System.out.println(bob.bot
+        System.out.println(bob.chatV.getTextOfLastChatLine());
+        System.out.println(bob.chatV
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
 
         // bob.bot.waitUntilGetChatMessage(alice.getName(), message);

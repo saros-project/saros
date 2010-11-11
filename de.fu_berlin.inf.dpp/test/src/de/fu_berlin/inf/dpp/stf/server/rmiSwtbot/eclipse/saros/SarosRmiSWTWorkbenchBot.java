@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
@@ -24,6 +23,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObj
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IChatViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.ISarosWindowObject;
@@ -52,13 +53,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /** RMI exported Saros object */
     public ISarosState stateObject;
 
-    private IRosterViewObject rosterViewObject;
+    public IRosterViewObject rosterViewObject;
 
     public ISarosWindowObject popupWindowObject;
 
-    private ISessionViewObject sessonViewObject;
+    public ISessionViewObject sessonViewObject;
 
-    private IRemoteScreenViewObject remoteScreenV;
+    public IRemoteScreenViewObject remoteScreenV;
+
+    public IChatViewObject chatV;
 
     public IRosterViewObject getRosterViewObject() throws RemoteException {
         return rosterViewObject;
@@ -197,152 +200,29 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         }
     }
 
-    /*******************************************************************************
-     * 
-     * Remote screen view page
-     * 
-     *******************************************************************************/
+    /**
+     * Export given chat view object by given name on our local RMI Registry.
+     */
+    public void exportChatView(ChatViewObject chatViewObject, String exportName) {
+        try {
+            this.chatV = (IChatViewObject) UnicastRemoteObject.exportObject(
+                chatViewObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.chatV);
+        } catch (RemoteException e) {
+            log.error("Could not export chat view object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind chat view object, because it is bound already.",
+                e);
+        }
+    }
 
     /*******************************************************************************
      * 
      * Chat view page
      * 
      *******************************************************************************/
-    public void activateChatView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
-    }
-
-    public void openChatView() throws RemoteException {
-        if (!isChatViewOpen())
-            viewObject.openViewById(SarosConstant.ID_CHAT_VIEW);
-    }
-
-    public void closeChatView() throws RemoteException {
-        viewObject.closeViewById(SarosConstant.ID_CHAT_VIEW);
-    }
-
-    public boolean isChatViewOpen() throws RemoteException {
-        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
-    }
-
-    public void sendChatMessage(String message) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        SarosSWTBotChatInput chatInput = delegate.chatInput();
-        chatInput.setText(message);
-        delegate.text();
-        log.debug("inerted message in chat view: " + chatInput.getText());
-        // chatInput.pressShortcut(Keystrokes.LF);
-        chatInput.pressEnterKey();
-    }
-
-    public String getUserNameOnChatLinePartnerChangeSeparator()
-        throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("user name of the first chat line partner change separator: "
-            + delegate.chatLinePartnerChangeSeparator().getPlainID());
-        return delegate.chatLinePartnerChangeSeparator().getPlainID();
-    }
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
-        throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("user name of the chat line partner change separator with the index"
-            + index
-            + ": "
-            + delegate.chatLinePartnerChangeSeparator(index).getPlainID());
-        return delegate.chatLinePartnerChangeSeparator(index).getPlainID();
-    }
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
-        throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("user name of the chat line partner change separator with the plainID "
-            + plainID
-            + ": "
-            + delegate.chatLinePartnerChangeSeparator(plainID).getPlainID());
-        return delegate.chatLinePartnerChangeSeparator(plainID).getPlainID();
-    }
-
-    public String getTextOfChatLine() throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("text of the first chat line: "
-            + delegate.chatLine().getText());
-        return delegate.chatLine().getText();
-    }
-
-    public String getTextOfChatLine(int index) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("text of the chat line with the index " + index + ": "
-            + delegate.chatLine(index).getText());
-        return delegate.chatLine(index).getText();
-    }
-
-    public String getTextOfLastChatLine() throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("text of the last chat line: "
-            + delegate.lastChatLine().getText());
-        return delegate.lastChatLine().getText();
-    }
-
-    public String getTextOfChatLine(String regex) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("text of the chat line with the specifed regex: "
-            + delegate.chatLine(regex).getText());
-        return delegate.chatLine(regex).getText();
-    }
-
-    public boolean compareChatMessage(String jid, String message)
-        throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
-        log.debug("chatLine: " + delegate.lastChatLine());
-        // log.debug("text of the lastChatLine: "
-        // + delegate.lastChatLine().widget.getText());
-        log.debug("text of the lastChatLine: "
-            + delegate.lastChatLine().getText());
-        String text = delegate.lastChatLine().getText();
-        return text.equals(message);
-
-        // return Comperator.compareStrings(jid, message, text);
-    }
-
-    // public boolean isContactOnline(String contact) {
-    // throw new NotImplementedException(
-    // "Can not be implemented, because no information is visible by swtbot. Enhance information with a tooltip or toher stuff.");
-    // }
-
-    // /**
-    // * Returns true if the given jid was found in Shared Project Session View.
-    // */
-    // public boolean isInSharedProject(String jid) {
-    // SWTBotView sessionView = delegate.viewByTitle("Shared Project Session");
-    // SWTBot bot = sessionView.bot();
-    //
-    // try {
-    // SWTBotTable table = bot.table();
-    // SWTBotTableItem item = table.getTableItem(jid);
-    // return item != null;
-    // } catch (WidgetNotFoundException e) {
-    // return false;
-    // }
-    // }
 
     /*******************************************************************************
      * 
@@ -431,7 +311,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void openSarosViews() throws RemoteException {
         rosterViewObject.openRosterView();
         sessonViewObject.openSessionView();
-        openChatView();
+        chatV.openChatView();
         remoteScreenV.openRemoteScreenView();
     }
 
