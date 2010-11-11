@@ -610,8 +610,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     }
 
     public void sendProjectArchive(JID recipient, String invitationID,
-        IProject project, File archive, SubMonitor progress)
-        throws SarosCancellationException, IOException {
+        File archive, SubMonitor progress) throws SarosCancellationException,
+        IOException {
 
         String user = connection.getUser();
         if (user == null) {

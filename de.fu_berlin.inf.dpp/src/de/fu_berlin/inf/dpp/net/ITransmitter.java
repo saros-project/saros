@@ -42,8 +42,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -287,7 +287,7 @@ public interface ITransmitter {
      * @blocking Blocks until the transfer is complete.
      */
     public void sendProjectArchive(JID recipient, String invitationID,
-        IProject project, File archive, SubMonitor monitor) throws IOException,
+        File archive, SubMonitor monitor) throws IOException,
         SarosCancellationException;
 
     /**

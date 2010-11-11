@@ -487,8 +487,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         subMonitor.setTaskName("Sending archive...");
         if (archive == null)
             log.debug("Inv" + Util.prefix(peer) + ": The archive is empty.");
-        transmitter.sendProjectArchive(peer, invitationID, this.project,
-            archive, subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
+        transmitter.sendProjectArchive(peer, invitationID, archive,
+            subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
     protected void streamArchive(SubMonitor subMonitor)
