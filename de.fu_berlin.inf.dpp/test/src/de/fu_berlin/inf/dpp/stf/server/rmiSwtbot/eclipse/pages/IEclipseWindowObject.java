@@ -36,4 +36,7 @@ public interface IEclipseWindowObject extends Remote {
     public void confirmWindowWithTreeWithFilterText(String title,
         String rootOfTreeNode, String teeNode, String buttonText)
         throws RemoteException;
+
+    public String getSecondLabelOfProblemOccurredWindow()
+        throws RemoteException;
 }

@@ -357,7 +357,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#sleep(long)}
      * </pre>
      */
-    public void sleep(long millis) throws RemoteException;
+    // public void sleep(long millis) throws RemoteException;
 
     // /**
     // * It waits as long a shell with given title was found. This method is
@@ -372,7 +372,7 @@ public interface IRmiSWTWorkbenchBot extends Remote {
      * {@link SWTWorkbenchBot#captureScreenshot(String)}
      * </pre>
      */
-    public void captureScreenshot(String filename) throws RemoteException;
+    // public void captureScreenshot(String filename) throws RemoteException;
 
     // public boolean isPerspectiveActive(String title) throws RemoteException;
 
@@ -406,8 +406,8 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     // public void showWindowUntilClosed(String title) throws RemoteException;
 
-    public boolean isTextWithLabelEqualWithText(String label, String text)
-        throws RemoteException;
+    // public boolean isTextWithLabelEqualWithText(String label, String text)
+    // throws RemoteException;
 
     // public void clickContextMenuOfTableInView(String viewName, String
     // itemName,
@@ -722,11 +722,11 @@ public interface IRmiSWTWorkbenchBot extends Remote {
     // public void closejavaEditorWithoutSave(String className)
     // throws RemoteException;
 
-    public void openProgressView() throws RemoteException;
+    // public void openProgressView() throws RemoteException;
 
-    public void activateProgressView() throws RemoteException;
+    // public void activateProgressView() throws RemoteException;
 
-    public boolean existPorgress() throws RemoteException;
+    // public boolean existPorgress() throws RemoteException;
 
     // public void newTextFileLineDelimiter(String OS) throws RemoteException;
 
@@ -747,10 +747,10 @@ public interface IRmiSWTWorkbenchBot extends Remote {
 
     // public void newProject(String projectName) throws RemoteException;
 
-    public void clickButton(String mnemonicText) throws RemoteException;
+    // public void clickButton(String mnemonicText) throws RemoteException;
 
-    public String getSecondLabelOfProblemOccurredWindow()
-        throws RemoteException;
+    // public String getSecondLabelOfProblemOccurredWindow()
+    // throws RemoteException;
 
     // public void waitUntilJavaEditorContentSame(String otherClassContent,
     // String projectName, String pkg, String className)

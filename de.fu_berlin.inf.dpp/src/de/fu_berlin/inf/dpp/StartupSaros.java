@@ -21,10 +21,12 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseEditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.ProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.PopUpWindowObject;
@@ -133,6 +135,14 @@ public class StartupSaros implements IStartup {
                      * static references "classVariable" to the object in the
                      * object in the server JVM.
                      */
+                    EclipseBasicObject.classVariable = new EclipseBasicObject(bot);
+                    bot.exportEclipseBasicObject(EclipseBasicObject.classVariable,
+                        "basicObject");
+
+                    ProgressViewObject.classVariable = new ProgressViewObject(
+                        bot);
+                    bot.exportProgressViewObject(
+                        ProgressViewObject.classVariable, "progressView");
 
                     EclipseMainMenuObject.classVariable = new EclipseMainMenuObject(
                         bot);

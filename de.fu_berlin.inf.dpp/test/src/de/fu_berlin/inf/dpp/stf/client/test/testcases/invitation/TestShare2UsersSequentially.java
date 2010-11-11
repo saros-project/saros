@@ -52,9 +52,9 @@ public class TestShare2UsersSequentially {
 
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        bob.bot
+        bob.basic
             .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
-        alice.bot
+        alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
         alice.bot.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,

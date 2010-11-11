@@ -167,12 +167,6 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
 
     /*******************************************************************************
      * 
-     * Share project session view page
-     * 
-     *******************************************************************************/
-
-    /*******************************************************************************
-     * 
      * Saros Package explorer page
      * 
      *******************************************************************************/
@@ -518,7 +512,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         if (!connectedByXMPP) {
             log.trace("clickTBConnectInRosterView");
             rosterViewObject.clickTBConnectInRosterView();
-            sleep(100);// wait a bit to check if shell pops up
+            eclipseBasicObject.sleep(100);// wait a bit to check if shell pops
+                                          // up
             log.trace("isShellActive");
             boolean shellActive = eclipseWindowObject
                 .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
@@ -608,9 +603,11 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         throws RemoteException {
         clickCMShareProjectInPEView(projectName);
         windowObject.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
-        captureScreenshot(TEMPDIR + "/shareProjectStepParallel1.png");
+        eclipseBasicObject.captureScreenshot(TEMPDIR
+            + "/shareProjectStepParallel1.png");
         tableObject.selectCheckBoxsInTable(inviteeJIDS);
-        captureScreenshot(TEMPDIR + "/shareProjectStepParallel2.png");
+        eclipseBasicObject.captureScreenshot(TEMPDIR
+            + "/shareProjectStepParallel2.png");
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
         delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
@@ -660,8 +657,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * host wait so long until all the invitation Processes are finished.
      */
     public void waitUntilNoInvitationProgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        progressViewObject.openProgressView();
+        progressViewObject.activateProgressView();
         delegate.waitUntil(SarosConditions.existNoInvitationProgress(delegate),
             100000);
     }
@@ -746,8 +743,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * remove the progress. ie. Click the gray clubs delete icon.
      */
     public void removeProgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        progressViewObject.openProgressView();
+        progressViewObject.activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
         view.setFocus();
         SWTBot bot = view.bot();
@@ -764,8 +761,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
      * end the invitation process. ie. Click the red stop icon in Progress view.
      */
     public void cancelInvitation() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        progressViewObject.openProgressView();
+        progressViewObject.activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
         view.setFocus();
         SWTBot bot = view.bot();
@@ -774,8 +771,8 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     }
 
     public void cancelInvitation(int index) throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        progressViewObject.openProgressView();
+        progressViewObject.activateProgressView();
         SWTBotView view = delegate.viewByTitle("Progress");
         view.toolbarButton("Remove All Finished Operations").click();
         view.setFocus();

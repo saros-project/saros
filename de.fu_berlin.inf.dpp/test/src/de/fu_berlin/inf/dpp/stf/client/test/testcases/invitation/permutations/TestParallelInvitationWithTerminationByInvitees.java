@@ -134,28 +134,28 @@ public class TestParallelInvitationWithTerminationByInvitees {
         alice.bot.shareProject(PROJECT, peersName);
 
         bob.eclipseWindow.waitUntilShellActive("Session Invitation");
-        bob.bot.clickButton(SarosConstant.BUTTON_CANCEL);
+        bob.basic.clickButton(SarosConstant.BUTTON_CANCEL);
         alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
-            bob.getName() + ".*"));
-        alice.bot.clickButton(SarosConstant.BUTTON_OK);
+        assertTrue(alice.eclipseWindow.getSecondLabelOfProblemOccurredWindow()
+            .matches(bob.getName() + ".*"));
+        alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
         carl.eclipseWindow.waitUntilShellActive("Session Invitation");
         carl.popupWindow.confirmSessionInvitationWindowStep1();
-        carl.bot.clickButton(SarosConstant.BUTTON_CANCEL);
+        carl.basic.clickButton(SarosConstant.BUTTON_CANCEL);
         alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
-            carl.getName() + ".*"));
-        alice.bot.clickButton(SarosConstant.BUTTON_OK);
+        assertTrue(alice.eclipseWindow.getSecondLabelOfProblemOccurredWindow()
+            .matches(carl.getName() + ".*"));
+        alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
         dave.eclipseWindow.waitUntilShellActive("Session Invitation");
         dave.popupWindow.confirmSessionInvitationWindowStep1();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
-        dave.bot.clickButton(SarosConstant.BUTTON_CANCEL);
+        dave.basic.clickButton(SarosConstant.BUTTON_CANCEL);
         alice.eclipseWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.bot.getSecondLabelOfProblemOccurredWindow().matches(
-            dave.getName() + ".*"));
-        alice.bot.clickButton(SarosConstant.BUTTON_OK);
+        assertTrue(alice.eclipseWindow.getSecondLabelOfProblemOccurredWindow()
+            .matches(dave.getName() + ".*"));
+        alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
         edna.eclipseWindow.waitUntilShellActive("Session Invitation");
         edna.popupWindow.confirmSessionInvitationWindowStep1();

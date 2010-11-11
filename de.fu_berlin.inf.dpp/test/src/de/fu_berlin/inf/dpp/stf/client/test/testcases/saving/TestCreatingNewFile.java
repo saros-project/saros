@@ -166,9 +166,9 @@ public class TestCreatingNewFile {
 
         carl.eclipseMainMenu.newFolder(PROJECT, FOLDER);
         carl.eclipseMainMenu.newFile(PROJECT, FOLDER, FILE);
-        alice.bot.sleep(500);
+        alice.basic.sleep(500);
         assertFalse(alice.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
-        bob.bot.sleep(500);
+        bob.basic.sleep(500);
         assertFalse(bob.eclipseState.isFileExist(PROJECT, FOLDER, FILE));
 
         if (!carl.state.isFollowingUser(alice.getBaseJid()))

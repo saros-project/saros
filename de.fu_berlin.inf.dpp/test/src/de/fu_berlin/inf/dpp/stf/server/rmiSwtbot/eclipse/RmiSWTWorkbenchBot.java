@@ -12,21 +12,16 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MainObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.PerspectiveObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
@@ -38,10 +33,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseEditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.EclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerViewObject;
 
 /**
@@ -51,8 +48,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.PackageExplorerVi
 public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     private static final transient Logger log = Logger
         .getLogger(RmiSWTWorkbenchBot.class);
-
-    private static final boolean SCREENSHOTS = true;
 
     public static transient SarosSWTBot delegate;
 
@@ -68,14 +63,21 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public int sleepTime = 750;
 
-    // public WaitUntilObject wUntilObject;
+    public IEclipseWindowObject eclipseWindowObject;
+    public IEclipseState eclipseState;
+    public IEclipseEditorObject eclipseEditorObject;
+    public IPackageExplorerViewObject packageExplorerViewObject;
+    public IEclipseMainMenuObject mainMenuObject;
+    public IProgressViewObject progressViewObject;
+    public IEclipseBasicObject eclipseBasicObject;
+
     public TableObject tableObject;
     public ToolbarObject tBarObject;
     public TreeObject treeObject;
     public ViewObject viewObject;
     public PerspectiveObject persObject;
     public EditorObject editorObject;
-    public MainObject mainObject;
+    public HelperObject mainObject;
     public MenuObject menuObject;
     public WindowObject windowObject;
     public BasicObject basicObject;
@@ -98,14 +100,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;
-        // wUntilObject = new WaitUntilObject(this);
         tableObject = new TableObject(this);
         tBarObject = new ToolbarObject(this);
         treeObject = new TreeObject(this);
         viewObject = new ViewObject(this);
         persObject = new PerspectiveObject(this);
         editorObject = new EditorObject(this);
-        mainObject = new MainObject(this);
+        mainObject = new HelperObject(this);
         menuObject = new MenuObject(this);
         windowObject = new WindowObject(this);
         basicObject = new BasicObject(this);
@@ -136,10 +137,8 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         } catch (RemoteException e) {
             registry = LocateRegistry.getRegistry(port);
             myName = exportName;
-
         }
         stub = (IRmiSWTWorkbenchBot) UnicastRemoteObject.exportObject(this, 0);
-
         addShutdownHook(exportName);
         try {
             registry.bind(exportName, stub);
@@ -162,11 +161,44 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
-    public IEclipseWindowObject eclipseWindowObject;
-    public IEclipseState eclipseState;
-    public IEclipseEditorObject eclipseEditorObject;
-    public IPackageExplorerViewObject packageExplorerViewObject;
-    public IEclipseMainMenuObject mainMenuObject;
+    /**
+     * Export give eclipse basic object object by given name on our local RMI
+     * Registry.
+     */
+    public void exportEclipseBasicObject(IEclipseBasicObject eclipseBasicObject,
+        String exportName) {
+        try {
+            this.eclipseBasicObject = (IEclipseBasicObject) UnicastRemoteObject
+                .exportObject(eclipseBasicObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.eclipseBasicObject);
+        } catch (RemoteException e) {
+            log.error("Could not export eclipse basic object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind eclipse basic object, because it is bound already.",
+                e);
+        }
+    }
+
+    /**
+     * Export give progress view object by given name on our local RMI Registry.
+     */
+    public void exportProgressViewObject(
+        IProgressViewObject progressViewObject, String exportName) {
+        try {
+            this.progressViewObject = (IProgressViewObject) UnicastRemoteObject
+                .exportObject(progressViewObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.progressViewObject);
+        } catch (RemoteException e) {
+            log.error("Could not export progress view object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind progress view object, because it is bound already.",
+                e);
+        }
+    }
 
     /**
      * Export give main menu object by given name on our local RMI Registry.
@@ -268,72 +300,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     /*******************************************************************************
      * 
-     * Progress View Page
-     * 
-     *******************************************************************************/
-    public void openProgressView() throws RemoteException {
-        viewObject.openViewById("org.eclipse.ui.views.ProgressView");
-    }
-
-    public void activateProgressView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_PROGRESS);
-    }
-
-    public boolean existPorgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
-        SWTBotView view = delegate.viewByTitle("Progress");
-        view.setFocus();
-        view.toolbarButton("Remove All Finished Operations").click();
-        SWTBot bot = view.bot();
-        try {
-            SWTBotToolbarButton b = bot.toolbarButton();
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-
-        // if (b == null)
-        // return false;
-        // else
-        // return true;
-        // if (bot.text().getText().matches("No operations to display.*"))
-        // return false;
-        // return true;
-    }
-
-    /*******************************************************************************
-     * 
-     * exported helper methods
-     * 
-     *******************************************************************************/
-
-    public void sleep(long millis) throws RemoteException {
-        delegate.sleep(millis);
-    }
-
-    public void captureScreenshot(String filename) throws RemoteException {
-        if (SCREENSHOTS)
-            delegate.captureScreenshot(filename);
-    }
-
-    // // FIXME If the file doesn't exist, this method hits the
-    // // SWTBotPreferences.TIMEOUT (5000ms) while waiting on a tree node.
-    // public boolean isJavaClassExistInGui(String projectName, String pkg,
-    // String className) throws RemoteException {
-    // showViewPackageExplorer();
-    // activatePackageExplorerView();
-    // return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-    // projectName, "src", pkg, className + ".java");
-    // }
-
-    public boolean isTextWithLabelEqualWithText(String label, String text)
-        throws RemoteException {
-        return delegate.textWithLabel(label).getText().equals(text);
-    }
-
-    /*******************************************************************************
-     * 
      * main page
      * 
      *******************************************************************************/
@@ -381,16 +347,6 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
                 }
             }
         });
-    }
-
-    public void clickButton(String mnemonicText) throws RemoteException {
-        delegate.button(mnemonicText).click();
-    }
-
-    public String getSecondLabelOfProblemOccurredWindow()
-        throws RemoteException {
-        SWTBotShell activeShell = delegate.activeShell();
-        return activeShell.bot().label(2).getText();
     }
 
     public IEclipseWindowObject getEclipseWindowObject() throws RemoteException {

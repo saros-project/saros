@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MainObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.PerspectiveObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
@@ -27,13 +27,10 @@ public class EclipseObject {
     protected WindowObject windowObject;
     protected BasicObject basicObject;
     protected ViewObject viewObject;
-    protected MainObject mainObject;
+    protected HelperObject mainObject;
     protected PerspectiveObject persObject;
     protected EditorObject editorObject;
     protected SarosSWTBot bot;
-
-    public EclipseObject() {
-    }
 
     /**
      * Creates an instance of a NoExportedObject.<br/>

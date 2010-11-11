@@ -125,10 +125,10 @@ public class TestChatViewFunctions {
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
-        alice.bot.sleep(2000);
+        alice.basic.sleep(2000);
         System.out.println(alice.bot.getTextOfLastChatLine());
 
-        bob.bot.sleep(2000);
+        bob.basic.sleep(2000);
         System.out.println(bob.bot.getTextOfLastChatLine());
         System.out.println(bob.bot
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));

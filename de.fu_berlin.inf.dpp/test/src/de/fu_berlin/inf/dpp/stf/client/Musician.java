@@ -17,10 +17,12 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseEditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseMainMenuObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IEclipseWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.pages.IProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.pages.IRosterViewObject;
@@ -40,6 +42,8 @@ public class Musician {
     public IEclipseEditorObject eclipseEditor;
     public IPackageExplorerViewObject packageExplorerV;
     public IEclipseMainMenuObject eclipseMainMenu;
+    public IProgressViewObject progressV;
+    public IEclipseBasicObject basic;
 
     public ISarosRmiSWTWorkbenchBot bot;
     public ISarosState state;
@@ -106,6 +110,8 @@ public class Musician {
                 .lookup("packageExplorerView");
             eclipseMainMenu = (IEclipseMainMenuObject) registry
                 .lookup("eclipseMainMenu");
+            progressV = (IProgressViewObject) registry.lookup("progressView");
+            basic = (IEclipseBasicObject) registry.lookup("basicObject");
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
                 + ", did you start the Eclipse instance?");

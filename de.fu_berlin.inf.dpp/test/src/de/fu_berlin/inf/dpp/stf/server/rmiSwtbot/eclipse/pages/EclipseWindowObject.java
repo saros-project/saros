@@ -215,4 +215,10 @@ public class EclipseWindowObject extends EclipseObject implements
         // waitUntilShellCloses(shellName);
     }
 
+    public String getSecondLabelOfProblemOccurredWindow()
+        throws RemoteException {
+        SWTBotShell activeShell = bot.activeShell();
+        return activeShell.bot().label(2).getText();
+    }
+
 }

@@ -145,7 +145,7 @@ public class TestParallelInvitationWithTerminationByHost {
 
         dave.eclipseWindow.waitUntilShellActive("Session Invitation");
         dave.popupWindow.confirmSessionInvitationWindowStep1();
-        dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
+        dave.basic.clickButton(SarosConstant.BUTTON_FINISH);
         alice.bot.cancelInvitation(0);
         dave.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
         assertTrue(dave.eclipseWindow.isShellActive("Invitation Cancelled"));

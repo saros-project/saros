@@ -166,10 +166,10 @@ public class TestSVN {
     @Test
     public void testRevert() throws RemoteException {
         alice.eclipseState.deleteProject(CLS_PATH);
-        bob.bot.sleep(1000);
+        bob.basic.sleep(1000);
         assertFalse(bob.eclipseState.isResourceExist(CLS_PATH));
         alice.packageExplorerV.revert();
-        bob.bot.sleep(1000);
+        bob.basic.sleep(1000);
         assertTrue(bob.eclipseState.isResourceExist(CLS_PATH));
     }
 }

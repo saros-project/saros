@@ -17,9 +17,9 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
 
-public class MainObject extends EclipseObject {
+public class HelperObject extends EclipseObject {
 
-    public MainObject(RmiSWTWorkbenchBot rmiBot) {
+    public HelperObject(RmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

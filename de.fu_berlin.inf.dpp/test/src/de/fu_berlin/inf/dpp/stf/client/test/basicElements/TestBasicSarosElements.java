@@ -39,7 +39,7 @@ public class TestBasicSarosElements {
         alice.sessionV.closeSessionView();
         assertEquals(false, alice.sessionV.isSessionViewOpen());
         alice.sessionV.openSessionView();
-        alice.bot
+        alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/session_view.png"));
         assertEquals(true, alice.sessionV.isSessionViewOpen());
     }
@@ -49,7 +49,7 @@ public class TestBasicSarosElements {
         alice.rosterV.closeRosterView();
         assertEquals(false, alice.rosterV.isRosterViewOpen());
         alice.rosterV.openRosterView();
-        alice.bot
+        alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/roster_view.png"));
         assertEquals(true, alice.rosterV.isRosterViewOpen());
     }
@@ -75,7 +75,7 @@ public class TestBasicSarosElements {
         log.trace("xmppConnect");
         alice.bot.xmppConnect(alice.jid, alice.password);
         log.trace("captureScreenshot");
-        alice.bot
+        alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_connected.png"));
         assertEquals(true, alice.rosterV.isConnectedByXMPP());
     }
@@ -84,7 +84,7 @@ public class TestBasicSarosElements {
     public void testXmppDisconnect() throws RemoteException {
         alice.bot.xmppConnect(alice.jid, alice.password);
         alice.rosterV.xmppDisconnect();
-        alice.bot
+        alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_disconnected.png"));
         assertEquals(false, alice.rosterV.isConnectedByXMPP());
     }
