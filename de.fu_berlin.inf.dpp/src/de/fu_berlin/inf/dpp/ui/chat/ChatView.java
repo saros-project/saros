@@ -1,12 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.chat;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -18,12 +20,19 @@ import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.chat.history.ChatHistory;
+import de.fu_berlin.inf.dpp.ui.chat.history.ChatHistoryEntry;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -37,6 +46,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 @Component(module = "ui")
 public class ChatView extends SimpleExplanatoryViewPart {
+    private static Logger log = Logger.getLogger(ChatView.class);
+
     /**
      * Default image for ChatView.
      */
@@ -49,13 +60,18 @@ public class ChatView extends SimpleExplanatoryViewPart {
     public static final Image composingImage = SarosUI
         .getImage("icons/composing.png");
 
-    private static Logger log = Logger.getLogger(ChatView.class);
-
-    protected SimpleExplanation howTo = new SimpleExplanation(
+    protected SimpleExplanation howtoExplanation = new SimpleExplanation(
         SWT.ICON_INFORMATION,
         "To use this chat you need to be connected to a Saros session.");
 
+    protected SimpleExplanation refreshExplanation = new SimpleExplanation(
+        SWT.ICON_INFORMATION, "Refreshing...");
+
+    protected static boolean joinedRoom = false;
+
     protected ChatControl chatControl;
+
+    protected ChatHistory chatHistory = new ChatHistory();
 
     @Inject
     protected MessagingManager messagingManager;
@@ -65,46 +81,60 @@ public class ChatView extends SimpleExplanatoryViewPart {
     @Inject
     protected SessionManager sessionManager;
 
-    protected boolean sessionStarted = false;
-
     protected IMBeepAction imBeepAction;
+
+    @Inject
+    // TODO: see
+    // https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id=167540&atid=843362
+    protected EditorManager editorManager;
+    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+        @Override
+        public void colorChanged() {
+            if (chatControl != null && !chatControl.isDisposed()) {
+                ChatView.this.refreshFromHistory();
+            }
+        }
+    };
 
     protected IChatListener chatListener = new IChatListener() {
 
         public void chatJoined(final User joinedUser) {
+            ChatView.this.addChatLine(joinedUser, "... joined the chat.",
+                new Date());
+
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    ChatView.this.chatControl.addChatLine(joinedUser,
-                        "... joined the chat.");
                     User localUser = sessionManager.getSarosSession()
                         .getLocalUser();
-                    if (localUser.equals(joinedUser))
+                    if (localUser.equals(joinedUser)) {
                         ChatView.this.hideExplanation();
+                        ChatView.joinedRoom = true;
+                    }
                 }
             });
         }
 
         public void chatLeft(final User leftUser) {
+            ChatView.this.addChatLine(leftUser, "... left the chat.",
+                new Date());
+
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    ChatView.this.chatControl.addChatLine(leftUser,
-                        "... left the chat.");
-
                     User localUser = sessionManager.getSarosSession()
                         .getLocalUser();
-                    if (localUser.equals(leftUser))
-                        ChatView.this.showExplanation(howTo);
+                    if (localUser.equals(leftUser)) {
+                        ChatView.this.showExplanation(howtoExplanation);
+                        ChatView.joinedRoom = false;
+                    }
                 }
             });
         }
 
         public void chatMessageAdded(final User user, final String message) {
-            ChatView.log
-                .debug("Received Message from " + user + ": " + message);
+            ChatView.this.addChatLine(user, message, new Date());
 
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    chatControl.addChatLine(user, message);
 
                     /*
                      * Beep when receiving a foreign message
@@ -159,6 +189,8 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
     public ChatView() {
         Saros.reinject(this);
+        editorManager.addSharedEditorListener(sharedEditorListener);
+        messagingManager.addChatListener(chatListener);
     }
 
     @Override
@@ -170,7 +202,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             .getSystemColor(SWT.COLOR_WHITE), 2);
 
         this.chatControl
-            .addChatListener(new de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatListener() {
+            .addChatControlListener(new de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatControlListener() {
                 public void characterEntered(CharacterEnteredEvent event) {
                     /*
                      * Sends a message with state composing.
@@ -192,21 +224,79 @@ public class ChatView extends SimpleExplanatoryViewPart {
                             enteredMessage, null);
                     }
                 }
+
+                public void chatCleared(ChatClearedEvent event) {
+                    /*
+                     * If the users chooses to clear the chat we do not want
+                     * keep the information in the chat history
+                     */
+                    ChatView.this.chatHistory.clear();
+                }
             });
 
-        this.showExplanation(howTo);
-
-        // Register the chat listener.
-        // Run a possible join() in a separate thread to prevent the opening of
-        // this view from blocking the SWT thread.
-        Util.runSafeAsync(log, new Runnable() {
-            public void run() {
-                messagingManager.addChatListener(chatListener);
-            }
-        });
+        if (!joinedRoom) {
+            this.showExplanation(howtoExplanation);
+        }
 
         IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
         mgr.add(this.imBeepAction = new IMBeepAction("Toggle beep"));
+
+        // Show eventually already received messages
+        this.refreshFromHistory();
+    }
+
+    /**
+     * Adds a new line to the chat control and logs it to the
+     * {@link ChatHistory}
+     * 
+     * @param user
+     * @param message
+     * @param receivedOn
+     */
+    protected void addChatLine(final User user, final String message,
+        final Date receivedOn) {
+
+        chatHistory.addEntry(new ChatHistoryEntry(user, message, receivedOn));
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                if (ChatView.this.chatControl == null
+                    || ChatView.this.chatControl.isDisposed())
+                    return;
+
+                String sender = user.getHumanReadableName();
+                Color color = SarosAnnotation.getLightUserColor(user);
+                ChatView.this.chatControl.addChatLine(sender, color, message,
+                    receivedOn);
+            }
+        });
+    }
+
+    /**
+     * Recreates the {@link ChatControl}s contents on the base of the
+     * {@link ChatHistory}
+     */
+    public void refreshFromHistory() {
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                if (ChatView.this.chatControl == null
+                    || ChatView.this.chatControl.isDisposed())
+                    return;
+
+                /*
+                 * As soon as we call ChatControl.clear it calls our own
+                 * listener which will clear the ChatHistory. We therefore need
+                 * to save the history before clearing the chat.
+                 */
+                ChatHistoryEntry[] entries = ChatView.this.chatHistory
+                    .getEntries();
+                ChatView.this.chatControl.clear();
+                for (ChatHistoryEntry entry : entries) {
+                    ChatView.this.addChatLine(entry.getSender(),
+                        entry.getMessage(), entry.getReceivedOn());
+                }
+            }
+        });
     }
 
     @Override
@@ -216,6 +306,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
     @Override
     public void dispose() {
+        editorManager.removeSharedEditorListener(sharedEditorListener);
         messagingManager.removeChatListener(chatListener);
         super.dispose();
     }

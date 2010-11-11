@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.chat.chatControl;
 
+import java.util.Date;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -13,9 +14,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatListener;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
@@ -39,7 +41,50 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
  * 
  */
 public class ChatControl extends Composite {
-    protected Vector<IChatListener> chatListeners = new Vector<IChatListener>();
+    protected Vector<IChatControlListener> chatControlListeners = new Vector<IChatControlListener>();
+
+    /**
+     * This {@link IChatDisplayListener} is used to forward events fired in the
+     * {@link ChatDisplay} so the user only has to add listeners on the
+     * {@link ChatControl} and not on all its child components.
+     */
+    protected IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
+        public void chatCleared(ChatClearedEvent event) {
+            ChatControl.this.notifyChatCleared(event);
+        }
+    };
+
+    /**
+     * This {@link KeyAdapter} is used to forward events fired in the
+     * {@link ChatInput} so the user only has to add listeners on the
+     * {@link ChatControl} and not on all its child components.
+     */
+    protected KeyAdapter chatInputListener = new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (e.keyCode) {
+            case SWT.CR:
+            case SWT.KEYPAD_CR:
+                if (e.stateMask == 0) {
+                    String message = ChatControl.this.getInputText().trim();
+                    ChatControl.this.setInputText("");
+                    if (!message.isEmpty())
+                        ChatControl.this.notifyMessageEntered(message);
+
+                    /*
+                     * We do not want the ENTER to be inserted
+                     */
+                    e.doit = false;
+                }
+                break;
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            ChatControl.this.notifyCharacterEntered(e.character);
+        }
+    };
 
     /**
      * Chat layer
@@ -61,42 +106,15 @@ public class ChatControl extends Composite {
 
         this.sashForm = new SashForm(this, SWT.VERTICAL);
 
+        // ChatDisplay
         this.chatDisplay = new ChatDisplay(sashForm, chatDisplayStyle,
             displayBackgroundColor);
-
         this.chatDisplay.setAlwaysShowScrollBars(true);
+        this.chatDisplay.addChatDisplayListener(this.chatDisplayListener);
 
+        // ChatInput
         this.chatInput = new ChatInput(sashForm, chatInputStyle);
-
-        /*
-         * Generate MessageEnteredEvents
-         */
-        this.chatInput.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.keyCode) {
-                case SWT.CR:
-                case SWT.KEYPAD_CR:
-                    if (e.stateMask == 0) {
-                        String message = ChatControl.this.getInputText().trim();
-                        ChatControl.this.setInputText("");
-                        if (!message.isEmpty())
-                            ChatControl.this.notifyMessageEntered(message);
-
-                        /*
-                         * We do not want the ENTER to be inserted
-                         */
-                        e.doit = false;
-                    }
-                    break;
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                ChatControl.this.notifyCharacterEntered(e.character);
-            }
-        });
+        this.chatInput.addKeyListener(this.chatInputListener);
 
         /*
          * Updates SashForm weights to emulate a fixed ChatInput height
@@ -121,20 +139,19 @@ public class ChatControl extends Composite {
                     chatInputHeight });
             }
         });
+
+        /*
+         * no need for dispose handling because all child controls (and
+         * listeners) are disposed automatically
+         */
     }
 
     /**
-     * @see ChatDisplay#addChatLine(User, String)
+     * @see ChatDisplay#addChatLine(Object, Color, String, Date)
      */
-    public void addChatLine(User user, String message) {
-        this.chatDisplay.addChatLine(user, message);
-    }
-
-    /**
-     * @see ChatDisplay#addChatLine(Object, Color, String)
-     */
-    public void addChatLine(Object user, Color color, String message) {
-        this.chatDisplay.addChatLine(user, color, message);
+    public void addChatLine(Object sender, Color color, String message,
+        Date receivedOn) {
+        this.chatDisplay.addChatLine(sender, color, message, receivedOn);
     }
 
     /**
@@ -157,45 +174,54 @@ public class ChatControl extends Composite {
     }
 
     /**
-     * Adds a chat listener
+     * Adds a {@link IChatControlListener}
      * 
-     * @param chatListener
+     * @param chatControlListener
      */
-    public void addChatListener(IChatListener chatListener) {
-        this.chatListeners.addElement(chatListener);
+    public void addChatControlListener(IChatControlListener chatControlListener) {
+        this.chatControlListeners.addElement(chatControlListener);
     }
 
     /**
-     * Removes a chat listener
+     * Removes a {@link IChatControlListener}
      * 
-     * @param chatListener
+     * @param chatControlListener
      */
-    public void removeChatListener(IChatListener chatListener) {
-        this.chatListeners.removeElement(chatListener);
+    public void removeChatListener(IChatControlListener chatControlListener) {
+        this.chatControlListeners.removeElement(chatControlListener);
     }
 
     /**
-     * Notify all chat listener about entered character
+     * Notify all {@link IChatControlListener}s about entered character
      * 
      * @param character
      *            the entered character
      */
     public void notifyCharacterEntered(Character character) {
-        for (IChatListener chatListener : this.chatListeners) {
-            chatListener.characterEntered(new CharacterEnteredEvent(this,
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.characterEntered(new CharacterEnteredEvent(this,
                 character));
         }
     }
 
     /**
-     * Notify all chat listener about entered text
+     * Notify all {@link IChatControlListener}s about entered text
      * 
      * @param message
      *            the entered text
      */
     public void notifyMessageEntered(String message) {
-        for (IChatListener chatListener : this.chatListeners) {
-            chatListener.messageEntered(new MessageEnteredEvent(this, message));
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.messageEntered(new MessageEnteredEvent(this, message));
+        }
+    }
+
+    /**
+     * Notify all {@link IChatDisplayListener}s about a cleared chat
+     */
+    public void notifyChatCleared(ChatClearedEvent event) {
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.chatCleared(event);
         }
     }
 
@@ -210,5 +236,4 @@ public class ChatControl extends Composite {
     public boolean setFocus() {
         return this.chatInput.setFocus();
     }
-
 }

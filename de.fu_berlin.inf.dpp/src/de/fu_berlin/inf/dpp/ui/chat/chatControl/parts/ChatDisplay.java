@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.chat.chatControl.parts;
 
 import java.util.Date;
+import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -16,7 +17,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLineSeparator;
@@ -27,6 +29,8 @@ import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLineSeparator;
  * @author bkahlert
  */
 public class ChatDisplay extends ScrolledComposite {
+    protected Vector<IChatDisplayListener> chatDisplayListeners = new Vector<IChatDisplayListener>();
+
     protected Composite contentComposite;
     protected Composite optionsComposite;
     protected Object lastUser;
@@ -90,70 +94,42 @@ public class ChatDisplay extends ScrolledComposite {
             }
         });
         clearButton.setLayoutData(new GridData(SWT.END, SWT.END, true, true));
-
     }
 
     /**
      * Displays a new line containing the supplied message and a separator line
      * if necessary.
      * 
-     * @param user
-     *            who composed the message
-     * @param message
-     *            composed by the user
-     */
-    public void addChatLine(User user, String message) {
-        addChatLine(user, null, message);
-    }
-
-    /**
-     * Displays a new line containing the supplied message and a separator line
-     * if necessary.
-     * 
-     * @param user
+     * @param sender
      *            who composed the message
      * @param color
-     *            to be used to mark the user; only supported if user not of
-     *            type {@link User}
+     *            to be used to mark the user
      * @param message
-     *            composed by the user
-     *            <p>
-     *            Note: If the user is of type {@link User} the user's
-     *            associated color is used.<br/>
-     *            If the user is of another type the <code>toString</code>
-     *            method and the provided color is used to display the chat
-     *            line.
+     *            composed by the sender
+     * @param receivedOn
+     *            the date the message was received
      */
     @SuppressWarnings("static-access")
-    public void addChatLine(Object user, Color color, String message) {
-        if (lastUser != null && lastUser.equals(user)) { // same user
-            ChatLineSeparator chatLineSeparator;
-            if (user instanceof User) {
-                chatLineSeparator = new ChatLineSeparator(contentComposite,
-                    (User) user, new Date());
-            } else {
-                chatLineSeparator = new ChatLineSeparator(contentComposite,
-                    user.toString(), color, new Date());
-            }
-
-            GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true,
-                false);
-            chatLineSeparator.setLayoutData(gridData);
+    public void addChatLine(Object sender, Color color, String message,
+        Date receivedOn) {
+        /*
+         * Sender line
+         */
+        if (lastUser != null && lastUser.equals(sender)) { // same user
+            ChatLineSeparator chatLineSeparator = new ChatLineSeparator(
+                contentComposite, sender.toString(), color, new Date());
+            chatLineSeparator.setLayoutData(new GridData(SWT.FILL,
+                SWT.BEGINNING, true, false));
         } else { // new / different user
-            ChatLinePartnerChangeSeparator chatPartnerChangeLine;
-            if (user instanceof User) {
-                chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
-                    contentComposite, (User) user, new Date());
-            } else {
-                chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
-                    contentComposite, user.toString(), color, new Date());
-            }
-
-            GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true,
-                false);
-            chatPartnerChangeLine.setLayoutData(gridData);
+            ChatLinePartnerChangeSeparator chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
+                contentComposite, sender.toString(), color, new Date());
+            chatPartnerChangeLine.setLayoutData(new GridData(SWT.FILL,
+                SWT.BEGINNING, true, false));
         }
 
+        /*
+         * Message line
+         */
         ChatLine chatLine = new ChatLine(contentComposite, message);
         GridData chatLineGridData = new GridData(SWT.FILL, SWT.BEGINNING, true,
             false);
@@ -167,11 +143,11 @@ public class ChatDisplay extends ScrolledComposite {
 
         this.refresh();
 
-        lastUser = user;
+        lastUser = sender;
     }
 
     /**
-     * Return the chat items used to display the current conversation
+     * Returns the chat items used to display the current conversation
      * 
      * @return ordered array of items like
      *         {@link ChatLinePartnerChangeSeparator}s and {@link ChatLine}s
@@ -203,7 +179,7 @@ public class ChatDisplay extends ScrolledComposite {
      * Layouts the contents anew, updates the scrollbar min size and scrolls to
      * the bottom
      */
-    protected void refresh() {
+    public void refresh() {
         /*
          * Layout makes the added controls visible
          */
@@ -230,5 +206,33 @@ public class ChatDisplay extends ScrolledComposite {
         }
         this.refresh();
         this.lastUser = null;
+        this.notifyChatCleared();
+    }
+
+    /**
+     * Adds a {@link IChatDisplayListener}
+     * 
+     * @param chatListener
+     */
+    public void addChatDisplayListener(IChatDisplayListener chatListener) {
+        this.chatDisplayListeners.addElement(chatListener);
+    }
+
+    /**
+     * Removes a {@link IChatDisplayListener}
+     * 
+     * @param chatListener
+     */
+    public void removeChatListener(IChatDisplayListener chatListener) {
+        this.chatDisplayListeners.removeElement(chatListener);
+    }
+
+    /**
+     * Notify all {@link IChatDisplayListener}s about a cleared chat
+     */
+    public void notifyChatCleared() {
+        for (IChatDisplayListener chatListener : this.chatDisplayListeners) {
+            chatListener.chatCleared(new ChatClearedEvent(this));
+        }
     }
 }
