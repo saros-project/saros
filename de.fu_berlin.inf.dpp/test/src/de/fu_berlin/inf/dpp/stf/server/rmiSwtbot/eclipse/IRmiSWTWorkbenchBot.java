@@ -5,9 +5,8 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
 
 /**
  * This Interface is the stub for remote {@link SWTWorkbenchBot}. The
@@ -16,9 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindo
  */
 public interface IRmiSWTWorkbenchBot extends Remote {
 
-    public IEclipseWindowObject getEclipseWindowObject() throws RemoteException;
+    public SarosPopUpWindowObject getPopUpWindowObject() throws RemoteException;
 
-    public IEclipseState getEclipseState() throws RemoteException;
-
-    public IEclipseEditorObject getEclipseEditorObject() throws RemoteException;
+    public EclipseEditorObject getEclipseEditorObject() throws RemoteException;
 }

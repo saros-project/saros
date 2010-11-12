@@ -62,7 +62,7 @@ public class TestSVN {
         alice.state.isDriver(alice.jid);
         alice.state.isParticipant(bob.jid);
         bob.state.isObserver(bob.jid);
-        assertTrue(bob.eclipseState.isInSVN());
+        assertTrue(bob.state.isInSVN());
 
     }
 
@@ -81,9 +81,9 @@ public class TestSVN {
     public void testSwitch() throws RemoteException {
 
         alice.packageExplorerV.switchToTag();
-        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
-        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
+        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.state.getURLOfRemoteResource(CLS_PATH)));
 
     }
 
@@ -101,14 +101,12 @@ public class TestSVN {
     @Test
     public void testDisconnectAndConnect() throws RemoteException {
         alice.packageExplorerV.disConnectSVN();
-        bob.eclipseState
-            .waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
-        assertFalse(bob.eclipseState.isInSVN());
+        bob.state.waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertFalse(bob.state.isInSVN());
 
         alice.packageExplorerV.connectSVN();
-        bob.eclipseState
-            .waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
-        assertTrue(bob.eclipseState.isInSVN());
+        bob.state.waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
+        assertTrue(bob.state.isInSVN());
     }
 
     /**
@@ -125,9 +123,9 @@ public class TestSVN {
     @Test
     public void testUpdate() throws RemoteException {
         alice.packageExplorerV.switchToOtherRevision();
-        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
-        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
+        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.state.getURLOfRemoteResource(CLS_PATH)));
     }
 
     /**
@@ -145,9 +143,9 @@ public class TestSVN {
     @Test
     public void testUpdateSingleFile() throws RemoteException {
         alice.packageExplorerV.switchToOtherRevision(CLS_PATH);
-        bob.eclipseWindow.waitUntilShellCloses("Saros running VCS operation");
-        assertTrue(alice.eclipseState.getURLOfRemoteResource(CLS_PATH).equals(
-            bob.eclipseState.getURLOfRemoteResource(CLS_PATH)));
+        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
+            bob.state.getURLOfRemoteResource(CLS_PATH)));
     }
 
     /**
@@ -165,11 +163,11 @@ public class TestSVN {
      */
     @Test
     public void testRevert() throws RemoteException {
-        alice.eclipseState.deleteProject(CLS_PATH);
+        alice.state.deleteProject(CLS_PATH);
         bob.basic.sleep(1000);
-        assertFalse(bob.eclipseState.isResourceExist(CLS_PATH));
+        assertFalse(bob.state.isResourceExist(CLS_PATH));
         alice.packageExplorerV.revert();
         bob.basic.sleep(1000);
-        assertTrue(bob.eclipseState.isResourceExist(CLS_PATH));
+        assertTrue(bob.state.isResourceExist(CLS_PATH));
     }
 }

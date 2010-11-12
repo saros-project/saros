@@ -20,21 +20,19 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObjectImp;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -138,54 +136,45 @@ public class StartupSaros implements IStartup {
                      * static references "classVariable" to the object in the
                      * object in the server JVM.
                      */
-                    EclipseBasicObject.classVariable = new EclipseBasicObject(
+                    EclipseBasicObjectImp.classVariable = new EclipseBasicObjectImp(
                         bot);
                     bot.exportEclipseBasicObject(
-                        EclipseBasicObject.classVariable, "basicObject");
+                        EclipseBasicObjectImp.classVariable, "basicObject");
 
-                    ProgressViewObject.classVariable = new ProgressViewObject(
+                    ProgressViewObjectImp.classVariable = new ProgressViewObjectImp(
                         bot);
                     bot.exportProgressViewObject(
-                        ProgressViewObject.classVariable, "progressView");
+                        ProgressViewObjectImp.classVariable, "progressView");
 
                     SarosMainMenuObjectImp.classVariable = new SarosMainMenuObjectImp(
                         bot);
                     bot.exportMainMenuObject(
                         SarosMainMenuObjectImp.classVariable, "sarosMainMenu");
 
-                    PackageExplorerViewObject.classVariable = new PackageExplorerViewObject(
+                    PackageExplorerViewObjectImp.classVariable = new PackageExplorerViewObjectImp(
                         bot);
                     bot.exportPackageExplorerViewObject(
-                        PackageExplorerViewObject.classVariable,
+                        PackageExplorerViewObjectImp.classVariable,
                         "packageExplorerView");
 
-                    EclipseState.classVariable = new EclipseState(bot);
-                    bot.exportEclipseState(EclipseState.classVariable,
-                        "eclipseState");
-
-                    EclipseWindowObject.classVariable = new EclipseWindowObject(
-                        bot);
-                    bot.exportEclipseWindowObject(
-                        EclipseWindowObject.classVariable, "eclipseWindow");
-
-                    EclipseEditorObject.classVariable = new EclipseEditorObject(
+                    EclipseEditorObjectImp.classVariable = new EclipseEditorObjectImp(
                         bot);
                     bot.exportEclipseEditorObject(
-                        EclipseEditorObject.classVariable, "eclipseEditor");
+                        EclipseEditorObjectImp.classVariable, "eclipseEditor");
 
-                    SarosState.classVariable = new SarosState(saros,
+                    SarosStateImp.classVariable = new SarosStateImp(saros,
                         sessionManager, dataTransferManager, editorManager);
-                    bot.exportState(SarosState.classVariable, "state");
+                    bot.exportState(SarosStateImp.classVariable, "state");
 
                     RosterViewObjectImp.classVariable = new RosterViewObjectImp(
                         bot);
                     bot.exportRosterView(RosterViewObjectImp.classVariable,
                         "rosterView");
 
-                    PopUpWindowObjectImp.classVariable = new PopUpWindowObjectImp(
+                    SarosPopUpWindowObjectImp.classVariable = new SarosPopUpWindowObjectImp(
                         bot);
-                    bot.exportPopUpWindow(PopUpWindowObjectImp.classVariable,
-                        "popUpWindow");
+                    bot.exportPopUpWindow(
+                        SarosPopUpWindowObjectImp.classVariable, "popUpWindow");
 
                     SessionViewObjectImp.classVariable = new SessionViewObjectImp(
                         bot);

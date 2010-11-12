@@ -95,14 +95,14 @@ public class TestParallelInvitationWithTerminationByHost {
         carl.popupWindow.confirmSessionInvitationWindowStep1();
 
         alice.progressV.cancelInvitation();
-        bob.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(bob.eclipseWindow.isShellActive("Invitation Cancelled"));
+        bob.popupWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(bob.popupWindow.isShellActive("Invitation Cancelled"));
         bob.popupWindow.confirmInvitationCancelledWindow();
         alice.progressV.removeProgress();
 
         alice.progressV.cancelInvitation();
-        carl.eclipseWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(carl.eclipseWindow.isShellActive("Invitation Cancelled"));
+        carl.popupWindow.waitUntilShellActive("Invitation Cancelled");
+        assertTrue(carl.popupWindow.isShellActive("Invitation Cancelled"));
         carl.popupWindow.confirmInvitationCancelledWindow();
         alice.progressV.removeProgress();
 

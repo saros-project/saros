@@ -176,19 +176,19 @@ public class TestAllParticipantsFollowDriver {
             PKG, CLS);
 
         alice.eclipseEditor.closeJavaEditorWithSave(CLS);
-        String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS);
+        String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
+            CLS);
         bob.eclipseEditor.waitUntilJavaEditorClosed(CLS);
         assertFalse(bob.eclipseEditor.isClassOpen(CLS));
         carl.eclipseEditor.waitUntilJavaEditorClosed(CLS);
         assertFalse(carl.eclipseEditor.isClassOpen(CLS));
         dave.eclipseEditor.waitUntilJavaEditorClosed(CLS);
         assertFalse(dave.eclipseEditor.isClassOpen(CLS));
-        assertTrue(bob.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
+        assertTrue(bob.state.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
-        assertTrue(carl.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
+        assertTrue(carl.state.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
-        assertTrue(bob.eclipseState.getClassContent(PROJECT, PKG, CLS).equals(
+        assertTrue(bob.state.getClassContent(PROJECT, PKG, CLS).equals(
             clsContentOfAlice));
     }
 }

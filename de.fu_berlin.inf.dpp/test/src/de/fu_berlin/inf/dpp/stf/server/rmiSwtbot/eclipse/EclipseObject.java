@@ -39,6 +39,10 @@ public class EclipseObject {
     protected EditorObject editorObject;
     protected SarosSWTBot bot;
 
+    public EclipseObject() {
+
+    }
+
     /**
      * Creates an instance of a NoExportedObject.<br/>
      * 

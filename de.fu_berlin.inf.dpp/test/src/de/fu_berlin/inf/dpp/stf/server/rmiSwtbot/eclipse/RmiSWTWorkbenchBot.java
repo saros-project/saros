@@ -22,17 +22,15 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.Toolbar
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IPackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
 
 /**
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
@@ -56,13 +54,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
 
     public int sleepTime = 750;
 
-    public IEclipseWindowObject eclipseWindowObject;
-    public IEclipseState eclipseState;
-    public IEclipseEditorObject eclipseEditorObject;
-    public IPackageExplorerViewObject packageExplorerViewObject;
+    public SarosPopUpWindowObject exportedPopUpWindow;
+
+    public EclipseEditorObject eclipseEditorObject;
+    public PackageExplorerViewObject packageExplorerViewObject;
     public SarosMainMenuObject mainMenuObject;
-    public IProgressViewObject progressViewObject;
-    public IEclipseBasicObject eclipseBasicObject;
+    public ProgressViewObject progressViewObject;
+    public EclipseBasicObject eclipseBasicObject;
 
     public TableObject tableObject;
     public ToolbarObject tBarObject;
@@ -149,10 +147,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
      * Export give eclipse basic object object by given name on our local RMI
      * Registry.
      */
-    public void exportEclipseBasicObject(
-        IEclipseBasicObject eclipseBasicObject, String exportName) {
+    public void exportEclipseBasicObject(EclipseBasicObject eclipseBasicObject,
+        String exportName) {
         try {
-            this.eclipseBasicObject = (IEclipseBasicObject) UnicastRemoteObject
+            this.eclipseBasicObject = (EclipseBasicObject) UnicastRemoteObject
                 .exportObject(eclipseBasicObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.eclipseBasicObject);
@@ -168,10 +166,10 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     /**
      * Export give progress view object by given name on our local RMI Registry.
      */
-    public void exportProgressViewObject(
-        IProgressViewObject progressViewObject, String exportName) {
+    public void exportProgressViewObject(ProgressViewObject progressViewObject,
+        String exportName) {
         try {
-            this.progressViewObject = (IProgressViewObject) UnicastRemoteObject
+            this.progressViewObject = (ProgressViewObject) UnicastRemoteObject
                 .exportObject(progressViewObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.progressViewObject);
@@ -204,33 +202,13 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     /**
-     * Export given eclipse window object by given name on our local RMI
-     * Registry.
-     */
-    public void exportEclipseWindowObject(
-        EclipseWindowObject eclipseWindowObject, String exportName) {
-        try {
-            this.eclipseWindowObject = (IEclipseWindowObject) UnicastRemoteObject
-                .exportObject(eclipseWindowObject, 0);
-            addShutdownHook(exportName);
-            registry.bind(exportName, this.eclipseWindowObject);
-        } catch (RemoteException e) {
-            log.error("Could not export eclipse window object.", e);
-        } catch (AlreadyBoundException e) {
-            log.error(
-                "Could not bind eclipse window object, because it is bound already.",
-                e);
-        }
-    }
-
-    /**
      * Export given eclipse editor object by given name on our local RMI
      * Registry.
      */
     public void exportEclipseEditorObject(
-        EclipseEditorObject eclipseEditorObject, String exportName) {
+        EclipseEditorObjectImp eclipseEditorObject, String exportName) {
         try {
-            this.eclipseEditorObject = (IEclipseEditorObject) UnicastRemoteObject
+            this.eclipseEditorObject = (EclipseEditorObject) UnicastRemoteObject
                 .exportObject(eclipseEditorObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.eclipseEditorObject);
@@ -244,32 +222,14 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     }
 
     /**
-     * Export given eclipse state object by given name on our local RMI
-     * Registry.
-     */
-    public void exportEclipseState(EclipseState eclipseState, String exportName) {
-        try {
-            this.eclipseState = (IEclipseState) UnicastRemoteObject
-                .exportObject(eclipseState, 0);
-            addShutdownHook(exportName);
-            registry.bind(exportName, this.eclipseState);
-        } catch (RemoteException e) {
-            log.error("Could not export eclipse state object.", e);
-        } catch (AlreadyBoundException e) {
-            log.error(
-                "Could not bind eclipse state object, because it is bound already.",
-                e);
-        }
-    }
-
-    /**
      * Export package Explorer view object by given name on our local RMI
      * Registry.
      */
     public void exportPackageExplorerViewObject(
-        PackageExplorerViewObject packageExplorerViewObject, String exportName) {
+        PackageExplorerViewObjectImp packageExplorerViewObject,
+        String exportName) {
         try {
-            this.packageExplorerViewObject = (IPackageExplorerViewObject) UnicastRemoteObject
+            this.packageExplorerViewObject = (PackageExplorerViewObject) UnicastRemoteObject
                 .exportObject(packageExplorerViewObject, 0);
             addShutdownHook(exportName);
             registry.bind(exportName, this.packageExplorerViewObject);
@@ -282,21 +242,31 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         }
     }
 
-    /*******************************************************************************
-     * 
-     * main page
-     * 
-     *******************************************************************************/
-
-    public IEclipseWindowObject getEclipseWindowObject() throws RemoteException {
-        return eclipseWindowObject;
+    /**
+     * Export given pop up window object by given name on our local RMI
+     * Registry.
+     */
+    public void exportPopUpWindow(SarosPopUpWindowObjectImp popUpWindowObject,
+        String exportName) {
+        try {
+            this.exportedPopUpWindow = (SarosPopUpWindowObject) UnicastRemoteObject
+                .exportObject(popUpWindowObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, this.exportedPopUpWindow);
+        } catch (RemoteException e) {
+            log.error("Could not export popup window object.", e);
+        } catch (AlreadyBoundException e) {
+            log.error(
+                "Could not bind popup window object, because it is bound already.",
+                e);
+        }
     }
 
-    public IEclipseState getEclipseState() throws RemoteException {
-        return eclipseState;
+    public SarosPopUpWindowObject getPopUpWindowObject() throws RemoteException {
+        return exportedPopUpWindow;
     }
 
-    public IEclipseEditorObject getEclipseEditorObject() throws RemoteException {
+    public EclipseEditorObject getEclipseEditorObject() throws RemoteException {
         return eclipseEditorObject;
     }
 

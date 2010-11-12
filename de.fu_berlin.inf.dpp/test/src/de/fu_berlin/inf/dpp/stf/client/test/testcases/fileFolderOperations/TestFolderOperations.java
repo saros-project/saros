@@ -44,9 +44,9 @@ public class TestFolderOperations {
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.eclipseState.existsClass(PROJECT, PKG, CLS))
+        if (!alice.state.existsClass(PROJECT, PKG, CLS))
             alice.mainMenu.newClass(PROJECT, PKG, CLS);
-        if (!alice.eclipseState.isFolderExist(PROJECT, FOLDER))
+        if (!alice.state.isFolderExist(PROJECT, FOLDER))
             alice.mainMenu.newFolder(PROJECT, FOLDER);
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
@@ -72,8 +72,8 @@ public class TestFolderOperations {
         final String newFolderName = FOLDER + "New";
 
         alice.packageExplorerV.renameFolder(PROJECT, FOLDER, newFolderName);
-        bob.eclipseState.waitUntilFolderExist(PROJECT, newFolderName);
-        assertTrue(bob.eclipseState.isFolderExist(PROJECT, newFolderName));
-        assertFalse(bob.eclipseState.isFolderExist(PROJECT, FOLDER));
+        bob.state.waitUntilFolderExist(PROJECT, newFolderName);
+        assertTrue(bob.state.isFolderExist(PROJECT, newFolderName));
+        assertFalse(bob.state.isFolderExist(PROJECT, FOLDER));
     }
 }

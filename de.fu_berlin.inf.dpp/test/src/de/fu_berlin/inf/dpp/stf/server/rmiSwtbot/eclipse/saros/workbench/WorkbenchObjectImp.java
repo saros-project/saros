@@ -23,15 +23,15 @@ public class WorkbenchObjectImp extends EclipseObject implements
     }
 
     public void openSarosViews() throws RemoteException {
-        rmiBot.rosterViewObject.openRosterView();
-        rmiBot.sessonViewObject.openSessionView();
+        rmiBot.rosterV.openRosterView();
+        rmiBot.sessonV.openSessionView();
         rmiBot.chatV.openChatView();
         rmiBot.remoteScreenV.openRemoteScreenView();
     }
 
     public void resetSaros() throws RemoteException {
-        rmiBot.rosterViewObject.xmppDisconnect();
-        rmiBot.eclipseState.deleteAllProjects();
+        rmiBot.rosterV.xmppDisconnect();
+        rmiBot.state.deleteAllProjects();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {

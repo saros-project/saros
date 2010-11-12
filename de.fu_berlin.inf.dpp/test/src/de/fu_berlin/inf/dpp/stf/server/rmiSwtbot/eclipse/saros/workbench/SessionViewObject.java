@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -38,7 +38,7 @@ public interface SessionViewObject extends Remote {
      * Test if you are now in a session. <br>
      * This function check if the tool bar button "Leave the session" in the
      * session view is enabled. You can also use another function
-     * {@link ISarosState#isInSession()}, which test the session state without
+     * {@link SarosState#isInSession()}, which test the session state without
      * GUI.
      * 
      * <p>
@@ -46,7 +46,7 @@ public interface SessionViewObject extends Remote {
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
      * <li>Try to use the {@link SessionViewObject#isInSession()} and
-     * {@link ISarosState#isInSession()} together in your junittests.</li>
+     * {@link SarosState#isInSession()} together in your junittests.</li>
      * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
@@ -73,7 +73,7 @@ public interface SessionViewObject extends Remote {
 
     public void waitUntilSessionOpen() throws RemoteException;
 
-    public void waitUntilSessionOpenBy(ISarosState state)
+    public void waitUntilSessionOpenBy(SarosState state)
         throws RemoteException;
 
     /**
@@ -98,7 +98,7 @@ public interface SessionViewObject extends Remote {
 
     public void waitUntilSessionCloses() throws RemoteException;
 
-    public void waitUntilSessionClosedBy(ISarosState state)
+    public void waitUntilSessionClosedBy(SarosState state)
         throws RemoteException;
 
     /**
@@ -138,11 +138,11 @@ public interface SessionViewObject extends Remote {
      * </ol>
      * 
      * @param stateOfInvitee
-     *            the {@link ISarosState} of the user whom you want to give
+     *            the {@link SarosState} of the user whom you want to give
      *            drive role.
      * @throws RemoteException
      */
-    public void giveDriverRole(ISarosState stateOfInvitee)
+    public void giveDriverRole(SarosState stateOfInvitee)
         throws RemoteException;
 
     /**
@@ -209,24 +209,24 @@ public interface SessionViewObject extends Remote {
      * </ol>
      * 
      * @param stateOfFollowedUser
-     *            the {@link ISarosState} of the user whom you want to follow.
+     *            the {@link SarosState} of the user whom you want to follow.
      * @throws RemoteException
      */
-    public void followThisUser(ISarosState stateOfFollowedUser)
+    public void followThisUser(SarosState stateOfFollowedUser)
         throws RemoteException;
 
     /**
      * Test if you are in follow mode. <br>
      * This function check if the context menu "Stop following this user" of
      * every contact listed in the session view exists and is enabled. You can
-     * also use another function {@link ISarosState#isInFollowMode()}, which
+     * also use another function {@link SarosState#isInFollowMode()}, which
      * test the following state without GUI.
      * 
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use only the function{@link ISarosState#isInSession()} for
+     * <li>Try to use only the function{@link SarosState#isInSession()} for
      * your junittests, because the method
      * {@link TableObject#existContextOfTableItem(String, String)} need to be
      * still optimized.</li>
@@ -241,11 +241,11 @@ public interface SessionViewObject extends Remote {
 
     /**
      * This function do same as the
-     * {@link SessionViewObject#stopFollowingThisUser(ISarosState)} except you
-     * don't need to pass the {@link ISarosState} of the user followed by you to
+     * {@link SessionViewObject#stopFollowingThisUser(SarosState)} except you
+     * don't need to pass the {@link SarosState} of the user followed by you to
      * the function. It is very useful, if you don't exactly know whom you are
      * now following. Instead, we get the followed user JID using the method
-     * {@link ISarosState#getFollowedUserJID()}.
+     * {@link SarosState#getFollowedUserJID()}.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -268,11 +268,11 @@ public interface SessionViewObject extends Remote {
      * </ol>
      * 
      * @param stateOfFollowedUser
-     *            the {@link ISarosState} of the user whom you want to stop
+     *            the {@link SarosState} of the user whom you want to stop
      *            following.
      * @throws RemoteException
      */
-    public void stopFollowingThisUser(ISarosState stateOfFollowedUser)
+    public void stopFollowingThisUser(SarosState stateOfFollowedUser)
         throws RemoteException;
 
     /**
@@ -306,7 +306,7 @@ public interface SessionViewObject extends Remote {
 
     public void waitUntilFollowed(String plainJID) throws RemoteException;
 
-    public void shareYourScreenWithSelectedUser(ISarosState respondentState)
+    public void shareYourScreenWithSelectedUser(SarosState respondentState)
         throws RemoteException;
 
     public void stopSessionWithUser(String name) throws RemoteException;

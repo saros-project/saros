@@ -133,25 +133,21 @@ public class TestDriverResetsFiles {
             CLS);
 
         alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
-        dave.eclipseWindow.waitUntilShellActive("Save Resource");
-        dave.eclipseWindow.confirmWindow("Save Resource",
-            SarosConstant.BUTTON_NO);
+        dave.popupWindow.waitUntilShellActive("Save Resource");
+        dave.popupWindow
+            .confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
 
-        edna.eclipseWindow.waitUntilShellActive("Save Resource");
-        edna.eclipseWindow.confirmWindow("Save Resource",
-            SarosConstant.BUTTON_NO);
+        edna.popupWindow.waitUntilShellActive("Save Resource");
+        edna.popupWindow
+            .confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
 
-        String contentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS);
+        String contentOfAlice = alice.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("alice's class content" + contentOfAlice);
-        String contentOfDave = dave.eclipseState.getClassContent(PROJECT, PKG,
-            CLS);
+        String contentOfDave = dave.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfEdna = edna.eclipseState.getClassContent(PROJECT, PKG,
-            CLS);
+        String contentOfEdna = edna.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
-            CLS);
+        String contentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("bob's class content" + contentOfBob);
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

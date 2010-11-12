@@ -11,9 +11,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 public class RosterViewObjectImp extends EclipseObject implements
@@ -77,12 +76,11 @@ public class RosterViewObjectImp extends EclipseObject implements
     }
 
     /**
-     * This method returns true if {@link SarosState} and the GUI
+     * This method returns true if {@link SarosStateImp} and the GUI
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return rmiBot.stateObject.isConnectedByXMPP()
-            && isConnectedByXmppGuiCheck();
+        return rmiBot.state.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
     }
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {
@@ -123,8 +121,7 @@ public class RosterViewObjectImp extends EclipseObject implements
         waitUntil(SarosConditions.isDisConnected(bot));
     }
 
-    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException {
+    public void addContact(JID jid) throws RemoteException {
         if (!hasContactWith(jid)) {
             openRosterView();
             setFocusOnRosterView();
@@ -136,23 +133,17 @@ public class RosterViewObjectImp extends EclipseObject implements
                 jid.getBase());
             basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
             bot.button(SarosConstant.BUTTON_FINISH).click();
-            participant.getPopupWindowObject()
-                .confirmRequestOfSubscriptionReceivedWindow();
-            rmiBot.popupWindowObject
-                .confirmRequestOfSubscriptionReceivedWindow();
         }
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return rmiBot.stateObject.hasContactWith(jid)
-            && isBuddyExist(jid.getBase());
+        return rmiBot.state.hasContactWith(jid) && isBuddyExist(jid.getBase());
     }
 
     /**
      * Remove given contact from Roster, if contact was added before.
      */
-    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException {
+    public void deleteContact(JID jid) throws RemoteException {
         if (!hasContactWith(jid))
             return;
         try {
@@ -162,15 +153,9 @@ public class RosterViewObjectImp extends EclipseObject implements
                 jid.getBase());
             windowObject
                 .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-            rmiBot.eclipseWindowObject.confirmWindow(
+            rmiBot.exportedPopUpWindow.confirmWindow(
                 SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
-            participant.getEclipseWindowObject().waitUntilShellActive(
-                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-            participant.getEclipseWindowObject().confirmWindow(
-                SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
-                SarosConstant.BUTTON_OK);
-
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + jid.getBase(), e);
         }
@@ -198,11 +183,11 @@ public class RosterViewObjectImp extends EclipseObject implements
                                                  // pops
             // up
             log.trace("isShellActive");
-            boolean shellActive = rmiBot.eclipseWindowObject
+            boolean shellActive = rmiBot.exportedPopUpWindow
                 .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
             if (shellActive) {
                 log.trace("confirmSarosConfigurationWindow");
-                rmiBot.popupWindowObject.confirmSarosConfigurationWizard(
+                rmiBot.exportedPopUpWindow.confirmSarosConfigurationWizard(
                     jid.getDomain(), jid.getName(), password);
             }
             waitUntilConnected();

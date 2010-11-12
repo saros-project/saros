@@ -67,13 +67,12 @@ public class TestFollowMode {
         assertTrue(bob.state.isInFollowMode());
         assertTrue(bob.eclipseEditor.isJavaEditorActive(CLS1));
 
-        String clsContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS1);
-
-        bob.eclipseState.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
-            clsContentOfAlice);
-        String clsContentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
+        String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS1);
+
+        bob.state.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
+            clsContentOfAlice);
+        String clsContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
         alice.mainMenu.newClass(PROJECT, PKG, CLS2);

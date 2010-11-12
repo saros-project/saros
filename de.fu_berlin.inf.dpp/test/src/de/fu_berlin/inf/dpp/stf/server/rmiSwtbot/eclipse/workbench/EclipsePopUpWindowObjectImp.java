@@ -13,12 +13,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
 
-public class EclipseWindowObject extends EclipseObject implements
-    IEclipseWindowObject {
+public class EclipsePopUpWindowObjectImp extends EclipseObject implements
+    EclipsePopUpWindowObject {
 
-    public static EclipseWindowObject classVariable;
-
-    public EclipseWindowObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public EclipsePopUpWindowObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
         super(rmiBot);
     }
 

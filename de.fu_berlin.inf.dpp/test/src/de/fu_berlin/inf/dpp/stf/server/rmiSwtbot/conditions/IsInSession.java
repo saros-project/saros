@@ -2,13 +2,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 
 public class IsInSession extends DefaultCondition {
 
-    private ISarosState state;
+    private SarosState state;
 
-    IsInSession(ISarosState state) {
+    IsInSession(SarosState state) {
         this.state = state;
     }
 

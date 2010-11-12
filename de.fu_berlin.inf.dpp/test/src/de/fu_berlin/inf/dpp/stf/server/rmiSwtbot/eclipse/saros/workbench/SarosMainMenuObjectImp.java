@@ -4,9 +4,9 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMenuObjectImp;
 
-public class SarosMainMenuObjectImp extends EclipseMainMenuObject implements
+public class SarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
     SarosMainMenuObject {
     public static SarosMainMenuObjectImp classVariable;
 
@@ -18,7 +18,7 @@ public class SarosMainMenuObjectImp extends EclipseMainMenuObject implements
         throws RemoteException {
         rmiBot.workbench.getEclipseShell().activate().setFocus();
         menuObject.clickMenuWithTexts("Saros", "Create Account");
-        rmiBot.popupWindowObject.confirmCreateNewUserAccountWindow(
+        rmiBot.exportedPopUpWindow.confirmCreateNewUserAccountWindow(
             jid.getDomain(), jid.getName(), password);
     }
 }

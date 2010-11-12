@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMenuObject;
 
-public interface SarosMainMenuObject extends IEclipseMainMenuObject {
+public interface SarosMainMenuObject extends EclipseMainMenuObject {
 
     public void creatNewAccount(JID jid, String password)
         throws RemoteException;

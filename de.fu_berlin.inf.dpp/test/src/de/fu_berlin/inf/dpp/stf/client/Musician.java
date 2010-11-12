@@ -16,21 +16,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.IEclipseState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IEclipseWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IPackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -40,21 +37,19 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.IProgressView
 public class Musician {
     private static final Logger log = Logger.getLogger(Musician.class);
 
-    public IEclipseWindowObject eclipseWindow;
-    public IEclipseState eclipseState;
-    public IEclipseEditorObject eclipseEditor;
-    public IPackageExplorerViewObject packageExplorerV;
+    public EclipseEditorObject eclipseEditor;
+    public PackageExplorerViewObject packageExplorerV;
     public SarosMainMenuObject mainMenu;
-    public IProgressViewObject progressV;
-    public IEclipseBasicObject basic;
+    public ProgressViewObject progressV;
+    public EclipseBasicObject basic;
 
-    public ISarosRmiSWTWorkbenchBot bot;
-    public ISarosState state;
+    // public ISarosRmiSWTWorkbenchBot bot;
+    public SarosState state;
     public RosterViewObject rosterV;
     public SessionViewObject sessionV;
     public RemoteScreenViewObject remoteScreenV;
     public ChatViewObject chatV;
-    public PopUpWindowObject popupWindow;
+    public SarosPopUpWindowObject popupWindow;
     public WorkbenchObject workbench;
 
     public JID jid;
@@ -94,8 +89,8 @@ public class Musician {
         AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
-            bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
-            state = (ISarosState) registry.lookup("state");
+            // bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
+            state = (SarosState) registry.lookup("state");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it
@@ -108,18 +103,16 @@ public class Musician {
             sessionV = (SessionViewObject) registry.lookup("sessionView");
             remoteScreenV = (RemoteScreenViewObject) registry
                 .lookup("remoteScreenView");
-            popupWindow = (PopUpWindowObject) registry.lookup("popUpWindow");
+            popupWindow = (SarosPopUpWindowObject) registry
+                .lookup("popUpWindow");
 
-            eclipseWindow = (IEclipseWindowObject) registry
-                .lookup("eclipseWindow");
-            eclipseState = (IEclipseState) registry.lookup("eclipseState");
-            eclipseEditor = (IEclipseEditorObject) registry
+            eclipseEditor = (EclipseEditorObject) registry
                 .lookup("eclipseEditor");
-            packageExplorerV = (IPackageExplorerViewObject) registry
+            packageExplorerV = (PackageExplorerViewObject) registry
                 .lookup("packageExplorerView");
             mainMenu = (SarosMainMenuObject) registry.lookup("sarosMainMenu");
-            progressV = (IProgressViewObject) registry.lookup("progressView");
-            basic = (IEclipseBasicObject) registry.lookup("basicObject");
+            progressV = (ProgressViewObject) registry.lookup("progressView");
+            basic = (EclipseBasicObject) registry.lookup("basicObject");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -140,8 +133,8 @@ public class Musician {
 
         popupWindow.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
-            popupWindow.confirmSessionUsingNewOrExistProject(invitee.bot,
-                this.jid, projectName, invitee.typeOfSharingProject);
+            invitee.popupWindow.confirmSessionUsingNewOrExistProject(this.jid,
+                projectName, invitee.typeOfSharingProject);
         }
     }
 
@@ -191,7 +184,7 @@ public class Musician {
     public void leaveSessionFirst(Musician... musicians)
         throws RemoteException, InterruptedException {
         sessionV.leaveTheSession();
-        eclipseWindow.confirmWindow("Confirm Closing Session",
+        popupWindow.confirmWindow("Confirm Closing Session",
             SarosConstant.BUTTON_YES);
         sessionV.waitUntilSessionCloses();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
@@ -200,11 +193,11 @@ public class Musician {
             closeSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.eclipseWindow
+                    musician.popupWindow
                         .waitUntilShellActive("Closing the Session");
-                    musician.eclipseWindow.confirmWindow("Closing the Session",
+                    musician.popupWindow.confirmWindow("Closing the Session",
                         SarosConstant.BUTTON_OK);
-                    musician.eclipseWindow
+                    musician.popupWindow
                         .waitUntilShellCloses("Closing the Session");
                     return null;
                 }
@@ -349,6 +342,30 @@ public class Musician {
 
     public String getXmppServer() {
         return jid.getDomain();
+    }
+
+    public void addContactDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasContactWith(peer.jid)) {
+            rosterV.addContact(peer.jid);
+            peer.popupWindow.confirmRequestOfSubscriptionReceivedWindow();
+            popupWindow.confirmRequestOfSubscriptionReceivedWindow();
+        }
+    }
+
+    /**
+     * Remove given contact from Roster, if contact was added before.
+     */
+    public void deleteContactDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasContactWith(peer.jid))
+            return;
+        rosterV.deleteContact(peer.jid);
+
+        peer.popupWindow
+            .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
+        peer.popupWindow.confirmWindow(
+            SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
+            SarosConstant.BUTTON_OK);
+
     }
 
 }

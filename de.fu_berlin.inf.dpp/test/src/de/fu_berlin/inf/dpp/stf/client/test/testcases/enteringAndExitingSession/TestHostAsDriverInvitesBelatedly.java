@@ -153,15 +153,13 @@ public class TestHostAsDriverInvitesBelatedly {
         bob.popupWindow
             .confirmSessionInvitationWindowStep2UsingExistProject(PROJECT);
 
-        String CLSContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS);
-        String CLS2ContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS2);
-
-        String CLSContentOfBob = bob.eclipseState.getClassContent(PROJECT, PKG,
+        String CLSContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS);
-        String CLS2ContentOfBob = bob.eclipseState.getClassContent(PROJECT,
-            PKG, CLS2);
+        String CLS2ContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
+            CLS2);
+
+        String CLSContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS);
+        String CLS2ContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS2);
 
         assertTrue(CLSContentOfAlice.equals(CLSContentOfBob));
         assertTrue(CLS2ContentOfAlice.equals(CLS2ContentOfBob));

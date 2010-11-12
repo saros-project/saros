@@ -179,10 +179,9 @@ public class TestDriverSavesFiles {
             CLS2);
         String dirtyCls2ContentOfAlice = alice.eclipseEditor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
-        String cls2ContentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS2);
-        String cls2ContentOfBob = bob.eclipseState.getClassContent(PROJECT,
-            PKG, CLS2);
+        String cls2ContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
+            CLS2);
+        String cls2ContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS2);
         assertFalse(cls2ContentOfBob.equals(dirtyCls2ContentOfAlice));
         assertTrue(cls2ContentOfBob.equals(cls2ContentOfAlice));
     }
@@ -259,10 +258,10 @@ public class TestDriverSavesFiles {
         assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_JAVA_EDITOR));
 
-        bob.eclipseState.waitUntilClassContentsSame(PROJECT, PKG, CLS2,
+        bob.state.waitUntilClassContentsSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
-        String contentChangeOfBob = bob.eclipseState.getClassContent(PROJECT,
-            PKG, CLS2);
+        String contentChangeOfBob = bob.state.getClassContent(PROJECT, PKG,
+            CLS2);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
         carl.packageExplorerV.openClass(PROJECT, PKG, CLS2);
@@ -293,15 +292,14 @@ public class TestDriverSavesFiles {
     @Test
     public void testCloseDirtyFileByAlice() throws RemoteException,
         IOException, CoreException {
-        String clsConentofBob = bob.eclipseState.getClassContent(PROJECT, PKG,
-            CLS);
+        String clsConentofBob = bob.state.getClassContent(PROJECT, PKG, CLS);
         alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
         alice.eclipseEditor.closeJavaEditorWithSave(CLS);
-        String clsConentOfAlice = alice.eclipseState.getClassContent(PROJECT,
-            PKG, CLS);
+        String clsConentOfAlice = alice.state
+            .getClassContent(PROJECT, PKG, CLS);
 
-        dave.eclipseState.waitUntilClassContentsSame(PROJECT, PKG, CLS,
+        dave.state.waitUntilClassContentsSame(PROJECT, PKG, CLS,
             clsConentOfAlice);
         assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));

@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-public interface IEclipseWindowObject extends Remote {
+public interface EclipsePopUpWindowObject extends Remote {
     public void waitUntilShellActive(String title) throws RemoteException;
 
     public void waitUntilShellCloses(SWTBotShell shell) throws RemoteException;

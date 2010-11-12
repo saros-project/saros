@@ -19,12 +19,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.Toolbar
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ISarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.PopUpWindowObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
@@ -36,7 +34,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.Workben
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
- * exports {@link ISarosState} via RMI. You should not use this within tests.
+ * exports {@link SarosState} via RMI. You should not use this within tests.
  * Have a look at {@link Musician} if you want to write tests.
  */
 public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
@@ -50,31 +48,17 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     private static transient SarosRmiSWTWorkbenchBot self;
 
     /** RMI exported Saros object */
-    public ISarosState stateObject;
+    public SarosState state;
 
-    public RosterViewObject rosterViewObject;
+    public RosterViewObject rosterV;
 
-    public PopUpWindowObject popupWindowObject;
-
-    public SessionViewObject sessonViewObject;
+    public SessionViewObject sessonV;
 
     public RemoteScreenViewObject remoteScreenV;
 
     public ChatViewObject chatV;
 
     public WorkbenchObject workbench;
-
-    public RosterViewObject getRosterViewObject() throws RemoteException {
-        return rosterViewObject;
-    }
-
-    public PopUpWindowObject getPopupWindowObject() throws RemoteException {
-        return popupWindowObject;
-    }
-
-    public SessionViewObject getSessionViewObject() throws RemoteException {
-        return sessonViewObject;
-    }
 
     /**
      * SarosRmiSWTWorkbenchBot is a singleton
@@ -109,12 +93,12 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * Export given state object by given name on our local RMI Registry.
      */
-    public void exportState(SarosState state, String exportName) {
+    public void exportState(SarosStateImp state, String exportName) {
         try {
-            this.stateObject = (ISarosState) UnicastRemoteObject.exportObject(
-                state, 0);
+            this.state = (SarosState) UnicastRemoteObject
+                .exportObject(state, 0);
             addShutdownHook(exportName);
-            registry.bind(exportName, this.stateObject);
+            registry.bind(exportName, this.state);
         } catch (RemoteException e) {
             log.error("Could not export stat object.", e);
         } catch (AlreadyBoundException e) {
@@ -129,35 +113,15 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void exportRosterView(RosterViewObjectImp rosterView,
         String exportName) {
         try {
-            this.rosterViewObject = (RosterViewObject) UnicastRemoteObject
-                .exportObject(rosterView, 0);
+            this.rosterV = (RosterViewObject) UnicastRemoteObject.exportObject(
+                rosterView, 0);
             addShutdownHook(exportName);
-            registry.bind(exportName, this.rosterViewObject);
+            registry.bind(exportName, this.rosterV);
         } catch (RemoteException e) {
             log.error("Could not export rosterview object.", e);
         } catch (AlreadyBoundException e) {
             log.error(
                 "Could not bind rosterview object, because it is bound already.",
-                e);
-        }
-    }
-
-    /**
-     * Export given pop up window object by given name on our local RMI
-     * Registry.
-     */
-    public void exportPopUpWindow(PopUpWindowObjectImp popUpWindowObject,
-        String exportName) {
-        try {
-            this.popupWindowObject = (PopUpWindowObject) UnicastRemoteObject
-                .exportObject(popUpWindowObject, 0);
-            addShutdownHook(exportName);
-            registry.bind(exportName, this.popupWindowObject);
-        } catch (RemoteException e) {
-            log.error("Could not export popup window object.", e);
-        } catch (AlreadyBoundException e) {
-            log.error(
-                "Could not bind popup window object, because it is bound already.",
                 e);
         }
     }
@@ -169,10 +133,10 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     public void exportSessionView(SessionViewObjectImp sharedSessonViewObject,
         String exportName) {
         try {
-            this.sessonViewObject = (SessionViewObject) UnicastRemoteObject
+            this.sessonV = (SessionViewObject) UnicastRemoteObject
                 .exportObject(sharedSessonViewObject, 0);
             addShutdownHook(exportName);
-            registry.bind(exportName, this.sessonViewObject);
+            registry.bind(exportName, this.sessonV);
         } catch (RemoteException e) {
             log.error("Could not export shared session view object.", e);
         } catch (AlreadyBoundException e) {

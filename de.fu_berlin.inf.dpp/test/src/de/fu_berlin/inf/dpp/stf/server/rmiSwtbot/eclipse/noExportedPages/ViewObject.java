@@ -132,7 +132,7 @@ public class ViewObject extends EclipseObject {
             menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            rmiBot.eclipseWindowObject.confirmWindowWithTreeWithFilterText(
+            rmiBot.exportedPopUpWindow.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }

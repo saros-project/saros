@@ -34,8 +34,8 @@ public class TestHandleContacts {
 
     @Before
     public void setUp() throws RemoteException {
-        alice.rosterV.addContact(bob.jid, bob.bot);
-        bob.rosterV.addContact(alice.jid, alice.bot);
+        alice.addContactDone(bob);
+        bob.addContactDone(alice);
     }
 
     @After
@@ -51,8 +51,8 @@ public class TestHandleContacts {
     public void testBobRemoveContactAlice() throws RemoteException {
         assertTrue(alice.rosterV.hasContactWith(bob.jid));
         assertTrue(bob.rosterV.hasContactWith(alice.jid));
-        bob.rosterV.deleteContact(alice.jid, alice.bot);
-        assertFalse(bob.rosterV.hasContactWith(alice.jid));
+        bob.deleteContactDone(alice);
+        // assertFalse(bob.rosterV.hasContactWith(alice.jid));
         assertFalse(alice.rosterV.hasContactWith(bob.jid));
     }
 
@@ -60,23 +60,24 @@ public class TestHandleContacts {
     public void testAliceRemoveContactBob() throws RemoteException {
         assertTrue(alice.rosterV.hasContactWith(bob.jid));
         assertTrue(bob.rosterV.hasContactWith(alice.jid));
-        alice.rosterV.deleteContact(bob.jid, bob.bot);
+        alice.deleteContactDone(bob);
+
         assertFalse(bob.rosterV.hasContactWith(alice.jid));
         assertFalse(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test
     public void testAliceAddContactBob() throws RemoteException {
-        alice.rosterV.deleteContact(bob.jid, bob.bot);
-        alice.rosterV.addContact(bob.jid, bob.bot);
+        alice.deleteContactDone(bob);
+        alice.addContactDone(bob);
         assertTrue(bob.rosterV.hasContactWith(alice.jid));
         assertTrue(alice.rosterV.hasContactWith(bob.jid));
     }
 
     @Test
     public void testBobAddContactAlice() throws RemoteException {
-        bob.rosterV.deleteContact(alice.jid, alice.bot);
-        bob.rosterV.addContact(alice.jid, alice.bot);
+        bob.deleteContactDone(alice);
+        bob.addContactDone(alice);
         assertTrue(bob.rosterV.hasContactWith(alice.jid));
         assertTrue(alice.rosterV.hasContactWith(bob.jid));
     }
@@ -85,9 +86,9 @@ public class TestHandleContacts {
     public void testAddNoValidContact() throws RemoteException {
         alice.rosterV.clickTBAddANewContactInRosterView();
         alice.popupWindow.confirmNewContactWindow("bob@bla");
-        alice.eclipseWindow.waitUntilShellActive("Contact look-up failed");
-        assertTrue(alice.eclipseWindow.isShellActive("Contact look-up failed"));
-        alice.eclipseWindow.confirmWindow("Contact look-up failed",
+        alice.popupWindow.waitUntilShellActive("Contact look-up failed");
+        assertTrue(alice.popupWindow.isShellActive("Contact look-up failed"));
+        alice.popupWindow.confirmWindow("Contact look-up failed",
             SarosConstant.BUTTON_NO);
     }
 
@@ -95,9 +96,9 @@ public class TestHandleContacts {
     public void testAddExistedContact() throws RemoteException {
         alice.rosterV.clickTBAddANewContactInRosterView();
         alice.popupWindow.confirmNewContactWindow(bob.getBaseJid());
-        alice.eclipseWindow.waitUntilShellActive("Contact already added");
-        assertTrue(alice.eclipseWindow.isShellActive("Contact already added"));
-        alice.eclipseWindow.closeShell("Contact already added");
+        alice.popupWindow.waitUntilShellActive("Contact already added");
+        assertTrue(alice.popupWindow.isShellActive("Contact already added"));
+        alice.popupWindow.closeShell("Contact already added");
     }
 
 }

@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.ISarosRmiSWTWorkbenchBot;
 
 public interface RosterViewObject extends Remote {
 
@@ -38,13 +37,11 @@ public interface RosterViewObject extends Remote {
 
     public void waitUntilDisConnected() throws RemoteException;
 
-    public void addContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException;
+    public void addContact(JID jid) throws RemoteException;
 
     public boolean hasContactWith(JID jid) throws RemoteException;
 
-    public void deleteContact(JID jid, ISarosRmiSWTWorkbenchBot participant)
-        throws RemoteException;
+    public void deleteContact(JID jid) throws RemoteException;
 
     public void renameContact(String contact, String newName)
         throws RemoteException;

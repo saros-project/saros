@@ -158,8 +158,7 @@ public class InitMusician {
             for (int j = i + 1; j < musicians.size(); j++) {
                 Musician addedMuscian = musicians.get(j);
                 if (!musican.rosterV.hasContactWith(addedMuscian.jid))
-                    musican.rosterV.addContact(addedMuscian.jid,
-                        addedMuscian.bot);
+                    musican.addContactDone(addedMuscian);
             }
         }
     }
