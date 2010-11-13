@@ -9,14 +9,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class PerspectiveObject extends EclipseObject {
-
-    public PerspectiveObject(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     /**
      * Open a perspective using Window->Open Perspective->Other... The method is
@@ -38,7 +33,7 @@ public class PerspectiveObject extends EclipseObject {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            rmiBot.workbenchObject.activateEclipseShell();
+            workbenchObject.activateEclipseShell();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {

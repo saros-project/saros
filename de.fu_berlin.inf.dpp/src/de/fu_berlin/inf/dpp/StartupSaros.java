@@ -113,7 +113,7 @@ public class StartupSaros implements IStartup {
                 SarosControler bot = SarosControler.getInstance();
                 bot.sleepTime = time;
                 try {
-                    bot.init(port, saros, sessionManager, dataTransferManager,
+                    bot.initExportedObjects(port, saros, sessionManager, dataTransferManager,
                         editorManager);
                     bot.listRmiObjects();
                 } catch (RemoteException e) {

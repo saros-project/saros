@@ -28,8 +28,7 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 /**
  * Screen object that represents the operations that can be performed on a view.
@@ -47,9 +46,6 @@ public class ViewObject extends EclipseObject {
      *            interface for {@link SWTWorkbenchBot}. Using it
      *            {@link ViewObject} can access other screen objects.
      */
-    public ViewObject(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     /**
      * set focus on the specified view. It should be only called if View is
@@ -128,11 +124,11 @@ public class ViewObject extends EclipseObject {
     public void openViewWithName(String viewTitle, String category,
         String nodeName) throws RemoteException {
         if (!isViewOpen(viewTitle)) {
-            rmiBot.workbenchObject.activateEclipseShell();
+            workbenchObject.activateEclipseShell();
             menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            rmiBot.windowObject.confirmWindowWithTreeWithFilterText(
+            exportedWindowObject.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }

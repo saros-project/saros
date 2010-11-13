@@ -8,7 +8,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class ProgressViewObjectImp extends EclipseObject implements
     ProgressViewObject {
@@ -21,15 +21,11 @@ public class ProgressViewObjectImp extends EclipseObject implements
      * {@link ProgressViewObjectImp} is a singleton, but inheritance is
      * possible.
      */
-    public static ProgressViewObjectImp getInstance(SarosControler rmiBot) {
+    public static ProgressViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new ProgressViewObjectImp(rmiBot);
+        self = new ProgressViewObjectImp();
         return self;
-    }
-
-    public ProgressViewObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
     }
 
     public void openProgressView() throws RemoteException {

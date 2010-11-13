@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class EclipseBasicObjectImp extends EclipseObject implements
     EclipseBasicObject {
@@ -16,15 +16,11 @@ public class EclipseBasicObjectImp extends EclipseObject implements
      * {@link EclipseBasicObjectImp} is a singleton, but inheritance is
      * possible.
      */
-    public static EclipseBasicObjectImp getInstance(SarosControler rmiBot) {
+    public static EclipseBasicObjectImp getInstance() {
         if (eclipseBasicObjectImp != null)
             return eclipseBasicObjectImp;
-        eclipseBasicObjectImp = new EclipseBasicObjectImp(rmiBot);
+        eclipseBasicObjectImp = new EclipseBasicObjectImp();
         return eclipseBasicObjectImp;
-    }
-
-    public EclipseBasicObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
     }
 
     public void sleep(long millis) throws RemoteException {

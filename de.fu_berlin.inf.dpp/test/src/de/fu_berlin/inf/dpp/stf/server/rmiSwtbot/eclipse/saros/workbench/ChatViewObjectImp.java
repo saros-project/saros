@@ -5,8 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
 
@@ -17,15 +16,11 @@ public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
     /**
      * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
      */
-    public static ChatViewObjectImp getInstance(SarosControler rmiBot) {
+    public static ChatViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new ChatViewObjectImp(rmiBot);
+        self = new ChatViewObjectImp();
         return self;
-    }
-
-    public ChatViewObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
     }
 
     public void waitUntilGetChatMessage(String jid, String message)

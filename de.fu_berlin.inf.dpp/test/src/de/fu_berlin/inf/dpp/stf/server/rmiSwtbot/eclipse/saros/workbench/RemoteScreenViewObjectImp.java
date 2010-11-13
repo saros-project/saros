@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class RemoteScreenViewObjectImp extends EclipseObject implements
     RemoteScreenViewObject {
@@ -15,10 +15,10 @@ public class RemoteScreenViewObjectImp extends EclipseObject implements
     /**
      * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
      */
-    public static RemoteScreenViewObjectImp getInstance(SarosControler rmiBot) {
+    public static RemoteScreenViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new RemoteScreenViewObjectImp(rmiBot);
+        self = new RemoteScreenViewObjectImp();
         return self;
     }
 
@@ -31,9 +31,6 @@ public class RemoteScreenViewObjectImp extends EclipseObject implements
      *            controls Saros from the GUI perspective and manage all
      *            exported rmi-objects.
      */
-    public RemoteScreenViewObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     public void activateRemoteScreenView() throws RemoteException {
         viewObject

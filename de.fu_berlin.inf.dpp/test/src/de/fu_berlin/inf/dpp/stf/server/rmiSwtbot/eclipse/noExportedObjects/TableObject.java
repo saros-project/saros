@@ -21,14 +21,9 @@ import org.hamcrest.Matcher;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class TableObject extends EclipseObject {
-
-    public TableObject(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     public SWTBotTable getTable() {
         return bot.table();

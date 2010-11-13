@@ -10,14 +10,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class EclipsePopUpWindowObjectImp extends EclipseObject implements
     EclipsePopUpWindowObject {
-
-    public EclipsePopUpWindowObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     public void waitUntilShellActive(String title) throws RemoteException {
         waitUntil(SarosConditions.ShellActive(bot, title));

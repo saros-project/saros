@@ -9,14 +9,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class HelperObject extends EclipseObject {
-
-    public HelperObject(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     public String[] changeToRegex(String... texts) {
         String[] matchTexts = new String[texts.length];

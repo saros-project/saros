@@ -10,8 +10,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class WorkbenchObjectImp extends EclipseObject implements
     WorkbenchObject {
@@ -23,27 +22,23 @@ public class WorkbenchObjectImp extends EclipseObject implements
     /**
      * {@link WorkbenchObjectImp} is a singleton, but inheritance is possible.
      */
-    public static WorkbenchObjectImp getInstance(SarosControler rmiBot) {
+    public static WorkbenchObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new WorkbenchObjectImp(rmiBot);
+        self = new WorkbenchObjectImp();
         return self;
     }
 
-    public WorkbenchObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
-    }
-
     public void openSarosViews() throws RemoteException {
-        rmiBot.rosterVObject.openRosterView();
-        rmiBot.sessonVObject.openSessionView();
-        rmiBot.chatVObject.openChatView();
-        rmiBot.remoteScreenVObject.openRemoteScreenView();
+        rosterVObject.openRosterView();
+        sessonVObject.openSessionView();
+        chatVObject.openChatView();
+        remoteScreenVObject.openRemoteScreenView();
     }
 
     public void resetSaros() throws RemoteException {
-        rmiBot.rosterVObject.xmppDisconnect();
-        rmiBot.stateObject.deleteAllProjects();
+        rosterVObject.xmppDisconnect();
+        stateObject.deleteAllProjects();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -74,7 +69,7 @@ public class WorkbenchObjectImp extends EclipseObject implements
     }
 
     public void resetWorkbench() throws RemoteException {
-        rmiBot.menuObject.openPerspectiveJava();
+        exportedMenuObject.openPerspectiveJava();
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();

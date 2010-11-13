@@ -10,7 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class PackageExplorerViewObjectImp extends EclipseObject implements
     PackageExplorerViewObject {
@@ -22,15 +22,11 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
      * {@link EclipseBasicObjectImp} is a singleton, but inheritance is
      * possible.
      */
-    public static PackageExplorerViewObjectImp getInstance(SarosControler rmiBot) {
+    public static PackageExplorerViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new PackageExplorerViewObjectImp(rmiBot);
+        self = new PackageExplorerViewObjectImp();
         return self;
-    }
-
-    public PackageExplorerViewObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
     }
 
     public void closePackageExplorerView() throws RemoteException {
@@ -69,7 +65,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         SWTBotTree tree = viewObject.getTreeInView(PEViewName);
         tree.select(projectName);
         menuObject.clickMenuWithTexts("Edit", "Delete");
-        rmiBot.windowObject.confirmWindowWithCheckBox(
+        exportedWindowObject.confirmWindowWithCheckBox(
             SarosConstant.SHELL_TITLE_DELETE_RESOURCE, SarosConstant.BUTTON_OK,
             true);
         windowObject
@@ -100,12 +96,12 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         viewObject.clickContextMenuOfTreeInView(PEViewName, "Delete", nodes);
         windowObject
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-        rmiBot.windowObject.confirmWindow(
+        exportedWindowObject.confirmWindow(
             SarosConstant.SHELL_TITLE_CONFIRM_DELETE, SarosConstant.BUTTON_OK);
     }
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
-        rmiBot.workbenchObject.activateEclipseShell();
+        workbenchObject.activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
         SWTBotTree tree = viewObject.getTreeInView(PEViewName);
@@ -130,7 +126,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
      */
     public void openClass(String projectName, String packageName,
         String className) throws RemoteException {
-        if (!rmiBot.editorObject.isClassOpen(className)) {
+        if (!exportedEditorObject.isClassOpen(className)) {
             viewObject.openFileInView(PEViewName, projectName, "src",
                 packageName, className + ".java");
             bot.sleep(sleepTime);
@@ -138,7 +134,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     }
 
     public void openFile(String... filePath) throws RemoteException {
-        if (!rmiBot.editorObject.isFileOpen(filePath[filePath.length - 1])) {
+        if (!exportedEditorObject.isFileOpen(filePath[filePath.length - 1])) {
             viewObject.openFileInView(PEViewName, filePath);
             bot.sleep(sleepTime);
         }
@@ -154,7 +150,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         SWTBotTable table = bot.table();
         table.select(whichEditor);
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
-        rmiBot.windowObject.confirmWindow("Editor Selection",
+        exportedWindowObject.confirmWindow("Editor Selection",
             SarosConstant.BUTTON_OK);
     }
 
@@ -187,7 +183,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
         viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
             matchTexts, "Team", "Disconnect...");
-        rmiBot.windowObject.confirmWindow("Confirm Disconnect from SVN",
+        exportedWindowObject.confirmWindow("Confirm Disconnect from SVN",
             SarosConstant.BUTTON_YES);
     }
 
@@ -196,7 +192,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Share Project...");
-        rmiBot.windowObject.confirmWindowWithTable("Share Project", "SVN",
+        exportedWindowObject.confirmWindowWithTable("Share Project", "SVN",
             SarosConstant.BUTTON_NEXT);
         bot.button(SarosConstant.BUTTON_FINISH).click();
     }
@@ -241,7 +237,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Revert...");
-        rmiBot.windowObject.confirmWindow("Revert", SarosConstant.BUTTON_OK);
+        exportedWindowObject.confirmWindow("Revert", SarosConstant.BUTTON_OK);
         windowObject.waitUntilShellClosed("Revert");
     }
 
@@ -311,14 +307,14 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     }
 
     public void importProjectFromSVN(String path) throws RemoteException {
-        rmiBot.workbenchObject.activateEclipseShell();
+        workbenchObject.activateEclipseShell();
         menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
             SarosConstant.MENU_TITLE_IMPORT);
-        rmiBot.windowObject.confirmWindowWithTreeWithFilterText(
+        exportedWindowObject.confirmWindowWithTreeWithFilterText(
             SarosConstant.SHELL_TITLE_IMPORT, "SVN",
             "Checkout Projects from SVN", SarosConstant.BUTTON_NEXT);
         if (bot.table().containsItem(path)) {
-            rmiBot.windowObject.confirmWindowWithTable("Checkout from SVN",
+            exportedWindowObject.confirmWindowWithTable("Checkout from SVN",
                 BotConfiguration.SVN_URL, SarosConstant.BUTTON_NEXT);
         } else {
             bot.radio("Create a new repository location").click();

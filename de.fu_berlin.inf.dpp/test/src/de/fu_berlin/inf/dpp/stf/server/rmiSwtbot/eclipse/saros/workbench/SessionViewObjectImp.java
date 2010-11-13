@@ -10,9 +10,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -36,10 +35,10 @@ public class SessionViewObjectImp extends EclipseObject implements
     /**
      * {@link SessionViewObjectImp} is a singleton, but inheritance is possible.
      */
-    public static SessionViewObjectImp getInstance(SarosControler rmiBot) {
+    public static SessionViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new SessionViewObjectImp(rmiBot);
+        self = new SessionViewObjectImp();
         return self;
     }
 
@@ -52,9 +51,6 @@ public class SessionViewObjectImp extends EclipseObject implements
      *            controls Saros from the GUI perspective and manage all
      *            exported rmi-objects.
      */
-    public SessionViewObjectImp(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     /**************************************************************
      * 
@@ -63,7 +59,7 @@ public class SessionViewObjectImp extends EclipseObject implements
      **************************************************************/
     public boolean isInSession() throws RemoteException {
         precondition();
-        SWTBotToolbarButton toolbarButton = rmiBot.view
+        SWTBotToolbarButton toolbarButton = viewObject
             .getToolbarButtonWithTooltipInView(viewName,
                 SarosConstant.TOOL_TIP_TEXT_LEAVE_THE_SESSION);
         return toolbarButton.isEnabled();
@@ -79,7 +75,7 @@ public class SessionViewObjectImp extends EclipseObject implements
     }
 
     public void waitUntilSessionOpen() throws RemoteException {
-        waitUntil(SarosConditions.isInSession(rmiBot.stateObject));
+        waitUntil(SarosConditions.isInSession(stateObject));
     }
 
     public void waitUntilSessionOpenBy(SarosStateObject state)
@@ -103,7 +99,7 @@ public class SessionViewObjectImp extends EclipseObject implements
 
     public void waitUntilSessionCloses() throws RemoteException {
         log.info("wait begin " + System.currentTimeMillis());
-        waitUntil(SarosConditions.isSessionClosed(rmiBot.stateObject));
+        waitUntil(SarosConditions.isSessionClosed(stateObject));
         log.info("wait end " + System.currentTimeMillis());
     }
 
@@ -158,14 +154,14 @@ public class SessionViewObjectImp extends EclipseObject implements
         throws RemoteException {
         precondition();
         JID JIDOfFollowedUser = stateOfFollowedUser.getJID();
-        if (rmiBot.stateObject.isInFollowMode()
-            && rmiBot.stateObject.isSameUser(JIDOfFollowedUser)) {
+        if (stateObject.isInFollowMode()
+            && stateObject.isSameUser(JIDOfFollowedUser)) {
             log.debug(JIDOfFollowedUser.getBase()
                 + " is already followed by you.");
             return;
         }
         log.debug("JID of the followed User: " + JIDOfFollowedUser.getBase());
-        if (rmiBot.stateObject.isSameUser(JIDOfFollowedUser)) {
+        if (stateObject.isSameUser(JIDOfFollowedUser)) {
             throw new RuntimeException(
                 "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
         }
@@ -181,7 +177,7 @@ public class SessionViewObjectImp extends EclipseObject implements
         precondition();
         List<String> allContactsName = getAllContactsInSessionView();
         for (String contactName : allContactsName) {
-            // SWTBotTable table = rmiBot.tableObject.getTable();
+            // SWTBotTable table = tableObject.getTable();
             if (!tableObject.existContextOfTableItem(contactName,
                 SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER))
                 continue;
@@ -192,14 +188,14 @@ public class SessionViewObjectImp extends EclipseObject implements
     }
 
     public void stopFollowing() throws RemoteException {
-        JID followedUserJID = rmiBot.stateObject.getFollowedUserJID();
+        JID followedUserJID = stateObject.getFollowedUserJID();
         if (followedUserJID == null) {
             log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
             return;
         }
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
-        if (rmiBot.stateObject.isDriver(followedUserJID))
+        if (stateObject.isDriver(followedUserJID))
             tableObject
                 .clickContextMenuOfTable(followedUserJID.getBase() + roleName,
                     SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER);
@@ -212,11 +208,11 @@ public class SessionViewObjectImp extends EclipseObject implements
         throws RemoteException {
         precondition();
         JID followedUserJID = stateOfFollowedUser.getJID();
-        if (!rmiBot.stateObject.isInFollowMode()) {
+        if (!stateObject.isInFollowMode()) {
             log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
             return;
         }
-        if (rmiBot.stateObject.isSameUser(followedUserJID)) {
+        if (stateObject.isSameUser(followedUserJID)) {
             throw new RuntimeException(
                 "Hi guy, you can't stop following youself, it makes no sense! Please pass a correct parameter to the method.");
         }
@@ -242,13 +238,13 @@ public class SessionViewObjectImp extends EclipseObject implements
     }
 
     public void waitUntilFollowed(String plainJID) throws RemoteException {
-        waitUntil(SarosConditions.isFollowingUser(rmiBot.stateObject, plainJID));
+        waitUntil(SarosConditions.isFollowingUser(stateObject, plainJID));
     }
 
     public void shareYourScreenWithSelectedUser(SarosStateObject respondentState)
         throws RemoteException {
         JID respondentJID = respondentState.getJID();
-        if (rmiBot.stateObject.isSameUser(respondentJID)) {
+        if (stateObject.isSameUser(respondentJID)) {
             throw new RuntimeException(
                 "Hi guy, you can't share screen with youself, it makes no sense! Please pass a correct parameter to the method.");
         }
@@ -323,7 +319,7 @@ public class SessionViewObjectImp extends EclipseObject implements
 
     public void waitUntilAllPeersLeaveSession(List<JID> jids)
         throws RemoteException {
-        waitUntil(SarosConditions.existNoParticipant(rmiBot.stateObject, jids));
+        waitUntil(SarosConditions.existNoParticipant(stateObject, jids));
     }
 
     public void jumpToPositionOfSelectedUser(String participantJID, String sufix)
@@ -343,7 +339,7 @@ public class SessionViewObjectImp extends EclipseObject implements
 
     public void invitateUser(String inviteeJID) throws RemoteException {
         openInvitationInterface();
-        rmiBot.windowObject.comfirmInvitationWindow(inviteeJID);
+        exportedWindowObject.comfirmInvitationWindow(inviteeJID);
     }
 
     /**************************************************************
@@ -389,7 +385,7 @@ public class SessionViewObjectImp extends EclipseObject implements
     public void leaveSessionByPeer() throws RemoteException {
         // Need to check for isDriver before leaving.
         leaveTheSession();
-        rmiBot.windowObject.confirmWindow(
+        exportedWindowObject.confirmWindow(
             SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION,
             SarosConstant.BUTTON_YES);
         waitUntilSessionCloses();
@@ -400,15 +396,15 @@ public class SessionViewObjectImp extends EclipseObject implements
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
                 try {
-                    rmiBot.windowObject.confirmWindow(
+                    exportedWindowObject.confirmWindow(
                         "Confirm Closing Session", SarosConstant.BUTTON_YES);
                 } catch (RemoteException e) {
                     // no popup
                 }
             }
         });
-        if (rmiBot.windowObject.isShellActive("Confirm Closing Session"))
-            rmiBot.windowObject.confirmWindow("Confirm Closing Session",
+        if (exportedWindowObject.isShellActive("Confirm Closing Session"))
+            exportedWindowObject.confirmWindow("Confirm Closing Session",
                 SarosConstant.BUTTON_YES);
         waitUntilSessionCloses();
     }

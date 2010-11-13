@@ -9,14 +9,9 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class EditorObject extends EclipseObject {
-
-    public EditorObject(SarosControler rmiBot) {
-        super(rmiBot);
-    }
 
     public void setTextInEditorWithSave(String contents, String fileName) {
         SWTBotEclipseEditor e = getTextEditor(fileName);

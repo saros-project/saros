@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
 
 /**
@@ -42,20 +41,18 @@ public class SarosStateObjectImp extends EclipseStateObjectImp implements
     /**
      * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
      */
-    public static SarosStateObjectImp getInstance(SarosControler rmiBot,
-        Saros saros, SessionManager sessionManager,
-        DataTransferManager dataTransferManager, EditorManager editorManager) {
+    public static SarosStateObjectImp getInstance(Saros saros,
+        SessionManager sessionManager, DataTransferManager dataTransferManager,
+        EditorManager editorManager) {
         if (self != null)
             return self;
-        self = new SarosStateObjectImp(rmiBot, saros, sessionManager,
+        self = new SarosStateObjectImp(saros, sessionManager,
             dataTransferManager, editorManager);
         return self;
     }
 
-    public SarosStateObjectImp(SarosControler rmiBot, Saros saros,
-        SessionManager sessionManager, DataTransferManager dataTransferManager,
-        EditorManager editorManager) {
-        super(rmiBot);
+    public SarosStateObjectImp(Saros saros, SessionManager sessionManager,
+        DataTransferManager dataTransferManager, EditorManager editorManager) {
         this.saros = saros;
         this.sessionManager = sessionManager;
         this.dataTransferManager = dataTransferManager;
