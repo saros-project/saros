@@ -73,10 +73,9 @@ public class TestFileOperations {
 
     @Test
     public void testRenameFile() throws RemoteException {
-        // alice.renameFile(
         alice.packageExplorerV.renameClass(CLS2, PROJECT, PKG, CLS);
-        bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
-        carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
+        // bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
+        // carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         assertFalse(bob.state.existsClass(PROJECT, PKG, CLS));
         assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
         assertFalse(carl.state.existsClass(PROJECT, PKG, CLS));
@@ -137,8 +136,8 @@ public class TestFileOperations {
     @Test
     public void testRenamePkg() throws RemoteException {
         alice.packageExplorerV.renamePkg(PKG2, PROJECT, "src", PKG);
-        bob.state.waitUntilPkgExist(PROJECT, PKG2);
-        carl.state.waitUntilPkgExist(PROJECT, PKG2);
+        // bob.state.waitUntilPkgExist(PROJECT, PKG2);
+        // carl.state.waitUntilPkgExist(PROJECT, PKG2);
         assertFalse(bob.state.isPkgExist(PROJECT, PKG));
         assertTrue(bob.state.isPkgExist(PROJECT, PKG2));
         assertFalse(carl.state.isPkgExist(PROJECT, PKG));
@@ -147,7 +146,6 @@ public class TestFileOperations {
 
     @Test
     public void testDeletePkg() throws RemoteException {
-        // alice.renameFile(
         alice.state.deletePkg(PROJECT, PKG);
         bob.state.waitUntilPkgNotExist(PROJECT, PKG);
         carl.state.waitUntilPkgNotExist(PROJECT, PKG);

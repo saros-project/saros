@@ -2,8 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class EclipseBasicObjectImp extends EclipseObject implements
     EclipseBasicObject {
@@ -11,7 +10,7 @@ public class EclipseBasicObjectImp extends EclipseObject implements
     public static EclipseBasicObjectImp classVariable;
     private static final boolean SCREENSHOTS = true;
 
-    public EclipseBasicObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public EclipseBasicObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
@@ -122,12 +122,11 @@ public class StartupSaros implements IStartup {
         Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 log.debug("Util.isSWT(): " + Util.isSWT());
-                SarosRmiSWTWorkbenchBot bot = SarosRmiSWTWorkbenchBot
-                    .getInstance();
+                SarosControler bot = SarosControler.getInstance();
                 bot.sleepTime = time;
 
                 try {
-                    bot.init("Bot", port);
+                    bot.init(port);
                     /*
                      * sometimes when connecting to a server i'm getting error:
                      * java.rmi.NoSuchObjectException:no Such object in table.
@@ -162,7 +161,7 @@ public class StartupSaros implements IStartup {
                     bot.exportEclipseEditorObject(
                         EclipseEditorObjectImp.classVariable, "eclipseEditor");
 
-                    SarosStateImp.classVariable = new SarosStateImp(saros,
+                    SarosStateImp.classVariable = new SarosStateImp(bot, saros,
                         sessionManager, dataTransferManager, editorManager);
                     bot.exportState(SarosStateImp.classVariable, "state");
 

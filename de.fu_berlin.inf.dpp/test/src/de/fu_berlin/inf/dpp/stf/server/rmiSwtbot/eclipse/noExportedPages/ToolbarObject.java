@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class ToolbarObject extends EclipseObject {
 
-    public ToolbarObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public ToolbarObject(SarosControler rmiBot) {
         super(rmiBot);
     }
 }

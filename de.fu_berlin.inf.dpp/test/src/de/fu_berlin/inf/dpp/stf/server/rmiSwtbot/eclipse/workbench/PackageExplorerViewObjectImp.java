@@ -10,14 +10,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class PackageExplorerViewObjectImp extends EclipseObject implements
     PackageExplorerViewObject {
     public static PackageExplorerViewObjectImp classVariable;
 
-    public PackageExplorerViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public PackageExplorerViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 
@@ -162,7 +161,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         String targetProject, String targetPkg) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = mainObject.changeToRegex(projectName, "src", pkg,
+        String[] matchTexts = helperObject.changeToRegex(projectName, "src", pkg,
             className);
         log.info("matchTexts: " + matchTexts);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
@@ -244,7 +243,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = mainObject.changeToRegex(texts);
+        String[] matchTexts = helperObject.changeToRegex(texts);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
             "Rename...");
@@ -274,7 +273,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = mainObject.changeToRegex(texts);
+        String[] matchTexts = helperObject.changeToRegex(texts);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
             "Rename...");
@@ -329,7 +328,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
+        String[] matchTexts = helperObject.changeToRegex(nodes);
 
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
@@ -341,7 +340,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
+        String[] matchTexts = helperObject.changeToRegex(nodes);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
@@ -352,7 +351,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
+        String[] matchTexts = helperObject.changeToRegex(nodes);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
@@ -362,7 +361,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = mainObject.changeToRegex(nodes);
+        String[] matchTexts = helperObject.changeToRegex(nodes);
         viewObject.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);

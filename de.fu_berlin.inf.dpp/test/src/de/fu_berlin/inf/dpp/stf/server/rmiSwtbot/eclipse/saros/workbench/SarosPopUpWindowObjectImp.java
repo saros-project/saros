@@ -8,8 +8,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipsePopUpWindowObjectImp;
 
 public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
@@ -17,7 +17,7 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
 
     public static SarosPopUpWindowObjectImp classVariable;
 
-    public SarosPopUpWindowObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public SarosPopUpWindowObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 
@@ -30,19 +30,19 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException {
         windowObject.waitUntilShellActive("Problem Occurred");
-        RmiSWTWorkbenchBot.delegate.text().getText()
+        EclipseControler.delegate.text().getText()
             .matches("*." + plainJID + ".*");
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_OK).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_OK).click();
     }
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException {
         windowObject
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
-        RmiSWTWorkbenchBot.delegate.textWithLabel(
+        EclipseControler.delegate.textWithLabel(
             SarosConstant.TEXT_LABEL_JABBER_ID).setText(plainJID);
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
     }
 
     public void comfirmInvitationWindow(String inviteeJID)
@@ -103,15 +103,15 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
         String username, String password) throws RemoteException {
         try {
             windowObject.activateShellWithText("Create New User Account");
-            RmiSWTWorkbenchBot.delegate.textWithLabel("Jabber Server").setText(
+            EclipseControler.delegate.textWithLabel("Jabber Server").setText(
                 server);
-            RmiSWTWorkbenchBot.delegate.textWithLabel("Username").setText(
+            EclipseControler.delegate.textWithLabel("Username").setText(
                 username);
-            RmiSWTWorkbenchBot.delegate.textWithLabel("Password").setText(
+            EclipseControler.delegate.textWithLabel("Password").setText(
                 password);
-            RmiSWTWorkbenchBot.delegate.textWithLabel("Repeat Password")
+            EclipseControler.delegate.textWithLabel("Repeat Password")
                 .setText(password);
-            RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH)
+            EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH)
                 .click();
         } catch (WidgetNotFoundException e) {
             log.error("widget not found while accountBySarosMenu", e);
@@ -130,7 +130,7 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project1.png");
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_NEXT);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_NEXT).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_NEXT).click();
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project2.png");
         basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
@@ -143,24 +143,24 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
      */
     public void confirmSessionInvitationWindowStep2UsingNewproject(
         String projectName) throws RemoteException {
-        RmiSWTWorkbenchBot.delegate.radio(
+        EclipseControler.delegate.radio(
             SarosConstant.RADIO_LABEL_CREATE_NEW_PROJECT).click();
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project3.png");
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
         // rmiBot.captureScreenshot(rmiBot.TEMPDIR +
         // "/acknowledge_project4.png");
-        windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        windowObject.waitUntilShellCloses(EclipseControler.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProject(
         String projectName) throws RemoteException {
-        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
-        RmiSWTWorkbenchBot.delegate.button("Browse").click();
+        EclipseControler.delegate.radio("Use existing project").click();
+        EclipseControler.delegate.button("Browse").click();
         windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
 
         rmiBot.exportedPopUpWindow.confirmWindow(
             "Warning: Local changes will be deleted", SarosConstant.BUTTON_YES);
@@ -178,7 +178,7 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
              * save your files locally. So rmiBot need to wait until the
              * invitation is finished.
              */
-            windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+            windowObject.waitUntilShellCloses(EclipseControler.delegate
                 .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         }
 
@@ -195,7 +195,7 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
          */
         if (rmiBot.exportedPopUpWindow
             .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION)) {
-            windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+            windowObject.waitUntilShellCloses(EclipseControler.delegate
                 .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
         }
 
@@ -203,25 +203,25 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException {
-        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
-        RmiSWTWorkbenchBot.delegate.button("Browse").click();
+        EclipseControler.delegate.radio("Use existing project").click();
+        EclipseControler.delegate.button("Browse").click();
         windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
         rmiBot.exportedPopUpWindow.confirmWindow(
             "Warning: Local changes will be deleted", SarosConstant.BUTTON_NO);
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
         String projectName) throws RemoteException {
-        RmiSWTWorkbenchBot.delegate.radio("Use existing project").click();
-        RmiSWTWorkbenchBot.delegate.button("Browse").click();
+        EclipseControler.delegate.radio("Use existing project").click();
+        EclipseControler.delegate.button("Browse").click();
         windowObject.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
-        RmiSWTWorkbenchBot.delegate.checkBox(
+        EclipseControler.delegate.checkBox(
             "Create copy for working distributed. New project name:").click();
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
-        windowObject.waitUntilShellCloses(RmiSWTWorkbenchBot.delegate
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        windowObject.waitUntilShellCloses(EclipseControler.delegate
             .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
     }
 
@@ -233,16 +233,16 @@ public class SarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
         String password) throws RemoteException {
         rmiBot.windowObject
             .activateShellWithText(SarosConstant.SAROS_CONFI_SHELL_TITLE);
-        RmiSWTWorkbenchBot.delegate.textWithLabel(
+        EclipseControler.delegate.textWithLabel(
             SarosConstant.TEXT_LABEL_JABBER_SERVER).setText(xmppServer);
-        RmiSWTWorkbenchBot.delegate.sleep(rmiBot.sleepTime);
-        RmiSWTWorkbenchBot.delegate.textWithLabel(
+        EclipseControler.delegate.sleep(rmiBot.sleepTime);
+        EclipseControler.delegate.textWithLabel(
             SarosConstant.TEXT_LABEL_USER_NAME).setText(jid);
-        RmiSWTWorkbenchBot.delegate.sleep(rmiBot.sleepTime);
-        RmiSWTWorkbenchBot.delegate.textWithLabel(
+        EclipseControler.delegate.sleep(rmiBot.sleepTime);
+        EclipseControler.delegate.textWithLabel(
             SarosConstant.TEXT_LABEL_PASSWORD).setText(password);
-        RmiSWTWorkbenchBot.delegate.textWithLabel("Confirm:").setText(password);
-        RmiSWTWorkbenchBot.delegate.button(SarosConstant.BUTTON_FINISH).click();
+        EclipseControler.delegate.textWithLabel("Confirm:").setText(password);
+        EclipseControler.delegate.button(SarosConstant.BUTTON_FINISH).click();
 
         // while (delegate.button("Next >").isEnabled()) {
         // delegate.button("Next >").click();

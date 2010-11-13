@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 /**
  * The goal of this class is to gather state and provide an RMI interface for
@@ -38,8 +39,10 @@ public class SarosStateImp extends EclipseStateImp implements SarosState {
         super();
     }
 
-    public SarosStateImp(Saros saros, SessionManager sessionManager,
-        DataTransferManager dataTransferManager, EditorManager editorManager) {
+    public SarosStateImp(SarosControler rmiBot, Saros saros,
+        SessionManager sessionManager, DataTransferManager dataTransferManager,
+        EditorManager editorManager) {
+        super(rmiBot);
         this.saros = saros;
         this.sessionManager = sessionManager;
         this.dataTransferManager = dataTransferManager;

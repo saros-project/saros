@@ -22,15 +22,14 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 
 public class EclipseEditorObjectImp extends EclipseObject implements
     EclipseEditorObject {
     public static EclipseEditorObjectImp classVariable;
 
-    public EclipseEditorObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public EclipseEditorObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 
@@ -78,11 +77,11 @@ public class EclipseEditorObjectImp extends EclipseObject implements
     }
 
     public void waitUntilEditorClosed(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorClosed(rmiBot, name));
+        waitUntil(SarosConditions.isEditorClosed(this, name));
     }
 
     public void waitUntilEditorOpen(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorOpen(rmiBot, name));
+        waitUntil(SarosConditions.isEditorOpen(this, name));
     }
 
     public void waitUntilEditorActive(String name) throws RemoteException {

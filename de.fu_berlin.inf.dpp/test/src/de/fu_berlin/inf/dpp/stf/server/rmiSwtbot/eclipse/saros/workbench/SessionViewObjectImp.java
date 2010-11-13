@@ -10,9 +10,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -34,13 +34,13 @@ public class SessionViewObjectImp extends EclipseObject implements
     /**
      * constructs a SessionViewObject, which would only be created in class
      * {@links StartupSaros} and then exported by
-     * {@link SarosRmiSWTWorkbenchBot} on our local RMI Registry.
+     * {@link SarosControler} on our local RMI Registry.
      * 
      * @param rmiBot
      *            controls Saros from the GUI perspective and manage all
      *            exported rmi-objects.
      */
-    public SessionViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public SessionViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

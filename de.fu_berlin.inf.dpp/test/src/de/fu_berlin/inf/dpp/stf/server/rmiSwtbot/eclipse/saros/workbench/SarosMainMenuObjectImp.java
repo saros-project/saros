@@ -3,14 +3,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMenuObjectImp;
 
 public class SarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
     SarosMainMenuObject {
     public static SarosMainMenuObjectImp classVariable;
 
-    public SarosMainMenuObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public SarosMainMenuObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

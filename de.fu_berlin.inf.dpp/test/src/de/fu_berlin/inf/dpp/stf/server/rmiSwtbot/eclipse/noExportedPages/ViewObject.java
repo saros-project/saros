@@ -27,9 +27,9 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 /**
  * Screen object that represents the operations that can be performed on a view.
@@ -40,14 +40,14 @@ public class ViewObject extends EclipseObject {
 
     /**
      * Creates an instance of a viewObject.<br/>
-     * ViewObject should be instanced in {@link RmiSWTWorkbenchBot}.
+     * ViewObject should be instanced in {@link EclipseControler}.
      * 
      * @param rmiBot
      *            delegates to {@link SWTWorkbenchBot} to implement an java.rmi
      *            interface for {@link SWTWorkbenchBot}. Using it
      *            {@link ViewObject} can access other screen objects.
      */
-    public ViewObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public ViewObject(SarosControler rmiBot) {
         super(rmiBot);
     }
 
@@ -107,7 +107,7 @@ public class ViewObject extends EclipseObject {
     /**
      * Open a view using menus Window->Show View->Other... The method is defined
      * as helper method for other showView* methods in
-     * {@link RmiSWTWorkbenchBot} and should not be exported by rmi. <br/>
+     * {@link EclipseControler} and should not be exported by rmi. <br/>
      * Operational steps:
      * <ol>
      * <li>if the view already exist, return.</li>
@@ -121,7 +121,7 @@ public class ViewObject extends EclipseObject {
      *            example: "General"
      * @param nodeName
      *            example: "Console"
-     * @see RmiSWTWorkbenchBot#activateEclipseShell()
+     * @see EclipseControler#activateEclipseShell()
      * @see MenuObject#clickMenuWithTexts(String...)
      * 
      */

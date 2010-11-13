@@ -15,7 +15,8 @@ import org.eclipse.swt.program.Program;
 
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -24,6 +25,10 @@ public class EclipseStateImp extends EclipseObject implements EclipseState {
 
     public EclipseStateImp() {
         super();
+    }
+
+    public EclipseStateImp(SarosControler rmiBot) {
+        super(rmiBot);
     }
 
     /**
@@ -346,7 +351,7 @@ public class EclipseStateImp extends EclipseObject implements EclipseState {
 
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
-        return mainObject.ConvertStreamToString(file.getContents());
+        return helperObject.ConvertStreamToString(file.getContents());
     }
 
     /**

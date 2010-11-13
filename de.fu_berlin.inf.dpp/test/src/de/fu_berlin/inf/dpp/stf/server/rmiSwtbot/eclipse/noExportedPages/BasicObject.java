@@ -2,12 +2,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
 
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class BasicObject extends EclipseObject {
 
-    public BasicObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public BasicObject(SarosControler rmiBot) {
         super(rmiBot);
     }
 

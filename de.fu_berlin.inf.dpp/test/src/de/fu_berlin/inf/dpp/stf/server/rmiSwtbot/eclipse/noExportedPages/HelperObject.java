@@ -9,12 +9,12 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class HelperObject extends EclipseObject {
 
-    public HelperObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public HelperObject(SarosControler rmiBot) {
         super(rmiBot);
     }
 

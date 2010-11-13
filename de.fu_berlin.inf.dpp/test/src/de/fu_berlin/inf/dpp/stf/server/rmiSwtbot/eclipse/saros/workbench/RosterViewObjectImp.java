@@ -10,9 +10,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 public class RosterViewObjectImp extends EclipseObject implements
@@ -20,7 +20,7 @@ public class RosterViewObjectImp extends EclipseObject implements
 
     public static RosterViewObjectImp classVariable;
 
-    public RosterViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public RosterViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

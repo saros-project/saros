@@ -8,15 +8,14 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class ProgressViewObjectImp extends EclipseObject implements
     ProgressViewObject {
 
     public static ProgressViewObjectImp classVariable;
 
-    public ProgressViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public ProgressViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

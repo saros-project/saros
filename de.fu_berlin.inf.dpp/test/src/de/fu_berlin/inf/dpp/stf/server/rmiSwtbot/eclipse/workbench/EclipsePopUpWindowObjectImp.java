@@ -10,13 +10,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class EclipsePopUpWindowObjectImp extends EclipseObject implements
     EclipsePopUpWindowObject {
 
-    public EclipsePopUpWindowObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public EclipsePopUpWindowObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

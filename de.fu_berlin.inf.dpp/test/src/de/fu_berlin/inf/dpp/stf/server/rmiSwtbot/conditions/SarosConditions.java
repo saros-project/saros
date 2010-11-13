@@ -12,11 +12,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.IRmiSWTWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
 
 public class SarosConditions extends Conditions {
 
@@ -55,12 +55,14 @@ public class SarosConditions extends Conditions {
         return new isEditorActive(bot, name);
     }
 
-    public static ICondition isEditorOpen(IRmiSWTWorkbenchBot bot, String name) {
-        return new IsEditorOpen(bot, name);
+    public static ICondition isEditorOpen(EclipseEditorObject editor,
+        String name) {
+        return new IsEditorOpen(editor, name);
     }
 
-    public static ICondition isEditorClosed(IRmiSWTWorkbenchBot bot, String name) {
-        return new IsEditorClosed(bot, name);
+    public static ICondition isEditorClosed(EclipseEditorObject editor,
+        String name) {
+        return new IsEditorClosed(editor, name);
     }
 
     public static ICondition isSessionClosed(SarosState state) {
@@ -115,14 +117,14 @@ public class SarosConditions extends Conditions {
         return new ExistNoInvitationProgress(bot);
     }
 
-    public static ICondition isJavaEditorContentsSame(RmiSWTWorkbenchBot bot,
+    public static ICondition isJavaEditorContentsSame(EclipseControler bot,
         String projectName, String packageName, String className,
         String otherContent) {
         return new IsJavaEditorContentsSame(bot, projectName, packageName,
             className, otherContent);
     }
 
-    public static ICondition isEditorContentsSame(RmiSWTWorkbenchBot bot,
+    public static ICondition isEditorContentsSame(EclipseControler bot,
         String otherContent, String... filePath) {
         return new IsEditorContentsSame(bot, otherContent, filePath);
     }

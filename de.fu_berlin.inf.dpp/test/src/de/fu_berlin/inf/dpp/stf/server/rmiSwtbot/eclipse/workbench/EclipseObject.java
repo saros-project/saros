@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -7,6 +7,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
@@ -16,7 +17,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableOb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class EclipseObject {
     protected static final transient Logger log = Logger
@@ -25,7 +26,7 @@ public class EclipseObject {
     protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
     protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
 
-    protected SarosRmiSWTWorkbenchBot rmiBot;
+    protected SarosControler rmiBot;
 
     // No exported objects
     protected TableObject tableObject;
@@ -34,7 +35,7 @@ public class EclipseObject {
     protected WindowObject windowObject;
     protected BasicObject basicObject;
     protected ViewObject viewObject;
-    protected HelperObject mainObject;
+    protected HelperObject helperObject;
     protected PerspectiveObject persObject;
     protected EditorObject editorObject;
     protected SarosSWTBot bot;
@@ -52,16 +53,16 @@ public class EclipseObject {
      *            interface for {@link SWTWorkbenchBot}. Using the
      *            {@link EclipseObject} can access other objects.
      */
-    public EclipseObject(SarosRmiSWTWorkbenchBot rmiBot) {
+    public EclipseObject(SarosControler rmiBot) {
         this.rmiBot = rmiBot;
-        this.bot = RmiSWTWorkbenchBot.delegate;
+        this.bot = EclipseControler.delegate;
         this.tableObject = rmiBot.tableObject;
         this.menuObject = rmiBot.menuObject;
         this.treeObject = rmiBot.treeObject;
         this.windowObject = rmiBot.windowObject;
         this.basicObject = rmiBot.basicObject;
         this.viewObject = rmiBot.viewObject;
-        this.mainObject = rmiBot.mainObject;
+        this.helperObject = rmiBot.helperObject;
         this.persObject = rmiBot.persObject;
         this.editorObject = rmiBot.editorObject;
     }

@@ -10,15 +10,15 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class WorkbenchObjectImp extends EclipseObject implements
     WorkbenchObject {
 
     public static WorkbenchObjectImp classVariable;
 
-    public WorkbenchObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public WorkbenchObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

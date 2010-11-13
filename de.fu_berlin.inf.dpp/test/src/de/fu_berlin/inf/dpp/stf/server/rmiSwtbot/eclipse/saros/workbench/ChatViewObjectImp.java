@@ -5,14 +5,14 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 
 public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
 
     public static ChatViewObjectImp classVariable;
 
-    public ChatViewObjectImp(SarosRmiSWTWorkbenchBot rmiBot) {
+    public ChatViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

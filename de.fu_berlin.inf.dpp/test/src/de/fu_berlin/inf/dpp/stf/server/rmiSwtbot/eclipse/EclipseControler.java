@@ -36,26 +36,20 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewO
  * RmiSWTWorkbenchBot delegates to {@link SWTWorkbenchBot} to implement an
  * java.rmi interface for {@link SWTWorkbenchBot}.
  */
-public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
+public class EclipseControler {
     private static final transient Logger log = Logger
-        .getLogger(RmiSWTWorkbenchBot.class);
+        .getLogger(EclipseControler.class);
 
     public static transient SarosSWTBot delegate;
 
-    private static transient RmiSWTWorkbenchBot self;
+    private static transient EclipseControler self;
 
     /** The RMI registry used, is not exported */
     protected static transient Registry registry;
 
-    /** RMI exported remote usable SWTWorkbenchBot replacement */
-    public IRmiSWTWorkbenchBot stub;
-
-    protected transient String myName;
-
     public int sleepTime = 750;
 
     public SarosPopUpWindowObject exportedPopUpWindow;
-
     public EclipseEditorObject eclipseEditorObject;
     public PackageExplorerViewObject packageExplorerViewObject;
     public SarosMainMenuObject mainMenuObject;
@@ -68,26 +62,26 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
     public ViewObject viewObject;
     public PerspectiveObject persObject;
     public EditorObject editorObject;
-    public HelperObject mainObject;
+    public HelperObject helperObject;
     public MenuObject menuObject;
     public WindowObject windowObject;
     public BasicObject basicObject;
 
     /** RmiSWTWorkbenchBot is a singleton */
-    public static RmiSWTWorkbenchBot getInstance() {
+    public static EclipseControler getInstance() {
         if (delegate != null && self != null)
             return self;
 
-        self = new RmiSWTWorkbenchBot();
+        self = new EclipseControler();
         return self;
     }
 
-    protected RmiSWTWorkbenchBot() {
+    protected EclipseControler() {
         this(new SarosSWTBot());
     }
 
     /** RmiSWTWorkbenchBot is a singleton, but inheritance is possible */
-    protected RmiSWTWorkbenchBot(SarosSWTBot bot) {
+    protected EclipseControler(SarosSWTBot bot) {
         super();
         assert bot != null : "delegated SWTWorkbenchBot is null";
         delegate = bot;
@@ -113,23 +107,24 @@ public class RmiSWTWorkbenchBot implements IRmiSWTWorkbenchBot {
         });
     }
 
-    public void init(String exportName, int port) throws RemoteException {
+    public void init(int port) throws RemoteException {
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
             registry = LocateRegistry.getRegistry(port);
-            myName = exportName;
+
         }
-        stub = (IRmiSWTWorkbenchBot) UnicastRemoteObject.exportObject(this, 0);
-        addShutdownHook(exportName);
-        try {
-            registry.bind(exportName, stub);
-        } catch (AlreadyBoundException e) {
-            log.debug("Object with name " + exportName + " was already bound.",
-                e);
-        } catch (Exception e) {
-            log.debug("bind failed: ", e);
-        }
+        // stub = (IRmiSWTWorkbenchBot) UnicastRemoteObject.exportObject(this,
+        // 0);
+        // addShutdownHook(exportName);
+        // try {
+        // registry.bind(exportName, stub);
+        // } catch (AlreadyBoundException e) {
+        // log.debug("Object with name " + exportName + " was already bound.",
+        // e);
+        // } catch (Exception e) {
+        // log.debug("bind failed: ", e);
+        // }
     }
 
     public void listRmiObjects() {

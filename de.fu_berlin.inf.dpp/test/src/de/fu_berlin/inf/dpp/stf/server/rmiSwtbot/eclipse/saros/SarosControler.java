@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.RmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
@@ -37,15 +37,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.Workben
  * exports {@link SarosState} via RMI. You should not use this within tests.
  * Have a look at {@link Musician} if you want to write tests.
  */
-public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
-    ISarosRmiSWTWorkbenchBot {
+public class SarosControler extends EclipseControler {
     private static final transient Logger log = Logger
-        .getLogger(SarosRmiSWTWorkbenchBot.class);
+        .getLogger(SarosControler.class);
 
     public static final transient String TEMPDIR = System
         .getProperty("java.io.tmpdir");
 
-    private static transient SarosRmiSWTWorkbenchBot self;
+    private static transient SarosControler self;
 
     /** RMI exported Saros object */
     public SarosState state;
@@ -63,19 +62,19 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
     /**
      * SarosRmiSWTWorkbenchBot is a singleton
      */
-    public static SarosRmiSWTWorkbenchBot getInstance() {
+    public static SarosControler getInstance() {
         if (delegate != null && self != null)
             return self;
 
         SarosSWTBot swtwbb = new SarosSWTBot();
-        self = new SarosRmiSWTWorkbenchBot(swtwbb);
+        self = new SarosControler(swtwbb);
         return self;
     }
 
     /**
      * RmiSWTWorkbenchBot is a singleton, but inheritance is possible
      */
-    protected SarosRmiSWTWorkbenchBot(SarosSWTBot bot) {
+    protected SarosControler(SarosSWTBot bot) {
         super(bot);
         tableObject = new TableObject(this);
         tBarObject = new ToolbarObject(this);
@@ -83,7 +82,7 @@ public class SarosRmiSWTWorkbenchBot extends RmiSWTWorkbenchBot implements
         viewObject = new ViewObject(this);
         persObject = new PerspectiveObject(this);
         editorObject = new EditorObject(this);
-        mainObject = new HelperObject(this);
+        helperObject = new HelperObject(this);
         menuObject = new MenuObject(this);
         windowObject = new WindowObject(this);
         basicObject = new BasicObject(this);

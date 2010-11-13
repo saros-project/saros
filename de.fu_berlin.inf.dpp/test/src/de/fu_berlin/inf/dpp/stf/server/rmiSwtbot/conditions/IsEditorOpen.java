@@ -2,17 +2,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.IRmiSWTWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
 
 public class IsEditorOpen extends DefaultCondition {
 
-    private IRmiSWTWorkbenchBot bot1;
+    private EclipseEditorObject editor;
     private String name;
 
-    IsEditorOpen(IRmiSWTWorkbenchBot bot, String name) {
-
+    IsEditorOpen(EclipseEditorObject editor, String name) {
         this.name = name;
-        this.bot1 = bot;
+        this.editor = editor;
     }
 
     public String getFailureMessage() {
@@ -21,7 +20,7 @@ public class IsEditorOpen extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.getEclipseEditorObject().isFileOpen(name);
+        return editor.isFileOpen(name);
     }
 
 }
