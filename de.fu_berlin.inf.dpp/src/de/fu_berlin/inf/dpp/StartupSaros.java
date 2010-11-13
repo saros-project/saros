@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -110,7 +110,7 @@ public class StartupSaros implements IStartup {
         Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 log.debug("Util.isSWT(): " + Util.isSWT());
-                SarosControler bot = SarosControler.getInstance();
+                STFController bot = STFController.getInstance();
                 bot.sleepTime = time;
                 try {
                     bot.initExportedObjects(port, saros, sessionManager, dataTransferManager,

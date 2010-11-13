@@ -34,8 +34,6 @@ public abstract class EclipseObject {
     protected static final transient Logger log = Logger
         .getLogger(EclipseObject.class);
 
-    protected int sleepTime = 750;
-
     protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
     protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
 
@@ -64,7 +62,9 @@ public abstract class EclipseObject {
     public static PerspectiveObject persObject;
     public static EditorObject editorObject;
     public static ToolbarObject toolbarObject;
+
     public static SarosSWTBot bot;
+    public static int sleepTime = 750;
 
     /**
      * Creates an instance of a NoExportedObject.<br/>

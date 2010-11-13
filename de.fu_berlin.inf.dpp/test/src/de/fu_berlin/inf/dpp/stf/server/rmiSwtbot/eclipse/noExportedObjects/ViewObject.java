@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 /**

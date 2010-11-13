@@ -1,7 +1,13 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 
+import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
 
@@ -11,8 +17,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.HelperObject;
@@ -52,33 +56,45 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewO
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
  * exports {@link SarosStateObject} via RMI. You should not use this within
  * tests. Have a look at {@link Musician} if you want to write tests.
+ * 
  */
-public class SarosControler extends EclipseControler {
+public class STFController {
 
     private static final transient Logger log = Logger
-        .getLogger(SarosControler.class);
+        .getLogger(STFController.class);
 
     public static final transient String TEMPDIR = System
         .getProperty("java.io.tmpdir");
 
-    private static transient SarosControler sarosControler;
+    private static transient STFController stfController;
+
+    public static transient SarosSWTBot sarosSWTBot;
+
+    public int sleepTime = 750;
+
+    /** The RMI registry used, is not exported */
+    private static transient Registry registry;
 
     /**
-     * {@link SarosControler} is a singleton, but inheritance is possible.
+     * {@link STFController} is a singleton, but inheritance is possible.
      */
-    public static SarosControler getInstance() {
-        if (sarosSWTBot != null && sarosControler != null)
-            return sarosControler;
+    public static STFController getInstance() {
+        if (sarosSWTBot != null && stfController != null)
+            return stfController;
         SarosSWTBot swtwbb = new SarosSWTBot();
-        sarosControler = new SarosControler(swtwbb);
-        return sarosControler;
+        stfController = new STFController(swtwbb);
+        return stfController;
     }
 
     /**
-     * Initiate {@link SarosControler} and all the no exported objects.
+     * Initiate {@link STFController} and all the no exported objects.
      */
-    protected SarosControler(SarosSWTBot bot) {
-        super(bot);
+    protected STFController(SarosSWTBot bot) {
+        super();
+        assert bot != null : "SarosSWTBot is null";
+        sarosSWTBot = bot;
+        EclipseObject.bot = sarosSWTBot;
+        EclipseObject.sleepTime = sleepTime;
         initNoExportedObects();
     }
 
@@ -147,5 +163,54 @@ public class SarosControler extends EclipseControler {
         EclipseObject.stateObject = (SarosStateObject) exportObject(
             SarosStateObjectImp.getInstance(saros, sessionManager,
                 dataTransferManager, editorManager), "state");
+    }
+
+    /**
+     * Add a shutdown hook to unbind exported Object from registry.
+     */
+    private void addShutdownHook(final String name) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    if (registry != null && name != null)
+                        registry.unbind(name);
+                } catch (RemoteException e) {
+                    log.warn("Failed to unbind: " + name, e);
+                } catch (NotBoundException e) {
+                    log.warn("Failed to unbind: " + name, e);
+                }
+            }
+        });
+    }
+
+    /**
+     * Export object by given name on our local RMI Registry.
+     */
+    private Remote exportObject(Remote exportedObject, String exportName) {
+        try {
+            Remote remoteObject = UnicastRemoteObject.exportObject(
+                exportedObject, 0);
+            addShutdownHook(exportName);
+            registry.bind(exportName, remoteObject);
+            return remoteObject;
+        } catch (RemoteException e) {
+            log.error("Could not export the object " + exportName, e);
+        } catch (AlreadyBoundException e) {
+            log.error("Could not bind the object " + exportName
+                + ", because it is bound already.", e);
+        }
+        return null;
+    }
+
+    public void listRmiObjects() {
+        try {
+            for (String s : registry.list())
+                log.debug("registered Object: " + s);
+        } catch (AccessException e) {
+            log.error("Failed on access", e);
+        } catch (RemoteException e) {
+            log.error("Failed", e);
+        }
     }
 }
