@@ -8,20 +8,22 @@ import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.BasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.EditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.HelperObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.MenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.PerspectiveObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TableObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.TreeObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.ViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages.WindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.HelperObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.MenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.PerspectiveObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TableObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreeObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 
 public class EclipseObject {
     protected static final transient Logger log = Logger
         .getLogger(EclipseObject.class);
+
+    protected int sleepTime = 750;
 
     protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
     protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
@@ -55,16 +57,17 @@ public class EclipseObject {
      */
     public EclipseObject(SarosControler rmiBot) {
         this.rmiBot = rmiBot;
-        this.bot = EclipseControler.delegate;
-        this.tableObject = rmiBot.tableObject;
-        this.menuObject = rmiBot.menuObject;
-        this.treeObject = rmiBot.treeObject;
-        this.windowObject = rmiBot.windowObject;
-        this.basicObject = rmiBot.basicObject;
-        this.viewObject = rmiBot.viewObject;
-        this.helperObject = rmiBot.helperObject;
-        this.persObject = rmiBot.persObject;
-        this.editorObject = rmiBot.editorObject;
+        this.sleepTime = rmiBot.sleepTime;
+        this.bot = EclipseControler.sarosSWTBot;
+        this.tableObject = rmiBot.table;
+        this.menuObject = rmiBot.menu;
+        this.treeObject = rmiBot.tree;
+        this.windowObject = rmiBot.window;
+        this.basicObject = rmiBot.basic;
+        this.viewObject = rmiBot.view;
+        this.helperObject = rmiBot.helper;
+        this.persObject = rmiBot.perspective;
+        this.editorObject = rmiBot.editor;
     }
 
     protected void waitUntil(ICondition condition) {

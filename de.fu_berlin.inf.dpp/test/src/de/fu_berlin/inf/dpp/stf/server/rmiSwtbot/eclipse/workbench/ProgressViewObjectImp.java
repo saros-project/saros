@@ -13,7 +13,20 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 public class ProgressViewObjectImp extends EclipseObject implements
     ProgressViewObject {
 
-    public static ProgressViewObjectImp classVariable;
+    // public static ProgressViewObjectImp classVariable;
+
+    private static transient ProgressViewObjectImp self;
+
+    /**
+     * {@link ProgressViewObjectImp} is a singleton, but inheritance is
+     * possible.
+     */
+    public static ProgressViewObjectImp getInstance(SarosControler rmiBot) {
+        if (self != null)
+            return self;
+        self = new ProgressViewObjectImp(rmiBot);
+        return self;
+    }
 
     public ProgressViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);

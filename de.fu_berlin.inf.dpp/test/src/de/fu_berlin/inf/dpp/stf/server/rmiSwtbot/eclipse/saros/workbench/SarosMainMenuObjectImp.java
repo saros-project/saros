@@ -8,7 +8,20 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMe
 
 public class SarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
     SarosMainMenuObject {
-    public static SarosMainMenuObjectImp classVariable;
+    // public static SarosMainMenuObjectImp classVariable;
+
+    private static transient SarosMainMenuObjectImp self;
+
+    /**
+     * {@link SarosMainMenuObjectImp} is a singleton, but inheritance is
+     * possible.
+     */
+    public static SarosMainMenuObjectImp getInstance(SarosControler rmiBot) {
+        if (self != null)
+            return self;
+        self = new SarosMainMenuObjectImp(rmiBot);
+        return self;
+    }
 
     public SarosMainMenuObjectImp(SarosControler rmiBot) {
         super(rmiBot);
@@ -16,9 +29,9 @@ public class SarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
 
     public void creatNewAccount(JID jid, String password)
         throws RemoteException {
-        rmiBot.workbench.getEclipseShell().activate().setFocus();
+        rmiBot.workbenchObject.getEclipseShell().activate().setFocus();
         menuObject.clickMenuWithTexts("Saros", "Create Account");
-        rmiBot.exportedPopUpWindow.confirmCreateNewUserAccountWindow(
-            jid.getDomain(), jid.getName(), password);
+        rmiBot.windowObject.confirmCreateNewUserAccountWindow(jid.getDomain(),
+            jid.getName(), password);
     }
 }

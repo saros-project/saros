@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 

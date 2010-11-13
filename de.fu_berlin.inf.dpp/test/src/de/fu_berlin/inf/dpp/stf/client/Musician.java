@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
@@ -44,7 +44,7 @@ public class Musician {
     public EclipseBasicObject basic;
 
     // public ISarosRmiSWTWorkbenchBot bot;
-    public SarosState state;
+    public SarosStateObject state;
     public RosterViewObject rosterV;
     public SessionViewObject sessionV;
     public RemoteScreenViewObject remoteScreenV;
@@ -90,7 +90,7 @@ public class Musician {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
             // bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
-            state = (SarosState) registry.lookup("state");
+            state = (SarosStateObject) registry.lookup("state");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it

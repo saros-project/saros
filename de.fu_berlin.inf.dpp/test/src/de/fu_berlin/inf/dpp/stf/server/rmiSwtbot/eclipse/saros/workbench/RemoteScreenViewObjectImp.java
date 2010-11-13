@@ -8,12 +8,24 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject
 
 public class RemoteScreenViewObjectImp extends EclipseObject implements
     RemoteScreenViewObject {
-    public static RemoteScreenViewObjectImp classVariable;
+    // public static RemoteScreenViewObjectImp classVariable;
+
+    private static transient RemoteScreenViewObjectImp self;
+
+    /**
+     * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
+     */
+    public static RemoteScreenViewObjectImp getInstance(SarosControler rmiBot) {
+        if (self != null)
+            return self;
+        self = new RemoteScreenViewObjectImp(rmiBot);
+        return self;
+    }
 
     /**
      * constructs a remoteScreenViewObject, which would only be created in class
-     * {@links StartupSaros} and then exported by
-     * {@link SarosControler} on our local RMI Registry.
+     * {@links StartupSaros} and then exported by {@link SarosControler} on our
+     * local RMI Registry.
      * 
      * @param rmiBot
      *            controls Saros from the GUI perspective and manage all

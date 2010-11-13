@@ -11,14 +11,26 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
 public class RosterViewObjectImp extends EclipseObject implements
     RosterViewObject {
 
-    public static RosterViewObjectImp classVariable;
+    // public static RosterViewObjectImp classVariable;
+
+    private static transient RosterViewObjectImp self;
+
+    /**
+     * {@link RosterViewObjectImp} is a singleton, but inheritance is possible.
+     */
+    public static RosterViewObjectImp getInstance(SarosControler rmiBot) {
+        if (self != null)
+            return self;
+        self = new RosterViewObjectImp(rmiBot);
+        return self;
+    }
 
     public RosterViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);
@@ -55,7 +67,7 @@ public class RosterViewObjectImp extends EclipseObject implements
     }
 
     public boolean isBuddyExist(String contact) throws RemoteException {
-        SWTBotTree tree = rmiBot.viewObject
+        SWTBotTree tree = rmiBot.view
             .getTreeInView(SarosConstant.VIEW_TITLE_ROSTER);
         return treeObject.isTreeItemWithMatchTextExist(tree,
             SarosConstant.BUDDIES, contact + ".*");
@@ -76,17 +88,18 @@ public class RosterViewObjectImp extends EclipseObject implements
     }
 
     /**
-     * This method returns true if {@link SarosStateImp} and the GUI
+     * This method returns true if {@link SarosStateObjectImp} and the GUI
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return rmiBot.state.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
+        return rmiBot.stateObject.isConnectedByXMPP()
+            && isConnectedByXmppGuiCheck();
     }
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        rmiBot.viewObject.clickToolbarButtonWithTooltipInView(
+        rmiBot.view.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_ADD_A_NEW_CONTACT);
     }
@@ -137,7 +150,8 @@ public class RosterViewObjectImp extends EclipseObject implements
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return rmiBot.state.hasContactWith(jid) && isBuddyExist(jid.getBase());
+        return rmiBot.stateObject.hasContactWith(jid)
+            && isBuddyExist(jid.getBase());
     }
 
     /**
@@ -153,7 +167,7 @@ public class RosterViewObjectImp extends EclipseObject implements
                 jid.getBase());
             windowObject
                 .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-            rmiBot.exportedPopUpWindow.confirmWindow(
+            rmiBot.windowObject.confirmWindow(
                 SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
         } catch (WidgetNotFoundException e) {
@@ -179,15 +193,15 @@ public class RosterViewObjectImp extends EclipseObject implements
         if (!connectedByXMPP) {
             log.trace("clickTBConnectInRosterView");
             clickTBConnectInRosterView();
-            rmiBot.eclipseBasicObject.sleep(100);// wait a bit to check if shell
-                                                 // pops
+            rmiBot.basicObject.sleep(100);// wait a bit to check if shell
+                                          // pops
             // up
             log.trace("isShellActive");
-            boolean shellActive = rmiBot.exportedPopUpWindow
+            boolean shellActive = rmiBot.windowObject
                 .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
             if (shellActive) {
                 log.trace("confirmSarosConfigurationWindow");
-                rmiBot.exportedPopUpWindow.confirmSarosConfigurationWizard(
+                rmiBot.windowObject.confirmSarosConfigurationWizard(
                     jid.getDomain(), jid.getName(), password);
             }
             waitUntilConnected();

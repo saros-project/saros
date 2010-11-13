@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import java.rmi.RemoteException;
 
@@ -38,7 +38,7 @@ public class PerspectiveObject extends EclipseObject {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            rmiBot.workbench.activateEclipseShell();
+            rmiBot.workbenchObject.activateEclipseShell();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {

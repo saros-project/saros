@@ -2,20 +2,19 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
 
 public class IsJavaEditorContentsSame extends DefaultCondition {
 
-    private EclipseControler bot1;
+    private EclipseEditorObject editor;
     private String file;
     private String projectName;
     private String packageName;
     private String className;
 
-    IsJavaEditorContentsSame(EclipseControler bot, String projectName,
+    IsJavaEditorContentsSame(EclipseEditorObject editor, String projectName,
         String packageName, String className, String otherConent) {
-
-        this.bot1 = bot;
+        this.editor = editor;
         this.file = otherConent;
         this.projectName = projectName;
         this.packageName = packageName;
@@ -29,8 +28,7 @@ public class IsJavaEditorContentsSame extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.getEclipseEditorObject()
-            .getTextOfJavaEditor(projectName, packageName, className)
+        return editor.getTextOfJavaEditor(projectName, packageName, className)
             .equals(file);
     }
 }

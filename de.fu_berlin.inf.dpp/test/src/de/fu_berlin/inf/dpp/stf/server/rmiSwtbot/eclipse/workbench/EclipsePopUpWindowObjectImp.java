@@ -87,7 +87,7 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
         // waitUntilShellActive(title);
         if (windowObject.activateShellWithText(title)) {
             bot.button(buttonText).click();
-            bot.sleep(rmiBot.sleepTime);
+            bot.sleep(sleepTime);
         }
     }
 
@@ -108,7 +108,7 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
         if (isChecked)
             bot.checkBox().click();
         bot.button(buttonText).click();
-        bot.sleep(rmiBot.sleepTime);
+        bot.sleep(sleepTime);
     }
 
     /**

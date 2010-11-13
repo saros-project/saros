@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedPages;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -106,8 +106,8 @@ public class ViewObject extends EclipseObject {
 
     /**
      * Open a view using menus Window->Show View->Other... The method is defined
-     * as helper method for other showView* methods in
-     * {@link EclipseControler} and should not be exported by rmi. <br/>
+     * as helper method for other showView* methods in {@link EclipseControler}
+     * and should not be exported by rmi. <br/>
      * Operational steps:
      * <ol>
      * <li>if the view already exist, return.</li>
@@ -128,11 +128,11 @@ public class ViewObject extends EclipseObject {
     public void openViewWithName(String viewTitle, String category,
         String nodeName) throws RemoteException {
         if (!isViewOpen(viewTitle)) {
-            rmiBot.workbench.activateEclipseShell();
+            rmiBot.workbenchObject.activateEclipseShell();
             menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            rmiBot.exportedPopUpWindow.confirmWindowWithTreeWithFilterText(
+            rmiBot.windowObject.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }

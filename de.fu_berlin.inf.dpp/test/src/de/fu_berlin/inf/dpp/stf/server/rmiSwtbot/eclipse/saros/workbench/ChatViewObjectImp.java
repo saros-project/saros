@@ -10,7 +10,19 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseObject
 
 public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
 
-    public static ChatViewObjectImp classVariable;
+    // public static ChatViewObjectImp classVariable;
+
+    private static transient ChatViewObjectImp self;
+
+    /**
+     * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
+     */
+    public static ChatViewObjectImp getInstance(SarosControler rmiBot) {
+        if (self != null)
+            return self;
+        self = new ChatViewObjectImp(rmiBot);
+        return self;
+    }
 
     public ChatViewObjectImp(SarosControler rmiBot) {
         super(rmiBot);

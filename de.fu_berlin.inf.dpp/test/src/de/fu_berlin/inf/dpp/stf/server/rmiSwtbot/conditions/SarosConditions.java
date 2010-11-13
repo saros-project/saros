@@ -12,9 +12,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseControler;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
 
@@ -65,11 +64,11 @@ public class SarosConditions extends Conditions {
         return new IsEditorClosed(editor, name);
     }
 
-    public static ICondition isSessionClosed(SarosState state) {
+    public static ICondition isSessionClosed(SarosStateObject state) {
         return new isSessionclosed(state);
     }
 
-    public static ICondition isInSession(SarosState state) {
+    public static ICondition isInSession(SarosStateObject state) {
         return new IsInSession(state);
     }
 
@@ -81,7 +80,7 @@ public class SarosConditions extends Conditions {
         return new isViewActive(bot, name);
     }
 
-    public static ICondition isClassContentsSame(EclipseStateImp state,
+    public static ICondition isClassContentsSame(EclipseStateObjectImp state,
         String projectName, String pkg, String className,
         String otherClassContent) {
         return new IsClassContentsSame(state, projectName, pkg, className,
@@ -104,7 +103,8 @@ public class SarosConditions extends Conditions {
         return new ExistNoResource(resourcePath);
     }
 
-    public static ICondition existNoParticipant(SarosState state, List<JID> jids) {
+    public static ICondition existNoParticipant(SarosStateObject state,
+        List<JID> jids) {
         return new ExistNoParticipants(state, jids);
     }
 
@@ -117,19 +117,20 @@ public class SarosConditions extends Conditions {
         return new ExistNoInvitationProgress(bot);
     }
 
-    public static ICondition isJavaEditorContentsSame(EclipseControler bot,
+    public static ICondition isJavaEditorContentsSame(EclipseEditorObject editor,
         String projectName, String packageName, String className,
         String otherContent) {
-        return new IsJavaEditorContentsSame(bot, projectName, packageName,
+        return new IsJavaEditorContentsSame(editor, projectName, packageName,
             className, otherContent);
     }
 
-    public static ICondition isEditorContentsSame(EclipseControler bot,
+    public static ICondition isEditorContentsSame(EclipseEditorObject editor,
         String otherContent, String... filePath) {
-        return new IsEditorContentsSame(bot, otherContent, filePath);
+        return new IsEditorContentsSame(editor, otherContent, filePath);
     }
 
-    public static ICondition isFollowingUser(SarosState state, String plainJID) {
+    public static ICondition isFollowingUser(SarosStateObject state,
+        String plainJID) {
         return new IsFollowingUser(state, plainJID);
     }
 }

@@ -21,13 +21,13 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-public class EclipseStateImp extends EclipseObject implements EclipseState {
+public class EclipseStateObjectImp extends EclipseObject implements EclipseStateObject {
 
-    public EclipseStateImp() {
+    public EclipseStateObjectImp() {
         super();
     }
 
-    public EclipseStateImp(SarosControler rmiBot) {
+    public EclipseStateObjectImp(SarosControler rmiBot) {
         super(rmiBot);
     }
 

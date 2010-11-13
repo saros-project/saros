@@ -2,13 +2,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
 
 public class isSessionclosed extends DefaultCondition {
 
-    private SarosState state;
+    private SarosStateObject state;
 
-    isSessionclosed(SarosState state) {
+    isSessionclosed(SarosStateObject state) {
 
         this.state = state;
     }

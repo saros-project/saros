@@ -7,8 +7,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
 public class EclipseBasicObjectImp extends EclipseObject implements
     EclipseBasicObject {
 
-    public static EclipseBasicObjectImp classVariable;
+    // public static EclipseBasicObjectImp classVariable;
     private static final boolean SCREENSHOTS = true;
+
+    private static transient EclipseBasicObjectImp eclipseBasicObjectImp;
+
+    /**
+     * {@link EclipseBasicObjectImp} is a singleton, but inheritance is
+     * possible.
+     */
+    public static EclipseBasicObjectImp getInstance(SarosControler rmiBot) {
+        if (eclipseBasicObjectImp != null)
+            return eclipseBasicObjectImp;
+        eclipseBasicObjectImp = new EclipseBasicObjectImp(rmiBot);
+        return eclipseBasicObjectImp;
+    }
 
     public EclipseBasicObjectImp(SarosControler rmiBot) {
         super(rmiBot);

@@ -2,18 +2,18 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObjectImp;
 
 public class IsClassContentsSame extends DefaultCondition {
 
-    private EclipseStateImp state;
+    private EclipseStateObjectImp state;
 
     private String projectName;
     private String pkg;
     private String className;
     private String otherClassContent;
 
-    IsClassContentsSame(EclipseStateImp state, String projectName, String pkg,
+    IsClassContentsSame(EclipseStateObjectImp state, String projectName, String pkg,
         String className, String otherClassContent) {
         this.state = state;
         this.projectName = projectName;

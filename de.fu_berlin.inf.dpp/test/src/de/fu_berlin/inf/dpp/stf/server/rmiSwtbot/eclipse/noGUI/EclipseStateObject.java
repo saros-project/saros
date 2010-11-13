@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 
-public interface EclipseState extends Remote {
+public interface EclipseStateObject extends Remote {
     public void waitUntilFileExist(String... filePath) throws RemoteException;
 
     public void waitUntilClassExist(String projectName, String pkg,

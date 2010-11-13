@@ -20,26 +20,39 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.SarosControler;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
 
 /**
  * The goal of this class is to gather state and provide an RMI interface for
  * getting internal states from the outside.
  */
-public class SarosStateImp extends EclipseStateImp implements SarosState {
+public class SarosStateObjectImp extends EclipseStateObjectImp implements
+    SarosStateObject {
 
     private JID jid;
     private transient static final Logger log = Logger
-        .getLogger(SarosStateImp.class);
+        .getLogger(SarosStateObjectImp.class);
 
-    public static SarosStateImp classVariable;
+    // public static SarosStateObjectImp classVariable;
 
-    public SarosStateImp() {
-        super();
+    private static transient SarosStateObjectImp self;
+
+    /**
+     * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
+     */
+    public static SarosStateObjectImp getInstance(SarosControler rmiBot,
+        Saros saros, SessionManager sessionManager,
+        DataTransferManager dataTransferManager, EditorManager editorManager) {
+        if (self != null)
+            return self;
+        self = new SarosStateObjectImp(rmiBot, saros, sessionManager,
+            dataTransferManager, editorManager);
+        return self;
     }
 
-    public SarosStateImp(SarosControler rmiBot, Saros saros,
+    public SarosStateObjectImp(SarosControler rmiBot, Saros saros,
         SessionManager sessionManager, DataTransferManager dataTransferManager,
         EditorManager editorManager) {
         super(rmiBot);
