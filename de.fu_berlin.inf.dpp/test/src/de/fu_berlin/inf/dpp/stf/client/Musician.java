@@ -286,33 +286,6 @@ public class Musician {
             stopFollowTasks.size());
     }
 
-    public void giveExclusiveDriverRole(Musician invitee)
-        throws RemoteException {
-        if (invitee.state.isDriver(invitee.jid)) {
-            throw new RuntimeException(
-                "User \""
-                    + invitee.getBaseJid()
-                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
-        }
-        if (invitee.equals(this))
-            sessionV.giveExclusiveDriverRole(SarosConstant.OWNCONTACTNAME);
-        else
-            sessionV.giveExclusiveDriverRole(invitee.getBaseJid());
-    }
-
-    public void removeDriverRole(Musician driver) throws RemoteException {
-        if (!driver.state.isDriver()) {
-            throw new RuntimeException(
-                "User \""
-                    + driver.getBaseJid()
-                    + "\" is no driver! Please pass a correct Musician Object to the method.");
-        }
-        if (driver.equals(this))
-            sessionV.removeDriverRole(SarosConstant.OWNCONTACTNAME);
-        else
-            sessionV.removeDriverRole(driver.getBaseJid());
-    }
-
     /**
      * @Return the name segment of {@link JID}.
      */
@@ -359,7 +332,12 @@ public class Musician {
         peer.popupWindow.confirmWindow(
             SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
             SarosConstant.BUTTON_OK);
+    }
 
+    public void shareYourScreenWithSelectedUserDone(Musician peer)
+        throws RemoteException {
+        sessionV.shareYourScreenWithSelectedUser(peer.state);
+        peer.sessionV.confirmIncomingScreensharingSesionWindow();
     }
 
 }

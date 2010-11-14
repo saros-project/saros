@@ -87,13 +87,13 @@ public class TestDriverChangeAndImmediateWrite {
         alice.sessionV.giveDriverRole(bob.state);
         bob.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         bob.basic.sleep(5000);
-        assertFalse(bob.sessionV.isToolbarNoInconsistenciesEnabled());
+        assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
         alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
             PKG, CLS);
 
         bob.basic.sleep(5000);
-        assertFalse(bob.sessionV.isToolbarNoInconsistenciesEnabled());
+        assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
     }
 }

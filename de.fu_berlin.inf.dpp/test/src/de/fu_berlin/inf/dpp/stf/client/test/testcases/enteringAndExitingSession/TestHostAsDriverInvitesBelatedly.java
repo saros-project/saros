@@ -147,7 +147,7 @@ public class TestHostAsDriverInvitesBelatedly {
         bob.eclipseEditor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT,
             PKG, CLS2);
 
-        alice.sessionV.invitateUser(bob.getBaseJid());
+        alice.sessionV.openInvitationInterface(bob.getBaseJid());
 
         bob.popupWindow.confirmSessionInvitationWindowStep1();
         bob.popupWindow

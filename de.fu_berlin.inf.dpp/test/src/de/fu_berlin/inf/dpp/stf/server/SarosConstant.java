@@ -26,7 +26,7 @@ public class SarosConstant {
     public final static String TOOL_TIP_TEXT_PAUSE = "Pause";
     public final static String TOOL_TIP_TEXT_SEND_FILE_TO_SELECTED_USER = "Send a file to selected user";
     public final static String TOOL_TIP_TEXT_START_VOIP_SESSION = "Start a VoIP Session...";
-    public final static String TOOL_TIP_TEXT_NO_INCONSISTENCIES = "No inconsistencies";
+    public final static String TOOL_TIP_TEXT_INCONSISTENCY_DETECTED = "Inconsistency Detected in.*";
     public final static String TOOL_TIP_TEXT_REMOVE_ALL_DRIVER_ROLES = "Remove all driver roles";
     public final static String TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
     public final static String TOOL_TIP_TEXT_LEAVE_THE_SESSION = "Leave the session";

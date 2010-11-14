@@ -7,15 +7,16 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class ProgressViewObjectImp extends EclipseObject implements
     ExProgressViewObject {
 
-    // public static ProgressViewObjectImp classVariable;
-
     private static transient ProgressViewObjectImp self;
+
+    protected final static String VIEWNAME = SarosConstant.VIEW_TITLE_PROGRESS;
 
     /**
      * {@link ProgressViewObjectImp} is a singleton, but inheritance is
@@ -33,7 +34,7 @@ public class ProgressViewObjectImp extends EclipseObject implements
     }
 
     public void activateProgressView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(PGViewName);
+        viewO.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean existPorgress() throws RemoteException {

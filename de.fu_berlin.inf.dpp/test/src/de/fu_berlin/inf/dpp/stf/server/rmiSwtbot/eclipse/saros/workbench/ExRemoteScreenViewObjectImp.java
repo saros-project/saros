@@ -12,6 +12,40 @@ public class ExRemoteScreenViewObjectImp extends EclipseObject implements
 
     private static transient ExRemoteScreenViewObjectImp self;
 
+    // View infos
+    private final static String VIEWNAME = SarosConstant.VIEW_TITLE_REMOTE_SCREEN;
+    private final static String VIEWID = SarosConstant.ID_REMOTE_SCREEN_VIEW;
+
+    /*
+     * title of shells which are pop up by performing the actions on the session
+     * view.
+     */
+    private final static String CONFIRMLEAVINGSESSION = SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION;
+    private final static String CONFIRMCLOSINGSESSION = "Confirm Closing Session";
+    private final static String INCOMINGSCREENSHARINGSESSION = "Incoming screensharing session";
+
+    /*
+     * Tool tip text of toolbar buttons on the session view
+     */
+    private final static String SHARESCREENWITHUSER = SarosConstant.TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER;
+    private final static String STOPSESSIONWITHUSER = "Stop session with user";
+    private final static String SENDAFILETOSELECTEDUSER = SarosConstant.TOOL_TIP_TEXT_SEND_FILE_TO_SELECTED_USER;
+    private final static String STARTVOIPSESSION = SarosConstant.TOOL_TIP_TEXT_START_VOIP_SESSION;
+    private final static String NOINCONSISTENCIES = SarosConstant.TOOL_TIP_TEXT_INCONSISTENCY_DETECTED;
+    private final static String OPENINVITATIONINTERFACE = SarosConstant.TOOL_TIP_TEXT_OPEN_INVITATION_INTERFACE;
+    private final static String REMOVEALLDRIVERROLES = SarosConstant.TOOL_TIP_TEXT_REMOVE_ALL_DRIVER_ROLES;
+    private final static String ENABLEDISABLEFOLLOWMODE = SarosConstant.TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE;
+    private final static String LEAVETHESESSION = SarosConstant.TOOL_TIP_TEXT_LEAVE_THE_SESSION;
+
+    // Context menu of the table on the view
+    private final static String GIVEEXCLUSIVEDRIVERROLE = SarosConstant.CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE;
+    private final static String GIVEDRIVERROLE = SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE;
+    private final static String REMOVEDRIVERROLE = SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE;
+    private final static String FOLLOWTHISUSER = SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER;
+    private final static String STOPFOLLOWINGTHISUSER = SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER;
+    private final static String JUMPTOPOSITIONSELECTEDUSER = SarosConstant.CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER;
+    private final static String CHANGECOLOR = "Change Color";
+
     /**
      * {@link ExChatViewObjectImp} is a singleton, but inheritance is possible.
      */
@@ -33,12 +67,15 @@ public class ExRemoteScreenViewObjectImp extends EclipseObject implements
      */
 
     public void activateRemoteScreenView() throws RemoteException {
-        viewO
-            .setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
+        viewO.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
     }
 
     public boolean isRemoteScreenViewOpen() throws RemoteException {
         return viewO.isViewOpen(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
+    }
+
+    public boolean isRemoteScreenViewActive() throws RemoteException {
+        return viewO.isViewActive(VIEWNAME);
     }
 
     public void openRemoteScreenView() throws RemoteException {
@@ -82,5 +119,9 @@ public class ExRemoteScreenViewObjectImp extends EclipseObject implements
         viewO.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
             SarosConstant.TOOL_TIP_TEXT_PAUSE);
+    }
+
+    public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
+        viewO.waitUntilViewActive(VIEWNAME);
     }
 }

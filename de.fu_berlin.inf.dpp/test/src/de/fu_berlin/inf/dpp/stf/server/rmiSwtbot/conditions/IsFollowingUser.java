@@ -7,20 +7,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObje
 public class IsFollowingUser extends DefaultCondition {
 
     private ExStateObject state;
-    private String plainJID;
+    private String baseJID;
 
     IsFollowingUser(ExStateObject state, String plainJID) {
         this.state = state;
-        this.plainJID = plainJID;
+        this.baseJID = plainJID;
     }
 
     public String getFailureMessage() {
 
-        return null;
+        return "You are not in follow mode or the followed user is not "
+            + baseJID;
     }
 
     public boolean test() throws Exception {
-        return state.isFollowingUser(plainJID);
+        return state.isFollowingUser(baseJID);
     }
 
 }

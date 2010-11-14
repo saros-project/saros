@@ -4,7 +4,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -46,7 +48,7 @@ public interface ExSessionViewObject extends Remote {
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
      * <li>Try to use the {@link ExSessionViewObject#isInSession()} and
-     * {@link ExStateObject#isInSession()} together in your junittests.</li>
+     * {@link ExStateObject#isInSession()} together in your junit tests.</li>
      * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
@@ -82,11 +84,11 @@ public interface ExSessionViewObject extends Remote {
     /**
      * waits until the session by the defined peer is open.
      * 
-     * @param state
+     * @param stateOfPeer
      *            the {@link ExStateObject} of the defined peer.
      * @throws RemoteException
      */
-    public void waitUntilSessionOpenBy(ExStateObject state)
+    public void waitUntilSessionOpenBy(ExStateObject stateOfPeer)
         throws RemoteException;
 
     /**
@@ -109,9 +111,47 @@ public interface ExSessionViewObject extends Remote {
      */
     public void closeSessionView() throws RemoteException;
 
-    public void waitUntilSessionCloses() throws RemoteException;
+    /**
+     * Waits until the {@link SessionManager#getSarosSession()} is null.
+     * <p>
+     * <b>Attention</b>:<br/>
+     * After a action is performed, you immediately try to assert a condition is
+     * true/false or perform a following action which based on that the current
+     * performed action is completely finished, e.g. alice.state.isInSession is
+     * false after alice leave the session by running the
+     * {@link ExSessionViewObjectImp#leaveTheSession()} and confirming the
+     * appeared pop up window without this waitUntil. In this case, you may get
+     * the AssertException, because alice should not really leave the session
+     * yet during asserting the condition or performing a following action. So
+     * it is recommended that you wait until the session is completely closed
+     * before you run the assertion or perform a following action.
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilSessionClosed() throws RemoteException;
 
-    public void waitUntilSessionClosedBy(ExStateObject state)
+    /**
+     * Waits until the {@link SessionManager#getSarosSession()} is null.
+     * <p>
+     * <b>Attention</b>:<br/>
+     * After a action is performed, you immediately try to assert a condition is
+     * true/false or perform a following action which based on that the current
+     * performed action is completely finished, e.g.
+     * assertFalse(alice.state.isDriver(bob.jid)) after bob leave the session by
+     * running the {@link ExSessionViewObjectImp#leaveTheSession()} and
+     * confirming the appeared pop up window without this waitUntil. In this
+     * case, you may get the AssertException, because bob should not really
+     * leave the session yet during asserting a condition or performing a
+     * following action. So it is recommended that you wait until the session by
+     * the defined peer is completely closed before you run a assertion or
+     * perform a following action.
+     * 
+     * @param stateOfPeer
+     *            the {@link ExStateObject} of the user, whose session should be
+     *            closed.
+     * @throws RemoteException
+     */
+    public void waitUntilSessionClosedBy(ExStateObject stateOfPeer)
         throws RemoteException;
 
     /**
@@ -135,19 +175,14 @@ public interface ExSessionViewObject extends Remote {
 
     /**
      * Perform the action "Give driver Role" which should be activated by
-     * clicking the context menu "Give driver Role" of the tableItem with
-     * itemText e.g. "bob1_fu@jabber.ccc.de" in the session view.
+     * clicking the context menu "Give driver Role" of a tableItem with itemText
+     * e.g. "bob1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
-     * <li>Make sure, the session view is open and active.</li>
+     * <li>Makes sure, the session view is open and active.</li>
      * <li>Waits until the shell "Progress Information" is closed. It guarantee
      * that the "Give driver Role" action is completely done.</li>
-     * <li>There are same function {@link Musician#giveDriverRole(Musician)}
-     * defined In the {@link Musician} class, which reference to this. The goal
-     * is to see, Whether the passed parameter is correct, if not, throws a
-     * runtimeException. So for your tests you should only need to use the
-     * function: {@link Musician#giveDriverRole(Musician)}.</li>
      * </ol>
      * 
      * @param stateOfInvitee
@@ -169,52 +204,40 @@ public interface ExSessionViewObject extends Remote {
      * <li>Make sure, the session view is open and active.</li>
      * <li>Waits until the shell "Progress Information" is closed. It guarantee
      * that the "Give exclusive driver Role" action is completely done.</li>
-     * <li>There are same function
-     * {@link Musician#giveExclusiveDriverRole(Musician)} defined In the
-     * {@link Musician} class, which reference to this. The goal is to see,
-     * Whether the passed parameter is correct, if not, throws a
-     * runtimeException. So for your tests you should only need to use the
-     * function: {@link Musician#giveExclusiveDriverRole(Musician)}.</li>
      * </ol>
      * 
-     * @param inviteeBaseJID
-     *            the {@link JID#getBase()} of the user whom you want to give
+     * @param stateOfInvitee
+     *            the {@link ExStateObject} of the user whom you want to give
      *            exclusive drive role.
      * @throws RemoteException
      */
-    public void giveExclusiveDriverRole(String inviteeBaseJID)
+    public void giveExclusiveDriverRole(ExStateObject stateOfInvitee)
         throws RemoteException;
 
     /**
-     * Using this function host can perform the action "Remove driver Role"
-     * which should be activated by clicking the context menu
-     * "Remove driver Role" of the tableItem with itemText e.g.
-     * "bob1_fu@jabber.ccc.de (Driver)" in the session view.
+     * performs the action "Remove driver Role" which should be activated by
+     * clicking the context menu "Remove driver Role" of the tableItem with
+     * itemText e.g. "bob1_fu@jabber.ccc.de (Driver)" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
      * <li>Waits until the shell "Progress Information" is closed. It guarantee
      * that the "Remove driver Role" action is completely done.</li>
-     * <li>There are same function {@link Musician#removeDriverRole(Musician)}
-     * defined In the {@link Musician} class, which reference to this. The goal
-     * is to see, Whether the passed parameter is correct, if not, throws a
-     * runtimeException. So for your tests you should only need to use the
-     * function: {@link Musician#removeDriverRole(Musician)}.</li>
      * </ol>
      * 
-     * @param inviteeBaseJID
-     *            the {@link JID#getBase()} of the user whose drive role you
+     * @param stateOfInvitee
+     *            the {@link ExStateObject} of the user whose drive role you
      *            want to remove.
      * @throws RemoteException
      */
-    public void removeDriverRole(String inviteeBaseJID) throws RemoteException;
+    public void removeDriverRole(ExStateObject stateOfInvitee)
+        throws RemoteException;
 
     /**
-     * Using this function host can perform the action "Follow this user" which
-     * should be activated by clicking the context menu "Follow this user" of
-     * the tableItem with itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in
-     * the session view.
+     * Performs the action "Follow this user" which should be activated by
+     * clicking the context menu "Follow this user" of the tableItem with
+     * itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -231,7 +254,7 @@ public interface ExSessionViewObject extends Remote {
     /**
      * Test if you are in follow mode. <br>
      * This function check if the context menu "Stop following this user" of
-     * every contact listed in the session view exists and is enabled. You can
+     * every contact listed in the session view is existed and enabled. You can
      * also use another function {@link ExStateObject#isInFollowMode()}, which
      * test the following state without GUI.
      * 
@@ -241,8 +264,8 @@ public interface ExSessionViewObject extends Remote {
      * <li>Make sure, the session view is open and active.</li>
      * <li>Try to use only the function{@link ExStateObject#isInSession()} for
      * your junittests, because the method
-     * {@link TableObject#existContextOfTableItem(String, String)} need to be
-     * still optimized.</li>
+     * {@link TableObject#existsContextOfTableItem(String, String)} isn't really
+     * optimal implemented.</li>
      * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
@@ -255,10 +278,10 @@ public interface ExSessionViewObject extends Remote {
     /**
      * This function do same as the
      * {@link ExSessionViewObject#stopFollowingThisUser(ExStateObject)} except
-     * you don't need to pass the {@link ExStateObject} of the user followed by
-     * you to the function. It is very useful, if you don't exactly know whom
-     * you are now following. Instead, we get the followed user JID using the
-     * method {@link ExStateObject#getFollowedUserJID()}.
+     * you don't need to pass the {@link ExStateObject} of the followed user to
+     * the function. It is very useful, if you don't exactly know whom you are
+     * now following. Instead, we get the followed user JID from the method
+     * {@link ExStateObject#getFollowedUserJID()}.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -270,10 +293,10 @@ public interface ExSessionViewObject extends Remote {
     public void stopFollowing() throws RemoteException;
 
     /**
-     * Using this function host can perform the action
-     * "Stop following this user" which should be activated by clicking the
-     * context menu "Stop following this user" of the tableItem with itemText
-     * e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
+     * Performs the action "Stop following this user" which should be activated
+     * by clicking the context menu "Stop following this user" of a tableItem
+     * with the itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session
+     * view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -289,68 +312,333 @@ public interface ExSessionViewObject extends Remote {
         throws RemoteException;
 
     /**
-     * check if the context menu "Stop following this user" of a contact listed
+     * checks if the context menu "Stop following this user" of a contact listed
      * in the session view is enabled. It would be used by
      * {@link ExSessionViewObjectImp#isInFollowMode()}.
      * 
-     * @param contactName
+     * @param baseJIDOfFollowedUser
      *            the name, which listed in the session view. e.g. "You" or
      *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
      * @return <tt>true</tt> if the context menu "Following this user" of the
      *         passed contactName listed in the session view is enabled.
      * @throws RemoteException
      */
-    public boolean isStopFollowingThisUserEnabled(String contactName)
+    public boolean isStopFollowingThisUserEnabled(String baseJIDOfFollowedUser)
         throws RemoteException;
 
     /**
      * check if the context menu "Stop following this user" of a contact listed
      * in the session view is visible.
      * 
-     * @param contactName
+     * @param baseJIDOfFollowedUser
      *            the name, which listed in the session view. e.g. "You" or
      *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
      * @return <tt>true</tt> if the context menu "Following this user" of the
      *         passed contactName listed in the session view is visible.
      * @throws RemoteException
      */
-    public boolean isStopFollowingThisUserVisible(String contactName)
+    public boolean isStopFollowingThisUserVisible(String baseJIDOfFollowedUser)
         throws RemoteException;
 
-    public void waitUntilFollowed(String plainJID) throws RemoteException;
-
-    public void shareYourScreenWithSelectedUser(ExStateObject respondentState)
+    /**
+     * Waits until the {@link EditorManager#getFollowedUser()} is same as the
+     * given user.
+     * <p>
+     * <b>Attention</b>:<br/>
+     * After a action is performed, you immediately try to assert a condition is
+     * true/false or perform a following action which based on that the current
+     * performed action is completely finished, e.g. assert bob's workbench
+     * state after bob follow the given user by running the
+     * {@link ExSessionViewObjectImp#followThisUser(ExStateObject)}without this
+     * waitUntil. In this case, you may get the AssertException, because bob
+     * should not really in the follow mode yet during asserting a condition or
+     * performing a following action. So it is recommended that you wait until
+     * the session is completely closed before you run the assertion or perform
+     * a following action.
+     * 
+     * @param baseJIDOfFollowedUser
+     * @throws RemoteException
+     */
+    public void waitUntilIsFollowingUser(String baseJIDOfFollowedUser)
         throws RemoteException;
 
-    public void stopSessionWithUser(String name) throws RemoteException;
-
-    public void sendAFileToSelectedUser(String inviteeJID)
+    /**
+     * performs the action "Share your screen with selected user" which should
+     * be activated by clicking the tool bar button with the tooltip text
+     * "Share your screen with selected user" on the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param stateOfPeer
+     *            the {@link ExStateObject} of the user with whom you want to
+     *            share your screen.
+     * @throws RemoteException
+     */
+    public void shareYourScreenWithSelectedUser(ExStateObject stateOfPeer)
         throws RemoteException;
 
-    public void openInvitationInterface() throws RemoteException;
+    /**
+     * performs the action "Stop share session with user" which should be
+     * activated by clicking the tool bar button with the tooltip text
+     * "Stop share session with user" on the session view. This toolbar button
+     * is only visible after clicking the
+     * {@link ExSessionViewObject#shareYourScreenWithSelectedUser(ExStateObject)}
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param stateOfselectedUser
+     *            the {@link ExStateObject} of the user with whom you want to
+     *            stop the screen session.
+     * @throws RemoteException
+     */
+    public void stopSessionWithUser(ExStateObject stateOfselectedUser)
+        throws RemoteException;
 
-    public void startAVoIPSession() throws RemoteException;
+    /**
+     * performs the action "Send a file to selected user" which should be
+     * activated by clicking the tool bar button with the tooltip text
+     * "Send a file to selected user" on the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are called by the action
+     * ""Send a file to selected user", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side to send a file to selected user are done.</li>
+     * </ol>
+     * 
+     * TODO: this function isn't complete yet. SWTBot don't support native
+     * dialog, So the action on the "Select the file to send" dialog can be
+     * performed.
+     * 
+     * @param stateOfselectedUser
+     *            the {@link ExStateObject} of the user with whom you want to
+     *            share your screen.
+     * @throws RemoteException
+     */
+    public void sendAFileToSelectedUser(ExStateObject stateOfselectedUser)
+        throws RemoteException;
 
-    public void noInconsistencies() throws RemoteException;
+    /**
+     * performs the action "Start a VoIP session" which should be activated by
+     * clicking the tool bar button with the tooltip text "Start a VoIP session"
+     * on the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Start a VoIP session", e.g. a popup window. In this case, the method
+     * should handle all the following actions so long until all needed steps by
+     * your side are done.</li>
+     * </ol>
+     * 
+     * TODO: this function isn't complete yet.
+     * 
+     * 
+     * @param stateOfselectedUser
+     *            the {@link ExStateObject} of the user with whom you want to
+     *            share your screen.
+     * @throws RemoteException
+     */
+    public void startAVoIPSession(ExStateObject stateOfselectedUser)
+        throws RemoteException;
 
+    /**
+     * performs the action "inconsistency detected in ..." which should be
+     * activated by clicking the tool bar button with the tooltip text
+     * "inconsistency detected in ..." on the session view. The button is only
+     * enabled, if there are inconsistency detected in a file.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "inconsistency detected in ...", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * TODO: this function isn't complete yet.
+     * 
+     * @throws RemoteException
+     */
+    public void inconsistencyDetected() throws RemoteException;
+
+    /**
+     * performs the action "Remove all river roles" which should be activated by
+     * clicking the tool bar button with the tooltip text
+     * "Remove all river roles" on the session view. The button is only enabled,
+     * if there are Driver existed in the session.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "inconsistency detected in ...", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     public void removeAllRriverRoles() throws RemoteException;
 
+    /**
+     * performs the action "Enable/disable follow mode" which should be
+     * activated by clicking the tool bar button with the tooltip text
+     * "REnable/disable follow mode" on the session view. The button is only
+     * enabled, if there are participant who is in follow mode.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Enable/disable follow mode", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     public void enableDisableFollowMode() throws RemoteException;
 
-    // public void leaveTheSession() throws RemoteException;
-
+    /**
+     * Waits until all the given users are not in the session.
+     * <p>
+     * <b>Attention</b>:<br/>
+     * After a action is performed, you immediately try to assert a condition is
+     * true/false or perform a following action which based on that the current
+     * performed action is completely finished, e.g. alice(host)leave the
+     * session immediately after bob and carl leave the session without this
+     * waitUntil. In this case, you may get a popup window what you did not
+     * expected, because bob and carl should not really leave the session yet
+     * during performing a following action. So it is recommended that you wait
+     * until all the peers completely leave the session before you run a
+     * assertion or perform a following action.
+     * 
+     * @param jids
+     * @throws RemoteException
+     * @see Musician#leaveSessionFirstByPeers(Musician...)
+     */
     public void waitUntilAllPeersLeaveSession(List<JID> jids)
         throws RemoteException;
 
-    public void jumpToPositionOfSelectedUser(String participantJID, String sufix)
+    /**
+     * Performs the action "Jump to position of selected user" which should be
+     * activated by clicking the context menu
+     * "SJump to position of selected user" of a tableItem with the itemText
+     * e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Make sure, the session view is open and active.</li>
+     * </ol>
+     * 
+     * @param stateOfselectedUser
+     *            the {@link ExStateObject} of the user whom you want to stop
+     *            following.
+     * @throws RemoteException
+     */
+    public void jumpToPositionOfSelectedUser(ExStateObject stateOfselectedUser)
         throws RemoteException;
 
-    public boolean isToolbarNoInconsistenciesEnabled() throws RemoteException;
+    /**
+     * 
+     * @return <tt>true</tt>, if the toolbar button is existed and enabled.
+     * @throws RemoteException
+     */
+    public boolean isInconsistencyDetectedEnabled() throws RemoteException;
 
-    public void invitateUser(String inviteeJID) throws RemoteException;
+    /**
+     * performs the action "Open invitation interface" which should be activated
+     * by clicking the tool bar button with the tooltip text
+     * "Open invitation interface" on the session view. The button is only
+     * enabled, if you are host.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Open invitation interface", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * @param jidOfInvitee
+     * @throws RemoteException
+     */
+    public void openInvitationInterface(String jidOfInvitee)
+        throws RemoteException;
 
+    /**
+     * After perform the
+     * {@link ExSessionViewObject#openInvitationInterface(String)} you should
+     * get this popup window.
+     * 
+     * @throws RemoteException
+     */
+    public void comfirmInvitationWindow(String jidOfinvitee)
+        throws RemoteException;
+
+    /**
+     * performs the action "Leave the session" which should be activated by
+     * clicking the tool bar button with the tooltip text "Leave the session" on
+     * the session view. After clicking the button you will get different popup
+     * window depending on whether you are host or not. So if you are host,
+     * please use this one, otherwise use
+     * {@link ExSessionViewObject#leaveTheSessionByPeer()}
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Open invitation interface", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     public void leaveTheSessionByHost() throws RemoteException;
 
+    /**
+     * performs the action "Leave the session" which should be activated by
+     * clicking the tool bar button with the tooltip text "Leave the session" on
+     * the session view. After clicking the button you will get different popup
+     * window depending on whether you are host or not. So if you are peer,
+     * please use this one, otherwise use
+     * {@link ExSessionViewObject#leaveTheSessionByHost()}
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the session view is open and active.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Open invitation interface", e.g. a popup window. In this case, the
+     * method should handle all the following actions so long until all needed
+     * steps by your side are done.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     public void leaveTheSessionByPeer() throws RemoteException;
+
+    /**
+     * After perform the
+     * {@link ExSessionViewObject#shareYourScreenWithSelectedUser(ExStateObject)}
+     * the selected user should get this popup window.
+     * 
+     * @throws RemoteException
+     * @see Musician#shareYourScreenWithSelectedUserDone(Musician)
+     */
+    public void confirmIncomingScreensharingSesionWindow()
+        throws RemoteException;
 
 }

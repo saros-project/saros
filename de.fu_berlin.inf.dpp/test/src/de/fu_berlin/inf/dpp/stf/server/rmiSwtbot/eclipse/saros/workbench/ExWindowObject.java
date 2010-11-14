@@ -12,8 +12,8 @@ public interface ExWindowObject extends EclipsePopUpWindowObject {
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException;
 
-    public void comfirmInvitationWindow(String inviteeJID)
-        throws RemoteException;
+    // public void comfirmInvitationWindow(String inviteeJID)
+    // throws RemoteException;
 
     public void confirmRequestOfSubscriptionReceivedWindow()
         throws RemoteException;

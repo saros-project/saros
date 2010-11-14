@@ -486,8 +486,11 @@ public class ViewObject extends EclipseObject {
     }
 
     public boolean isToolbarInViewEnabled(String viewName, String buttonTooltip) {
-        return getToolbarButtonWithTooltipInView(viewName, buttonTooltip)
-            .isEnabled();
+        SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
+            viewName, buttonTooltip);
+        if (button == null)
+            return false;
+        return button.isEnabled();
     }
 
     /**
@@ -500,15 +503,6 @@ public class ViewObject extends EclipseObject {
      */
     public void waitUntilViewActive(String viewName) {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
-    }
-
-    protected List<String> getAllProjects() {
-        SWTBotTree tree = getTreeInView(PEViewName);
-        List<String> projectNames = new ArrayList<String>();
-        for (int i = 0; i < tree.getAllItems().length; i++) {
-            projectNames.add(tree.getAllItems()[i].getText());
-        }
-        return projectNames;
     }
 
 }

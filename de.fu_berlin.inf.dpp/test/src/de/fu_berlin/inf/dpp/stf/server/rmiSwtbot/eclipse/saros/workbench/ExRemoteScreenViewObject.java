@@ -9,6 +9,8 @@ public interface ExRemoteScreenViewObject extends Remote {
 
     public boolean isRemoteScreenViewOpen() throws RemoteException;
 
+    public boolean isRemoteScreenViewActive() throws RemoteException;
+
     public void openRemoteScreenView() throws RemoteException;
 
     public void closeRemoteScreenView() throws RemoteException;
@@ -20,4 +22,6 @@ public interface ExRemoteScreenViewObject extends Remote {
     public void resume() throws RemoteException;
 
     public void pause() throws RemoteException;
+
+    public void waitUntilRemoteScreenViewIsActive() throws RemoteException;
 }

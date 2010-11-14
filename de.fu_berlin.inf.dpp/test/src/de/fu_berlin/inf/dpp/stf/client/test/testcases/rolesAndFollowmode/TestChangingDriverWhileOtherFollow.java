@@ -133,7 +133,7 @@ public class TestChangingDriverWhileOtherFollow {
     @Test
     public void testChanginDriverWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.sessionV.giveExclusiveDriverRole(carl.getBaseJid());
+        alice.sessionV.giveExclusiveDriverRole(carl.state);
         /*
          * After new release 10.10.28 all of the observer is automatically in
          * follow mode(are the observers really in follow mode???) when host

@@ -102,9 +102,9 @@ public class SarosConditions extends Conditions {
         return new ExistNoResource(resourcePath);
     }
 
-    public static ICondition existNoParticipant(ExStateObject state,
-        List<JID> jids) {
-        return new ExistNoParticipants(state, jids);
+    public static ICondition existsNoParticipants(ExStateObject state,
+        List<JID> jidsOfAllParticipants) {
+        return new ExistsNoParticipants(state, jidsOfAllParticipants);
     }
 
     public static ICondition isChatMessageExist(ExChatViewObjectImp chatV,

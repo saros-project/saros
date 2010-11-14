@@ -56,7 +56,7 @@ public class TestSessionViewObject {
                 SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         }
         if (bob.state.isDriver()) {
-            alice.removeDriverRole(bob);
+            alice.sessionV.removeDriverRole(bob.state);
         }
         if (!alice.state.isDriver()) {
             alice.sessionV.giveDriverRole(alice.state);
@@ -137,7 +137,7 @@ public class TestSessionViewObject {
             + ROLENAME));
 
         log.trace("alice give bob exclusive driver role.");
-        alice.giveExclusiveDriverRole(bob);
+        alice.sessionV.giveExclusiveDriverRole(bob.state);
         assertFalse(alice.state.isDriver());
         assertTrue(bob.state.isDriver());
 
@@ -159,8 +159,17 @@ public class TestSessionViewObject {
         assertTrue(alice.state.isInFollowMode());
     }
 
+    /**
+     * TODO there are some exception.
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testShareYourScreenWithSelectedUser() throws RemoteException {
-        alice.sessionV.shareYourScreenWithSelectedUser(bob.state);
+        alice.shareYourScreenWithSelectedUserDone(bob);
+        bob.remoteScreenV.waitUntilRemoteScreenViewIsActive();
+        assertTrue(bob.remoteScreenV.isRemoteScreenViewActive());
+        alice.sessionV.stopSessionWithUser(bob.state);
     }
+
 }

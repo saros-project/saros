@@ -41,18 +41,10 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
     }
 
     public void confirmNewContactWindow(String plainJID) throws RemoteException {
-        windowO
-            .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+        windowO.waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
         bot.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(plainJID);
         basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_FINISH);
         bot.button(SarosConstant.BUTTON_FINISH).click();
-    }
-
-    public void comfirmInvitationWindow(String inviteeJID)
-        throws RemoteException {
-        windowO.waitUntilShellActive("Invitation");
-        exWindowO.confirmWindowWithCheckBox("Invitation",
-            SarosConstant.BUTTON_FINISH, inviteeJID);
     }
 
     public void confirmRequestOfSubscriptionReceivedWindow()
@@ -66,8 +58,7 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
 
     public void confirmInvitationWindow(String... invitees)
         throws RemoteException {
-        windowO
-            .activateShellWithText(SarosConstant.SHELL_TITLE_INVITATION);
+        windowO.activateShellWithText(SarosConstant.SHELL_TITLE_INVITATION);
         exWindowO.confirmWindowWithCheckBox(
             SarosConstant.SHELL_TITLE_INVITATION, SarosConstant.BUTTON_FINISH,
             invitees);
@@ -159,8 +150,8 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
             SarosConstant.BUTTON_OK, projectName);
         bot.button(SarosConstant.BUTTON_FINISH).click();
 
-        exWindowO.confirmWindow(
-            "Warning: Local changes will be deleted", SarosConstant.BUTTON_YES);
+        exWindowO.confirmWindow("Warning: Local changes will be deleted",
+            SarosConstant.BUTTON_YES);
 
         /*
          * if there are some files locally, which are not saved yet, you will
@@ -168,8 +159,7 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
          * the window "Warning: Local changes will be deleted" with YES.
          */
         if (exWindowO.isShellActive("Save Resource")) {
-            exWindowO.confirmWindow("Save Resource",
-                SarosConstant.BUTTON_YES);
+            exWindowO.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
             /*
              * it take some more time for the session invitation if you don't
              * save your files locally. So rmiBot need to wait until the
@@ -205,8 +195,8 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
         windowO.confirmWindowWithTree("Folder Selection",
             SarosConstant.BUTTON_OK, projectName);
         bot.button(SarosConstant.BUTTON_FINISH).click();
-        exWindowO.confirmWindow(
-            "Warning: Local changes will be deleted", SarosConstant.BUTTON_NO);
+        exWindowO.confirmWindow("Warning: Local changes will be deleted",
+            SarosConstant.BUTTON_NO);
     }
 
     public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
@@ -228,8 +218,7 @@ public class ExSarosPopUpWindowObjectImp extends EclipsePopUpWindowObjectImp
 
     public void confirmSarosConfigurationWizard(String xmppServer, String jid,
         String password) throws RemoteException {
-        windowO
-            .activateShellWithText(SarosConstant.SAROS_CONFI_SHELL_TITLE);
+        windowO.activateShellWithText(SarosConstant.SAROS_CONFI_SHELL_TITLE);
         bot.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_SERVER).setText(
             xmppServer);
 

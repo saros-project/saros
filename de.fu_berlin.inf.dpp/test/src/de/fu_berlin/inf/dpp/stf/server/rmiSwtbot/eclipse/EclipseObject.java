@@ -33,8 +33,19 @@ public abstract class EclipseObject {
     protected static final transient Logger log = Logger
         .getLogger(EclipseObject.class);
 
-    protected final String PEViewName = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
-    protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
+    // Title of Buttons
+    protected final static String YES = SarosConstant.BUTTON_YES;
+    protected final static String OK = SarosConstant.BUTTON_OK;
+    protected final static String NO = SarosConstant.BUTTON_NO;
+    protected final static String CANCEL = SarosConstant.BUTTON_CANCEL;
+    protected final static String FINISH = SarosConstant.BUTTON_FINISH;
+    protected final static String NEXT = SarosConstant.BUTTON_NEXT;
+
+    // Title of Shells
+    protected final static String PROGRESSINFORMATION = SarosConstant.SHELL_TITLE_PROGRESS_INFORMATION;
+
+    // Role:Driver
+    protected final static String ROLENAME = SarosConstant.ROLENAME;
 
     // exported objects
     public static ExBasicObject exBasicO;

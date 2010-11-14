@@ -133,7 +133,7 @@ public class TableObject extends EclipseObject {
      * @return <tt>true</tt>, if the context menu of the specified table item
      *         exists.
      */
-    public boolean existContextOfTableItem(String itemName, String contextName) {
+    public boolean existsContextOfTableItem(String itemName, String contextName) {
         try {
             bot.table().getTableItem(itemName).contextMenu(contextName);
             return true;

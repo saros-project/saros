@@ -15,11 +15,10 @@ public class isSessionclosed extends DefaultCondition {
 
     public String getFailureMessage() {
 
-        return null;
+        return "It seems that the session is still open";
     }
 
     public boolean test() throws Exception {
-        System.out.println("existSession() == " + state.isInSession());
         if (state.isInSession()) {
             return false;
         }

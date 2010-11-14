@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -14,9 +15,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class PackageExplorerViewObjectImp extends EclipseObject implements
     ExPackageExplorerViewObject {
-    // public static PackageExplorerViewObjectImp classVariable;
 
     private static transient PackageExplorerViewObjectImp self;
+
+    private final static String VIEWNAME = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
 
     /**
      * {@link EclipseBasicObjectImp} is a singleton, but inheritance is
@@ -30,7 +32,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     }
 
     public void closePackageExplorerView() throws RemoteException {
-        viewO.closeViewByTitle(PEViewName);
+        viewO.closeViewByTitle(VIEWNAME);
     }
 
     public void closeWelcomeView() throws RemoteException {
@@ -38,7 +40,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     }
 
     public void activatePackageExplorerView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(PEViewName);
+        viewO.setFocusOnViewByTitle(VIEWNAME);
     }
 
     /**
@@ -62,7 +64,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void deleteProjectGui(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewO.getTreeInView(PEViewName);
+        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
         tree.select(projectName);
         menuO.clickMenuWithTexts("Edit", "Delete");
         exWindowO.confirmWindowWithCheckBox(
@@ -92,7 +94,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void deleteFileGui(String... nodes) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        viewO.clickContextMenuOfTreeInView(PEViewName, "Delete", nodes);
+        viewO.clickContextMenuOfTreeInView(VIEWNAME, "Delete", nodes);
         windowO.waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
         exWindowO.confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
             SarosConstant.BUTTON_OK);
@@ -102,7 +104,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         exWorkbenchO.activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewO.getTreeInView(PEViewName);
+        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
         return treeO.isTreeItemWithMatchTextExist(tree, matchTexts);
     }
 
@@ -125,7 +127,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void openClass(String projectName, String packageName,
         String className) throws RemoteException {
         if (!exEditorO.isClassOpen(className)) {
-            viewO.openFileInView(PEViewName, projectName, "src", packageName,
+            viewO.openFileInView(VIEWNAME, projectName, "src", packageName,
                 className + ".java");
             bot.sleep(sleepTime);
         }
@@ -133,14 +135,14 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
 
     public void openFile(String... filePath) throws RemoteException {
         if (!exEditorO.isFileOpen(filePath[filePath.length - 1])) {
-            viewO.openFileInView(PEViewName, filePath);
+            viewO.openFileInView(VIEWNAME, filePath);
             bot.sleep(sleepTime);
         }
     }
 
     public void openClassWith(String whichEditor, String projectName,
         String packageName, String className) throws RemoteException {
-        SWTBotTree tree = viewO.getTreeInView(PEViewName);
+        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
         tree.expandNode(projectName, "src", packageName, className + ".java")
             .select();
         ContextMenuHelper.clickContextMenu(tree, "Open With", "Other...");
@@ -159,7 +161,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
      * 
      */
     public void showViewPackageExplorer() throws RemoteException {
-        viewO.openViewWithName(PEViewName, "Java", "Package Explorer");
+        viewO.openViewWithName(VIEWNAME, "Java", "Package Explorer");
     }
 
     public void moveClassTo(String projectName, String pkg, String className,
@@ -169,7 +171,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         String[] matchTexts = helperO.changeToRegex(projectName, "src", pkg,
             className);
         log.info("matchTexts: " + matchTexts);
-        viewO.clickMenusOfContextMenuOfTreeItemInView(PEViewName, matchTexts,
+        viewO.clickMenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts,
             "Refactor", "Move...");
         windowO.waitUntilShellActive("Move");
         windowO.confirmWindowWithTree("Move", SarosConstant.BUTTON_OK,
@@ -178,7 +180,7 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
 
     public void disConnectSVN() throws RemoteException {
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewO.clickMenusOfContextMenuOfTreeItemInView(PEViewName, matchTexts,
+        viewO.clickMenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts,
             "Team", "Disconnect...");
         exWindowO.confirmWindow("Confirm Disconnect from SVN",
             SarosConstant.BUTTON_YES);
@@ -393,4 +395,12 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         bot.button(SarosConstant.BUTTON_FINISH).click();
     }
 
+    protected List<String> getAllProjects() {
+        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
+        List<String> projectNames = new ArrayList<String>();
+        for (int i = 0; i < tree.getAllItems().length; i++) {
+            projectNames.add(tree.getAllItems()[i].getText());
+        }
+        return projectNames;
+    }
 }

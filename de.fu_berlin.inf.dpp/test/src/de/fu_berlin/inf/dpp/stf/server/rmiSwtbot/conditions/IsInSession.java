@@ -13,8 +13,7 @@ public class IsInSession extends DefaultCondition {
     }
 
     public String getFailureMessage() {
-
-        return null;
+        return "There are no session!";
     }
 
     public boolean test() throws Exception {
