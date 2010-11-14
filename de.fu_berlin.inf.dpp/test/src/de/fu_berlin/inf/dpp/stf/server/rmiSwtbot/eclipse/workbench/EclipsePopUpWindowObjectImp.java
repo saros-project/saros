@@ -81,7 +81,7 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
     public void confirmWindow(String title, String buttonText)
         throws RemoteException {
         // waitUntilShellActive(title);
-        if (windowObject.activateShellWithText(title)) {
+        if (windowO.activateShellWithText(title)) {
             bot.button(buttonText).click();
             bot.sleep(sleepTime);
         }
@@ -100,7 +100,7 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
      */
     public void confirmWindowWithCheckBox(String title, String buttonText,
         boolean isChecked) throws RemoteException {
-        windowObject.activateShellWithText(title);
+        windowO.activateShellWithText(title);
         if (isChecked)
             bot.checkBox().click();
         bot.button(buttonText).click();
@@ -120,11 +120,11 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
      */
     public void confirmWindowWithCheckBox(String title, String buttonText,
         String... itemNames) throws RemoteException {
-        windowObject.waitUntilShellActive(title);
+        windowO.waitUntilShellActive(title);
         for (String itemName : itemNames) {
-            tableObject.selectCheckBoxInTable(itemName);
+            tableO.selectCheckBoxInTable(itemName);
         }
-        basicObject.waitUntilButtonEnabled(buttonText);
+        basicO.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }
@@ -146,7 +146,7 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
         // waitUntilShellActive(shellName);
         try {
             bot.table().select(itemName);
-            basicObject.waitUntilButtonEnabled(buttonText);
+            basicO.waitUntilButtonIsEnabled(buttonText);
             bot.button(buttonText).click();
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
@@ -199,11 +199,11 @@ public class EclipsePopUpWindowObjectImp extends EclipseObject implements
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(SarosConstant.TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        treeObject.waitUntilTreeExisted(bot.tree(), rootOfTreeNode);
+        treeO.waitUntilTreeExisted(bot.tree(), rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        treeObject.waitUntilTreeNodeExisted(treeItem, teeNode);
+        treeO.waitUntilTreeNodeExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
-        basicObject.waitUntilButtonEnabled(buttonText);
+        basicO.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }

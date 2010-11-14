@@ -50,7 +50,7 @@ public class MakeOperationConcurrently {
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.sessionV.leaveSessionByPeer();
+                    musician.sessionV.leaveTheSessionByPeer();
                     return musician.state.isParticipant(musician.jid);
                 }
             });

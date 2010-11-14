@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class PackageExplorerViewObjectImp extends EclipseObject implements
-    PackageExplorerViewObject {
+    ExPackageExplorerViewObject {
     // public static PackageExplorerViewObjectImp classVariable;
 
     private static transient PackageExplorerViewObjectImp self;
@@ -30,15 +30,15 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     }
 
     public void closePackageExplorerView() throws RemoteException {
-        viewObject.closeViewWithText(PEViewName);
+        viewO.closeViewByTitle(PEViewName);
     }
 
     public void closeWelcomeView() throws RemoteException {
-        viewObject.closeViewWithText(SarosConstant.VIEW_TITLE_WELCOME);
+        viewO.closeViewByTitle(SarosConstant.VIEW_TITLE_WELCOME);
     }
 
     public void activatePackageExplorerView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(PEViewName);
+        viewO.setFocusOnViewByTitle(PEViewName);
     }
 
     /**
@@ -62,14 +62,13 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void deleteProjectGui(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
+        SWTBotTree tree = viewO.getTreeInView(PEViewName);
         tree.select(projectName);
-        menuObject.clickMenuWithTexts("Edit", "Delete");
-        exportedWindowObject.confirmWindowWithCheckBox(
+        menuO.clickMenuWithTexts("Edit", "Delete");
+        exWindowO.confirmWindowWithCheckBox(
             SarosConstant.SHELL_TITLE_DELETE_RESOURCE, SarosConstant.BUTTON_OK,
             true);
-        windowObject
-            .waitUntilShellClosed(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
+        windowO.waitUntilShellClosed(SarosConstant.SHELL_TITLE_DELETE_RESOURCE);
     }
 
     /**
@@ -93,19 +92,18 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void deleteFileGui(String... nodes) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        viewObject.clickContextMenuOfTreeInView(PEViewName, "Delete", nodes);
-        windowObject
-            .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-        exportedWindowObject.confirmWindow(
-            SarosConstant.SHELL_TITLE_CONFIRM_DELETE, SarosConstant.BUTTON_OK);
+        viewO.clickContextMenuOfTreeInView(PEViewName, "Delete", nodes);
+        windowO.waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
+        exWindowO.confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
+            SarosConstant.BUTTON_OK);
     }
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
-        workbenchObject.activateEclipseShell();
+        exWorkbenchO.activateEclipseShell();
         showViewPackageExplorer();
         activatePackageExplorerView();
-        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
-        return treeObject.isTreeItemWithMatchTextExist(tree, matchTexts);
+        SWTBotTree tree = viewO.getTreeInView(PEViewName);
+        return treeO.isTreeItemWithMatchTextExist(tree, matchTexts);
     }
 
     /**
@@ -126,32 +124,31 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
      */
     public void openClass(String projectName, String packageName,
         String className) throws RemoteException {
-        if (!exportedEditorObject.isClassOpen(className)) {
-            viewObject.openFileInView(PEViewName, projectName, "src",
-                packageName, className + ".java");
+        if (!exEditorO.isClassOpen(className)) {
+            viewO.openFileInView(PEViewName, projectName, "src", packageName,
+                className + ".java");
             bot.sleep(sleepTime);
         }
     }
 
     public void openFile(String... filePath) throws RemoteException {
-        if (!exportedEditorObject.isFileOpen(filePath[filePath.length - 1])) {
-            viewObject.openFileInView(PEViewName, filePath);
+        if (!exEditorO.isFileOpen(filePath[filePath.length - 1])) {
+            viewO.openFileInView(PEViewName, filePath);
             bot.sleep(sleepTime);
         }
     }
 
     public void openClassWith(String whichEditor, String projectName,
         String packageName, String className) throws RemoteException {
-        SWTBotTree tree = viewObject.getTreeInView(PEViewName);
+        SWTBotTree tree = viewO.getTreeInView(PEViewName);
         tree.expandNode(projectName, "src", packageName, className + ".java")
             .select();
         ContextMenuHelper.clickContextMenu(tree, "Open With", "Other...");
-        windowObject.waitUntilShellActive("Editor Selection");
+        windowO.waitUntilShellActive("Editor Selection");
         SWTBotTable table = bot.table();
         table.select(whichEditor);
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
-        exportedWindowObject.confirmWindow("Editor Selection",
-            SarosConstant.BUTTON_OK);
+        basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_OK);
+        exWindowO.confirmWindow("Editor Selection", SarosConstant.BUTTON_OK);
     }
 
     /**
@@ -162,37 +159,37 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
      * 
      */
     public void showViewPackageExplorer() throws RemoteException {
-        viewObject.openViewWithName(PEViewName, "Java", "Package Explorer");
+        viewO.openViewWithName(PEViewName, "Java", "Package Explorer");
     }
 
     public void moveClassTo(String projectName, String pkg, String className,
         String targetProject, String targetPkg) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = helperObject.changeToRegex(projectName, "src",
-            pkg, className);
+        String[] matchTexts = helperO.changeToRegex(projectName, "src", pkg,
+            className);
         log.info("matchTexts: " + matchTexts);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
-            matchTexts, "Refactor", "Move...");
-        windowObject.waitUntilShellActive("Move");
-        windowObject.confirmWindowWithTree("Move", SarosConstant.BUTTON_OK,
+        viewO.clickMenusOfContextMenuOfTreeItemInView(PEViewName, matchTexts,
+            "Refactor", "Move...");
+        windowO.waitUntilShellActive("Move");
+        windowO.confirmWindowWithTree("Move", SarosConstant.BUTTON_OK,
             targetProject, "src", targetPkg);
     }
 
     public void disConnectSVN() throws RemoteException {
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(PEViewName,
-            matchTexts, "Team", "Disconnect...");
-        exportedWindowObject.confirmWindow("Confirm Disconnect from SVN",
+        viewO.clickMenusOfContextMenuOfTreeItemInView(PEViewName, matchTexts,
+            "Team", "Disconnect...");
+        exWindowO.confirmWindow("Confirm Disconnect from SVN",
             SarosConstant.BUTTON_YES);
     }
 
     public void connectSVN() throws RemoteException {
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Share Project...");
-        exportedWindowObject.confirmWindowWithTable("Share Project", "SVN",
+        exWindowO.confirmWindowWithTable("Share Project", "SVN",
             SarosConstant.BUTTON_NEXT);
         bot.button(SarosConstant.BUTTON_FINISH).click();
     }
@@ -201,14 +198,14 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Switch to another Branch/Tag/Revision...");
-        windowObject.waitUntilShellActive("Switch");
+        windowO.waitUntilShellActive("Switch");
         bot.checkBox("Switch to HEAD revision").click();
         bot.textWithLabel("Revision:").setText("115");
         bot.button(SarosConstant.BUTTON_OK).click();
-        windowObject.waitUntilShellClosed("SVN Switch");
+        windowO.waitUntilShellClosed("SVN Switch");
     }
 
     public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
@@ -220,25 +217,25 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
             matchTexts[i] = matchTexts[i] + ".*";
         }
         // String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Switch to another Branch/Tag/Revision...");
-        windowObject.waitUntilShellActive("Switch");
+        windowO.waitUntilShellActive("Switch");
         bot.checkBox("Switch to HEAD revision").click();
         bot.textWithLabel("Revision:").setText("116");
         bot.button(SarosConstant.BUTTON_OK).click();
-        windowObject.waitUntilShellClosed("SVN Switch");
+        windowO.waitUntilShellClosed("SVN Switch");
     }
 
     public void revert() throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Revert...");
-        exportedWindowObject.confirmWindow("Revert", SarosConstant.BUTTON_OK);
-        windowObject.waitUntilShellClosed("Revert");
+        exWindowO.confirmWindow("Revert", SarosConstant.BUTTON_OK);
+        windowO.waitUntilShellClosed("Revert");
     }
 
     public void renameClass(String newName, String projectName, String pkg,
@@ -250,15 +247,15 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = helperObject.changeToRegex(texts);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        String[] matchTexts = helperO.changeToRegex(texts);
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
             "Rename...");
-        windowObject.activateShellWithText("Rename Compilation Unit");
+        windowO.activateShellWithText("Rename Compilation Unit");
         bot.textWithLabel("New name:").setText(newName);
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_FINISH);
         bot.button(SarosConstant.BUTTON_FINISH).click();
-        windowObject.waitUntilShellClosed("Rename Compilation Unit");
+        windowO.waitUntilShellClosed("Rename Compilation Unit");
     }
 
     public void renameFolder(String projectName, String oldPath, String newPath)
@@ -266,77 +263,77 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName, oldPath };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, nodes, "Refactor",
             "Rename...");
-        windowObject.waitUntilShellActive("Rename Resource");
+        windowO.waitUntilShellActive("Rename Resource");
         bot.textWithLabel("New name:").setText(newPath);
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_OK);
         bot.button(SarosConstant.BUTTON_OK).click();
-        windowObject.waitUntilShellClosed("Rename Resource");
+        windowO.waitUntilShellClosed("Rename Resource");
     }
 
     public void renamePkg(String newName, String... texts)
         throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
-        String[] matchTexts = helperObject.changeToRegex(texts);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        String[] matchTexts = helperO.changeToRegex(texts);
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Refactor",
             "Rename...");
-        windowObject.activateShellWithText("Rename Package");
+        windowO.activateShellWithText("Rename Package");
         bot.textWithLabel("New name:").setText(newName);
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_OK);
+        basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_OK);
         bot.button(SarosConstant.BUTTON_OK).click();
-        windowObject.waitUntilShellClosed("Rename Package");
+        windowO.waitUntilShellClosed("Rename Package");
     }
 
     public void switchToTag() throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Team",
             "Switch to another Branch/Tag/Revision...");
-        windowObject.waitUntilShellActive("Switch");
+        windowO.waitUntilShellActive("Switch");
         bot.button("Select...").click();
-        windowObject.confirmWindowWithTree("Repository Browser",
+        windowO.confirmWindowWithTree("Repository Browser",
             SarosConstant.BUTTON_OK, "tags", "eclipsecon2009");
         bot.button(SarosConstant.BUTTON_OK).click();
-        windowObject.waitUntilShellClosed("SVN Switch");
+        windowO.waitUntilShellClosed("SVN Switch");
     }
 
     public void importProjectFromSVN(String path) throws RemoteException {
-        workbenchObject.activateEclipseShell();
-        menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+        exWorkbenchO.activateEclipseShell();
+        menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
             SarosConstant.MENU_TITLE_IMPORT);
-        exportedWindowObject.confirmWindowWithTreeWithFilterText(
+        exWindowO.confirmWindowWithTreeWithFilterText(
             SarosConstant.SHELL_TITLE_IMPORT, "SVN",
             "Checkout Projects from SVN", SarosConstant.BUTTON_NEXT);
         if (bot.table().containsItem(path)) {
-            exportedWindowObject.confirmWindowWithTable("Checkout from SVN",
+            exWindowO.confirmWindowWithTable("Checkout from SVN",
                 BotConfiguration.SVN_URL, SarosConstant.BUTTON_NEXT);
         } else {
             bot.radio("Create a new repository location").click();
             bot.button(SarosConstant.BUTTON_NEXT).click();
             bot.comboBoxWithLabel("Url:").setText(path);
             bot.button(SarosConstant.BUTTON_NEXT).click();
-            windowObject.waitUntilShellActive("Checkout from SVN");
+            windowO.waitUntilShellActive("Checkout from SVN");
         }
-        windowObject.confirmWindowWithTree("Checkout from SVN",
+        windowO.confirmWindowWithTree("Checkout from SVN",
             SarosConstant.BUTTON_FINISH, path, "trunk", "examples");
-        windowObject.waitUntilShellActive("SVN Checkout");
+        windowO.waitUntilShellActive("SVN Checkout");
         SWTBotShell shell2 = bot.shell("SVN Checkout");
-        windowObject.waitUntilShellCloses(shell2);
+        windowO.waitUntilShellCloses(shell2);
     }
 
     public void shareProject(String projectName) throws RemoteException {
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = helperObject.changeToRegex(nodes);
+        String[] matchTexts = helperO.changeToRegex(nodes);
 
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT);
     }
@@ -346,8 +343,8 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = helperObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        String[] matchTexts = helperO.changeToRegex(nodes);
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS);
     }
@@ -357,8 +354,8 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = helperObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        String[] matchTexts = helperO.changeToRegex(nodes);
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY);
     }
@@ -367,8 +364,8 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
         showViewPackageExplorer();
         activatePackageExplorerView();
         String[] nodes = { projectName };
-        String[] matchTexts = helperObject.changeToRegex(nodes);
-        viewObject.clickMenusOfContextMenuOfTreeItemInView(
+        String[] matchTexts = helperO.changeToRegex(nodes);
+        viewO.clickMenusOfContextMenuOfTreeItemInView(
             SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER, matchTexts, "Saros",
             SarosConstant.CONTEXT_MENU_ADD_TO_SESSION);
     }
@@ -390,9 +387,9 @@ public class PackageExplorerViewObjectImp extends EclipseObject implements
     public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException {
         shareProject(projectName);
-        windowObject.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
-        tableObject.selectCheckBoxsInTable(inviteeJIDS);
-        basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+        windowO.waitUntilShellActive(SarosConstant.SHELL_TITLE_INVITATION);
+        tableO.selectCheckBoxsInTable(inviteeJIDS);
+        basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_FINISH);
         bot.button(SarosConstant.BUTTON_FINISH).click();
     }
 

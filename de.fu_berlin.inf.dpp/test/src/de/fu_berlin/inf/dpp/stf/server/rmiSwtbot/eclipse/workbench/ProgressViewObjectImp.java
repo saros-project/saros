@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class ProgressViewObjectImp extends EclipseObject implements
-    ProgressViewObject {
+    ExProgressViewObject {
 
     // public static ProgressViewObjectImp classVariable;
 
@@ -29,11 +29,11 @@ public class ProgressViewObjectImp extends EclipseObject implements
     }
 
     public void openProgressView() throws RemoteException {
-        viewObject.openViewById("org.eclipse.ui.views.ProgressView");
+        viewO.openViewById("org.eclipse.ui.views.ProgressView");
     }
 
     public void activateProgressView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(PGViewName);
+        viewO.setFocusOnViewByTitle(PGViewName);
     }
 
     public boolean existPorgress() throws RemoteException {
@@ -65,7 +65,7 @@ public class ProgressViewObjectImp extends EclipseObject implements
     }
 
     public boolean isProgressViewOpen() throws RemoteException {
-        return viewObject.isViewOpen("Progress");
+        return viewO.isViewOpen("Progress");
     }
 
     /**

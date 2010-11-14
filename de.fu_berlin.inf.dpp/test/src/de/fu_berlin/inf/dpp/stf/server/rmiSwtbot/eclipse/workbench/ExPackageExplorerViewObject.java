@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface PackageExplorerViewObject extends Remote {
+public interface ExPackageExplorerViewObject extends Remote {
 
     public void closePackageExplorerView() throws RemoteException;
 

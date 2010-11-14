@@ -161,7 +161,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
         edna.popupWindow.confirmSessionInvitationWindowStep1();
         edna.popupWindow
             .confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
-        edna.sessionV.leaveSessionByPeer();
+        edna.sessionV.leaveTheSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }
 }

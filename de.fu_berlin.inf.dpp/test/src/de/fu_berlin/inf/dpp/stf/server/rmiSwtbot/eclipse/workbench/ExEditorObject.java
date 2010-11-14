@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 
-public interface EclipseEditorObject extends Remote {
+public interface ExEditorObject extends Remote {
 
     /**
      * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of

@@ -15,23 +15,23 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSessionViewObject;
 
 /**
  * This is used to check the state of {@link Saros} from the inside. Use this
  * from {@link Musician}.
  */
-public interface SarosStateObject extends EclipseStateObject {
+public interface ExStateObject extends EclipseStateObject {
 
     /**
      * Test if you are now in a session. <br>
-     * You can also use another function {@link SessionViewObject#isInSession()}
+     * You can also use another function {@link ExSessionViewObject#isInSession()}
      * , which test the session state with GUI.
      * 
      * <p>
      * <b>Attention:</b> <br>
-     * Try to use the {@link SessionViewObject#isInSession()} and
-     * {@link SarosStateObject#isInSession()} together in your junittests.
+     * Try to use the {@link ExSessionViewObject#isInSession()} and
+     * {@link ExStateObject#isInSession()} together in your junittests.
      * 
      * 
      * @return <tt>true</tt> if {@link SessionManager#getSarosSession()} is not

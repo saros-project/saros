@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-public interface WorkbenchObject extends Remote {
+public interface ExWorkbenchObject extends Remote {
 
     public void openSarosViews() throws RemoteException;
 

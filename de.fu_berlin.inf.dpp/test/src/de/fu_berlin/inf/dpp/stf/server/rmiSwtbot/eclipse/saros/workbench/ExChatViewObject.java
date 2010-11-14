@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ChatViewObject extends Remote {
+public interface ExChatViewObject extends Remote {
 
     public void openChatView() throws RemoteException;
 

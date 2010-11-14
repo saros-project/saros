@@ -17,7 +17,7 @@ public class WindowObject extends EclipseObject {
 
     public boolean isTableItemInWindowExist(String title, String label) {
         activateShellWithText(title);
-        return tableObject.existTableItem(label);
+        return tableO.existTableItem(label);
     }
 
     public boolean activateShellWithText(String title) {
@@ -75,7 +75,7 @@ public class WindowObject extends EclipseObject {
         // waitUntilShellActive(shellName);
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
-        treeObject.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
+        treeO.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
         // basicObject.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);

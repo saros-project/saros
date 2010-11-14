@@ -7,19 +7,19 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
-public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
+public class ExChatViewObjectImp extends EclipseObject implements ExChatViewObject {
 
     // public static ChatViewObjectImp classVariable;
 
-    private static transient ChatViewObjectImp self;
+    private static transient ExChatViewObjectImp self;
 
     /**
-     * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
+     * {@link ExChatViewObjectImp} is a singleton, but inheritance is possible.
      */
-    public static ChatViewObjectImp getInstance() {
+    public static ExChatViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new ChatViewObjectImp();
+        self = new ExChatViewObjectImp();
         return self;
     }
 
@@ -29,20 +29,20 @@ public class ChatViewObjectImp extends EclipseObject implements ChatViewObject {
     }
 
     public void activateChatView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        viewO.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            viewObject.openViewById(SarosConstant.ID_CHAT_VIEW);
+            viewO.openViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public void closeChatView() throws RemoteException {
-        viewObject.closeViewById(SarosConstant.ID_CHAT_VIEW);
+        viewO.closeViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        return viewO.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
     }
 
     public void sendChatMessage(String message) throws RemoteException {

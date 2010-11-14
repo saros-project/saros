@@ -16,18 +16,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRemoteScreenViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkbenchObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExProgressViewObject;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -37,20 +37,20 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewO
 public class Musician {
     private static final Logger log = Logger.getLogger(Musician.class);
 
-    public EclipseEditorObject eclipseEditor;
-    public PackageExplorerViewObject packageExplorerV;
-    public SarosMainMenuObject mainMenu;
-    public ProgressViewObject progressV;
-    public EclipseBasicObject basic;
+    public ExEditorObject eclipseEditor;
+    public ExPackageExplorerViewObject packageExplorerV;
+    public ExMainMenuObject mainMenu;
+    public ExProgressViewObject progressV;
+    public ExBasicObject basic;
 
     // public ISarosRmiSWTWorkbenchBot bot;
-    public SarosStateObject state;
-    public RosterViewObject rosterV;
-    public SessionViewObject sessionV;
-    public RemoteScreenViewObject remoteScreenV;
-    public ChatViewObject chatV;
-    public SarosPopUpWindowObject popupWindow;
-    public WorkbenchObject workbench;
+    public ExStateObject state;
+    public ExRosterViewObject rosterV;
+    public ExSessionViewObject sessionV;
+    public ExRemoteScreenViewObject remoteScreenV;
+    public ExChatViewObject chatV;
+    public ExWindowObject popupWindow;
+    public ExWorkbenchObject workbench;
 
     public JID jid;
     public String password;
@@ -90,29 +90,27 @@ public class Musician {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
             // bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
-            state = (SarosStateObject) registry.lookup("state");
+            state = (ExStateObject) registry.lookup("state");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it
              * work for the remote tests too.
              */
             state.setJID(jid);
-            workbench = (WorkbenchObject) registry.lookup("workbench");
-            chatV = (ChatViewObject) registry.lookup("chatView");
-            rosterV = (RosterViewObject) registry.lookup("rosterView");
-            sessionV = (SessionViewObject) registry.lookup("sessionView");
-            remoteScreenV = (RemoteScreenViewObject) registry
+            workbench = (ExWorkbenchObject) registry.lookup("workbench");
+            chatV = (ExChatViewObject) registry.lookup("chatView");
+            rosterV = (ExRosterViewObject) registry.lookup("rosterView");
+            sessionV = (ExSessionViewObject) registry.lookup("sessionView");
+            remoteScreenV = (ExRemoteScreenViewObject) registry
                 .lookup("remoteScreenView");
-            popupWindow = (SarosPopUpWindowObject) registry
-                .lookup("popUpWindow");
+            popupWindow = (ExWindowObject) registry.lookup("popUpWindow");
 
-            eclipseEditor = (EclipseEditorObject) registry
-                .lookup("eclipseEditor");
-            packageExplorerV = (PackageExplorerViewObject) registry
+            eclipseEditor = (ExEditorObject) registry.lookup("eclipseEditor");
+            packageExplorerV = (ExPackageExplorerViewObject) registry
                 .lookup("packageExplorerView");
-            mainMenu = (SarosMainMenuObject) registry.lookup("sarosMainMenu");
-            progressV = (ProgressViewObject) registry.lookup("progressView");
-            basic = (EclipseBasicObject) registry.lookup("basicObject");
+            mainMenu = (ExMainMenuObject) registry.lookup("sarosMainMenu");
+            progressV = (ExProgressViewObject) registry.lookup("progressView");
+            basic = (ExBasicObject) registry.lookup("basicObject");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -183,10 +181,7 @@ public class Musician {
      */
     public void leaveSessionFirst(Musician... musicians)
         throws RemoteException, InterruptedException {
-        sessionV.leaveTheSession();
-        popupWindow.confirmWindow("Confirm Closing Session",
-            SarosConstant.BUTTON_YES);
-        sessionV.waitUntilSessionCloses();
+        sessionV.leaveTheSessionByHost();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < musicians.length; i++) {
             final Musician musician = musicians[i];
@@ -228,7 +223,7 @@ public class Musician {
             final Musician musician = musicians[i];
             leaveTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.leaveSessionByPeer();
+                    musician.sessionV.leaveTheSessionByPeer();
                     return null;
                 }
             });
@@ -239,8 +234,7 @@ public class Musician {
         }
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-        sessionV.leaveTheSession();
-        sessionV.waitUntilSessionCloses();
+        sessionV.leaveTheSessionByHost();
     }
 
     /**

@@ -33,7 +33,7 @@ public class PerspectiveObject extends EclipseObject {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            workbenchObject.activateEclipseShell();
+            exWorkbenchO.activateEclipseShell();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {

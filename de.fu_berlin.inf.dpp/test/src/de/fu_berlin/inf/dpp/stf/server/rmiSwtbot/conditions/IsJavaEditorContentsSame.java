@@ -2,17 +2,17 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
 
 public class IsJavaEditorContentsSame extends DefaultCondition {
 
-    private EclipseEditorObject editor;
+    private ExEditorObject editor;
     private String file;
     private String projectName;
     private String packageName;
     private String className;
 
-    IsJavaEditorContentsSame(EclipseEditorObject editor, String projectName,
+    IsJavaEditorContentsSame(ExEditorObject editor, String projectName,
         String packageName, String className, String otherConent) {
         this.editor = editor;
         this.file = otherConent;

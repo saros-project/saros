@@ -19,6 +19,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.hamcrest.Matcher;
 
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
@@ -29,6 +30,23 @@ public class TableObject extends EclipseObject {
         return bot.table();
     }
 
+    /**
+     * Click a context menu of the selected table item. The method is defined as
+     * helper method for other clickTB*In*View methods in {@link SarosSWTBot}
+     * and should not be exported by rmi. <br/>
+     * Operational steps:
+     * <ol>
+     * <li>select a table item</li>
+     * 
+     * <li>then click the specified context menu on it</li>
+     * </ol>
+     * 
+     * @param viewName
+     * 
+     * @param itemName
+     *            the table item' name, whose context menu you want to click.
+     * @see #selectTableItemWithLabelInView(String, String)
+     */
     public void clickContextMenuOfTable(String itemName, String contextName) {
         getTable().getTableItem(itemName).contextMenu(contextName).click();
     }
@@ -181,5 +199,24 @@ public class TableObject extends EclipseObject {
         waitUntil(SarosConditions.ExistContextMenuOfTableItem(tableItem,
             context));
     }
+
+    // /**
+    // *
+    // * @param itemName
+    // * the table item name.
+    // * @param contextName
+    // * @return <tt>true</tt> if the specified context menu of the select table
+    // * item exists.
+    // */
+    // public boolean isContextMenuOfTableItemExist(String itemName,
+    // String contextName) {
+    // SWTBotTableItem item = selectTableItemWithLabel(itemName);
+    // try {
+    // item.contextMenu(contextName);
+    // return true;
+    // } catch (TimeoutException e) {
+    // return false;
+    // }
+    // }
 
 }

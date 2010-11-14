@@ -5,14 +5,14 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObject;
 
 public class ExistNoParticipants extends DefaultCondition {
 
     private List<JID> jids;
-    private SarosStateObject state;
+    private ExStateObject state;
 
-    ExistNoParticipants(SarosStateObject state, List<JID> jids) {
+    ExistNoParticipants(ExStateObject state, List<JID> jids) {
         this.jids = jids;
         this.state = state;
     }

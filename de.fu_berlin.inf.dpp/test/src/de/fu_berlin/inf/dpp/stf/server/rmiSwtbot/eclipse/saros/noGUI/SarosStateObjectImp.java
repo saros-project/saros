@@ -21,14 +21,14 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.EclipseStateObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObjectImp;
 
 /**
  * The goal of this class is to gather state and provide an RMI interface for
  * getting internal states from the outside.
  */
 public class SarosStateObjectImp extends EclipseStateObjectImp implements
-    SarosStateObject {
+    ExStateObject {
 
     private JID jid;
     private transient static final Logger log = Logger
@@ -39,7 +39,7 @@ public class SarosStateObjectImp extends EclipseStateObjectImp implements
     private static transient SarosStateObjectImp self;
 
     /**
-     * {@link ChatViewObjectImp} is a singleton, but inheritance is possible.
+     * {@link ExChatViewObjectImp} is a singleton, but inheritance is possible.
      */
     public static SarosStateObjectImp getInstance(Saros saros,
         SessionManager sessionManager, DataTransferManager dataTransferManager,

@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class EclipseBasicObjectImp extends EclipseObject implements
-    EclipseBasicObject {
+    ExBasicObject {
 
     // public static EclipseBasicObjectImp classVariable;
     private static final boolean SCREENSHOTS = true;

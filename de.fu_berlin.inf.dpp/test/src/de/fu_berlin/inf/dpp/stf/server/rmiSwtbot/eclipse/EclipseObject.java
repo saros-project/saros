@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
@@ -17,18 +16,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.Toolb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRemoteScreenViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkbenchObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExPackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExProgressViewObject;
 
 public abstract class EclipseObject {
     protected static final transient Logger log = Logger
@@ -38,43 +37,33 @@ public abstract class EclipseObject {
     protected final String PGViewName = SarosConstant.VIEW_TITLE_PROGRESS;
 
     // exported objects
-    public static SarosStateObject stateObject;
-    public static RosterViewObject rosterVObject;
-    public static SessionViewObject sessonVObject;
-    public static RemoteScreenViewObject remoteScreenVObject;
-    public static ChatViewObject chatVObject;
-    public static WorkbenchObject workbenchObject;
-    public static SarosPopUpWindowObject exportedWindowObject;
-    public static EclipseEditorObject exportedEditorObject;
-    public static PackageExplorerViewObject packageExplorerVObject;
-    public static SarosMainMenuObject exportedMenuObject;
-    public static ProgressViewObject progressVObject;
-    public static EclipseBasicObject exportedBasicObject;
+    public static ExBasicObject exBasicO;
+    public static ExMainMenuObject exMainMenuO;
+    public static ExEditorObject exEditorO;
+    public static ExWindowObject exWindowO;
+    public static ExWorkbenchObject exWorkbenchO;
+    public static ExStateObject exStateO;
+    public static ExRosterViewObject exRosterVO;
+    public static ExSessionViewObject exSessonVO;
+    public static ExRemoteScreenViewObject exRemoteScreenVO;
+    public static ExChatViewObject exChatVO;
+    public static ExPackageExplorerViewObject exPackageExplorerVO;
+    public static ExProgressViewObject exProgressVO;
 
     // No exported objects
-    public static TableObject tableObject;
-    public static MenuObject menuObject;
-    public static TreeObject treeObject;
-    public static WindowObject windowObject;
-    public static BasicObject basicObject;
-    public static ViewObject viewObject;
-    public static HelperObject helperObject;
-    public static PerspectiveObject persObject;
-    public static EditorObject editorObject;
-    public static ToolbarObject toolbarObject;
+    public static TableObject tableO;
+    public static MenuObject menuO;
+    public static TreeObject treeO;
+    public static WindowObject windowO;
+    public static BasicObject basicO;
+    public static ViewObject viewO;
+    public static HelperObject helperO;
+    public static PerspectiveObject perspectiveO;
+    public static EditorObject editorO;
+    public static ToolbarObject toolbarO;
 
     public static SarosSWTBot bot;
     public static int sleepTime = 750;
-
-    /**
-     * Creates an instance of a NoExportedObject.<br/>
-     * 
-     * 
-     * @param rmiBot
-     *            delegates to {@link SWTWorkbenchBot} to implement an java.rmi
-     *            interface for {@link SWTWorkbenchBot}. Using the
-     *            {@link EclipseObject} can access other objects.
-     */
 
     protected void waitUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);

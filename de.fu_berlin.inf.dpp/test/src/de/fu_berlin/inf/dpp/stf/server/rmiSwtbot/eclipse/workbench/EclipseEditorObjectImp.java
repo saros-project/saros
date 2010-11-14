@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
 public class EclipseEditorObjectImp extends EclipseObject implements
-    EclipseEditorObject {
+    ExEditorObject {
     // public static EclipseEditorObjectImp classVariable;
 
     private static transient EclipseEditorObjectImp self;
@@ -93,26 +93,26 @@ public class EclipseEditorObjectImp extends EclipseObject implements
     }
 
     public void waitUntilEditorActive(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorActive(bot, name));
+        waitUntil(SarosConditions.isEditorActive(editorO, name));
     }
 
     public boolean isClassOpen(String className) throws RemoteException {
-        return editorObject.isEditorOpen(className + ".java");
+        return editorO.isEditorOpen(className + ".java");
     }
 
     public boolean isFileOpen(String fileName) throws RemoteException {
-        return editorObject.isEditorOpen(fileName);
+        return editorO.isEditorOpen(fileName);
     }
 
     public boolean isJavaEditorActive(String className) throws RemoteException {
         if (!isClassOpen(className))
             return false;
-        return editorObject.isEditorActive(className + ".java");
+        return editorO.isEditorActive(className + ".java");
     }
 
     public String getJavaTextOnLine(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return getJavaEditor(className).getTextOnLine(line);
     }
@@ -128,22 +128,22 @@ public class EclipseEditorObjectImp extends EclipseObject implements
 
     public RGB getJavaLineBackground(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
         return getJavaEditor(className).getLineBackground(line);
     }
 
     public SWTBotEclipseEditor getJavaEditor(String className)
         throws RemoteException {
-        return editorObject.getTextEditor(className + ".java");
+        return editorO.getTextEditor(className + ".java");
     }
 
     public void activateJavaEditor(String className) throws RemoteException {
-        editorObject.activateEditor(className + ".java");
+        editorO.activateEditor(className + ".java");
     }
 
     public void activateEditor(String fileName) throws RemoteException {
-        editorObject.activateEditor(fileName);
+        editorO.activateEditor(fileName);
     }
 
     /**
@@ -151,29 +151,29 @@ public class EclipseEditorObjectImp extends EclipseObject implements
      */
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
-        return editorObject.getTextEditor(className + ".java").getText();
+        return editorO.getTextEditor(className + ".java").getText();
     }
 
     public String getTextOfEditor(String... filepath) throws RemoteException {
-        packageExplorerVObject.openFile(filepath);
+        exPackageExplorerVO.openFile(filepath);
         String fileName = filepath[filepath.length - 1];
         activateEditor(fileName);
-        return editorObject.getTextEditor(fileName).getText();
+        return editorO.getTextEditor(fileName).getText();
     }
 
     public void selectLineInJavaEditor(int line, String fileName)
         throws RemoteException {
-        editorObject.selectLineInEditor(line, fileName + ".java");
+        editorO.selectLineInEditor(line, fileName + ".java");
     }
 
     public void setBreakPoint(int line, String projectName, String packageName,
         String className) throws RemoteException {
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
         selectLineInJavaEditor(line, className);
-        menuObject.clickMenuWithTexts("Run", "Toggle Breakpoint");
+        menuO.clickMenuWithTexts("Run", "Toggle Breakpoint");
 
     }
 
@@ -205,8 +205,7 @@ public class EclipseEditorObjectImp extends EclipseObject implements
         throws RemoteException {
         activateJavaEditor(className);
         getJavaEditor(className).close();
-        exportedWindowObject.confirmWindow("Save Resource",
-            SarosConstant.BUTTON_YES);
+        exWindowO.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
     }
 
     /**
@@ -252,10 +251,10 @@ public class EclipseEditorObjectImp extends EclipseObject implements
     public void setTextInJavaEditorWithSave(String contentPath,
         String projectName, String packageName, String className)
         throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
+        String contents = exStateO.getContents(contentPath);
         // activateEclipseShell();
 
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
         SWTBotEditor editor;
         editor = bot.editorByTitle(className + ".java");
@@ -286,28 +285,28 @@ public class EclipseEditorObjectImp extends EclipseObject implements
     public void setTextInEditorWithSave(String contentPath, String... filePath)
         throws RemoteException {
 
-        String contents = stateObject.getContents(contentPath);
+        String contents = exStateO.getContents(contentPath);
         String fileName = filePath[filePath.length - 1];
-        packageExplorerVObject.openFile(filePath);
+        exPackageExplorerVO.openFile(filePath);
         activateEditor(fileName);
-        editorObject.setTextInEditorWithSave(contents, fileName);
+        editorO.setTextInEditorWithSave(contents, fileName);
     }
 
     public void setTextInJavaEditorWithoutSave(String contentPath,
         String projectName, String packageName, String className)
         throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        String contents = exStateO.getContents(contentPath);
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
-        editorObject.setTextinEditorWithoutSave(contents, className + ".java");
+        editorO.setTextinEditorWithoutSave(contents, className + ".java");
     }
 
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException {
-        String contents = stateObject.getContents(contentPath);
-        workbenchObject.activateEclipseShell();
-        packageExplorerVObject.openClass(projectName, packageName, className);
+        String contents = exStateO.getContents(contentPath);
+        exWorkbenchO.activateEclipseShell();
+        exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
-        editorObject.typeTextInEditor(contents, className + ".java");
+        editorO.typeTextInEditor(contents, className + ".java");
     }
 }

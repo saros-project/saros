@@ -12,33 +12,33 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
-public class WorkbenchObjectImp extends EclipseObject implements
-    WorkbenchObject {
+public class ExWorkbenchObjectImp extends EclipseObject implements
+    ExWorkbenchObject {
 
     // public static WorkbenchObjectImp classVariable;
 
-    private static transient WorkbenchObjectImp self;
+    private static transient ExWorkbenchObjectImp self;
 
     /**
-     * {@link WorkbenchObjectImp} is a singleton, but inheritance is possible.
+     * {@link ExWorkbenchObjectImp} is a singleton, but inheritance is possible.
      */
-    public static WorkbenchObjectImp getInstance() {
+    public static ExWorkbenchObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new WorkbenchObjectImp();
+        self = new ExWorkbenchObjectImp();
         return self;
     }
 
     public void openSarosViews() throws RemoteException {
-        rosterVObject.openRosterView();
-        sessonVObject.openSessionView();
-        chatVObject.openChatView();
-        remoteScreenVObject.openRemoteScreenView();
+        exRosterVO.openRosterView();
+        exSessonVO.openSessionView();
+        exChatVO.openChatView();
+        exRemoteScreenVO.openRemoteScreenView();
     }
 
     public void resetSaros() throws RemoteException {
-        rosterVObject.xmppDisconnect();
-        stateObject.deleteAllProjects();
+        exRosterVO.xmppDisconnect();
+        exStateO.deleteAllProjects();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -69,7 +69,7 @@ public class WorkbenchObjectImp extends EclipseObject implements
     }
 
     public void resetWorkbench() throws RemoteException {
-        exportedMenuObject.openPerspectiveJava();
+        exMainMenuO.openPerspectiveJava();
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();

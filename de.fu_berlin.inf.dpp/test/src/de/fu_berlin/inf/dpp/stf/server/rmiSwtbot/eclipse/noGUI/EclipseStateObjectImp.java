@@ -343,7 +343,7 @@ public class EclipseStateObjectImp extends EclipseObject implements
 
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
-        return helperObject.ConvertStreamToString(file.getContents());
+        return helperO.ConvertStreamToString(file.getContents());
     }
 
     /**

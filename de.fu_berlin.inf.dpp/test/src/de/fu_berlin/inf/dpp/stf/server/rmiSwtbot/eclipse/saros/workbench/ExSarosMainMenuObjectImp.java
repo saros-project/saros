@@ -5,28 +5,28 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseMainMenuObjectImp;
 
-public class SarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
-    SarosMainMenuObject {
+public class ExSarosMainMenuObjectImp extends EclipseMainMenuObjectImp implements
+    ExMainMenuObject {
     // public static SarosMainMenuObjectImp classVariable;
 
-    private static transient SarosMainMenuObjectImp self;
+    private static transient ExSarosMainMenuObjectImp self;
 
     /**
-     * {@link SarosMainMenuObjectImp} is a singleton, but inheritance is
+     * {@link ExSarosMainMenuObjectImp} is a singleton, but inheritance is
      * possible.
      */
-    public static SarosMainMenuObjectImp getInstance() {
+    public static ExSarosMainMenuObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new SarosMainMenuObjectImp();
+        self = new ExSarosMainMenuObjectImp();
         return self;
     }
 
     public void creatNewAccount(JID jid, String password)
         throws RemoteException {
-        workbenchObject.getEclipseShell().activate().setFocus();
-        menuObject.clickMenuWithTexts("Saros", "Create Account");
-        exportedWindowObject.confirmCreateNewUserAccountWindow(jid.getDomain(),
+        exWorkbenchO.getEclipseShell().activate().setFocus();
+        menuO.clickMenuWithTexts("Saros", "Create Account");
+        exWindowO.confirmCreateNewUserAccountWindow(jid.getDomain(),
             jid.getName(), password);
     }
 }

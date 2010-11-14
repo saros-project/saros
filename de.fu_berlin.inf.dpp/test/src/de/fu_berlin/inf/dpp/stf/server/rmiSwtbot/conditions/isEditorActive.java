@@ -1,19 +1,19 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorObject;
+
 public class isEditorActive extends DefaultCondition {
 
-    private SWTWorkbenchBot bot1;
-    private String name;
+    private EditorObject editor;
+    private String fileName;
 
-    isEditorActive(SWTWorkbenchBot bot, String name) {
-
-        this.name = name;
-        this.bot1 = bot;
+    isEditorActive(EditorObject editor, String fileName) {
+        this.fileName = fileName;
+        this.editor = editor;
     }
 
     public String getFailureMessage() {
@@ -22,11 +22,9 @@ public class isEditorActive extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-
         try {
-            SWTBotEditor editor = bot1.editorByTitle(name);
-            return editor.isActive();
-            // return true;
+            SWTBotEditor e = editor.getEditor(fileName);
+            return e.isActive();
         } catch (WidgetNotFoundException e) {
             return false;
         }

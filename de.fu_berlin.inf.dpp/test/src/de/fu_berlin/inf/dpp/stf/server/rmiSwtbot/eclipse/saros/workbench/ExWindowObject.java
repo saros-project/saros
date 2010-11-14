@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipsePopUpWindowObject;
 
-public interface SarosPopUpWindowObject extends EclipsePopUpWindowObject {
+public interface ExWindowObject extends EclipsePopUpWindowObject {
 
     public void confirmProblemOccurredWindow(String plainJID)
         throws RemoteException;

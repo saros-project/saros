@@ -27,34 +27,34 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.Toolb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreeObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RemoteScreenViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPopUpWindowObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.WorkbenchObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRemoteScreenViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRemoteScreenViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRosterViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExRosterViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExMainMenuObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSarosMainMenuObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWindowObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSarosPopUpWindowObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSessionViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExSessionViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkbenchObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkbenchObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExPackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObjectImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExProgressViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewObjectImp;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
- * exports {@link SarosStateObject} via RMI. You should not use this within
+ * exports {@link ExStateObject} via RMI. You should not use this within
  * tests. Have a look at {@link Musician} if you want to write tests.
  * 
  */
@@ -99,16 +99,16 @@ public class STFController {
     }
 
     private void initNoExportedObects() {
-        EclipseObject.tableObject = new TableObject();
-        EclipseObject.toolbarObject = new ToolbarObject();
-        EclipseObject.treeObject = new TreeObject();
-        EclipseObject.viewObject = new ViewObject();
-        EclipseObject.persObject = new PerspectiveObject();
-        EclipseObject.editorObject = new EditorObject();
-        EclipseObject.helperObject = new HelperObject();
-        EclipseObject.menuObject = new MenuObject();
-        EclipseObject.windowObject = new WindowObject();
-        EclipseObject.basicObject = new BasicObject();
+        EclipseObject.tableO = new TableObject();
+        EclipseObject.toolbarO = new ToolbarObject();
+        EclipseObject.treeO = new TreeObject();
+        EclipseObject.viewO = new ViewObject();
+        EclipseObject.perspectiveO = new PerspectiveObject();
+        EclipseObject.editorO = new EditorObject();
+        EclipseObject.helperO = new HelperObject();
+        EclipseObject.menuO = new MenuObject();
+        EclipseObject.windowO = new WindowObject();
+        EclipseObject.basicO = new BasicObject();
     }
 
     /*
@@ -127,40 +127,40 @@ public class STFController {
             registry = LocateRegistry.getRegistry(port);
         }
 
-        EclipseObject.exportedBasicObject = (EclipseBasicObject) exportObject(
+        EclipseObject.exBasicO = (ExBasicObject) exportObject(
             EclipseBasicObjectImp.getInstance(), "basicObject");
 
-        EclipseObject.packageExplorerVObject = (PackageExplorerViewObject) exportObject(
+        EclipseObject.exPackageExplorerVO = (ExPackageExplorerViewObject) exportObject(
             PackageExplorerViewObjectImp.getInstance(), "packageExplorerView");
 
-        EclipseObject.progressVObject = (ProgressViewObject) exportObject(
+        EclipseObject.exProgressVO = (ExProgressViewObject) exportObject(
             ProgressViewObjectImp.getInstance(), "progressView");
 
-        EclipseObject.exportedMenuObject = (SarosMainMenuObject) exportObject(
-            SarosMainMenuObjectImp.getInstance(), "sarosMainMenu");
+        EclipseObject.exMainMenuO = (ExMainMenuObject) exportObject(
+            ExSarosMainMenuObjectImp.getInstance(), "sarosMainMenu");
 
-        EclipseObject.exportedEditorObject = (EclipseEditorObject) exportObject(
+        EclipseObject.exEditorO = (ExEditorObject) exportObject(
             EclipseEditorObjectImp.getInstance(), "eclipseEditor");
 
-        EclipseObject.rosterVObject = (RosterViewObject) exportObject(
-            RosterViewObjectImp.getInstance(), "rosterView");
+        EclipseObject.exRosterVO = (ExRosterViewObject) exportObject(
+            ExRosterViewObjectImp.getInstance(), "rosterView");
 
-        EclipseObject.exportedWindowObject = (SarosPopUpWindowObject) exportObject(
-            SarosPopUpWindowObjectImp.getInstance(), "popUpWindow");
+        EclipseObject.exWindowO = (ExWindowObject) exportObject(
+            ExSarosPopUpWindowObjectImp.getInstance(), "popUpWindow");
 
-        EclipseObject.sessonVObject = (SessionViewObject) exportObject(
-            SessionViewObjectImp.getInstance(), "sessionView");
+        EclipseObject.exSessonVO = (ExSessionViewObject) exportObject(
+            ExSessionViewObjectImp.getInstance(), "sessionView");
 
-        EclipseObject.remoteScreenVObject = (RemoteScreenViewObject) exportObject(
-            RemoteScreenViewObjectImp.getInstance(), "remoteScreenView");
+        EclipseObject.exRemoteScreenVO = (ExRemoteScreenViewObject) exportObject(
+            ExRemoteScreenViewObjectImp.getInstance(), "remoteScreenView");
 
-        EclipseObject.chatVObject = (ChatViewObject) exportObject(
-            ChatViewObjectImp.getInstance(), "chatView");
+        EclipseObject.exChatVO = (ExChatViewObject) exportObject(
+            ExChatViewObjectImp.getInstance(), "chatView");
 
-        EclipseObject.workbenchObject = (WorkbenchObject) exportObject(
-            WorkbenchObjectImp.getInstance(), "workbench");
+        EclipseObject.exWorkbenchO = (ExWorkbenchObject) exportObject(
+            ExWorkbenchObjectImp.getInstance(), "workbench");
 
-        EclipseObject.stateObject = (SarosStateObject) exportObject(
+        EclipseObject.exStateO = (ExStateObject) exportObject(
             SarosStateObjectImp.getInstance(saros, sessionManager,
                 dataTransferManager, editorManager), "state");
     }

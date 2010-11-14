@@ -14,38 +14,44 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateObjectImp;
 import de.fu_berlin.inf.dpp.ui.RosterView;
 
-public class RosterViewObjectImp extends EclipseObject implements
-    RosterViewObject {
+/**
+ * This implementation of {@link ExRosterViewObject}
+ * 
+ * @author Lin
+ */
+public class ExRosterViewObjectImp extends EclipseObject implements
+    ExRosterViewObject {
 
     // public static RosterViewObjectImp classVariable;
 
-    private static transient RosterViewObjectImp self;
+    private static transient ExRosterViewObjectImp self;
 
     /**
-     * {@link RosterViewObjectImp} is a singleton, but inheritance is possible.
+     * {@link ExRosterViewObjectImp} is a singleton, but inheritance is
+     * possible.
      */
-    public static RosterViewObjectImp getInstance() {
+    public static ExRosterViewObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new RosterViewObjectImp();
+        self = new ExRosterViewObjectImp();
         return self;
     }
 
     public void openRosterView() throws RemoteException {
         if (!isRosterViewOpen())
-            viewObject.openViewById(SarosConstant.ID_ROSTER_VIEW);
+            viewO.openViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
-        return viewObject.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
+        return viewO.isViewOpen(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        viewObject.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
+        viewO.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_ROSTER);
     }
 
     public void closeRosterView() throws RemoteException {
-        viewObject.closeViewById(SarosConstant.ID_ROSTER_VIEW);
+        viewO.closeViewById(SarosConstant.ID_ROSTER_VIEW);
     }
 
     public void xmppDisconnect() throws RemoteException {
@@ -57,22 +63,21 @@ public class RosterViewObjectImp extends EclipseObject implements
     }
 
     public SWTBotTreeItem selectBuddy(String contact) throws RemoteException {
-        return viewObject.selectTreeWithLabelsInView(
+        return viewO.selectTreeWithLabelsInView(
             SarosConstant.VIEW_TITLE_ROSTER, "Buddies", contact);
     }
 
     public boolean isBuddyExist(String contact) throws RemoteException {
-        SWTBotTree tree = viewObject
-            .getTreeInView(SarosConstant.VIEW_TITLE_ROSTER);
-        return treeObject.isTreeItemWithMatchTextExist(tree,
-            SarosConstant.BUDDIES, contact + ".*");
+        SWTBotTree tree = viewO.getTreeInView(SarosConstant.VIEW_TITLE_ROSTER);
+        return treeO.isTreeItemWithMatchTextExist(tree, SarosConstant.BUDDIES,
+            contact + ".*");
     }
 
     public boolean isConnectedByXmppGuiCheck() throws RemoteException {
         try {
             openRosterView();
             setFocusOnRosterView();
-            SWTBotToolbarButton toolbarButton = viewObject
+            SWTBotToolbarButton toolbarButton = viewO
                 .getToolbarButtonWithTooltipInView(
                     SarosConstant.VIEW_TITLE_ROSTER,
                     SarosConstant.TOOL_TIP_TEXT_DISCONNECT);
@@ -87,13 +92,13 @@ public class RosterViewObjectImp extends EclipseObject implements
      * {@link RosterView} having the connected state.
      */
     public boolean isConnectedByXMPP() throws RemoteException {
-        return stateObject.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
+        return exStateO.isConnectedByXMPP() && isConnectedByXmppGuiCheck();
     }
 
     public void clickTBAddANewContactInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        viewObject.clickToolbarButtonWithTooltipInView(
+        viewO.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_ADD_A_NEW_CONTACT);
     }
@@ -104,7 +109,7 @@ public class RosterViewObjectImp extends EclipseObject implements
     public void clickTBConnectInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        viewObject.clickToolbarButtonWithTooltipInView(
+        viewO.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_CONNECT);
     }
@@ -115,7 +120,7 @@ public class RosterViewObjectImp extends EclipseObject implements
     public boolean clickTBDisconnectInRosterView() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();
-        return viewObject.clickToolbarButtonWithTooltipInView(
+        return viewO.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_ROSTER,
             SarosConstant.TOOL_TIP_TEXT_DISCONNECT) != null;
     }
@@ -133,18 +138,17 @@ public class RosterViewObjectImp extends EclipseObject implements
             openRosterView();
             setFocusOnRosterView();
             clickTBAddANewContactInRosterView();
-            windowObject
-                .waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
+            windowO.waitUntilShellActive(SarosConstant.SHELL_TITLE_NEW_CONTACT);
             // activateShellWithText(SarosConstant.SHELL_TITLE_NEW_CONTACT);
             bot.textWithLabel(SarosConstant.TEXT_LABEL_JABBER_ID).setText(
                 jid.getBase());
-            basicObject.waitUntilButtonEnabled(SarosConstant.BUTTON_FINISH);
+            basicO.waitUntilButtonIsEnabled(SarosConstant.BUTTON_FINISH);
             bot.button(SarosConstant.BUTTON_FINISH).click();
         }
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return stateObject.hasContactWith(jid) && isBuddyExist(jid.getBase());
+        return exStateO.hasContactWith(jid) && isBuddyExist(jid.getBase());
     }
 
     /**
@@ -154,14 +158,12 @@ public class RosterViewObjectImp extends EclipseObject implements
         if (!hasContactWith(jid))
             return;
         try {
-            viewObject.clickContextMenuOfTreeInView(
-                SarosConstant.VIEW_TITLE_ROSTER,
+            viewO.clickContextMenuOfTreeInView(SarosConstant.VIEW_TITLE_ROSTER,
                 SarosConstant.CONTEXT_MENU_DELETE, SarosConstant.BUDDIES,
                 jid.getBase());
-            windowObject
+            windowO
                 .waitUntilShellActive(SarosConstant.SHELL_TITLE_CONFIRM_DELETE);
-            exportedWindowObject.confirmWindow(
-                SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
+            exWindowO.confirmWindow(SarosConstant.SHELL_TITLE_CONFIRM_DELETE,
                 SarosConstant.BUTTON_YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + jid.getBase(), e);
@@ -172,10 +174,10 @@ public class RosterViewObjectImp extends EclipseObject implements
         throws RemoteException {
         SWTBotTree tree = bot.viewByTitle(SarosConstant.VIEW_TITLE_ROSTER)
             .bot().tree();
-        SWTBotTreeItem item = treeObject.getTreeItemWithMatchText(tree,
+        SWTBotTreeItem item = treeO.getTreeItemWithMatchText(tree,
             SarosConstant.BUDDIES + ".*", contact + ".*");
         item.contextMenu("Rename...").click();
-        windowObject.waitUntilShellActive("Set new nickname");
+        windowO.waitUntilShellActive("Set new nickname");
         bot.text(contact).setText(newName);
         bot.button(SarosConstant.BUTTON_OK).click();
     }
@@ -190,12 +192,12 @@ public class RosterViewObjectImp extends EclipseObject implements
                            // pops
             // up
             log.trace("isShellActive");
-            boolean shellActive = exportedWindowObject
+            boolean shellActive = exWindowO
                 .isShellActive(SarosConstant.SAROS_CONFI_SHELL_TITLE);
             if (shellActive) {
                 log.trace("confirmSarosConfigurationWindow");
-                exportedWindowObject.confirmSarosConfigurationWizard(
-                    jid.getDomain(), jid.getName(), password);
+                exWindowO.confirmSarosConfigurationWizard(jid.getDomain(),
+                    jid.getName(), password);
             }
             waitUntilConnected();
         }

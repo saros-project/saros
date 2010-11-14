@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
 
 public class IsEditorOpen extends DefaultCondition {
 
-    private EclipseEditorObject editor;
+    private ExEditorObject editor;
     private String name;
 
-    IsEditorOpen(EclipseEditorObject editor, String name) {
+    IsEditorOpen(ExEditorObject editor, String name) {
         this.name = name;
         this.editor = editor;
     }

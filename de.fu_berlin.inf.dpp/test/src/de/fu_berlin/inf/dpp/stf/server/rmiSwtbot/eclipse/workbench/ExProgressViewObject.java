@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ProgressViewObject extends Remote {
+public interface ExProgressViewObject extends Remote {
 
     public void openProgressView() throws RemoteException;
 

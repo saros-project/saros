@@ -152,4 +152,31 @@ public class TreeObject extends EclipseObject {
         String nodeName) {
         waitUntil(SarosConditions.existTreeItem(treeItem, nodeName));
     }
+
+    // /**
+    // * This method is very useful, if you want to click a submenu of the
+    // context
+    // * menu of a selected treeitem.e.g. the context menu "Team->Commit...".
+    // You
+    // * should first select the project that his context menu you want to
+    // click.
+    // *
+    // * @param nodes
+    // * node path to expand. Attempts to expand all nodes along the
+    // * path specified by the node array parameter.e.g.{"Foo-saros",
+    // * "my.pkg", "myClass.java"}
+    // * @param contexts
+    // * all context menus'name.e.g. {"Team", "Commit..."}
+    // */
+    // public void clickContextMenusOfTreeItem(String[] nodes, String...
+    // contexts) {
+    // try {
+    // SWTBotTree tree = bot.tree();
+    // SWTBotTreeItem treeItem = getTreeItemWithMatchText(tree, nodes);
+    // treeItem.select();
+    // ContextMenuHelper.clickContextMenu(tree, contexts);
+    // } catch (WidgetNotFoundException e) {
+    // log.error("context menu can't be found.", e);
+    // }
+    // }
 }

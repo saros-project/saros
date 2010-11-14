@@ -11,6 +11,12 @@ import java.util.Arrays;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
+/**
+ * This class contains the logic functions without GUI, which is only used by
+ * rmi server side and not exported.
+ * 
+ * @author lchen
+ */
 public class HelperObject extends EclipseObject {
 
     public String[] changeToRegex(String... texts) {

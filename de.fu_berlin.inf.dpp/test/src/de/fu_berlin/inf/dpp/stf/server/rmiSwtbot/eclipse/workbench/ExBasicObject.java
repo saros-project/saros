@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface EclipseBasicObject extends Remote {
+public interface ExBasicObject extends Remote {
 
     public void sleep(long millis) throws RemoteException;
 

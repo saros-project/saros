@@ -28,71 +28,63 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkbenchObjectImp;
 
 /**
- * Screen object that represents the operations that can be performed on a view.
+ * This class contains basic API to find widgets based on a view in SWTBot and
+ * to perform the operations on it, which is only used by rmi server side and
+ * not exported.
  * 
- * @author Lin
+ * @author lchen
  */
 public class ViewObject extends EclipseObject {
 
     /**
-     * Creates an instance of a viewObject.<br/>
-     * ViewObject should be instanced in {@link EclipseControler}.
-     * 
-     * @param rmiBot
-     *            delegates to {@link SWTWorkbenchBot} to implement an java.rmi
-     *            interface for {@link SWTWorkbenchBot}. Using it
-     *            {@link ViewObject} can access other screen objects.
-     */
-
-    /**
-     * set focus on the specified view. It should be only called if View is
+     * Set focus on the specified view. It should be only called if View is
      * open.
      * 
      * @param title
-     *            the view title.
+     *            the title on the view tab.
      * @see SWTBotView#setFocus()
      */
     public void setFocusOnViewByTitle(String title) {
         try {
             bot.viewByTitle(title).setFocus();
         } catch (WidgetNotFoundException e) {
-            log.warn("Widget not found '" + title + "'", e);
+            log.warn("view not found '" + title + "'", e);
         }
     }
 
     /**
-     * test, if the specified view is active.
-     * 
      * @param title
-     *            the view title
-     * @return <tt>true</tt> if here is a active view with the same title.
+     *            the title on the view tab.
+     * @return <tt>true</tt> if the specified view is active.
      */
     public boolean isViewActive(String title) {
         if (!isViewOpen(title))
             return false;
-        return bot.activeView().getTitle().equals(title);
+        try {
+            return bot.activeView().getTitle().equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
     }
 
     /**
-     * test, if the specified view is open.
-     * 
      * @param title
-     *            the view title.
-     * @return <tt>true</tt> if all the opened views contains the specified view
-     *         with the title.
-     * @see ViewObject#getViewTitles()
+     *            the title on the view tab.
+     * @return <tt>true</tt> if the specified view is open.
+     * @see ViewObject#getTitlesOfAllOpenedViews()
      */
     public boolean isViewOpen(String title) {
-        return getViewTitles().contains(title);
+        return getTitlesOfAllOpenedViews().contains(title);
     }
 
     /**
-     * @return the name list of the views which are opened currently.
+     * @return all titles of the views which are opened currently.
      * @see SWTWorkbenchBot#views()
      */
-    public List<String> getViewTitles() {
+    public List<String> getTitlesOfAllOpenedViews() {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotView view : bot.views())
             list.add(view.getTitle());
@@ -101,33 +93,34 @@ public class ViewObject extends EclipseObject {
 
     /**
      * Open a view using menus Window->Show View->Other... The method is defined
-     * as helper method for other showView* methods in {@link EclipseControler}
-     * and should not be exported by rmi. <br/>
+     * as helper method and should not be exported by rmi. <br/>
      * Operational steps:
      * <ol>
-     * <li>if the view already exist, return.</li>
-     * <li>activate the saros-instance-window(alice / bob / carl). If the
-     * workbench isn't active, delegate can't find the main menus.</li>
-     * <li>click main menus Window -> Show View -> Other....</li>
-     * <li>confirm the pop-up window "Show View".</li>
+     * <li>If the view is already open, return.</li>
+     * <li>Activate the saros-instance workbench(alice / bob / carl). If the
+     * workbench isn't active, bot can't find the main menus.</li>
+     * <li>Click main menus Window -> Show View -> Other....</li>
+     * <li>Confirm the pop-up window "Show View".</li>
      * </ol>
      * 
+     * @param title
+     *            the title on the view tab.
      * @param category
      *            example: "General"
      * @param nodeName
      *            example: "Console"
-     * @see EclipseControler#activateEclipseShell()
+     * @see ExWorkbenchObjectImp#activateEclipseShell()
      * @see MenuObject#clickMenuWithTexts(String...)
      * 
      */
-    public void openViewWithName(String viewTitle, String category,
-        String nodeName) throws RemoteException {
-        if (!isViewOpen(viewTitle)) {
-            workbenchObject.activateEclipseShell();
-            menuObject.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
+    public void openViewWithName(String title, String category, String nodeName)
+        throws RemoteException {
+        if (!isViewOpen(title)) {
+            exWorkbenchO.activateEclipseShell();
+            menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            exportedWindowObject.confirmWindowWithTreeWithFilterText(
+            exWindowO.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }
@@ -136,7 +129,7 @@ public class ViewObject extends EclipseObject {
     /**
      * 
      * @param viewName
-     *            the view title
+     *            the title on the view tab.
      * @return a {@link SWTBotTree} with the specified <code>none</code> in
      *         specified view.
      */
@@ -146,26 +139,27 @@ public class ViewObject extends EclipseObject {
 
     /**
      * 
-     * @param viewName
-     *            the view title
+     * @param title
+     *            the title on the view tab.
      * @return {@link SWTBotTable} with the specified <code>none</code> in
      *         specified view.
      */
-    public SWTBotTable getTableInView(String viewName) {
-        return bot.viewByTitle(viewName).bot().table();
+    public SWTBotTable getTableInView(String title) {
+        return bot.viewByTitle(title).bot().table();
     }
 
     /**
-     * @param viewName
-     * @param buttonTooltip
-     * @return the toolbar_button, whose name is matched with one of the
-     *         currently visible toolbar_buttons.
+     * @param title
+     *            the title on the view tab.
+     * @param tooltipText
+     *            the tooltip text of the button.
+     * @return the toolbar_button with the specified tooltipText.
      */
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
-        String viewName, String buttonTooltip) {
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
+    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String title,
+        String tooltipText) {
+        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(title)
             .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
+            if (toolbarButton.getToolTipText().matches(tooltipText)) {
                 return toolbarButton;
             }
         }
@@ -176,8 +170,9 @@ public class ViewObject extends EclipseObject {
      * close the specified view
      * 
      * @param title
+     *            the title on the view tab.
      */
-    public void closeViewWithText(String title) {
+    public void closeViewByTitle(String title) {
         if (isViewOpen(title)) {
             bot.viewByTitle(title).close();
         }
@@ -226,7 +221,7 @@ public class ViewObject extends EclipseObject {
         String label) {
         try {
             SWTBotTable table = getTableInView(viewName);
-            return tableObject.selectTableItemWithLabel(table, label).select();
+            return tableO.selectTableItemWithLabel(table, label).select();
         } catch (WidgetNotFoundException e) {
             log.warn(" table item " + label + " on View " + viewName
                 + " not found.", e);
@@ -252,7 +247,7 @@ public class ViewObject extends EclipseObject {
         String[] nodes, String... contexts) {
         try {
             SWTBotTree tree = getTreeInView(viewTitle);
-            SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
+            SWTBotTreeItem treeItem = treeO.getTreeItemWithMatchText(tree,
                 nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
@@ -268,7 +263,7 @@ public class ViewObject extends EclipseObject {
      * 
      */
     public boolean isTableItemInViewExist(String viewName, String itemName) {
-        return tableObject.existTableItem(itemName);
+        return tableO.existTableItem(itemName);
     }
 
     /**
@@ -336,7 +331,7 @@ public class ViewObject extends EclipseObject {
             SWTBotTree tree = getTreeInView(viewTitle);
             // you should first select the project,whose context you want to
             // click.
-            SWTBotTreeItem treeItem = treeObject.getTreeItemWithMatchText(tree,
+            SWTBotTreeItem treeItem = treeO.getTreeItemWithMatchText(tree,
                 nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
@@ -440,12 +435,12 @@ public class ViewObject extends EclipseObject {
 
     public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
         String... labels) {
-        return treeObject.selectTreeWithLabels(getTreeInView(viewName), labels);
+        return treeO.selectTreeWithLabels(getTreeInView(viewName), labels);
     }
 
     public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
         String viewName, String... labels) {
-        return treeObject.selectTreeWithLabelsWithWaitungExpand(
+        return treeO.selectTreeWithLabelsWithWaitungExpand(
             getTreeInView(viewName), labels);
     }
 

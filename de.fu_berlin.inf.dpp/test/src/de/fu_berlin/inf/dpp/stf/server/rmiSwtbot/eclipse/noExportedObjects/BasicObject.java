@@ -4,13 +4,32 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
+/**
+ * This class contains basic API to find widgets based on the workbench in
+ * SWTBot and to perform the operations on it, which is only used by rmi server
+ * side and not exported.
+ * 
+ * @author lchen
+ */
 public class BasicObject extends EclipseObject {
 
-    public void waitUntilButtonEnabled(String mnemonicText) {
+    /**
+     * Waits until the button is enabled.
+     * 
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     */
+    public void waitUntilButtonIsEnabled(String mnemonicText) {
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
     }
 
-    public void waitUnitButtonWithTooltipTextEnabled(String tooltipText) {
+    /**
+     * Waits until the button is enabled.
+     * 
+     * @param tooltipText
+     *            the tooltip on the widget.
+     */
+    public void waitUnitButtonWithTooltipIsEnabled(String tooltipText) {
         waitUntil(Conditions
             .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
     }
