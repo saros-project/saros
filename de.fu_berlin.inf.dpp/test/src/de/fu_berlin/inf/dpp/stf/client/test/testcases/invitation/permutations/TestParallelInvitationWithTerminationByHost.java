@@ -130,26 +130,26 @@ public class TestParallelInvitationWithTerminationByHost {
 
         alice.packageExplorerV.shareProject(PROJECT, peersName);
 
-        bob.popupWindow.waitUntilShellActive("Session Invitation");
+        bob.packageExplorerV.waitUntilWIndowSessionInvitationActive();
         alice.progressV.cancelInvitation(0);
-        bob.popupWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(bob.popupWindow.isShellActive("Invitation Cancelled"));
-        bob.popupWindow.closeShell("Invitation Cancelled");
+        bob.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(bob.packageExplorerV.isWindowInvitationCancelledActive());
+        bob.packageExplorerV.closeWindowInvitaitonCancelled();
 
-        carl.popupWindow.waitUntilShellActive("Session Invitation");
-        carl.popupWindow.confirmSessionInvitationWindowStep1();
+        carl.packageExplorerV.waitUntilWIndowSessionInvitationActive();
+        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
         alice.progressV.cancelInvitation(0);
-        carl.popupWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(carl.popupWindow.isShellActive("Invitation Cancelled"));
-        carl.popupWindow.closeShell("Invitation Cancelled");
+        carl.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(carl.packageExplorerV.isWindowInvitationCancelledActive());
+        carl.packageExplorerV.closeWindowInvitaitonCancelled();
 
-        dave.popupWindow.waitUntilShellActive("Session Invitation");
-        dave.popupWindow.confirmSessionInvitationWindowStep1();
+        dave.packageExplorerV.waitUntilWIndowSessionInvitationActive();
+        dave.packageExplorerV.confirmSessionInvitationWindowStep1();
         dave.basic.clickButton(SarosConstant.BUTTON_FINISH);
         alice.progressV.cancelInvitation(0);
-        dave.popupWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(dave.popupWindow.isShellActive("Invitation Cancelled"));
-        dave.popupWindow.closeShell("Invitation Cancelled");
+        dave.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(dave.packageExplorerV.isWindowInvitationCancelledActive());
+        dave.packageExplorerV.closeWindowInvitaitonCancelled();
 
     }
 }

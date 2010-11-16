@@ -81,7 +81,7 @@ public class Musician {
         log.trace("openSarosViews");
         workbench.openSarosViews();
         log.trace("xmppConnect");
-        rosterV.xmppConnect(jid, password);
+        rosterV.connect(jid, password);
         log.trace("initBot leave");
     }
 
@@ -129,10 +129,10 @@ public class Musician {
         }
         packageExplorerV.clickShareProjectWith(projectName, shareProjectWith);
 
-        popupWindow.confirmInvitationWindow(inviteeJIDs);
+        packageExplorerV.confirmInvitationWindow(inviteeJIDs);
         for (Musician invitee : invitees) {
-            invitee.popupWindow.confirmSessionUsingNewOrExistProject(this.jid,
-                projectName, invitee.typeOfSharingProject);
+            invitee.packageExplorerV.confirmSessionUsingNewOrExistProject(
+                this.jid, projectName, invitee.typeOfSharingProject);
         }
     }
 
@@ -155,7 +155,7 @@ public class Musician {
             final Musician musician = peers.get(i);
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.popupWindow.confirmSessionInvitationWizard(
+                    musician.packageExplorerV.confirmSessionInvitationWizard(
                         getBaseJid(), BotConfiguration.PROJECTNAME);
                     return null;
                 }
@@ -188,12 +188,7 @@ public class Musician {
             closeSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.popupWindow
-                        .waitUntilShellActive("Closing the Session");
-                    musician.popupWindow.confirmWindow("Closing the Session",
-                        SarosConstant.BUTTON_OK);
-                    musician.popupWindow
-                        .waitUntilShellCloses("Closing the Session");
+                    musician.sessionV.confirmClosingTheSessionWindow();
                     return null;
                 }
             });
@@ -313,9 +308,9 @@ public class Musician {
 
     public void addContactDone(Musician peer) throws RemoteException {
         if (!rosterV.hasContactWith(peer.jid)) {
-            rosterV.addContact(peer.jid);
-            peer.popupWindow.confirmRequestOfSubscriptionReceivedWindow();
-            popupWindow.confirmRequestOfSubscriptionReceivedWindow();
+            rosterV.addANewContact(peer.jid);
+            peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
+            rosterV.confirmRequestOfSubscriptionReceivedWindow();
         }
     }
 
@@ -326,12 +321,7 @@ public class Musician {
         if (!rosterV.hasContactWith(peer.jid))
             return;
         rosterV.deleteContact(peer.jid);
-
-        peer.popupWindow
-            .waitUntilShellActive(SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION);
-        peer.popupWindow.confirmWindow(
-            SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION,
-            SarosConstant.BUTTON_OK);
+        peer.rosterV.confirmRemovelOfSubscriptionWindow();
     }
 
     public void shareYourScreenWithSelectedUserDone(Musician peer)

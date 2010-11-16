@@ -1,16 +1,18 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
+import java.util.List;
+
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-
 public class IsConnect extends DefaultCondition {
 
-    private SarosSWTBot bot;
+    private List<SWTBotToolbarButton> buttons;
+    private String tooltipText;
 
-    IsConnect(SarosSWTBot bot) {
-        this.bot = bot;
+    IsConnect(List<SWTBotToolbarButton> buttons, String tooltipText) {
+        this.buttons = buttons;
+        this.tooltipText = tooltipText;
     }
 
     public String getFailureMessage() {
@@ -19,17 +21,11 @@ public class IsConnect extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        // if (state.isConnectedByXMPP())
-        // return true;
-        // else
-        // return false;
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle("Roster")
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches("Disconnect.*")) {
+        for (SWTBotToolbarButton toolbarButton : buttons) {
+            if (toolbarButton.getToolTipText().matches(tooltipText + ".*")) {
                 return true;
             }
         }
-
         return false;
     }
 }

@@ -43,17 +43,17 @@ public class EclipseMainMenuObjectImp extends EclipseObject implements
         tree.expandNode("General").select("Workspace");
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            exWindowO.closeShell("Preferences");
+            windowO.closeShell("Preferences");
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            exWindowO.closeShell("Preferences");
+            windowO.closeShell("Preferences");
             return itemName;
         }
-        exWindowO.closeShell("Preferences");
+        windowO.closeShell("Preferences");
         return "";
     }
 
@@ -222,8 +222,7 @@ public class EclipseMainMenuObjectImp extends EclipseObject implements
                 exWorkbenchO.activateEclipseShell();
                 menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                     SarosConstant.MENU_TITLE_NEW, "Package");
-                exWindowO
-                    .activateShellWithMatchText("New Java Package");
+                windowO.activateShellWithMatchText("New Java Package");
                 bot.textWithLabel("Source folder:").setText(
                     (projectName + "/src"));
                 bot.textWithLabel("Name:").setText(pkg);

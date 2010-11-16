@@ -92,18 +92,18 @@ public class TestParallelInvitationWithTerminationByHost {
     @Test
     public void testInvitationWithTerminationByHost() throws RemoteException {
         alice.packageExplorerV.shareProject(PROJECT, invitees);
-        carl.popupWindow.confirmSessionInvitationWindowStep1();
+        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
 
         alice.progressV.cancelInvitation();
-        bob.popupWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(bob.popupWindow.isShellActive("Invitation Cancelled"));
-        bob.popupWindow.confirmInvitationCancelledWindow();
+        bob.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(bob.packageExplorerV.isWindowInvitationCancelledActive());
+        bob.packageExplorerV.confirmInvitationCancelledWindow();
         alice.progressV.removeProgress();
 
         alice.progressV.cancelInvitation();
-        carl.popupWindow.waitUntilShellActive("Invitation Cancelled");
-        assertTrue(carl.popupWindow.isShellActive("Invitation Cancelled"));
-        carl.popupWindow.confirmInvitationCancelledWindow();
+        carl.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(carl.packageExplorerV.isWindowInvitationCancelledActive());
+        carl.packageExplorerV.confirmInvitationCancelledWindow();
         alice.progressV.removeProgress();
 
         assertFalse(bob.sessionV.isInSession());

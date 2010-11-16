@@ -22,7 +22,9 @@ public class ExSessionViewObjectImp extends EclipseObject implements
 
     private static transient ExSessionViewObjectImp self;
 
-    // View infos
+    /*
+     * View infos
+     */
     private final static String VIEWNAME = SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION;
     private final static String VIEWID = SarosConstant.ID_SESSION_VIEW;
 
@@ -35,6 +37,7 @@ public class ExSessionViewObjectImp extends EclipseObject implements
     private final static String INCOMINGSCREENSHARINGSESSION = "Incoming screensharing session";
     private final static String INVITATION = "Invitation";
     private final static String ERRORINSAROSPLUGIN = "Error in Saros-Plugin";
+    private final static String CLOSINGTHESESSION = "Closing the Session";
 
     /*
      * Tool tip text of toolbar buttons on the session view
@@ -280,7 +283,7 @@ public class ExSessionViewObjectImp extends EclipseObject implements
             stateOfselectedUser,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(STARTVOIPSESSION);
-        if (exWindowO.isShellActive(ERRORINSAROSPLUGIN)) {
+        if (windowO.isShellActive(ERRORINSAROSPLUGIN)) {
             confirmErrorInSarosPluginWindow();
         }
     }
@@ -288,7 +291,7 @@ public class ExSessionViewObjectImp extends EclipseObject implements
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(INCONSISTENCYDETECTED);
-        exWindowO.waitUntilShellCloses(PROGRESSINFORMATION);
+        windowO.waitUntilShellCloses(PROGRESSINFORMATION);
     }
 
     public void removeAllRriverRoles() throws RemoteException {
@@ -347,13 +350,13 @@ public class ExSessionViewObjectImp extends EclipseObject implements
     public void comfirmInvitationWindow(String jidOfinvitee)
         throws RemoteException {
         windowO.waitUntilShellActive(INVITATION);
-        exWindowO.confirmWindowWithCheckBox(INVITATION, FINISH, jidOfinvitee);
+        windowO.confirmWindowWithCheckBox(INVITATION, FINISH, jidOfinvitee);
     }
 
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         leaveTheSession();
-        exWindowO.confirmWindow(CONFIRMLEAVINGSESSION, YES);
+        windowO.confirmWindow(CONFIRMLEAVINGSESSION, YES);
         waitUntilSessionClosed();
     }
 
@@ -370,19 +373,25 @@ public class ExSessionViewObjectImp extends EclipseObject implements
         // }
         // }
         // });
-        if (exWindowO.isShellActive(CONFIRMCLOSINGSESSION))
-            exWindowO.confirmWindow(CONFIRMCLOSINGSESSION, YES);
+        if (windowO.isShellActive(CONFIRMCLOSINGSESSION))
+            windowO.confirmWindow(CONFIRMCLOSINGSESSION, YES);
         waitUntilSessionClosed();
     }
 
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException {
-        exWindowO.waitUntilShellActive(INCOMINGSCREENSHARINGSESSION);
-        exWindowO.confirmWindow(INCOMINGSCREENSHARINGSESSION, YES);
+        windowO.waitUntilShellActive(INCOMINGSCREENSHARINGSESSION);
+        windowO.confirmWindow(INCOMINGSCREENSHARINGSESSION, YES);
     }
 
     public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        exWindowO.confirmWindow(ERRORINSAROSPLUGIN, OK);
+        windowO.confirmWindow(ERRORINSAROSPLUGIN, OK);
+    }
+
+    public void confirmClosingTheSessionWindow() throws RemoteException {
+        windowO.waitUntilShellActive(CLOSINGTHESESSION);
+        windowO.confirmWindow(CLOSINGTHESESSION, OK);
+        windowO.waitUntilShellCloses(CLOSINGTHESESSION);
     }
 
     /**************************************************************
@@ -422,8 +431,7 @@ public class ExSessionViewObjectImp extends EclipseObject implements
     }
 
     private boolean isToolbarButtonEnabled(String tooltip) {
-        return viewO.isToolbarInViewEnabled(
-            SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION, tooltip);
+        return viewO.isToolbarInViewEnabled(VIEWNAME, tooltip);
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText) {
@@ -461,4 +469,5 @@ public class ExSessionViewObjectImp extends EclipseObject implements
                 jidOfSelectedUser.getBase());
         }
     }
+
 }

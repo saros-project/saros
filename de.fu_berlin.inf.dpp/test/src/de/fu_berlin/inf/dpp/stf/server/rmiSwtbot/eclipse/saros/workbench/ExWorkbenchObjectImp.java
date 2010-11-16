@@ -37,7 +37,7 @@ public class ExWorkbenchObjectImp extends EclipseObject implements
     }
 
     public void resetSaros() throws RemoteException {
-        exRosterVO.xmppDisconnect();
+        exRosterVO.disconnect();
         exStateO.deleteAllProjects();
     }
 

@@ -133,13 +133,8 @@ public class TestDriverResetsFiles {
             CLS);
 
         alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
-        dave.popupWindow.waitUntilShellActive("Save Resource");
-        dave.popupWindow
-            .confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
-
-        edna.popupWindow.waitUntilShellActive("Save Resource");
-        edna.popupWindow
-            .confirmWindow("Save Resource", SarosConstant.BUTTON_NO);
+        dave.eclipseEditor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
+        edna.eclipseEditor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
 
         String contentOfAlice = alice.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("alice's class content" + contentOfAlice);
@@ -153,5 +148,4 @@ public class TestDriverResetsFiles {
         assertTrue(contentOfAlice.equals(contentOfEdna));
         assertTrue(contentOfAlice.equals(contentOfBob));
     }
-
 }

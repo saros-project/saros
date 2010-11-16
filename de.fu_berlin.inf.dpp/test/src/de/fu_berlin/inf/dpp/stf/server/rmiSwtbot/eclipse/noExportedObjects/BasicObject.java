@@ -34,4 +34,11 @@ public class BasicObject extends EclipseObject {
             .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
     }
 
+    public void setTextInTextWithLabel(String text, String label) {
+        bot.textWithLabel(label).setText(text);
+    }
+
+    public void clickButton(String mnemonicText) {
+        bot.button(mnemonicText).click();
+    }
 }

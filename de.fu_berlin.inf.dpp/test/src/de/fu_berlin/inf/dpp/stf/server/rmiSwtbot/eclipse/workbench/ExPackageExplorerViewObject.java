@@ -4,6 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 public interface ExPackageExplorerViewObject extends Remote {
 
     public void closePackageExplorerView() throws RemoteException;
@@ -72,4 +74,54 @@ public interface ExPackageExplorerViewObject extends Remote {
 
     public void shareProject(String projectName, List<String> inviteeJIDS)
         throws RemoteException;
+
+    public boolean isWindowInvitationCancelledActive() throws RemoteException;
+
+    public void closeWindowInvitaitonCancelled() throws RemoteException;
+
+    public void waitUntilIsWindowInvitationCnacelledActive()
+        throws RemoteException;
+
+    public boolean isWIndowSessionInvitationActive() throws RemoteException;
+
+    public void closeWIndowSessionInvitation() throws RemoteException;
+
+    public void waitUntilWIndowSessionInvitationActive() throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep1() throws RemoteException;
+
+    public void confirmSessionUsingNewOrExistProject(JID inviterJID,
+        String projectName, int typeOfSharingProject) throws RemoteException;
+
+    public void cancelInivtationInSessionInvitationWindow()
+        throws RemoteException;
+
+    public void confirmInvitationCancelledWindow() throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
+        String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
+        String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep2UsingExistProject(
+        String projectName) throws RemoteException;
+
+    public void confirmSessionInvitationWindowStep2UsingNewproject(
+        String projectName) throws RemoteException;
+
+    public void confirmInvitationWindow(String... invitees)
+        throws RemoteException;
+
+    public void confirmSessionInvitationWizard(String inviter,
+        String projectname) throws RemoteException;
+
+    public void waitUntilIsWindowProblemOccurredActive() throws RemoteException;
+
+    public void waitUntilSarosRunningVCSOperationClosed()
+        throws RemoteException;
+
+    public String getSecondLabelOfProblemOccurredWindow()
+        throws RemoteException;
+
 }

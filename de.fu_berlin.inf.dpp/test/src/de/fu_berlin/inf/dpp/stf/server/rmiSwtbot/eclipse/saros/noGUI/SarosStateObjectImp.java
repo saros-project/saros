@@ -144,7 +144,7 @@ public class SarosStateObjectImp extends EclipseStateObjectImp implements
         return roster.contains(jidBase);
     }
 
-    public boolean isConnectedByXMPP() {
+    public boolean isConnected() {
         return saros.isConnected();
     }
 

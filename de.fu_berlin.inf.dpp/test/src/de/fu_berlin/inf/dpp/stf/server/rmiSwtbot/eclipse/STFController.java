@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkb
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExBasicObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseBasicObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EclipseEditorObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExPackageExplorerViewObject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PackageExplorerViewObjectImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExProgressViewObject;
@@ -140,7 +140,7 @@ public class STFController {
             ExSarosMainMenuObjectImp.getInstance(), "sarosMainMenu");
 
         EclipseObject.exEditorO = (ExEditorObject) exportObject(
-            EclipseEditorObjectImp.getInstance(), "eclipseEditor");
+            ExEditorObjectImp.getInstance(), "eclipseEditor");
 
         EclipseObject.exRosterVO = (ExRosterViewObject) exportObject(
             ExRosterViewObjectImp.getInstance(), "rosterView");

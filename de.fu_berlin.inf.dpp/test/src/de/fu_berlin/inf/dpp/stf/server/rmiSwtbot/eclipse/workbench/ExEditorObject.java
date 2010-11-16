@@ -115,4 +115,7 @@ public interface ExEditorObject extends Remote {
 
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException;
+
+    public void confirmSaveSourceWindow(String buttonType)
+        throws RemoteException;
 }

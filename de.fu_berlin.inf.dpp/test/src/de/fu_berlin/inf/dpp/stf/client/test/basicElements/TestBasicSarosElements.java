@@ -31,7 +31,7 @@ public class TestBasicSarosElements {
     @After
     public void cleanUp() throws RemoteException {
         alice.workbench.resetWorkbench();
-        alice.rosterV.xmppDisconnect();
+        alice.rosterV.disconnect();
     }
 
     @Test
@@ -73,19 +73,19 @@ public class TestBasicSarosElements {
     @Test
     public void testXmppConnect() throws RemoteException {
         log.trace("xmppConnect");
-        alice.rosterV.xmppConnect(alice.jid, alice.password);
+        alice.rosterV.connect(alice.jid, alice.password);
         log.trace("captureScreenshot");
         alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.rosterV.isConnectedByXMPP());
+        assertEquals(true, alice.rosterV.isConnected());
     }
 
     @Test
     public void testXmppDisconnect() throws RemoteException {
-        alice.rosterV.xmppConnect(alice.jid, alice.password);
-        alice.rosterV.xmppDisconnect();
+        alice.rosterV.connect(alice.jid, alice.password);
+        alice.rosterV.disconnect();
         alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.rosterV.isConnectedByXMPP());
+        assertEquals(false, alice.rosterV.isConnected());
     }
 }

@@ -104,14 +104,14 @@ public class TestEditDuringInvitation {
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        carl.popupWindow.confirmSessionInvitationWindowStep1();
+        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
 
         log.trace("bob.setTextInJavaEditor");
         bob.eclipseEditor.setTextInJavaEditorWithSave(
             BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.popupWindow
+        carl.packageExplorerV
             .confirmSessionInvitationWindowStep2UsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");

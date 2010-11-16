@@ -81,7 +81,7 @@ public class TestSVN {
     public void testSwitch() throws RemoteException {
 
         alice.packageExplorerV.switchToTag();
-        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
 
@@ -123,7 +123,7 @@ public class TestSVN {
     @Test
     public void testUpdate() throws RemoteException {
         alice.packageExplorerV.switchToOtherRevision();
-        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
     }
@@ -143,7 +143,7 @@ public class TestSVN {
     @Test
     public void testUpdateSingleFile() throws RemoteException {
         alice.packageExplorerV.switchToOtherRevision(CLS_PATH);
-        bob.popupWindow.waitUntilShellCloses("Saros running VCS operation");
+        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
     }

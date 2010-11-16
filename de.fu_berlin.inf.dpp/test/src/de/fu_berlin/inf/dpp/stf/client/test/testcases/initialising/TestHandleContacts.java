@@ -84,21 +84,20 @@ public class TestHandleContacts {
 
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.rosterV.clickTBAddANewContactInRosterView();
-        alice.popupWindow.confirmNewContactWindow("bob@bla");
-        alice.popupWindow.waitUntilShellActive("Contact look-up failed");
-        assertTrue(alice.popupWindow.isShellActive("Contact look-up failed"));
-        alice.popupWindow.confirmWindow("Contact look-up failed",
-            SarosConstant.BUTTON_NO);
+        alice.rosterV.clickAddANewContactToolbarButton();
+        alice.rosterV.confirmNewContactWindow("bob@bla");
+        alice.rosterV.waitUntilContactLookupFailedIsActive();
+        assertTrue(alice.rosterV.isWindowContactLookupFailedActive());
+        alice.rosterV.confirmContactLookupFailedWindow(SarosConstant.BUTTON_NO);
     }
 
     @Test
     public void testAddExistedContact() throws RemoteException {
-        alice.rosterV.clickTBAddANewContactInRosterView();
-        alice.popupWindow.confirmNewContactWindow(bob.getBaseJid());
-        alice.popupWindow.waitUntilShellActive("Contact already added");
-        assertTrue(alice.popupWindow.isShellActive("Contact already added"));
-        alice.popupWindow.closeShell("Contact already added");
+        alice.rosterV.clickAddANewContactToolbarButton();
+        alice.rosterV.confirmNewContactWindow(bob.getBaseJid());
+        alice.rosterV.waitUntilWindowContactAlreadyAddedIsActive();
+        assertTrue(alice.rosterV.isWindowContactAlreadyAddedActive());
+        alice.rosterV.closeWindowContactAlreadyAdded();
     }
 
 }

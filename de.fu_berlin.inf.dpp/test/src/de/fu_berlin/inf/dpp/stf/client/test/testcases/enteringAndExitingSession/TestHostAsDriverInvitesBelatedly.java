@@ -149,8 +149,8 @@ public class TestHostAsDriverInvitesBelatedly {
 
         alice.sessionV.openInvitationInterface(bob.getBaseJid());
 
-        bob.popupWindow.confirmSessionInvitationWindowStep1();
-        bob.popupWindow
+        bob.packageExplorerV.confirmSessionInvitationWindowStep1();
+        bob.packageExplorerV
             .confirmSessionInvitationWindowStep2UsingExistProject(PROJECT);
 
         String CLSContentOfAlice = alice.state.getClassContent(PROJECT, PKG,

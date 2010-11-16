@@ -408,10 +408,9 @@ public interface ExSessionViewObject extends Remote {
      * <b>Attention:</b>
      * <ol>
      * <li>Makes sure, the session view is open and active.</li>
-     * <li>If there are some following actions which are called by the action
-     * ""Send a file to selected user", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side to send a file to selected user are done.</li>
+     * <li>If there are some following actions which are activated by the action
+     * "Send a file to selected user", e.g. a popup window. In this case, the
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * TODO: this function isn't complete yet. SWTBot don't support native
@@ -435,9 +434,8 @@ public interface ExSessionViewObject extends Remote {
      * <ol>
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
-     * "Start a VoIP session", e.g. a popup window. In this case, the method
-     * should handle all the following actions so long until all needed steps by
-     * your side are done.</li>
+     * "Start a VoIP session", e.g. a popup window. In this case, e.g. a popup
+     * window. In this case, the method should handle the popup window too.</li>
      * </ol>
      * 
      * TODO: this function isn't complete yet.
@@ -462,8 +460,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "inconsistency detected in ...", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * TODO: this function isn't complete yet.
@@ -483,8 +480,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "inconsistency detected in ...", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -502,8 +498,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "Enable/disable follow mode", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -568,8 +563,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "Open invitation interface", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * @param jidOfInvitee
@@ -601,8 +595,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "Open invitation interface", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -622,8 +615,7 @@ public interface ExSessionViewObject extends Remote {
      * <li>Makes sure, the session view is open and active.</li>
      * <li>If there are some following actions which are activated by the action
      * "Open invitation interface", e.g. a popup window. In this case, the
-     * method should handle all the following actions so long until all needed
-     * steps by your side are done.</li>
+     * method should handle the popup window too.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -640,5 +632,7 @@ public interface ExSessionViewObject extends Remote {
      */
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException;
+
+    public void confirmClosingTheSessionWindow() throws RemoteException;
 
 }

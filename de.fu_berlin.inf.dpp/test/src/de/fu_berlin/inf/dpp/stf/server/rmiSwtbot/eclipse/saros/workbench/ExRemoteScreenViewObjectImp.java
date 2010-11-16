@@ -124,4 +124,10 @@ public class ExRemoteScreenViewObjectImp extends EclipseObject implements
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
         viewO.waitUntilViewActive(VIEWNAME);
     }
+
+    public void IncomingScreensharingSession(String YesOrNot)
+        throws RemoteException {
+        windowO.confirmWindow(
+            SarosConstant.SHELL_TITLE_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+    }
 }

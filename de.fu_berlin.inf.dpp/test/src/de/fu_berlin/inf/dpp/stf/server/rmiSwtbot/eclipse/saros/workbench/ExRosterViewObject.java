@@ -12,18 +12,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewO
 
 /**
  * This interface contains convenience API to perform a action using widgets in
- * roster view. then you can start off as follows:
+ * the roster view. then you can start off as follows:
  * <ol>
  * <li>
  * At first you need to create a {@link Musician} object in your junit-test.
  * (How to do it please look at the javadoc in class {@link TestPattern} or read
  * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * after then you can use the object sessionV initialized in {@link Musician} to
+ * after then you can use the object rosterV initialized in {@link Musician} to
  * access the API :), e.g.
  * 
  * <pre>
- * alice.sessionV.openRosterView();
+ * alice.rosterV.openRosterView();
  * </pre>
  * 
  * </li>
@@ -44,27 +44,27 @@ public interface ExRosterViewObject extends Remote {
 
     public void closeRosterView() throws RemoteException;
 
-    public void xmppDisconnect() throws RemoteException;
+    public void disconnect() throws RemoteException;
 
     public SWTBotTreeItem selectBuddy(String contact) throws RemoteException;
 
     public boolean isBuddyExist(String contact) throws RemoteException;
 
-    public boolean isConnectedByXmppGuiCheck() throws RemoteException;
+    public boolean isConnectedGUI() throws RemoteException;
 
-    public boolean isConnectedByXMPP() throws RemoteException;
+    public boolean isConnected() throws RemoteException;
 
-    public void clickTBAddANewContactInRosterView() throws RemoteException;
+    public void clickAddANewContactToolbarButton() throws RemoteException;
 
-    public void clickTBConnectInRosterView() throws RemoteException;
+    // public void connect() throws RemoteException;
 
-    public boolean clickTBDisconnectInRosterView() throws RemoteException;
+    // public void disconnect() throws RemoteException;
 
-    public void waitUntilConnected() throws RemoteException;
+    public void waitUntilIsConnected() throws RemoteException;
 
-    public void waitUntilDisConnected() throws RemoteException;
+    public void waitUntilIsDisConnected() throws RemoteException;
 
-    public void addContact(JID jid) throws RemoteException;
+    public void addANewContact(JID jid) throws RemoteException;
 
     public boolean hasContactWith(JID jid) throws RemoteException;
 
@@ -73,5 +73,31 @@ public interface ExRosterViewObject extends Remote {
     public void renameContact(String contact, String newName)
         throws RemoteException;
 
-    public void xmppConnect(JID jid, String password) throws RemoteException;
+    public void connect(JID jid, String password) throws RemoteException;
+
+    public void confirmDeleteWindow() throws RemoteException;
+
+    public void clickContextMenuOfBuddy(String context, String baseJID)
+        throws RemoteException;
+
+    public void confirmContactLookupFailedWindow(String buttonType)
+        throws RemoteException;
+
+    public void confirmRemovelOfSubscriptionWindow() throws RemoteException;
+
+    public boolean isWindowContactLookupFailedActive() throws RemoteException;
+
+    public void waitUntilContactLookupFailedIsActive() throws RemoteException;
+
+    public boolean isWindowContactAlreadyAddedActive() throws RemoteException;
+
+    public void waitUntilWindowContactAlreadyAddedIsActive()
+        throws RemoteException;
+
+    public void confirmNewContactWindow(String plainJID) throws RemoteException;
+
+    public void closeWindowContactAlreadyAdded() throws RemoteException;
+
+    public void confirmRequestOfSubscriptionReceivedWindow()
+        throws RemoteException;
 }

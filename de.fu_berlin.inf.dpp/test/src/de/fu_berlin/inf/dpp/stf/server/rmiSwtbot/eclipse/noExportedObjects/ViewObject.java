@@ -39,6 +39,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExWorkb
  */
 public class ViewObject extends EclipseObject {
 
+    public SWTBotView getView(String title) {
+        return bot.viewByTitle(title);
+    }
+
+    public List<SWTBotToolbarButton> getToolbarButtonsOnView(String title) {
+        return getView(title).getToolbarButtons();
+    }
+
     /**
      * Set focus on the specified view. It should be only called if View is
      * open.
@@ -120,7 +128,7 @@ public class ViewObject extends EclipseObject {
             menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            exWindowO.confirmWindowWithTreeWithFilterText(
+            windowO.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }

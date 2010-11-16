@@ -60,7 +60,7 @@ public interface ExStateObject extends EclipseStateObject {
     /**
      * Returns true if this Saros is connected to a XMPP server.
      */
-    public boolean isConnectedByXMPP() throws RemoteException;
+    public boolean isConnected() throws RemoteException;
 
     /**
      * Returns true if the incoming connection from destJid was Jingle TCP.

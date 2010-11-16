@@ -75,9 +75,8 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
         alice.buildSessionSequential(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.popupWindow
-            .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
-        bob.popupWindow
+        assertTrue(bob.packageExplorerV.isWIndowSessionInvitationActive());
+        bob.packageExplorerV
             .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
 
         assertTrue(bob.state.existsProject(PROJECT));

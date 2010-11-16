@@ -24,20 +24,18 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseObject;
 
-public class EclipseEditorObjectImp extends EclipseObject implements
-    ExEditorObject {
+public class ExEditorObjectImp extends EclipseObject implements ExEditorObject {
     // public static EclipseEditorObjectImp classVariable;
 
-    private static transient EclipseEditorObjectImp self;
+    private static transient ExEditorObjectImp self;
 
     /**
-     * {@link EclipseEditorObjectImp} is a singleton, but inheritance is
-     * possible.
+     * {@link ExEditorObjectImp} is a singleton, but inheritance is possible.
      */
-    public static EclipseEditorObjectImp getInstance() {
+    public static ExEditorObjectImp getInstance() {
         if (self != null)
             return self;
-        self = new EclipseEditorObjectImp();
+        self = new ExEditorObjectImp();
         return self;
     }
 
@@ -205,7 +203,7 @@ public class EclipseEditorObjectImp extends EclipseObject implements
         throws RemoteException {
         activateJavaEditor(className);
         getJavaEditor(className).close();
-        exWindowO.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+        windowO.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
     }
 
     /**
@@ -308,5 +306,11 @@ public class EclipseEditorObjectImp extends EclipseObject implements
         exPackageExplorerVO.openClass(projectName, packageName, className);
         activateJavaEditor(className);
         editorO.typeTextInEditor(contents, className + ".java");
+    }
+
+    public void confirmSaveSourceWindow(String buttonType)
+        throws RemoteException {
+        windowO.waitUntilShellActive("Save Resource");
+        windowO.confirmWindow("Save Resource", buttonType);
     }
 }

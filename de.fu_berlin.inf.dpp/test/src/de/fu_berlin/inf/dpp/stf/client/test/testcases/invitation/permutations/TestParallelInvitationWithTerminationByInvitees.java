@@ -132,34 +132,36 @@ public class TestParallelInvitationWithTerminationByInvitees {
         peersName.add(edna.getBaseJid());
 
         alice.packageExplorerV.shareProject(PROJECT, peersName);
-
-        bob.popupWindow.waitUntilShellActive("Session Invitation");
+        bob.packageExplorerV.waitUntilWIndowSessionInvitationActive();
         bob.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.popupWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.popupWindow.getSecondLabelOfProblemOccurredWindow()
-            .matches(bob.getName() + ".*"));
+        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.packageExplorerV
+            .getSecondLabelOfProblemOccurredWindow().matches(
+                bob.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        carl.popupWindow.waitUntilShellActive("Session Invitation");
-        carl.popupWindow.confirmSessionInvitationWindowStep1();
+        carl.packageExplorerV.waitUntilWIndowSessionInvitationActive();
+        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
         carl.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.popupWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.popupWindow.getSecondLabelOfProblemOccurredWindow()
-            .matches(carl.getName() + ".*"));
+        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.packageExplorerV
+            .getSecondLabelOfProblemOccurredWindow().matches(
+                carl.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        dave.popupWindow.waitUntilShellActive("Session Invitation");
-        dave.popupWindow.confirmSessionInvitationWindowStep1();
+        dave.packageExplorerV.isWIndowSessionInvitationActive();
+        dave.packageExplorerV.confirmSessionInvitationWindowStep1();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         dave.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.popupWindow.waitUntilShellActive("Problem Occurred");
-        assertTrue(alice.popupWindow.getSecondLabelOfProblemOccurredWindow()
-            .matches(dave.getName() + ".*"));
+        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.packageExplorerV
+            .getSecondLabelOfProblemOccurredWindow().matches(
+                dave.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        edna.popupWindow.waitUntilShellActive("Session Invitation");
-        edna.popupWindow.confirmSessionInvitationWindowStep1();
-        edna.popupWindow
+        edna.packageExplorerV.isWIndowSessionInvitationActive();
+        edna.packageExplorerV.confirmSessionInvitationWindowStep1();
+        edna.packageExplorerV
             .confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));

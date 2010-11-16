@@ -7,6 +7,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -20,12 +21,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ExEditorObjec
 
 public class SarosConditions extends Conditions {
 
-    public static ICondition isConnect(SarosSWTBot bot) {
-        return new IsConnect(bot);
+    public static ICondition isConnect(List<SWTBotToolbarButton> buttons,
+        String tooltipText) {
+        return new IsConnect(buttons, tooltipText);
     }
 
-    public static ICondition isDisConnected(SarosSWTBot bot) {
-        return new isDisConnected(bot);
+    public static ICondition isDisConnected(List<SWTBotToolbarButton> buttons,
+        String tooltipText) {
+        return new isDisConnected(buttons, tooltipText);
     }
 
     public static ICondition existTreeItem(SWTBotTreeItem treeItem,
