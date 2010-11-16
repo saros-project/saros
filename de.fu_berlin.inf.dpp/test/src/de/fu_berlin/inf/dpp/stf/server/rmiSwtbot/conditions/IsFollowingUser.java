@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.ExStateObject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 
 public class IsFollowingUser extends DefaultCondition {
 
-    private ExStateObject state;
+    private SarosState state;
     private String baseJID;
 
-    IsFollowingUser(ExStateObject state, String plainJID) {
+    IsFollowingUser(SarosState state, String plainJID) {
         this.state = state;
         this.baseJID = plainJID;
     }

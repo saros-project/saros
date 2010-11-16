@@ -2,15 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ExChatViewObjectImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 
 public class IsChatMessageExist extends DefaultCondition {
 
     private String jid;
     private String message;
-    private ExChatViewObjectImp chatV;
+    private ChatViewComponentImp chatV;
 
-    IsChatMessageExist(ExChatViewObjectImp chatV, String jid, String message) {
+    IsChatMessageExist(ChatViewComponentImp chatV, String jid, String message) {
         this.chatV = chatV;
         this.jid = jid;
         this.message = message;
