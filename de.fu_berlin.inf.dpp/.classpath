@@ -13,7 +13,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ext-src"/>
 	<classpathentry kind="src" path="test/src"/>
-	<classpathentry exported="true" kind="lib" path="bin" sourcepath="bin"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar" sourcepath="lib/log4j-1.2.15-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
