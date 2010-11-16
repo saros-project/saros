@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar" sourcepath="lib/log4j-1.2.15-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.ant.optional.junit4_2.0.0.595-dev-e36.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.eclipse.ui_2.0.0.595-dev-e36.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.0.595-dev-e36.jar"/>
@@ -13,7 +14,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ext-src"/>
 	<classpathentry kind="src" path="test/src"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar" sourcepath="lib/log4j-1.2.15-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar"/>

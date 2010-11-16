@@ -312,13 +312,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
      * Helper for receiving a Packet via XMPPReceiver using
      * SarosPacketCollector.
      */
-    protected SarosPacketCollector installReceiver(PacketFilter filter) {
+    public SarosPacketCollector installReceiver(PacketFilter filter) {
         return receiver.createCollector(filter);
     }
 
-    protected Packet receive(SubMonitor monitor,
-        SarosPacketCollector collector, long timeout, boolean forceWait)
-        throws LocalCancellationException, IOException {
+    public Packet receive(SubMonitor monitor, SarosPacketCollector collector,
+        long timeout, boolean forceWait) throws LocalCancellationException,
+        IOException {
 
         if (isConnectionInvalid())
             return null;

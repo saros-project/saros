@@ -105,6 +105,7 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
  de.fu_berlin.inf.dpp.editor.internal,
+ de.fu_berlin.inf.dpp.exceptions,
  de.fu_berlin.inf.dpp.invitation;
   uses:="org.eclipse.core.runtime,
    de.fu_berlin.inf.dpp,
@@ -175,6 +176,7 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.eclipse.swt.widgets,
    de.fu_berlin.inf.dpp.invitation",
  de.fu_berlin.inf.dpp.util;uses:="org.eclipse.core.resources,org.jivesoftware.smack.packet",
+ org.apache.log4j,
  org.jivesoftware.smack,
  org.jivesoftware.smack.debugger,
  org.jivesoftware.smack.filter,
@@ -214,6 +216,7 @@ Export-Package: de.fu_berlin.inf.dpp;
  org.jivesoftware.smackx.workgroup.settings,
  org.jivesoftware.smackx.workgroup.user,
  org.jivesoftware.smackx.workgroup.util,
+ org.junit,
  org.limewire.collection,
  org.limewire.common,
  org.limewire.concurrent,
