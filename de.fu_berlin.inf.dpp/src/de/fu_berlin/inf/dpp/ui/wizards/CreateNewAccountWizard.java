@@ -22,13 +22,13 @@ public class CreateNewAccountWizard extends Wizard {
 
     public CreateNewAccountWizard() {
         Saros.reinject(this);
-        setWindowTitle("Create XMPP-Account");
+        setWindowTitle("Create XMPP account");
         addPageToWizard();
     }
 
     protected void addPageToWizard() {
         this.accountPage = new AccountPage();
-        this.accountPage.setPageTitle("Add new XMPP-Account");
+        this.accountPage.setPageTitle("Add new XMPP account");
         addPage(accountPage);
     }
 
