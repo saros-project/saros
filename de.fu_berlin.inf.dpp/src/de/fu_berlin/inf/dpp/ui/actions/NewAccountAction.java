@@ -26,13 +26,14 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
 @Component(module = "ui")
@@ -72,8 +73,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     public void runNewAccount() {
         Shell shell = this.window.getShell();
-        WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
-            saros, preferenceUtils, true, true, true));
+        WizardDialog wd = new WizardDialog(shell, new CreateNewAccountWizard());
         wd.setHelpAvailable(false);
         // open() blocks until the user closed the dialog
         wd.open();
@@ -82,6 +82,9 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
          * user start inviting buddies
          */
         sarosUI.activateRosterView();
+        Roster sarosRoster = saros.getRoster();
+        if (sarosRoster != null)
+            sarosRoster.reload();
     }
 
     /*
