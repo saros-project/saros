@@ -98,7 +98,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
     protected IMultiUserChatListener chatListener = new IMultiUserChatListener() {
 
-        public void chatJoined(final User joinedUser) {
+        public void userJoined(final User joinedUser) {
             ChatView.this.addChatLine(joinedUser, "... joined the chat.",
                 new Date());
 
@@ -114,7 +114,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             });
         }
 
-        public void chatLeft(final User leftUser) {
+        public void userLeft(final User leftUser) {
             ChatView.this.addChatLine(leftUser, "... left the chat.",
                 new Date());
 
@@ -130,7 +130,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             });
         }
 
-        public void chatMessageReceived(final User user, final String message) {
+        public void messageReceived(final User user, final String message) {
             ChatView.this.addChatLine(user, message, new Date());
 
             Util.runSafeSWTAsync(log, new Runnable() {
@@ -152,7 +152,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
          * state in the chat. Furthermore changes the image of the view, if
          * anyone is composing a message.
          */
-        public void chatStateUpdated(final User sender, final ChatState state) {
+        public void stateChanged(final User sender, final ChatState state) {
             ChatView.log.debug("Received ChatState from " + sender + ": "
                 + state.toString());
 

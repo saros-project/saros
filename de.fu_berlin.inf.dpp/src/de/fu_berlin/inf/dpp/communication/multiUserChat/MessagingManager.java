@@ -166,7 +166,7 @@ public class MessagingManager implements IConnectionListener,
      */
     public void notifyChatJoined(User user) {
         for (IMultiUserChatListener listener : chatListeners) {
-            listener.chatJoined(user);
+            listener.userJoined(user);
         }
     }
 
@@ -179,7 +179,7 @@ public class MessagingManager implements IConnectionListener,
      */
     public void notifyChatLeft(User user) {
         for (IMultiUserChatListener listener : chatListeners) {
-            listener.chatLeft(user);
+            listener.userLeft(user);
         }
     }
 
@@ -191,7 +191,7 @@ public class MessagingManager implements IConnectionListener,
     public void chatStateUpdated(final User sender, final ChatState state) {
         log.debug("Notifying Listeners.");
         for (IMultiUserChatListener l : chatListeners) {
-            l.chatStateUpdated(sender, state);
+            l.stateChanged(sender, state);
             log.debug("Notified Listener.");
         }
     }
@@ -203,7 +203,7 @@ public class MessagingManager implements IConnectionListener,
     public void chatMessageAdded(final User sender, final String message) {
         log.debug("Notifying Listeners.");
         for (IMultiUserChatListener l : chatListeners) {
-            l.chatMessageReceived(sender, message);
+            l.messageReceived(sender, message);
             log.debug("Notified Listener.");
         }
     }

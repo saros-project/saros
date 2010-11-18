@@ -160,7 +160,7 @@ public class MultiChatSession implements IMultiUserChatSessionProvider,
         User user = sarosSession.getUser(jid);
 
         for (IMultiUserChatListener chatListener : this.messagingManager.chatListeners) {
-            chatListener.chatMessageReceived(user, text);
+            chatListener.messageReceived(user, text);
         }
     }
 
