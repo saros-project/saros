@@ -76,7 +76,7 @@ public class MessagingManager implements IConnectionListener,
 
     public final List<IMultiUserChatListener> chatListeners = new ArrayList<IMultiUserChatListener>();
 
-    private MultiChatSession mucSession;
+    private MultiUserChatSession mucSession;
 
     /** Stores the last connection used so that we know if it changes. */
     private Connection currentConnection;
@@ -277,7 +277,7 @@ public class MessagingManager implements IConnectionListener,
         XMPPConnection connection = saros.getConnection();
         if (mucSession == null || !connection.equals(currentConnection)) {
             log.debug("Creating MUC session.");
-            mucSession = new MultiChatSession(this.saros,
+            mucSession = new MultiUserChatSession(this.saros,
                 this.sessionManager.getSarosSession(),
                 getCommunicationPreferences(), this);
             currentConnection = connection;
