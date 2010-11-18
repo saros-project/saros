@@ -31,8 +31,6 @@ public class MultiChatSession implements IMultiUserChatSessionProvider,
     private final Logger log = Logger.getLogger(MultiChatSession.class
         .getName());
 
-    private final String name;
-
     private final List<ChatLine> history = new ArrayList<ChatLine>();
 
     /** The chat room corresponding to the current session. */
@@ -54,12 +52,6 @@ public class MultiChatSession implements IMultiUserChatSessionProvider,
         this.sarosSession = sarosSession;
         this.communicationPreferences = communicationPreferences;
         this.messagingManager = messagingManager;
-
-        this.name = "Multi User Chat (" + saros.getMyJID().getName() + ")";
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<ChatLine> getHistory() {

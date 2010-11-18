@@ -10,11 +10,9 @@ import org.jivesoftware.smackx.ChatState;
 public interface IMultiUserChatSessionProvider {
     public List<ChatLine> getHistory();
 
-    public String getName();
-
     /**
-     * Sends a message and/ or a state to all other participants in the
-     * multi user chat.
+     * Sends a message and/ or a state to all other participants in the multi
+     * user chat.
      * 
      * @param msg
      *            message to send to other chat participants; can be null
