@@ -67,32 +67,32 @@ public class RSViewComponentImp extends EclipseComponent implements
      */
 
     public void activateRemoteScreenView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
+        viewPart.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
     }
 
     public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return viewO.isViewOpen(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
+        return viewPart.isViewOpen(SarosConstant.VIEW_TITLE_REMOTE_SCREEN);
     }
 
     public boolean isRemoteScreenViewActive() throws RemoteException {
-        return viewO.isViewActive(VIEWNAME);
+        return viewPart.isViewActive(VIEWNAME);
     }
 
     public void openRemoteScreenView() throws RemoteException {
         if (!isRemoteScreenViewOpen())
-            viewO
+            viewPart
                 .openViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
     }
 
     public void closeRemoteScreenView() throws RemoteException {
-        viewO
+        viewPart
             .closeViewById("de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView");
     }
 
     public void changeModeOfImageSource() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewO.clickToolbarButtonWithTooltipInView(
+        viewPart.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
             SarosConstant.TOOL_TIP_TEXT_CHANGE_MODE_IMAGE_SOURCE);
     }
@@ -100,7 +100,7 @@ public class RSViewComponentImp extends EclipseComponent implements
     public void stopRunningSession() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewO.clickToolbarButtonWithTooltipInView(
+        viewPart.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
             SarosConstant.TOOL_TIP_TEXT_STOP_RUNNING_SESSION);
     }
@@ -108,7 +108,7 @@ public class RSViewComponentImp extends EclipseComponent implements
     public void resume() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewO.clickToolbarButtonWithTooltipInView(
+        viewPart.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
             SarosConstant.TOOL_TIP_TEXT_RESUME);
     }
@@ -116,18 +116,18 @@ public class RSViewComponentImp extends EclipseComponent implements
     public void pause() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewO.clickToolbarButtonWithTooltipInView(
+        viewPart.clickToolbarButtonWithTooltipInView(
             SarosConstant.VIEW_TITLE_REMOTE_SCREEN,
             SarosConstant.TOOL_TIP_TEXT_PAUSE);
     }
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        viewO.waitUntilViewActive(VIEWNAME);
+        viewPart.waitUntilViewActive(VIEWNAME);
     }
 
     public void IncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        windowO.confirmWindow(
+        windowPart.confirmWindow(
             SarosConstant.SHELL_TITLE_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 

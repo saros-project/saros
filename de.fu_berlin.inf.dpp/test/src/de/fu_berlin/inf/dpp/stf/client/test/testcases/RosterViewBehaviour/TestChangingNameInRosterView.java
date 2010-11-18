@@ -28,7 +28,7 @@ public class TestChangingNameInRosterView {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+        alice.shareProjectWithDone(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 

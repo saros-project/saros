@@ -2,9 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
-
-import de.fu_berlin.inf.dpp.net.JID;
 
 public interface PEViewComponent extends Remote {
 
@@ -48,6 +45,22 @@ public interface PEViewComponent extends Remote {
 
     public boolean isClassExistGUI(String... matchTexts) throws RemoteException;
 
+    /**
+     * Open a class
+     * 
+     * 1. if the class file is already open, return.
+     * 
+     * 2. select the class file.
+     * 
+     * 3. then click the context menu open.
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo-Saros.
+     * @param packageName
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     */
     public void openClass(String projectName, String packageName,
         String className) throws RemoteException;
 
@@ -56,6 +69,13 @@ public interface PEViewComponent extends Remote {
     public void openClassWith(String whichEditor, String projectName,
         String packageName, String className) throws RemoteException;
 
+    /**
+     * Open the view "Package Explorer". The name of the method is defined the
+     * same as the menu names. The name "showViewPackageExplorer" then means:
+     * hello guy, please click main menus Window -> Show view ->
+     * PackageExplorer.
+     * 
+     */
     public void showViewPackageExplorer() throws RemoteException;
 
     public void moveClassTo(String projectName, String pkg, String className,
@@ -87,69 +107,7 @@ public interface PEViewComponent extends Remote {
 
     public void switchToTag() throws RemoteException;
 
-    public void addToSession(String projectName) throws RemoteException;
-
-    public void shareProjectPartically(String projectName)
-        throws RemoteException;
-
-    public void shareprojectWithVCSSupport(String projectName)
-        throws RemoteException;
-
-    public void shareProject(String projectName) throws RemoteException;
-
-    public void clickShareProjectWith(String projectName,
-        String shareProjectWith) throws RemoteException;
-
-    public void shareProject(String projectName, List<String> inviteeJIDS)
-        throws RemoteException;
-
-    public boolean isWindowInvitationCancelledActive() throws RemoteException;
-
-    public void closeWindowInvitaitonCancelled() throws RemoteException;
-
-    public void waitUntilIsWindowInvitationCnacelledActive()
-        throws RemoteException;
-
-    public boolean isWIndowSessionInvitationActive() throws RemoteException;
-
-    public void closeWIndowSessionInvitation() throws RemoteException;
-
-    public void waitUntilWIndowSessionInvitationActive() throws RemoteException;
-
-    public void confirmSessionInvitationWindowStep1() throws RemoteException;
-
-    public void confirmSessionUsingNewOrExistProject(JID inviterJID,
-        String projectName, int typeOfSharingProject) throws RemoteException;
-
-    public void cancelInivtationInSessionInvitationWindow()
-        throws RemoteException;
-
-    public void confirmInvitationCancelledWindow() throws RemoteException;
-
-    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(
-        String projectName) throws RemoteException;
-
-    public void confirmSessionInvitationWindowStep2UsingExistProjectWithCancelLocalChange(
-        String projectName) throws RemoteException;
-
-    public void confirmSessionInvitationWindowStep2UsingExistProject(
-        String projectName) throws RemoteException;
-
-    public void confirmSessionInvitationWindowStep2UsingNewproject(
-        String projectName) throws RemoteException;
-
-    public void confirmInvitationWindow(String... invitees)
-        throws RemoteException;
-
-    public void confirmSessionInvitationWizard(String inviter,
-        String projectname) throws RemoteException;
-
-    public void waitUntilIsWindowProblemOccurredActive() throws RemoteException;
-
     public void waitUntilSarosRunningVCSOperationClosed()
-        throws RemoteException;
-
-    public String getSecondLabelOfProblemOccurredWindow()
         throws RemoteException;
 
 }

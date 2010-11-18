@@ -184,20 +184,20 @@ public class TestCreatingNewFile {
         bob.state.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
         assertTrue(bob.state.isFileExist(PROJECT, FOLDER2, FILE2));
 
-        alice.eclipseEditor
+        alice.editor
             .setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
 
-        String file2ContentOfAlice = alice.eclipseEditor.getTextOfEditor(
+        String file2ContentOfAlice = alice.editor.getTextOfEditor(
             PROJECT, FOLDER2, FILE2);
-        carl.eclipseEditor.waitUntilEditorContentSame(file2ContentOfAlice,
+        carl.editor.waitUntilEditorContentSame(file2ContentOfAlice,
             PROJECT, FOLDER2, FILE2);
-        String file2ContentOfCarl = carl.eclipseEditor.getTextOfEditor(PROJECT,
+        String file2ContentOfCarl = carl.editor.getTextOfEditor(PROJECT,
             FOLDER2, FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
 
-        bob.eclipseEditor.waitUntilEditorContentSame(file2ContentOfAlice,
+        bob.editor.waitUntilEditorContentSame(file2ContentOfAlice,
             PROJECT, FOLDER2, FILE2);
-        String file2ContentOfBob = bob.eclipseEditor.getTextOfEditor(PROJECT,
+        String file2ContentOfBob = bob.editor.getTextOfEditor(PROJECT,
             FOLDER2, FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
 

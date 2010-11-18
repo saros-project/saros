@@ -29,8 +29,8 @@ public class TestSVN {
     public static void initMusicians() throws Exception {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.packageExplorerV.importProjectFromSVN(BotConfiguration.SVN_URL);
-        alice.buildSessionSequential(BotConfiguration.PROJECTNAME_SVN_TRUNK,
+        alice.pEV.importProjectFromSVN(BotConfiguration.SVN_URL);
+        alice.shareProjectWithDone(BotConfiguration.PROJECTNAME_SVN_TRUNK,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
     }
@@ -80,8 +80,8 @@ public class TestSVN {
     @Test
     public void testSwitch() throws RemoteException {
 
-        alice.packageExplorerV.switchToTag();
-        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
+        alice.pEV.switchToTag();
+        bob.pEV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
 
@@ -100,11 +100,11 @@ public class TestSVN {
      */
     @Test
     public void testDisconnectAndConnect() throws RemoteException {
-        alice.packageExplorerV.disConnectSVN();
+        alice.pEV.disConnectSVN();
         bob.state.waitUntilProjectNotInSVN(BotConfiguration.PROJECTNAME_SVN);
         assertFalse(bob.state.isInSVN());
 
-        alice.packageExplorerV.connectSVN();
+        alice.pEV.connectSVN();
         bob.state.waitUntilProjectInSVN(BotConfiguration.PROJECTNAME_SVN);
         assertTrue(bob.state.isInSVN());
     }
@@ -122,8 +122,8 @@ public class TestSVN {
      */
     @Test
     public void testUpdate() throws RemoteException {
-        alice.packageExplorerV.switchToOtherRevision();
-        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
+        alice.pEV.switchToOtherRevision();
+        bob.pEV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
     }
@@ -142,8 +142,8 @@ public class TestSVN {
      */
     @Test
     public void testUpdateSingleFile() throws RemoteException {
-        alice.packageExplorerV.switchToOtherRevision(CLS_PATH);
-        bob.packageExplorerV.waitUntilSarosRunningVCSOperationClosed();
+        alice.pEV.switchToOtherRevision(CLS_PATH);
+        bob.pEV.waitUntilSarosRunningVCSOperationClosed();
         assertTrue(alice.state.getURLOfRemoteResource(CLS_PATH).equals(
             bob.state.getURLOfRemoteResource(CLS_PATH)));
     }
@@ -166,7 +166,7 @@ public class TestSVN {
         alice.state.deleteProject(CLS_PATH);
         bob.basic.sleep(1000);
         assertFalse(bob.state.isResourceExist(CLS_PATH));
-        alice.packageExplorerV.revert();
+        alice.pEV.revert();
         bob.basic.sleep(1000);
         assertTrue(bob.state.isResourceExist(CLS_PATH));
     }

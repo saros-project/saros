@@ -124,11 +124,11 @@ public class ViewPart extends EclipseComponent {
     public void openViewWithName(String title, String category, String nodeName)
         throws RemoteException {
         if (!isViewOpen(title)) {
-            exWorkbenchO.activateEclipseShell();
-            menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
+            workbenchC.activateEclipseShell();
+            menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
                 SarosConstant.MENU_TITLE_SHOW_VIEW,
                 SarosConstant.MENU_TITLE_OTHER);
-            windowO.confirmWindowWithTreeWithFilterText(
+            windowPart.confirmWindowWithTreeWithFilterText(
                 SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
                 SarosConstant.BUTTON_OK);
         }
@@ -229,7 +229,7 @@ public class ViewPart extends EclipseComponent {
         String label) {
         try {
             SWTBotTable table = getTableInView(viewName);
-            return tableO.selectTableItemWithLabel(table, label).select();
+            return tablePart.selectTableItemWithLabel(table, label).select();
         } catch (WidgetNotFoundException e) {
             log.warn(" table item " + label + " on View " + viewName
                 + " not found.", e);
@@ -251,11 +251,11 @@ public class ViewPart extends EclipseComponent {
      * @param contexts
      *            all context menus'name.e.g. {"Team", "Commit..."}
      */
-    public void clickMenusOfContextMenuOfTreeItemInView(String viewTitle,
+    public void clickContextMenusOfTreeItemInView(String viewTitle,
         String[] nodes, String... contexts) {
         try {
             SWTBotTree tree = getTreeInView(viewTitle);
-            SWTBotTreeItem treeItem = treeO.getTreeItemWithMatchText(tree,
+            SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
                 nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
@@ -271,7 +271,7 @@ public class ViewPart extends EclipseComponent {
      * 
      */
     public boolean isTableItemInViewExist(String viewName, String itemName) {
-        return tableO.existTableItem(itemName);
+        return tablePart.existTableItem(itemName);
     }
 
     /**
@@ -339,7 +339,7 @@ public class ViewPart extends EclipseComponent {
             SWTBotTree tree = getTreeInView(viewTitle);
             // you should first select the project,whose context you want to
             // click.
-            SWTBotTreeItem treeItem = treeO.getTreeItemWithMatchText(tree,
+            SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
                 nodes);
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
@@ -443,12 +443,12 @@ public class ViewPart extends EclipseComponent {
 
     public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
         String... labels) {
-        return treeO.selectTreeWithLabels(getTreeInView(viewName), labels);
+        return treePart.selectTreeWithLabels(getTreeInView(viewName), labels);
     }
 
     public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
         String viewName, String... labels) {
-        return treeO.selectTreeWithLabelsWithWaitungExpand(
+        return treePart.selectTreeWithLabelsWithWaitungExpand(
             getTreeInView(viewName), labels);
     }
 

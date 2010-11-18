@@ -114,7 +114,7 @@ public class TestStrictSequentialInvitationWithoutTermination {
         InterruptedException {
         alice.mainMenu.newTextFileLineDelimiter("Unix");
 
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
 
         String delimiterByAlice = alice.mainMenu.getTextFileLineDelimiter();

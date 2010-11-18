@@ -50,18 +50,18 @@ public class TestShare2UsersSequentially {
         InterruptedException {
         log.trace("testShareProject enter");
 
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         bob.basic
             .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.eclipseEditor.setTextInJavaEditorWithSave(
+        alice.editor.setTextInJavaEditorWithSave(
             BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
 
         log.trace("invitee.openFile");
-        bob.packageExplorerV.openClass(PROJECT, PKG, CLS);
+        bob.pEV.openClass(PROJECT, PKG, CLS);
 
         // invitee.sleep(2000);
         assertTrue(bob.state.isParticipant(bob.jid));

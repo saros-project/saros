@@ -49,7 +49,7 @@ public class TestShare3UsersSequentially {
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
 
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
 
         assertTrue(carl.state.isParticipant(carl.jid));

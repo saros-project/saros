@@ -91,7 +91,7 @@ public class TestEditDuringInvitation {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
@@ -104,20 +104,20 @@ public class TestEditDuringInvitation {
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
         // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
-        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
+        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.eclipseEditor.setTextInJavaEditorWithSave(
+        bob.editor.setTextInJavaEditorWithSave(
             BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.packageExplorerV
-            .confirmSessionInvitationWindowStep2UsingNewproject(PKG);
+        carl.pEV
+            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.eclipseEditor.getTextOfJavaEditor(PROJECT,
+        String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT,
             PKG, CLS);
-        String textFormAlice = alice.eclipseEditor.getTextOfJavaEditor(PROJECT,
+        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT,
             PKG, CLS);
         assertTrue(textFromCarl.equals(textFormAlice));
 

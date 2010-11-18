@@ -8,9 +8,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponentImp;
 
-public class SarosMainMenuComponentImp extends MainMenuComponentImp
-    implements SarosMainMenuComponent {
-    // public static SarosMainMenuObjectImp classVariable;
+public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
+    SarosMainMenuComponent {
 
     private static transient SarosMainMenuComponentImp self;
 
@@ -27,8 +26,8 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp
 
     public void creatNewAccount(JID jid, String password)
         throws RemoteException {
-        exWorkbenchO.getEclipseShell().activate().setFocus();
-        menuO.clickMenuWithTexts("Saros", "Create Account");
+        workbenchC.getEclipseShell().activate().setFocus();
+        menuPart.clickMenuWithTexts("Saros", "Create Account");
         confirmCreateNewUserAccountWindow(jid.getDomain(), jid.getName(),
             password);
     }
@@ -36,7 +35,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp
     public void confirmCreateNewUserAccountWindow(String server,
         String username, String password) throws RemoteException {
         try {
-            windowO.activateShellWithText("Create New User Account");
+            windowPart.activateShellWithText("Create New User Account");
             bot.textWithLabel("Jabber Server").setText(server);
             bot.textWithLabel("Username").setText(username);
             bot.textWithLabel("Password").setText(password);

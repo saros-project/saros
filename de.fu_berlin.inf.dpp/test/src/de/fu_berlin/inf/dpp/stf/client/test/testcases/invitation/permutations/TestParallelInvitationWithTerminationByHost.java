@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -123,33 +122,29 @@ public class TestParallelInvitationWithTerminationByHost {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        List<String> peersName = new LinkedList<String>();
-        peersName.add(bob.getBaseJid());
-        peersName.add(dave.getBaseJid());
-        peersName.add(carl.getBaseJid());
+        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), dave.getBaseJid(),
+            carl.getBaseJid());
 
-        alice.packageExplorerV.shareProject(PROJECT, peersName);
-
-        bob.packageExplorerV.waitUntilWIndowSessionInvitationActive();
+        bob.pEV.waitUntilWIndowSessionInvitationActive();
         alice.progressV.cancelInvitation(0);
-        bob.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
-        assertTrue(bob.packageExplorerV.isWindowInvitationCancelledActive());
-        bob.packageExplorerV.closeWindowInvitaitonCancelled();
+        bob.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(bob.pEV.isWindowInvitationCancelledActive());
+        bob.pEV.closeWindowInvitaitonCancelled();
 
-        carl.packageExplorerV.waitUntilWIndowSessionInvitationActive();
-        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
+        carl.pEV.waitUntilWIndowSessionInvitationActive();
+        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
         alice.progressV.cancelInvitation(0);
-        carl.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
-        assertTrue(carl.packageExplorerV.isWindowInvitationCancelledActive());
-        carl.packageExplorerV.closeWindowInvitaitonCancelled();
+        carl.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(carl.pEV.isWindowInvitationCancelledActive());
+        carl.pEV.closeWindowInvitaitonCancelled();
 
-        dave.packageExplorerV.waitUntilWIndowSessionInvitationActive();
-        dave.packageExplorerV.confirmSessionInvitationWindowStep1();
+        dave.pEV.waitUntilWIndowSessionInvitationActive();
+        dave.pEV.confirmFirstPageOfWizardSessionInvitation();
         dave.basic.clickButton(SarosConstant.BUTTON_FINISH);
         alice.progressV.cancelInvitation(0);
-        dave.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
-        assertTrue(dave.packageExplorerV.isWindowInvitationCancelledActive());
-        dave.packageExplorerV.closeWindowInvitaitonCancelled();
+        dave.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(dave.pEV.isWindowInvitationCancelledActive());
+        dave.pEV.closeWindowInvitaitonCancelled();
 
     }
 }

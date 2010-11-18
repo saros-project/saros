@@ -68,7 +68,7 @@ public class TestHostAsDriverInvitesBelatedly {
          * alice build session with carl and is followed by carl.
          */
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl);
         alice.followedBy(carl);
     }
@@ -137,21 +137,21 @@ public class TestHostAsDriverInvitesBelatedly {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException {
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
-        bob.eclipseEditor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG,
+        bob.editor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG,
             CLS);
 
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG,
             CLS2);
-        bob.eclipseEditor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT,
+        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT,
             PKG, CLS2);
 
         alice.sessionV.openInvitationInterface(bob.getBaseJid());
 
-        bob.packageExplorerV.confirmSessionInvitationWindowStep1();
-        bob.packageExplorerV
-            .confirmSessionInvitationWindowStep2UsingExistProject(PROJECT);
+        bob.pEV.confirmFirstPageOfWizardSessionInvitation();
+        bob.pEV
+            .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT);
 
         String CLSContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS);

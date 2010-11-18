@@ -73,7 +73,7 @@ public class TestFileOperations {
 
     @Test
     public void testRenameFile() throws RemoteException {
-        alice.packageExplorerV.renameClass(CLS2, PROJECT, PKG, CLS);
+        alice.pEV.renameClass(CLS2, PROJECT, PKG, CLS);
         // bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         // carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         assertFalse(bob.state.existsClass(PROJECT, PKG, CLS));
@@ -105,7 +105,7 @@ public class TestFileOperations {
         assertTrue(bob.state.existsClass(PROJECT, PKG2, CLS));
         assertTrue(carl.state.existsClass(PROJECT, PKG2, CLS));
 
-        alice.eclipseEditor.setTextInJavaEditorWithSave(
+        alice.editor.setTextInJavaEditorWithSave(
             BotConfiguration.CONTENTPATH, PROJECT, PKG2, CLS);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG2,
             CLS);
@@ -124,7 +124,7 @@ public class TestFileOperations {
     public void testMoveClass() throws RemoteException {
         alice.mainMenu.newPackage(PROJECT, PKG2);
         alice.mainMenu.newClass(PROJECT, PKG2, CLS2);
-        alice.packageExplorerV.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
+        alice.pEV.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
         bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
@@ -135,7 +135,7 @@ public class TestFileOperations {
 
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.packageExplorerV.renamePkg(PKG2, PROJECT, "src", PKG);
+        alice.pEV.renamePkg(PKG2, PROJECT, "src", PKG);
         // bob.state.waitUntilPkgExist(PROJECT, PKG2);
         // carl.state.waitUntilPkgExist(PROJECT, PKG2);
         assertFalse(bob.state.isPkgExist(PROJECT, PKG));

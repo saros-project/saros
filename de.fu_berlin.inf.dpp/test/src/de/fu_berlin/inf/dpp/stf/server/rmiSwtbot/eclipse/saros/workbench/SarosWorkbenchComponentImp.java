@@ -31,15 +31,15 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void openSarosViews() throws RemoteException {
-        exRosterVO.openRosterView();
-        exSessonVO.openSessionView();
-        exChatVO.openChatView();
-        exRemoteScreenVO.openRemoteScreenView();
+        rosterVC.openRosterView();
+        sessonVC.openSessionView();
+        chatVC.openChatView();
+        rsVC.openRemoteScreenView();
     }
 
     public void resetSaros() throws RemoteException {
-        exRosterVO.disconnect();
-        exStateO.deleteAllProjects();
+        rosterVC.disconnect();
+        state.deleteAllProjects();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -70,7 +70,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void resetWorkbench() throws RemoteException {
-        exMainMenuO.openPerspectiveJava();
+        mainMenuC.openPerspectiveJava();
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
@@ -88,7 +88,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void closeWelcomeView() throws RemoteException {
-        viewO.closeViewByTitle(SarosConstant.VIEW_TITLE_WELCOME);
+        viewPart.closeViewByTitle(SarosConstant.VIEW_TITLE_WELCOME);
     }
 
     @Override

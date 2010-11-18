@@ -16,8 +16,8 @@ public class MainMenuComponentImp extends EclipseComponent implements
     MainMenuComponent {
 
     public void preference() throws RemoteException {
-        exWorkbenchO.activateEclipseShell();
-        menuO.clickMenuWithTexts("Window", "Preferences");
+        workbenchC.activateEclipseShell();
+        menuPart.clickMenuWithTexts("Window", "Preferences");
     }
 
     public void newTextFileLineDelimiter(String OS) throws RemoteException {
@@ -34,7 +34,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
         }
         bot.button("Apply").click();
         bot.button("OK").click();
-        windowO.waitUntilShellClosed("Preferences");
+        windowPart.waitUntilShellClosed("Preferences");
     }
 
     public String getTextFileLineDelimiter() throws RemoteException {
@@ -43,17 +43,17 @@ public class MainMenuComponentImp extends EclipseComponent implements
         tree.expandNode("General").select("Workspace");
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            windowO.closeShell("Preferences");
+            windowPart.closeShell("Preferences");
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            windowO.closeShell("Preferences");
+            windowPart.closeShell("Preferences");
             return itemName;
         }
-        windowO.closeShell("Preferences");
+        windowPart.closeShell("Preferences");
         return "";
     }
 
@@ -102,8 +102,8 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void newJavaProject(String projectName) throws RemoteException {
-        if (!exStateO.existsProject(projectName)) {
-            exWorkbenchO.activateEclipseShell();
+        if (!state.existsProject(projectName)) {
+            workbenchC.activateEclipseShell();
             bot.menu("File").menu("New").menu("Java Project").click();
             SWTBotShell shell = bot.shell("New Java Project");
             shell.activate();
@@ -179,8 +179,8 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void newProject(String projectName) throws RemoteException {
-        if (!exStateO.existsProject(projectName)) {
-            exWorkbenchO.activateEclipseShell();
+        if (!state.existsProject(projectName)) {
+            workbenchC.activateEclipseShell();
             bot.menu("File").menu("New").menu("Project...").click();
             SWTBotShell shell = bot.shell("New Project");
             shell.activate();
@@ -217,17 +217,17 @@ public class MainMenuComponentImp extends EclipseComponent implements
      */
     public void newPackage(String projectName, String pkg)
         throws RemoteException {
-        if (!exStateO.isPkgExist(projectName, pkg))
+        if (!state.isPkgExist(projectName, pkg))
             try {
-                exWorkbenchO.activateEclipseShell();
-                menuO.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
+                workbenchC.activateEclipseShell();
+                menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
                     SarosConstant.MENU_TITLE_NEW, "Package");
-                windowO.activateShellWithMatchText("New Java Package");
+                windowPart.activateShellWithMatchText("New Java Package");
                 bot.textWithLabel("Source folder:").setText(
                     (projectName + "/src"));
                 bot.textWithLabel("Name:").setText(pkg);
                 bot.button(SarosConstant.BUTTON_FINISH).click();
-                windowO.waitUntilShellClosed("New java Package");
+                windowPart.waitUntilShellClosed("New java Package");
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new package";
                 log.error(cause, e);
@@ -252,7 +252,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
      *            subFolder}
      */
     public void newFolder(String... folderPath) throws RemoteException {
-        if (!exStateO.isFolderExist(folderPath))
+        if (!state.isFolderExist(folderPath))
             try {
                 String projectName = "";
                 String folders = "";
@@ -262,7 +262,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
                     else
                         folders += folderPath[i] + "/";
                 }
-                exWorkbenchO.activateEclipseShell();
+                workbenchC.activateEclipseShell();
                 bot.menu("File").menu("New").menu("Folder").click();
                 SWTBotShell shell = bot.shell("New Folder");
                 shell.activate();
@@ -279,7 +279,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
     }
 
     public void newFile(String... filePath) throws RemoteException {
-        if (!exStateO.isFileExist(filePath))
+        if (!state.isFileExist(filePath))
             try {
                 String[] folders = new String[filePath.length - 1];
                 String fileName = "";
@@ -289,7 +289,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
                     else
                         folders[i] = filePath[i];
                 }
-                exWorkbenchO.activateEclipseShell();
+                workbenchC.activateEclipseShell();
                 bot.menu("File").menu("New").menu("File").click();
                 SWTBotShell shell = bot.shell("New File");
                 shell.activate();
@@ -331,9 +331,9 @@ public class MainMenuComponentImp extends EclipseComponent implements
      */
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
-        if (!exStateO.existsClass(projectName, pkg, className))
+        if (!state.existsClass(projectName, pkg, className))
             try {
-                exWorkbenchO.activateEclipseShell();
+                workbenchC.activateEclipseShell();
                 bot.menu("File").menu("New").menu("Class").click();
                 SWTBotShell shell = bot.shell("New Java Class");
                 shell.activate();
@@ -376,7 +376,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     public void newClassImplementsRunnable(String projectName, String pkg,
         String className) throws RemoteException {
-        exWorkbenchO.activateEclipseShell();
+        workbenchC.activateEclipseShell();
         bot.menu("File").menu("New").menu("Class").click();
         SWTBotShell shell = bot.shell("New Java Class");
         shell.activate();
@@ -385,12 +385,12 @@ public class MainMenuComponentImp extends EclipseComponent implements
         bot.textWithLabel("Name:").setText(className);
 
         bot.button("Add...").click();
-        windowO.waitUntilShellActive("Implemented Interfaces Selection");
+        windowPart.waitUntilShellActive("Implemented Interfaces Selection");
         bot.shell("Implemented Interfaces Selection").activate();
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
         text.setText("java.lang.Runnable");
-        tableO.waitUntilTableHasRows(1);
+        tablePart.waitUntilTableHasRows(1);
 
         bot.button("OK").click();
         bot.shell("New Java Class").activate();
@@ -407,7 +407,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void showViewProblems() throws RemoteException {
-        viewO.openViewWithName("Problems", "General", "Problems");
+        viewPart.openViewWithName("Problems", "General", "Problems");
     }
 
     /**
@@ -417,7 +417,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void showViewProjectExplorer() throws RemoteException {
-        viewO.openViewWithName("Project Explorer", "General",
+        viewPart.openViewWithName("Project Explorer", "General",
             "Project Explorer");
     }
 
@@ -428,14 +428,14 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void openPerspectiveJava() throws RemoteException {
-        perspectiveO.openPerspectiveWithId(SarosConstant.ID_JAVA_PERSPECTIVE);
+        perspectivePart.openPerspectiveWithId(SarosConstant.ID_JAVA_PERSPECTIVE);
     }
 
     /**
      * test, if the java perspective is active.
      */
     public boolean isJavaPerspectiveActive() throws RemoteException {
-        return perspectiveO
+        return perspectivePart
             .isPerspectiveActive(SarosConstant.ID_JAVA_PERSPECTIVE);
     }
 
@@ -446,14 +446,14 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void openPerspectiveDebug() throws RemoteException {
-        perspectiveO.openPerspectiveWithId(SarosConstant.ID_DEBUG_PERSPECTIVE);
+        perspectivePart.openPerspectiveWithId(SarosConstant.ID_DEBUG_PERSPECTIVE);
     }
 
     /**
      * test, if the debug perspective is active.
      */
     public boolean isDebugPerspectiveActive() throws RemoteException {
-        return perspectiveO
+        return perspectivePart
             .isPerspectiveActive(SarosConstant.ID_DEBUG_PERSPECTIVE);
     }
 

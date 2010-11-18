@@ -22,7 +22,7 @@ public class WindowPart extends EclipseComponent {
 
     public boolean isTableItemInWindowExist(String title, String label) {
         activateShellWithText(title);
-        return tableO.existTableItem(label);
+        return tablePart.existTableItem(label);
     }
 
     public boolean activateShellWithText(String title) {
@@ -80,7 +80,7 @@ public class WindowPart extends EclipseComponent {
         // waitUntilShellActive(shellName);
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
-        treeO.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
+        treePart.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
         // basicObject.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
@@ -97,7 +97,7 @@ public class WindowPart extends EclipseComponent {
      */
     public void confirmWindow(String title, String buttonText) {
         // waitUntilShellActive(title);
-        if (windowO.activateShellWithText(title)) {
+        if (windowPart.activateShellWithText(title)) {
             bot.button(buttonText).click();
             bot.sleep(sleepTime);
         }
@@ -153,7 +153,7 @@ public class WindowPart extends EclipseComponent {
      */
     public void confirmWindowWithCheckBox(String title, String buttonText,
         boolean isChecked) throws RemoteException {
-        windowO.activateShellWithText(title);
+        windowPart.activateShellWithText(title);
         if (isChecked)
             bot.checkBox().click();
         bot.button(buttonText).click();
@@ -169,15 +169,15 @@ public class WindowPart extends EclipseComponent {
      *            text of the button
      * @param itemNames
      *            the labels of the checkboxs, which you want to select.
-     * @throws RemoteException
+     * 
      */
     public void confirmWindowWithCheckBox(String title, String buttonText,
-        String... itemNames) throws RemoteException {
-        windowO.waitUntilShellActive(title);
+        String... itemNames) {
+        windowPart.waitUntilShellActive(title);
         for (String itemName : itemNames) {
-            tableO.selectCheckBoxInTable(itemName);
+            tablePart.selectCheckBoxInTable(itemName);
         }
-        basicO.waitUntilButtonIsEnabled(buttonText);
+        basicPart.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }
@@ -199,7 +199,7 @@ public class WindowPart extends EclipseComponent {
         // waitUntilShellActive(shellName);
         try {
             bot.table().select(itemName);
-            basicO.waitUntilButtonIsEnabled(buttonText);
+            basicPart.waitUntilButtonIsEnabled(buttonText);
             bot.button(buttonText).click();
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
@@ -227,11 +227,11 @@ public class WindowPart extends EclipseComponent {
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(SarosConstant.TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        treeO.waitUntilTreeExisted(bot.tree(), rootOfTreeNode);
+        treePart.waitUntilTreeExisted(bot.tree(), rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        treeO.waitUntilTreeNodeExisted(treeItem, teeNode);
+        treePart.waitUntilTreeNodeExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
-        basicO.waitUntilButtonIsEnabled(buttonText);
+        basicPart.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }

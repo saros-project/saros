@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -27,8 +26,6 @@ public class TestParallelInvitationWithTerminationByHost {
     protected static Musician bob;
     protected static Musician carl;
 
-    protected static ArrayList<String> invitees = new ArrayList<String>();
-
     @BeforeClass
     public static void initMusicians() throws AccessException, RemoteException,
         InterruptedException {
@@ -38,8 +35,6 @@ public class TestParallelInvitationWithTerminationByHost {
         bob = musicians.get(1);
         carl = musicians.get(2);
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        invitees.add(bob.getBaseJid());
-        invitees.add(carl.getBaseJid());
     }
 
     /**
@@ -91,19 +86,19 @@ public class TestParallelInvitationWithTerminationByHost {
      */
     @Test
     public void testInvitationWithTerminationByHost() throws RemoteException {
-        alice.packageExplorerV.shareProject(PROJECT, invitees);
-        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
+        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), carl.getBaseJid());
+        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         alice.progressV.cancelInvitation();
-        bob.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
-        assertTrue(bob.packageExplorerV.isWindowInvitationCancelledActive());
-        bob.packageExplorerV.confirmInvitationCancelledWindow();
+        bob.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(bob.pEV.isWindowInvitationCancelledActive());
+        bob.pEV.confirmWindowInvitationCancelled();
         alice.progressV.removeProgress();
 
         alice.progressV.cancelInvitation();
-        carl.packageExplorerV.waitUntilIsWindowInvitationCnacelledActive();
-        assertTrue(carl.packageExplorerV.isWindowInvitationCancelledActive());
-        carl.packageExplorerV.confirmInvitationCancelledWindow();
+        carl.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        assertTrue(carl.pEV.isWindowInvitationCancelledActive());
+        carl.pEV.confirmWindowInvitationCancelled();
         alice.progressV.removeProgress();
 
         assertFalse(bob.sessionV.isInSession());

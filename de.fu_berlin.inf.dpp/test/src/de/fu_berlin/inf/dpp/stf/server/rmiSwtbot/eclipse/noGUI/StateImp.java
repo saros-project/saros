@@ -343,7 +343,7 @@ public class StateImp extends EclipseComponent implements
 
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
-        return helperO.ConvertStreamToString(file.getContents());
+        return helperPart.ConvertStreamToString(file.getContents());
     }
 
     /**

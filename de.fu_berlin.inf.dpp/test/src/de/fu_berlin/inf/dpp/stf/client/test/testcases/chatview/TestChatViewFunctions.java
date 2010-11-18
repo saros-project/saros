@@ -52,7 +52,7 @@ public class TestChatViewFunctions {
         /*
          * alice build session with bob.
          */
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 

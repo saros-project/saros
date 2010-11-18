@@ -130,31 +130,31 @@ public class TestDriverSavesFiles {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException {
-        assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertFalse(dave.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
+        assertFalse(dave.editor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_JAVA_EDITOR));
-        assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS3,
+        assertFalse(dave.editor.isClassDirty(PROJECT, PKG, CLS3,
             SarosConstant.ID_JAVA_EDITOR));
-        assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
+        assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_JAVA_EDITOR));
-        assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS3,
+        assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS3,
             SarosConstant.ID_JAVA_EDITOR));
 
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
-        String dirtyClsContentOfAlice = alice.eclipseEditor
+        String dirtyClsContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT, PKG, CLS);
 
-        dave.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
+        dave.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
             dirtyClsContentOfAlice);
-        assertTrue(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertTrue(dave.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        edna.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
+        edna.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
             dirtyClsContentOfAlice);
-        assertTrue(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertTrue(edna.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
     }
 
@@ -175,9 +175,9 @@ public class TestDriverSavesFiles {
     @Test
     public void testNoChangeByExternalEditorByBob() throws IOException,
         CoreException {
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS2);
-        String dirtyCls2ContentOfAlice = alice.eclipseEditor
+        String dirtyCls2ContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
         String cls2ContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS2);
@@ -202,17 +202,17 @@ public class TestDriverSavesFiles {
      */
     @Test
     public void testChangeByEclipseEditorByCarl() throws RemoteException {
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS2);
-        String dirtyCls2ContentOfAlice = alice.eclipseEditor
+        String dirtyCls2ContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
-        carl.packageExplorerV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
+        carl.pEV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
 
-        carl.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
+        carl.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ContentOfAlice);
-        assertTrue(carl.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
+        assertTrue(carl.editor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_TEXT_EDITOR));
-        String dirtyCls2ContentOfCarl = carl.eclipseEditor.getTextOfJavaEditor(
+        String dirtyCls2ContentOfCarl = carl.editor.getTextOfJavaEditor(
             PROJECT, PKG, CLS2);
         assertTrue(dirtyCls2ContentOfCarl.equals(dirtyCls2ContentOfAlice));
     }
@@ -240,22 +240,22 @@ public class TestDriverSavesFiles {
 
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS2);
-        carl.packageExplorerV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
-        carl.eclipseEditor.closeJavaEditorWithSave(CLS2);
+        carl.pEV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
+        carl.editor.closeJavaEditorWithSave(CLS2);
 
-        alice.eclipseEditor.setTextInJavaEditorWithSave(CP2_change, PROJECT,
+        alice.editor.setTextInJavaEditorWithSave(CP2_change, PROJECT,
             PKG, CLS2);
-        String dirtyCls2ChangeContentOfAlice = alice.eclipseEditor
+        String dirtyCls2ChangeContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
-        dave.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
+        dave.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
-        assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
+        assertFalse(dave.editor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_JAVA_EDITOR));
-        edna.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
+        edna.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
-        assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS2,
+        assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS2,
             SarosConstant.ID_JAVA_EDITOR));
 
         bob.state.waitUntilClassContentsSame(PROJECT, PKG, CLS2,
@@ -264,13 +264,13 @@ public class TestDriverSavesFiles {
             CLS2);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.packageExplorerV.openClass(PROJECT, PKG, CLS2);
-        carl.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
+        carl.pEV.openClass(PROJECT, PKG, CLS2);
+        carl.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
-        String contentOfCarl = carl.eclipseEditor.getTextOfJavaEditor(PROJECT,
+        String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT,
             PKG, CLS2);
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
-        carl.eclipseEditor.closeJavaEditorWithSave(CLS2);
+        carl.editor.closeJavaEditorWithSave(CLS2);
     }
 
     /**
@@ -293,29 +293,29 @@ public class TestDriverSavesFiles {
     public void testCloseDirtyFileByAlice() throws RemoteException,
         IOException, CoreException {
         String clsConentofBob = bob.state.getClassContent(PROJECT, PKG, CLS);
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
-        alice.eclipseEditor.closeJavaEditorWithSave(CLS);
+        alice.editor.closeJavaEditorWithSave(CLS);
         String clsConentOfAlice = alice.state
             .getClassContent(PROJECT, PKG, CLS);
 
         dave.state.waitUntilClassContentsSame(PROJECT, PKG, CLS,
             clsConentOfAlice);
-        assertFalse(dave.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertFalse(dave.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        edna.eclipseEditor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
+        edna.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
             clsConentOfAlice);
-        assertFalse(edna.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        String clsContentChangeOfBob = bob.eclipseEditor.getTextOfJavaEditor(
+        String clsContentChangeOfBob = bob.editor.getTextOfJavaEditor(
             PROJECT, PKG, CLS);
         assertFalse(clsContentChangeOfBob.equals(clsConentofBob));
 
-        String clsContentChangeOfCarl = carl.eclipseEditor.getTextOfJavaEditor(
+        String clsContentChangeOfCarl = carl.editor.getTextOfJavaEditor(
             PROJECT, PKG, CLS);
         assertTrue(clsContentChangeOfCarl.equals(clsConentOfAlice));
-        carl.eclipseEditor.closeJavaEditorWithSave(CLS);
+        carl.editor.closeJavaEditorWithSave(CLS);
     }
 
 }

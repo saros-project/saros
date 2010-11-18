@@ -85,19 +85,19 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void openRosterView() throws RemoteException {
         if (!isRosterViewOpen())
-            viewO.openViewById(VIEWID);
+            viewPart.openViewById(VIEWID);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
-        return viewO.isViewOpen(VIEWNAME);
+        return viewPart.isViewOpen(VIEWNAME);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(VIEWNAME);
+        viewPart.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public void closeRosterView() throws RemoteException {
-        viewO.closeViewById(VIEWID);
+        viewPart.closeViewById(VIEWID);
     }
 
     public void disconnect() throws RemoteException {
@@ -109,13 +109,13 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public SWTBotTreeItem selectBuddy(String baseJID) throws RemoteException {
-        return viewO.selectTreeWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
+        return viewPart.selectTreeWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
     }
 
     public boolean isBuddyExist(String baseJID) throws RemoteException {
         precondition();
-        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
-        return treeO
+        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+        return treePart
             .isTreeItemWithMatchTextExist(tree, BUDDIES, baseJID + ".*");
     }
 
@@ -129,7 +129,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * {@link RosterView} having the connected state.
      */
     public boolean isConnected() throws RemoteException {
-        return exStateO.isConnected() && isConnectedGUI();
+        return state.isConnected() && isConnectedGUI();
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {
@@ -153,14 +153,14 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void confirmNewContactWindow(String baseJID) {
-        windowO.waitUntilShellActive(NEWCONTACT);
-        basicO.setTextInTextWithLabel(baseJID, JABBERID);
-        basicO.waitUntilButtonIsEnabled(FINISH);
-        basicO.clickButton(FINISH);
+        windowPart.waitUntilShellActive(NEWCONTACT);
+        basicPart.setTextInTextWithLabel(baseJID, JABBERID);
+        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicPart.clickButton(FINISH);
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return exStateO.hasContactWith(jid) && isBuddyExist(jid.getBase());
+        return state.hasContactWith(jid) && isBuddyExist(jid.getBase());
     }
 
     /**
@@ -179,34 +179,34 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void clickContextMenuOfBuddy(String context, String baseJID)
         throws RemoteException {
-        viewO.clickContextMenuOfTreeInView(VIEWNAME, DELETE, BUDDIES, baseJID);
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, BUDDIES, baseJID);
     }
 
     public void confirmDeleteWindow() throws RemoteException {
-        windowO.waitUntilShellActive(CONFIRMDELETE);
-        windowO.confirmWindow(CONFIRMDELETE, YES);
+        windowPart.waitUntilShellActive(CONFIRMDELETE);
+        windowPart.confirmWindow(CONFIRMDELETE, YES);
     }
 
     public void confirmContactLookupFailedWindow(String buttonType)
         throws RemoteException {
-        windowO.confirmWindow(CONTACTLOOKUPFAILED, buttonType);
+        windowPart.confirmWindow(CONTACTLOOKUPFAILED, buttonType);
     }
 
     public boolean isWindowContactLookupFailedActive() throws RemoteException {
-        return windowO.isShellActive(CONTACTLOOKUPFAILED);
+        return windowPart.isShellActive(CONTACTLOOKUPFAILED);
     }
 
     public boolean isWindowContactAlreadyAddedActive() throws RemoteException {
-        return windowO.isShellActive(CONTACTALREADYADDED);
+        return windowPart.isShellActive(CONTACTALREADYADDED);
     }
 
     public void renameContact(String contact, String newName)
         throws RemoteException {
-        SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = treeO.getTreeItemWithMatchText(tree, BUDDIES
+        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+        SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
             + ".*", contact + ".*");
         item.contextMenu(RENAME).click();
-        windowO.waitUntilShellActive("Set new nickname");
+        windowPart.waitUntilShellActive("Set new nickname");
         bot.text(contact).setText(newName);
         bot.button(OK).click();
     }
@@ -228,7 +228,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public boolean isCreateXMPPAccountWindowActive() throws RemoteException {
-        return windowO.isShellActive(CREATEXMPPACCOUNT);
+        return windowPart.isShellActive(CREATEXMPPACCOUNT);
     }
 
     /**
@@ -236,19 +236,19 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     public void confirmSarosConfigurationWizard(String xmppServer, String jid,
         String password) {
-        windowO.activateShellWithText(CREATEXMPPACCOUNT);
-        basicO.setTextInTextWithLabel(xmppServer, SERVER);
+        windowPart.activateShellWithText(CREATEXMPPACCOUNT);
+        basicPart.setTextInTextWithLabel(xmppServer, SERVER);
         bot.sleep(sleepTime);
-        basicO.setTextInTextWithLabel(jid, USERNAME);
+        basicPart.setTextInTextWithLabel(jid, USERNAME);
         bot.sleep(sleepTime);
-        basicO.setTextInTextWithLabel(password, PASSWORD);
-        basicO.setTextInTextWithLabel(password, CONFIRM);
-        basicO.clickButton(FINISH);
+        basicPart.setTextInTextWithLabel(password, PASSWORD);
+        basicPart.setTextInTextWithLabel(password, CONFIRM);
+        basicPart.clickButton(FINISH);
     }
 
     public void confirmRemovelOfSubscriptionWindow() throws RemoteException {
-        windowO.waitUntilShellActive(REMOVELOFSUBSCRIPTION);
-        windowO.confirmWindow(REMOVELOFSUBSCRIPTION, OK);
+        windowPart.waitUntilShellActive(REMOVELOFSUBSCRIPTION);
+        windowPart.confirmWindow(REMOVELOFSUBSCRIPTION, OK);
     }
 
     /**************************************************************
@@ -271,37 +271,37 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void waitUntilContactLookupFailedIsActive() throws RemoteException {
-        windowO.waitUntilShellActive(CONTACTLOOKUPFAILED);
+        windowPart.waitUntilShellActive(CONTACTLOOKUPFAILED);
     }
 
     public void waitUntilWindowContactAlreadyAddedIsActive()
         throws RemoteException {
-        windowO.waitUntilShellActive(CONTACTALREADYADDED);
+        windowPart.waitUntilShellActive(CONTACTALREADYADDED);
     }
 
     public void closeWindowContactAlreadyAdded() throws RemoteException {
-        windowO.closeShell(CONTACTALREADYADDED);
+        windowPart.closeShell(CONTACTALREADYADDED);
     }
 
     public void confirmRequestOfSubscriptionReceivedWindow()
         throws RemoteException {
-        windowO
+        windowPart
             .waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        windowO.confirmWindow(
+        windowPart.confirmWindow(
             SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
             SarosConstant.BUTTON_OK);
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip) {
-        return viewO.isToolbarInViewEnabled(VIEWNAME, tooltip);
+        return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
     }
 
     protected void clickToolbarButtonWithTooltip(String tooltipText) {
-        viewO.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
+        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
     }
 
     protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return viewO.getToolbarButtonsOnView(VIEWNAME);
+        return viewPart.getToolbarButtonsOnView(VIEWNAME);
     }
 
 }

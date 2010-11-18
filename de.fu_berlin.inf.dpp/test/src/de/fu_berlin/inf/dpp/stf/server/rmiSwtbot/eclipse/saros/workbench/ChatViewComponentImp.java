@@ -30,20 +30,20 @@ public class ChatViewComponentImp extends EclipseComponent implements
     }
 
     public void activateChatView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        viewPart.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            viewO.openViewById(SarosConstant.ID_CHAT_VIEW);
+            viewPart.openViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public void closeChatView() throws RemoteException {
-        viewO.closeViewById(SarosConstant.ID_CHAT_VIEW);
+        viewPart.closeViewById(SarosConstant.ID_CHAT_VIEW);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return viewO.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        return viewPart.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
     }
 
     public void sendChatMessage(String message) throws RemoteException {

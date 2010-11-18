@@ -36,7 +36,7 @@ public class TestSessionViewObject {
         log.trace("alice create a new proejct and a new class.");
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
         log.trace("alice share session with bob.");
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
@@ -52,7 +52,7 @@ public class TestSessionViewObject {
         alice.workbench.openSarosViews();
         if (!alice.state.isInSession()) {
             bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-            alice.buildSessionSequential(PROJECT,
+            alice.shareProjectWithDone(PROJECT,
                 SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         }
         if (bob.state.isDriver()) {
@@ -167,8 +167,8 @@ public class TestSessionViewObject {
     @Test
     public void testShareYourScreenWithSelectedUser() throws RemoteException {
         alice.shareYourScreenWithSelectedUserDone(bob);
-        bob.remoteScreenV.waitUntilRemoteScreenViewIsActive();
-        assertTrue(bob.remoteScreenV.isRemoteScreenViewActive());
+        bob.rSV.waitUntilRemoteScreenViewIsActive();
+        assertTrue(bob.rSV.isRemoteScreenViewActive());
         alice.sessionV.stopSessionWithUser(bob.state);
     }
 

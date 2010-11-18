@@ -62,7 +62,7 @@ public class TestShareProjectUsingExistingProject {
     public void testShareProjectUsingExistingProject() throws RemoteException {
         assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertFalse(bob.state.existsClass(PROJECT2, PKG, CLS));
         assertFalse(bob.state.existsProject(PROJECT2));
@@ -73,11 +73,11 @@ public class TestShareProjectUsingExistingProject {
     public void testShareProjectUsingExistingProjectWithCancelLocalChange()
         throws RemoteException {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
-        alice.buildSessionSequential(PROJECT,
+        alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.packageExplorerV.isWIndowSessionInvitationActive());
-        bob.packageExplorerV
-            .confirmSessionInvitationWindowStep2UsingExistProjectWithCopy(PROJECT);
+        assertTrue(bob.pEV.isWIndowSessionInvitationActive());
+        bob.pEV
+            .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT);
 
         assertTrue(bob.state.existsProject(PROJECT));
         assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
@@ -91,7 +91,7 @@ public class TestShareProjectUsingExistingProject {
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
-        alice.buildSessionSequential(BotConfiguration.PROJECTNAME,
+        alice.shareProjectWithDone(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.state.existsProject(PROJECT));
         assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));

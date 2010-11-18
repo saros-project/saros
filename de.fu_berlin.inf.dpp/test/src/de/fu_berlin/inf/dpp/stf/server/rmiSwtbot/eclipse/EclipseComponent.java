@@ -20,14 +20,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewP
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 
 public abstract class EclipseComponent {
@@ -42,8 +42,6 @@ public abstract class EclipseComponent {
     protected final static String FINISH = SarosConstant.BUTTON_FINISH;
     protected final static String NEXT = SarosConstant.BUTTON_NEXT;
 
-    protected String VIEWNAME = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
-
     // Title of Shells
     protected final static String PROGRESSINFORMATION = SarosConstant.SHELL_TITLE_PROGRESS_INFORMATION;
 
@@ -51,30 +49,29 @@ public abstract class EclipseComponent {
     protected final static String ROLENAME = SarosConstant.ROLENAME;
 
     // exported objects
-    public static BasicComponent exBasicO;
-    public static SarosMainMenuComponent exMainMenuO;
-    public static EditorComponent exEditorO;
-    // public static ExWindowObject exWindowO;
-    public static SarosWorkbenchComponent exWorkbenchO;
-    public static SarosState exStateO;
-    public static RosterViewComponent exRosterVO;
-    public static SessionViewComponent exSessonVO;
-    public static RSViewComponent exRemoteScreenVO;
-    public static ChatViewComponent exChatVO;
-    public static PEViewComponent exPackageExplorerVO;
-    public static ProgressViewComponent exProgressVO;
+    public static BasicComponent basicC;
+    public static SarosMainMenuComponent mainMenuC;
+    public static EditorComponent editorC;
+    public static SarosWorkbenchComponent workbenchC;
+    public static SarosState state;
+    public static RosterViewComponent rosterVC;
+    public static SessionViewComponent sessonVC;
+    public static RSViewComponent rsVC;
+    public static ChatViewComponent chatVC;
+    public static SarosPEViewComponent peVC;
+    public static ProgressViewComponent progressC;
 
     // No exported objects
-    public static TablePart tableO;
-    public static MenuPart menuO;
-    public static TreePart treeO;
-    public static WindowPart windowO;
-    public static BasicPart basicO;
-    public static ViewPart viewO;
-    public static HelperPart helperO;
-    public static PerspectivePart perspectiveO;
-    public static EditorPart editorO;
-    public static ToolbarPart toolbarO;
+    public static TablePart tablePart;
+    public static MenuPart menuPart;
+    public static TreePart treePart;
+    public static WindowPart windowPart;
+    public static BasicPart basicPart;
+    public static ViewPart viewPart;
+    public static HelperPart helperPart;
+    public static PerspectivePart perspectivePart;
+    public static EditorPart editorPart;
+    public static ToolbarPart toolbarPart;
 
     public static SarosSWTBot bot;
     public static int sleepTime = 750;

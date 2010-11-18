@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -125,44 +124,35 @@ public class TestParallelInvitationWithTerminationByInvitees {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        List<String> peersName = new LinkedList<String>();
-        peersName.add(bob.getBaseJid());
-        peersName.add(dave.getBaseJid());
-        peersName.add(carl.getBaseJid());
-        peersName.add(edna.getBaseJid());
-
-        alice.packageExplorerV.shareProject(PROJECT, peersName);
-        bob.packageExplorerV.waitUntilWIndowSessionInvitationActive();
+        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), dave.getBaseJid(),
+            carl.getBaseJid(), edna.getBaseJid());
+        bob.pEV.waitUntilWIndowSessionInvitationActive();
         bob.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
-        assertTrue(alice.packageExplorerV
-            .getSecondLabelOfProblemOccurredWindow().matches(
-                bob.getName() + ".*"));
+        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
+            bob.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        carl.packageExplorerV.waitUntilWIndowSessionInvitationActive();
-        carl.packageExplorerV.confirmSessionInvitationWindowStep1();
+        carl.pEV.waitUntilWIndowSessionInvitationActive();
+        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
         carl.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
-        assertTrue(alice.packageExplorerV
-            .getSecondLabelOfProblemOccurredWindow().matches(
-                carl.getName() + ".*"));
+        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
+            carl.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        dave.packageExplorerV.isWIndowSessionInvitationActive();
-        dave.packageExplorerV.confirmSessionInvitationWindowStep1();
+        dave.pEV.isWIndowSessionInvitationActive();
+        dave.pEV.confirmFirstPageOfWizardSessionInvitation();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         dave.basic.clickButton(SarosConstant.BUTTON_CANCEL);
-        alice.packageExplorerV.waitUntilIsWindowProblemOccurredActive();
-        assertTrue(alice.packageExplorerV
-            .getSecondLabelOfProblemOccurredWindow().matches(
-                dave.getName() + ".*"));
+        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
+            dave.getName() + ".*"));
         alice.basic.clickButton(SarosConstant.BUTTON_OK);
 
-        edna.packageExplorerV.isWIndowSessionInvitationActive();
-        edna.packageExplorerV.confirmSessionInvitationWindowStep1();
-        edna.packageExplorerV
-            .confirmSessionInvitationWindowStep2UsingNewproject(PROJECT);
+        edna.pEV.isWIndowSessionInvitationActive();
+        edna.pEV.confirmFirstPageOfWizardSessionInvitation();
+        edna.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }

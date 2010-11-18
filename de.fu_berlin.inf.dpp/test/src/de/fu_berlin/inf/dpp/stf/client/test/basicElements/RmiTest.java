@@ -163,11 +163,11 @@ public class RmiTest {
     @Ignore
     public void testCloseEditorWithSave() throws IOException, CoreException {
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
-        String dirtyClsContentOfAlice = alice.eclipseEditor
+        String dirtyClsContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT2, PKG, CLS);
-        alice.eclipseEditor.closeJavaEditorWithSave(CLS);
+        alice.editor.closeJavaEditorWithSave(CLS);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS);
         assertTrue(dirtyClsContentOfAlice.equals(clsContentOfAlice));
@@ -177,11 +177,11 @@ public class RmiTest {
     @Ignore
     public void testCloseEditorWithoutSave() throws IOException, CoreException {
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
-        String dirtyClsContentOfAlice = alice.eclipseEditor
+        String dirtyClsContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT2, PKG, CLS);
-        alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
+        alice.editor.closejavaEditorWithoutSave(CLS);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS);
         assertFalse(dirtyClsContentOfAlice.equals(clsContentOfAlice));
@@ -190,10 +190,10 @@ public class RmiTest {
     @Test
     public void testIsClassDirty() throws RemoteException {
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        assertFalse(alice.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        assertFalse(alice.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        alice.eclipseEditor.setTextInJavaEditorWithSave(CP, PROJECT, PKG, CLS);
-        assertTrue(alice.eclipseEditor.isClassDirty(PROJECT, PKG, CLS,
+        alice.editor.setTextInJavaEditorWithSave(CP, PROJECT, PKG, CLS);
+        assertTrue(alice.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
     }
 
@@ -218,7 +218,7 @@ public class RmiTest {
     @Ignore
     public void testOpenWith() throws RemoteException {
         alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.packageExplorerV.openClassWith(
+        alice.pEV.openClassWith(
             SarosConstant.MENU_TITLE_TEXT_EDITOR, PROJECT, PKG, CLS);
         alice.state.openClassWithSystemEditor(PROJECT, PKG, CLS);
 
@@ -237,7 +237,7 @@ public class RmiTest {
     public void testTypeTextInEditor() throws RemoteException {
         alice.mainMenu.newJavaProject(PROJECT);
         alice.mainMenu.newClassImplementsRunnable(PROJECT, "pkg", "Cls");
-        alice.eclipseEditor.typeTextInJavaEditor(CP, PROJECT, "pkg", "Cls");
+        alice.editor.typeTextInJavaEditor(CP, PROJECT, "pkg", "Cls");
     }
 
     @Test
@@ -255,7 +255,7 @@ public class RmiTest {
     public void testRenameFile() throws RemoteException {
         alice.mainMenu.newJavaProject(PROJECT);
         alice.mainMenu.newClass(PROJECT, "pkg", "Cls");
-        alice.packageExplorerV.renameClass("Cls2", PROJECT, "pkg", "Cls");
+        alice.pEV.renameClass("Cls2", PROJECT, "pkg", "Cls");
 
         assertFalse(alice.state.existsClass(PROJECT, "pkg", "Cls"));
         assertTrue(alice.state.existsClass(PROJECT, "pkg", "Cls2"));
@@ -266,7 +266,7 @@ public class RmiTest {
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.mainMenu.newJavaProject(PROJECT);
         assertTrue(alice.state.existsProject(PROJECT));
-        alice.packageExplorerV.deleteProjectGui(PROJECT);
+        alice.pEV.deleteProjectGui(PROJECT);
         assertFalse(alice.state.existsProject(PROJECT));
     }
 
@@ -276,7 +276,7 @@ public class RmiTest {
         alice.mainMenu.newJavaProject(PROJECT);
         alice.mainMenu.newClass(PROJECT, "pkg", "Cls");
         assertTrue(alice.state.existsClass(PROJECT, "pkg", "Cls"));
-        alice.packageExplorerV.deleteFileGui(PROJECT, "src", "pkg", "Cls.java");
+        alice.pEV.deleteFileGui(PROJECT, "src", "pkg", "Cls.java");
         assertFalse(alice.state.existsClass(PROJECT, "pkg", "Cls"));
     }
 
@@ -296,10 +296,10 @@ public class RmiTest {
     public void testIsFileExistWithGUI() throws RemoteException {
         alice.mainMenu.newJavaProject(PROJECT);
         alice.mainMenu.newClass(PROJECT, "pkg", "Cls");
-        assertTrue(alice.packageExplorerV
+        assertTrue(alice.pEV
             .isClassExistGUI(PROJECT, "pkg", "Cls"));
         alice.state.deleteClass(PROJECT, "pkg", "Cls");
-        assertFalse(alice.packageExplorerV.isClassExistGUI(PROJECT, "pkg",
+        assertFalse(alice.pEV.isClassExistGUI(PROJECT, "pkg",
             "Cls"));
     }
 

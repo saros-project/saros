@@ -18,14 +18,14 @@ import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 
 /**
@@ -36,19 +36,16 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewC
 public class Musician {
     private static final Logger log = Logger.getLogger(Musician.class);
 
-    public EditorComponent eclipseEditor;
-    public PEViewComponent packageExplorerV;
+    public EditorComponent editor;
+    public SarosPEViewComponent pEV;
     public SarosMainMenuComponent mainMenu;
     public ProgressViewComponent progressV;
     public BasicComponent basic;
-
-    // public ISarosRmiSWTWorkbenchBot bot;
     public SarosState state;
     public RosterViewComponent rosterV;
     public SessionViewComponent sessionV;
-    public RSViewComponent remoteScreenV;
+    public RSViewComponent rSV;
     public ChatViewComponent chatV;
-    // public ExWindowObject popupWindow;
     public SarosWorkbenchComponent workbench;
 
     public JID jid;
@@ -100,14 +97,13 @@ public class Musician {
             chatV = (ChatViewComponent) registry.lookup("chatView");
             rosterV = (RosterViewComponent) registry.lookup("rosterView");
             sessionV = (SessionViewComponent) registry.lookup("sessionView");
-            remoteScreenV = (RSViewComponent) registry
-                .lookup("remoteScreenView");
+            rSV = (RSViewComponent) registry.lookup("remoteScreenView");
             // popupWindow = (ExWindowObject) registry.lookup("popUpWindow");
 
-            eclipseEditor = (EditorComponent) registry.lookup("eclipseEditor");
-            packageExplorerV = (PEViewComponent) registry
-                .lookup("packageExplorerView");
-            mainMenu = (SarosMainMenuComponent) registry.lookup("sarosMainMenu");
+            editor = (EditorComponent) registry.lookup("eclipseEditor");
+            pEV = (SarosPEViewComponent) registry.lookup("packageExplorerView");
+            mainMenu = (SarosMainMenuComponent) registry
+                .lookup("sarosMainMenu");
             progressV = (ProgressViewComponent) registry.lookup("progressView");
             basic = (BasicComponent) registry.lookup("basicObject");
 
@@ -120,18 +116,16 @@ public class Musician {
 
     /*************** Component, which consist of other simple functions ******************/
 
-    public void buildSessionSequential(String projectName,
-        String shareProjectWith, Musician... invitees) throws RemoteException {
-        String[] inviteeJIDs = new String[invitees.length];
+    public void shareProjectWithDone(String projectName,
+        String howToShareProject, Musician... invitees) throws RemoteException {
+        String[] inviteeBaseJIDs = new String[invitees.length];
         for (int i = 0; i < invitees.length; i++) {
-            inviteeJIDs[i] = invitees[i].getBaseJid();
+            inviteeBaseJIDs[i] = invitees[i].getBaseJid();
         }
-        packageExplorerV.clickShareProjectWith(projectName, shareProjectWith);
-
-        packageExplorerV.confirmInvitationWindow(inviteeJIDs);
+        pEV.shareProjectWith(projectName, howToShareProject, inviteeBaseJIDs);
         for (Musician invitee : invitees) {
-            invitee.packageExplorerV.confirmSessionUsingNewOrExistProject(
-                this.jid, projectName, invitee.typeOfSharingProject);
+            invitee.pEV.confirmWizardSessionInvitationUsingWhichProject(
+                getBaseJid(), projectName, invitee.typeOfSharingProject);
         }
     }
 
@@ -139,23 +133,21 @@ public class Musician {
         String shareProjectWith, Musician... invitees) throws RemoteException,
         InterruptedException {
         List<Musician> peers = new LinkedList<Musician>();
-        List<String> peersName = new LinkedList<String>();
-        for (Musician invitee : invitees) {
-            peers.add(invitee);
-            peersName.add(invitee.getBaseJid());
+        String[] peersName = new String[invitees.length];
+        for (int i = 0; i < invitees.length; i++) {
+            peers.add(invitees[i]);
+            peersName[i] = invitees[i].getBaseJid();
         }
-
         log.trace("alice.shareProjectParallel");
-        this.packageExplorerV.shareProject(BotConfiguration.PROJECTNAME,
-            peersName);
+        this.pEV.shareProject(BotConfiguration.PROJECTNAME, peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.size(); i++) {
             final Musician musician = peers.get(i);
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.packageExplorerV.confirmSessionInvitationWizard(
-                        getBaseJid(), BotConfiguration.PROJECTNAME);
+                    musician.pEV
+                        .confirmWirzardSessionInvitationWithNewProject(BotConfiguration.PROJECTNAME);
                     return null;
                 }
             });

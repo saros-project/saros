@@ -85,15 +85,15 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void openSessionView() throws RemoteException {
         if (!isSessionViewOpen())
-            viewO.openViewById(VIEWID);
+            viewPart.openViewById(VIEWID);
     }
 
     public boolean isSessionViewOpen() throws RemoteException {
-        return viewO.isViewOpen(VIEWNAME);
+        return viewPart.isViewOpen(VIEWNAME);
     }
 
     public void waitUntilSessionOpen() throws RemoteException {
-        waitUntil(SarosConditions.isInSession(exStateO));
+        waitUntil(SarosConditions.isInSession(state));
     }
 
     public void waitUntilSessionOpenBy(SarosState stateOfPeer)
@@ -102,21 +102,21 @@ public class SessionViewComponentImp extends EclipseComponent implements
     }
 
     public void setFocusOnSessionView() throws RemoteException {
-        viewO.setFocusOnViewByTitle(VIEWNAME);
-        viewO.waitUntilViewActive(VIEWNAME);
+        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        viewPart.waitUntilViewActive(VIEWNAME);
     }
 
     public boolean isSessionViewActive() throws RemoteException {
-        return viewO.isViewActive(VIEWNAME);
+        return viewPart.isViewActive(VIEWNAME);
     }
 
     public void closeSessionView() throws RemoteException {
         if (isSessionViewOpen())
-            viewO.closeViewById(VIEWID);
+            viewPart.closeViewById(VIEWID);
     }
 
     public void waitUntilSessionClosed() throws RemoteException {
-        waitUntil(SarosConditions.isSessionClosed(exStateO));
+        waitUntil(SarosConditions.isSessionClosed(state));
     }
 
     public void waitUntilSessionClosedBy(SarosState stateOfPeer)
@@ -127,7 +127,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public boolean isContactInSessionView(String contactName)
         throws RemoteException {
         precondition();
-        SWTBotTable table = tableO.getTable();
+        SWTBotTable table = tablePart.getTable();
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().equals(contactName))
                 return true;
@@ -145,8 +145,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tableO.clickContextMenuOfTable(InviteeJID.getBase(), GIVEDRIVERROLE);
-        windowO.waitUntilShellClosed(PROGRESSINFORMATION);
+        tablePart.clickContextMenuOfTable(InviteeJID.getBase(), GIVEDRIVERROLE);
+        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
     public void giveExclusiveDriverRole(SarosState stateOfInvitee)
@@ -159,9 +159,9 @@ public class SessionViewComponentImp extends EclipseComponent implements
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tableO.clickContextMenuOfTable(InviteeJID.getBase(),
+        tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
             GIVEEXCLUSIVEDRIVERROLE);
-        windowO.waitUntilShellClosed(PROGRESSINFORMATION);
+        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
     public void removeDriverRole(SarosState stateOfInvitee)
@@ -174,16 +174,16 @@ public class SessionViewComponentImp extends EclipseComponent implements
                     + "\" is  no driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tableO.clickContextMenuOfTable(InviteeJID.getBase() + ROLENAME,
+        tablePart.clickContextMenuOfTable(InviteeJID.getBase() + ROLENAME,
             REMOVEDRIVERROLE);
-        windowO.waitUntilShellClosed(PROGRESSINFORMATION);
+        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
     public void followThisUser(SarosState stateOfFollowedUser)
         throws RemoteException {
         precondition();
         JID JIDOfFollowedUser = stateOfFollowedUser.getJID();
-        if (exStateO.isInFollowMode()) {
+        if (state.isInFollowMode()) {
             log.debug(JIDOfFollowedUser.getBase()
                 + " is already followed by you.");
             return;
@@ -199,7 +199,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         List<String> allContactsName = getAllContactsInSessionView();
         for (String contactName : allContactsName) {
             // SWTBotTable table = tableObject.getTable();
-            if (!tableO.existsContextOfTableItem(contactName,
+            if (!tablePart.existsContextOfTableItem(contactName,
                 STOPFOLLOWINGTHISUSER))
                 continue;
             if (isStopFollowingThisUserEnabled(contactName))
@@ -209,24 +209,24 @@ public class SessionViewComponentImp extends EclipseComponent implements
     }
 
     public void stopFollowing() throws RemoteException {
-        JID followedUserJID = exStateO.getFollowedUserJID();
+        JID followedUserJID = state.getFollowedUserJID();
         if (followedUserJID == null) {
             log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
             return;
         }
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
-        if (exStateO.isDriver(followedUserJID))
-            tableO.clickContextMenuOfTable(
+        if (state.isDriver(followedUserJID))
+            tablePart.clickContextMenuOfTable(
                 followedUserJID.getBase() + ROLENAME, STOPFOLLOWINGTHISUSER);
         else
-            tableO.clickContextMenuOfTable(followedUserJID.getBase(),
+            tablePart.clickContextMenuOfTable(followedUserJID.getBase(),
                 STOPFOLLOWINGTHISUSER);
     }
 
     public void stopFollowingThisUser(SarosState stateOfFollowedUser)
         throws RemoteException {
-        if (!exStateO.isInFollowMode()) {
+        if (!state.isInFollowMode()) {
             log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
             return;
         }
@@ -238,19 +238,19 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public boolean isStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
-        return tableO.isContextMenuOfTableVisible(contactName,
+        return tablePart.isContextMenuOfTableVisible(contactName,
             STOPFOLLOWINGTHISUSER);
     }
 
     public boolean isStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
-        return tableO.isContextMenuOfTableEnabled(contactName,
+        return tablePart.isContextMenuOfTableEnabled(contactName,
             STOPFOLLOWINGTHISUSER);
     }
 
     public void waitUntilIsFollowingUser(String baseJIDOfFollowedUser)
         throws RemoteException {
-        waitUntil(SarosConditions.isFollowingUser(exStateO,
+        waitUntil(SarosConditions.isFollowingUser(state,
             baseJIDOfFollowedUser));
     }
 
@@ -284,7 +284,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
             stateOfselectedUser,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(STARTVOIPSESSION);
-        if (windowO.isShellActive(ERRORINSAROSPLUGIN)) {
+        if (windowPart.isShellActive(ERRORINSAROSPLUGIN)) {
             confirmErrorInSarosPluginWindow();
         }
     }
@@ -292,7 +292,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(INCONSISTENCYDETECTED);
-        windowO.waitUntilShellCloses(PROGRESSINFORMATION);
+        windowPart.waitUntilShellCloses(PROGRESSINFORMATION);
     }
 
     public void removeAllRriverRoles() throws RemoteException {
@@ -323,7 +323,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void waitUntilAllPeersLeaveSession(List<JID> jidsOfAllParticipants)
         throws RemoteException {
-        waitUntil(SarosConditions.existsNoParticipants(exStateO,
+        waitUntil(SarosConditions.existsNoParticipants(state,
             jidsOfAllParticipants));
     }
 
@@ -350,14 +350,14 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void comfirmInvitationWindow(String jidOfinvitee)
         throws RemoteException {
-        windowO.waitUntilShellActive(INVITATION);
-        windowO.confirmWindowWithCheckBox(INVITATION, FINISH, jidOfinvitee);
+        windowPart.waitUntilShellActive(INVITATION);
+        windowPart.confirmWindowWithCheckBox(INVITATION, FINISH, jidOfinvitee);
     }
 
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         leaveTheSession();
-        windowO.confirmWindow(CONFIRMLEAVINGSESSION, YES);
+        windowPart.confirmWindow(CONFIRMLEAVINGSESSION, YES);
         waitUntilSessionClosed();
     }
 
@@ -374,25 +374,25 @@ public class SessionViewComponentImp extends EclipseComponent implements
         // }
         // }
         // });
-        if (windowO.isShellActive(CONFIRMCLOSINGSESSION))
-            windowO.confirmWindow(CONFIRMCLOSINGSESSION, YES);
+        if (windowPart.isShellActive(CONFIRMCLOSINGSESSION))
+            windowPart.confirmWindow(CONFIRMCLOSINGSESSION, YES);
         waitUntilSessionClosed();
     }
 
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException {
-        windowO.waitUntilShellActive(INCOMINGSCREENSHARINGSESSION);
-        windowO.confirmWindow(INCOMINGSCREENSHARINGSESSION, YES);
+        windowPart.waitUntilShellActive(INCOMINGSCREENSHARINGSESSION);
+        windowPart.confirmWindow(INCOMINGSCREENSHARINGSESSION, YES);
     }
 
     public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        windowO.confirmWindow(ERRORINSAROSPLUGIN, OK);
+        windowPart.confirmWindow(ERRORINSAROSPLUGIN, OK);
     }
 
     public void confirmClosingTheSessionWindow() throws RemoteException {
-        windowO.waitUntilShellActive(CLOSINGTHESESSION);
-        windowO.confirmWindow(CLOSINGTHESESSION, OK);
-        windowO.waitUntilShellCloses(CLOSINGTHESESSION);
+        windowPart.waitUntilShellActive(CLOSINGTHESESSION);
+        windowPart.confirmWindow(CLOSINGTHESESSION, OK);
+        windowPart.waitUntilShellCloses(CLOSINGTHESESSION);
     }
 
     /**************************************************************
@@ -425,7 +425,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private List<String> getAllContactsInSessionView() throws RemoteException {
         precondition();
         List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = tableO.getTable();
+        SWTBotTable table = tablePart.getTable();
         for (int i = 0; i < table.rowCount(); i++) {
             allContactsName.add(table.getTableItem(i).getText());
         }
@@ -436,43 +436,43 @@ public class SessionViewComponentImp extends EclipseComponent implements
         SarosState stateOfselectedUser, String context, String message)
         throws RemoteException {
         JID jidOfSelectedUser = stateOfselectedUser.getJID();
-        if (exStateO.isSameUser(jidOfSelectedUser)) {
+        if (state.isSameUser(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
         precondition();
         if (stateOfselectedUser.isDriver(jidOfSelectedUser))
-            tableO.clickContextMenuOfTable(jidOfSelectedUser.getBase()
+            tablePart.clickContextMenuOfTable(jidOfSelectedUser.getBase()
                 + ROLENAME, context);
         else
-            tableO
+            tablePart
                 .clickContextMenuOfTable(jidOfSelectedUser.getBase(), context);
     }
 
     private void selectUser(SarosState stateOfselectedUser, String message)
         throws RemoteException {
         JID jidOfSelectedUser = stateOfselectedUser.getJID();
-        if (exStateO.isSameUser(jidOfSelectedUser)) {
+        if (state.isSameUser(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
         precondition();
         if (stateOfselectedUser.isDriver(jidOfSelectedUser)) {
-            viewO.selectTableItemWithLabelInView(VIEWNAME,
+            viewPart.selectTableItemWithLabelInView(VIEWNAME,
                 jidOfSelectedUser.getBase() + ROLENAME);
         } else {
-            viewO.selectTableItemWithLabelInView(VIEWNAME,
+            viewPart.selectTableItemWithLabelInView(VIEWNAME,
                 jidOfSelectedUser.getBase());
         }
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip) {
-        return viewO.isToolbarInViewEnabled(VIEWNAME, tooltip);
+        return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
     }
 
     protected void clickToolbarButtonWithTooltip(String tooltipText) {
-        viewO.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
+        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
     }
 
     protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return viewO.getToolbarButtonsOnView(VIEWNAME);
+        return viewPart.getToolbarButtonsOnView(VIEWNAME);
     }
 }

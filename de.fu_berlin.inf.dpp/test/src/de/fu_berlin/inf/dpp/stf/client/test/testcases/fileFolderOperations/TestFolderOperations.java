@@ -71,7 +71,7 @@ public class TestFolderOperations {
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER + "New";
 
-        alice.packageExplorerV.renameFolder(PROJECT, FOLDER, newFolderName);
+        alice.pEV.renameFolder(PROJECT, FOLDER, newFolderName);
         bob.state.waitUntilFolderExist(PROJECT, newFolderName);
         assertTrue(bob.state.isFolderExist(PROJECT, newFolderName));
         assertFalse(bob.state.isFolderExist(PROJECT, FOLDER));

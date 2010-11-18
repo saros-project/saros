@@ -129,12 +129,12 @@ public class TestDriverResetsFiles {
     public void testAliceResetsFile() throws IOException, CoreException {
         dave.sessionV.followThisUser(alice.state);
         edna.sessionV.followThisUser(alice.state);
-        alice.eclipseEditor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
             CLS);
 
-        alice.eclipseEditor.closejavaEditorWithoutSave(CLS);
-        dave.eclipseEditor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
-        edna.eclipseEditor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
+        alice.editor.closejavaEditorWithoutSave(CLS);
+        dave.editor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
+        edna.editor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
 
         String contentOfAlice = alice.state.getClassContent(PROJECT, PKG, CLS);
         System.out.println("alice's class content" + contentOfAlice);
