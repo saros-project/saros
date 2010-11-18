@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.communication.multiUserChat;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -15,7 +15,6 @@ import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 
-import de.fu_berlin.inf.dpp.MessagingManager.ChatStatusListener;
 
 /**
  * Handles chat state for all chats on a particular XMPPConnection. This class
@@ -132,8 +131,8 @@ public class ChatStatusManager {
     private void fireNewChatStatus(String sender, ChatState state) {
         // TODO stateChanged needs sender Information
         for (PacketListener listener : this.muc.getListeners()) {
-            if (listener instanceof ChatStatusListener) {
-                ((ChatStatusListener) listener).stateChanged(sender, state);
+            if (listener instanceof IMultiUserChatStatusListener) {
+                ((IMultiUserChatStatusListener) listener).stateChanged(sender, state);
             }
         }
     }

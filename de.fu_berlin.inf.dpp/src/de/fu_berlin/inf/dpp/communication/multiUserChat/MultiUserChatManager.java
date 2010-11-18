@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.communication.multiUserChat;
 
 import java.util.ArrayList;
 import java.util.List;

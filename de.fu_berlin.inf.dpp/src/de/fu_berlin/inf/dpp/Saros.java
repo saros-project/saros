@@ -82,6 +82,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
+import de.fu_berlin.inf.dpp.communication.multiUserChat.MessagingManager;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;

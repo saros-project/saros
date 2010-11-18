@@ -15,11 +15,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.MessagingManager;
-import de.fu_berlin.inf.dpp.MessagingManager.IChatListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.multiUserChat.IMultiUserChatListener;
+import de.fu_berlin.inf.dpp.communication.multiUserChat.MessagingManager;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -96,7 +96,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
         }
     };
 
-    protected IChatListener chatListener = new IChatListener() {
+    protected IMultiUserChatListener chatListener = new IMultiUserChatListener() {
 
         public void chatJoined(final User joinedUser) {
             ChatView.this.addChatLine(joinedUser, "... joined the chat.",
@@ -130,7 +130,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             });
         }
 
-        public void chatMessageAdded(final User user, final String message) {
+        public void chatMessageReceived(final User user, final String message) {
             ChatView.this.addChatLine(user, message, new Date());
 
             Util.runSafeSWTAsync(log, new Runnable() {

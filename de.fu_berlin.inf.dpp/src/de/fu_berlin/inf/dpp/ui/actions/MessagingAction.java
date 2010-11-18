@@ -24,7 +24,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 
-import de.fu_berlin.inf.dpp.MessagingManager;
+import de.fu_berlin.inf.dpp.communication.multiUserChat.MessagingManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
