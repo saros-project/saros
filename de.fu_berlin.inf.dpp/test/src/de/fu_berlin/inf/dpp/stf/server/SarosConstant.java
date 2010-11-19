@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
+
 public class SarosConstant {
 
     public final static int CREATE_NEW_PROJECT = 1;
@@ -69,7 +71,7 @@ public class SarosConstant {
     public final static String NODE_ROSTER = "Roster";
     public final static String NODE_SAROS_SESSION = "Saros Session";
 
-    public final static String SHELL_TITLE_CREATE_XMPP_ACCOUNT = "Create XMPP-Account";
+    public final static String SHELL_TITLE_CREATE_XMPP_ACCOUNT = CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
     public final static String SHELL_TITLE_DELETE_RESOURCE = "Delete Resources";
     public final static String SHELL_TITLE_NEW_PROJECT = "New project";
     public final static String SHELL_TITLE_INVITATION = "Invitation";

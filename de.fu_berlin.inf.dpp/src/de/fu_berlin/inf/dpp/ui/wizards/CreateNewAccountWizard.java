@@ -15,6 +15,8 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
  */
 public class CreateNewAccountWizard extends Wizard {
 
+    public static final String CREATE_XMPP_ACCOUNT = "Create XMPP account";
+
     @Inject
     XMPPAccountStore service;
     AccountPage accountPage;
@@ -22,7 +24,7 @@ public class CreateNewAccountWizard extends Wizard {
 
     public CreateNewAccountWizard() {
         Saros.reinject(this);
-        setWindowTitle("Create XMPP account");
+        setWindowTitle(CREATE_XMPP_ACCOUNT);
         addPageToWizard();
     }
 
