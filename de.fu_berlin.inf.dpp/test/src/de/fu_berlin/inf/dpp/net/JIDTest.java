@@ -1,7 +1,8 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
+ * (c) Björn Kahlert - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +27,19 @@ import org.junit.Test;
 
 public class JIDTest {
 
-    private JID id;
-    private JID idWithResource;
+    private JID jid;
+    private JID jidWithResource;
+    private JID servicePerspectiveJID;
+    private JID servicePerspectiveJIDWithResource;
 
     @Before
     public void setUp() throws Exception {
-        id = new JID("riad@jabber.org");
-        idWithResource = new JID("riad@jabber.org/saros");
+        jid = new JID("userXYZ@jabber.org");
+        jidWithResource = new JID("userXYZ@jabber.org/Saros");
+        servicePerspectiveJID = JID
+            .createFromServicePerspective("saros128280129@conference.jabber.ccc.de/userXYZ@jabber.org");
+        servicePerspectiveJIDWithResource = JID
+            .createFromServicePerspective("saros128280129@conference.jabber.ccc.de/userXYZ@jabber.org/Saros");
     }
 
     /**
@@ -45,34 +52,59 @@ public class JIDTest {
 
     @Test
     public void testGetUser() {
-        assertEquals("riad", id.getName());
-        assertEquals("riad", idWithResource.getName());
+        assertEquals("userXYZ", jid.getName());
+        assertEquals("userXYZ", jidWithResource.getName());
+        assertEquals("userXYZ", servicePerspectiveJID.getName());
+        assertEquals("userXYZ", servicePerspectiveJIDWithResource.getName());
     }
 
     @Test
     public void testGetHost() {
-        assertEquals("jabber.org", id.getDomain());
-        assertEquals("jabber.org", idWithResource.getDomain());
+        assertEquals("jabber.org", jid.getDomain());
+        assertEquals("jabber.org", jidWithResource.getDomain());
+        assertEquals("jabber.org", servicePerspectiveJID.getDomain());
+        assertEquals("jabber.org",
+            servicePerspectiveJIDWithResource.getDomain());
     }
 
     @Test
     public void testGetResource() {
-        assertEquals("", id.getResource());
-        assertEquals("saros", idWithResource.getResource());
+        assertEquals("", jid.getResource());
+        assertEquals("Saros", jidWithResource.getResource());
+        assertEquals("", servicePerspectiveJID.getResource());
+        assertEquals("Saros", servicePerspectiveJIDWithResource.getResource());
     }
 
     @Test
     public void testGetBase() {
-        assertEquals("riad@jabber.org", id.getBase());
-        assertEquals("riad@jabber.org", idWithResource.getBase());
+        assertEquals("userXYZ@jabber.org", jid.getBase());
+        assertEquals("userXYZ@jabber.org", jidWithResource.getBase());
+        assertEquals("userXYZ@jabber.org", servicePerspectiveJID.getBase());
+        assertEquals("userXYZ@jabber.org",
+            servicePerspectiveJIDWithResource.getBase());
     }
 
     @Test
     public void testEquals() {
-        assertEquals(id, id);
-        assertEquals(idWithResource, idWithResource);
-        assertEquals(id, idWithResource);
+        assertEquals(jid, jid);
+        assertEquals(jid, jidWithResource);
+        assertEquals(jid, servicePerspectiveJID);
+        assertEquals(jid, servicePerspectiveJIDWithResource);
 
-        assert !id.equals(new JID("bob@jabber.org"));
+        assertEquals(jidWithResource, jidWithResource);
+        assertEquals(jidWithResource, servicePerspectiveJID);
+        assertEquals(jidWithResource, servicePerspectiveJIDWithResource);
+
+        assertEquals(servicePerspectiveJID, servicePerspectiveJID);
+        assertEquals(servicePerspectiveJID, servicePerspectiveJIDWithResource);
+
+        assertEquals(servicePerspectiveJIDWithResource,
+            servicePerspectiveJIDWithResource);
+
+        assert !jid.equals(new JID("bob@jabber.org"));
+        assert !jidWithResource.equals(new JID("bob@jabber.org"));
+        assert !servicePerspectiveJID.equals(new JID("bob@jabber.org"));
+        assert !servicePerspectiveJIDWithResource.equals(new JID(
+            "bob@jabber.org"));
     }
 }

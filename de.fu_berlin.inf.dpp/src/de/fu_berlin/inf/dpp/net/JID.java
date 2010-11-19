@@ -23,6 +23,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.util.StringUtils;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -40,6 +41,26 @@ public class JID implements Serializable {
     private static final long serialVersionUID = 4830741516870940459L;
 
     private final String jid;
+
+    /**
+     * Creates the client {@link JID} on the base of a service perspective
+     * {@link JID} as explained in XEP-0045.
+     * <p>
+     * Example: A {@link MultiUserChat} participant has - from the perspective
+     * of the {@link MultiUserChat} itself - the JID
+     * <b>saros128280129@conference.jabber.ccc.de/bkahlert@jabber.org/Saros</b>.
+     * This method would return the {@link JID} representing
+     * <b>bkahlert@jabber.org/Saros</b>.
+     * 
+     * @see <a href="http://xmpp.org/extensions/xep-0045.html#user">XEP-0045</a>
+     * 
+     * @param servicePerspectiveJID
+     *            the XMPP address from the perspective of the service
+     * @return the client JID portion
+     */
+    public static JID createFromServicePerspective(String servicePerspectiveJID) {
+        return new JID(StringUtils.parseResource(servicePerspectiveJID));
+    }
 
     /**
      * Construct a new Jabber-ID
