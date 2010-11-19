@@ -262,9 +262,6 @@ public interface ITransmitter {
      * 
      * @param recipient
      *            the Jabber ID of the recipient.
-     * @param project
-     *            the project of which the given path contains the file to be
-     *            sent.
      * @param archive
      *            the project-relative path of the resource that is to be sent.
      * @param monitor
