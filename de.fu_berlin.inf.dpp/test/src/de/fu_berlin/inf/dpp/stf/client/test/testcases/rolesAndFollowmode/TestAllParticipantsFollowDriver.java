@@ -17,15 +17,11 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestAllParticipantsFollowDriver {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
+public class TestAllParticipantsFollowDriver extends STFTest {
 
     private static Musician alice;
     private static Musician bob;
@@ -59,7 +55,7 @@ public class TestAllParticipantsFollowDriver {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.editor.closejavaEditorWithoutSave(CLS);
 
         /*
@@ -113,7 +109,7 @@ public class TestAllParticipantsFollowDriver {
         assertFalse(carl.editor.isClassOpen(CLS));
         assertFalse(dave.editor.isClassOpen(CLS));
 
-        alice.pEV.openClass(PROJECT, PKG, CLS);
+        alice.pEV.openFile(getClassNodes(PROJECT, PKG, CLS));
         bob.editor.waitUntilJavaEditorOpen(CLS);
         carl.editor.waitUntilJavaEditorOpen(CLS);
         dave.editor.waitUntilJavaEditorOpen(CLS);
@@ -131,34 +127,33 @@ public class TestAllParticipantsFollowDriver {
      */
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS);
-        String dirtyClsContentOfAlice = alice.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT, PKG, CLS);
 
-        bob.editor.waitUntilJavaEditorContentSame(
-            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        bob.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
+            PROJECT, PKG, CLS);
         assertTrue(bob.editor.isJavaEditorActive(CLS));
         assertTrue(bob.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(bob.editor.getTextOfJavaEditor(PROJECT, PKG, CLS)
-            .equals(dirtyClsContentOfAlice));
+        assertTrue(bob.editor.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+            dirtyClsContentOfAlice));
 
-        carl.editor.waitUntilJavaEditorContentSame(
-            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        carl.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
+            PROJECT, PKG, CLS);
         assertTrue(carl.editor.isJavaEditorActive(CLS));
         assertTrue(carl.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(carl.editor.getTextOfJavaEditor(PROJECT, PKG, CLS)
-            .equals(dirtyClsContentOfAlice));
+        assertTrue(carl.editor.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+            dirtyClsContentOfAlice));
 
-        dave.editor.waitUntilJavaEditorContentSame(
-            dirtyClsContentOfAlice, PROJECT, PKG, CLS);
+        dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
+            PROJECT, PKG, CLS);
         assertTrue(dave.editor.isJavaEditorActive(CLS));
         assertTrue(dave.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
-        assertTrue(dave.editor.getTextOfJavaEditor(PROJECT, PKG, CLS)
-            .equals(dirtyClsContentOfAlice));
+        assertTrue(dave.editor.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
+            dirtyClsContentOfAlice));
         bob.editor.closeJavaEditorWithSave(CLS);
         carl.editor.closeJavaEditorWithSave(CLS);
         dave.editor.closeJavaEditorWithSave(CLS);
@@ -168,12 +163,12 @@ public class TestAllParticipantsFollowDriver {
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.pEV.openClass(PROJECT, PKG, CLS);
+        alice.pEV.openFile(getClassNodes(PROJECT, PKG, CLS));
         bob.editor.waitUntilJavaEditorOpen(CLS);
         carl.editor.waitUntilJavaEditorOpen(CLS);
         dave.editor.waitUntilJavaEditorOpen(CLS);
-        alice.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
-            PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG,
+            CLS);
 
         alice.editor.closeJavaEditorWithSave(CLS);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,

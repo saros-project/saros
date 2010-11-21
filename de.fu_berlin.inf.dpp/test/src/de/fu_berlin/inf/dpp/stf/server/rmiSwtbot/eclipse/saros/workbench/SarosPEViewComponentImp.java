@@ -18,27 +18,30 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
      * title of shells which are pop up by performing the actions on the package
      * explorer view.
      */
-    private final static String INVITATION = SarosConstant.SHELL_TITLE_INVITATION;
+    private final static String INVITATION = "Invitation";
     private final static String INVITATIONCANCELLED = "Invitation Cancelled";
-    protected final static String SESSIONINVITATION = "Session Invitation";
-    protected final static String PROBLEMOCCURRED = "Problem Occurred";
-    protected final static String SESSION_INVITATION = SarosConstant.SHELL_TITLE_SESSION_INVITATION;
-    protected final static String WARNING_LOCAL_CHANGES_DELETED = "Warning: Local changes will be deleted";
+    private final static String SESSIONINVITATION = "Session Invitation";
+    private final static String PROBLEMOCCURRED = "Problem Occurred";
+    private final static String SESSION_INVITATION = "Session Invitation";
+    private final static String WARNING_LOCAL_CHANGES_DELETED = "Warning: Local changes will be deleted";
     private final static String FOLDER_SELECTION = "Folder Selection";
+    private final static String SHELL_SAVE_RESOURCE = "Save Resource";
 
     /* Context menu of a selected tree item on the package explorer view */
     private final static String SAROS = "Saros";
-    private final static String SHARE_PROJECT = SarosConstant.CONTEXT_MENU_SHARE_PROJECT;
-    private final static String SHARE_PROJECT_WITH_VCS = SarosConstant.CONTEXT_MENU_SHARE_PROJECT_WITH_VCS;
-    private final static String SHARE_PROJECT_PARTIALLY = SarosConstant.CONTEXT_MENU_SHARE_PROJECT_PARTIALLY;
-    private final static String ADD_TO_SESSION = SarosConstant.CONTEXT_MENU_ADD_TO_SESSION;
+
+    /* All the sub menus of the context menu "Saros" */
+    private final static String SHARE_PROJECT = "Share project...";
+    private final static String SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+    private final static String SHARE_PROJECT_PARTIALLY = "Share project partially (experimental)...";
+    private final static String ADD_TO_SESSION = "Add to session (experimental)...";
     private final static String BUTTON_BROWSE = "Browse";
 
     /*
      * second page of the wizard "Session invitation"
      */
     private final static String RADIO_USING_EXISTING_PROJECT = "Use existing project";
-    private final static String RADIO_CREATE_NEW_PROJECT = SarosConstant.RADIO_LABEL_CREATE_NEW_PROJECT;
+    private final static String RADIO_CREATE_NEW_PROJECT = "Create new project";
 
     /**
      * {@link BasicComponentImp} is a singleton, but inheritance is possible.
@@ -126,6 +129,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
         bot.button(BUTTON_BROWSE).click();
         windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK, projectName);
+        windowPart.waitUntilShellCloses(FOLDER_SELECTION);
         bot.button(FINISH).click();
         windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
         /*
@@ -133,8 +137,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * get a popup window with the title "Save Resource" after you comfirm
          * the window "Warning: Local changes will be deleted" with YES.
          */
-        if (windowPart.isShellActive(SAVE_RESOURCE)) {
-            windowPart.confirmWindow(SAVE_RESOURCE, YES);
+        if (windowPart.isShellActive(SHELL_SAVE_RESOURCE)) {
+            windowPart.confirmWindow(SHELL_SAVE_RESOURCE, YES);
             /*
              * If there are local unsaved files, it take more time for the
              * session invitation to complete. So waitUntilShellCloses is
@@ -152,10 +156,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (windowPart
-            .isShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION)) {
-            windowPart.waitUntilShellCloses(bot
-                .shell(SarosConstant.SHELL_TITLE_SESSION_INVITATION));
+        if (windowPart.isShellActive(SESSION_INVITATION)) {
+            windowPart.waitUntilShellCloses(bot.shell(SESSION_INVITATION));
         }
     }
 

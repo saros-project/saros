@@ -5,7 +5,9 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
+import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 
 /**
  * This class contains basic API to find widget menu in SWTBot and to perform
@@ -36,6 +38,41 @@ public class MenuPart extends EclipseComponent {
     @Override
     protected void precondition() throws RemoteException {
         // TODO Auto-generated method stub
+    }
+
+    /**
+     * Open a view using menus Window->Show View->Other... The method is defined
+     * as helper method and should not be exported by rmi. <br/>
+     * Operational steps:
+     * <ol>
+     * <li>If the view is already open, return.</li>
+     * <li>Activate the saros-instance workbench(alice / bob / carl). If the
+     * workbench isn't active, bot can't find the main menus.</li>
+     * <li>Click main menus Window -> Show View -> Other....</li>
+     * <li>Confirm the pop-up window "Show View".</li>
+     * </ol>
+     * 
+     * @param title
+     *            the title on the view tab.
+     * @param category
+     *            example: "General"
+     * @param nodeName
+     *            example: "Console"
+     * @see SarosWorkbenchComponentImp#activateEclipseShell()
+     * @see MenuPart#clickMenuWithTexts(String...)
+     * 
+     */
+    public void openViewWithName(String category, String nodeName)
+        throws RemoteException {
+        workbenchC.activateEclipseShell();
+        menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
+            SarosConstant.MENU_TITLE_SHOW_VIEW, SarosConstant.MENU_TITLE_OTHER);
+        windowPart.confirmWindowWithTreeWithFilterText(
+            SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
+            SarosConstant.BUTTON_OK);
 
     }
+
+    // private final static String WINDOW = "Window";
+    // private final static String SHOW_VIEW =
 }

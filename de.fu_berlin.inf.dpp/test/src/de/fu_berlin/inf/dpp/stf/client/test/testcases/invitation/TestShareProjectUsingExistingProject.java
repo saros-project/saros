@@ -13,19 +13,14 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestShareProjectUsingExistingProject {
+public class TestShareProjectUsingExistingProject extends STFTest {
 
     private static Musician alice;
     private static Musician bob;
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PROJECT2 = BotConfiguration.PROJECTNAME + " 2";
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
 
     @BeforeClass
     public static void initMusicians() {
@@ -35,19 +30,19 @@ public class TestShareProjectUsingExistingProject {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS2);
+        bob.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS2);
     }
 
     @After
     public void cleanUp() throws RemoteException, InterruptedException {
         alice.leaveSessionFirst(bob);
-        alice.state.deleteProject(PROJECT);
-        bob.state.deleteProject(PROJECT);
+        alice.pEV.deleteProject(PROJECT);
+        bob.pEV.deleteProject(PROJECT);
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
@@ -60,12 +55,12 @@ public class TestShareProjectUsingExistingProject {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
         alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.state.existsClass(PROJECT2, PKG, CLS));
-        assertFalse(bob.state.existsProject(PROJECT2));
+        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT2, PKG, CLS)));
+        assertFalse(bob.pEV.isProjectExist(PROJECT2));
 
     }
 
@@ -79,11 +74,11 @@ public class TestShareProjectUsingExistingProject {
         bob.pEV
             .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT);
 
-        assertTrue(bob.state.existsProject(PROJECT));
-        assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
-        assertTrue(bob.state.existsProject(PROJECT2));
-        assertTrue(bob.state.existsClass(PROJECT2, PKG, CLS));
-        bob.state.deleteProject(PROJECT2);
+        assertTrue(bob.pEV.isProjectExist(PROJECT));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+        assertTrue(bob.pEV.isProjectExist(PROJECT + " 2"));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT + " 2", PKG, CLS)));
+        bob.pEV.deleteProject(PROJECT + " 2");
 
     }
 
@@ -93,12 +88,12 @@ public class TestShareProjectUsingExistingProject {
         bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
         alice.shareProjectWithDone(BotConfiguration.PROJECTNAME,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.state.existsProject(PROJECT));
-        assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
-        assertTrue(bob.state.existsProject(PROJECT2));
-        assertTrue(bob.state.existsClass(PROJECT2, PKG, CLS));
+        assertTrue(bob.pEV.isProjectExist(PROJECT));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+        assertTrue(bob.pEV.isProjectExist(PROJECT + " 2"));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT + " 2", PKG, CLS)));
 
-        bob.state.deleteProject(PROJECT2);
+        bob.pEV.deleteProject(PROJECT + " 2");
 
     }
 }

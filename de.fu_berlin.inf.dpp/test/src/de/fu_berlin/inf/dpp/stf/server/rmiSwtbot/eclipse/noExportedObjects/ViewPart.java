@@ -16,6 +16,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -24,11 +25,9 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 
 /**
  * This class contains basic API to find widgets based on a view in SWTBot and
@@ -97,41 +96,6 @@ public class ViewPart extends EclipseComponent {
         for (SWTBotView view : bot.views())
             list.add(view.getTitle());
         return list;
-    }
-
-    /**
-     * Open a view using menus Window->Show View->Other... The method is defined
-     * as helper method and should not be exported by rmi. <br/>
-     * Operational steps:
-     * <ol>
-     * <li>If the view is already open, return.</li>
-     * <li>Activate the saros-instance workbench(alice / bob / carl). If the
-     * workbench isn't active, bot can't find the main menus.</li>
-     * <li>Click main menus Window -> Show View -> Other....</li>
-     * <li>Confirm the pop-up window "Show View".</li>
-     * </ol>
-     * 
-     * @param title
-     *            the title on the view tab.
-     * @param category
-     *            example: "General"
-     * @param nodeName
-     *            example: "Console"
-     * @see SarosWorkbenchComponentImp#activateEclipseShell()
-     * @see MenuPart#clickMenuWithTexts(String...)
-     * 
-     */
-    public void openViewWithName(String title, String category, String nodeName)
-        throws RemoteException {
-        if (!isViewOpen(title)) {
-            workbenchC.activateEclipseShell();
-            menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
-                SarosConstant.MENU_TITLE_SHOW_VIEW,
-                SarosConstant.MENU_TITLE_OTHER);
-            windowPart.confirmWindowWithTreeWithFilterText(
-                SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
-                SarosConstant.BUTTON_OK);
-        }
     }
 
     /**
@@ -350,25 +314,6 @@ public class ViewPart extends EclipseComponent {
     }
 
     /**
-     * This method is only a helper method for "openClass". Later you can define
-     * e.g. openXml, openText, openTHML using it. Make sure, the path is
-     * completely defined, e.g. in openClass you should pass parameter "nodes"
-     * such as Foo_Saros, src, my.pkg, MyClass.java to the method.
-     * 
-     * @param viewName
-     *            e.g. Package Explorer view or Resource Explorer view
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void openFileInView(String viewName, String... nodes)
-        throws RemoteException {
-        clickContextMenuOfTreeInView(viewName, SarosConstant.CONTEXT_MENU_OPEN,
-            nodes);
-    }
-
-    /**
      * click toolbar button in view. e.g. connect. if you don't know the tooltip
      * exactly, please use this method.
      * 
@@ -422,6 +367,13 @@ public class ViewPart extends EclipseComponent {
 
                     IWorkbenchPage page = win.getActivePage();
                     try {
+                        IViewReference[] registeredViews = page
+                            .getViewReferences();
+                        for (IViewReference registeredView : registeredViews) {
+                            log.debug("registered view ID: "
+                                + registeredView.getId());
+                        }
+
                         page.showView(viewId);
                     } catch (PartInitException e) {
                         throw new IllegalArgumentException(e);
@@ -443,7 +395,7 @@ public class ViewPart extends EclipseComponent {
 
     public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
         String... labels) {
-        return treePart.selectTreeWithLabels(getTreeInView(viewName), labels);
+        return getTreeInView(viewName).expandNode(labels).select();
     }
 
     public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(

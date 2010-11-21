@@ -51,7 +51,7 @@ public class TestEditDuringInvitation {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -107,18 +107,17 @@ public class TestEditDuringInvitation {
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.editor.setTextInJavaEditorWithSave(
-            BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
+        bob.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG, CLS);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.pEV
-            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG);
+        carl.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG);
 
         log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT,
-            PKG, CLS);
-        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT,
-            PKG, CLS);
+        String textFromCarl = carl.editor
+            .getTextOfJavaEditor(PROJECT, PKG, CLS);
+        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT, PKG,
+            CLS);
         assertTrue(textFromCarl.equals(textFormAlice));
 
         log.trace("testEditDuringInvitation done");

@@ -78,11 +78,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * exported functions
      * 
      **************************************************************/
-    public boolean isInSession() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(LEAVETHESESSION);
-    }
-
     public void openSessionView() throws RemoteException {
         if (!isSessionViewOpen())
             viewPart.openViewById(VIEWID);
@@ -90,6 +85,11 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public boolean isSessionViewOpen() throws RemoteException {
         return viewPart.isViewOpen(VIEWNAME);
+    }
+
+    public boolean isInSession() throws RemoteException {
+        precondition();
+        return isToolbarButtonEnabled(LEAVETHESESSION);
     }
 
     public void waitUntilSessionOpen() throws RemoteException {
@@ -217,8 +217,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         if (state.isDriver(followedUserJID))
-            tablePart.clickContextMenuOfTable(
-                followedUserJID.getBase() + ROLENAME, STOPFOLLOWINGTHISUSER);
+            tablePart.clickContextMenuOfTable(followedUserJID.getBase()
+                + ROLENAME, STOPFOLLOWINGTHISUSER);
         else
             tablePart.clickContextMenuOfTable(followedUserJID.getBase(),
                 STOPFOLLOWINGTHISUSER);
@@ -250,12 +250,11 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void waitUntilIsFollowingUser(String baseJIDOfFollowedUser)
         throws RemoteException {
-        waitUntil(SarosConditions.isFollowingUser(state,
-            baseJIDOfFollowedUser));
+        waitUntil(SarosConditions.isFollowingUser(state, baseJIDOfFollowedUser));
     }
 
-    public void shareYourScreenWithSelectedUser(
-        SarosState stateOfselectedUser) throws RemoteException {
+    public void shareYourScreenWithSelectedUser(SarosState stateOfselectedUser)
+        throws RemoteException {
         selectUser(
             stateOfselectedUser,
             "Hi guy, you can't share screen with youself, it makes no sense! Please pass a correct parameter to the method.");
@@ -432,9 +431,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return allContactsName;
     }
 
-    private void clickContextMenuOfSelectedUser(
-        SarosState stateOfselectedUser, String context, String message)
-        throws RemoteException {
+    private void clickContextMenuOfSelectedUser(SarosState stateOfselectedUser,
+        String context, String message) throws RemoteException {
         JID jidOfSelectedUser = stateOfselectedUser.getJID();
         if (state.isSameUser(jidOfSelectedUser)) {
             throw new RuntimeException(message);
@@ -444,8 +442,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
             tablePart.clickContextMenuOfTable(jidOfSelectedUser.getBase()
                 + ROLENAME, context);
         else
-            tablePart
-                .clickContextMenuOfTable(jidOfSelectedUser.getBase(), context);
+            tablePart.clickContextMenuOfTable(jidOfSelectedUser.getBase(),
+                context);
     }
 
     private void selectUser(SarosState stateOfselectedUser, String message)

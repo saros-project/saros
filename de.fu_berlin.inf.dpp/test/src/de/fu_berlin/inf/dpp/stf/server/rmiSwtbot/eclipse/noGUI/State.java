@@ -7,68 +7,32 @@ import java.rmi.RemoteException;
 import org.eclipse.core.runtime.CoreException;
 
 public interface State extends Remote {
-    public void waitUntilFileExist(String... filePath) throws RemoteException;
 
-    public void waitUntilClassExist(String projectName, String pkg,
-        String className) throws RemoteException;
-
-    public void waitUntilClassNotExist(String projectName, String pkg,
-        String className) throws RemoteException;
-
+    /**
+     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
+     * file, which is modified by another peer (e.g. Alice). Because of data
+     * transfer delay Bob need to wait a minute to see the changes . So it will
+     * be a good idea that you give bob some time before you compare the two
+     * files from Alice and Bob.
+     * 
+     * <p>
+     * <b>Note:</b> the mothod is different from
+     * {@link #waitUntilEditorContentSame(String, String, String, String)}. this
+     * method compare only the contents of the class files which is saved.
+     * </p>
+     * * *
+     */
     public void waitUntilClassContentsSame(String projectName, String pkg,
         String className, String otherClassContent) throws RemoteException;
-
-    public void waitUntilFolderExist(String... folderPath)
-        throws RemoteException;
-
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException;
-
-    public void waitUntilProjectInSVN(String projectName)
-        throws RemoteException;
-
-    public void waitUntilPkgExist(String projectName, String pkg)
-        throws RemoteException;
-
-    public void waitUntilPkgNotExist(String projectName, String pkg)
-        throws RemoteException;
-
-    public void openClassWithSystemEditor(String projectName, String pkg,
-        String className) throws RemoteException;
-
-    public String getRevision(String fullPath) throws RemoteException;
 
     public String getURLOfRemoteResource(String fullPath)
         throws RemoteException;
 
-    public boolean isFolderExist(String... folderPath) throws RemoteException;
-
     public String getClassContent(String projectName, String pkg,
         String className) throws RemoteException, IOException, CoreException;
 
-    public boolean isFileExist(String... filePath) throws RemoteException;
-
-    public boolean existsClass(String projectName, String pkg, String className)
-        throws RemoteException;
-
-    public boolean isPkgExist(String projectName, String pkg)
-        throws RemoteException;
-
     public boolean isResourceExist(String resourcePath) throws RemoteException;
-
-    public boolean existsProject(String projectName) throws RemoteException;
-
-    public boolean isInSVN() throws RemoteException;
 
     public void deleteAllProjects() throws RemoteException;
 
-    public void deleteProject(String projectName) throws RemoteException;
-
-    public void deletePkg(String projectName, String pkg)
-        throws RemoteException;
-
-    public void deleteFolder(String... folders) throws RemoteException;
-
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException;
 }

@@ -62,7 +62,7 @@ public class TestDriverResetsFiles {
         dave = musicians.get(3);
         edna = musicians.get(4);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
@@ -129,8 +129,7 @@ public class TestDriverResetsFiles {
     public void testAliceResetsFile() throws IOException, CoreException {
         dave.sessionV.followThisUser(alice.state);
         edna.sessionV.followThisUser(alice.state);
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
 
         alice.editor.closejavaEditorWithoutSave(CLS);
         dave.editor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);

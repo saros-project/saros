@@ -40,7 +40,7 @@ public class TestDriverChangeAndImmediateWrite {
     public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -89,8 +89,8 @@ public class TestDriverChangeAndImmediateWrite {
         bob.basic.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
-            PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG,
+            CLS);
 
         bob.basic.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());

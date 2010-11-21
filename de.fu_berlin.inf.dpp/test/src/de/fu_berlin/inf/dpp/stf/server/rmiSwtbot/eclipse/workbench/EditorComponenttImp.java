@@ -24,7 +24,8 @@ import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
-public class EditorComponenttImp extends EclipseComponent implements EditorComponent {
+public class EditorComponenttImp extends EclipseComponent implements
+    EditorComponent {
     // public static EclipseEditorObjectImp classVariable;
 
     private static transient EditorComponenttImp self;
@@ -110,7 +111,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
 
     public String getJavaTextOnLine(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         return getJavaEditor(className).getTextOnLine(line);
     }
@@ -126,7 +127,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
 
     public RGB getJavaLineBackground(String projectName, String packageName,
         String className, int line) throws RemoteException {
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         return getJavaEditor(className).getLineBackground(line);
     }
@@ -149,7 +150,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
      */
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         return editorPart.getTextEditor(className + ".java").getText();
     }
@@ -168,7 +169,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
 
     public void setBreakPoint(int line, String projectName, String packageName,
         String className) throws RemoteException {
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         selectLineInJavaEditor(line, className);
         menuPart.clickMenuWithTexts("Run", "Toggle Breakpoint");
@@ -252,7 +253,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
         String contents = state.getContents(contentPath);
         // activateEclipseShell();
 
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         SWTBotEditor editor;
         editor = bot.editorByTitle(className + ".java");
@@ -294,7 +295,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
         String projectName, String packageName, String className)
         throws RemoteException {
         String contents = state.getContents(contentPath);
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         editorPart.setTextinEditorWithoutSave(contents, className + ".java");
     }
@@ -303,7 +304,7 @@ public class EditorComponenttImp extends EclipseComponent implements EditorCompo
         String packageName, String className) throws RemoteException {
         String contents = state.getContents(contentPath);
         workbenchC.activateEclipseShell();
-        peVC.openClass(projectName, packageName, className);
+        peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         editorPart.typeTextInEditor(contents, className + ".java");
     }

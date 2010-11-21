@@ -12,7 +12,8 @@ public class SarosConstant {
     public final static String VIEW_TITLE_PROGRESS = "Progress";
     public final static String VIEW_TITLE_CHAT_VIEW = "Chat View";
     public final static String VIEW_TITLE_SHARED_PROJECT_SESSION = "Shared Project Session";
-    public final static String VIEW_TITLE_PACKAGE_EXPLORER = "Package Explorer";
+    // public final static String VIEW_TITLE_PACKAGE_EXPLORER =
+    // "Package Explorer";
     public final static String VIEW_TITLE_WELCOME = "Welcome";
     public final static String VIEW_TITLE_REMOTE_SCREEN = "Remote Screen";
 
@@ -72,12 +73,14 @@ public class SarosConstant {
     public final static String NODE_SAROS_SESSION = "Saros Session";
 
     public final static String SHELL_TITLE_CREATE_XMPP_ACCOUNT = CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
-    public final static String SHELL_TITLE_DELETE_RESOURCE = "Delete Resources";
+    // public final static String SHELL_TITLE_DELETE_RESOURCE =
+    // "Delete Resources";
     public final static String SHELL_TITLE_NEW_PROJECT = "New project";
-    public final static String SHELL_TITLE_INVITATION = "Invitation";
-    public final static String SHELL_TITLE_SESSION_INVITATION = "Session Invitation";
+    // public final static String SHELL_TITLE_INVITATION = "Invitation";
+    // public final static String SHELL_TITLE_SESSION_INVITATION =
+    // "Session Invitation";
     public final static String SHELL_TITLE_NEW_JAVA_CLASS = "New Java Class";
-    public final static String SHELL_TITLE_CONFIRM_DELETE = "Confirm Delete";
+    // public final static String SHELL_TITLE_CONFIRM_DELETE = "Confirm Delete";
     public final static String SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
     public final static String SHELL_TITLE_NEW_CONTACT = "New Contact";
     public final static String SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
@@ -90,7 +93,7 @@ public class SarosConstant {
     public final static String CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
     public final static String CONTEXT_MENU__DRIVER_ROLE = "Give exclusive driver role";
     public final static String CONTEXT_MENU_REMOVE_DRIVER_ROLE = "Remove driver role";
-    public final static String CONTEXT_MENU_OPEN = "Open";
+    // public final static String CONTEXT_MENU_OPEN = "Open";
     public final static String CONTEXT_MENU_FOLLOW_THIS_USER = "Follow this user";
     public final static String CONTEXT_MENU_STOP_FOLLOWING_THIS_USER = "Stop following this user";
     public final static String CONTEXT_MENU_DELETE = "Delete";
@@ -101,7 +104,8 @@ public class SarosConstant {
     public final static String CONTEXT_MENU_SHARE_PROJECT_PARTIALLY = "Share project partially (experimental)...";
     public final static String CONTEXT_MENU_ADD_TO_SESSION = "Add to session (experimental)...";
 
-    public final static String RADIO_LABEL_CREATE_NEW_PROJECT = "Create new project";
+    // public final static String RADIO_LABEL_CREATE_NEW_PROJECT =
+    // "Create new project";
 
     public final static String BUDDIES = "Buddies";
 

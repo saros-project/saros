@@ -119,7 +119,7 @@ public class TestParallelInvitationWithTerminationByInvitees {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -152,7 +152,8 @@ public class TestParallelInvitationWithTerminationByInvitees {
 
         edna.pEV.isWIndowSessionInvitationActive();
         edna.pEV.confirmFirstPageOfWizardSessionInvitation();
-        edna.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT);
+        edna.pEV
+            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }

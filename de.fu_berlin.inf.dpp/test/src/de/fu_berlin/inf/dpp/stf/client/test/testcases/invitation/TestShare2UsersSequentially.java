@@ -13,16 +13,14 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestShare2UsersSequentially {
+public class TestShare2UsersSequentially extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestShare2UsersSequentially.class);
 
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
     private static Musician alice;
     private static Musician bob;
 
@@ -30,7 +28,7 @@ public class TestShare2UsersSequentially {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     @AfterClass
@@ -57,11 +55,11 @@ public class TestShare2UsersSequentially {
         alice.basic
             .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
-        alice.editor.setTextInJavaEditorWithSave(
-            BotConfiguration.CONTENTPATH, PROJECT, PKG, CLS);
+        alice.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG, CLS);
 
         log.trace("invitee.openFile");
-        bob.pEV.openClass(PROJECT, PKG, CLS);
+        bob.pEV.openFile(getClassNodes(PROJECT, PKG, CLS));
 
         // invitee.sleep(2000);
         assertTrue(bob.state.isParticipant(bob.jid));

@@ -42,7 +42,8 @@ public abstract class EclipseComponent {
     protected final static String FINISH = SarosConstant.BUTTON_FINISH;
     protected final static String NEXT = SarosConstant.BUTTON_NEXT;
 
-    // Title of Shells
+    public static final String SRC = "src";
+    public final static String SUFIX_JAVA = ".java";
     protected final static String PROGRESSINFORMATION = SarosConstant.SHELL_TITLE_PROGRESS_INFORMATION;
 
     // Role:Driver
@@ -81,4 +82,31 @@ public abstract class EclipseComponent {
     }
 
     abstract protected void precondition() throws RemoteException;
+
+    public String getClassPath(String projectName, String pkg, String className) {
+        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
+            + className + ".java";
+    }
+
+    public String getPkgPath(String projectName, String pkg) {
+        return projectName + "/src/" + pkg.replaceAll("\\.", "/");
+    }
+
+    public String[] getClassNodes(String projectName, String pkg,
+        String className) {
+        String[] nodes = { projectName, SRC, pkg, className + SUFIX_JAVA };
+        return nodes;
+    }
+
+    public String getPath(String... nodes) {
+        String folderpath = "";
+        for (int i = 0; i < nodes.length; i++) {
+            if (i == nodes.length - 1) {
+                folderpath += nodes[i];
+            } else
+                folderpath += nodes[i] + "/";
+        }
+        return folderpath;
+    }
+
 }

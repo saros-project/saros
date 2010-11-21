@@ -82,12 +82,11 @@ public class TreePart extends EclipseComponent {
         for (String label : labels) {
             try {
                 if (selectedTreeItem == null) {
-                    // treeObject.waitUntilTreeExisted(tree, label);
+                    treePart.waitUntilTreeExisted(tree, label);
                     selectedTreeItem = tree.expandNode(label);
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 } else {
-                    // treeObject
-                    // .waitUntilTreeNodeExisted(selectedTreeItem, label);
+                    treePart.waitUntilTreeNodeExisted(selectedTreeItem, label);
                     selectedTreeItem = selectedTreeItem.expandNode(label);
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 }
@@ -103,20 +102,20 @@ public class TreePart extends EclipseComponent {
         return null;
     }
 
-    public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
-        String... labels) {
-        try {
-            return tree.expandNode(labels);
-        } catch (WidgetNotFoundException e) {
-            log.warn("table item not found.", e);
-            return null;
-        }
-
-    }
+    // public SWTBotTreeItem selectTreeWithLabels(SWTBotTree tree,
+    // String... labels) {
+    // try {
+    // return tree.expandNode(labels);
+    // } catch (WidgetNotFoundException e) {
+    // log.warn("table item not found.", e);
+    // return null;
+    // }
+    //
+    // }
 
     public List<String> getAllItemsOfTreeItem(String... paths) {
         SWTBotTree tree = bot.tree();
-        SWTBotTreeItem item = selectTreeWithLabels(tree, paths);
+        SWTBotTreeItem item = tree.expandNode(paths);
         List<String> list = new ArrayList<String>();
 
         for (int i = 0; i < item.getItems().length; i++) {

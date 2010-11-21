@@ -14,15 +14,10 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestSessionViewObject {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String ROLENAME = SarosConstant.ROLENAME;
-    private static final String OWNCONTACTNAME = SarosConstant.OWNCONTACTNAME;
+public class TestSessionViewObject extends STFTest {
 
     private static final Logger log = Logger
         .getLogger(TestSessionViewObject.class);
@@ -34,7 +29,7 @@ public class TestSessionViewObject {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         log.trace("alice create a new proejct and a new class.");
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
         log.trace("alice share session with bob.");
         alice.shareProjectWithDone(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);

@@ -40,7 +40,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
     private final static String CONTACTALREADYADDED = "Contact already added";
     private final static String CREATEXMPPACCOUNT = SarosConstant.SHELL_TITLE_CREATE_XMPP_ACCOUNT;
     private final static String NEWCONTACT = SarosConstant.SHELL_TITLE_NEW_CONTACT;
-    private final static String CONFIRMDELETE = SarosConstant.SHELL_TITLE_CONFIRM_DELETE;
     private final static String CONTACTLOOKUPFAILED = "Contact look-up failed";
     private final static String REMOVELOFSUBSCRIPTION = SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION;
 
@@ -115,8 +114,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
     public boolean isBuddyExist(String baseJID) throws RemoteException {
         precondition();
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        return treePart
-            .isTreeItemWithMatchTextExist(tree, BUDDIES, baseJID + ".*");
+        return treePart.isTreeItemWithMatchTextExist(tree, BUDDIES, baseJID
+            + ".*");
     }
 
     public boolean isConnectedGUI() throws RemoteException {
@@ -171,7 +170,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
             return;
         try {
             clickContextMenuOfBuddy(DELETE, jid.getBase());
-            confirmDeleteWindow();
+            windowPart.confirmDeleteWindow(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + jid.getBase(), e);
         }
@@ -179,12 +178,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void clickContextMenuOfBuddy(String context, String baseJID)
         throws RemoteException {
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, BUDDIES, baseJID);
-    }
-
-    public void confirmDeleteWindow() throws RemoteException {
-        windowPart.waitUntilShellActive(CONFIRMDELETE);
-        windowPart.confirmWindow(CONFIRMDELETE, YES);
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, BUDDIES,
+            baseJID);
     }
 
     public void confirmContactLookupFailedWindow(String buttonType)

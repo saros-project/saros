@@ -4,268 +4,650 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.swt.program.Program;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
+import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public class PEViewComponentImp extends EclipseComponent implements
     PEViewComponent {
 
-    /*
-     * View infos
-     */
-    protected final static String VIEWNAME = SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER;
-    // protected final static String VIEWID = SarosConstant.ID_
+    /* View infos */
+    protected final static String VIEWNAME = "Package Explorer";
+    protected final static String VIEWID = "org.eclipse.jdt.ui.PackageExplorer";
 
     /*
      * title of shells which are pop up by performing the actions on the package
      * explorer view.
      */
-    protected final static String DELETE_RESOURCE = SarosConstant.SHELL_TITLE_DELETE_RESOURCE;
-    protected final static String CONFIRM_DELETE = SarosConstant.SHELL_TITLE_CONFIRM_DELETE;
-    protected final static String EDITOR_SELECTION = "Editor Selection";
-    protected final static String MOVE_TITLE = "Move";
-    protected final static String CONFIRM_DISCONNECT_FROM_SVN = "Confirm Disconnect from SVN";
-    protected final static String SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
-    protected final static String SAVE_RESOURCE = "Save Resource";
+    private final static String SHELL_DELETE_RESOURCE = "Delete Resources";
+    private final static String SHELL_EDITOR_SELECTION = "Editor Selection";
+    private final static String SHELL_MOVE = "Move";
+    private final static String SHELL_REVERT = "Revert";
+    private final static String SHELL_SHEARE_PROJECT = "Share Project";
+    private final static String SHELL_SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
+    private final static String SHELL_RENAME_PACKAGE = "Rename Package";
+    private final static String SHELL_RENAME_RESOURCE = "Rename Resource";
+    private final static String SHELL_RENAME_COMPiIATION_UNIT = "Rename Compilation Unit";
+    private static final String SHELL_SWITCH = "Switch";
+    private static final String SHELL_SVN_SWITCH = "SVN Switch";
+    private static final String SHELL_NEW_JAVA_PROJECT = "New Java Project";
+    private static final String LABEL_PROJECT_NAME = "Project name:";
+    private static final String SHELL_NEW_PROJECT = "New Project";
+    private final static String SHELL_CONFIRM_DISCONNECT_FROM_SVN = "Confirm Disconnect from SVN";
+    private final static String SHELL_NEW_FOLDER = "New Folder";
+    private final static String SHELL_NEW_FILE = "New File";
+    private final static String SHELL_NEW_JAVA_PACKAGE = "New Java Package";
+    private final static String SHELL_NEW_JAVA_CLASS = "New Java Class";
 
-    /*
-     * Tool tip text of toolbar buttons on the package explorer view
-     */
+    /* Label of pop up windows */
+    private final static String LABEL_CREATE_A_NEW_REPOSITORY_LOCATION = "Create a new repository location";
+    private final static String LABEL_URL = "Url:";
+    private final static String LABEL_NEW_NAME = "New name:";
+    private final static String LABEL_TO_URL = "To URL:";
+    private static final String LABEL_SWITCH_TOHEAD_REVISION = "Switch to HEAD revision";
+    private static final String LABEL_REVISION = "Revision:";
+    private static final String LABEL_FOLDER_NAME = "Folder name:";
+    private static final String LABEL_FILE_NAME = "File name:";
 
-    // Context menu of the tree on the view
-    protected final static String DELETE = "Delete";
-    protected final static String OPEN_WITH = "Open With";
-    protected final static String OTHER = "Other...";
-    protected final static String REFACTOR = "Refactor";
-    protected final static String MOVE = "Move...";
-    protected final static String TEAM = "Team";
-    protected final static String DISCONNECT = "Disconnect...";
+    /* Context menu of a selected tree item on the package explorer view */
+    private final static String DELETE = "Delete";
+    private final static String REFACTOR = "Refactor";
+    private static final String NEW = "New";
+
+    /* Context menu of a selected file on the package explorer view */
+    private final static String OPEN = "Open";
+    private final static String OPEN_WITH = "Open With";
+    private final static String TEAM = "Team";
+
+    /* All the sub menus of the context menu "Open with" */
+    private final static String TEXT_EDITOR = "Text Editor";
+    private final static String SYSTEM_EDITOR = "System Editor";
+    private final static String DEFAULT_EDITOR = "Default Editor";
+    private final static String OTHER = "Other...";
+
+    /* All the sub menus of the context menu "Team" */
+    private final static String REVERT = "Revert...";
+    private final static String DISCONNECT = "Disconnect...";
     private final static String SHARE_PROJECT = "Share Project...";
-    protected final static String SWITCH_TO_ANOTHER_BRANCH = "Switch to another Branch/Tag/Revision...";
+    private final static String SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION = "Switch to another Branch/Tag/Revision...";
 
-    protected final static String SRC = "src";
-    protected final static String SUFIX_JAVA = ".java";
+    /* All the sub menus of the context menu "Refactor" */
+    private final static String RENAME = "Rename...";
+    private final static String MOVE = "Move...";
 
-    public void closePackageExplorerView() throws RemoteException {
+    /* All the sub menus of the context menu "New" */
+    private static final String PROJECT = "Project...";
+    private static final String FOLDER = "Folder";
+    private static final String FILE = "File";
+    private static final String CLASS = "Class";
+    private static final String PACKAGE = "Package";
+    private static final String JAVA_PROJECT = "Java Project";
+
+    /* categories and nodes of the shell "New Project" */
+    private static final String CATEGORY_GENERAL = "General";
+    private static final String NODE_PROJECT = "Project";
+
+    /* table iems of the shell "Share project" of the conext menu "Team" */
+    private final static String REPOSITORY_TYPE_SVN = "SVN";
+
+    /***********************************************************************
+     * 
+     * exported functions
+     * 
+     ***********************************************************************/
+
+    /**********************************************
+     * 
+     * open/close/activate the package explorer view
+     * 
+     **********************************************/
+    public void openPEView() throws RemoteException {
+        if (!isPEViewOpen())
+            viewPart.openViewById(VIEWID);
+    }
+
+    public boolean isPEViewOpen() throws RemoteException {
+        return viewPart.isViewOpen(VIEWNAME);
+    }
+
+    public void closePEView() throws RemoteException {
         viewPart.closeViewByTitle(VIEWNAME);
     }
 
-    public void setFocusOnPackageExplorerView() throws RemoteException {
+    public void setFocusOnPEView() throws RemoteException {
         viewPart.setFocusOnViewByTitle(VIEWNAME);
     }
 
-    public void deleteProjectGui(String projectName) throws RemoteException {
-        precondition();
-        // SWTBotTree tree = viewO.getTreeInView(VIEWNAME);
-        // tree.select(projectName);
-        // menuO.clickMenuWithTexts("Edit", DELETE);
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, projectName);
-        windowPart.confirmWindowWithCheckBox(DELETE_RESOURCE, OK, true);
-        windowPart.waitUntilShellClosed(DELETE_RESOURCE);
+    public boolean isPEViewActive() throws RemoteException {
+        return viewPart.isViewActive(VIEWNAME);
     }
 
-    public void deleteFileGui(String... nodes) throws RemoteException {
-        precondition();
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, nodes);
-        windowPart.waitUntilShellActive(CONFIRM_DELETE);
-        windowPart.confirmWindow(CONFIRM_DELETE, OK);
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "New"
+     * 
+     **********************************************/
+    public void newProject(String projectName) throws RemoteException {
+        if (!isProjectExist(projectName)) {
+            menuPart.clickMenuWithTexts(FILE, NEW, PROJECT);
+            confirmWizardNewProject(projectName);
+        }
     }
 
-    public boolean isClassExistGUI(String... matchTexts) throws RemoteException {
+    public void newJavaProject(String projectName) throws RemoteException {
+        if (!isProjectExist(projectName)) {
+            workbenchC.activateEclipseShell();
+            menuPart.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
+            confirmWindowNewJavaProject(projectName);
+        }
+    }
+
+    public boolean isProjectExist(String projectName) throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        return project.exists();
+    }
+
+    public void newFolder(String newFolderName, String... parentNodes)
+        throws RemoteException {
+        precondition();
+        String[] folderNodes = new String[parentNodes.length];
+        for (int i = 0; i < parentNodes.length; i++) {
+            folderNodes[i] = parentNodes[i];
+        }
+        folderNodes[folderNodes.length - 1] = newFolderName;
+        if (!isFolderExist(folderNodes)) {
+            try {
+                viewPart.selectTreeWithLabelsInView(VIEWNAME, parentNodes);
+                menuPart.clickMenuWithTexts(FILE, NEW, FOLDER);
+                confirmWindowNewFolder(newFolderName);
+            } catch (WidgetNotFoundException e) {
+                final String cause = "Error creating new folder";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+        }
+    }
+
+    public boolean isFolderExist(String... folderNodes) throws RemoteException {
+        IPath path = new Path(getPath(folderNodes));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            return false;
+        return true;
+    }
+
+    public void waitUntilFolderExist(String... folderNodes)
+        throws RemoteException {
+        String fullPath = getPath(folderNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void newPackage(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            if (!isPkgExist(projectName, pkg))
+                try {
+                    menuPart.clickMenuWithTexts(FILE, NEW, PACKAGE);
+                    confirmWindowNewJavaPackage(projectName, pkg);
+                } catch (WidgetNotFoundException e) {
+                    final String cause = "error creating new package";
+                    log.error(cause, e);
+                    throw new RemoteException(cause, e);
+                }
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public boolean isPkgExist(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(getPkgPath(projectName, pkg));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource != null)
+            return true;
+        return false;
+    }
+
+    public void waitUntilPkgNotExist(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
+                projectName, pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void newFile(String... fileNodes) throws RemoteException {
+        if (!isFileExist(getPath(fileNodes)))
+            try {
+                precondition();
+                String[] parentNodes = new String[fileNodes.length - 1];
+                String newFileName = "";
+                for (int i = 0; i < fileNodes.length; i++) {
+                    if (i == fileNodes.length - 1)
+                        newFileName = fileNodes[i];
+                    else
+                        parentNodes[i] = fileNodes[i];
+                }
+                viewPart.selectTreeWithLabelsInView(VIEWNAME, parentNodes);
+                menuPart.clickMenuWithTexts(FILE, NEW, FILE);
+                confirmWindowNewFile(newFileName);
+            } catch (WidgetNotFoundException e) {
+                final String cause = "error creating new file.";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+    }
+
+    public boolean isFileExist(String filePath) throws RemoteException {
+        IPath path = new Path(filePath);
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        return file.exists();
+    }
+
+    public boolean isFileExistWithGUI(String... nodes) throws RemoteException {
         workbenchC.activateEclipseShell();
         precondition();
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        return treePart.isTreeItemWithMatchTextExist(tree, matchTexts);
+        return treePart.isTreeItemWithMatchTextExist(tree, nodes);
     }
 
-    public void openClass(String projectName, String packageName,
+    public void waitUntilFileExist(String... fileNodes) throws RemoteException {
+        String fullPath = getPath(fileNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void newClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        if (!isFileExist(getClassPath(projectName, pkg, className))) {
+            try {
+                workbenchC.activateEclipseShell();
+                menuPart.clickMenuWithTexts(FILE, NEW, CLASS);
+                confirmWindowNewJavaClass(projectName, pkg, className);
+            } catch (WidgetNotFoundException e) {
+                final String cause = "error creating new Java Class";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+        }
+    }
+
+    public void waitUntilClassExist(String projectName, String pkg,
         String className) throws RemoteException {
-        if (!editorC.isClassOpen(className)) {
-            viewPart.openFileInView(VIEWNAME, projectName, SRC, packageName,
-                className + SUFIX_JAVA);
-            bot.sleep(sleepTime);
-        }
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceExist(path));
     }
 
-    public void openFile(String... filePath) throws RemoteException {
-        if (!editorC.isFileOpen(filePath[filePath.length - 1])) {
-            viewPart.openFileInView(VIEWNAME, filePath);
-            bot.sleep(sleepTime);
-        }
+    public void waitUntilClassNotExist(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
-    public void openClassWith(String whichEditor, String projectName,
-        String packageName, String className) throws RemoteException {
+    public void newClassImplementsRunnable(String projectName, String pkg,
+        String className) throws RemoteException {
+        if (!isFileExist(getClassPath(projectName, pkg, className))) {
+            precondition();
+            menuPart.clickMenuWithTexts(FILE, NEW, CLASS);
+        }
+        SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_CLASS);
+        shell.activate();
+        bot.textWithLabel("Source folder:").setText(projectName + "/src");
+        bot.textWithLabel("Package:").setText(pkg);
+        bot.textWithLabel("Name:").setText(className);
+        bot.button("Add...").click();
+        windowPart.waitUntilShellActive("Implemented Interfaces Selection");
+        bot.shell("Implemented Interfaces Selection").activate();
+        SWTBotText text = bot.textWithLabel("Choose interfaces:");
+        bot.sleep(2000);
+        text.setText("java.lang.Runnable");
+        tablePart.waitUntilTableHasRows(1);
+        bot.button(OK).click();
+        bot.shell(SHELL_NEW_JAVA_CLASS).activate();
+        bot.checkBox("Inherited abstract methods").click();
+        bot.button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    public void newJavaProjectWithClass(String projectName, String pkg,
+        String className) throws RemoteException {
+        newJavaProject(projectName);
+        // bot.sleep(50);
+        newClass(projectName, pkg, className);
+    }
+
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Open"
+     * 
+     **********************************************/
+    public void openFileWith(String whichEditor, String... nodes)
+        throws RemoteException {
+        precondition();
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        tree.expandNode(projectName, SRC, packageName, className + SUFIX_JAVA)
-            .select();
+        tree.expandNode(nodes).select();
         ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
-        windowPart.waitUntilShellActive(EDITOR_SELECTION);
+        windowPart.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
         basicPart.waitUntilButtonIsEnabled(OK);
-        windowPart.confirmWindow(EDITOR_SELECTION, OK);
+        windowPart.confirmWindow(SHELL_EDITOR_SELECTION, OK);
     }
 
-    public void showViewPackageExplorer() throws RemoteException {
-        viewPart.openViewWithName(VIEWNAME, "Java", "Package Explorer");
+    public void openClassWithSystemEditor(String projectName, String pkg,
+        String className) throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        Program.launch(resource.getLocation().toString());
     }
 
+    public void openFile(String... nodes) throws RemoteException {
+        precondition();
+        if (!editorC.isFileOpen(nodes[nodes.length - 1])) {
+            viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, nodes);
+            // bot.sleep(sleepTime);
+        }
+    }
+
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Delete"
+     * 
+     **********************************************/
+
+    public void deleteProject(String projectName) throws RemoteException {
+        IPath path = new Path(projectName);
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + projectName, e);
+            }
+        }
+    }
+
+    public void deleteFolder(String... folderNodes) throws RemoteException {
+        String folderpath = getPath(folderNodes);
+        IPath path = new Path(getPath(folderNodes));
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete folder " + folderpath, e);
+            }
+        }
+    }
+
+    public void deletePkg(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            IPath path = new Path(getPkgPath(projectName, pkg));
+            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
+                .getRoot();
+            IResource resource = root.findMember(path);
+            if (resource.isAccessible()) {
+                try {
+                    FileUtil.delete(resource);
+                    root.refreshLocal(IResource.DEPTH_INFINITE, null);
+                } catch (CoreException e) {
+                    log.debug("Couldn't delete file " + projectName, e);
+                }
+            }
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void deleteProjectWithGUI(String projectName) throws RemoteException {
+        precondition();
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, projectName);
+        windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
+        windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+    }
+
+    public void deleteFile(String... nodes) throws RemoteException {
+        precondition();
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, nodes);
+        windowPart.confirmDeleteWindow(OK);
+    }
+
+    public void deleteClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        IPath path = new Path(projectName + "/src/"
+            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+
+            } catch (CoreException e) {
+                log.debug("Couldn't delete file " + className + ".java", e);
+            }
+        }
+    }
+
+    /*
+     * context menu: Refactor -> move
+     */
     public void moveClassTo(String projectName, String pkg, String className,
         String targetProject, String targetPkg) throws RemoteException {
-        showViewPackageExplorer();
-        setFocusOnPackageExplorerView();
+        precondition();
         String[] matchTexts = helperPart.changeToRegex(projectName, SRC, pkg,
             className);
         log.info("matchTexts: " + matchTexts);
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
             REFACTOR, MOVE);
-        windowPart.waitUntilShellActive(MOVE_TITLE);
-        windowPart.confirmWindowWithTree(MOVE_TITLE, OK, targetProject, SRC,
+        windowPart.waitUntilShellActive(SHELL_MOVE);
+        windowPart.confirmWindowWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
     }
 
-    public void disConnectSVN() throws RemoteException {
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            DISCONNECT);
-        windowPart.confirmWindow(CONFIRM_DISCONNECT_FROM_SVN, YES);
-    }
-
-    public void connectSVN() throws RemoteException {
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SHARE_PROJECT);
-        windowPart.confirmWindowWithTable("Share Project", "SVN", NEXT);
-        bot.button(FINISH).click();
-    }
-
-    public void switchToOtherRevision() throws RemoteException {
-        precondition();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH);
-        windowPart.waitUntilShellActive("Switch");
-        bot.checkBox("Switch to HEAD revision").click();
-        bot.textWithLabel("Revision:").setText("115");
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed("SVN Switch");
-    }
-
-    public void switchToOtherRevision(String CLS_PATH) throws RemoteException {
-        precondition();
-        String[] matchTexts = CLS_PATH.split("/");
-        for (int i = 0; i < matchTexts.length; i++) {
-            matchTexts[i] = matchTexts[i] + ".*";
-        }
-        // String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH);
-        windowPart.waitUntilShellActive("Switch");
-        bot.checkBox("Switch to HEAD revision").click();
-        bot.textWithLabel("Revision:").setText("116");
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed("SVN Switch");
-    }
-
-    public void revert() throws RemoteException {
-        showViewPackageExplorer();
-        setFocusOnPackageExplorerView();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            "Revert...");
-        windowPart.confirmWindow("Revert", OK);
-        windowPart.waitUntilShellClosed("Revert");
-    }
-
+    /*
+     * context menu: Refactor -> rename
+     */
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException {
         renameFile(newName, projectName, SRC, pkg, className);
     }
 
-    public void renameFile(String newName, String... texts)
+    public void renameFile(String newName, String... nodes)
         throws RemoteException {
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(texts);
+        String[] matchTexts = helperPart.changeToRegex(nodes);
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
-            REFACTOR, "Rename...");
-        windowPart.activateShellWithText("Rename Compilation Unit");
-        bot.textWithLabel("New name:").setText(newName);
+            REFACTOR, RENAME);
+        windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed("Rename Compilation Unit");
+        windowPart.waitUntilShellClosed(SHELL_RENAME_COMPiIATION_UNIT);
     }
 
-    public void renameFolder(String projectName, String oldPath, String newPath)
+    public void renameFolder(String newName, String... nodes)
         throws RemoteException {
         precondition();
-        String[] nodes = { projectName, oldPath };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
-            "Rename...");
-        windowPart.waitUntilShellActive("Rename Resource");
-        bot.textWithLabel("New name:").setText(newPath);
+            RENAME);
+        windowPart.waitUntilShellActive(SHELL_RENAME_RESOURCE);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(OK);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed("Rename Resource");
+        windowPart.waitUntilShellClosed(SHELL_RENAME_RESOURCE);
     }
 
-    public void renamePkg(String newName, String... texts)
+    public void renamePkg(String newName, String... pkgNodes)
         throws RemoteException {
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(texts);
+        String[] matchTexts = helperPart.changeToRegex(pkgNodes);
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
-            REFACTOR, "Rename...");
-        windowPart.activateShellWithText("Rename Package");
-        bot.textWithLabel("New name:").setText(newName);
+            REFACTOR, RENAME);
+        windowPart.activateShellWithText(SHELL_RENAME_PACKAGE);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(OK);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed("Rename Package");
+        windowPart.waitUntilShellClosed(SHELL_RENAME_PACKAGE);
     }
 
-    public void switchToTag() throws RemoteException {
-        precondition();
-        String[] matchTexts = { BotConfiguration.PROJECTNAME_SVN + ".*" };
+    /*
+     * SVN
+     */
+    public void shareProject(String projectName, String url)
+        throws RemoteException {
+        String[] matchTexts = { projectName + ".*" };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH);
-        windowPart.waitUntilShellActive("Switch");
-        bot.button("Select...").click();
-        windowPart.confirmWindowWithTree("Repository Browser", OK, "tags",
-            "eclipsecon2009");
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed("SVN Switch");
-    }
-
-    public void importProjectFromSVN(String path) throws RemoteException {
-        workbenchC.activateEclipseShell();
-        menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_FILE,
-            SarosConstant.MENU_TITLE_IMPORT);
-        windowPart.confirmWindowWithTreeWithFilterText(
-            SarosConstant.SHELL_TITLE_IMPORT, "SVN",
-            "Checkout Projects from SVN", NEXT);
-        if (bot.table().containsItem(path)) {
-            windowPart.confirmWindowWithTable("Checkout from SVN",
-                BotConfiguration.SVN_URL, NEXT);
+            SHARE_PROJECT);
+        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+            REPOSITORY_TYPE_SVN, NEXT);
+        if (bot.table().containsItem(url)) {
+            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT, url, NEXT);
+            bot.button(FINISH).click();
         } else {
-            bot.radio("Create a new repository location").click();
+            bot.checkBox(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
             bot.button(NEXT).click();
-            bot.comboBoxWithLabel("Url:").setText(path);
-            bot.button(NEXT).click();
-            windowPart.waitUntilShellActive("Checkout from SVN");
+            bot.comboBoxWithLabel(LABEL_URL).setText(url);
+            bot.button(FINISH).click();
         }
-        windowPart.confirmWindowWithTree("Checkout from SVN", FINISH, path,
-            "trunk", "examples");
-        windowPart.waitUntilShellActive("SVN Checkout");
-        SWTBotShell shell2 = bot.shell("SVN Checkout");
-        windowPart.waitUntilShellCloses(shell2);
+        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
     }
 
-    protected List<String> getAllProjects() {
+    public void disConnect(String projectName) throws RemoteException {
+        String[] matchTexts = { projectName + ".*" };
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            DISCONNECT);
+        windowPart.confirmWindow(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
+    }
+
+    public void revert(String projectName) throws RemoteException {
+        precondition();
+        String[] matchTexts = { projectName + ".*" };
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            REVERT);
+        windowPart.confirmWindow(SHELL_REVERT, OK);
+        windowPart.waitUntilShellClosed(SHELL_REVERT);
+    }
+
+    public void switchToAnotherRevision(String CLS_PATH, String versionID)
+        throws RemoteException {
+        precondition();
+        String[] matchTexts = CLS_PATH.split("/");
+        for (int i = 0; i < matchTexts.length; i++) {
+            matchTexts[i] = matchTexts[i] + ".*";
+        }
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        windowPart.waitUntilShellActive(SHELL_SWITCH);
+        if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
+            bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
+        bot.textWithLabel(LABEL_REVISION).setText(versionID);
+        bot.button(OK).click();
+        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+    }
+
+    public void switchToAnotherBranchOrTag(String projectName, String url)
+        throws RemoteException {
+        precondition();
+        String[] matchTexts = { projectName + ".*" };
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        windowPart.waitUntilShellActive(SHELL_SWITCH);
+        bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
+        bot.button(OK).click();
+        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+    }
+
+    public void waitUntilWindowSarosRunningVCSOperationClosed()
+        throws RemoteException {
+        windowPart.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+    }
+
+    public boolean isInSVN() throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(BotConfiguration.PROJECTNAME_SVN);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null)
+            return false;
+        return true;
+    }
+
+    public void waitUntilProjectNotInSVN(String projectName)
+        throws RemoteException {
+        waitUntil(SarosConditions.isNotInSVN(projectName));
+    }
+
+    public void waitUntilProjectInSVN(String projectName)
+        throws RemoteException {
+        waitUntil(SarosConditions.isInSVN(projectName));
+    }
+
+    public void waitUntilPkgExist(String projectName, String pkg)
+        throws RemoteException {
+        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
+        waitUntil(SarosConditions.isResourceExist(path));
+    }
+
+    public String getRevision(String fullPath) throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs == null)
+            return null;
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        return info.revision;
+    }
+
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
+
+    @Override
+    protected void precondition() throws RemoteException {
+        openPEView();
+        setFocusOnPEView();
+    }
+
+    private List<String> getAllProjects() {
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
         List<String> projectNames = new ArrayList<String>();
         for (int i = 0; i < tree.getAllItems().length; i++) {
@@ -274,15 +656,57 @@ public class PEViewComponentImp extends EclipseComponent implements
         return projectNames;
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        showViewPackageExplorer();
-        setFocusOnPackageExplorerView();
+    private void confirmWindowNewJavaProject(String projectName) {
+        SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_PROJECT);
+        shell.activate();
+        bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+        bot.button(FINISH).click();
+        windowPart.waitUntilShellClosed(SHELL_NEW_JAVA_PROJECT);
     }
 
-    public void waitUntilSarosRunningVCSOperationClosed()
-        throws RemoteException {
-        windowPart.waitUntilShellClosed(SAROS_RUNNING_VCS_OPERATION);
+    private void confirmWindowNewFolder(String newFolderName) {
+        SWTBotShell shell = bot.shell(SHELL_NEW_FOLDER);
+        shell.activate();
+        bot.textWithLabel(LABEL_FOLDER_NAME).setText(newFolderName);
+        bot.button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    private void confirmWindowNewFile(String newFileName) {
+        SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
+        shell.activate();
+        bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
+        bot.button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    private void confirmWindowNewJavaPackage(String projectName, String pkg) {
+        SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_PACKAGE);
+        shell.activate();
+        bot.textWithLabel("Source folder:").setText((projectName + "/src"));
+        bot.textWithLabel("Name:").setText(pkg);
+        bot.button(FINISH).click();
+        windowPart.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
+    }
+
+    private void confirmWindowNewJavaClass(String projectName, String pkg,
+        String className) {
+        SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_CLASS);
+        shell.activate();
+        bot.textWithLabel("Source folder:").setText(projectName + "/src");
+        bot.textWithLabel("Package:").setText(pkg);
+        bot.textWithLabel("Name:").setText(className);
+        bot.button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    private void confirmWizardNewProject(String projectName) {
+        windowPart.confirmWindowWithTree(SHELL_NEW_PROJECT, NEXT,
+            CATEGORY_GENERAL, NODE_PROJECT);
+        bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+        bot.button(FINISH).click();
+        windowPart.waitUntilShellClosed(SHELL_NEW_PROJECT);
+        bot.sleep(50);
     }
 
 }

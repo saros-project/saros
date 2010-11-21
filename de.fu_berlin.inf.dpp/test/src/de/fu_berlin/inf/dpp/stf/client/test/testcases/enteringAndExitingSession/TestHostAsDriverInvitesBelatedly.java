@@ -16,18 +16,11 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestHostAsDriverInvitesBelatedly {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
-    private static final String CP2 = BotConfiguration.CONTENTPATH2;
-    private static final String CP2_CHANGE = BotConfiguration.CONTENTCHANGEPATH2;
+public class TestHostAsDriverInvitesBelatedly extends STFTest {
 
     private static Musician alice;
     private static Musician bob;
@@ -59,10 +52,10 @@ public class TestHostAsDriverInvitesBelatedly {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.mainMenu.newClass(PROJECT, PKG, CLS2);
-        bob.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        bob.mainMenu.newClass(PROJECT, PKG, CLS2);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newClass(PROJECT, PKG, CLS2);
+        bob.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        bob.pEV.newClass(PROJECT, PKG, CLS2);
 
         /*
          * alice build session with carl and is followed by carl.
@@ -137,15 +130,12 @@ public class TestHostAsDriverInvitesBelatedly {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS);
-        bob.editor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG,
-            CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        bob.editor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG, CLS);
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG, CLS2);
+        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT, PKG,
             CLS2);
-        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT,
-            PKG, CLS2);
 
         alice.sessionV.openInvitationInterface(bob.getBaseJid());
 

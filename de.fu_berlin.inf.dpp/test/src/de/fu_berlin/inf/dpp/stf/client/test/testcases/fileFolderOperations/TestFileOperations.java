@@ -16,19 +16,14 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestFileOperations {
+public class TestFileOperations extends STFTest {
     private static Musician alice;
     private static Musician bob;
     private static Musician carl;
-
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PKG2 = BotConfiguration.PACKAGENAME2;
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
 
     @BeforeClass
     public static void initMusicians() throws RemoteException,
@@ -38,7 +33,7 @@ public class TestFileOperations {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
         alice.buildSessionConcurrently(PROJECT,
             SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
         carl.sessionV.followThisUser(alice.state);
@@ -46,12 +41,12 @@ public class TestFileOperations {
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.state.existsClass(PROJECT, PKG, CLS))
-            alice.mainMenu.newClass(PROJECT, PKG, CLS);
-        if (alice.state.existsClass(PROJECT, PKG, CLS2))
-            alice.state.deleteClass(PROJECT, PKG, CLS2);
-        if (alice.state.isPkgExist(PROJECT, PKG2))
-            alice.state.deletePkg(PROJECT, PKG2);
+        if (!alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)))
+            alice.pEV.newClass(PROJECT, PKG, CLS);
+        if (alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)))
+            alice.pEV.deleteClass(PROJECT, PKG, CLS2);
+        if (alice.pEV.isPkgExist(PROJECT, PKG2))
+            alice.pEV.deletePkg(PROJECT, PKG2);
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
@@ -76,37 +71,37 @@ public class TestFileOperations {
         alice.pEV.renameClass(CLS2, PROJECT, PKG, CLS);
         // bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
         // carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertFalse(bob.state.existsClass(PROJECT, PKG, CLS));
-        assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(carl.state.existsClass(PROJECT, PKG, CLS));
-        assertTrue(carl.state.existsClass(PROJECT, PKG, CLS2));
+        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
+        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
     }
 
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.state.deleteClass(PROJECT, PKG, CLS);
-        bob.state.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(bob.state.existsClass(PROJECT, PKG, CLS));
-        carl.state.waitUntilClassNotExist(PROJECT, PKG, CLS);
-        assertFalse(carl.state.existsClass(PROJECT, PKG, CLS));
+        alice.pEV.deleteClass(PROJECT, PKG, CLS);
+        bob.pEV.waitUntilClassNotExist(PROJECT, PKG, CLS);
+        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
+        carl.pEV.waitUntilClassNotExist(PROJECT, PKG, CLS);
+        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
     }
 
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
-        alice.mainMenu.newPackage(PROJECT, PKG2);
-        bob.state.waitUntilPkgExist(PROJECT, PKG2);
-        carl.state.waitUntilPkgExist(PROJECT, PKG2);
-        assertTrue(bob.state.isPkgExist(PROJECT, PKG2));
-        assertTrue(carl.state.isPkgExist(PROJECT, PKG2));
+        alice.pEV.newPackage(PROJECT, PKG2);
+        bob.pEV.waitUntilPkgExist(PROJECT, PKG2);
+        carl.pEV.waitUntilPkgExist(PROJECT, PKG2);
+        assertTrue(bob.pEV.isPkgExist(PROJECT, PKG2));
+        assertTrue(carl.pEV.isPkgExist(PROJECT, PKG2));
 
-        alice.mainMenu.newClass(PROJECT, PKG2, CLS);
-        bob.state.waitUntilClassExist(PROJECT, PKG2, CLS);
-        carl.state.waitUntilClassExist(PROJECT, PKG2, CLS);
-        assertTrue(bob.state.existsClass(PROJECT, PKG2, CLS));
-        assertTrue(carl.state.existsClass(PROJECT, PKG2, CLS));
+        alice.pEV.newClass(PROJECT, PKG2, CLS);
+        bob.pEV.waitUntilClassExist(PROJECT, PKG2, CLS);
+        carl.pEV.waitUntilClassExist(PROJECT, PKG2, CLS);
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG2, CLS)));
+        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT, PKG2, CLS)));
 
-        alice.editor.setTextInJavaEditorWithSave(
-            BotConfiguration.CONTENTPATH, PROJECT, PKG2, CLS);
+        alice.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
+            PROJECT, PKG2, CLS);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG2,
             CLS);
         carl.state.waitUntilClassContentsSame(PROJECT, PKG2, CLS,
@@ -122,15 +117,15 @@ public class TestFileOperations {
 
     @Test
     public void testMoveClass() throws RemoteException {
-        alice.mainMenu.newPackage(PROJECT, PKG2);
-        alice.mainMenu.newClass(PROJECT, PKG2, CLS2);
+        alice.pEV.newPackage(PROJECT, PKG2);
+        alice.pEV.newClass(PROJECT, PKG2, CLS2);
         alice.pEV.moveClassTo(PROJECT, PKG2, CLS2, PROJECT, PKG);
-        bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
-        carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
-        assertTrue(bob.state.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(bob.state.existsClass(PROJECT, PKG2, CLS2));
-        assertTrue(carl.state.existsClass(PROJECT, PKG, CLS2));
-        assertFalse(carl.state.existsClass(PROJECT, PKG2, CLS2));
+        bob.pEV.waitUntilClassExist(PROJECT, PKG, CLS2);
+        carl.pEV.waitUntilClassExist(PROJECT, PKG, CLS2);
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT, PKG2, CLS2)));
+        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT, PKG2, CLS2)));
     }
 
     @Test
@@ -138,18 +133,18 @@ public class TestFileOperations {
         alice.pEV.renamePkg(PKG2, PROJECT, "src", PKG);
         // bob.state.waitUntilPkgExist(PROJECT, PKG2);
         // carl.state.waitUntilPkgExist(PROJECT, PKG2);
-        assertFalse(bob.state.isPkgExist(PROJECT, PKG));
-        assertTrue(bob.state.isPkgExist(PROJECT, PKG2));
-        assertFalse(carl.state.isPkgExist(PROJECT, PKG));
-        assertTrue(carl.state.isPkgExist(PROJECT, PKG2));
+        assertFalse(bob.pEV.isPkgExist(PROJECT, PKG));
+        assertTrue(bob.pEV.isPkgExist(PROJECT, PKG2));
+        assertFalse(carl.pEV.isPkgExist(PROJECT, PKG));
+        assertTrue(carl.pEV.isPkgExist(PROJECT, PKG2));
     }
 
     @Test
     public void testDeletePkg() throws RemoteException {
-        alice.state.deletePkg(PROJECT, PKG);
-        bob.state.waitUntilPkgNotExist(PROJECT, PKG);
-        carl.state.waitUntilPkgNotExist(PROJECT, PKG);
-        assertFalse(bob.state.isPkgExist(PROJECT, PKG));
-        assertFalse(carl.state.isPkgExist(PROJECT, PKG));
+        alice.pEV.deletePkg(PROJECT, PKG);
+        bob.pEV.waitUntilPkgNotExist(PROJECT, PKG);
+        carl.pEV.waitUntilPkgNotExist(PROJECT, PKG);
+        assertFalse(bob.pEV.isPkgExist(PROJECT, PKG));
+        assertFalse(carl.pEV.isPkgExist(PROJECT, PKG));
     }
 }

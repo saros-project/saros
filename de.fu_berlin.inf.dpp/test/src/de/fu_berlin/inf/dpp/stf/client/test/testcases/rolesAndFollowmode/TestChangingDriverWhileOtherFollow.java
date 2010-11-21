@@ -57,7 +57,7 @@ public class TestChangingDriverWhileOtherFollow {
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -144,13 +144,12 @@ public class TestChangingDriverWhileOtherFollow {
         // bob.bot.waitUntilFollowed(carl.getBaseJid());
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
-        carl.editor
-            .setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        String dirtyClsContentOfCarl = carl.editor.getTextOfJavaEditor(
-            PROJECT, PKG, CLS);
+        carl.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        String dirtyClsContentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT,
+            PKG, CLS);
 
-        alice.editor.waitUntilJavaEditorContentSame(
-            dirtyClsContentOfCarl, PROJECT, PKG, CLS);
+        alice.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
+            PROJECT, PKG, CLS);
         assertTrue(alice.editor.isJavaEditorActive(CLS));
         assertTrue(alice.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
@@ -161,18 +160,18 @@ public class TestChangingDriverWhileOtherFollow {
         assertTrue(bob.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        dave.editor.waitUntilJavaEditorContentSame(
-            dirtyClsContentOfCarl, PROJECT, PKG, CLS);
+        dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
+            PROJECT, PKG, CLS);
         assertTrue(dave.editor.isJavaEditorActive(CLS));
         assertTrue(dave.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
         carl.stopFollowedBy(alice, bob, dave);
-        carl.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT,
-            PKG, CLS);
+        carl.editor
+            .setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
         carl.editor.closeJavaEditorWithSave(CLS);
-        String dirtyClsChangeContentOfCarl = carl.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS);
+        String dirtyClsChangeContentOfCarl = carl.editor.getTextOfJavaEditor(
+            PROJECT, PKG, CLS);
 
         assertTrue(alice.editor.isJavaEditorActive(CLS));
         /*

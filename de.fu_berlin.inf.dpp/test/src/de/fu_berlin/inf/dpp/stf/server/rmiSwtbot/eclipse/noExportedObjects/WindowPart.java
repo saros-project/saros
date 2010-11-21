@@ -77,13 +77,21 @@ public class WindowPart extends EclipseComponent {
      */
     public void confirmWindowWithTree(String title, String buttonText,
         String... nodes) {
-        // waitUntilShellActive(shellName);
+        bot.shell(title).activate();
+        SWTBotTree tree = bot.tree();
+        log.info("allItems " + tree.getAllItems().length);
+        tree.expandNode(nodes).select();
+        basicPart.waitUntilButtonIsEnabled(buttonText);
+        bot.button(buttonText).click();
+    }
+
+    public void confirmWindowWithTreeWithWaitingExpand(String title,
+        String buttonText, String... nodes) {
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
         treePart.selectTreeWithLabelsWithWaitungExpand(tree, nodes);
-        // basicObject.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
-        // waitUntilShellCloses(shellName);
+
     }
 
     /**
@@ -239,6 +247,14 @@ public class WindowPart extends EclipseComponent {
     @Override
     protected void precondition() throws RemoteException {
         // TODO Auto-generated method stub
-
     }
+
+    // Title of Shells
+    protected final static String CONFIRM_DELETE = "Confirm Delete";
+
+    public void confirmDeleteWindow(String buttonName) {
+        windowPart.waitUntilShellActive(CONFIRM_DELETE);
+        windowPart.confirmWindow(CONFIRM_DELETE, buttonName);
+    }
+
 }

@@ -75,7 +75,8 @@ public interface RosterViewComponent extends Remote {
 
     public void connect(JID jid, String password) throws RemoteException;
 
-    public void confirmDeleteWindow() throws RemoteException;
+    // public void confirmDeleteWindow(String buttonName) throws
+    // RemoteException;
 
     public void clickContextMenuOfBuddy(String context, String baseJID)
         throws RemoteException;

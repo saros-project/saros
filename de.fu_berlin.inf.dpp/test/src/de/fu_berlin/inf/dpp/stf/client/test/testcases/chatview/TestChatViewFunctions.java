@@ -11,16 +11,13 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestChatViewFunctions {
+public class TestChatViewFunctions extends STFTest {
 
     String message = "Hello Bob";
-
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
 
     protected static Musician alice;
     protected static Musician bob;
@@ -47,7 +44,7 @@ public class TestChatViewFunctions {
         alice = musicians.get(0);
         bob = musicians.get(1);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
 
         /*
          * alice build session with bob.

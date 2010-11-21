@@ -34,7 +34,7 @@ public class TestParallelInvitationWithTerminationByHost {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
     }
 
     /**

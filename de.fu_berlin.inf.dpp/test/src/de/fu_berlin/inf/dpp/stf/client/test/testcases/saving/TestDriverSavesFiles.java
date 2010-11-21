@@ -16,19 +16,11 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
-public class TestDriverSavesFiles {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
-    private static final String CLS3 = BotConfiguration.CLASSNAME3;
-
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP2_change = BotConfiguration.CONTENTCHANGEPATH2;
+public class TestDriverSavesFiles extends STFTest {
 
     private static Musician alice;
     private static Musician bob;
@@ -66,9 +58,9 @@ public class TestDriverSavesFiles {
         dave = musicians.get(3);
         edna = musicians.get(4);
 
-        alice.mainMenu.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.mainMenu.newClass(PROJECT, PKG, CLS2);
-        alice.mainMenu.newClass(PROJECT, PKG, CLS3);
+        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newClass(PROJECT, PKG, CLS2);
+        alice.pEV.newClass(PROJECT, PKG, CLS3);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
@@ -143,10 +135,9 @@ public class TestDriverSavesFiles {
         assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS3,
             SarosConstant.ID_JAVA_EDITOR));
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS);
-        String dirtyClsContentOfAlice = alice.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT, PKG, CLS);
 
         dave.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS,
             dirtyClsContentOfAlice);
@@ -175,10 +166,9 @@ public class TestDriverSavesFiles {
     @Test
     public void testNoChangeByExternalEditorByBob() throws IOException,
         CoreException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS2);
-        String dirtyCls2ContentOfAlice = alice.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS2);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT, PKG, CLS2);
         String cls2ContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
             CLS2);
         String cls2ContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS2);
@@ -202,11 +192,10 @@ public class TestDriverSavesFiles {
      */
     @Test
     public void testChangeByEclipseEditorByCarl() throws RemoteException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS2);
-        String dirtyCls2ContentOfAlice = alice.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS2);
-        carl.pEV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT, PKG, CLS2);
+        carl.pEV.openFileWith("Text Editor", getClassNodes(PROJECT, PKG, CLS2));
 
         carl.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ContentOfAlice);
@@ -240,13 +229,12 @@ public class TestDriverSavesFiles {
 
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS2);
-        carl.pEV.openClassWith("Text Editor", PROJECT, PKG, CLS2);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS2);
+        carl.pEV.openFileWith("Text Editor", getClassNodes(PROJECT, PKG, CLS2));
         carl.editor.closeJavaEditorWithSave(CLS2);
 
-        alice.editor.setTextInJavaEditorWithSave(CP2_change, PROJECT,
-            PKG, CLS2);
+        alice.editor
+            .setTextInJavaEditorWithSave(CP2_CHANGE, PROJECT, PKG, CLS2);
         String dirtyCls2ChangeContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT, PKG, CLS2);
         dave.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
@@ -264,11 +252,11 @@ public class TestDriverSavesFiles {
             CLS2);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.pEV.openClass(PROJECT, PKG, CLS2);
+        carl.pEV.openFile(getClassNodes(PROJECT, PKG, CLS2));
         carl.editor.waitUntilEditorContentSame(PROJECT, PKG, CLS2,
             dirtyCls2ChangeContentOfAlice);
-        String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT,
-            PKG, CLS2);
+        String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT, PKG,
+            CLS2);
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
         carl.editor.closeJavaEditorWithSave(CLS2);
     }
@@ -293,8 +281,7 @@ public class TestDriverSavesFiles {
     public void testCloseDirtyFileByAlice() throws RemoteException,
         IOException, CoreException {
         String clsConentofBob = bob.state.getClassContent(PROJECT, PKG, CLS);
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG,
-            CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
         alice.editor.closeJavaEditorWithSave(CLS);
         String clsConentOfAlice = alice.state
             .getClassContent(PROJECT, PKG, CLS);
@@ -308,8 +295,8 @@ public class TestDriverSavesFiles {
         assertFalse(edna.editor.isClassDirty(PROJECT, PKG, CLS,
             SarosConstant.ID_JAVA_EDITOR));
 
-        String clsContentChangeOfBob = bob.editor.getTextOfJavaEditor(
-            PROJECT, PKG, CLS);
+        String clsContentChangeOfBob = bob.editor.getTextOfJavaEditor(PROJECT,
+            PKG, CLS);
         assertFalse(clsContentChangeOfBob.equals(clsConentofBob));
 
         String clsContentChangeOfCarl = carl.editor.getTextOfJavaEditor(
