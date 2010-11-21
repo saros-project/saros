@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.Path;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public class StateImp extends EclipseComponent implements State {
 
@@ -40,21 +38,6 @@ public class StateImp extends EclipseComponent implements State {
     }
 
     /**
-     * @param resourcePath
-     *            full path of the resource, e.g.
-     *            Foo_Saros/src/my/pkg/myClass.java.
-     *            Foo_Saros/myFolder/myFile.xml.
-     */
-    public boolean isResourceExist(String resourcePath) throws RemoteException {
-        IPath path = new Path(resourcePath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            return false;
-        return true;
-    }
-
-    /**
      * get the content of the class file, which is saved.
      */
     public String getClassContent(String projectName, String pkg,
@@ -68,18 +51,6 @@ public class StateImp extends EclipseComponent implements State {
         log.info("Checking full path: \"" + file.getFullPath().toOSString()
             + "\"");
         return helperPart.ConvertStreamToString(file.getContents());
-    }
-
-    public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException {
-        IPath path = new Path(fullPath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs == null)
-            return null;
-        final VCSResourceInfo info = vcs.getResourceInfo(resource);
-        return info.url;
     }
 
     @Override

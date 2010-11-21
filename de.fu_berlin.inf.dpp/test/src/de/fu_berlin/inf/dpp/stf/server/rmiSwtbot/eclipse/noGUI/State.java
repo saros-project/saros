@@ -25,13 +25,8 @@ public interface State extends Remote {
     public void waitUntilClassContentsSame(String projectName, String pkg,
         String className, String otherClassContent) throws RemoteException;
 
-    public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException;
-
     public String getClassContent(String projectName, String pkg,
         String className) throws RemoteException, IOException, CoreException;
-
-    public boolean isResourceExist(String resourcePath) throws RemoteException;
 
     public void deleteAllProjects() throws RemoteException;
 

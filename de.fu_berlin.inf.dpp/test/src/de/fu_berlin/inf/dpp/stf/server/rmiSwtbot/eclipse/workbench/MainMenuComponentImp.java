@@ -6,7 +6,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
@@ -125,8 +124,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
         windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, IMPORT_SOURCE, NEXT);
         if (bot.table().containsItem(path)) {
-            windowPart.confirmWindowWithTable("Checkout from SVN",
-                BotConfiguration.SVN_URL, NEXT);
+            windowPart.confirmWindowWithTable("Checkout from SVN", path, NEXT);
         } else {
             bot.radio("Create a new repository location").click();
             bot.button(NEXT).click();

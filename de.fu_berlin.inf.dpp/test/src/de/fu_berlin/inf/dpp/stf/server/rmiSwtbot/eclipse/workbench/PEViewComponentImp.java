@@ -21,7 +21,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.util.FileUtil;
@@ -232,6 +231,17 @@ public class PEViewComponentImp extends EclipseComponent implements
         return false;
     }
 
+    public void waitUntilPkgExist(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
+                pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
     public void waitUntilPkgNotExist(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches("[\\w\\.]*\\w+")) {
@@ -340,7 +350,6 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void newJavaProjectWithClass(String projectName, String pkg,
         String className) throws RemoteException {
         newJavaProject(projectName);
-        // bot.sleep(50);
         newClass(projectName, pkg, className);
     }
 
@@ -349,11 +358,18 @@ public class PEViewComponentImp extends EclipseComponent implements
      * all related actions with the sub menus of the context menu "Open"
      * 
      **********************************************/
-    public void openFileWith(String whichEditor, String... nodes)
+    public void openFile(String... fileNodes) throws RemoteException {
+        precondition();
+        if (!editorC.isFileOpen(fileNodes[fileNodes.length - 1])) {
+            viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, fileNodes);
+        }
+    }
+
+    public void openFileWith(String whichEditor, String... fileNodes)
         throws RemoteException {
         precondition();
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        tree.expandNode(nodes).select();
+        tree.expandNode(fileNodes).select();
         ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
         windowPart.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
@@ -364,19 +380,10 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException {
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        IPath path = new Path(getClassPath(projectName, pkg, className));
         final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         IResource resource = root.findMember(path);
         Program.launch(resource.getLocation().toString());
-    }
-
-    public void openFile(String... nodes) throws RemoteException {
-        precondition();
-        if (!editorC.isFileOpen(nodes[nodes.length - 1])) {
-            viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, nodes);
-            // bot.sleep(sleepTime);
-        }
     }
 
     /**********************************************
@@ -397,6 +404,13 @@ public class PEViewComponentImp extends EclipseComponent implements
                 log.debug("Couldn't delete file " + projectName, e);
             }
         }
+    }
+
+    public void deleteProjectWithGUI(String projectName) throws RemoteException {
+        precondition();
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, projectName);
+        windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
+        windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteFolder(String... folderNodes) throws RemoteException {
@@ -435,13 +449,6 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void deleteProjectWithGUI(String projectName) throws RemoteException {
-        precondition();
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, projectName);
-        windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
-    }
-
     public void deleteFile(String... nodes) throws RemoteException {
         precondition();
         viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, nodes);
@@ -450,8 +457,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void deleteClass(String projectName, String pkg, String className)
         throws RemoteException {
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        IPath path = new Path(getClassPath(projectName, pkg, className));
         final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         IResource resource = root.findMember(path);
         if (resource.isAccessible()) {
@@ -465,40 +471,46 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
-    /*
-     * context menu: Refactor -> move
-     */
-    public void moveClassTo(String projectName, String pkg, String className,
-        String targetProject, String targetPkg) throws RemoteException {
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Refactor"
+     * 
+     **********************************************/
+
+    public void moveClassTo(String sourceProject, String sourcePkg,
+        String className, String targetProject, String targetPkg)
+        throws RemoteException {
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(projectName, SRC, pkg,
-            className);
-        log.info("matchTexts: " + matchTexts);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
+        String[] classNodes = getClassNodes(sourceProject, sourcePkg, className);
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, classNodes,
             REFACTOR, MOVE);
         windowPart.waitUntilShellActive(SHELL_MOVE);
         windowPart.confirmWindowWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
+        windowPart.waitUntilShellClosed(SHELL_MOVE);
     }
 
-    /*
-     * context menu: Refactor -> rename
-     */
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException {
-        renameFile(newName, projectName, SRC, pkg, className);
-    }
-
-    public void renameFile(String newName, String... nodes)
-        throws RemoteException {
-        precondition();
-        String[] matchTexts = helperPart.changeToRegex(nodes);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
+        String[] classNodes = getClassNodes(projectName, pkg, className);
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, classNodes,
             REFACTOR, RENAME);
         windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
+        windowPart.waitUntilShellClosed(SHELL_RENAME_COMPiIATION_UNIT);
+    }
+
+    public void renameFile(String newName, String... nodes)
+        throws RemoteException {
+        precondition();
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
+            RENAME);
+        windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
+        basicPart.waitUntilButtonIsEnabled(OK);
+        bot.button(OK).click();
         windowPart.waitUntilShellClosed(SHELL_RENAME_COMPiIATION_UNIT);
     }
 
@@ -514,11 +526,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_RENAME_RESOURCE);
     }
 
-    public void renamePkg(String newName, String... pkgNodes)
+    public void renamePkg(String newName, String projectName, String pkg)
         throws RemoteException {
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(pkgNodes);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
+        String[] pkgNodes = getPkgNodes(projectName, pkg);
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, pkgNodes,
             REFACTOR, RENAME);
         windowPart.activateShellWithText(SHELL_RENAME_PACKAGE);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
@@ -527,25 +539,31 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_RENAME_PACKAGE);
     }
 
-    /*
-     * SVN
-     */
-    public void shareProject(String projectName, String url)
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "SVN"
+     * 
+     **********************************************/
+    public void shareProjectWithSVN(String projectName, String url)
         throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
             SHARE_PROJECT);
         windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
-        if (bot.table().containsItem(url)) {
-            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT, url, NEXT);
-            bot.button(FINISH).click();
-        } else {
-            bot.checkBox(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
-            bot.button(NEXT).click();
-            bot.comboBoxWithLabel(LABEL_URL).setText(url);
-            bot.button(FINISH).click();
-        }
+        log.debug("SVN share project text: " + bot.text());
+        basicPart.waitUntilButtonIsEnabled(FINISH);
+        bot.button(FINISH).click();
+        // if (bot.table().containsItem(url)) {
+        // windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT, url, NEXT);
+        // bot.button(NEXT).click();
+        // bot.button(FINISH).click();
+        // } else {
+        // bot.checkBox(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+        // bot.button(NEXT).click();
+        // bot.comboBoxWithLabel(LABEL_URL).setText(url);
+        // bot.button(FINISH).click();
+        // }
         windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
     }
 
@@ -565,21 +583,17 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_REVERT);
     }
 
-    public void switchToAnotherRevision(String CLS_PATH, String versionID)
-        throws RemoteException {
-        precondition();
-        String[] matchTexts = CLS_PATH.split("/");
-        for (int i = 0; i < matchTexts.length; i++) {
-            matchTexts[i] = matchTexts[i] + ".*";
-        }
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
-        windowPart.waitUntilShellActive(SHELL_SWITCH);
-        if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
-            bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
-        bot.textWithLabel(LABEL_REVISION).setText(versionID);
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+    public void switchProjectToAnotherRevision(String projectName,
+        String versionID) throws RemoteException {
+        String[] nodes = { projectName + ".*" };
+        switchToAnotherRevision(nodes, versionID);
+    }
+
+    public void switchClassToAnotherRevision(String projectName, String pkg,
+        String className, String versionID) throws RemoteException {
+        String[] nodes = getClassNodes(projectName, pkg, className);
+        nodes = helperPart.changeToRegex(nodes);
+        switchToAnotherRevision(nodes, versionID);
     }
 
     public void switchToAnotherBranchOrTag(String projectName, String url)
@@ -599,18 +613,13 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
-    public boolean isInSVN() throws RemoteException {
+    public boolean isInSVN(String projectName) throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(BotConfiguration.PROJECTNAME_SVN);
+            .getProject(projectName);
         final VCSAdapter vcs = VCSAdapter.getAdapter(project);
         if (vcs == null)
             return false;
         return true;
-    }
-
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException {
-        waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
     public void waitUntilProjectInSVN(String projectName)
@@ -618,13 +627,28 @@ public class PEViewComponentImp extends EclipseComponent implements
         waitUntil(SarosConditions.isInSVN(projectName));
     }
 
-    public void waitUntilPkgExist(String projectName, String pkg)
+    public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
-        String path = projectName + "/src/" + pkg.replaceAll("\\.", "/");
-        waitUntil(SarosConditions.isResourceExist(path));
+        waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
-    public String getRevision(String fullPath) throws RemoteException {
+    public String getReversion(String fullPath) throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs != null)
+            return vcs.getRevisionString(resource);
+        return null;
+    }
+
+    public void waitUntilReversionIsSame(String fullPath, String reversionID)
+        throws RemoteException {
+        waitUntil(SarosConditions.isReversionSame(fullPath, reversionID));
+    }
+
+    public String getURLOfRemoteResource(String fullPath)
+        throws RemoteException {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
@@ -632,7 +656,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (vcs == null)
             return null;
         final VCSResourceInfo info = vcs.getResourceInfo(resource);
-        return info.revision;
+        return info.url;
     }
 
     /**************************************************************
@@ -707,6 +731,19 @@ public class PEViewComponentImp extends EclipseComponent implements
         bot.button(FINISH).click();
         windowPart.waitUntilShellClosed(SHELL_NEW_PROJECT);
         bot.sleep(50);
+    }
+
+    private void switchToAnotherRevision(String[] matchTexts, String versionID)
+        throws RemoteException {
+        precondition();
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        windowPart.waitUntilShellActive(SHELL_SWITCH);
+        if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
+            bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
+        bot.textWithLabel(LABEL_REVISION).setText(versionID);
+        bot.button(OK).click();
+        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
 }

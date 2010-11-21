@@ -84,6 +84,10 @@ public interface EditorComponent extends Remote {
     public void closeJavaEditorWithSave(String className)
         throws RemoteException;
 
+    public void closeEditorWithSave(String fileName) throws RemoteException;
+
+    public void closeEditorWithoutSave(String fileName) throws RemoteException;
+
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException;
 

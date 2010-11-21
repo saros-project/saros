@@ -34,6 +34,22 @@ public class STFTest {
     public static final String ROLENAME = SarosConstant.ROLENAME;
     public static final String OWNCONTACTNAME = SarosConstant.OWNCONTACTNAME;
 
+    /*
+     * SVN
+     */
+    protected static String SVN_PROJECT = "examples";
+    protected static String SVN_PKG = "org.eclipsecon.swtbot.example";
+    protected static String SVN_CLS = "MyFirstTest01";
+    protected static String SVN_URL = "http://swtbot-examples.googlecode.com/svn";
+    protected static String SVN_TAG_URL = "http://swtbot-examples.googlecode.com/svn/tags/eclipsecon2009";
+    protected static final String SVN_CLS_PATH = SVN_PROJECT
+        + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
+
+    /*
+     * Contextmenu "Saros"
+     */
+    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+
     public String getClassPath(String projectName, String pkg, String className) {
         return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
             + className + ".java";

@@ -29,8 +29,7 @@ public class BotConfiguration {
 
     public final static transient String SCREENSHOTDIR = "screenshot";
     /** A small Java Project */
-    public final static String PROJECTNAME_SVN = "examples";
-    public final static String PROJECTNAME_SVN_TRUNK = "examples";
+
     public final static String PROJECTNAME = "Foo_Saros";
     public final static String PROJECTNAME2 = "Foo_Saros2";
     public final static String PROJECTNAME3 = "Foo_Saros3";
@@ -58,7 +57,8 @@ public class BotConfiguration {
     public final static String CONTENTPATH3 = "test/STF/" + CLASSNAME3
         + ".java";
 
-    public final static String SVN_URL = "http://swtbot-examples.googlecode.com/svn";
+    // public final static String SVN_URL =
+    // "http://swtbot-examples.googlecode.com/svn";
 
     /**
      * VM test accounts

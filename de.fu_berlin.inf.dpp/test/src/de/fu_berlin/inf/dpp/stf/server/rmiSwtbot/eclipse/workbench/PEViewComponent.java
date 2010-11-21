@@ -189,16 +189,6 @@ public interface PEViewComponent extends Remote {
         throws RemoteException;
 
     /**
-     * Delete the specified folder using FileUntil.delete(resource).
-     * 
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}
-     */
-    public void deleteFolder(String... folderNodes) throws RemoteException;
-
-    /**
      * Performs the action "create a new package" which should be done with the
      * following steps:
      * <ol>
@@ -236,6 +226,18 @@ public interface PEViewComponent extends Remote {
         throws RemoteException;
 
     /**
+     * wait until the given package is exist
+     * 
+     * @param projectName
+     *            name of the java project, e.g. Foo-Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * @throws RemoteException
+     */
+    public void waitUntilPkgExist(String projectName, String pkg)
+        throws RemoteException;
+
+    /**
      * waits until the given package isn't exist
      ** 
      * @param projectName
@@ -245,17 +247,6 @@ public interface PEViewComponent extends Remote {
      * @throws RemoteException
      */
     public void waitUntilPkgNotExist(String projectName, String pkg)
-        throws RemoteException;
-
-    /**
-     * Delete the specified package using FileUntil.delete(resource).
-     * 
-     * @param projectName
-     *            name of the project, which package you want to delete.
-     * @param pkg
-     *            name of the package, which you want to delete.
-     */
-    public void deletePkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -403,9 +394,77 @@ public interface PEViewComponent extends Remote {
     public void newJavaProjectWithClass(String projectName, String pkg,
         String className) throws RemoteException;
 
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Open"
+     * 
+     **********************************************/
+
+    /**
+     * Performs the action "open file" which should be done with the following
+     * steps:
+     * 
+     * <ol>
+     * <li>if the class file is already open, return.</li>
+     * <li>selects the file, which you want to open, and then click the context
+     * menu "Open".</li>
+     * </ol>
+     * 
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{Foo_Saros,
+     *            myFolder, myFile.xml}
+     * @throws RemoteException
+     */
+    public void openFile(String... fileNodes) throws RemoteException;
+
+    /**
+     * Performs the action "open file with" which should be done with the
+     * following steps:
+     * 
+     * <ol>
+     * <li>selects the file, which you want to open, and then click the context
+     * menu "Open with -> Other..."</li>
+     * <li>choose the given editor for opening the file</li>
+     * <li>click "OK" to confirm the rename</li>
+     * </ol>
+     * 
+     * @param whichEditor
+     *            the name of the editor, with which you want to open the file.
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g. {Foo_Saros,
+     *            myFolder, myFile.xml}
+     * 
+     * @throws RemoteException
+     */
+    public void openFileWith(String whichEditor, String... fileNodes)
+        throws RemoteException;
+
+    /**
+     * open class with system editor using
+     * Program.launch(resource.getLocation().toString()
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     * @throws RemoteException
+     */
+    public void openClassWithSystemEditor(String projectName, String pkg,
+        String className) throws RemoteException;
+
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Delete"
+     * 
+     **********************************************/
+
     /**
      * Delete the project using FileUntil.delete(resource). This delete-method
-     * costs less time than the previous version.
+     * costs less time than the method using GUI
      * 
      * @param projectName
      *            name of the project, which you want to delete.
@@ -426,6 +485,27 @@ public interface PEViewComponent extends Remote {
      *            the name of the project, which you want to delete.
      */
     public void deleteProjectWithGUI(String projectName) throws RemoteException;
+
+    /**
+     * Delete the specified folder using FileUntil.delete(resource).
+     * 
+     * @param folderNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder"}
+     */
+    public void deleteFolder(String... folderNodes) throws RemoteException;
+
+    /**
+     * Delete the specified package using FileUntil.delete(resource).
+     * 
+     * @param projectName
+     *            name of the project, which package you want to delete.
+     * @param pkg
+     *            name of the package, which you want to delete.
+     */
+    public void deletePkg(String projectName, String pkg)
+        throws RemoteException;
 
     /**
      * Performs the action "delete file" which should be done with the following
@@ -479,50 +559,6 @@ public interface PEViewComponent extends Remote {
     public void waitUntilFileExist(String... fileNodes) throws RemoteException;
 
     /**
-     * Performs the action "open file" which should be done with the following
-     * steps:
-     * 
-     * <ol>
-     * <li>if the class file is already open, return.</li>
-     * <li>selects the file, which you want to open, and then click the context
-     * menu "Open".</li>
-     * </ol>
-     * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g. {Foo_Saros,
-     *            src, my.pkg, MyClass.java}
-     * @throws RemoteException
-     */
-    public void openFile(String... nodes) throws RemoteException;
-
-    /**
-     * Performs the action "open class with" which should be done with the
-     * following steps:
-     * 
-     * <ol>
-     * <li>selects the class, which you want to open, and then click the context
-     * menu "Open with -> Other..."</li>
-     * <li>choose the given editor for opening the class file</li>
-     * <li>click "OK" to confirm the rename</li>
-     * </ol>
-     * 
-     * @param whichEditor
-     *            the name of the editor, with which you want to open the class
-     *            file.
-     * @param projectName
-     *            name of the project, e.g. Foo-Saros.
-     * @param packageName
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * 
-     * @throws RemoteException
-     */
-    public void openFileWith(String whichEditor, String... nodes)
-        throws RemoteException;
-
-    /**
      * Performs the action "move class to another package" which should be done
      * with the following steps:
      * 
@@ -533,9 +569,9 @@ public interface PEViewComponent extends Remote {
      * <li>click "OK" to confirm the move</li>
      * </ol>
      * 
-     * @param projectName
+     * @param sourceProject
      *            name of the project, e.g. Foo-Saros.
-     * @param pkg
+     * @param sourcePkg
      *            name of the package, e.g. my.pkg.
      * @param className
      *            name of the class, e.g. myClass.
@@ -543,8 +579,9 @@ public interface PEViewComponent extends Remote {
      * @param targetPkg
      * @throws RemoteException
      */
-    public void moveClassTo(String projectName, String pkg, String className,
-        String targetProject, String targetPkg) throws RemoteException;
+    public void moveClassTo(String sourceProject, String sourcePkg,
+        String className, String targetProject, String targetPkg)
+        throws RemoteException;
 
     /**
      * Perform the action "rename package" which should be done with the
@@ -570,13 +607,10 @@ public interface PEViewComponent extends Remote {
      * 
      * @param newName
      *            the new name of the given package.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array
-     *            parameter.e.g.{"Foo-saros","src" "my.pkg"}
+     * 
      * @throws RemoteException
      */
-    public void renamePkg(String newName, String... nodes)
+    public void renamePkg(String newName, String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -733,7 +767,7 @@ public interface PEViewComponent extends Remote {
      *            the repository location
      * @throws RemoteException
      */
-    public void shareProject(String projectName, String url)
+    public void shareProjectWithSVN(String projectName, String url)
         throws RemoteException;
 
     /**
@@ -781,16 +815,51 @@ public interface PEViewComponent extends Remote {
      * need to treat the following popup window too.</li>
      * 
      * 
-     * @param PATH
-     *            the path to the project/file, which should be switch to
-     *            another reversion. e.g.
-     *            Examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param projectName
+     *            name of the java project, e.g. Foo-Saros.
      * @param versionID
      *            the ID of the reversion to which you want to switch
      * @throws RemoteException
      */
-    public void switchToAnotherRevision(String PATH, String versionID)
-        throws RemoteException;
+    public void switchProjectToAnotherRevision(String projectName,
+        String versionID) throws RemoteException;
+
+    /**
+     * Perform the action "switch to another Reversion" which should be done
+     * with the following steps:
+     * 
+     * <ol>
+     * <li>Select the given project and click "Team" >
+     * "Switch to another Branch/Tag/Revision..."</li>
+     * <li>uncheckt the checkbox with the title "Switch to HEAD version"</li>
+     * <li>Enter the given versionID to the text field with the title
+     * "Revision:"</li>
+     * <li>click "OK" to confirm the switch</li>
+     * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
+     * "switch to another Reversion" action is completely done.</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "switch to another Reversion" . I mean, after clicking the sub menu you
+     * need to treat the following popup window too.</li>
+     * 
+     * 
+     * @param projectName
+     *            name of the java project, e.g. Foo-Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     * @param versionID
+     *            the ID of the reversion to which you want to switch
+     * @throws RemoteException
+     */
+    public void switchClassToAnotherRevision(String projectName, String pkg,
+        String className, String versionID) throws RemoteException;
 
     /**
      * Perform the action "switch to another Branch/Tag" which should be done
@@ -834,20 +903,68 @@ public interface PEViewComponent extends Remote {
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException;
 
-    public void openClassWithSystemEditor(String projectName, String pkg,
-        String className) throws RemoteException;
+    /**
+     * 
+     * @param prjectName
+     *            the name of the project
+     * @return <tt>true</tt>, if the given project is under SVN control
+     * @throws RemoteException
+     */
+    public boolean isInSVN(String prjectName) throws RemoteException;
 
-    public boolean isInSVN() throws RemoteException;
-
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException;
-
+    /**
+     * waits until the given project is in SVN control
+     * 
+     * @param projectName
+     *            the name of the project
+     * @throws RemoteException
+     */
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException;
 
-    public void waitUntilPkgExist(String projectName, String pkg)
+    /**
+     * waits until the given project is not under SVN control
+     * 
+     * @param projectName
+     *            the name of the project
+     * @throws RemoteException
+     */
+    public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException;
 
-    public String getRevision(String fullPath) throws RemoteException;
+    /**
+     * 
+     * @param fullPath
+     *            the path of the resource, e.g.
+     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @return the reversion id of the given resource.
+     * @throws RemoteException
+     */
+    public String getReversion(String fullPath) throws RemoteException;
+
+    /**
+     * 
+     * @param fullPath
+     *            the path of the resource, e.g.
+     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param reversionID
+     *            the ID of the reversion,with which your reversion should
+     *            compare
+     * @throws RemoteException
+     */
+    public void waitUntilReversionIsSame(String fullPath, String reversionID)
+        throws RemoteException;
+
+    /**
+     * @param fullPath
+     *            the path of the resource, e.g.
+     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * 
+     * @return the VCS specific URL information for the given resource specified
+     *         by the passed parameter"fullPath".
+     * @throws RemoteException
+     */
+    public String getURLOfRemoteResource(String fullPath)
+        throws RemoteException;
 
 }

@@ -98,6 +98,11 @@ public abstract class EclipseComponent {
         return nodes;
     }
 
+    public String[] getPkgNodes(String projectName, String pkg) {
+        String[] nodes = { projectName, SRC, pkg };
+        return nodes;
+    }
+
     public String getPath(String... nodes) {
         String folderpath = "";
         for (int i = 0; i < nodes.length; i++) {

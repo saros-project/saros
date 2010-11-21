@@ -100,7 +100,7 @@ public class SarosConstant {
     public final static String CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER = "Jump to position of selected user";
     public final static String CONTEXT_MENU_LEAVE_THE_SESSION = "Leave the session";
     public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
-    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+
     public final static String CONTEXT_MENU_SHARE_PROJECT_PARTIALLY = "Share project partially (experimental)...";
     public final static String CONTEXT_MENU_ADD_TO_SESSION = "Add to session (experimental)...";
 

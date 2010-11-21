@@ -131,8 +131,11 @@ public class SarosConditions extends Conditions {
         return new IsEditorContentsSame(editor, otherContent, filePath);
     }
 
-    public static ICondition isFollowingUser(SarosState state,
-        String plainJID) {
+    public static ICondition isFollowingUser(SarosState state, String plainJID) {
         return new IsFollowingUser(state, plainJID);
+    }
+
+    public static ICondition isReversionSame(String fullPath, String reversionID) {
+        return new IsReversionSame(fullPath, reversionID);
     }
 }

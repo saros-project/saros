@@ -130,7 +130,7 @@ public class TestFileOperations extends STFTest {
 
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.pEV.renamePkg(PKG2, PROJECT, "src", PKG);
+        alice.pEV.renamePkg(PKG2, PROJECT, PKG);
         // bob.state.waitUntilPkgExist(PROJECT, PKG2);
         // carl.state.waitUntilPkgExist(PROJECT, PKG2);
         assertFalse(bob.pEV.isPkgExist(PROJECT, PKG));

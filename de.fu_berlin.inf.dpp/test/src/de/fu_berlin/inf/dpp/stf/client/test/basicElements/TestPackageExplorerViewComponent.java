@@ -39,6 +39,11 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.workbench.resetSaros();
     }
 
+    /**********************************************
+     * 
+     * test all related actions with the sub menus of the context menu "New"
+     * 
+     **********************************************/
     @Test
     public void testNewProject() throws RemoteException {
         alice.pEV.newProject(PROJECT);
@@ -92,6 +97,91 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newClass(PROJECT, PKG, CLS);
         assertTrue(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
     }
+
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Open"
+     * 
+     **********************************************/
+    @Test
+    public void testOpenFile() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT);
+        alice.pEV.newFolder(FOLDER, PROJECT);
+        alice.pEV.newFile(PROJECT, FOLDER, FILE);
+        assertTrue(alice.editor.isFileOpen(FILE));
+        alice.editor.closeEditorWithSave(FILE);
+        assertFalse(alice.editor.isFileOpen(FILE));
+        alice.pEV.openFile(PROJECT, FOLDER, FILE);
+        assertTrue(alice.editor.isFileOpen(FILE));
+        alice.pEV.deleteFile(PROJECT, FOLDER, FILE);
+        assertFalse(alice.editor.isFileOpen(FILE));
+    }
+
+    @Test
+    public void testOpenFileWith() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT);
+        alice.pEV.newFolder(FOLDER, PROJECT);
+        alice.pEV.newFile(PROJECT, FOLDER, FILE);
+        alice.editor.closeEditorWithSave(FILE);
+        alice.pEV.openFileWith("Text Editor", PROJECT, FOLDER, FILE);
+        assertTrue(alice.editor.isFileOpen(FILE));
+        alice.pEV.deleteFile(PROJECT, FOLDER, FILE);
+        assertFalse(alice.editor.isFileOpen(FILE));
+    }
+
+    /**********************************************
+     * 
+     * all related actions with the sub menus of the context menu "Refactor"
+     * 
+     **********************************************/
+    @Test
+    public void testMoveClassTo() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT);
+        alice.pEV.newClass(PROJECT, PKG, CLS);
+        alice.pEV.newPackage(PROJECT, PKG2);
+        alice.pEV.moveClassTo(PROJECT, PKG, CLS, PROJECT, PKG2);
+        assertFalse(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
+        assertTrue(alice.pEV.isFileExist(getClassPath(PROJECT, PKG2, CLS)));
+    }
+
+    @Test
+    public void testRenameClass() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT);
+        alice.pEV.newClass(PROJECT, PKG, CLS);
+        alice.pEV.renameClass(CLS2, PROJECT, PKG, CLS);
+        assertFalse(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
+        assertTrue(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
+    }
+
+    @Test
+    public void testRenameFile() throws RemoteException {
+        alice.pEV.newProject(PROJECT);
+        alice.pEV.newFolder(FOLDER, PROJECT);
+        alice.pEV.newFile(PROJECT, FOLDER, FILE);
+        alice.pEV.renameFile(FILE2, PROJECT, FOLDER, FILE);
+        assertFalse(alice.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE)));
+        assertTrue(alice.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE2)));
+    }
+
+    @Test
+    public void testRenameFolder() throws RemoteException {
+        alice.pEV.newProject(PROJECT);
+        alice.pEV.newFolder(FOLDER, PROJECT);
+        alice.pEV.renameFolder(FOLDER2, PROJECT, FOLDER);
+        assertFalse(alice.pEV.isFolderExist(PROJECT, FOLDER));
+        assertTrue(alice.pEV.isFolderExist(PROJECT, FOLDER2));
+    }
+
+    @Test
+    public void testRenamePackage() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT);
+        alice.pEV.newPackage(PROJECT, PKG);
+        alice.pEV.renamePkg(PKG2, PROJECT, PKG);
+        assertFalse(alice.pEV.isPkgExist(PROJECT, PKG));
+        assertTrue(alice.pEV.isPkgExist(PROJECT, PKG2));
+    }
+
+    /***********************************************************/
 
     @Test
     @Ignore
@@ -239,12 +329,4 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.openClassWithSystemEditor(PROJECT, PKG, CLS);
     }
 
-    @Test
-    public void testRenameFile() throws RemoteException {
-        alice.pEV.newJavaProject(PROJECT);
-        alice.pEV.newClass(PROJECT, PKG, CLS);
-        alice.pEV.renameClass(CLS2, PROJECT, PKG, CLS);
-        assertFalse(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)));
-        assertTrue(alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
-    }
 }

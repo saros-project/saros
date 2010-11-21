@@ -200,6 +200,18 @@ public class EditorComponenttImp extends EclipseComponent implements
         // });
     }
 
+    public void closeEditorWithSave(String fileName) throws RemoteException {
+        activateEditor(fileName);
+        editorPart.getTextEditor(fileName).save();
+        editorPart.getTextEditor(fileName).close();
+    }
+
+    public void closeEditorWithoutSave(String fileName) throws RemoteException {
+        activateEditor(fileName);
+        editorPart.getTextEditor(fileName).close();
+        windowPart.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+    }
+
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
         activateJavaEditor(className);
