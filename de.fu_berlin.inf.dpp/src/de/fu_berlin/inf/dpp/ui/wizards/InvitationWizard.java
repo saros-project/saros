@@ -93,7 +93,15 @@ public class InvitationWizard extends Wizard {
     public boolean performCancel() {
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                sessionManager.stopSarosSession();
+                /*
+                 * If more than one person is in the session, it should not be
+                 * closed because we are adding to an existing session not
+                 * abandoning our attempt to set one up.
+                 */
+                ISarosSession s = sessionManager.getSarosSession();
+                if (s != null && s.getParticipants().size() <= 1) {
+                    sessionManager.stopSarosSession();
+                }
             }
         });
 
