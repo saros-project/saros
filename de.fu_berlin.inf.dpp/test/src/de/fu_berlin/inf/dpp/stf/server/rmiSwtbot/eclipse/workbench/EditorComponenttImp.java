@@ -20,7 +20,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
@@ -209,14 +208,14 @@ public class EditorComponenttImp extends EclipseComponent implements
     public void closeEditorWithoutSave(String fileName) throws RemoteException {
         activateEditor(fileName);
         editorPart.getTextEditor(fileName).close();
-        windowPart.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+        windowPart.confirmWindow("Save Resource", YES);
     }
 
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
         activateJavaEditor(className);
         getJavaEditor(className).close();
-        windowPart.confirmWindow("Save Resource", SarosConstant.BUTTON_YES);
+        windowPart.confirmWindow("Save Resource", YES);
     }
 
     /**

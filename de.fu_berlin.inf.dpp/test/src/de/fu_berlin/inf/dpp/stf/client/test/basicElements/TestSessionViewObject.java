@@ -15,7 +15,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestSessionViewObject extends STFTest {
 
@@ -29,10 +28,9 @@ public class TestSessionViewObject extends STFTest {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         log.trace("alice create a new proejct and a new class.");
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         log.trace("alice share session with bob.");
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass
@@ -46,9 +44,9 @@ public class TestSessionViewObject extends STFTest {
         bob.workbench.openSarosViews();
         alice.workbench.openSarosViews();
         if (!alice.state.isInSession()) {
-            bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-            alice.shareProjectWithDone(PROJECT,
-                SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+            bob.typeOfSharingProject = USE_EXISTING_PROJECT;
+            alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+                bob);
         }
         if (bob.state.isDriver()) {
             alice.sessionV.removeDriverRole(bob.state);
@@ -99,48 +97,48 @@ public class TestSessionViewObject extends STFTest {
 
     @Test
     public void testGiveDriverRole() throws RemoteException {
-        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
-            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
+            + ROLE_NAME));
         assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
-        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
         assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLENAME));
+            + ROLE_NAME));
 
         log.trace("alice give bob driver role.");
         alice.sessionV.giveDriverRole(bob.state);
         assertTrue(alice.state.isDriver());
         assertTrue(bob.state.isDriver());
 
-        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
-            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
+            + ROLE_NAME));
         assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
-            + ROLENAME));
-        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME
-            + ROLENAME));
+            + ROLE_NAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME
+            + ROLE_NAME));
         assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLENAME));
+            + ROLE_NAME));
 
     }
 
     @Test
     public void testGiveExclusiveDriverRole() throws RemoteException {
-        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME
-            + ROLENAME));
+        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
+            + ROLE_NAME));
         assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
-        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
         assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLENAME));
+            + ROLE_NAME));
 
         log.trace("alice give bob exclusive driver role.");
         alice.sessionV.giveExclusiveDriverRole(bob.state);
         assertFalse(alice.state.isDriver());
         assertTrue(bob.state.isDriver());
 
-        assertTrue(alice.sessionV.isContactInSessionView(OWNCONTACTNAME));
+        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
         assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
-            + ROLENAME));
-        assertTrue(bob.sessionV.isContactInSessionView(OWNCONTACTNAME
-            + ROLENAME));
+            + ROLE_NAME));
+        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME
+            + ROLE_NAME));
         assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()));
     }
 

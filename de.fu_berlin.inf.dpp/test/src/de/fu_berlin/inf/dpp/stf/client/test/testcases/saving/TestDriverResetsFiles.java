@@ -13,23 +13,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestDriverResetsFiles {
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CP = BotConfiguration.CONTENTPATH;
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
-    private static Musician dave;
-    private static Musician edna;
+public class TestDriverResetsFiles extends STFTest {
 
     /**
      * Preconditions:
@@ -53,22 +42,22 @@ public class TestDriverResetsFiles {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL, BotConfiguration.PORT_DAVE,
-            BotConfiguration.PORT_EDNA);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE,
+            MusicianConfigurationInfos.PORT_EDNA);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
         edna = musicians.get(4);
 
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionConcurrently(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, edna, bob, carl, dave);
+        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
     }
@@ -129,19 +118,20 @@ public class TestDriverResetsFiles {
     public void testAliceResetsFile() throws IOException, CoreException {
         dave.sessionV.followThisUser(alice.state);
         edna.sessionV.followThisUser(alice.state);
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
 
-        alice.editor.closejavaEditorWithoutSave(CLS);
-        dave.editor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
-        edna.editor.confirmSaveSourceWindow(SarosConstant.BUTTON_NO);
+        alice.editor.closejavaEditorWithoutSave(CLS1);
+        dave.editor.confirmSaveSourceWindow(NO);
+        edna.editor.confirmSaveSourceWindow(NO);
 
-        String contentOfAlice = alice.state.getClassContent(PROJECT, PKG, CLS);
+        String contentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+            CLS1);
         System.out.println("alice's class content" + contentOfAlice);
-        String contentOfDave = dave.state.getClassContent(PROJECT, PKG, CLS);
+        String contentOfDave = dave.state.getClassContent(PROJECT1, PKG1, CLS1);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfEdna = edna.state.getClassContent(PROJECT, PKG, CLS);
+        String contentOfEdna = edna.state.getClassContent(PROJECT1, PKG1, CLS1);
         System.out.println("dave's class content" + contentOfDave);
-        String contentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS);
+        String contentOfBob = bob.state.getClassContent(PROJECT1, PKG1, CLS1);
         System.out.println("bob's class content" + contentOfBob);
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

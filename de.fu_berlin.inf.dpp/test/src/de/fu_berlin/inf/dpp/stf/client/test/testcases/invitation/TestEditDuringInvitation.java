@@ -11,21 +11,15 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestEditDuringInvitation {
+public class TestEditDuringInvitation extends STFTest {
 
     private static final Logger log = Logger
         .getLogger(TestEditDuringInvitation.class);
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician carl;
-    private static Musician alice;
-    private static Musician bob;
 
     /**
      * Preconditions:
@@ -45,13 +39,13 @@ public class TestEditDuringInvitation {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass
@@ -91,8 +85,7 @@ public class TestEditDuringInvitation {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
         alice.sessionV.giveDriverRole(bob.state);
@@ -107,17 +100,17 @@ public class TestEditDuringInvitation {
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG, CLS);
+        bob.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG);
+        carl.pEV
+            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG1);
 
         log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.editor
-            .getTextOfJavaEditor(PROJECT, PKG, CLS);
-        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT, PKG,
-            CLS);
+        String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
+        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
         assertTrue(textFromCarl.equals(textFormAlice));
 
         log.trace("testEditDuringInvitation done");

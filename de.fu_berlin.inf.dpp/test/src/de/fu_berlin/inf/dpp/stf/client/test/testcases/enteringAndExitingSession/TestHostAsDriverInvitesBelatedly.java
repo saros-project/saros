@@ -14,17 +14,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestHostAsDriverInvitesBelatedly extends STFTest {
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
 
     /**
      * Preconditions:
@@ -46,23 +41,22 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.pEV.newClass(PROJECT, PKG, CLS2);
-        bob.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        bob.pEV.newClass(PROJECT, PKG, CLS2);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
+        bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        bob.pEV.newClass(PROJECT1, PKG1, CLS2);
 
         /*
          * alice build session with carl and is followed by carl.
          */
-        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl);
+        bob.typeOfSharingProject = USE_EXISTING_PROJECT;
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl);
         alice.followedBy(carl);
     }
 
@@ -130,26 +124,29 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        bob.editor.setTextInJavaEditorWithSave(CP_CHANGE, PROJECT, PKG, CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
+        bob.editor
+            .setTextInJavaEditorWithSave(CP1_CHANGE, PROJECT1, PKG1, CLS1);
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT, PKG, CLS2);
-        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT, PKG,
+        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT1, PKG1, CLS2);
+        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT1, PKG1,
             CLS2);
 
         alice.sessionV.openInvitationInterface(bob.getBaseJid());
 
         bob.pEV.confirmFirstPageOfWizardSessionInvitation();
         bob.pEV
-            .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT);
+            .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
 
-        String CLSContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
-            CLS);
-        String CLS2ContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
+        String CLSContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+            CLS1);
+        String CLS2ContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS2);
 
-        String CLSContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS);
-        String CLS2ContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS2);
+        String CLSContentOfBob = bob.state
+            .getClassContent(PROJECT1, PKG1, CLS1);
+        String CLS2ContentOfBob = bob.state.getClassContent(PROJECT1, PKG1,
+            CLS2);
 
         assertTrue(CLSContentOfAlice.equals(CLSContentOfBob));
         assertTrue(CLS2ContentOfAlice.equals(CLS2ContentOfBob));

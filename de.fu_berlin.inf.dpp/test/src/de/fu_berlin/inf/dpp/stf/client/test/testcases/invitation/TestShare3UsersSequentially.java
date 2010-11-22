@@ -10,25 +10,17 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestShare3UsersSequentially {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician carl = InitMusician.newCarl();
-    private static Musician alice = InitMusician.newAlice();
-    private static Musician bob = InitMusician.newBob();
+public class TestShare3UsersSequentially extends STFTest {
 
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         carl = InitMusician.newCarl();
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass
@@ -49,8 +41,8 @@ public class TestShare3UsersSequentially {
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
 
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl,
+            bob);
 
         assertTrue(carl.state.isParticipant(carl.jid));
         assertTrue(carl.state.isObserver(carl.jid));

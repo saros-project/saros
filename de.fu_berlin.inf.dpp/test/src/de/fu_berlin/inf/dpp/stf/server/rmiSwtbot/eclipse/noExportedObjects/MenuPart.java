@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 
@@ -16,6 +15,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWo
  * @author lchen
  */
 public class MenuPart extends EclipseComponent {
+
+    public final static String MENU_TITLE_OTHER = "Other...";
+    public final static String MENU_TITLE_SHOW_VIEW = "Show View";
+    public final static String MENU_TITLE_WINDOW = "Window";
 
     public void clickMenuWithTexts(String... texts) {
         SWTBotMenu selectedmenu = null;
@@ -65,11 +68,10 @@ public class MenuPart extends EclipseComponent {
     public void openViewWithName(String category, String nodeName)
         throws RemoteException {
         workbenchC.activateEclipseShell();
-        menuPart.clickMenuWithTexts(SarosConstant.MENU_TITLE_WINDOW,
-            SarosConstant.MENU_TITLE_SHOW_VIEW, SarosConstant.MENU_TITLE_OTHER);
-        windowPart.confirmWindowWithTreeWithFilterText(
-            SarosConstant.MENU_TITLE_SHOW_VIEW, category, nodeName,
-            SarosConstant.BUTTON_OK);
+        menuPart.clickMenuWithTexts(MENU_TITLE_WINDOW, MENU_TITLE_SHOW_VIEW,
+            MENU_TITLE_OTHER);
+        windowPart.confirmWindowWithTreeWithFilterText(MENU_TITLE_SHOW_VIEW,
+            category, nodeName, OK);
 
     }
 

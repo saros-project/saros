@@ -14,17 +14,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestCreatingNewFile extends STFTest {
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
 
     /**
      * Preconditions:
@@ -45,19 +40,19 @@ public class TestCreatingNewFile extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        carl.pEV.newProject(PROJECT);
+        carl.pEV.newProject(PROJECT1);
 
         /*
          * build session with bob, and alice simultaneously
          */
-        carl.buildSessionConcurrently(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, alice);
+        carl.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob, alice);
 
     }
 
@@ -84,18 +79,18 @@ public class TestCreatingNewFile extends STFTest {
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
-        if (bob.pEV.isFolderExist(PROJECT, FOLDER))
-            bob.pEV.deleteFolder(PROJECT, FOLDER);
-        if (bob.pEV.isFolderExist(PROJECT, FOLDER2))
-            bob.pEV.deleteFolder(PROJECT, FOLDER2);
-        if (alice.pEV.isFolderExist(PROJECT, FOLDER))
-            alice.pEV.deleteFolder(PROJECT, FOLDER);
-        if (alice.pEV.isFolderExist(PROJECT, FOLDER2))
-            alice.pEV.deleteFolder(PROJECT, FOLDER2);
-        if (carl.pEV.isFolderExist(PROJECT, FOLDER))
-            carl.pEV.deleteFolder(PROJECT, FOLDER);
-        if (carl.pEV.isFolderExist(PROJECT, FOLDER2))
-            carl.pEV.deleteFolder(PROJECT, FOLDER2);
+        if (bob.pEV.isFolderExist(PROJECT1, FOLDER1))
+            bob.pEV.deleteFolder(PROJECT1, FOLDER1);
+        if (bob.pEV.isFolderExist(PROJECT1, FOLDER2))
+            bob.pEV.deleteFolder(PROJECT1, FOLDER2);
+        if (alice.pEV.isFolderExist(PROJECT1, FOLDER1))
+            alice.pEV.deleteFolder(PROJECT1, FOLDER1);
+        if (alice.pEV.isFolderExist(PROJECT1, FOLDER2))
+            alice.pEV.deleteFolder(PROJECT1, FOLDER2);
+        if (carl.pEV.isFolderExist(PROJECT1, FOLDER1))
+            carl.pEV.deleteFolder(PROJECT1, FOLDER1);
+        if (carl.pEV.isFolderExist(PROJECT1, FOLDER2))
+            carl.pEV.deleteFolder(PROJECT1, FOLDER2);
 
     }
 
@@ -116,12 +111,12 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.pEV.newFolder(FOLDER, PROJECT);
-        carl.pEV.newFile(PROJECT, FOLDER, FILE);
-        alice.pEV.waitUntilFileExist(PROJECT, FOLDER, FILE);
-        assertTrue(alice.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE)));
-        bob.pEV.waitUntilFileExist(PROJECT, FOLDER, FILE);
-        assertTrue(bob.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE)));
+        carl.pEV.newFolder(FOLDER1, PROJECT1);
+        carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.pEV.waitUntilFileExist(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        bob.pEV.waitUntilFileExist(PROJECT1, FOLDER1, FILE1);
+        assertTrue(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
     }
 
     /**
@@ -157,40 +152,40 @@ public class TestCreatingNewFile extends STFTest {
         assertTrue(carl.state.isDriver(alice.jid));
         assertTrue(bob.state.isDriver(alice.jid));
 
-        carl.pEV.newFolder(FOLDER, PROJECT);
-        carl.pEV.newFile(PROJECT, FOLDER, FILE);
+        carl.pEV.newFolder(FOLDER1, PROJECT1);
+        carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.basic.sleep(500);
-        assertFalse(alice.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE)));
+        assertFalse(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
         bob.basic.sleep(500);
-        assertFalse(bob.pEV.isFileExist(getPath(PROJECT, FOLDER, FILE)));
+        assertFalse(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
 
         if (!carl.state.isFollowingUser(alice.getBaseJid()))
             carl.sessionV.followThisUser(alice.state);
         if (!bob.state.isFollowingUser(alice.getBaseJid()))
             bob.sessionV.followThisUser(alice.state);
 
-        alice.pEV.newFolder(PROJECT, FOLDER2);
-        alice.pEV.newFile(PROJECT, FOLDER2, FILE2);
+        alice.pEV.newFolder(PROJECT1, FOLDER2);
+        alice.pEV.newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.pEV.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
-        assertTrue(carl.pEV.isFileExist(getPath(PROJECT, FOLDER2, FILE2)));
-        bob.pEV.waitUntilFileExist(PROJECT, FOLDER2, FILE2);
-        assertTrue(bob.pEV.isFileExist(getPath(PROJECT, FOLDER2, FILE2)));
+        carl.pEV.waitUntilFileExist(PROJECT1, FOLDER2, FILE2);
+        assertTrue(carl.pEV.isFileExist(getPath(PROJECT1, FOLDER2, FILE2)));
+        bob.pEV.waitUntilFileExist(PROJECT1, FOLDER2, FILE2);
+        assertTrue(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER2, FILE2)));
 
-        alice.editor.setTextInEditorWithSave(CP, PROJECT, FOLDER2, FILE2);
+        alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
 
-        String file2ContentOfAlice = alice.editor.getTextOfEditor(PROJECT,
+        String file2ContentOfAlice = alice.editor.getTextOfEditor(PROJECT1,
             FOLDER2, FILE2);
-        carl.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT,
+        carl.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT1,
             FOLDER2, FILE2);
-        String file2ContentOfCarl = carl.editor.getTextOfEditor(PROJECT,
+        String file2ContentOfCarl = carl.editor.getTextOfEditor(PROJECT1,
             FOLDER2, FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
 
-        bob.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT,
+        bob.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT1,
             FOLDER2, FILE2);
-        String file2ContentOfBob = bob.editor.getTextOfEditor(PROJECT, FOLDER2,
-            FILE2);
+        String file2ContentOfBob = bob.editor.getTextOfEditor(PROJECT1,
+            FOLDER2, FILE2);
         assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
 
     }

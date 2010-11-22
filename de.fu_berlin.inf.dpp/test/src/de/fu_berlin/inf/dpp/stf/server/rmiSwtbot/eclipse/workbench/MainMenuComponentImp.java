@@ -6,11 +6,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class MainMenuComponentImp extends EclipseComponent implements
     MainMenuComponent {
+
+    public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
+    public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
 
     public void preference() throws RemoteException {
         workbenchC.activateEclipseShell();
@@ -81,16 +83,14 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void openPerspectiveJava() throws RemoteException {
-        perspectivePart
-            .openPerspectiveWithId(SarosConstant.ID_JAVA_PERSPECTIVE);
+        perspectivePart.openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
     }
 
     /**
      * test, if the java perspective is active.
      */
     public boolean isJavaPerspectiveActive() throws RemoteException {
-        return perspectivePart
-            .isPerspectiveActive(SarosConstant.ID_JAVA_PERSPECTIVE);
+        return perspectivePart.isPerspectiveActive(ID_JAVA_PERSPECTIVE);
     }
 
     /**
@@ -100,21 +100,19 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      */
     public void openPerspectiveDebug() throws RemoteException {
-        perspectivePart
-            .openPerspectiveWithId(SarosConstant.ID_DEBUG_PERSPECTIVE);
+        perspectivePart.openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
     }
 
     /**
      * test, if the debug perspective is active.
      */
     public boolean isDebugPerspectiveActive() throws RemoteException {
-        return perspectivePart
-            .isPerspectiveActive(SarosConstant.ID_DEBUG_PERSPECTIVE);
+        return perspectivePart.isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
     }
 
-    private static final String MENU_FILE = SarosConstant.MENU_TITLE_FILE;
-    private static final String MENU_IMPORT = SarosConstant.MENU_TITLE_IMPORT;
-    private static final String SHELL_IMPORT = SarosConstant.SHELL_TITLE_IMPORT;
+    private static final String MENU_FILE = "File";
+    private static final String MENU_IMPORT = "Import...";
+    private static final String SHELL_IMPORT = "Import";
     private static final String REPOSITORY_TYPE_SVN = "SVN";
     private static final String IMPORT_SOURCE = "Checkout Projects from SVN";
 

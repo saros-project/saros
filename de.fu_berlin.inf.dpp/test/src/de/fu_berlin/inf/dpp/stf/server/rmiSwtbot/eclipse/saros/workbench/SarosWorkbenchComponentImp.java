@@ -10,18 +10,18 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class SarosWorkbenchComponentImp extends EclipseComponent implements
     SarosWorkbenchComponent {
 
-    // public static WorkbenchObjectImp classVariable;
-
     private static transient SarosWorkbenchComponentImp self;
 
+    private final static String VIEW_TITLE_WELCOME = "Welcome";
+
     /**
-     * {@link SarosWorkbenchComponentImp} is a singleton, but inheritance is possible.
+     * {@link SarosWorkbenchComponentImp} is a singleton, but inheritance is
+     * possible.
      */
     public static SarosWorkbenchComponentImp getInstance() {
         if (self != null)
@@ -88,7 +88,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void closeWelcomeView() throws RemoteException {
-        viewPart.closeViewByTitle(SarosConstant.VIEW_TITLE_WELCOME);
+        viewPart.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
     @Override

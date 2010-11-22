@@ -8,7 +8,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
@@ -26,41 +25,42 @@ public class SessionViewComponentImp extends EclipseComponent implements
     /*
      * View infos
      */
-    private final static String VIEWNAME = SarosConstant.VIEW_TITLE_SHARED_PROJECT_SESSION;
-    private final static String VIEWID = SarosConstant.ID_SESSION_VIEW;
+    private final static String VIEWNAME = "Shared Project Session";
+    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.SessionView";
 
     /*
      * title of shells which are pop up by performing the actions on the session
      * view.
      */
-    private final static String CONFIRMLEAVINGSESSION = SarosConstant.SHELL_TITLE_CONFIRM_LEAVING_SESSION;
-    private final static String CONFIRMCLOSINGSESSION = "Confirm Closing Session";
-    private final static String INCOMINGSCREENSHARINGSESSION = "Incoming screensharing session";
-    private final static String INVITATION = "Invitation";
-    private final static String ERRORINSAROSPLUGIN = "Error in Saros-Plugin";
-    private final static String CLOSINGTHESESSION = "Closing the Session";
+
+    private final static String SHELL_CONFIRM_CLOSING_SESSION = "Confirm Closing Session";
+    private final static String SHELL_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
+    private final static String SHELL_INVITATION = "Invitation";
+    private final static String SHELL_ERROR_IN_SAROS_PLUGIN = "Error in Saros-Plugin";
+    private final static String CLOSING_THE_SESSION = "Closing the Session";
+    protected final static String CONFIRM_LEAVING_SESSION = "Confirm Leaving Session";
 
     /*
      * Tool tip text of toolbar buttons on the session view
      */
-    private final static String SHARESCREENWITHUSER = SarosConstant.TOOL_TIP_TEXT_SHARE_SCREEN_WITH_USER;
-    private final static String STOPSESSIONWITHUSER = "Stop session with user";
-    private final static String SENDAFILETOSELECTEDUSER = SarosConstant.TOOL_TIP_TEXT_SEND_FILE_TO_SELECTED_USER;
-    private final static String STARTVOIPSESSION = SarosConstant.TOOL_TIP_TEXT_START_VOIP_SESSION;
-    private final static String INCONSISTENCYDETECTED = SarosConstant.TOOL_TIP_TEXT_INCONSISTENCY_DETECTED;
-    private final static String OPENINVITATIONINTERFACE = SarosConstant.TOOL_TIP_TEXT_OPEN_INVITATION_INTERFACE;
-    private final static String REMOVEALLDRIVERROLES = SarosConstant.TOOL_TIP_TEXT_REMOVE_ALL_DRIVER_ROLES;
-    private final static String ENABLEDISABLEFOLLOWMODE = SarosConstant.TOOL_TIP_TEXT_ENABLE_DISABLE_FOLLOW_MODE;
-    private final static String LEAVETHESESSION = SarosConstant.TOOL_TIP_TEXT_LEAVE_THE_SESSION;
+    private final static String TB_SHARE_SCREEN_WITH_USER = "Share your screen with selected user";
+    private final static String TB_STOP_SESSION_WITH_USER = "Stop session with user";
+    private final static String TB_SEND_A_FILE_TO_SELECTED_USER = "Send a file to selected user";
+    private final static String TB_START_VOIP_SESSION = "Start a VoIP Session...";
+    private final static String TB_INCONSISTEN_CYDETECTED = "Inconsistency Detected in.*";
+    private final static String TB_OPEN_INVITATION_INTERFACE = "Open invitation interface";
+    private final static String TB_REMOVE_ALL_DRIVER_ROLES = "Remove all driver roles";
+    private final static String TB_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
+    private final static String TB_LEAVE_THE_SESSION = "Leave the session";
 
     // Context menu of the table on the view
-    private final static String GIVEEXCLUSIVEDRIVERROLE = SarosConstant.CONTEXT_MENU_GIVE_EXCLUSIVE_DRIVER_ROLE;
-    private final static String GIVEDRIVERROLE = SarosConstant.CONTEXT_MENU_GIVE_DRIVER_ROLE;
-    private final static String REMOVEDRIVERROLE = SarosConstant.CONTEXT_MENU_REMOVE_DRIVER_ROLE;
-    private final static String FOLLOWTHISUSER = SarosConstant.CONTEXT_MENU_FOLLOW_THIS_USER;
-    private final static String STOPFOLLOWINGTHISUSER = SarosConstant.CONTEXT_MENU_STOP_FOLLOWING_THIS_USER;
-    private final static String JUMPTOPOSITIONSELECTEDUSER = SarosConstant.CONTEXT_MENU_JUMP_TO_POSITION_SELECTED_USER;
-    private final static String CHANGECOLOR = "Change Color";
+    private final static String CM_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
+    private final static String CM_GIVE_DRIVER_ROLE = "Give driver role";
+    private final static String CM_REMOVE_DRIVER_ROLE = "Remove driver role";
+    private final static String CM_FOLLOW_THIS_USER = "Follow this user";
+    private final static String CM_STOP_FOLLOWING_THIS_USER = "Stop following this user";
+    private final static String CM_JUMP_TO_POSITION_SELECTED_USER = "Jump to position of selected user";
+    private final static String CM_CHANGE_COLOR = "Change Color";
 
     /**
      * {@link SessionViewComponentImp} is a singleton, but inheritance is
@@ -89,7 +89,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public boolean isInSession() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(LEAVETHESESSION);
+        return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
     }
 
     public void waitUntilSessionOpen() throws RemoteException {
@@ -145,7 +145,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tablePart.clickContextMenuOfTable(InviteeJID.getBase(), GIVEDRIVERROLE);
+        tablePart.clickContextMenuOfTable(InviteeJID.getBase(), CM_GIVE_DRIVER_ROLE);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
@@ -160,7 +160,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
-            GIVEEXCLUSIVEDRIVERROLE);
+            CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
@@ -175,7 +175,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         tablePart.clickContextMenuOfTable(InviteeJID.getBase() + ROLENAME,
-            REMOVEDRIVERROLE);
+            CM_REMOVE_DRIVER_ROLE);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
@@ -190,7 +190,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         clickContextMenuOfSelectedUser(
             stateOfFollowedUser,
-            FOLLOWTHISUSER,
+            CM_FOLLOW_THIS_USER,
             "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
     }
 
@@ -200,7 +200,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         for (String contactName : allContactsName) {
             // SWTBotTable table = tableObject.getTable();
             if (!tablePart.existsContextOfTableItem(contactName,
-                STOPFOLLOWINGTHISUSER))
+                CM_STOP_FOLLOWING_THIS_USER))
                 continue;
             if (isStopFollowingThisUserEnabled(contactName))
                 return true;
@@ -218,10 +218,10 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         if (state.isDriver(followedUserJID))
             tablePart.clickContextMenuOfTable(followedUserJID.getBase()
-                + ROLENAME, STOPFOLLOWINGTHISUSER);
+                + ROLENAME, CM_STOP_FOLLOWING_THIS_USER);
         else
             tablePart.clickContextMenuOfTable(followedUserJID.getBase(),
-                STOPFOLLOWINGTHISUSER);
+                CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public void stopFollowingThisUser(SarosState stateOfFollowedUser)
@@ -232,20 +232,20 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         clickContextMenuOfSelectedUser(
             stateOfFollowedUser,
-            STOPFOLLOWINGTHISUSER,
+            CM_STOP_FOLLOWING_THIS_USER,
             "Hi guy, you can't stop following youself, it makes no sense! Please pass a correct parameter to the method.");
     }
 
     public boolean isStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
         return tablePart.isContextMenuOfTableVisible(contactName,
-            STOPFOLLOWINGTHISUSER);
+            CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public boolean isStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
         return tablePart.isContextMenuOfTableEnabled(contactName,
-            STOPFOLLOWINGTHISUSER);
+            CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public void waitUntilIsFollowingUser(String baseJIDOfFollowedUser)
@@ -258,7 +258,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         selectUser(
             stateOfselectedUser,
             "Hi guy, you can't share screen with youself, it makes no sense! Please pass a correct parameter to the method.");
-        clickToolbarButtonWithTooltip(SHARESCREENWITHUSER);
+        clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_USER);
     }
 
     public void stopSessionWithUser(SarosState stateOfselectedUser)
@@ -266,7 +266,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         selectUser(
             stateOfselectedUser,
             "Hi guy, you can't stop screen session with youself, it makes no sense! Please pass a correct parameter to the method.");
-        clickToolbarButtonWithTooltip(STOPSESSIONWITHUSER);
+        clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_USER);
     }
 
     public void sendAFileToSelectedUser(SarosState stateOfselectedUser)
@@ -274,7 +274,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         selectUser(
             stateOfselectedUser,
             "Hi guy, you can't send a file to youself, it makes no sense! Please pass a correct parameter to the method.");
-        clickToolbarButtonWithTooltip(SENDAFILETOSELECTEDUSER);
+        clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_USER);
     }
 
     public void startAVoIPSession(SarosState stateOfselectedUser)
@@ -282,42 +282,42 @@ public class SessionViewComponentImp extends EclipseComponent implements
         selectUser(
             stateOfselectedUser,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
-        clickToolbarButtonWithTooltip(STARTVOIPSESSION);
-        if (windowPart.isShellActive(ERRORINSAROSPLUGIN)) {
+        clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
+        if (windowPart.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
             confirmErrorInSarosPluginWindow();
         }
     }
 
     public void inconsistencyDetected() throws RemoteException {
         precondition();
-        clickToolbarButtonWithTooltip(INCONSISTENCYDETECTED);
+        clickToolbarButtonWithTooltip(TB_INCONSISTEN_CYDETECTED);
         windowPart.waitUntilShellCloses(PROGRESSINFORMATION);
     }
 
     public void removeAllRriverRoles() throws RemoteException {
         precondition();
         if (isRemoveAllRiverEnabled())
-            clickToolbarButtonWithTooltip(REMOVEALLDRIVERROLES);
+            clickToolbarButtonWithTooltip(TB_REMOVE_ALL_DRIVER_ROLES);
     }
 
     public boolean isRemoveAllRiverEnabled() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(REMOVEALLDRIVERROLES);
+        return isToolbarButtonEnabled(TB_REMOVE_ALL_DRIVER_ROLES);
     }
 
     public void enableDisableFollowMode() throws RemoteException {
         precondition();
         if (isEnableDisableFollowModeEnabled())
-            clickToolbarButtonWithTooltip(ENABLEDISABLEFOLLOWMODE);
+            clickToolbarButtonWithTooltip(TB_ENABLE_DISABLE_FOLLOW_MODE);
     }
 
     public boolean isEnableDisableFollowModeEnabled() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(ENABLEDISABLEFOLLOWMODE);
+        return isToolbarButtonEnabled(TB_ENABLE_DISABLE_FOLLOW_MODE);
     }
 
     private void leaveTheSession() {
-        clickToolbarButtonWithTooltip(LEAVETHESESSION);
+        clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
     }
 
     public void waitUntilAllPeersLeaveSession(List<JID> jidsOfAllParticipants)
@@ -330,33 +330,34 @@ public class SessionViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         clickContextMenuOfSelectedUser(
             stateOfselectedUser,
-            JUMPTOPOSITIONSELECTEDUSER,
+            CM_JUMP_TO_POSITION_SELECTED_USER,
             "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
     }
 
     public boolean isInconsistencyDetectedEnabled() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(INCONSISTENCYDETECTED);
+        return isToolbarButtonEnabled(TB_INCONSISTEN_CYDETECTED);
 
     }
 
     public void openInvitationInterface(String jidOfInvitee)
         throws RemoteException {
         precondition();
-        clickToolbarButtonWithTooltip(OPENINVITATIONINTERFACE);
+        clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
         comfirmInvitationWindow(jidOfInvitee);
     }
 
     public void comfirmInvitationWindow(String jidOfinvitee)
         throws RemoteException {
-        windowPart.waitUntilShellActive(INVITATION);
-        windowPart.confirmWindowWithCheckBox(INVITATION, FINISH, jidOfinvitee);
+        windowPart.waitUntilShellActive(SHELL_INVITATION);
+        windowPart.confirmWindowWithCheckBox(SHELL_INVITATION, FINISH,
+            jidOfinvitee);
     }
 
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         leaveTheSession();
-        windowPart.confirmWindow(CONFIRMLEAVINGSESSION, YES);
+        windowPart.confirmWindow(CONFIRM_LEAVING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
@@ -373,25 +374,25 @@ public class SessionViewComponentImp extends EclipseComponent implements
         // }
         // }
         // });
-        if (windowPart.isShellActive(CONFIRMCLOSINGSESSION))
-            windowPart.confirmWindow(CONFIRMCLOSINGSESSION, YES);
+        if (windowPart.isShellActive(SHELL_CONFIRM_CLOSING_SESSION))
+            windowPart.confirmWindow(SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException {
-        windowPart.waitUntilShellActive(INCOMINGSCREENSHARINGSESSION);
-        windowPart.confirmWindow(INCOMINGSCREENSHARINGSESSION, YES);
+        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
+        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
     }
 
     public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        windowPart.confirmWindow(ERRORINSAROSPLUGIN, OK);
+        windowPart.confirmWindow(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
     }
 
     public void confirmClosingTheSessionWindow() throws RemoteException {
-        windowPart.waitUntilShellActive(CLOSINGTHESESSION);
-        windowPart.confirmWindow(CLOSINGTHESESSION, OK);
-        windowPart.waitUntilShellCloses(CLOSINGTHESESSION);
+        windowPart.waitUntilShellActive(CLOSING_THE_SESSION);
+        windowPart.confirmWindow(CLOSING_THE_SESSION, OK);
+        windowPart.waitUntilShellCloses(CLOSING_THE_SESSION);
     }
 
     /**************************************************************

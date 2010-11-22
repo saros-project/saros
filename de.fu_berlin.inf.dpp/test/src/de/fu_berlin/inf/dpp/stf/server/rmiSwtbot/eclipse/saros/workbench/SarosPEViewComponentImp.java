@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponentImp;
 
@@ -14,6 +13,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     private static transient SarosPEViewComponentImp self;
 
+    public final static int CREATE_NEW_PROJECT = 1;
+    public final static int USE_EXISTING_PROJECT = 2;
+    public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
+    public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
     /*
      * title of shells which are pop up by performing the actions on the package
      * explorer view.
@@ -192,16 +195,16 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         String projectName, int usingWhichProject) throws RemoteException {
         windowPart.waitUntilShellActive(SESSIONINVITATION);
         switch (usingWhichProject) {
-        case SarosConstant.CREATE_NEW_PROJECT:
+        case CREATE_NEW_PROJECT:
             confirmWirzardSessionInvitationWithNewProject(projectName);
             break;
-        case SarosConstant.USE_EXISTING_PROJECT:
+        case USE_EXISTING_PROJECT:
             confirmWizardSessionInvitationUsingExistProject(projectName);
             break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
+        case USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
             confirmWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
             break;
-        case SarosConstant.USE_EXISTING_PROJECT_WITH_COPY:
+        case USE_EXISTING_PROJECT_WITH_COPY:
             confirmWizardSessionInvitationUsingExistProjectWithCopy(projectName);
             break;
         default:

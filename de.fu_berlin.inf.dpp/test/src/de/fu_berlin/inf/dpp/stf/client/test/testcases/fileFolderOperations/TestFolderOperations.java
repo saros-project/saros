@@ -15,13 +15,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestFolderOperations extends STFTest {
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
 
     @BeforeClass
     public static void initMusicians() throws RemoteException,
@@ -31,17 +26,17 @@ public class TestFolderOperations extends STFTest {
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.buildSessionConcurrently(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            carl, bob);
     }
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS)))
-            alice.pEV.newClass(PROJECT, PKG, CLS);
-        if (!alice.pEV.isFolderExist(PROJECT, FOLDER))
-            alice.pEV.newFolder(FOLDER, PROJECT);
+        if (!alice.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)))
+            alice.pEV.newClass(PROJECT1, PKG1, CLS1);
+        if (!alice.pEV.isFolderExist(PROJECT1, FOLDER1))
+            alice.pEV.newFolder(FOLDER1, PROJECT1);
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
@@ -63,11 +58,11 @@ public class TestFolderOperations extends STFTest {
 
     @Test
     public void testRenameFolder() throws RemoteException {
-        final String newFolderName = FOLDER + "New";
+        final String newFolderName = FOLDER1 + "New";
 
-        alice.pEV.renameFolder(newFolderName, PROJECT, FOLDER);
-        bob.pEV.waitUntilFolderExist(PROJECT, newFolderName);
-        assertTrue(bob.pEV.isFolderExist(PROJECT, newFolderName));
-        assertFalse(bob.pEV.isFolderExist(PROJECT, FOLDER));
+        alice.pEV.renameFolder(newFolderName, PROJECT1, FOLDER1);
+        bob.pEV.waitUntilFolderExist(PROJECT1, newFolderName);
+        assertTrue(bob.pEV.isFolderExist(PROJECT1, newFolderName));
+        assertFalse(bob.pEV.isFolderExist(PROJECT1, FOLDER1));
     }
 }

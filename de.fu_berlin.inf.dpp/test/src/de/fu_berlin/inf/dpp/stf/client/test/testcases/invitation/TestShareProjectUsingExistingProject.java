@@ -11,16 +11,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class TestShareProjectUsingExistingProject extends STFTest {
-
-    private static Musician alice;
-    private static Musician bob;
 
     @BeforeClass
     public static void initMusicians() {
@@ -30,19 +24,19 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Before
     public void setUpAlice() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @Before
     public void setUpBob() throws RemoteException {
-        bob.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS2);
+        bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
     }
 
     @After
     public void cleanUp() throws RemoteException, InterruptedException {
         alice.leaveSessionFirst(bob);
-        alice.pEV.deleteProject(PROJECT);
-        bob.pEV.deleteProject(PROJECT);
+        alice.pEV.deleteProject(PROJECT1);
+        bob.pEV.deleteProject(PROJECT1);
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
@@ -55,11 +49,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
-        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT;
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT2, PKG, CLS)));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        bob.typeOfSharingProject = USE_EXISTING_PROJECT;
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT2, PKG1, CLS1)));
         assertFalse(bob.pEV.isProjectExist(PROJECT2));
 
     }
@@ -67,33 +60,33 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @Test
     public void testShareProjectUsingExistingProjectWithCancelLocalChange()
         throws RemoteException {
-        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        bob.typeOfSharingProject = USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.pEV.isWIndowSessionInvitationActive());
         bob.pEV
-            .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT);
+            .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.pEV.isProjectExist(PROJECT));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
-        assertTrue(bob.pEV.isProjectExist(PROJECT + " 2"));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT + " 2", PKG, CLS)));
-        bob.pEV.deleteProject(PROJECT + " 2");
+        assertTrue(bob.pEV.isProjectExist(PROJECT1));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertTrue(bob.pEV.isProjectExist(PROJECT1 + " 2"));
+        assertTrue(bob.pEV
+            .isFileExist(getClassPath(PROJECT1 + " 2", PKG1, CLS1)));
+        bob.pEV.deleteProject(PROJECT1 + " 2");
 
     }
 
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
-        bob.typeOfSharingProject = SarosConstant.USE_EXISTING_PROJECT_WITH_COPY;
-        alice.shareProjectWithDone(BotConfiguration.PROJECTNAME,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertTrue(bob.pEV.isProjectExist(PROJECT));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT, PKG, CLS2)));
-        assertTrue(bob.pEV.isProjectExist(PROJECT + " 2"));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT + " 2", PKG, CLS)));
+        bob.typeOfSharingProject = USE_EXISTING_PROJECT_WITH_COPY;
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        assertTrue(bob.pEV.isProjectExist(PROJECT1));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertTrue(bob.pEV.isProjectExist(PROJECT1 + " 2"));
+        assertTrue(bob.pEV
+            .isFileExist(getClassPath(PROJECT1 + " 2", PKG1, CLS1)));
 
-        bob.pEV.deleteProject(PROJECT + " 2");
+        bob.pEV.deleteProject(PROJECT1 + " 2");
 
     }
 }

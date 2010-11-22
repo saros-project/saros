@@ -13,22 +13,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestChangingDriverWhileOtherFollow {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
-    private static Musician dave;
+public class TestChangingDriverWhileOtherFollow extends STFTest {
 
     /**
      * Preconditions:
@@ -51,19 +41,19 @@ public class TestChangingDriverWhileOtherFollow {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL, BotConfiguration.PORT_DAVE);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.buildSessionConcurrently(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl, dave);
+        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
         /*
@@ -144,36 +134,36 @@ public class TestChangingDriverWhileOtherFollow {
         // bob.bot.waitUntilFollowed(carl.getBaseJid());
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
-        carl.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
-        String dirtyClsContentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT,
-            PKG, CLS);
+        carl.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
+        String dirtyClsContentOfCarl = carl.editor.getTextOfJavaEditor(
+            PROJECT1, PKG1, CLS1);
 
         alice.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT, PKG, CLS);
-        assertTrue(alice.editor.isJavaEditorActive(CLS));
-        assertTrue(alice.editor.isClassDirty(PROJECT, PKG, CLS,
-            SarosConstant.ID_JAVA_EDITOR));
+            PROJECT1, PKG1, CLS1);
+        assertTrue(alice.editor.isJavaEditorActive(CLS1));
+        assertTrue(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
+            ID_JAVA_EDITOR));
 
         bob.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT, PKG, CLS);
-        assertTrue(bob.editor.isJavaEditorActive(CLS));
-        assertTrue(bob.editor.isClassDirty(PROJECT, PKG, CLS,
-            SarosConstant.ID_JAVA_EDITOR));
+            PROJECT1, PKG1, CLS1);
+        assertTrue(bob.editor.isJavaEditorActive(CLS1));
+        assertTrue(bob.editor
+            .isClassDirty(PROJECT1, PKG1, CLS1, ID_JAVA_EDITOR));
 
         dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT, PKG, CLS);
-        assertTrue(dave.editor.isJavaEditorActive(CLS));
-        assertTrue(dave.editor.isClassDirty(PROJECT, PKG, CLS,
-            SarosConstant.ID_JAVA_EDITOR));
+            PROJECT1, PKG1, CLS1);
+        assertTrue(dave.editor.isJavaEditorActive(CLS1));
+        assertTrue(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
+            ID_JAVA_EDITOR));
 
         carl.stopFollowedBy(alice, bob, dave);
-        carl.editor
-            .setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG, CLS);
-        carl.editor.closeJavaEditorWithSave(CLS);
+        carl.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
+            CLS1);
+        carl.editor.closeJavaEditorWithSave(CLS1);
         String dirtyClsChangeContentOfCarl = carl.editor.getTextOfJavaEditor(
-            PROJECT, PKG, CLS);
+            PROJECT1, PKG1, CLS1);
 
-        assertTrue(alice.editor.isJavaEditorActive(CLS));
+        assertTrue(alice.editor.isJavaEditorActive(CLS1));
         /*
          * TODO alice can still see the changes maded by carl, although she
          * already leave follow mode. There is a bug here (see Bug 3094186)and
@@ -186,7 +176,7 @@ public class TestChangingDriverWhileOtherFollow {
         // assertFalse(alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(bob.editor.isJavaEditorActive(CLS));
+        assertTrue(bob.editor.isJavaEditorActive(CLS1));
 
         /*
          * TODO bob can still see the changes maded by carl, although he already
@@ -199,7 +189,7 @@ public class TestChangingDriverWhileOtherFollow {
         // assertFalse(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(dave.editor.isJavaEditorActive(CLS));
+        assertTrue(dave.editor.isJavaEditorActive(CLS1));
 
         /*
          * TODO dave can still see the changes , although he already leave

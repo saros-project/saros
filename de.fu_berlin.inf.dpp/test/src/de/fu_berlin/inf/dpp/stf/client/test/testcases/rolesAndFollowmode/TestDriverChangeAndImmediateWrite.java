@@ -10,22 +10,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestDriverChangeAndImmediateWrite {
+public class TestDriverChangeAndImmediateWrite extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestDriverChangeAndImmediateWrite.class);
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
-    private static Musician alice;
-    private static Musician bob;
 
     /**
      * Preconditions:
@@ -40,9 +30,8 @@ public class TestDriverChangeAndImmediateWrite {
     public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     /**
@@ -85,12 +74,12 @@ public class TestDriverChangeAndImmediateWrite {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
         alice.sessionV.giveDriverRole(bob.state);
-        bob.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.basic.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP_CHANGE, PROJECT, PKG,
-            CLS);
+        alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
+            CLS1);
 
         bob.basic.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());

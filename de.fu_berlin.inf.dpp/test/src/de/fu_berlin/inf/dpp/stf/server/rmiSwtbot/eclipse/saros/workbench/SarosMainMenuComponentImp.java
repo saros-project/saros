@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponentImp;
 
 public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
@@ -40,7 +39,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
             bot.textWithLabel("Username").setText(username);
             bot.textWithLabel("Password").setText(password);
             bot.textWithLabel("Repeat Password").setText(password);
-            bot.button(SarosConstant.BUTTON_FINISH).click();
+            bot.button(FINISH).click();
         } catch (WidgetNotFoundException e) {
             log.error("widget not found while accountBySarosMenu", e);
         }

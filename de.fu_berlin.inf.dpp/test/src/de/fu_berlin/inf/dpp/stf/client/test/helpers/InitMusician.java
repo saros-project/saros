@@ -10,17 +10,17 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 
 public class InitMusician {
     private final static Logger log = Logger.getLogger(InitMusician.class);
 
     public final static Musician newAlice() {
         log.trace("new alice");
-        Musician alice = new Musician(new JID(BotConfiguration.JID_ALICE),
-            BotConfiguration.PASSWORD_ALICE, BotConfiguration.HOST_ALICE,
-            BotConfiguration.PORT_ALICE);
+        Musician alice = new Musician(new JID(MusicianConfigurationInfos.JID_ALICE),
+            MusicianConfigurationInfos.PASSWORD_ALICE, MusicianConfigurationInfos.HOST_ALICE,
+            MusicianConfigurationInfos.PORT_ALICE);
         try {
             log.trace("initBot");
             alice.initBot();
@@ -35,9 +35,9 @@ public class InitMusician {
     }
 
     public final static Musician newBob() {
-        Musician bob = new Musician(new JID(BotConfiguration.JID_BOB),
-            BotConfiguration.PASSWORD_BOB, BotConfiguration.HOST_BOB,
-            BotConfiguration.PORT_BOB);
+        Musician bob = new Musician(new JID(MusicianConfigurationInfos.JID_BOB),
+            MusicianConfigurationInfos.PASSWORD_BOB, MusicianConfigurationInfos.HOST_BOB,
+            MusicianConfigurationInfos.PORT_BOB);
         try {
             bob.initBot();
         } catch (AccessException e) {
@@ -51,9 +51,9 @@ public class InitMusician {
     }
 
     public final static Musician newCarl() {
-        Musician carl = new Musician(new JID(BotConfiguration.JID_CARL),
-            BotConfiguration.PASSWORD_CARL, BotConfiguration.HOST_CARL,
-            BotConfiguration.PORT_CARL);
+        Musician carl = new Musician(new JID(MusicianConfigurationInfos.JID_CARL),
+            MusicianConfigurationInfos.PASSWORD_CARL, MusicianConfigurationInfos.HOST_CARL,
+            MusicianConfigurationInfos.PORT_CARL);
         try {
             carl.initBot();
         } catch (AccessException e) {
@@ -67,9 +67,9 @@ public class InitMusician {
     }
 
     public final static Musician newDave() {
-        Musician dave = new Musician(new JID(BotConfiguration.JID_DAVE),
-            BotConfiguration.PASSWORD_DAVE, BotConfiguration.HOST_DAVE,
-            BotConfiguration.PORT_DAVE);
+        Musician dave = new Musician(new JID(MusicianConfigurationInfos.JID_DAVE),
+            MusicianConfigurationInfos.PASSWORD_DAVE, MusicianConfigurationInfos.HOST_DAVE,
+            MusicianConfigurationInfos.PORT_DAVE);
         try {
             dave.initBot();
         } catch (AccessException e) {
@@ -83,9 +83,9 @@ public class InitMusician {
     }
 
     public final static Musician newEdna() {
-        Musician edna = new Musician(new JID(BotConfiguration.JID_EDNA),
-            BotConfiguration.PASSWORD_EDNA, BotConfiguration.HOST_EDNA,
-            BotConfiguration.PORT_EDNA);
+        Musician edna = new Musician(new JID(MusicianConfigurationInfos.JID_EDNA),
+            MusicianConfigurationInfos.PASSWORD_EDNA, MusicianConfigurationInfos.HOST_EDNA,
+            MusicianConfigurationInfos.PORT_EDNA);
         try {
             edna.initBot();
         } catch (AccessException e) {
@@ -96,21 +96,6 @@ public class InitMusician {
             log.debug("", e);
         }
         return edna;
-    }
-
-    public static class MusicianConfiguration {
-        public MusicianConfiguration(String jidString, String password,
-            String host, int port) {
-            this.jidString = jidString;
-            this.password = password;
-            this.host = host;
-            this.port = port;
-        }
-
-        public String jidString;
-        public String password;
-        public String host;
-        public int port;
     }
 
     public static List<Musician> initAliceBobCarlConcurrently()

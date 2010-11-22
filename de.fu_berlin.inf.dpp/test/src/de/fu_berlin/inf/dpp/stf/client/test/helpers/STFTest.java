@@ -1,42 +1,63 @@
 package de.fu_berlin.inf.dpp.stf.client.test.helpers;
 
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.Musician;
 
 public class STFTest {
 
-    public static final String PROJECT = BotConfiguration.PROJECTNAME;
-    public static final String PROJECT2 = BotConfiguration.PROJECTNAME2;
-    public static final String PROJECT3 = BotConfiguration.PROJECTNAME3;
+    /* Musicians */
+    public static Musician alice;
+    public static Musician bob;
+    public static Musician carl;
+    public static Musician dave;
+    public static Musician edna;
 
-    public static final String FOLDER = BotConfiguration.FOLDERNAME;
-    public static final String FOLDER2 = BotConfiguration.FOLDERNAME2;
-    public static final String FILE = BotConfiguration.FILENAME;
-    public static final String FILE2 = BotConfiguration.FILENAME2;
+    // Title of Buttons
+    protected final static String YES = "Yes";
+    protected final static String OK = "OK";
+    protected final static String NO = "No";
+    protected final static String CANCEL = "Cancel";
+    protected final static String FINISH = "Finish";
+    protected final static String NEXT = "Next >";
 
-    public static final String PKG = BotConfiguration.PACKAGENAME;
-    public static final String PKG2 = BotConfiguration.PACKAGENAME2;
-    public static final String PKG3 = BotConfiguration.PACKAGENAME3;
+    /* Project name */
+    public static final String PROJECT1 = "Foo_Saros";
+    public static final String PROJECT2 = "Foo_Saros2";
+    public static final String PROJECT3 = "Foo_Saros3";
 
-    public static final String CLS = BotConfiguration.CLASSNAME;
-    public static final String CLS2 = BotConfiguration.CLASSNAME2;
-    public static final String CLS3 = BotConfiguration.CLASSNAME3;
+    /* Folder name */
+    public static final String FOLDER1 = "MyFolder";
+    public static final String FOLDER2 = "MyFolder2";
+
+    /* File name */
+    public static final String FILE1 = "MyFile.xml";
+    public static final String FILE2 = "MyFile2.xml";
+
+    /* Package name */
+    public static final String PKG1 = "my.pkg";
+    public static final String PKG2 = "my.pkg2";
+    public static final String PKG3 = "my.pkg3";
+
+    /* class name */
+    public static final String CLS1 = "MyClass";
+    public static final String CLS2 = "MyClass2";
+    public static final String CLS3 = "MyClass3";
+
+    /* content path */
+    public static final String CP1 = "test/STF/" + CLS1 + ".java";
+    public static final String CP2 = "test/STF/" + CLS2 + ".java";
+    public static final String CP3 = "test/STF/" + CLS3 + ".java";
+    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
+        + ".java";
+    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
+        + ".java";
 
     public static final String SRC = "src";
     public final static String SUFIX_JAVA = ".java";
 
-    public static final String CP = BotConfiguration.CONTENTPATH;
-    public static final String CP2 = BotConfiguration.CONTENTPATH2;
-    public static final String CP3 = BotConfiguration.CONTENTPATH3;
-    public static final String CP_CHANGE = BotConfiguration.CONTENTCHANGEPATH;
-    public static final String CP2_CHANGE = BotConfiguration.CONTENTCHANGEPATH2;
+    public static final String ROLE_NAME = " (Driver)";
+    public static final String OWN_CONTACT_NAME = "You";
 
-    public static final String ROLENAME = SarosConstant.ROLENAME;
-    public static final String OWNCONTACTNAME = SarosConstant.OWNCONTACTNAME;
-
-    /*
-     * SVN
-     */
+    /* SVN infos */
     protected static String SVN_PROJECT = "examples";
     protected static String SVN_PKG = "org.eclipsecon.swtbot.example";
     protected static String SVN_CLS = "MyFirstTest01";
@@ -49,6 +70,14 @@ public class STFTest {
      * Contextmenu "Saros"
      */
     public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+    public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
+
+    public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
+    public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
+    public final static int CREATE_NEW_PROJECT = 1;
+    public final static int USE_EXISTING_PROJECT = 2;
+    public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
+    public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
 
     public String getClassPath(String projectName, String pkg, String className) {
         return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"

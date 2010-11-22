@@ -11,14 +11,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestHandleContacts {
-
-    protected static Musician bob;
-    protected static Musician alice;
+public class TestHandleContacts extends STFTest {
 
     @BeforeClass
     public static void initMusicians() {
@@ -88,7 +84,7 @@ public class TestHandleContacts {
         alice.rosterV.confirmNewContactWindow("bob@bla");
         alice.rosterV.waitUntilContactLookupFailedIsActive();
         assertTrue(alice.rosterV.isWindowContactLookupFailedActive());
-        alice.rosterV.confirmContactLookupFailedWindow(SarosConstant.BUTTON_NO);
+        alice.rosterV.confirmContactLookupFailedWindow(NO);
     }
 
     @Test

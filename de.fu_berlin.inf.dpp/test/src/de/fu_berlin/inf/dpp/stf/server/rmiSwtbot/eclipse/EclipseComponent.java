@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
@@ -35,19 +34,19 @@ public abstract class EclipseComponent {
         .getLogger(EclipseComponent.class);
 
     // Title of Buttons
-    protected final static String YES = SarosConstant.BUTTON_YES;
-    protected final static String OK = SarosConstant.BUTTON_OK;
-    protected final static String NO = SarosConstant.BUTTON_NO;
-    protected final static String CANCEL = SarosConstant.BUTTON_CANCEL;
-    protected final static String FINISH = SarosConstant.BUTTON_FINISH;
-    protected final static String NEXT = SarosConstant.BUTTON_NEXT;
+    protected final static String YES = "Yes";
+    protected final static String OK = "OK";
+    protected final static String NO = "No";
+    protected final static String CANCEL = "Cancel";
+    protected final static String FINISH = "Finish";
+    protected final static String NEXT = "Next >";
 
     public static final String SRC = "src";
     public final static String SUFIX_JAVA = ".java";
-    protected final static String PROGRESSINFORMATION = SarosConstant.SHELL_TITLE_PROGRESS_INFORMATION;
+    protected final static String PROGRESSINFORMATION = "Progress Information";
 
     // Role:Driver
-    protected final static String ROLENAME = SarosConstant.ROLENAME;
+    protected final static String ROLENAME = " (Driver)";
 
     // exported objects
     public static BasicComponent basicC;
@@ -76,6 +75,8 @@ public abstract class EclipseComponent {
 
     public static SarosSWTBot bot;
     public static int sleepTime = 750;
+
+    public final static String SCREENSHOTDIR = "screenshot";
 
     protected void waitUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);

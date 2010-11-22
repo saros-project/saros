@@ -14,21 +14,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestParallelInvitationWithTerminationByInvitees {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
-    private static Musician dave;
-    private static Musician edna;
+public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
     /**
      * Preconditions:
@@ -51,9 +42,9 @@ public class TestParallelInvitationWithTerminationByInvitees {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL, BotConfiguration.PORT_DAVE,
-            BotConfiguration.PORT_EDNA);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE,
+            MusicianConfigurationInfos.PORT_EDNA);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
@@ -119,41 +110,41 @@ public class TestParallelInvitationWithTerminationByInvitees {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), dave.getBaseJid(),
+        alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid(), edna.getBaseJid());
         bob.pEV.waitUntilWIndowSessionInvitationActive();
-        bob.basic.clickButton(SarosConstant.BUTTON_CANCEL);
+        bob.basic.clickButton(CANCEL);
         alice.pEV.waitUntilIsWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             bob.getName() + ".*"));
-        alice.basic.clickButton(SarosConstant.BUTTON_OK);
+        alice.basic.clickButton(OK);
 
         carl.pEV.waitUntilWIndowSessionInvitationActive();
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
-        carl.basic.clickButton(SarosConstant.BUTTON_CANCEL);
+        carl.basic.clickButton(CANCEL);
         alice.pEV.waitUntilIsWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             carl.getName() + ".*"));
-        alice.basic.clickButton(SarosConstant.BUTTON_OK);
+        alice.basic.clickButton(OK);
 
         dave.pEV.isWIndowSessionInvitationActive();
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
         // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
-        dave.basic.clickButton(SarosConstant.BUTTON_CANCEL);
+        dave.basic.clickButton(CANCEL);
         alice.pEV.waitUntilIsWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             dave.getName() + ".*"));
-        alice.basic.clickButton(SarosConstant.BUTTON_OK);
+        alice.basic.clickButton(OK);
 
         edna.pEV.isWIndowSessionInvitationActive();
         edna.pEV.confirmFirstPageOfWizardSessionInvitation();
         edna.pEV
-            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT);
+            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(alice.state.isDriver(edna.jid));
     }

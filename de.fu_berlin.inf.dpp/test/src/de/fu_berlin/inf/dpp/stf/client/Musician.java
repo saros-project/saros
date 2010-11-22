@@ -14,8 +14,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponent;
@@ -33,7 +32,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewC
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Musician {
+public class Musician extends STFTest {
     private static final Logger log = Logger.getLogger(Musician.class);
 
     public EditorComponent editor;
@@ -52,7 +51,7 @@ public class Musician {
     public String password;
     public String host;
     public int port;
-    public int typeOfSharingProject = SarosConstant.CREATE_NEW_PROJECT;
+    public int typeOfSharingProject = CREATE_NEW_PROJECT;
 
     public Musician(JID jid, String password, String host, int port) {
         super();
@@ -129,7 +128,7 @@ public class Musician {
         }
     }
 
-    public void buildSessionConcurrently(String projectName,
+    public void buildSessionConcurrently(final String projectName,
         String shareProjectWith, Musician... invitees) throws RemoteException,
         InterruptedException {
         List<Musician> peers = new LinkedList<Musician>();
@@ -139,7 +138,7 @@ public class Musician {
             peersName[i] = invitees[i].getBaseJid();
         }
         log.trace("alice.shareProjectParallel");
-        this.pEV.shareProject(BotConfiguration.PROJECTNAME, peersName);
+        this.pEV.shareProject(projectName, peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.size(); i++) {
@@ -147,7 +146,7 @@ public class Musician {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV
-                        .confirmWirzardSessionInvitationWithNewProject(BotConfiguration.PROJECTNAME);
+                        .confirmWirzardSessionInvitationWithNewProject(projectName);
                     return null;
                 }
             });

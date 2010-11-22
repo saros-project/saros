@@ -9,11 +9,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.ui.RosterView;
+import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
 
 /**
  * This implementation of {@link RosterViewComponent}
@@ -30,39 +30,40 @@ public class RosterViewComponentImp extends EclipseComponent implements
     /*
      * View infos
      */
-    private final static String VIEWNAME = SarosConstant.VIEW_TITLE_ROSTER;
-    private final static String VIEWID = SarosConstant.ID_ROSTER_VIEW;
+    private final static String VIEWNAME = "Roster";
+    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.RosterView";
 
     /*
      * title of shells which are pop up by performing the actions on the session
      * view.
      */
-    private final static String CONTACTALREADYADDED = "Contact already added";
-    private final static String CREATEXMPPACCOUNT = SarosConstant.SHELL_TITLE_CREATE_XMPP_ACCOUNT;
-    private final static String NEWCONTACT = SarosConstant.SHELL_TITLE_NEW_CONTACT;
-    private final static String CONTACTLOOKUPFAILED = "Contact look-up failed";
-    private final static String REMOVELOFSUBSCRIPTION = SarosConstant.SHELL_TITLE_REMOVAL_OF_SUBSCRIPTION;
+    public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
+    private final static String SHELL_CONTACT_ALREADY_ADDED = "Contact already added";
+    private final static String SHELL_CREATE_XMPP_ACCOUNT = CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
+    private final static String SHELL_NEW_CONTACT = "New Contact";
+    private final static String SHELL_CONTACT_LOOKUP_FAILED = "Contact look-up failed";
+    private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
 
     /*
      * Tool tip text of toolbar buttons on the session view
      */
-    private final static String DISCONNECT = SarosConstant.TOOL_TIP_TEXT_DISCONNECT;
-    private final static String ADDANEWCONTACT = SarosConstant.TOOL_TIP_TEXT_ADD_A_NEW_CONTACT;
-    private final static String CONNECT = SarosConstant.TOOL_TIP_TEXT_CONNECT;
+    private final static String TB_DISCONNECT = "Disconnect.*";
+    private final static String TB_ADD_A_NEW_CONTACT = "Add a new contact";
+    private final static String TB_CONNECT = "Connect";
 
     // Context menu of the table on the view
-    private final static String DELETE = SarosConstant.CONTEXT_MENU_DELETE;
-    private final static String RENAME = "Rename...";
-    private final static String SKYPETHISUSER = "Skype this user";
-    private final static String INVITEUSER = "Invite user...";
-    private final static String TESTDATATRANSFER = "Test data transfer connection...";
+    private final static String CM_DELETE = "Delete";
+    private final static String CM_RENAME = "Rename...";
+    private final static String CM_SKYPE_THIS_USER = "Skype this user";
+    private final static String CM_INVITE_USER = "Invite user...";
+    private final static String CM_TEST_DATA_TRANSFER = "Test data transfer connection...";
 
     private final static String BUDDIES = "Buddies";
 
-    private final static String SERVER = SarosConstant.TEXT_LABEL_JABBER_SERVER;
-    private final static String USERNAME = SarosConstant.TEXT_LABEL_USER_NAME;
-    private final static String PASSWORD = SarosConstant.TEXT_LABEL_PASSWORD;
-    private final static String JABBERID = SarosConstant.TEXT_LABEL_JABBER_ID;
+    private final static String SERVER = "Server";
+    private final static String USERNAME = "Username:";
+    private final static String PASSWORD = "Password:";
+    private final static String JABBERID = "Jabber ID";
     private final static String CONFIRM = "Confirm:";
 
     /**
@@ -102,7 +103,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     public void disconnect() throws RemoteException {
         precondition();
         if (isConnected()) {
-            clickToolbarButtonWithTooltip(DISCONNECT);
+            clickToolbarButtonWithTooltip(TB_DISCONNECT);
             waitUntilIsDisConnected();
         }
     }
@@ -120,7 +121,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public boolean isConnectedGUI() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(DISCONNECT);
+        return isToolbarButtonEnabled(TB_DISCONNECT);
     }
 
     /**
@@ -133,15 +134,16 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void clickAddANewContactToolbarButton() throws RemoteException {
         precondition();
-        clickToolbarButtonWithTooltip(ADDANEWCONTACT);
+        clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
     }
 
     public void waitUntilIsConnected() throws RemoteException {
-        waitUntil(SarosConditions.isConnect(getToolbarButtons(), DISCONNECT));
+        waitUntil(SarosConditions.isConnect(getToolbarButtons(), TB_DISCONNECT));
     }
 
     public void waitUntilIsDisConnected() throws RemoteException {
-        waitUntil(SarosConditions.isDisConnected(getToolbarButtons(), CONNECT));
+        waitUntil(SarosConditions.isDisConnected(getToolbarButtons(),
+            TB_CONNECT));
     }
 
     public void addANewContact(JID jid) throws RemoteException {
@@ -152,7 +154,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void confirmNewContactWindow(String baseJID) {
-        windowPart.waitUntilShellActive(NEWCONTACT);
+        windowPart.waitUntilShellActive(SHELL_NEW_CONTACT);
         basicPart.setTextInTextWithLabel(baseJID, JABBERID);
         basicPart.waitUntilButtonIsEnabled(FINISH);
         basicPart.clickButton(FINISH);
@@ -169,7 +171,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (!hasContactWith(jid))
             return;
         try {
-            clickContextMenuOfBuddy(DELETE, jid.getBase());
+            clickContextMenuOfBuddy(CM_DELETE, jid.getBase());
             windowPart.confirmDeleteWindow(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + jid.getBase(), e);
@@ -178,21 +180,21 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void clickContextMenuOfBuddy(String context, String baseJID)
         throws RemoteException {
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, DELETE, BUDDIES,
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, CM_DELETE, BUDDIES,
             baseJID);
     }
 
     public void confirmContactLookupFailedWindow(String buttonType)
         throws RemoteException {
-        windowPart.confirmWindow(CONTACTLOOKUPFAILED, buttonType);
+        windowPart.confirmWindow(SHELL_CONTACT_LOOKUP_FAILED, buttonType);
     }
 
     public boolean isWindowContactLookupFailedActive() throws RemoteException {
-        return windowPart.isShellActive(CONTACTLOOKUPFAILED);
+        return windowPart.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
 
     public boolean isWindowContactAlreadyAddedActive() throws RemoteException {
-        return windowPart.isShellActive(CONTACTALREADYADDED);
+        return windowPart.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public void renameContact(String contact, String newName)
@@ -200,7 +202,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
         SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
             + ".*", contact + ".*");
-        item.contextMenu(RENAME).click();
+        item.contextMenu(CM_RENAME).click();
         windowPart.waitUntilShellActive("Set new nickname");
         bot.text(contact).setText(newName);
         bot.button(OK).click();
@@ -211,7 +213,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("clickTBConnectInRosterView");
-            clickToolbarButtonWithTooltip(CONNECT);
+            clickToolbarButtonWithTooltip(TB_CONNECT);
             bot.sleep(100);
             if (isCreateXMPPAccountWindowActive()) {
                 log.trace("confirmSarosConfigurationWindow");
@@ -223,7 +225,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public boolean isCreateXMPPAccountWindowActive() throws RemoteException {
-        return windowPart.isShellActive(CREATEXMPPACCOUNT);
+        return windowPart.isShellActive(SHELL_CREATE_XMPP_ACCOUNT);
     }
 
     /**
@@ -231,7 +233,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     public void confirmSarosConfigurationWizard(String xmppServer, String jid,
         String password) {
-        windowPart.activateShellWithText(CREATEXMPPACCOUNT);
+        windowPart.activateShellWithText(SHELL_CREATE_XMPP_ACCOUNT);
         basicPart.setTextInTextWithLabel(xmppServer, SERVER);
         bot.sleep(sleepTime);
         basicPart.setTextInTextWithLabel(jid, USERNAME);
@@ -242,8 +244,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void confirmRemovelOfSubscriptionWindow() throws RemoteException {
-        windowPart.waitUntilShellActive(REMOVELOFSUBSCRIPTION);
-        windowPart.confirmWindow(REMOVELOFSUBSCRIPTION, OK);
+        windowPart.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        windowPart.confirmWindow(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
     }
 
     /**************************************************************
@@ -266,25 +268,22 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void waitUntilContactLookupFailedIsActive() throws RemoteException {
-        windowPart.waitUntilShellActive(CONTACTLOOKUPFAILED);
+        windowPart.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
 
     public void waitUntilWindowContactAlreadyAddedIsActive()
         throws RemoteException {
-        windowPart.waitUntilShellActive(CONTACTALREADYADDED);
+        windowPart.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public void closeWindowContactAlreadyAdded() throws RemoteException {
-        windowPart.closeShell(CONTACTALREADYADDED);
+        windowPart.closeShell(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public void confirmRequestOfSubscriptionReceivedWindow()
         throws RemoteException {
-        windowPart
-            .waitUntilShellActive(SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        windowPart.confirmWindow(
-            SarosConstant.SHELL_TITLE_REQUEST_OF_SUBSCRIPTION_RECEIVED,
-            SarosConstant.BUTTON_OK);
+        windowPart.waitUntilShellActive(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+        windowPart.confirmWindow(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip) {

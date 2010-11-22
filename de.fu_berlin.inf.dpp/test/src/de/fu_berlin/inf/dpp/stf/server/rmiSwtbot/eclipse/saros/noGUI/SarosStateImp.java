@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 
@@ -27,8 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatVie
  * The goal of this class is to gather state and provide an RMI interface for
  * getting internal states from the outside.
  */
-public class SarosStateImp extends StateImp implements
-    SarosState {
+public class SarosStateImp extends StateImp implements SarosState {
 
     private JID jid;
     private transient static final Logger log = Logger
@@ -46,8 +44,8 @@ public class SarosStateImp extends StateImp implements
         EditorManager editorManager) {
         if (self != null)
             return self;
-        self = new SarosStateImp(saros, sessionManager,
-            dataTransferManager, editorManager);
+        self = new SarosStateImp(saros, sessionManager, dataTransferManager,
+            editorManager);
         return self;
     }
 
@@ -289,8 +287,7 @@ public class SarosStateImp extends StateImp implements
 
     public String getPathToScreenShot() throws RemoteException {
         Bundle bundle = saros.getBundle();
-        return bundle.getLocation().substring(16)
-            + BotConfiguration.SCREENSHOTDIR;
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
     public void setJID(JID jid) throws RemoteException {

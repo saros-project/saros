@@ -9,11 +9,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class WindowPart extends EclipseComponent {
+
+    public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
 
     public String getCurrentActiveShell() {
         final SWTBotShell activeShell = bot.activeShell();
@@ -234,7 +235,7 @@ public class WindowPart extends EclipseComponent {
         String rootOfTreeNode, String teeNode, String buttonText)
         throws RemoteException {
         // waitUntilShellActive(shellName);
-        bot.text(SarosConstant.TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
+        bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
         treePart.waitUntilTreeExisted(bot.tree(), rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
         treePart.waitUntilTreeNodeExisted(treeItem, teeNode);

@@ -14,19 +14,11 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestShare3UsersConcurrently {
+public class TestShare3UsersConcurrently extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestShare3UsersConcurrently.class);
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
 
     @BeforeClass
     public static void initMusicians() throws RemoteException,
@@ -35,7 +27,7 @@ public class TestShare3UsersConcurrently {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass
@@ -55,8 +47,8 @@ public class TestShare3UsersConcurrently {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.buildSessionConcurrently(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob, carl);
+        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob, carl);
         assertTrue(carl.state.isParticipant(carl.jid));
         assertTrue(carl.state.isObserver(carl.jid));
         assertTrue(carl.state.isParticipant(bob.jid));

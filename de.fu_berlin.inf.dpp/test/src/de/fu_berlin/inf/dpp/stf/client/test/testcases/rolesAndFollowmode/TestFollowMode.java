@@ -11,28 +11,17 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestFollowMode {
-    private static final String CLS1 = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
-    private static final String CLS3 = BotConfiguration.CLASSNAME3;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-
-    protected static Musician alice;
-    protected static Musician bob;
+public class TestFollowMode extends STFTest {
 
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS1);
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass
@@ -60,22 +49,22 @@ public class TestFollowMode {
      */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH,
-            PROJECT, PKG, CLS1);
+        alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
         bob.sessionV.followThisUser(alice.state);
         bob.editor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.state.isInFollowMode());
         assertTrue(bob.editor.isJavaEditorActive(CLS1));
 
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
+        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);
 
-        bob.state.waitUntilClassContentsSame(PROJECT, PKG, CLS1,
+        bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
             clsContentOfAlice);
-        String clsContentOfBob = bob.state.getClassContent(PROJECT, PKG, CLS1);
+        String clsContentOfBob = bob.state
+            .getClassContent(PROJECT1, PKG1, CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.pEV.newClass(PROJECT, PKG, CLS2);
+        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
         bob.editor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
@@ -92,11 +81,10 @@ public class TestFollowMode {
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
 
         bob.sessionV.followThisUser(alice.state);
-        alice.pEV.newClass(PROJECT, PKG, CLS3);
+        alice.pEV.newClass(PROJECT1, PKG1, CLS3);
         alice.editor.waitUntilJavaEditorActive(CLS3);
-        alice.editor.setTextInJavaEditorWithSave(BotConfiguration.CONTENTPATH3,
-            PROJECT, PKG, CLS3);
-        alice.editor.setBreakPoint(13, PROJECT, PKG, CLS3);
+        alice.editor.setTextInJavaEditorWithSave(CP3, PROJECT1, PKG1, CLS3);
+        alice.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
         // bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);

@@ -8,28 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-
-public class TestPattern {
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PROJECT2 = BotConfiguration.PROJECTNAME2;
-    private static final String PROJECT3 = BotConfiguration.PROJECTNAME3;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PKG2 = BotConfiguration.PACKAGENAME2;
-    private static final String PKG3 = BotConfiguration.PACKAGENAME3;
-
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String CLS2 = BotConfiguration.CLASSNAME2;
-    private static final String CLS3 = BotConfiguration.CLASSNAME3;
-
-    private static final String CP = BotConfiguration.CONTENTPATH;
-    private static final String CP2 = BotConfiguration.CONTENTPATH2;
-    private static final String CP3 = BotConfiguration.CONTENTPATH3;
-
-    protected static Musician alice;
-    protected static Musician bob;
-    protected static Musician carl;
+public class TestPattern extends STFTest {
 
     /**
      * make sure, alice create first a java project with a class. if you don't

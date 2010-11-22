@@ -7,7 +7,6 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
@@ -16,7 +15,7 @@ public class ProgressViewComponentImp extends EclipseComponent implements
 
     private static transient ProgressViewComponentImp self;
 
-    protected final static String VIEWNAME = SarosConstant.VIEW_TITLE_PROGRESS;
+    protected final static String VIEWNAME = "Progress";
 
     /**
      * {@link ProgressViewComponentImp} is a singleton, but inheritance is

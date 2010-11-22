@@ -10,26 +10,18 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestChangingNameInRosterView {
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    protected static Musician carl = InitMusician.newCarl();
-    protected static Musician alice;
-    protected static Musician bob;
+public class TestChangingNameInRosterView extends STFTest {
 
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.shareProjectWithDone(BotConfiguration.PROJECTNAME,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
+        carl = InitMusician.newCarl();
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass

@@ -14,17 +14,9 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestParallelInvitationWithTerminationByHost {
-
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-
-    protected static Musician alice;
-    protected static Musician bob;
-    protected static Musician carl;
+public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
     @BeforeClass
     public static void initMusicians() throws AccessException, RemoteException,
@@ -34,7 +26,7 @@ public class TestParallelInvitationWithTerminationByHost {
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     /**
@@ -86,7 +78,7 @@ public class TestParallelInvitationWithTerminationByHost {
      */
     @Test
     public void testInvitationWithTerminationByHost() throws RemoteException {
-        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), carl.getBaseJid());
+        alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), carl.getBaseJid());
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         alice.progressV.cancelInvitation();

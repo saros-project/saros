@@ -11,21 +11,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestStrictSequentialInvitationWithoutTermination {
+public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestStrictSequentialInvitationWithoutTermination.class);
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static Musician carl = InitMusician.newCarl();
-    private static Musician alice = InitMusician.newAlice();
-    private static Musician bob = InitMusician.newBob();
 
     /**
      * Preconditions:
@@ -45,13 +38,13 @@ public class TestStrictSequentialInvitationWithoutTermination {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
 
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     /**
@@ -114,8 +107,8 @@ public class TestStrictSequentialInvitationWithoutTermination {
         InterruptedException {
         alice.mainMenu.newTextFileLineDelimiter("Unix");
 
-        alice.shareProjectWithDone(PROJECT,
-            SarosConstant.CONTEXT_MENU_SHARE_PROJECT, carl, bob);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl,
+            bob);
 
         String delimiterByAlice = alice.mainMenu.getTextFileLineDelimiter();
         String delimiterByCarl = carl.mainMenu.getTextFileLineDelimiter();

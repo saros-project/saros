@@ -3,16 +3,19 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class ChatViewComponentImp extends EclipseComponent implements
     ChatViewComponent {
 
-    // public static ChatViewObjectImp classVariable;
-
     private static transient ChatViewComponentImp self;
+
+    /*
+     * View infos
+     */
+    private final static String VIEWNAME = "Chat View";
+    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.chat.ChatView";
 
     /**
      * {@link ChatViewComponentImp} is a singleton, but inheritance is possible.
@@ -30,20 +33,20 @@ public class ChatViewComponentImp extends EclipseComponent implements
     }
 
     public void activateChatView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        viewPart.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            viewPart.openViewById(SarosConstant.ID_CHAT_VIEW);
+            viewPart.openViewById(VIEWID);
     }
 
     public void closeChatView() throws RemoteException {
-        viewPart.closeViewById(SarosConstant.ID_CHAT_VIEW);
+        viewPart.closeViewById(VIEWID);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return viewPart.isViewOpen(SarosConstant.VIEW_TITLE_CHAT_VIEW);
+        return viewPart.isViewOpen(VIEWNAME);
     }
 
     public void sendChatMessage(String message) throws RemoteException {

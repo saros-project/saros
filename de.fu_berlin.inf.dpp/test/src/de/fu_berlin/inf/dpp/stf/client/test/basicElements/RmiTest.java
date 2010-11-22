@@ -17,7 +17,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
 
 public class RmiTest extends STFTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
@@ -98,62 +97,63 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testCloseEditorWithSave() throws IOException, CoreException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
-            PROJECT2, PKG, CLS);
-        alice.editor.closeJavaEditorWithSave(CLS);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
-            CLS);
+            PROJECT2, PKG1, CLS1);
+        alice.editor.closeJavaEditorWithSave(CLS1);
+        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+            CLS1);
         assertTrue(dirtyClsContentOfAlice.equals(clsContentOfAlice));
     }
 
     @Test
     @Ignore
     public void testCloseEditorWithoutSave() throws IOException, CoreException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.editor.setTextInJavaEditorWithoutSave(CP, PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
-            PROJECT2, PKG, CLS);
-        alice.editor.closejavaEditorWithoutSave(CLS);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT, PKG,
-            CLS);
+            PROJECT2, PKG1, CLS1);
+        alice.editor.closejavaEditorWithoutSave(CLS1);
+        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+            CLS1);
         assertFalse(dirtyClsContentOfAlice.equals(clsContentOfAlice));
     }
 
     @Test
     public void testIsClassDirty() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        assertFalse(alice.editor.isClassDirty(PROJECT, PKG, CLS,
-            SarosConstant.ID_JAVA_EDITOR));
-        alice.editor.setTextInJavaEditorWithSave(CP, PROJECT, PKG, CLS);
-        assertTrue(alice.editor.isClassDirty(PROJECT, PKG, CLS,
-            SarosConstant.ID_JAVA_EDITOR));
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        assertFalse(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
+            ID_JAVA_EDITOR));
+        alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
+        assertTrue(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
+            ID_JAVA_EDITOR));
     }
 
     @Test
     @Ignore
     public void testIsClassesSame() throws RemoteException, CoreException,
         IOException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
-        alice.pEV.newClass(PROJECT, PKG2, CLS);
-        String clsOfPkgProject = alice.state.getClassContent(PROJECT, PKG, CLS);
-        String clsOfpkg2Project = alice.state.getClassContent(PROJECT, PKG2,
-            CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.pEV.newClass(PROJECT1, PKG2, CLS1);
+        String clsOfPkgProject = alice.state.getClassContent(PROJECT1, PKG1,
+            CLS1);
+        String clsOfpkg2Project = alice.state.getClassContent(PROJECT1, PKG2,
+            CLS1);
         assertFalse(clsOfPkgProject.equals(clsOfpkg2Project));
 
-        alice.pEV.newJavaProjectWithClass(PROJECT2, PKG, CLS);
-        String clsOfPkgProject2 = alice.state.getClassContent(PROJECT2, PKG,
-            CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT2, PKG1, CLS1);
+        String clsOfPkgProject2 = alice.state.getClassContent(PROJECT2, PKG1,
+            CLS1);
         assertTrue(clsOfPkgProject.equals(clsOfPkgProject2));
     }
 
     @Test
     @Ignore
     public void testTypeTextInEditor() throws RemoteException {
-        alice.pEV.newJavaProject(PROJECT);
-        alice.pEV.newClassImplementsRunnable(PROJECT, "pkg", "Cls");
-        alice.editor.typeTextInJavaEditor(CP, PROJECT, "pkg", "Cls");
+        alice.pEV.newJavaProject(PROJECT1);
+        alice.pEV.newClassImplementsRunnable(PROJECT1, "pkg", "Cls");
+        alice.editor.typeTextInJavaEditor(CP1, PROJECT1, "pkg", "Cls");
     }
 
     @Test

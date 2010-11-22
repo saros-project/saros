@@ -13,21 +13,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
-import de.fu_berlin.inf.dpp.stf.server.BotConfiguration;
-import de.fu_berlin.inf.dpp.stf.server.SarosConstant;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestParallelInvitationWithTerminationByHost {
-
-    private static final String PROJECT = BotConfiguration.PROJECTNAME;
-    private static final String PKG = BotConfiguration.PACKAGENAME;
-    private static final String CLS = BotConfiguration.CLASSNAME;
-
-    private static Musician alice;
-    private static Musician bob;
-    private static Musician carl;
-    private static Musician dave;
+public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
     /**
      * Preconditions:
@@ -49,8 +40,8 @@ public class TestParallelInvitationWithTerminationByHost {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            BotConfiguration.PORT_ALICE, BotConfiguration.PORT_BOB,
-            BotConfiguration.PORT_CARL, BotConfiguration.PORT_DAVE);
+            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
@@ -117,12 +108,12 @@ public class TestParallelInvitationWithTerminationByHost {
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
-        alice.pEV.newJavaProjectWithClass(PROJECT, PKG, CLS);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.pEV.shareProject(PROJECT, bob.getBaseJid(), dave.getBaseJid(),
+        alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid());
 
         bob.pEV.waitUntilWIndowSessionInvitationActive();
@@ -140,7 +131,7 @@ public class TestParallelInvitationWithTerminationByHost {
 
         dave.pEV.waitUntilWIndowSessionInvitationActive();
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
-        dave.basic.clickButton(SarosConstant.BUTTON_FINISH);
+        dave.basic.clickButton(FINISH);
         alice.progressV.cancelInvitation(0);
         dave.pEV.waitUntilIsWindowInvitationCnacelledActive();
         assertTrue(dave.pEV.isWindowInvitationCancelledActive());

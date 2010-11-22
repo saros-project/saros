@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server;
+package de.fu_berlin.inf.dpp.stf.client;
 
 import de.fu_berlin.inf.dpp.Saros;
 
@@ -15,50 +15,8 @@ import de.fu_berlin.inf.dpp.Saros;
  * 
  * On the bottom you will find the used configurations which is used by STF.
  */
-public class BotConfiguration {
+public class MusicianConfigurationInfos {
     public final static boolean DEVELOPMODE = true;
-
-    /**
-     * Directory for temporary files for saving screen captures.
-     */
-    // public final static transient String TEMPDIR = System
-    // .getProperty("java.io.tmpdir");
-
-    // public final static transient String TEMPDIR =
-    // "D:\\Lin\\Space\\Saros_10.07.30\\screenshot";
-
-    public final static transient String SCREENSHOTDIR = "screenshot";
-    /** A small Java Project */
-
-    public final static String PROJECTNAME = "Foo_Saros";
-    public final static String PROJECTNAME2 = "Foo_Saros2";
-    public final static String PROJECTNAME3 = "Foo_Saros3";
-
-    public final static String FILENAME = "MyFile.xml";
-    public final static String FILENAME2 = "MyFile2.xml";
-    public final static String FOLDERNAME = "MyFolder";
-    public final static String FOLDERNAME2 = "MyFolder2";
-
-    public final static String CLASSNAME = "MyClass";
-    public final static String CLASSNAME2 = "MyClass2";
-    public final static String CLASSNAME3 = "MyClass3";
-    public final static String PACKAGENAME = "my.pkg";
-    public final static String PACKAGENAME2 = "my.pkg2";
-    public final static String PACKAGENAME3 = "my.pkg3";
-
-    public final static String CONTENTPATH = "test/STF/" + CLASSNAME + ".java";
-    public final static String CONTENTCHANGEPATH = "test/STF/" + CLASSNAME
-        + "Change" + ".java";
-    public final static String CONTENTPATH2 = "test/STF/" + CLASSNAME2
-        + ".java";
-
-    public final static String CONTENTCHANGEPATH2 = "test/STF/" + CLASSNAME2
-        + "Change" + ".java";
-    public final static String CONTENTPATH3 = "test/STF/" + CLASSNAME3
-        + ".java";
-
-    // public final static String SVN_URL =
-    // "http://swtbot-examples.googlecode.com/svn";
 
     /**
      * VM test accounts
