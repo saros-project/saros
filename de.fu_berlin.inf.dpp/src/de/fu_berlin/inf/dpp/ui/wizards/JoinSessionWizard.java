@@ -96,6 +96,8 @@ public class JoinSessionWizard extends Wizard {
         this.preferenceUtils = preferenceUtils;
         this.manager = manager;
 
+        EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
+
         process.setInvitationUI(this);
         setWindowTitle("Session Invitation");
         setHelpAvailable(false);
@@ -120,6 +122,7 @@ public class JoinSessionWizard extends Wizard {
             }
             getShell().forceActive();
         }
+
         return super.getNextPage(page);
     }
 
@@ -175,8 +178,10 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public void addPages() {
         descriptionPage = new ShowDescriptionPage(this, manager, process);
-        namePage = new EnterProjectNamePage(this, dataTransferManager,
-            preferenceUtils);
+        namePage = new EnterProjectNamePage(dataTransferManager,
+            preferenceUtils, this.process.getRemoteFileList(),
+            this.process.getPeer(), this.process.getProjectName(),
+            this.wizardDialog);
 
         addPage(descriptionPage);
         addPage(namePage);

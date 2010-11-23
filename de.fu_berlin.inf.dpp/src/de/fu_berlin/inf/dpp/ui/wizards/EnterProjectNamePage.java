@@ -6,6 +6,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.IPageChangingListener;
+import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -21,9 +23,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
+import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
@@ -35,7 +40,12 @@ class EnterProjectNamePage extends WizardPage {
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
 
-    protected final JoinSessionWizard joinSessionWizard;
+    private final JoinSessionWizard joinSessionWizard = null;
+
+    protected final FileList fileList;
+    protected final JID peer;
+    protected final String remoteProjectName;
+    protected WizardDialogAccessable wizardDialog;
 
     protected Label newProjectNameLabel;
     protected Button projCopy;
@@ -52,6 +62,8 @@ class EnterProjectNamePage extends WizardPage {
     protected Label updateProjectNameLabel;
     protected Button scanWorkspaceProjectsButton;
 
+    protected int pageChanges = 0;
+
     /* project for update or base project for copy into new project */
     protected IProject similarProject;
 
@@ -59,12 +71,32 @@ class EnterProjectNamePage extends WizardPage {
 
     protected PreferenceUtils preferenceUtils;
 
-    protected EnterProjectNamePage(JoinSessionWizard joinSessionWizard,
-        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
+    private boolean disposed;
+
+    protected EnterProjectNamePage(DataTransferManager dataTransferManager,
+        PreferenceUtils preferenceUtils, FileList fileList, JID peer,
+        String remoteProjectName, WizardDialogAccessable wizardDialog) {
         super("namePage");
-        this.joinSessionWizard = joinSessionWizard;
+        // this.joinSessionWizard = joinSessionWizard;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
+        this.peer = peer;
+        this.remoteProjectName = remoteProjectName;
+
+        this.wizardDialog = wizardDialog;
+
+        this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
+            public void handlePageChanging(PageChangingEvent event) {
+                pageChanges++;
+            }
+        });
+
+        if (this.wizardDialog == null) {
+            log.warn("WizardDialog is null");
+        }
+
+        // TODO: set fileList to something useful
+        this.fileList = fileList;
 
         setPageComplete(false);
         setTitle("Select local project.");
@@ -83,8 +115,8 @@ class EnterProjectNamePage extends WizardPage {
             this.updateProjectStatusResult.setText("Your project "
                 + project.getName()
                 + " matches with "
-                + this.joinSessionWizard.process.getRemoteFileList()
-                    .computeMatch(project) + "% accuracy.\n"
+                // + this.joinSessionWizard.process.getRemoteFileList()
+                + this.fileList.computeMatch(project) + "% accuracy.\n"
                 + "This fact will be used to shorten the process of "
                 + "downloading the remote project.");
 
@@ -99,8 +131,7 @@ class EnterProjectNamePage extends WizardPage {
      */
     protected void updateConnectionStatus() {
 
-        switch (dataTransferManager.getTransferMode(joinSessionWizard.process
-            .getPeer())) {
+        switch (dataTransferManager.getTransferMode(this.peer)) {
         case JINGLETCP:
         case JINGLEUDP:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
@@ -164,9 +195,8 @@ class EnterProjectNamePage extends WizardPage {
         this.newProjectNameText.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.newProjectNameText.setFocus();
-        this.newProjectNameText.setText(JoinSessionWizardUtils
-            .findProjectNameProposal(this.joinSessionWizard.process
-                .getProjectName()));
+        this.newProjectNameText.setText(EnterProjectNamePageUtils
+            .findProjectNameProposal(this.remoteProjectName));
     }
 
     /**
@@ -237,9 +267,8 @@ class EnterProjectNamePage extends WizardPage {
         this.copyToBeforeUpdateText.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.copyToBeforeUpdateText.setFocus();
-        this.copyToBeforeUpdateText.setText(JoinSessionWizardUtils
-            .findProjectNameProposal(this.joinSessionWizard.process
-                .getProjectName()));
+        this.copyToBeforeUpdateText.setText(EnterProjectNamePageUtils
+            .findProjectNameProposal(this.remoteProjectName));
 
         Composite scanGroup = new Composite(workArea, SWT.NONE);
         layout = new GridLayout();
@@ -262,8 +291,8 @@ class EnterProjectNamePage extends WizardPage {
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    setUpdateProject(JoinSessionWizardUtils
-                        .getBestScanMatch(EnterProjectNamePage.this.joinSessionWizard.process));
+                    setUpdateProject(EnterProjectNamePageUtils
+                        .getBestScanMatch(EnterProjectNamePage.this.fileList));
                 }
             });
 
@@ -306,16 +335,21 @@ class EnterProjectNamePage extends WizardPage {
 
         this.projCopy = new Button(composite, SWT.RADIO);
         this.projCopy.setText("Create new project");
-        this.projCopy.setSelection(!joinSessionWizard.isUpdateSelected());
+        this.projCopy.setSelection(!EnterProjectNamePageUtils
+            .autoUpdateProject(this.remoteProjectName));
 
         createNewProjectGroup(composite);
 
         this.projUpd = new Button(composite, SWT.RADIO);
         this.projUpd.setText("Use existing project");
-        this.projUpd.setSelection(joinSessionWizard.isUpdateSelected());
+        this.projUpd.setSelection(EnterProjectNamePageUtils
+            .autoUpdateProject(this.remoteProjectName));
 
-        createUpdateProjectGroup(composite,
-            joinSessionWizard.getUpdateProject());
+        String newProjectName = "";
+        if (EnterProjectNamePageUtils.autoUpdateProject(remoteProjectName)) {
+            newProjectName = this.remoteProjectName;
+        }
+        createUpdateProjectGroup(composite, newProjectName);
 
         if (preferenceUtils.isSkipSyncSelectable()) {
             this.skipCheckbox = new Button(composite, SWT.CHECK);
@@ -335,8 +369,43 @@ class EnterProjectNamePage extends WizardPage {
         updateEnabled();
 
         if (preferenceUtils.isAutoAcceptInvitation()) {
-            joinSessionWizard.pressWizardButton(IDialogConstants.FINISH_ID);
+            // joinSessionWizard.pressWizardButton(IDialogConstants.FINISH_ID);
+            pressWizardButton(IDialogConstants.FINISH_ID);
         }
+    }
+
+    private void pressWizardButton(final int buttonID) {
+        final int pageChangesAtStart = pageChanges;
+
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+
+                        // User clicked next in the meantime
+                        if (pageChangesAtStart != pageChanges)
+                            return;
+
+                        // Dialog already closed
+                        if (disposed)
+                            return;
+
+                        // Button not enabled
+                        if (!wizardDialog.getWizardButton(buttonID).isEnabled())
+                            return;
+
+                        wizardDialog.buttonPressed(buttonID);
+                    }
+                });
+            }
+        });
     }
 
     public boolean isUpdateSelected() {
@@ -370,11 +439,10 @@ class EnterProjectNamePage extends WizardPage {
 
                 // quickly scan for existing project with the same name
                 if (projUpd.getSelection()
-                    && !JoinSessionWizardUtils
-                        .projectIsUnique(joinSessionWizard.process
-                            .getProjectName())) {
-                    updateProjectText.setText(joinSessionWizard.process
-                        .getProjectName());
+                    && !EnterProjectNamePageUtils
+                        .projectIsUnique(EnterProjectNamePage.this.remoteProjectName)) {
+                    updateProjectText
+                        .setText(EnterProjectNamePage.this.remoteProjectName);
                 }
 
             }
@@ -394,7 +462,7 @@ class EnterProjectNamePage extends WizardPage {
             setErrorMessage("Please set a project name");
             setPageComplete(false);
         } else {
-            if (JoinSessionWizardUtils.projectIsUnique(newText)) {
+            if (EnterProjectNamePageUtils.projectIsUnique(newText)) {
                 setErrorMessage(null);
                 setPageComplete(true);
             } else {
@@ -442,7 +510,7 @@ class EnterProjectNamePage extends WizardPage {
                 setPageComplete(false);
 
             } else {
-                if (!JoinSessionWizardUtils.projectIsUnique(newText)) {
+                if (!EnterProjectNamePageUtils.projectIsUnique(newText)) {
 
                     if (this.copyCheckbox.getSelection()) {
                         setPageCompleteTargetProject(this.copyToBeforeUpdateText
@@ -516,5 +584,11 @@ class EnterProjectNamePage extends WizardPage {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        this.disposed = true;
+        super.dispose();
     }
 }
