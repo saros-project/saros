@@ -116,22 +116,27 @@ public class MainMenuComponentImp extends EclipseComponent implements
     private static final String REPOSITORY_TYPE_SVN = "SVN";
     private static final String IMPORT_SOURCE = "Checkout Projects from SVN";
 
-    public void importProjectFromSVN(String path) throws RemoteException {
+    public void importProjectFromSVN(String repository, String path)
+        throws RemoteException {
         precondition();
         menuPart.clickMenuWithTexts(MENU_FILE, MENU_IMPORT);
         windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, IMPORT_SOURCE, NEXT);
-        if (bot.table().containsItem(path)) {
-            windowPart.confirmWindowWithTable("Checkout from SVN", path, NEXT);
+        if (bot.table().containsItem(repository)) {
+            windowPart.confirmWindowWithTable("Checkout from SVN", repository,
+                NEXT);
         } else {
             bot.radio("Create a new repository location").click();
             bot.button(NEXT).click();
-            bot.comboBoxWithLabel("Url:").setText(path);
+            bot.comboBoxWithLabel("Url:").setText(repository);
             bot.button(NEXT).click();
             windowPart.waitUntilShellActive("Checkout from SVN");
         }
+        // Note that the character '"' is illegal in URLs
+        String[] nodes = (repository.replaceAll("/", "\"") + path).split("/");
+        nodes[0] = nodes[0].replaceAll("\"", "/");
         windowPart.confirmWindowWithTreeWithWaitingExpand("Checkout from SVN",
-            FINISH, path, "trunk", "examples");
+            FINISH, nodes);
         // windowPart.waitUntilShellActive("SVN Checkout");
         SWTBotShell shell2 = bot.shell("SVN Checkout");
         windowPart.waitUntilShellCloses(shell2);

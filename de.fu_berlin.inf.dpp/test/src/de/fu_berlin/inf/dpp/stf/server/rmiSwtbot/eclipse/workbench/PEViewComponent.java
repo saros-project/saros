@@ -714,6 +714,9 @@ public interface PEViewComponent extends Remote {
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException;
 
+    public void renameJavaProject(String newName, String... nodes)
+        throws RemoteException;
+
     /**
      * Perform the action "revert" which should be done with the following
      * steps:

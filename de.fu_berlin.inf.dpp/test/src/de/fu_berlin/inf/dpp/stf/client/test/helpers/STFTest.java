@@ -57,15 +57,6 @@ public class STFTest {
     public static final String ROLE_NAME = " (Driver)";
     public static final String OWN_CONTACT_NAME = "You";
 
-    /* SVN infos */
-    protected static String SVN_PROJECT = "examples";
-    protected static String SVN_PKG = "org.eclipsecon.swtbot.example";
-    protected static String SVN_CLS = "MyFirstTest01";
-    protected static String SVN_URL = "http://swtbot-examples.googlecode.com/svn";
-    protected static String SVN_TAG_URL = "http://swtbot-examples.googlecode.com/svn/tags/eclipsecon2009";
-    protected static final String SVN_CLS_PATH = SVN_PROJECT
-        + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
-
     /*
      * Contextmenu "Saros"
      */
@@ -100,5 +91,4 @@ public class STFTest {
         String[] nodes = { projectName, SRC, pkg, className + SUFIX_JAVA };
         return nodes;
     }
-
 }

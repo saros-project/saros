@@ -516,14 +516,24 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void renameFolder(String newName, String... nodes)
         throws RemoteException {
+        rename(SHELL_RENAME_RESOURCE, newName, nodes);
+    }
+
+    public void renameJavaProject(String newName, String... nodes)
+        throws RemoteException {
+        rename("Rename Java Project", newName, nodes);
+    }
+
+    public void rename(String shellTitle, String newName, String[] nodes)
+        throws RemoteException {
         precondition();
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
             RENAME);
-        windowPart.waitUntilShellActive(SHELL_RENAME_RESOURCE);
+        windowPart.waitUntilShellActive(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(OK);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_RENAME_RESOURCE);
+        windowPart.waitUntilShellClosed(shellTitle);
     }
 
     public void renamePkg(String newName, String projectName, String pkg)

@@ -53,6 +53,6 @@ public interface MainMenuComponent extends Remote {
      */
     public boolean isDebugPerspectiveActive() throws RemoteException;
 
-    public void importProjectFromSVN(String path) throws RemoteException;
+    public void importProjectFromSVN(String repository, String path) throws RemoteException;
 
 }
