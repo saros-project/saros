@@ -19,7 +19,7 @@ public class IBBTransport extends BytestreamTransport {
         //
     }
 
-    public static IBBTransport getTransport() {
+    public synchronized static IBBTransport getTransport() {
         if (instance == null)
             instance = new IBBTransport();
         return instance;

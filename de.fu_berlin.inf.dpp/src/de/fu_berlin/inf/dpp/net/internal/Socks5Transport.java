@@ -75,7 +75,7 @@ public class Socks5Transport extends BytestreamTransport {
         //
     }
 
-    public static Socks5Transport getTransport() {
+    public synchronized static Socks5Transport getTransport() {
         if (instance == null)
             instance = new Socks5Transport();
         return instance;
@@ -132,10 +132,9 @@ public class Socks5Transport extends BytestreamTransport {
                 } catch (InterruptedException e) {
                     // nothing to do here
                 } catch (ExecutionException e) {
-                    log
-                        .debug(prefix()
-                            + "Exception while waiting to close unneeded connection: "
-                            + e.getMessage());
+                    log.debug(prefix()
+                        + "Exception while waiting to close unneeded connection: "
+                        + e.getMessage());
                 }
             }
         };
@@ -178,7 +177,7 @@ public class Socks5Transport extends BytestreamTransport {
     /**
      * Tests one of the bytestreams != null in the opposite direction. It
      * returns it if bidirectional or tries to wrap two unidirectional streams
-     * if possible. Else an exception is thrown. . The testing order is defined
+     * if possible. Else an exception is thrown. The testing order is defined by the boolean preferInSession.
      * 
      * @pre inSession!=null || outSession!=null
      * 
@@ -210,11 +209,10 @@ public class Socks5Transport extends BytestreamTransport {
             + " session is bidirectional");
 
         if (streamIsBidirectional(session, preferInSession)) {
-            log
-                .debug(msg
-                    + "but at least the server allows bidirectional connections. (using "
-                    + (preferInSession ? "incoming session"
-                        : "outgoing session") + ")");
+            log.debug(msg
+                + "but at least the server allows bidirectional connections. (using "
+                + (preferInSession ? "incoming session" : "outgoing session")
+                + ")");
             Util.closeQuietly(preferInSession ? outSession : inSession);
             return session;
         }
@@ -226,9 +224,8 @@ public class Socks5Transport extends BytestreamTransport {
                 "Could only establish one unidirectional connection but need two for wrapping.");
         }
 
-        log
-            .debug(msg
-                + "and the server does not allow bidirectional connections. Wrapped session established.");
+        log.debug(msg
+            + "and the server does not allow bidirectional connections. Wrapped session established.");
 
         return new WrappedBidirectionalSocks5BytestreamSession(inSession,
             outSession);
@@ -346,9 +343,8 @@ public class Socks5Transport extends BytestreamTransport {
                 + "Wrapping bidirectional stream was interrupted.");
             Util.closeQuietly(inSession);
         } catch (TimeoutException e) {
-            log
-                .error(prefix()
-                    + "Wrapping bidirectional stream timed out in Request! Shouldn't have happened.");
+            log.error(prefix()
+                + "Wrapping bidirectional stream timed out in Request! Shouldn't have happened.");
             Util.closeQuietly(inSession);
         }
 
@@ -396,10 +392,9 @@ public class Socks5Transport extends BytestreamTransport {
             }
 
         } catch (Exception e) {
-            log
-                .warn(prefix()
-                    + "Couldn't accept request but still trying to establish a response connection: "
-                    + e.getMessage());
+            log.warn(prefix()
+                + "Couldn't accept request but still trying to establish a response connection: "
+                + e.getMessage());
         }
 
         Socks5BytestreamSession outSession = null;
@@ -409,24 +404,22 @@ public class Socks5Transport extends BytestreamTransport {
             outSession = responseFuture.get();
 
             if (outSession.isDirect()) {
-                log
-                    .debug(prefix()
-                        + "newly established session is direct! Discarding the other.");
+                log.debug(prefix()
+                    + "newly established session is direct! Discarding the other.");
                 Util.closeQuietly(inSession);
                 return new BinaryChannel(outSession,
                     NetTransferMode.SOCKS5_DIRECT);
             }
 
         } catch (IOException e) {
-            log
-                .error(
-                    prefix()
-                        + "Socket crashed while initiating sending session (for wrapping)",
-                    e);
+            log.error(
+                prefix()
+                    + "Socket crashed while initiating sending session (for wrapping)",
+                e);
         } catch (ExecutionException e) {
             log.error(
-                "An error occured while establishing a response connection ", e
-                    .getCause());
+                "An error occured while establishing a response connection ",
+                e.getCause());
         }
 
         if (inSession == null && outSession == null)
@@ -497,6 +490,12 @@ public class Socks5Transport extends BytestreamTransport {
                 exception = e;
             } catch (XMPPException e) {
                 exception = e;
+            } catch (Exception e) {
+                /*
+                 * catch any possible RuntimeException because we must wait for
+                 * the peer that may attempt to connect
+                 */
+                exception = e;
             }
 
             if (exception != null) {
@@ -518,9 +517,8 @@ public class Socks5Transport extends BytestreamTransport {
                     WAIT_FOR_RESPONSE_CONNECTION, TimeUnit.MILLISECONDS);
 
                 if (inSession.isDirect()) {
-                    log
-                        .debug(prefix()
-                            + "response connection is direct! Discarding the other.");
+                    log.debug(prefix()
+                        + "response connection is direct! Discarding the other.");
                     Util.closeQuietly(outSession);
                     return new BinaryChannel(inSession,
                         NetTransferMode.SOCKS5_DIRECT);
@@ -562,8 +560,8 @@ public class Socks5Transport extends BytestreamTransport {
 
         log.debug(prefix() + "Start to establish new response connection");
 
-        return manager.establishSession(peer.toString(), this
-            .getNextResponseSessionID());
+        return manager.establishSession(peer.toString(),
+            this.getNextResponseSessionID());
     }
 
     @Override
@@ -593,9 +591,8 @@ public class Socks5Transport extends BytestreamTransport {
     public void disposeXMPPConnection() {
         List<Runnable> notCommenced = executorService.shutdownNow();
         if (notCommenced.size() > 0)
-            log
-                .warn(prefix()
-                    + "threads for response connections found that didn't commence yet");
+            log.warn(prefix()
+                + "threads for response connections found that didn't commence yet");
         executorService = null;
         super.disposeXMPPConnection();
     }

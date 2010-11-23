@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
@@ -69,6 +71,9 @@ public class DataTransferManager implements IConnectionListener,
     protected PreferenceUtils preferenceUtils;
 
     protected ArrayList<ITransport> transports = null;
+
+    protected Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
+
     protected SessionIDObservable sessionID = null;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
@@ -110,9 +115,8 @@ public class DataTransferManager implements IConnectionListener,
                     for (JID jid : connections.keySet()) {
                         if (jid.toString().equals(presence.getFrom())) {
                             IBytestreamConnection c = connections.remove(jid);
-                            log
-                                .debug(jid.getBase()
-                                    + " is not available anymore. Bytestream connection closed.");
+                            log.debug(jid.getBase()
+                                + " is not available anymore. Bytestream connection closed.");
                             c.close();
                         }
                     }
@@ -311,8 +315,8 @@ public class DataTransferManager implements IConnectionListener,
 
         JID recipient = transferData.recipient;
 
-        IBytestreamConnection connection = getConnection(recipient, progress
-            .newChild(1));
+        IBytestreamConnection connection = getConnection(recipient,
+            progress.newChild(1));
 
         try {
             StopWatch watch = new StopWatch().start();
@@ -325,8 +329,8 @@ public class DataTransferManager implements IConnectionListener,
 
             watch.stop();
 
-            transferModeDispatch.transferFinished(recipient, connection
-                .getMode(), false, input.length, watch.getTime());
+            transferModeDispatch.transferFinished(recipient,
+                connection.getMode(), false, input.length, watch.getTime());
         } catch (SarosCancellationException e) {
             throw e; // Rethrow to circumvrent the Exception catch below
         } catch (IOException e) {
@@ -367,18 +371,34 @@ public class DataTransferManager implements IConnectionListener,
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
                 log.error(Util.prefix(recipient) + "Failed to connect using "
-                    + transport.toString() + ":", e.getCause() == null ? e : e
-                    .getCause());
+                    + transport.toString() + ":",
+                    e.getCause() == null ? e : e.getCause());
+                errors.put(transport.getDefaultNetTransferMode(), e.getCause());
+            } catch (InterruptedException e) {
+                throw e;
+            } catch (Exception e) {
+                log.error(Util.prefix(recipient) + "Failed to connect using "
+                    + transport.toString() + " because of an unknown error:", e);
+                errors.put(transport.getDefaultNetTransferMode(), e);
             }
             if (connection != null)
                 break;
         }
 
-        if (connection == null)
-            throw new IOException(Util.prefix(recipient)
-                + "Exhausted all transport options: "
-                + Arrays.toString(transports.toArray()));
-        else
+        if (connection == null) {
+
+            StringBuilder errorMsg = new StringBuilder(
+                "Exhausted all transport options: ");
+
+            for (Entry<NetTransferMode, Throwable> entry : errors.entrySet()) {
+                errorMsg.append(entry.getKey() + ": "
+                    + entry.getValue().getMessage() + ", ");
+            }
+
+            errorMsg.delete(errorMsg.length() - 2, errorMsg.length());
+
+            throw new IOException(Util.prefix(recipient) + errorMsg.toString());
+        } else
             connectionChanged(recipient, connection);
         return connection;
     }
@@ -471,17 +491,8 @@ public class DataTransferManager implements IConnectionListener,
      * smack API would be the place to implement it and there we should put our
      * effort.
      */
-    protected void updateFileTransferByChatOnly() {
-        if (preferenceUtils.forceFileTranserByChat()) {
-            if (transports.size() == 1)
-                return;
-            else {
-                initTransports();
-            }
-        } else if (transports.size() == 1) {
-            addPrimaryTransports();
-
-        }
+    protected void initTransports() {
+        initTransports(preferenceUtils.forceFileTranserByChat());
     }
 
     /**
@@ -489,9 +500,9 @@ public class DataTransferManager implements IConnectionListener,
      * (PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT only). The last method is
      * the in-band bytestream. see also addPrimaryTransports()
      */
-    protected void initTransports() {
+    protected void initTransports(boolean chatOnly) {
         this.transports = new ArrayList<ITransport>();
-        if (!preferenceUtils.forceFileTranserByChat()) {
+        if (!chatOnly) {
             addPrimaryTransports();
         }
         transports.add(IBBTransport.getTransport());
@@ -513,7 +524,7 @@ public class DataTransferManager implements IConnectionListener,
         UNKNOWN("???", "???", false), //
         IBB("IBB", "XEP 47 In-Band Bytestream", false), //
         JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), //
-        JINGLEUDP("Jingle/UDP", "XEP 166 Jingle (UDP)", true), // 
+        JINGLEUDP("Jingle/UDP", "XEP 166 Jingle (UDP)", true), //
         HANDMADE("Chat", "Chat", false), //
         SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), //
         SOCKS5_MEDIATED("SOCKS5 (mediated)", "XEP 65 SOCKS5", true), //
@@ -571,11 +582,10 @@ public class DataTransferManager implements IConnectionListener,
     protected void prepareConnection(final XMPPConnection connection) {
         assert (this.connectionIsDisposed());
 
-        this.updateFileTransferByChatOnly();
+        this.initTransports();
 
-        log
-            .debug("Prepare bytestreams for XMPP connection. Used transport order: "
-                + Arrays.toString(transports.toArray()));
+        log.debug("Prepare bytestreams for XMPP connection. Used transport order: "
+            + Arrays.toString(transports.toArray()));
 
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
@@ -595,8 +605,8 @@ public class DataTransferManager implements IConnectionListener,
 
         List<IBytestreamConnection> openConnections;
         synchronized (connections) {
-            openConnections = new ArrayList<IBytestreamConnection>(connections
-                .values());
+            openConnections = new ArrayList<IBytestreamConnection>(
+                connections.values());
         }
         for (IBytestreamConnection connection : openConnections) {
             if (connection != null) {
@@ -668,9 +678,8 @@ public class DataTransferManager implements IConnectionListener,
 
             List<TransferDescription> transfers = getIncomingTransfers(from);
             if (!transfers.remove(transferDescription)) {
-                log
-                    .warn("Removing incoming transfer description that was never added!:"
-                        + transferDescription);
+                log.warn("Removing incoming transfer description that was never added!:"
+                    + transferDescription);
             }
         }
     }
