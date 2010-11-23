@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessio
 import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryJoinElement;
 import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryLeaveElement;
 import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryMessageReceptionElement;
-import de.fu_berlin.inf.dpp.communication.muc.singleton.ChatViewSingletonMUCManager;
+import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -76,7 +76,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
     protected ChatControl chatControl;
 
     @Inject
-    protected ChatViewSingletonMUCManager mucManager;
+    protected MUCManagerSingletonWrapperChatView mucManager;
 
     @Inject
     protected SarosSessionManager sessionManager;
@@ -98,7 +98,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
     /**
      * Adds/removes an {@link IMUCSessionListener} to/from the
-     * {@link ChatViewSingletonMUCManager} depending on its availability.
+     * {@link MUCManagerSingletonWrapperChatView} depending on its availability.
      */
     protected IMUCManagerListener mucManagerListener = new MUCManagerAdapter() {
         @Override
@@ -113,11 +113,11 @@ public class ChatView extends SimpleExplanatoryViewPart {
     };
 
     /**
-     * Handles events on the {@link ChatViewSingletonMUCManager}
+     * Handles events on the {@link MUCManagerSingletonWrapperChatView}
      */
     protected IMUCSessionListener mucSessionListener = new IMUCSessionListener() {
         public void joined(final JID jid) {
-            ChatView.this.addChatJoined(new MUCSessionHistoryJoinElement(jid,
+            ChatView.this.addChatLine(new MUCSessionHistoryJoinElement(jid,
                 new Date()));
 
             if (ChatView.this.isOwnJID(jid)) {
@@ -130,7 +130,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
         }
 
         public void left(final JID jid) {
-            ChatView.this.addChatLeave(new MUCSessionHistoryLeaveElement(jid,
+            ChatView.this.addChatLine(new MUCSessionHistoryLeaveElement(jid,
                 new Date()));
 
             if (ChatView.this.isOwnJID(jid)) {
@@ -144,8 +144,8 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
         public void messageReceived(final JID jid, final String message) {
             ChatView.this
-                .addChatMessageReception(new MUCSessionHistoryMessageReceptionElement(
-                    jid, new Date(), message));
+                .addChatLine(new MUCSessionHistoryMessageReceptionElement(jid,
+                    new Date(), message));
 
             /*
              * Beep when receiving a FOREIGN message
@@ -213,6 +213,8 @@ public class ChatView extends SimpleExplanatoryViewPart {
             if (mucManager.getMUCSession() != null) {
                 mucManager.getMUCSession().clearHistory();
             }
+
+            // TODO: Dispose used light colors here
         }
     };
 
@@ -244,12 +246,10 @@ public class ChatView extends SimpleExplanatoryViewPart {
          * IMPORTANT: The user can open and close Views as he wishes. This means
          * that the live cycle of this ChatView is completely independent of the
          * global MUCSession. Therefore we need to correctly validate the
-         * MUCSessions state when this ChatView is reopened.
+         * MUCSession's state when this ChatView is reopened.
          */
         if (this.joinedSession()) {
-            if (mucManager.getMUCSession() != null) {
-                attachToMUCSession(mucManager.getMUCSession());
-            }
+            this.attachToMUCSession(mucManager.getMUCSession());
         } else {
             this.showExplanation(howtoExplanation);
         }
@@ -274,8 +274,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
     protected Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
     /**
-     * Adds a new line to the chat control and logs it to the
-     * {@link MUCSessionHistory}
+     * Adds a new line to the chat control
      * 
      * @param jid
      * @param message
@@ -312,15 +311,15 @@ public class ChatView extends SimpleExplanatoryViewPart {
         });
     }
 
-    protected void addChatJoined(MUCSessionHistoryJoinElement join) {
+    protected void addChatLine(MUCSessionHistoryJoinElement join) {
         addChatLine(join.getSender(), "... joined the chat.", join.getDate());
     }
 
-    protected void addChatLeave(MUCSessionHistoryLeaveElement leave) {
+    protected void addChatLine(MUCSessionHistoryLeaveElement leave) {
         addChatLine(leave.getSender(), "... left the chat.", leave.getDate());
     }
 
-    protected void addChatMessageReception(
+    protected void addChatLine(
         MUCSessionHistoryMessageReceptionElement messageReception) {
         addChatLine(messageReception.getSender(),
             messageReception.getMessage(), messageReception.getDate());
@@ -340,17 +339,17 @@ public class ChatView extends SimpleExplanatoryViewPart {
         chatControl.silentClear();
         for (MUCSessionHistoryElement element : entries) {
             if (element instanceof MUCSessionHistoryJoinElement)
-                addChatJoined((MUCSessionHistoryJoinElement) element);
+                addChatLine((MUCSessionHistoryJoinElement) element);
             if (element instanceof MUCSessionHistoryLeaveElement)
-                addChatLeave((MUCSessionHistoryLeaveElement) element);
+                addChatLine((MUCSessionHistoryLeaveElement) element);
             if (element instanceof MUCSessionHistoryMessageReceptionElement)
-                addChatMessageReception((MUCSessionHistoryMessageReceptionElement) element);
+                addChatLine((MUCSessionHistoryMessageReceptionElement) element);
         }
     }
 
     /**
      * Returns true if the provided JID equals the one used for connection to
-     * {@link ChatViewSingletonMUCManager}.
+     * {@link MUCManagerSingletonWrapperChatView}.
      * 
      * @param jid
      * @return
@@ -365,7 +364,8 @@ public class ChatView extends SimpleExplanatoryViewPart {
     }
 
     /**
-     * Returns true if the {@link ChatViewSingletonMUCManager} has been joined.
+     * Returns true if the {@link MUCManagerSingletonWrapperChatView} has been
+     * joined.
      * 
      * @return
      */
@@ -388,5 +388,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
         mucManager.removeMUCManagerListener(mucManagerListener);
         editorManager.removeSharedEditorListener(sharedEditorListener);
         super.dispose();
+
+        // TODO: Dispose used light colors here
     }
 }

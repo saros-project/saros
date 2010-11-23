@@ -84,7 +84,7 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
-import de.fu_berlin.inf.dpp.communication.muc.singleton.ChatViewSingletonMUCManager;
+import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -315,7 +315,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(LocalPresenceTracker.class);
         // this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MUCManager.class);
-        this.container.addComponent(ChatViewSingletonMUCManager.class);
+        this.container.addComponent(MUCManagerSingletonWrapperChatView.class);
         this.container.addComponent(PingPongCentral.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(PreferenceUtils.class);

@@ -15,15 +15,16 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.chat.ChatView;
 
 /**
- * This class handles the creation and destruction of the global
- * {@link MUCSession} used by the {@link ChatView}.
+ * This class handles the creation and destruction of the {@link MUCSession}
+ * used by the {@link ChatView}.
  * 
  * @author bkahlert
  */
 @Component(module = "communication")
-public class ChatViewSingletonMUCManager extends AbstractSingletonMUCManager {
+public class MUCManagerSingletonWrapperChatView extends
+    MUCManagerSingletonWrapper {
     private static final Logger log = Logger
-        .getLogger(ChatViewSingletonMUCManager.class);
+        .getLogger(MUCManagerSingletonWrapperChatView.class);
 
     protected ISarosSessionManager sarosSessionManager;
 
@@ -39,29 +40,29 @@ public class ChatViewSingletonMUCManager extends AbstractSingletonMUCManager {
                 .getOwnPreferences() : mucSessionPreferencesNegotiationManager
                 .getSessionPreferences();
 
-            ChatViewSingletonMUCManager.this.mucSession = mucManager
+            MUCManagerSingletonWrapperChatView.this.mucSession = mucManager
                 .connectMUC(preferences);
-            log.debug(ChatViewSingletonMUCManager.class.getSimpleName()
+            log.debug(MUCManagerSingletonWrapperChatView.class.getSimpleName()
                 + " created / joined.");
         }
 
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
-            assert ChatViewSingletonMUCManager.this.mucSession != null : ChatViewSingletonMUCManager.class
+            assert MUCManagerSingletonWrapperChatView.this.mucSession != null : MUCManagerSingletonWrapperChatView.class
                 .getSimpleName()
                 + " wants to leave a "
                 + MUCSession.class.getSimpleName()
                 + " that has never been created / joined.";
 
-            ChatViewSingletonMUCManager.this.mucSession.disconnect();
-            ChatViewSingletonMUCManager.this.mucSession = null;
-            log.debug(ChatViewSingletonMUCManager.class.getSimpleName()
+            MUCManagerSingletonWrapperChatView.this.mucSession.disconnect();
+            MUCManagerSingletonWrapperChatView.this.mucSession = null;
+            log.debug(MUCManagerSingletonWrapperChatView.class.getSimpleName()
                 + " left / destroyed.");
         }
     };
 
-    public ChatViewSingletonMUCManager(ISarosSessionManager sarosSessionManager,
-        MUCManager mucManager) {
+    public MUCManagerSingletonWrapperChatView(MUCManager mucManager,
+        ISarosSessionManager sarosSessionManager) {
         super(mucManager);
         this.sarosSessionManager = sarosSessionManager;
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);

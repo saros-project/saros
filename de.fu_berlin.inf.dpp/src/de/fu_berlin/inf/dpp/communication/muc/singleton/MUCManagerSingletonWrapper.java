@@ -16,10 +16,13 @@ import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
  * {@link IMUCManagerListener}s. In difference to the {@link MUCManager} this
  * class only fires events affect the single {@link MUCSession} this class is
  * responsible for.
+ * <p>
+ * Consequently the passed {@link MUCSession} reference in all
+ * {@link IMUCManagerListener} methods always equals {@link #getMUCSession()}.
  * 
  * @author bkahlert
  */
-public abstract class AbstractSingletonMUCManager {
+public abstract class MUCManagerSingletonWrapper {
 
     protected MUCManager mucManager;
 
@@ -27,42 +30,42 @@ public abstract class AbstractSingletonMUCManager {
 
     /**
      * This {@link IMUCManagerListener} forwards all events that have it's
-     * origin in this {@link AbstractSingletonMUCManager}.
+     * origin in this {@link MUCManagerSingletonWrapper}.
      * <p>
      * It uses the used {@link MUCSessionPreferences} to compare the equality.
      */
     protected IMUCManagerListener mucManagerListener = new IMUCManagerListener() {
         public void mucSessionCreated(MUCSession mucSession) {
-            if (mucSession.getPreferences() == AbstractSingletonMUCManager.this
+            if (mucSession.getPreferences() == MUCManagerSingletonWrapper.this
                 .getPreferences()) {
-                for (IMUCManagerListener mucManagerListener : AbstractSingletonMUCManager.this.mucManagerListeners) {
+                for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
                     mucManagerListener.mucSessionCreated(mucSession);
                 }
             }
         }
 
         public void mucSessionJoined(MUCSession mucSession) {
-            if (mucSession.getPreferences() == AbstractSingletonMUCManager.this
+            if (mucSession.getPreferences() == MUCManagerSingletonWrapper.this
                 .getPreferences()) {
-                for (IMUCManagerListener mucManagerListener : AbstractSingletonMUCManager.this.mucManagerListeners) {
+                for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
                     mucManagerListener.mucSessionJoined(mucSession);
                 }
             }
         }
 
         public void mucSessionLeft(MUCSession mucSession) {
-            if (mucSession.getPreferences() == AbstractSingletonMUCManager.this
+            if (mucSession.getPreferences() == MUCManagerSingletonWrapper.this
                 .getPreferences()) {
-                for (IMUCManagerListener mucManagerListener : AbstractSingletonMUCManager.this.mucManagerListeners) {
+                for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
                     mucManagerListener.mucSessionLeft(mucSession);
                 }
             }
         }
 
         public void mucSessionDestroyed(MUCSession mucSession) {
-            if (mucSession.getPreferences() == AbstractSingletonMUCManager.this
+            if (mucSession.getPreferences() == MUCManagerSingletonWrapper.this
                 .getPreferences()) {
-                for (IMUCManagerListener mucManagerListener : AbstractSingletonMUCManager.this.mucManagerListeners) {
+                for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
                     mucManagerListener.mucSessionDestroyed(mucSession);
                 }
             }
@@ -71,7 +74,7 @@ public abstract class AbstractSingletonMUCManager {
 
     protected List<IMUCManagerListener> mucManagerListeners = new ArrayList<IMUCManagerListener>();
 
-    public AbstractSingletonMUCManager(MUCManager mucManager) {
+    public MUCManagerSingletonWrapper(MUCManager mucManager) {
         this.mucManager = mucManager;
         this.mucManager.addMUCManagerListener(mucManagerListener);
     }
