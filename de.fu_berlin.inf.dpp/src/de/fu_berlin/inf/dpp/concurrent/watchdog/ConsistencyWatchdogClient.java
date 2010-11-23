@@ -37,12 +37,12 @@ import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
@@ -80,7 +80,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     /**
      * @Inject Injected via Constructor Injection
      */
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     @Inject
     protected RemoteProgressManager remoteProgressManager;
@@ -91,7 +91,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected Map<SPath, ChecksumActivity> latestChecksums = new HashMap<SPath, ChecksumActivity>();
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
             @Override
@@ -134,13 +134,13 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
     };
 
-    public ConsistencyWatchdogClient(SessionManager sessionManager) {
+    public ConsistencyWatchdogClient(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
+        this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
     public void dispose() {
-        this.sessionManager.removeSessionListener(sessionListener);
+        this.sessionManager.removeSarosSessionListener(sessionListener);
     }
 
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {

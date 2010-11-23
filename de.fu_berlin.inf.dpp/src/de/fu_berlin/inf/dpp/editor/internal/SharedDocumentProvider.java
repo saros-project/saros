@@ -8,12 +8,12 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This Document provider tries tell others that files are not editable if not a
@@ -28,11 +28,11 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     protected ISarosSession sarosSession;
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected boolean isDriver;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -60,13 +60,13 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
         }
     };
 
-    public SharedDocumentProvider(SessionManager sessionManager) {
+    public SharedDocumentProvider(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
 
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     /**
@@ -82,7 +82,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     @Override

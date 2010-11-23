@@ -11,12 +11,12 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -50,7 +50,7 @@ public class FollowModeAction extends Action implements Disposable {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
 
@@ -117,13 +117,13 @@ public class FollowModeAction extends Action implements Disposable {
         }
     };
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected EditorManager editorManager;
 
     protected Saros saros;
 
-    public FollowModeAction(Saros saros, SessionManager sessionManager,
+    public FollowModeAction(Saros saros, SarosSessionManager sessionManager,
         EditorManager editorManager) {
         super(null, AS_CHECK_BOX);
 
@@ -135,7 +135,7 @@ public class FollowModeAction extends Action implements Disposable {
         setToolTipText("Enable/disable follow mode");
         setId(ACTION_ID);
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         editorManager.addSharedEditorListener(editorListener);
 
         updateEnablement();
@@ -209,7 +209,7 @@ public class FollowModeAction extends Action implements Disposable {
     }
 
     public void dispose() {
-        sessionManager.removeSessionListener(sessionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
     }
 }

@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.ui.ChangeColorDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -40,7 +40,7 @@ public class ChangeColorAction extends SelectionProviderAction implements Dispos
     .getLogger(ChangeColorAction.class.getName());
 
     @Inject
-    protected ISessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     @Inject
     protected Saros saros;

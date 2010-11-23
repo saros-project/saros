@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * Collects the role changes of the local user. It is measured how long the user
@@ -67,7 +67,7 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
     };
 
     public RoleChangeCollector(StatisticManager statisticManager,
-        SessionManager sessionManager) {
+        SarosSessionManager sessionManager) {
         super(statisticManager, sessionManager);
     }
 

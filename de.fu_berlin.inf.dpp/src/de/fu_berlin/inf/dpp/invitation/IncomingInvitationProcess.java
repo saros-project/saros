@@ -66,7 +66,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.FileUtil;
@@ -93,7 +93,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
      * The project ID sent to us by the host with this invitation.
      */
     protected String projectName;
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
     protected JoinSessionWizard inInvitationUI;
     protected VersionManager versionManager;
     protected DateTime sessionStart;
@@ -111,7 +111,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SarosCancellationException cancellationCause;
 
-    public IncomingInvitationProcess(SessionManager sessionManager,
+    public IncomingInvitationProcess(SarosSessionManager sessionManager,
         ITransmitter transmitter, JID from, String projectName,
         String description, int colorID,
         InvitationProcessObservable invitationProcesses,
@@ -202,6 +202,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         boolean skipSync, SubMonitor monitor) throws SarosCancellationException {
 
         log.debug("Inv" + Util.prefix(peer) + ": Invitation accepted.");
+
         // The second monitor we use during the invitation.
         this.monitor = monitor;
 

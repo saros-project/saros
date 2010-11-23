@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.feedback;
 
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * Abstract base class for a StatisticCollector which registers itself with a
@@ -29,7 +29,7 @@ public abstract class AbstractStatisticCollector {
      * The listener gets notified on session start and session end. It clears
      * the previous data on session end and notifies the StatisticManager.
      */
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             doOnSessionStart(newSarosSession);
@@ -52,12 +52,12 @@ public abstract class AbstractStatisticCollector {
      * @param sessionManager
      */
     public AbstractStatisticCollector(StatisticManager statisticManager,
-        SessionManager sessionManager) {
+        SarosSessionManager sessionManager) {
         this.statisticManager = statisticManager;
         this.data = new SessionStatistic();
 
         statisticManager.registerCollector(this);
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     /**

@@ -10,14 +10,14 @@ import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
- * An interface behind which the {@link SessionManager} hides its non-public
+ * An interface behind which the {@link SarosSessionManager} hides its non-public
  * methods.
  * 
  * The (I)SessionManager is responsible for providing a link between the
@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * can change many times during the course of the plug-in life-cycle.
  */
 @Component(module = "net")
-public interface ISessionManager {
+public interface ISarosSessionManager {
 
     /**
      * @return the active SarosSession object or <code>null</code> if there is
@@ -88,7 +88,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be added.
      */
-    public void addSessionListener(ISessionListener listener);
+    public void addSarosSessionListener(ISarosSessionListener listener);
 
     /**
      * Removes the given session listener. Is ignored if the given listener
@@ -97,7 +97,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be removed.
      */
-    public void removeSessionListener(ISessionListener listener);
+    public void removeSarosSessionListener(ISarosSessionListener listener);
 
     /**
      * Is fired when an incoming invitation is received.
@@ -115,7 +115,7 @@ public interface ISessionManager {
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID, boolean doStream, CommunicationPreferences comPrefs);
+        String invitationID, boolean doStream, MUCSessionPreferences comPrefs);
 
     /*
      * @see IConnectionListener

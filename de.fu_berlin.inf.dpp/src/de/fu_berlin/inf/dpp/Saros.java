@@ -82,7 +82,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
-import de.fu_berlin.inf.dpp.communication.multiUserChat.MessagingManager;
+import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
+import de.fu_berlin.inf.dpp.communication.muc.singleton.ChatViewSingletonMUCManager;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -146,7 +148,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.PingPongCentral;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
@@ -155,7 +157,6 @@ import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -210,7 +211,7 @@ public class Saros extends AbstractUIPlugin {
 
     public String sarosFeatureID;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected MutablePicoContainer container;
 
@@ -313,7 +314,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(LocalPresenceTracker.class);
         // this.container.addComponent(MultiUserChatManager.class);
-        this.container.addComponent(MessagingManager.class);
+        this.container.addComponent(MUCManager.class);
+        this.container.addComponent(ChatViewSingletonMUCManager.class);
         this.container.addComponent(PingPongCentral.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(PreferenceUtils.class);
@@ -321,7 +323,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RosterTracker.class);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
-        this.container.addComponent(SessionManager.class);
+        this.container.addComponent(SarosSessionManager.class);
         this.container.addComponent(SessionViewOpener.class);
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(SkypeManager.class);
@@ -334,7 +336,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VideoSharing.class);
         this.container.addComponent(VersionManager.class);
-        this.container.addComponent(CommunicationNegotiatingManager.class);
+        this.container
+            .addComponent(MUCSessionPreferencesNegotiatingManager.class);
         this.container.addComponent(XMPPReceiver.class);
         this.container.addComponent(XMPPTransmitter.class);
         this.container.addComponent(RemoteProgressManager.class);
@@ -549,7 +552,7 @@ public class Saros extends AbstractUIPlugin {
         // instantiated
         container.getComponents(Object.class);
 
-        this.sessionManager = container.getComponent(SessionManager.class);
+        this.sessionManager = container.getComponent(SarosSessionManager.class);
 
         isInitialized = true;
 
@@ -761,7 +764,6 @@ public class Saros extends AbstractUIPlugin {
 
             setConnectionState(ConnectionState.CONNECTING, null);
             this.connection = new XMPPConnection(getConnectionConfiguration());
-
             this.connection.connect();
 
             // add connection listener so we get notified if it will be closed

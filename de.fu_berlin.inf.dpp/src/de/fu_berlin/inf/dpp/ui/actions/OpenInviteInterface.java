@@ -4,10 +4,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -20,7 +20,7 @@ public class OpenInviteInterface extends Action {
     private static final Logger log = Logger
         .getLogger(OpenInviteInterface.class.getName());
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             setEnabled(newSarosSession.isHost());
@@ -32,16 +32,16 @@ public class OpenInviteInterface extends Action {
         }
     };
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
-    public OpenInviteInterface(SessionManager sessionManager) {
+    public OpenInviteInterface(SarosSessionManager sessionManager) {
         super();
         this.sessionManager = sessionManager;
 
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/invites.png"));
         setToolTipText("Open invitation interface");
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
 
         // Needed when the Interface is created during a session
         ISarosSession sarosSession = sessionManager.getSarosSession();

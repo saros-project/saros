@@ -20,10 +20,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -52,7 +52,7 @@ public class StatisticManager extends AbstractFeedbackManager {
     protected Set<AbstractStatisticCollector> allCollectors;
     protected Set<AbstractStatisticCollector> activeCollectors;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -67,13 +67,13 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     };
 
-    public StatisticManager(Saros saros, SessionManager sessionManager,
+    public StatisticManager(Saros saros, SarosSessionManager sessionManager,
         FeedbackManager feedbackManager) {
         super(saros);
         this.feedbackManager = feedbackManager;
         this.allCollectors = new HashSet<AbstractStatisticCollector>();
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         logFeedbackSettings();
     }
 

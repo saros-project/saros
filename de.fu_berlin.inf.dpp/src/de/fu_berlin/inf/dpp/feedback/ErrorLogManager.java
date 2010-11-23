@@ -19,10 +19,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 
 /**
@@ -44,12 +44,12 @@ public class ErrorLogManager extends AbstractFeedbackManager {
     protected static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
     protected StatisticManager statisticManager;
     protected SessionIDObservable sessionID;
     protected String currentSessionID;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -65,14 +65,14 @@ public class ErrorLogManager extends AbstractFeedbackManager {
 
     };
 
-    public ErrorLogManager(Saros saros, SessionManager sessionManager,
+    public ErrorLogManager(Saros saros, SarosSessionManager sessionManager,
         StatisticManager statisticManager, SessionIDObservable sessionID) {
         super(saros);
         this.sessionManager = sessionManager;
         this.statisticManager = statisticManager;
         this.sessionID = sessionID;
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
 
         logErrorLogSettings();
     }

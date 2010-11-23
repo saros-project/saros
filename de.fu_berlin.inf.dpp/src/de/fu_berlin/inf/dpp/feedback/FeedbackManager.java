@@ -17,16 +17,16 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The FeedbackManager registers himself as a listener with the
- * {@link SessionManager} to show a {@link FeedbackDialog} at the end of a
+ * {@link SarosSessionManager} to show a {@link FeedbackDialog} at the end of a
  * session. But before he actually shows anything, it is determined from the
  * global preferences if the user wants to participate in general and in which
  * interval.
@@ -57,7 +57,7 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected static final Logger log = Logger.getLogger(FeedbackManager.class
         .getName());
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -136,10 +136,10 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected Date startTime;
     protected long sessionTime;
 
-    public FeedbackManager(final Saros saros, SessionManager sessionManager) {
+    public FeedbackManager(final Saros saros, SarosSessionManager sessionManager) {
         super(saros);
         // listen for start and end of a session
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         // listen for feedback preference changes
         saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
     }

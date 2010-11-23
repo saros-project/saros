@@ -42,10 +42,10 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -63,7 +63,7 @@ public class InviteAction extends SelectionProviderAction {
 
     protected DiscoveryManager discoveryManager;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             updateEnablement();
@@ -75,11 +75,11 @@ public class InviteAction extends SelectionProviderAction {
         }
     };
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
     protected Saros saros;
     protected InvitationProcessObservable invitationProcesses;
 
-    public InviteAction(SessionManager sessionManager, Saros saros,
+    public InviteAction(SarosSessionManager sessionManager, Saros saros,
         ISelectionProvider provider, DiscoveryManager discoManager,
         InvitationProcessObservable invitationProcesses) {
         super(provider, "Invite user...");
@@ -91,7 +91,7 @@ public class InviteAction extends SelectionProviderAction {
         this.saros = saros;
         this.discoveryManager = discoManager;
         this.invitationProcesses = invitationProcesses;
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
 
         updateEnablement();
     }

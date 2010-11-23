@@ -24,9 +24,9 @@ import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -66,44 +66,46 @@ public class ConsistencyWatchdogServer extends Job {
     @Inject
     protected XMPPTransmitter transmitter;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
-    public ConsistencyWatchdogServer(SessionManager sessionManager) {
+    public ConsistencyWatchdogServer(SarosSessionManager sessionManager) {
         super("ConsistencyWatchdog");
 
         this.sessionManager = sessionManager;
 
-        this.sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISarosSession newSarosSession) {
+        this.sessionManager
+            .addSarosSessionListener(new AbstractSarosSessionListener() {
+                @Override
+                public void sessionStarted(ISarosSession newSarosSession) {
 
-                if (newSarosSession.isHost()) {
-                    sarosSession = newSarosSession;
-                    log.debug("Starting consistency watchdog");
-                    setSystem(true);
-                    setPriority(Job.SHORT);
-                    schedule(10000);
-                }
-            }
-
-            @Override
-            public void sessionEnded(ISarosSession oldSarosSession) {
-
-                if (sarosSession != null) {
-                    // Cancel Job
-                    cancel();
-                    sarosSession = null;
-
-                    // Unregister from all documents
-                    for (DocumentChecksum document : docsChecksums.values()) {
-                        document.dispose();
+                    if (newSarosSession.isHost()) {
+                        sarosSession = newSarosSession;
+                        log.debug("Starting consistency watchdog");
+                        if (!isSystem())
+                            setSystem(true);
+                        setPriority(Job.SHORT);
+                        schedule(10000);
                     }
-                    docsChecksums.clear();
                 }
-            }
-        });
+
+                @Override
+                public void sessionEnded(ISarosSession oldSarosSession) {
+
+                    if (sarosSession != null) {
+                        // Cancel Job
+                        cancel();
+                        sarosSession = null;
+
+                        // Unregister from all documents
+                        for (DocumentChecksum document : docsChecksums.values()) {
+                            document.dispose();
+                        }
+                        docsChecksums.clear();
+                    }
+                }
+            });
     }
 
     @Override
@@ -194,11 +196,10 @@ public class ConsistencyWatchdogServer extends Job {
                     // Null means that the document does not exist locally
                     if (doc == null) {
                         if (localEditors.contains(docPath)) {
-                            log
-                                .error("EditorManager is in an inconsistent state. "
-                                    + "It is reporting a locally open editor but no"
-                                    + " document could be found on disk: "
-                                    + docPath);
+                            log.error("EditorManager is in an inconsistent state. "
+                                + "It is reporting a locally open editor but no"
+                                + " document could be found on disk: "
+                                + docPath);
                         }
                         if (!remoteEditors.contains(docPath)) {
                             /*

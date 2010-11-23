@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This class is responsible for parsing RequestForActivities and sending the
@@ -38,11 +38,11 @@ public class RequestForActivityHandler {
 
     protected SessionIDObservable sessionID;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected Handler handler;
 
-    public RequestForActivityHandler(SessionManager sessionManager,
+    public RequestForActivityHandler(SarosSessionManager sessionManager,
         XMPPReceiver receiver, SessionIDObservable sessionID) {
 
         this.sessionID = sessionID;

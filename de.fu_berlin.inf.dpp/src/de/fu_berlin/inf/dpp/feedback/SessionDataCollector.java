@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -48,7 +48,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
-        SessionManager sessionManager, SessionIDObservable sessionID,
+        SarosSessionManager sessionManager, SessionIDObservable sessionID,
         Saros saros, FeedbackManager feedbackManager) {
         super(statisticManager, sessionManager);
         this.sessionID = sessionID;

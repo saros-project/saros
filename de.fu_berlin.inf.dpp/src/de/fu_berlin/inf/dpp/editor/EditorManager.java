@@ -79,14 +79,14 @@ import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.RevertBufferListener;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
@@ -320,7 +320,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         protected RevertBufferListener buffListener;
 
@@ -429,7 +429,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     protected StopManager stopManager;
 
-    public EditorManager(Saros saros, SessionManager sessionManager,
+    public EditorManager(Saros saros, SarosSessionManager sessionManager,
         StopManager stopManager) {
 
         log.trace("EditorManager initialised");
@@ -437,7 +437,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         this.saros = saros;
 
         setEditorAPI(new EditorAPI(saros));
-        sessionManager.addSessionListener(this.sessionListener);
+        sessionManager.addSarosSessionListener(this.sessionListener);
 
         stopManager.addBlockable(stopManagerListener);
         this.stopManager = stopManager;
@@ -908,8 +908,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
     }
-    
-    protected void execColorChanged(){
+
+    protected void execColorChanged() {
         editorListener.colorChanged();
     }
 
@@ -1770,8 +1770,8 @@ public class EditorManager implements IActivityProvider, Disposable {
     public Set<SPath> getRemoteOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
     }
-    
-    public void colorChangend(){
+
+    public void colorChangend() {
         this.execColorChanged();
     }
 

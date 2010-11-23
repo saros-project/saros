@@ -9,12 +9,12 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -37,7 +37,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             newSarosSession.addListener(projectListener);
@@ -50,9 +50,9 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
-    public RemoveDriverRoleAction(SessionManager sessionManager,
+    public RemoveDriverRoleAction(SarosSessionManager sessionManager,
         ISelectionProvider provider) {
         super(provider, "Remove driver role");
         this.sessionManager = sessionManager;
@@ -60,7 +60,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user.png"));
         setToolTipText("Remove the driver role from this user.");
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         updateEnablement();
     }
 

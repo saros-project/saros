@@ -10,12 +10,12 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -38,7 +38,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             newSarosSession.addListener(projectListener);
@@ -54,7 +54,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     };
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     public GiveDriverRoleAction(ISelectionProvider provider) {
         super(provider, "Give driver role");
@@ -62,7 +62,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         setToolTipText("Give the driver role to this user");
 
         Saros.reinject(this);
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         updateEnablement();
     }
 

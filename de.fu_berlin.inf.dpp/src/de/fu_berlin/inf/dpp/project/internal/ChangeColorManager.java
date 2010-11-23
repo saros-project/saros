@@ -19,14 +19,14 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ChangeColorDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -42,7 +42,7 @@ public class ChangeColorManager implements IActivityProvider {
         .getName());
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
     @Inject
     protected EditorManager editorManager;
@@ -50,9 +50,9 @@ public class ChangeColorManager implements IActivityProvider {
     protected Saros saros;
     protected RGB rgbOfNewParticipant;
 
-    public ChangeColorManager(SessionManager sessionManager) {
+    public ChangeColorManager(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     public void addActivityListener(IActivityListener listener) {
@@ -81,7 +81,7 @@ public class ChangeColorManager implements IActivityProvider {
         this.activityListeners.remove(listener);
     }
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession project) {

@@ -11,10 +11,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -35,7 +35,7 @@ public class FollowThisPersonAction extends SelectionProviderAction {
 
     protected User selectedUser;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             update();
@@ -54,14 +54,14 @@ public class FollowThisPersonAction extends SelectionProviderAction {
         }
     };
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected EditorManager editorManager;
 
     protected Saros saros;
 
     public FollowThisPersonAction(ISelectionProvider provider, Saros saros,
-        SessionManager sessionManager, EditorManager editorManager) {
+        SarosSessionManager sessionManager, EditorManager editorManager) {
         super(provider, "Follow this user");
 
         this.saros = saros;
@@ -72,7 +72,7 @@ public class FollowThisPersonAction extends SelectionProviderAction {
         setToolTipText("Enable/disable follow mode");
         setId(ACTION_ID);
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         editorManager.addSharedEditorListener(editorListener);
 
         update();
@@ -130,7 +130,7 @@ public class FollowThisPersonAction extends SelectionProviderAction {
 
     @Override
     public void dispose() {
-        sessionManager.removeSessionListener(sessionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
     }
 

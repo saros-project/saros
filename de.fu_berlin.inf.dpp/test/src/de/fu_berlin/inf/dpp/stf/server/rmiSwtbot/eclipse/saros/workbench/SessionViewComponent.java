@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -112,7 +112,7 @@ public interface SessionViewComponent extends Remote {
     public void closeSessionView() throws RemoteException;
 
     /**
-     * Waits until the {@link SessionManager#getSarosSession()} is null.
+     * Waits until the {@link SarosSessionManager#getSarosSession()} is null.
      * <p>
      * <b>Attention</b>:<br/>
      * After a action is performed, you immediately try to assert a condition is
@@ -131,7 +131,7 @@ public interface SessionViewComponent extends Remote {
     public void waitUntilSessionClosed() throws RemoteException;
 
     /**
-     * Waits until the {@link SessionManager#getSarosSession()} is null.
+     * Waits until the {@link SarosSessionManager#getSarosSession()} is null.
      * <p>
      * <b>Attention</b>:<br/>
      * After a action is performed, you immediately try to assert a condition is

@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.State;
@@ -34,11 +34,11 @@ public interface SarosState extends State {
      * {@link SarosState#isInSession()} together in your junittests.
      * 
      * 
-     * @return <tt>true</tt> if {@link SessionManager#getSarosSession()} is not
+     * @return <tt>true</tt> if {@link SarosSessionManager#getSarosSession()} is not
      *         null.
      * 
      * @throws RemoteException
-     * @see SessionManager#getSarosSession()
+     * @see SarosSessionManager#getSarosSession()
      */
     public boolean isInSession() throws RemoteException;
 

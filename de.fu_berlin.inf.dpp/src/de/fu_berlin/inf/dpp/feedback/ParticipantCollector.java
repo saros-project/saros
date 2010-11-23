@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -85,7 +85,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
     };
 
     public ParticipantCollector(StatisticManager statisticManager,
-        SessionManager sessionManager) {
+        SarosSessionManager sessionManager) {
         super(statisticManager, sessionManager);
     }
 

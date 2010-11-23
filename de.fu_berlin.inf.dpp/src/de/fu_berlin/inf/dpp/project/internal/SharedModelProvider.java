@@ -15,9 +15,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This model provider is responsible for preventing an session observer from
@@ -82,25 +82,26 @@ public class SharedModelProvider extends ModelProvider {
     }
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     @Override
     protected void initialize() {
 
         Saros.reinject(this);
 
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISarosSession newSarosSession) {
-                sarosSession = newSarosSession;
-            }
+        sessionManager
+            .addSarosSessionListener(new AbstractSarosSessionListener() {
+                @Override
+                public void sessionStarted(ISarosSession newSarosSession) {
+                    sarosSession = newSarosSession;
+                }
 
-            @Override
-            public void sessionEnded(ISarosSession oldSarosSession) {
-                assert sarosSession == oldSarosSession;
-                sarosSession = null;
-            }
-        });
+                @Override
+                public void sessionEnded(ISarosSession oldSarosSession) {
+                    assert sarosSession == oldSarosSession;
+                    sarosSession = null;
+                }
+            });
         this.sarosSession = sessionManager.getSarosSession();
     }
 

@@ -24,13 +24,13 @@ import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -44,7 +44,7 @@ public class RemoteProgressManager {
     private static final Logger log = Logger
         .getLogger(RemoteProgressManager.class);
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -201,7 +201,7 @@ public class RemoteProgressManager {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSharedProject) {
@@ -225,9 +225,9 @@ public class RemoteProgressManager {
         }
     };
 
-    public RemoteProgressManager(SessionManager sessionManager) {
+    public RemoteProgressManager(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
+        this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
     protected SimpleDateFormat format = new SimpleDateFormat("HHmmssSS");

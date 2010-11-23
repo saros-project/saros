@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This collector collects information about selections made by observers that
@@ -198,7 +198,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
     };
 
     public SelectionCollector(StatisticManager statisticManager,
-        SessionManager sessionManager, EditorManager editorManager) {
+        SarosSessionManager sessionManager, EditorManager editorManager) {
         super(statisticManager, sessionManager);
 
         editorManager.addSharedEditorListener(editorListener);

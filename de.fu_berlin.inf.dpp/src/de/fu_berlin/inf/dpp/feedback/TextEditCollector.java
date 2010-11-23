@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -258,7 +258,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
     };
 
     public TextEditCollector(StatisticManager statisticManager,
-        SessionManager sessionManager, EditorManager editorManager) {
+        SarosSessionManager sessionManager, EditorManager editorManager) {
         super(statisticManager, sessionManager);
 
         editorManager.addSharedEditorListener(editorListener);

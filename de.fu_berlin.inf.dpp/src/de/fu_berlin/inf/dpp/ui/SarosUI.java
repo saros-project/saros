@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
@@ -89,9 +89,9 @@ public class SarosUI {
     @Inject
     XMPPAccountStore accountStore;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
-    public SarosUI(SessionManager sessionManager) {
+    public SarosUI(SarosSessionManager sessionManager) {
 
         this.sessionManager = sessionManager;
 

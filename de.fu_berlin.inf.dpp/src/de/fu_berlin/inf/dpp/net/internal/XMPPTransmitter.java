@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -89,7 +90,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -189,7 +189,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
     public void sendInvitation(String projectID, JID guest, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
         DateTime sessionStart, boolean doStream,
-        CommunicationPreferences comPrefs) {
+        MUCSessionPreferences comPrefs) {
 
         log.trace("Sending invitation to " + Util.prefix(guest)
             + " with description " + description);

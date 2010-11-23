@@ -75,10 +75,10 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionOutputStream
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -122,7 +122,7 @@ public class StreamServiceManager implements Startable {
 
     protected Saros saros;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     @Inject
     protected SessionIDObservable sarosSessionID;
@@ -195,7 +195,7 @@ public class StreamServiceManager implements Startable {
         DataTransferManager dataTransferManager,
         SarosSessionObservable sarosSessionObservable,
         Saros saros,
-        SessionManager sessionManager,
+        SarosSessionManager sessionManager,
         List<StreamService> streamServices,
         IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider) {
 
@@ -322,7 +322,7 @@ public class StreamServiceManager implements Startable {
                 }
 
             });
-        sessionManager.addSessionListener(new SessionListener());
+        sessionManager.addSarosSessionListener(new SessionListener());
     }
 
     /**
@@ -1878,7 +1878,7 @@ public class StreamServiceManager implements Startable {
     /**
      * Resets the {@link StreamServiceManager} when saros' session stopped.
      */
-    protected final class SessionListener implements ISessionListener {
+    protected final class SessionListener extends AbstractSarosSessionListener {
 
         public void invitationReceived(IncomingInvitationProcess invitation) {
             // NOP

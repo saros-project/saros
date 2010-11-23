@@ -34,11 +34,11 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -61,7 +61,7 @@ public class ConsistencyWatchdogHandler {
     @Inject
     protected StopManager stopManager;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -79,7 +79,7 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSharedProject) {
             sarosSession = newSharedProject;
@@ -95,9 +95,9 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
-    public ConsistencyWatchdogHandler(SessionManager sessionManager) {
+    public ConsistencyWatchdogHandler(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
+        this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
     /**

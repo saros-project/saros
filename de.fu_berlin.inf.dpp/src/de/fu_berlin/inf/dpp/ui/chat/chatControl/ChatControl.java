@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatControlListener;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
@@ -187,7 +187,8 @@ public class ChatControl extends Composite {
      * 
      * @param chatControlListener
      */
-    public void removeChatListener(IChatControlListener chatControlListener) {
+    public void removeChatControlListener(
+        IChatControlListener chatControlListener) {
         this.chatControlListeners.removeElement(chatControlListener);
     }
 
@@ -199,8 +200,8 @@ public class ChatControl extends Composite {
      */
     public void notifyCharacterEntered(Character character) {
         for (IChatControlListener chatControlListener : this.chatControlListeners) {
-            chatControlListener.characterEntered(new CharacterEnteredEvent(this,
-                character));
+            chatControlListener.characterEntered(new CharacterEnteredEvent(
+                this, character));
         }
     }
 
@@ -212,7 +213,8 @@ public class ChatControl extends Composite {
      */
     public void notifyMessageEntered(String message) {
         for (IChatControlListener chatControlListener : this.chatControlListeners) {
-            chatControlListener.messageEntered(new MessageEnteredEvent(this, message));
+            chatControlListener.messageEntered(new MessageEnteredEvent(this,
+                message));
         }
     }
 
@@ -226,10 +228,17 @@ public class ChatControl extends Composite {
     }
 
     /**
-     * Clears the ChatDisplay
+     * @see ChatDisplay#clear()
      */
     public void clear() {
         this.chatDisplay.clear();
+    }
+
+    /**
+     * @see ChatDisplay#silentClear()
+     */
+    public void silentClear() {
+        this.chatDisplay.silentClear();
     }
 
     @Override

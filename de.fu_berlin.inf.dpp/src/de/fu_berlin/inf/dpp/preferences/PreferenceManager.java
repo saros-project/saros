@@ -8,9 +8,9 @@ import org.eclipse.core.resources.IProject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator.IRestorePoint;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * The Preference Manager is responsible for
@@ -29,15 +29,16 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 /*
  * FIXME This class registers a SessionListener for project specific stuff. It
  * should not rely on the fact that a project is only added when a new session
- * starts. We need a new type of listener to handle the addition of a project to a session.
+ * starts. We need a new type of listener to handle the addition of a project to
+ * a session.
  */
 @Component(module = "prefs")
-public class PreferenceManager implements ISessionListener {
+public class PreferenceManager extends AbstractSarosSessionListener {
     protected List<IPreferenceManipulator> manipulators = new ArrayList<IPreferenceManipulator>();
 
     protected List<IRestorePoint> restorePoints = new ArrayList<IRestorePoint>();
 
-    public PreferenceManager(JDTFacade jdtFacade, SessionManager sessionManager) {
+    public PreferenceManager(JDTFacade jdtFacade, SarosSessionManager sessionManager) {
 
         // collect PreferenceManipulators
         if (jdtFacade.isJDTAvailable()) {
@@ -46,7 +47,7 @@ public class PreferenceManager implements ISessionListener {
         manipulators.add(new LineDelimiterManipulator());
         manipulators.add(new EncodingManipulator());
 
-        sessionManager.addSessionListener(this);
+        sessionManager.addSarosSessionListener(this);
     }
 
     public void sessionStarted(ISarosSession newSarosSession) {

@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
@@ -53,7 +53,7 @@ public class StartupSaros implements IStartup {
     protected ErrorLogManager errorLogManager;
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     @Inject
     protected DataTransferManager dataTransferManager;

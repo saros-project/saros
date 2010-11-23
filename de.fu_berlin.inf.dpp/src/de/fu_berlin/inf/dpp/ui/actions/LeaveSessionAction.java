@@ -26,9 +26,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -45,26 +45,27 @@ public class LeaveSessionAction extends Action {
     private static final Logger log = Logger.getLogger(LeaveSessionAction.class
         .getName());
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
-    public LeaveSessionAction(SessionManager sessionManager) {
+    public LeaveSessionAction(SarosSessionManager sessionManager) {
 
         this.sessionManager = sessionManager;
 
         setToolTipText("Leave the session");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
 
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISarosSession newSarosSession) {
-                updateEnablement();
-            }
+        sessionManager
+            .addSarosSessionListener(new AbstractSarosSessionListener() {
+                @Override
+                public void sessionStarted(ISarosSession newSarosSession) {
+                    updateEnablement();
+                }
 
-            @Override
-            public void sessionEnded(ISarosSession oldSarosSession) {
-                updateEnablement();
-            }
-        });
+                @Override
+                public void sessionEnded(ISarosSession oldSarosSession) {
+                    updateEnablement();
+                }
+            });
 
         updateEnablement();
     }

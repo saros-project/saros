@@ -47,6 +47,9 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -72,8 +75,6 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -86,10 +87,11 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * @author rdjemili
  */
 @Component(module = "core")
-public class SessionManager implements IConnectionListener, ISessionManager {
+public class SarosSessionManager implements IConnectionListener,
+    ISarosSessionManager {
 
-    private static Logger log = Logger
-        .getLogger(SessionManager.class.getName());
+    private static Logger log = Logger.getLogger(SarosSessionManager.class
+        .getName());
 
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
@@ -119,7 +121,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected VersionManager versionManager;
 
     @Inject
-    protected CommunicationNegotiatingManager comNegotiatingManager;
+    protected MUCManager mucManager;
+
+    @Inject
+    protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
 
     @Inject
     protected RosterTracker rosterTracker;
@@ -127,7 +132,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     @Inject
     protected DispatchThreadContext dispatchThreadContext;
 
-    private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
+    private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
     protected Saros saros;
 
@@ -139,7 +144,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected IPreferenceStore prefStore;
     protected boolean doStreamingInvitation = false;
 
-    public SessionManager(Saros saros) {
+    public SarosSessionManager(Saros saros) {
         this.saros = saros;
         saros.addListener(this);
     }
@@ -170,11 +175,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         this.sarosSessionObservable.setValue(sarosSession);
 
+        notifySarosSessionStarting(sarosSession);
         sarosSession.start();
-        for (ISessionListener listener : this.listeners) {
-            listener.sessionStarted(sarosSession);
-        }
-        SessionManager.log.info("Session started");
+        notifySarosSessionStarted(sarosSession);
+        SarosSessionManager.log.info("Session started");
     }
 
     /**
@@ -189,9 +193,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         sarosSession.addSharedProject(project, projectID);
         this.sarosSessionObservable.setValue(sarosSession);
 
-        for (ISessionListener listener : this.listeners) {
-            listener.sessionStarted(sarosSession);
-        }
+        notifySarosSessionStarting(sarosSession);
+        notifySarosSessionStarted(sarosSession);
 
         log.info("Saros session joined");
 
@@ -227,6 +230,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 return;
             }
 
+            notifySessionEnding(sarosSession);
+
             this.transmitter.sendLeaveMessage(sarosSession);
             log.debug("Leave message sent.");
             if (!sarosSession.isStopped()) {
@@ -240,14 +245,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
             this.sarosSessionObservable.setValue(null);
 
-            for (ISessionListener listener : this.listeners) {
-                try {
-                    listener.sessionEnded(sarosSession);
-                } catch (RuntimeException e) {
-                    log.error("Internal error in notifying listener"
-                        + " of SarosSession end: ", e);
-                }
-            }
+            notifySessionEnd(sarosSession);
 
             clearSessionID();
             log.info("Session left");
@@ -264,32 +262,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return this.sarosSessionObservable.getValue();
     }
 
-    public void addSessionListener(ISessionListener listener) {
-        if (!this.listeners.contains(listener)) {
-            /*
-             * HACK PreferencesManager relies on the fact that a project is
-             * added only when a session is started, and it might create a new
-             * file ".settings/org.eclipse.core.resources.prefs" for the project
-             * specific settings. Adding PreferencesManager as the last listener
-             * makes sure that the file creation is registered by the
-             * SharedResourcesManager.
-             */
-            if (listener instanceof PreferenceManager) {
-                this.listeners.add(listener);
-            } else {
-                this.listeners.add(0, listener);
-            }
-        }
-    }
-
-    public void removeSessionListener(ISessionListener listener) {
-        this.listeners.remove(listener);
-    }
-
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID, boolean doStream, CommunicationPreferences comPrefs) {
+        String invitationID, boolean doStream, MUCSessionPreferences comPrefs) {
 
         this.sessionID.setValue(sessionID);
 
@@ -297,7 +273,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             this, this.transmitter, from, projectName, description, colorID,
             invitationProcesses, versionManager, versionInfo, sessionStart,
             sarosUI, invitationID, saros, doStream);
-        comNegotiatingManager.setSessionPrefs(comPrefs);
+        comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
@@ -345,7 +321,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 // Instantiates and initializes the wizard
                 InvitationWizard wizard = new InvitationWizard(saros,
                     sarosSession, rosterTracker, discoveryManager,
-                    SessionManager.this, versionManager, invitationProcesses);
+                    SarosSessionManager.this, versionManager,
+                    invitationProcesses);
 
                 // Instantiates the wizard container with the wizard and opens
                 // it
@@ -379,7 +356,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             transmitter, toInvite, sarosSession, partialProjectResources,
             toInviteTo, description, sarosSession.getFreeColor(),
             invitationProcesses, versionManager, stopManager, discoveryManager,
-            comNegotiatingManager, doStreamingInvitation);
+            mucManager, comNegotiatingManager, doStreamingInvitation);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -405,14 +382,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         protected OutgoingInvitationProcess process;
         protected String peer;
-        protected ISessionListener cancelListener = new ISessionListener() {
+        protected ISarosSessionListener cancelListener = new AbstractSarosSessionListener() {
 
+            @Override
             public void sessionEnded(ISarosSession oldSharedProject) {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
-            }
-
-            public void sessionStarted(ISarosSession newSharedProject) {
-                // Nothing to do here
             }
 
         };
@@ -484,7 +458,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             Util.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
-                    SessionManager.this.addSessionListener(cancelListener);
+                    SarosSessionManager.this
+                        .addSarosSessionListener(cancelListener);
                 }
 
             });
@@ -494,10 +469,67 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             Util.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
-                    SessionManager.this.removeSessionListener(cancelListener);
+                    SarosSessionManager.this
+                        .removeSarosSessionListener(cancelListener);
                 }
 
             });
+        }
+    }
+
+    public void addSarosSessionListener(ISarosSessionListener listener) {
+        if (!this.sarosSessionListeners.contains(listener)) {
+            /*
+             * HACK PreferencesManager relies on the fact that a project is
+             * added only when a session is started, and it might create a new
+             * file ".settings/org.eclipse.core.resources.prefs" for the project
+             * specific settings. Adding PreferencesManager as the last listener
+             * makes sure that the file creation is registered by the
+             * SharedResourcesManager.
+             */
+            if (listener instanceof PreferenceManager) {
+                this.sarosSessionListeners.add(listener);
+            } else {
+                this.sarosSessionListeners.add(0, listener);
+            }
+        }
+    }
+
+    public void removeSarosSessionListener(ISarosSessionListener listener) {
+        this.sarosSessionListeners.remove(listener);
+    }
+
+    protected void notifySarosSessionStarting(ISarosSession sarosSession) {
+        for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+            sarosSessionListener.sessionStarting(sarosSession);
+        }
+    }
+
+    protected void notifySarosSessionStarted(ISarosSession sarosSession) {
+        for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+            sarosSessionListener.sessionStarted(sarosSession);
+        }
+    }
+
+    protected void notifySessionEnding(ISarosSession sarosSession) {
+        for (ISarosSessionListener saroSessionListener : this.sarosSessionListeners) {
+            try {
+                saroSessionListener.sessionEnding(sarosSession);
+            } catch (RuntimeException e) {
+                log.error("Internal error in notifying listener"
+                    + " of SarosSession ending: ", e);
+            }
+        }
+    }
+
+    protected void notifySessionEnd(ISarosSession sarosSession) {
+        for (ISarosSessionListener listener : this.sarosSessionListeners) {
+            try {
+                listener.sessionEnded(sarosSession);
+            } catch (RuntimeException e) {
+                log.error("Internal error in notifying listener"
+                    + " of SarosSession end: ", e);
+            }
         }
     }
 }

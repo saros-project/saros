@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
@@ -51,7 +51,7 @@ public class VoIPAction extends Action {
     };
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected SessionViewTableViewer viewer;
 

@@ -45,11 +45,11 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -93,7 +93,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     };
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -191,7 +191,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     protected EditorManager editorManager;
 
     @Inject
-    protected ISessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     public SharedProjectFileDecorator() {
 
@@ -199,7 +199,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         this.decoratedElements = new HashSet<Object>();
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
 
         editorManager.addSharedEditorListener(editorListener);
         if (sessionManager.getSarosSession() != null) {
@@ -288,7 +288,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     }
 
     public void dispose() {
-        sessionManager.removeSessionListener(sessionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
         // TODO clean up better
         this.sarosSession = null;

@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
@@ -117,7 +117,7 @@ public class STFController {
      * the object in the server JVM.
      */
     public void initExportedObjects(int port, Saros saros,
-        SessionManager sessionManager, DataTransferManager dataTransferManager,
+        SarosSessionManager sessionManager, DataTransferManager dataTransferManager,
         EditorManager editorManager) throws RemoteException {
         try {
             registry = LocateRegistry.createRegistry(port);

@@ -22,26 +22,23 @@ package de.fu_berlin.inf.dpp.project;
 /**
  * A listener for SarosSession life-cycle related events.
  * 
- * @author rdjemili
+ * @author bkahlert
  */
-public interface ISessionListener {
+public class AbstractSarosSessionListener implements ISarosSessionListener {
 
-    /**
-     * Is fired when a new session started.
-     * 
-     * @param newSarosSession
-     *            the session that has been created. Is never <code>null</code>.
-     * 
-     */
-    public void sessionStarted(ISarosSession newSarosSession);
+    public void sessionStarting(ISarosSession newSarosSession) {
+        // do nothing
+    }
 
-    /**
-     * Is fired when a session ended. Reasons for this can be that the session
-     * was closed or that the user left by himself.
-     * 
-     * @param oldSarosSession
-     *            the session that has just been left. Is never
-     *            <code>null</code>.
-     */
-    public void sessionEnded(ISarosSession oldSarosSession);
+    public void sessionStarted(ISarosSession newSarosSession) {
+        // do nothing
+    }
+
+    public void sessionEnding(ISarosSession oldSarosSession) {
+        // do nothing
+    }
+
+    public void sessionEnded(ISarosSession oldSarosSession) {
+        // do nothing
+    }
 }

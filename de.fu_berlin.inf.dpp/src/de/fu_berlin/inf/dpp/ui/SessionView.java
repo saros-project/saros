@@ -69,11 +69,11 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
@@ -404,7 +404,7 @@ public class SessionView extends ListExplanatoryViewPart {
     protected EditorManager editorManager;
 
     @Inject
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     @Inject
     protected ChildContainer container;
@@ -442,7 +442,7 @@ public class SessionView extends ListExplanatoryViewPart {
         EditorsUI.getPreferenceStore().removePropertyChangeListener(
             editorPrefsListener);
         editorManager.removeSharedEditorListener(sharedEditorListener);
-        sessionManager.removeSessionListener(sessionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
         rosterTracker.removeRosterListener(rosterListener);
 
         // Stop container and remove it from its parent.
@@ -523,7 +523,7 @@ public class SessionView extends ListExplanatoryViewPart {
         container.getComponents(Object.class);
 
         // Add Session Listener
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         if (sessionManager.getSarosSession() != null) {
             this.viewer.setInput(sessionManager.getSarosSession());
             showExplanation(false);
@@ -558,7 +558,7 @@ public class SessionView extends ListExplanatoryViewPart {
         this.viewer.getControl().setEnabled(this.sarosSession != null);
     }
 
-    public final ISessionListener sessionListener = new AbstractSessionListener() {
+    public final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {

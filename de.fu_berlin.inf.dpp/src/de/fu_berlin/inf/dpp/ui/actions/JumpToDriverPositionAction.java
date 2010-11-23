@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -25,14 +25,14 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
     private static final Logger log = Logger
         .getLogger(JumpToDriverPositionAction.class.getName());
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected EditorManager editorManager;
 
     protected Saros saros;
 
     public JumpToDriverPositionAction(Saros saros,
-        SessionManager sessionManager, EditorManager editorManager,
+        SarosSessionManager sessionManager, EditorManager editorManager,
         ISelectionProvider provider) {
         super(provider, "Jump to position of selected user");
 

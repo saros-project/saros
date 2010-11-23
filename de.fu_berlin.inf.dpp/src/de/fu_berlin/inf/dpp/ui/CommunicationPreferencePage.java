@@ -31,12 +31,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     protected MixerManager mixerManager;
 
     protected Composite parent;
-    protected BooleanFieldEditor userDefinedChatroom;
     protected StringFieldEditor chatserver;
-    protected StringFieldEditor chatroom;
-    protected BooleanFieldEditor userDefinedChatroomPassword;
     protected BooleanFieldEditor beepUponIM;
-    protected StringFieldEditor chatroomPassword;
     protected StringFieldEditor audioQuality;
     protected BooleanFieldEditor audio_vbr;
     protected BooleanFieldEditor audio_dtx;
@@ -59,31 +55,10 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         chatserver = new StringFieldEditor(PreferenceConstants.CHATSERVER,
             "Chatserver (Example: conference.jabber.org)", parent);
 
-        userDefinedChatroom = new BooleanFieldEditor(
-            PreferenceConstants.USER_DEFINED_CHATROOM,
-            "Use alternative Chatroom?", parent);
-
-        chatroom = new StringFieldEditor(PreferenceConstants.CHATROOM,
-            "Chatroom:", parent);
-
-        chatroom.setEnabled(prefs
-            .getBoolean(PreferenceConstants.USER_DEFINED_CHATROOM), parent);
-
-        userDefinedChatroomPassword = new BooleanFieldEditor(
-            PreferenceConstants.USER_DEFINED_CHATROOM_PASSWORD,
-            "Chatroom password", parent);
-
         beepUponIM = new BooleanFieldEditor(PreferenceConstants.BEEP_UPON_IM,
             "Beep when receiving a chat message", parent);
 
         beepUponIM.setEnabled(true, parent);
-
-        chatroomPassword = new StringFieldEditor(
-            PreferenceConstants.CHATROOM_PASSWORD, "Chatroom Password:", parent);
-
-        chatroomPassword.setEnabled(prefs
-            .getBoolean(PreferenceConstants.USER_DEFINED_CHATROOM_PASSWORD),
-            parent);
 
         audioQuality = new StringFieldEditor(
             PreferenceConstants.AUDIO_QUALITY_LEVEL,
@@ -115,10 +90,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             getRecordMixersString(), parent);
 
         addField(chatserver);
-        addField(userDefinedChatroom);
-        addField(chatroom);
-        addField(userDefinedChatroomPassword);
-        addField(chatroomPassword);
         addField(beepUponIM);
         addField(audioQuality);
         addField(audioSamplerate);
@@ -152,14 +123,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         if (chatserver.getStringValue() == "") {
             setErrorMessage("Chatserver Field is empty!");
             setValid(false);
-        } else if (userDefinedChatroom.getBooleanValue() == true
-            && chatroom.getStringValue() == "") {
-            setErrorMessage("Chatroom Field is empty!");
-            setValid(false);
-        } else if (userDefinedChatroomPassword.getBooleanValue() == true
-            && chatroomPassword.getStringValue() == "") {
-            setErrorMessage("Chatroom Password Field is empty!");
-            setValid(false);
         } else if (audioQualityCheck < 0 || audioQualityCheck > 10) {
             setErrorMessage("Audio Quality has to be >= 0 and <= 10");
             setValid(false);
@@ -174,11 +137,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         if (event.getProperty().equals(FieldEditor.VALUE)) {
             if (event.getSource().equals(chatserver)
-                || event.getSource().equals(chatroom)
-                || event.getSource().equals(chatroomPassword)
-                || event.getSource().equals(audioQuality)
-                || event.getSource().equals(userDefinedChatroom)
-                || event.getSource().equals(userDefinedChatroomPassword))
+                || event.getSource().equals(audioQuality))
                 checkState();
         }
 
@@ -189,22 +148,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
                 if (event.getNewValue() instanceof Boolean) {
                     Boolean newValue = (Boolean) event.getNewValue();
                     audio_dtx.setEnabled(newValue, parent);
-                }
-            }
-
-            if (field.getPreferenceName().equals(
-                PreferenceConstants.USER_DEFINED_CHATROOM)) {
-                if (event.getNewValue() instanceof Boolean) {
-                    Boolean newValue = (Boolean) event.getNewValue();
-                    chatroom.setEnabled(newValue, parent);
-                }
-            }
-
-            if (field.getPreferenceName().equals(
-                PreferenceConstants.USER_DEFINED_CHATROOM_PASSWORD)) {
-                if (event.getNewValue() instanceof Boolean) {
-                    Boolean newValue = (Boolean) event.getNewValue();
-                    chatroomPassword.setEnabled(newValue, parent);
                 }
             }
         }

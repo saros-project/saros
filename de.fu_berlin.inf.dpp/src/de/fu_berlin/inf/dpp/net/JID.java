@@ -131,6 +131,15 @@ public class JID implements Serializable {
     }
 
     /**
+     * Returns the unmodified JID this object was constructed with
+     * 
+     * @return
+     */
+    public String getRAW() {
+        return this.jid;
+    }
+
+    /**
      * @return <code>true</code> if the IDs have the same user and domain.
      *         Resource is ignored.
      */

@@ -35,7 +35,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     protected ISarosSession sarosSession;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected boolean sendPings = false;
 
@@ -139,7 +139,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     protected ScheduledFuture<?> pingPongHandle = null;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
 
@@ -176,10 +176,10 @@ public class PingPongCentral extends AbstractActivityProvider {
         }
     };
 
-    public PingPongCentral(Saros saros, SessionManager manager,
+    public PingPongCentral(Saros saros, SarosSessionManager manager,
         PreferenceUtils preferenceUtils) {
         this.sessionManager = manager;
-        this.sessionManager.addSessionListener(sessionListener);
+        this.sessionManager.addSarosSessionListener(sessionListener);
 
         this.sendPings = preferenceUtils.isPingPongActivated();
         /*
@@ -205,7 +205,7 @@ public class PingPongCentral extends AbstractActivityProvider {
     };
 
     public void dispose() {
-        this.sessionManager.removeSessionListener(sessionListener);
+        this.sessionManager.removeSarosSessionListener(sessionListener);
     }
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {

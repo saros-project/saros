@@ -11,14 +11,14 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 
 /**
@@ -51,27 +51,25 @@ public class RoleManager implements IActivityProvider {
 
         @Override
         public void userJoined(User user) {
-            SessionView.showNotification("User joined", user
-                .getHumanReadableName()
-                + " joined the session.");
+            SessionView.showNotification("User joined",
+                user.getHumanReadableName() + " joined the session.");
         }
 
         @Override
         public void userLeft(User user) {
-            SessionView.showNotification("User left", user
-                .getHumanReadableName()
-                + " left the session.");
+            SessionView.showNotification("User left",
+                user.getHumanReadableName() + " left the session.");
         }
     };
 
     @Inject
     protected Saros saros;
 
-    public RoleManager(SessionManager sessionManager) {
-        sessionManager.addSessionListener(sessionListener);
+    public RoleManager(SarosSessionManager sessionManager) {
+        sessionManager.addSarosSessionListener(sessionListener);
     }
 
-    public final ISessionListener sessionListener = new AbstractSessionListener() {
+    public final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {

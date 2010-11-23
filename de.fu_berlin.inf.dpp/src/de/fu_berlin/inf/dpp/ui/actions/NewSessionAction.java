@@ -36,8 +36,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "action")
 public class NewSessionAction extends GeneralNewSessionAction {
 
-    private static final Logger log = Logger
-        .getLogger(NewSessionAction.class.getName());
+    private static final Logger log = Logger.getLogger(NewSessionAction.class
+        .getName());
 
     /**
      * @review runSafe OK

@@ -133,7 +133,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     @Inject
     protected ConsistencyWatchdogClient consistencyWatchdogClient;
 
-    protected ISessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected Blockable stopManagerListener = new Blockable() {
         public void unblock() {
@@ -145,7 +145,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     };
 
-    public ISessionListener sessionListener = new AbstractSessionListener() {
+    public ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -177,10 +177,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
 
-    public SharedResourcesManager(ISessionManager sessionManager,
+    public SharedResourcesManager(ISarosSessionManager sessionManager,
         StopManager stopManager) {
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionListener(sessionListener);
+        this.sessionManager.addSarosSessionListener(sessionListener);
         this.stopManager = stopManager;
         this.stopManager.addBlockable(stopManagerListener);
     }

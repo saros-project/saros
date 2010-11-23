@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -34,13 +34,13 @@ public class InvitationWizard extends Wizard {
     protected RosterTracker rosterTracker;
     protected DiscoveryManager discoveryManager;
     protected InvitationWizardUserSelection userSelection;
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
     protected VersionManager versionManager;
     protected InvitationProcessObservable invitationProcesses;
 
     public InvitationWizard(Saros saros, ISarosSession sarosSession,
         RosterTracker rosterTracker, DiscoveryManager discoveryManager,
-        SessionManager sessionManager, VersionManager versionManager,
+        SarosSessionManager sessionManager, VersionManager versionManager,
         InvitationProcessObservable invitationProcesses) {
         this.saros = saros;
         this.sarosSession = sarosSession;

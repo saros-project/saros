@@ -50,12 +50,12 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -91,7 +91,7 @@ public class UndoManager implements Disposable, IActivityProvider {
     @Inject
     protected PreferenceUtils preferences;
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -260,7 +260,7 @@ public class UndoManager implements Disposable, IActivityProvider {
      * enables and disables the UndoManager and does cleanup works at the begin
      * and the end of a session.
      */
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -405,7 +405,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
     };
 
-    public UndoManager(SessionManager sessionManager,
+    public UndoManager(SarosSessionManager sessionManager,
         EditorManager editorManager) {
 
         if (log.isDebugEnabled())
@@ -414,7 +414,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         OperationHistoryFactory.getOperationHistory()
             .addOperationHistoryListener(historyListener);
 
-        sessionManager.addSessionListener(sessionListener);
+        sessionManager.addSarosSessionListener(sessionListener);
         this.sessionManager = sessionManager;
 
         editorManager.addActivityListener(this.activityListener);
@@ -528,7 +528,7 @@ public class UndoManager implements Disposable, IActivityProvider {
     public void dispose() {
         OperationHistoryFactory.getOperationHistory()
             .removeOperationHistoryListener(historyListener);
-        sessionManager.removeSessionListener(sessionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeActivityListener(activityListener);
         enabled = false;
         eclipseHistory.removeOperationApprover(operationBlocker);

@@ -154,19 +154,6 @@ public class PreferenceConstants {
      **/
     public static final String CHATROOM = "chatroom";
 
-    /** The checkbox preference for the chatroom **/
-    public static final String USER_DEFINED_CHATROOM = "USER_DEFINED_CHATROOM";
-
-    /**
-     * User specified chatroom password. Only available at
-     * CommunicationPreferencePage if USER_DEFINED_CHATROOM == true. If no
-     * chatroom password is specified a password will be generated
-     **/
-    public static final String CHATROOM_PASSWORD = "CHATROOM_PASSWORD";
-
-    /** The checkbox preference for the chatroom password **/
-    public static final String USER_DEFINED_CHATROOM_PASSWORD = "USER_DEFINED_CHATROOM_PASSWORD";
-
     /** Beep when receiving an IM **/
     public static final String BEEP_UPON_IM = "BEEP_UPON_IM";
 

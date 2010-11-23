@@ -46,6 +46,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
+import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -62,8 +64,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager;
-import de.fu_berlin.inf.dpp.util.CommunicationNegotiatingManager.CommunicationPreferences;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -105,7 +105,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
     protected SubMonitor monitor;
     protected VersionManager versionManager;
-    protected CommunicationNegotiatingManager comNegotiatingManager;
+    protected MUCManager mucManager;
+    protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
     protected StopManager stopManager;
     protected DiscoveryManager discoveryManager;
     protected String invitationID;
@@ -123,8 +124,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
-        DiscoveryManager discoveryManager,
-        CommunicationNegotiatingManager comNegotiatingManager, boolean doStream) {
+        DiscoveryManager discoveryManager, MUCManager mucManager,
+        MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
+        boolean doStream) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
 
@@ -133,6 +135,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         this.versionManager = versionManager;
         this.stopManager = stopManager;
         this.discoveryManager = discoveryManager;
+        this.mucManager = mucManager;
         this.comNegotiatingManager = comNegotiatingManager;
         this.project = project;
         this.doStream = doStream;
@@ -303,10 +306,10 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         hostVersionInfo.version = versionManager.getVersion();
 
-        CommunicationPreferences comPrefs = comNegotiatingManager.getOwnPrefs();
         transmitter.sendInvitation(sarosSession.getProjectID(this.project),
             peer, description, colorID, hostVersionInfo, invitationID,
-            sarosSession.getSessionStart(), doStream, comPrefs);
+            sarosSession.getSessionStart(), doStream,
+            comNegotiatingManager.getOwnPreferences());
 
         subMonitor.worked(25);
         subMonitor

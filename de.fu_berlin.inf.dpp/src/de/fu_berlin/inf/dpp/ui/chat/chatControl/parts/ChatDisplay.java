@@ -117,12 +117,12 @@ public class ChatDisplay extends ScrolledComposite {
          */
         if (lastUser != null && lastUser.equals(sender)) { // same user
             ChatLineSeparator chatLineSeparator = new ChatLineSeparator(
-                contentComposite, sender.toString(), color, new Date());
+                contentComposite, sender.toString(), color, receivedOn);
             chatLineSeparator.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
         } else { // new / different user
             ChatLinePartnerChangeSeparator chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
-                contentComposite, sender.toString(), color, new Date());
+                contentComposite, sender.toString(), color, receivedOn);
             chatPartnerChangeLine.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
         }
@@ -198,15 +198,22 @@ public class ChatDisplay extends ScrolledComposite {
     }
 
     /**
-     * Clears the chat display
+     * Clears the {@link ChatDisplay}
      */
     public void clear() {
+        this.silentClear();
+        this.notifyChatCleared();
+    }
+
+    /**
+     * Clears the {@link ChatDisplay} without firing events
+     */
+    public void silentClear() {
         for (Control chatItem : getChatItems()) {
             chatItem.dispose();
         }
         this.refresh();
         this.lastUser = null;
-        this.notifyChatCleared();
     }
 
     /**

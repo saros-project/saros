@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -30,14 +30,14 @@ public class ConsistencyAction extends Action {
 
     private static Logger log = Logger.getLogger(ConsistencyAction.class);
 
-    protected SessionManager sessionManager;
+    protected SarosSessionManager sessionManager;
 
     protected ConsistencyWatchdogClient watchdogClient;
 
     protected IsInconsistentObservable inconsistentObservable;
 
     public ConsistencyAction(ConsistencyWatchdogClient watchdogClient,
-        SessionManager sessionManager,
+        SarosSessionManager sessionManager,
         IsInconsistentObservable inconsistentObservable) {
 
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
@@ -47,17 +47,18 @@ public class ConsistencyAction extends Action {
         this.sessionManager = sessionManager;
         this.inconsistentObservable = inconsistentObservable;
 
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISarosSession newSarosSession) {
-                setSharedProject(newSarosSession);
-            }
+        sessionManager
+            .addSarosSessionListener(new AbstractSarosSessionListener() {
+                @Override
+                public void sessionStarted(ISarosSession newSarosSession) {
+                    setSharedProject(newSarosSession);
+                }
 
-            @Override
-            public void sessionEnded(ISarosSession oldSarosSession) {
-                setSharedProject(null);
-            }
-        });
+                @Override
+                public void sessionEnded(ISarosSession oldSarosSession) {
+                    setSharedProject(null);
+                }
+            });
 
         setSharedProject(sessionManager.getSarosSession());
     }
@@ -95,8 +96,8 @@ public class ConsistencyAction extends Action {
             setEnabled(newValue);
 
             if (newValue) {
-                final Set<SPath> paths = new HashSet<SPath>(watchdogClient
-                    .getPathsWithWrongChecksums());
+                final Set<SPath> paths = new HashSet<SPath>(
+                    watchdogClient.getPathsWithWrongChecksums());
 
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {

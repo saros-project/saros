@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 
@@ -40,7 +40,7 @@ public class SarosStateImp extends StateImp implements SarosState {
      * {@link ChatViewComponentImp} is a singleton, but inheritance is possible.
      */
     public static SarosStateImp getInstance(Saros saros,
-        SessionManager sessionManager, DataTransferManager dataTransferManager,
+        SarosSessionManager sessionManager, DataTransferManager dataTransferManager,
         EditorManager editorManager) {
         if (self != null)
             return self;
@@ -49,7 +49,7 @@ public class SarosStateImp extends StateImp implements SarosState {
         return self;
     }
 
-    public SarosStateImp(Saros saros, SessionManager sessionManager,
+    public SarosStateImp(Saros saros, SarosSessionManager sessionManager,
         DataTransferManager dataTransferManager, EditorManager editorManager) {
         this.saros = saros;
         this.sessionManager = sessionManager;
@@ -60,7 +60,7 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     protected transient Saros saros;
 
-    protected transient SessionManager sessionManager;
+    protected transient SarosSessionManager sessionManager;
 
     protected transient DataTransferManager dataTransferManager;
 
