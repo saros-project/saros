@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -60,7 +61,7 @@ public class InviteAction extends SelectionProviderAction {
     private static final Logger log = Logger.getLogger(InviteAction.class
         .getName());
 
-    protected DiscoveryManager discoManager;
+    protected DiscoveryManager discoveryManager;
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
@@ -88,7 +89,7 @@ public class InviteAction extends SelectionProviderAction {
 
         this.sessionManager = sessionManager;
         this.saros = saros;
-        this.discoManager = discoManager;
+        this.discoveryManager = discoManager;
         this.invitationProcesses = invitationProcesses;
         sessionManager.addSessionListener(sessionListener);
 
@@ -194,9 +195,17 @@ public class InviteAction extends SelectionProviderAction {
             return false;
 
         // Test if each user is reachable and available
-        for (JID jid : usersSelected) {
+        boolean sarosSupported = false;
+        for (final JID jid : usersSelected) {
+            try {
+                sarosSupported = discoveryManager.isSupportedNonBlock(jid,
+                    Saros.NAMESPACE);
+            } catch (CacheMissException e) {
+                // Saros support wasn't in cache. Update the discovery manager.
+                discoveryManager.cacheSarosSupport(jid);
+            }
             if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
-                || !discoManager.isSarosSupported(jid)
+                || !sarosSupported
                 || invitationProcesses.getInvitationProcess(jid) != null)
                 return false;
         }

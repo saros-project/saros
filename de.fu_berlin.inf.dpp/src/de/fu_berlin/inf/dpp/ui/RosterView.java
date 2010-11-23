@@ -138,9 +138,6 @@ public class RosterView extends ViewPart {
     protected RosterViewTransferModeListener transferModeListener = new RosterViewTransferModeListener();
 
     @Inject
-    protected DiscoveryManager discoManager;
-
-    @Inject
     protected Saros saros;
 
     @Inject
@@ -323,8 +320,8 @@ public class RosterView extends ViewPart {
                 rqPeer = discoveryManager.isSupportedNonBlock(getJID(),
                     Saros.NAMESPACE);
             } catch (CacheMissException e) {
-                // Saros support wasn't in cache. Force the discovery manager.
-                rqPeer = discoveryManager.isSarosSupported(getJID());
+                // Saros support wasn't in cache. Update the discovery manager.
+                discoveryManager.cacheSarosSupport(getJID());
             }
 
             if (presence.isAvailable() && saros.isConnected()) {
@@ -833,7 +830,7 @@ public class RosterView extends ViewPart {
         // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction(this.viewer);
         this.inviteAction = new InviteAction(sessionManager, saros,
-            this.viewer, discoManager, invitationProcesses);
+            this.viewer, discoveryManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
         this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
         this.testAction = new ConnectionTestAction(saros,

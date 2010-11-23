@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Roster;
@@ -21,6 +23,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class is responsible for performing ServiceDiscovery for features such
@@ -56,6 +59,12 @@ public class DiscoveryManager implements Disposable {
 
     @Inject
     protected RosterTracker rosterTracker;
+
+    /*
+     * Queues incoming calls that check Saros support by going to the discovery
+     * server. Max number of concurrent threads = 3.
+     */
+    ExecutorService supportExecutor = Executors.newFixedThreadPool(3);
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
@@ -278,6 +287,28 @@ public class DiscoveryManager implements Disposable {
         }
 
         return null;
+    }
+
+    /**
+     * Begin a thread that populates Saros-support information for all people in
+     * the given list.
+     * 
+     * @nonblocking This method start a new ASync thread.
+     */
+    public void cacheSarosSupport(final JID buddy) {
+        try {
+            isSupportedNonBlock(buddy, Saros.NAMESPACE);
+        } catch (CacheMissException e) {
+            supportExecutor.execute(new Runnable() {
+                public void run() {
+                    Util.runSafeAsync(log, new Runnable() {
+                        public void run() {
+                            isSarosSupported(buddy);
+                        }
+                    });
+                }
+            });
+        }
     }
 
     /**
