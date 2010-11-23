@@ -150,7 +150,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             /*
              * Beep when receiving a FOREIGN message
              */
-            if (ChatView.this.isOwnJID(jid)) {
+            if (!ChatView.this.isOwnJID(jid)) {
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         imBeepAction.beep();
