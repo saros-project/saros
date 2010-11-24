@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -13,6 +12,9 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
     public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
+
+    private static final String MENU_FILE = "File";
+    private static final String MENU_IMPORT = "Import...";
 
     public void preference() throws RemoteException {
         workbenchC.activateEclipseShell();
@@ -110,41 +112,10 @@ public class MainMenuComponentImp extends EclipseComponent implements
         return perspectivePart.isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
     }
 
-    private static final String MENU_FILE = "File";
-    private static final String MENU_IMPORT = "Import...";
-    private static final String SHELL_IMPORT = "Import";
-    private static final String REPOSITORY_TYPE_SVN = "SVN";
-    private static final String IMPORT_SOURCE = "Checkout Projects from SVN";
-
-    public void importProjectFromSVN(String repository, String path)
-        throws RemoteException {
-        precondition();
-        menuPart.clickMenuWithTexts(MENU_FILE, MENU_IMPORT);
-        windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
-            REPOSITORY_TYPE_SVN, IMPORT_SOURCE, NEXT);
-        if (bot.table().containsItem(repository)) {
-            windowPart.confirmWindowWithTable("Checkout from SVN", repository,
-                NEXT);
-        } else {
-            bot.radio("Create a new repository location").click();
-            bot.button(NEXT).click();
-            bot.comboBoxWithLabel("Url:").setText(repository);
-            bot.button(NEXT).click();
-            windowPart.waitUntilShellActive("Checkout from SVN");
-        }
-        // Note that the character '"' is illegal in URLs
-        String[] nodes = (repository.replaceAll("/", "\"") + path).split("/");
-        nodes[0] = nodes[0].replaceAll("\"", "/");
-        windowPart.confirmWindowWithTreeWithWaitingExpand("Checkout from SVN",
-            FINISH, nodes);
-        // windowPart.waitUntilShellActive("SVN Checkout");
-        SWTBotShell shell2 = bot.shell("SVN Checkout");
-        windowPart.waitUntilShellCloses(shell2);
-    }
-
     @Override
     protected void precondition() throws RemoteException {
-        workbenchC.activateEclipseShell();
+        // TODO Auto-generated method stub
+
     }
 
 }

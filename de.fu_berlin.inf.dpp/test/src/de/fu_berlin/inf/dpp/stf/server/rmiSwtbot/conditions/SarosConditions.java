@@ -44,6 +44,10 @@ public class SarosConditions extends Conditions {
         return new ShellActive(bot, title);
     }
 
+    public static ICondition isShellOpen(SWTWorkbenchBot bot, String title) {
+        return new IsShellOpen(bot, title);
+    }
+
     public static ICondition existTableItem(SWTBotTable table,
         String tableItemName) {
         return new ExistTableItem(table, tableItemName);

@@ -57,6 +57,18 @@ public class STFTest {
     public static final String ROLE_NAME = " (Driver)";
     public static final String OWN_CONTACT_NAME = "You";
 
+    /* SVN infos */
+    protected static final String REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests";
+    protected static final String SVN_PROJECT = "stf_test_project";
+    protected static final String SVN_PROJECT_COPY = "stf_test_project_copy";
+    protected static String SVN_PKG = "org.eclipsecon.swtbot.example";
+    protected static String SVN_CLS = "MyFirstTest01";
+    protected static String SVN_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/trunk/dpp";
+    protected static String SPECIFIED_FODLER_NAME = "/stf_test_project";
+    protected static String SVN_TAG_URL = "http://swtbot-examples.googlecode.com/svn/tags/eclipsecon2009";
+    protected static final String SVN_CLS_PATH = SVN_PROJECT
+        + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
+
     /*
      * Contextmenu "Saros"
      */

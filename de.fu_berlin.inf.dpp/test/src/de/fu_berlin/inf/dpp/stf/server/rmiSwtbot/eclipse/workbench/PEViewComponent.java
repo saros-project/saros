@@ -741,18 +741,19 @@ public interface PEViewComponent extends Remote {
     public void revert(String projectName) throws RemoteException;
 
     /**
-     * Perform the action "share project using SVN" which should be done with
-     * the following steps:
+     * Perform the action "share project with SVN" which should be done with the
+     * following steps:
      * 
      * <ol>
      * <li>Select the given project and click "Team" > "Share project"</li>
      * <li>Select the repository type "SVN"</li>
-     * <li>If the given URL is already existed, then select the URL and cofirm
-     * the popup window</li>
+     * <li>If the given repository URL is already existed, then select the URL
+     * and confirm the popup window</li>
      * <li>Otherwise check the checkbox "Create a new repository location",
-     * enter the given URL and click "Finish" to confirm the share process</li>
-     * <li>Waits until the shell "Revert" is closed. It guarantee that the
-     * "Revert" action is completely done.</li>
+     * enter the given repository URL and click "Finish" to confirm the share
+     * project process</li>
+     * <li>Waits until the shell is closed. It guarantee that the share project
+     * action is completely done.</li>
      * </ol>
      * <p>
      * <b>Attention:</b>
@@ -766,11 +767,112 @@ public interface PEViewComponent extends Remote {
      * @param projectName
      *            the name of the project located in the package explorer view,
      *            which will be shared under SVN.
-     * @param url
+     * @param repositoryURL
      *            the repository location
      * @throws RemoteException
      */
-    public void shareProjectWithSVN(String projectName, String url)
+    public void shareProjectWithSVN(String projectName, String repositoryURL)
+        throws RemoteException;
+
+    /**
+     * Perform the action
+     * "share project with SVN, which is already configured with SVN repository information"
+     * which should be done with the following steps:
+     * 
+     * <ol>
+     * <li>Select the given project and click "Team" > "Share project"</li>
+     * <li>Select the repository type "SVN"</li>
+     * <li>click "Finish" to confirm the share proejct process</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "share project" . I mean, after clicking the sub menu you need to treat
+     * the following popup window too.</li>
+     * <li>this method is only suitable for such project, which still include
+     * the SVN meta information.</li>
+     * 
+     * @param projectName
+     *            the name of the project located in the package explorer view,
+     *            which will be shared under SVN.
+     * @param repositoryURL
+     *            the repository location
+     * @throws RemoteException
+     */
+    public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
+        String projectName, String repositoryURL) throws RemoteException;
+
+    /**
+     * using this method you can import a project from SVN (Other variant to
+     * import a project from SVN is in the method
+     * {@link PEViewComponent#importProjectFromSVN(String)} defined). which
+     * should be done with the following steps:
+     * 
+     * <ol>
+     * <li>Select the given project and click "Team" > "Share project"</li>
+     * <li>Select the repository type "SVN" and click next</li>
+     * <li>In the next page select the repositoryURL if the repositoryURL
+     * already exists,otherwise create a new one and click the next button</li>
+     * <li>In the next page activate the radio button
+     * "Use specified folder name", insert the given folder name in the text
+     * field and click finish to confirm the import prorject with SVN process.</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "share project" . I mean, after clicking the sub menu you need to treat
+     * the following popup window too.</li>
+     * 
+     * @param projectName
+     *            the name of the project located in the package explorer view,
+     *            which will be shared under SVN.
+     * @param repositoryURL
+     *            the repository location
+     * @param specifiedFolderName
+     *            the name of the folder, which already exists in the
+     *            repository, e.g. trunk/examples
+     * @throws RemoteException
+     */
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
+        String repositoryURL, String specifiedFolderName)
+        throws RemoteException;
+
+    /**
+     * Using this method you can import a project from SVN (Other variant to
+     * import a project from SVN is in the method
+     * {@link PEViewComponent#shareProjectWithSVNUsingSpecifiedFolderName(String, String, String)}
+     * defined). which should be done with the following steps:
+     * 
+     * <ol>
+     * <li>Clicks main menu "File" > "Import..."</li>
+     * <li>Selects SVN -> checkout projects from SVN and click the button "next"
+     * </li>
+     * <li>In the next page select the repositoryURL if the repositoryURL
+     * already exists,otherwise create a new one and click the next button</li>
+     * <li>In the next page select the folder to be checked out from SVN and
+     * click finish to confirm the import project with SVN process.</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "share project" . I mean, after clicking the sub menu you need to treat
+     * the following popup window too.</li>
+     * 
+     * @param repositoryURL
+     *            the repository location
+     * 
+     * @throws RemoteException
+     */
+    public void importProjectFromSVN(String repositoryURL)
         throws RemoteException;
 
     /**

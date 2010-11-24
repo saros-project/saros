@@ -57,6 +57,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     private final static String SHELL_NEW_FILE = "New File";
     private final static String SHELL_NEW_JAVA_PACKAGE = "New Java Package";
     private final static String SHELL_NEW_JAVA_CLASS = "New Java Class";
+    private static final String SHELL_IMPORT = "Import";
 
     /* Label of pop up windows */
     private final static String LABEL_CREATE_A_NEW_REPOSITORY_LOCATION = "Create a new repository location";
@@ -554,8 +555,29 @@ public class PEViewComponentImp extends EclipseComponent implements
      * all related actions with the sub menus of the context menu "SVN"
      * 
      **********************************************/
-    public void shareProjectWithSVN(String projectName, String url)
+    public void shareProjectWithSVN(String projectName, String repositoryURL)
         throws RemoteException {
+        String[] matchTexts = { projectName + ".*" };
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            SHARE_PROJECT);
+        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+            REPOSITORY_TYPE_SVN, NEXT);
+        log.debug("SVN share project text: " + bot.text());
+        if (bot.table().containsItem(repositoryURL)) {
+            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+                repositoryURL, NEXT);
+        } else {
+            bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+            bot.button(NEXT).click();
+            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+        }
+        basicPart.waitUntilButtonIsEnabled(FINISH);
+        bot.button(FINISH).click();
+        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+    }
+
+    public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
+        String projectName, String repositoryURL) throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
             SHARE_PROJECT);
@@ -564,17 +586,63 @@ public class PEViewComponentImp extends EclipseComponent implements
         log.debug("SVN share project text: " + bot.text());
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
-        // if (bot.table().containsItem(url)) {
-        // windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT, url, NEXT);
-        // bot.button(NEXT).click();
-        // bot.button(FINISH).click();
-        // } else {
-        // bot.checkBox(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
-        // bot.button(NEXT).click();
-        // bot.comboBoxWithLabel(LABEL_URL).setText(url);
-        // bot.button(FINISH).click();
-        // }
         windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+    }
+
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
+        String repositoryURL, String specifiedFolderName)
+        throws RemoteException {
+        String[] matchTexts = { projectName + ".*" };
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
+            SHARE_PROJECT);
+        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+            REPOSITORY_TYPE_SVN, NEXT);
+        if (bot.table().containsItem(repositoryURL)) {
+            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+                repositoryURL, NEXT);
+            bot.radio("Use specified folder name:").click();
+            bot.text().setText(specifiedFolderName);
+            bot.button(FINISH).click();
+            windowPart.waitUntilShellActive("Remote Project Exists");
+            windowPart.confirmWindow("Remote Project Exists", YES);
+            windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+            windowPart.waitUntilShellOpen("Confirm Open Perspective");
+            windowPart.activateShellWithText("Confirm Open Perspective");
+            bot.button(NO).click();
+            // windowPart.confirmWindow("Confirm Open Perspective", NO);
+        } else {
+            bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+            bot.button(NEXT).click();
+            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            bot.button(NEXT).click();
+            bot.radio("Use specified folder name:").click();
+            bot.text().setText(specifiedFolderName);
+            bot.button(FINISH).click();
+        }
+    }
+
+    public void importProjectFromSVN(String repositoryURL)
+        throws RemoteException {
+        precondition();
+        menuPart.clickMenuWithTexts("File", "Import...");
+        windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
+            REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
+        if (bot.table().containsItem(repositoryURL)) {
+            windowPart.confirmWindowWithTable("Checkout from SVN",
+                repositoryURL, NEXT);
+        } else {
+            bot.radio("Create a new repository location").click();
+            bot.button(NEXT).click();
+            bot.comboBoxWithLabel("Url:").setText(repositoryURL);
+            bot.button(NEXT).click();
+            windowPart.waitUntilShellActive("Checkout from SVN");
+        }
+        windowPart.confirmWindowWithTreeWithWaitingExpand("Checkout from SVN",
+            FINISH, repositoryURL, "trunk", "examples");
+        windowPart.waitUntilShellActive("SVN Checkout");
+
+        SWTBotShell shell2 = bot.shell("SVN Checkout");
+        windowPart.waitUntilShellCloses(shell2);
     }
 
     public void disConnect(String projectName) throws RemoteException {

@@ -180,6 +180,13 @@ public class TestPackageExplorerViewComponent extends STFTest {
         assertTrue(alice.pEV.isPkgExist(PROJECT1, PKG2));
     }
 
+    @Test
+    public void testShareProjectWithSVN() throws RemoteException {
+        alice.pEV.newJavaProject(PROJECT1);
+        alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(PROJECT1,
+            SVN_URL, SPECIFIED_FODLER_NAME);
+    }
+
     /***********************************************************/
 
     @Test
