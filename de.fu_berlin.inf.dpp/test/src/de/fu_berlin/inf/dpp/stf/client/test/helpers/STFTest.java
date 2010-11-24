@@ -63,9 +63,10 @@ public class STFTest {
     protected static final String SVN_PROJECT_COPY = "stf_test_project_copy";
     protected static String SVN_PKG = "org.eclipsecon.swtbot.example";
     protected static String SVN_CLS = "MyFirstTest01";
-    protected static String SVN_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/trunk/dpp";
-    protected static String SPECIFIED_FODLER_NAME = "/stf_test_project";
-    protected static String SVN_TAG_URL = "http://swtbot-examples.googlecode.com/svn/tags/eclipsecon2009";
+    protected static String SVN_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
+    protected static String SPECIFIED_FODLER_NAME = "/stf_tests/stf_test_project";
+    protected static String SVN_TAG_URL = SVN_URL
+        + "/stf_tests/stf_test_project_copy";
     protected static final String SVN_CLS_PATH = SVN_PROJECT
         + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
 

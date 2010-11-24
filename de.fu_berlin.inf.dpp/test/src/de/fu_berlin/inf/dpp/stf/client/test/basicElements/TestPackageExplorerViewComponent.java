@@ -177,10 +177,13 @@ public class TestPackageExplorerViewComponent extends STFTest {
     }
 
     @Test
+    // @Ignore
     public void testShareProjectWithSVN() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
+        assertFalse(alice.pEV.isInSVN(PROJECT1));
         alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(PROJECT1,
             SVN_URL, SPECIFIED_FODLER_NAME);
+        assertTrue(alice.pEV.isInSVN(PROJECT1));
     }
 
     /**
