@@ -1,0 +1,33 @@
+
+Saros CHANGELOG
+ 
+1.0.1
+	New Features
+		- Better selection support for both driver and observer.
+	
+	Usability Enhancements 
+		- Added Confirm Dialog to before actually deleting a contact.
+		- Better tool-tip for connect button (shows current username).
+		- Disallow connect if username is not set.
+		- Allow to connect also if in Error-State (after a failed connect).
+		- Create Jabber-Account requires repeated password entry and 
+		  stores configuration by default.
+		- Can automatically start follow mode.
+		- On first install a configuration dialog is shown.
+	
+	Bugs
+		- Fixed leak of timer resources since sharing a project was actually never stopped.
+		- Fixed bug in rename action.
+		- Fixed [ 1607388 ] Invitation dialog should suggest project name
+		- Fixed [ 1607387 ] Invitation dialog fails if project already exists
+ 	
+1.0
+	- added skype support
+ 
+0.8.2
+	- Fixed severe bug in project synchronization
+	- Fixed severe bug in account creation
+	- Show invitee name without XMPP-Resource on invitation wizard
+ 
+0.8.1
+	- First beta release

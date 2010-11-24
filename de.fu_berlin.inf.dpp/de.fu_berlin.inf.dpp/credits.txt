@@ -1,0 +1,17 @@
+
+ Author: Riad Djemili, Christopher Oezbek, Björn Gustavs, Oliver Rieger
+ 
+ Icons: Eclipse Org. & Silk Icon set by http://www.famfamfam.com
+ 
+ Jupiter Algorithm Implementation taken from "ace - A Collaborative Editor"
+ 
+ This project uses the following libraries: 
+ 
+   * Log4J - Apache ASL 2.0
+   * Smack - Apache ASL 2.0
+   * PicoContainer - Simplified BSD 
+   * Limewire - GPLv2.0 or later
+   * Easy Mock - MIT
+   * XStream - Simplified BSD
+   * Commons IO/Lang/Codec - Apache ASL 2.0
+   * JUnit - CPL
