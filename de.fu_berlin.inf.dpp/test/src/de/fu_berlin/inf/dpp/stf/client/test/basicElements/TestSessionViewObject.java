@@ -10,9 +10,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -20,8 +20,6 @@ public class TestSessionViewObject extends STFTest {
 
     private static final Logger log = Logger
         .getLogger(TestSessionViewObject.class);
-    private static Musician alice;
-    private static Musician bob;
 
     @BeforeClass
     public static void initMusican() throws RemoteException {
@@ -158,6 +156,7 @@ public class TestSessionViewObject extends STFTest {
      * @throws RemoteException
      */
     @Test
+    @Ignore
     public void testShareYourScreenWithSelectedUser() throws RemoteException {
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();

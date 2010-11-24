@@ -40,8 +40,8 @@ public class SarosStateImp extends StateImp implements SarosState {
      * {@link ChatViewComponentImp} is a singleton, but inheritance is possible.
      */
     public static SarosStateImp getInstance(Saros saros,
-        SarosSessionManager sessionManager, DataTransferManager dataTransferManager,
-        EditorManager editorManager) {
+        SarosSessionManager sessionManager,
+        DataTransferManager dataTransferManager, EditorManager editorManager) {
         if (self != null)
             return self;
         self = new SarosStateImp(saros, sessionManager, dataTransferManager,
@@ -186,9 +186,10 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean isHost(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
-        log.debug("isHost(" + jid.toString() + ") == "
-            + sarosSession.getUser(jid) != null);
-        return sarosSession.getUser(jid) != null;
+        final boolean result = sarosSession.getUser(jid) == sarosSession
+            .getHost();
+        log.debug("isHost(" + jid.toString() + ") == " + result);
+        return result;
     }
 
     public boolean isIncomingConnectionIBB(JID destJid) throws RemoteException {

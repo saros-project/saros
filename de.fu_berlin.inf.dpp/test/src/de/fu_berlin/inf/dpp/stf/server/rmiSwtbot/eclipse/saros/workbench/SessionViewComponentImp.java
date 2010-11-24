@@ -29,8 +29,10 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.SessionView";
 
     /*
-     * title of shells which are pop up by performing the actions on the view.
+     * title of shells which are pop up by performing the actions on the session
+     * view.
      */
+
     private final static String SHELL_CONFIRM_CLOSING_SESSION = "Confirm Closing Session";
     private final static String SHELL_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
     private final static String SHELL_INVITATION = "Invitation";
@@ -39,7 +41,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     protected final static String CONFIRM_LEAVING_SESSION = "Confirm Leaving Session";
 
     /*
-     * Tool tip text of all the toolbar buttons on the view
+     * Tool tip text of toolbar buttons on the session view
      */
     private final static String TB_SHARE_SCREEN_WITH_USER = "Share your screen with selected user";
     private final static String TB_STOP_SESSION_WITH_USER = "Stop session with user";
@@ -51,7 +53,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private final static String TB_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
     private final static String TB_LEAVE_THE_SESSION = "Leave the session";
 
-    // Context menu's name of the table on the view
+    // Context menu of the table on the view
     private final static String CM_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
     private final static String CM_GIVE_DRIVER_ROLE = "Give driver role";
     private final static String CM_REMOVE_DRIVER_ROLE = "Remove driver role";
@@ -76,12 +78,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * exported functions
      * 
      **************************************************************/
-
-    /**********************************************
-     * 
-     * open/close/activate the view
-     * 
-     **********************************************/
     public void openSessionView() throws RemoteException {
         if (!isSessionViewOpen())
             viewPart.openViewById(VIEWID);
@@ -91,25 +87,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return viewPart.isViewOpen(VIEWNAME);
     }
 
-    public void closeSessionView() throws RemoteException {
-        if (isSessionViewOpen())
-            viewPart.closeViewById(VIEWID);
-    }
-
-    public void setFocusOnSessionView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
-        viewPart.waitUntilViewActive(VIEWNAME);
-    }
-
-    public boolean isSessionViewActive() throws RemoteException {
-        return viewPart.isViewActive(VIEWNAME);
-    }
-
-    /**********************************************
-     * 
-     * is Session open/close?
-     * 
-     **********************************************/
     public boolean isInSession() throws RemoteException {
         precondition();
         return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
@@ -122,6 +99,20 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void waitUntilSessionOpenBy(SarosState stateOfPeer)
         throws RemoteException {
         waitUntil(SarosConditions.isInSession(stateOfPeer));
+    }
+
+    public void setFocusOnSessionView() throws RemoteException {
+        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        viewPart.waitUntilViewActive(VIEWNAME);
+    }
+
+    public boolean isSessionViewActive() throws RemoteException {
+        return viewPart.isViewActive(VIEWNAME);
+    }
+
+    public void closeSessionView() throws RemoteException {
+        if (isSessionViewOpen())
+            viewPart.closeViewById(VIEWID);
     }
 
     public void waitUntilSessionClosed() throws RemoteException {
@@ -144,11 +135,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return false;
     }
 
-    /**********************************************
-     * 
-     * context menu of a contact on the view: give/remove driver role
-     * 
-     **********************************************/
     public void giveDriverRole(SarosState stateOfInvitee)
         throws RemoteException {
         JID InviteeJID = stateOfInvitee.getJID();
@@ -159,9 +145,14 @@ public class SessionViewComponentImp extends EclipseComponent implements
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
-            CM_GIVE_DRIVER_ROLE);
+        if (stateOfInvitee.isHost(InviteeJID))
+            tablePart.clickContextMenuOfTable("You", CM_GIVE_DRIVER_ROLE);
+        else
+            tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
+                CM_GIVE_DRIVER_ROLE);
+        windowPart.waitUntilShellActive(PROGRESSINFORMATION);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
+        bot.sleep(sleepTime);
     }
 
     public void giveExclusiveDriverRole(SarosState stateOfInvitee)
@@ -176,7 +167,9 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
+        windowPart.waitUntilShellActive(PROGRESSINFORMATION);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
+        bot.sleep(sleepTime);
     }
 
     public void removeDriverRole(SarosState stateOfInvitee)
@@ -194,11 +187,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 
-    /**********************************************
-     * 
-     * context menu of a contact on the view: follow/stop following user
-     * 
-     **********************************************/
     public void followThisUser(SarosState stateOfFollowedUser)
         throws RemoteException {
         precondition();
@@ -273,24 +261,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         waitUntil(SarosConditions.isFollowingUser(state, baseJIDOfFollowedUser));
     }
 
-    /**********************************************
-     * 
-     * context menu of a contact on the view: jump to position of selected user
-     * 
-     **********************************************/
-    public void jumpToPositionOfSelectedUser(SarosState stateOfselectedUser)
-        throws RemoteException {
-        clickContextMenuOfSelectedUser(
-            stateOfselectedUser,
-            CM_JUMP_TO_POSITION_SELECTED_USER,
-            "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: share your screen with selected user
-     * 
-     **********************************************/
     public void shareYourScreenWithSelectedUser(SarosState stateOfselectedUser)
         throws RemoteException {
         selectUser(
@@ -299,17 +269,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_USER);
     }
 
-    public void confirmIncomingScreensharingSesionWindow()
-        throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
-        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: stop session with user
-     * 
-     **********************************************/
     public void stopSessionWithUser(SarosState stateOfselectedUser)
         throws RemoteException {
         selectUser(
@@ -318,11 +277,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_USER);
     }
 
-    /**********************************************
-     * 
-     * toolbar button on the view: send a file to selected user
-     * 
-     **********************************************/
     public void sendAFileToSelectedUser(SarosState stateOfselectedUser)
         throws RemoteException {
         selectUser(
@@ -331,11 +285,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_USER);
     }
 
-    /**********************************************
-     * 
-     * toolbar button on the view: start a VoIP session
-     * 
-     **********************************************/
     public void startAVoIPSession(SarosState stateOfselectedUser)
         throws RemoteException {
         selectUser(
@@ -347,31 +296,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        windowPart.confirmWindow(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: inconsistence detected
-     * 
-     **********************************************/
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTEN_CYDETECTED);
         windowPart.waitUntilShellCloses(PROGRESSINFORMATION);
     }
 
-    public boolean isInconsistencyDetectedEnabled() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_INCONSISTEN_CYDETECTED);
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: remove all river role
-     * 
-     **********************************************/
     public void removeAllRriverRoles() throws RemoteException {
         precondition();
         if (isRemoveAllRiverEnabled())
@@ -383,11 +313,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return isToolbarButtonEnabled(TB_REMOVE_ALL_DRIVER_ROLES);
     }
 
-    /**********************************************
-     * 
-     * toolbar button on the view: enable/disable follow mode
-     * 
-     **********************************************/
     public void enableDisableFollowMode() throws RemoteException {
         precondition();
         if (isEnableDisableFollowModeEnabled())
@@ -399,11 +324,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return isToolbarButtonEnabled(TB_ENABLE_DISABLE_FOLLOW_MODE);
     }
 
-    /**********************************************
-     * 
-     * toolbar button on the view: leave the session
-     * 
-     **********************************************/
     private void leaveTheSession() {
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
     }
@@ -412,6 +332,34 @@ public class SessionViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         waitUntil(SarosConditions.existsNoParticipants(state,
             jidsOfAllParticipants));
+    }
+
+    public void jumpToPositionOfSelectedUser(SarosState stateOfselectedUser)
+        throws RemoteException {
+        clickContextMenuOfSelectedUser(
+            stateOfselectedUser,
+            CM_JUMP_TO_POSITION_SELECTED_USER,
+            "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
+    }
+
+    public boolean isInconsistencyDetectedEnabled() throws RemoteException {
+        precondition();
+        return isToolbarButtonEnabled(TB_INCONSISTEN_CYDETECTED);
+
+    }
+
+    public void openInvitationInterface(String jidOfInvitee)
+        throws RemoteException {
+        precondition();
+        clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
+        comfirmInvitationWindow(jidOfInvitee);
+    }
+
+    public void comfirmInvitationWindow(String jidOfinvitee)
+        throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_INVITATION);
+        windowPart.confirmWindowWithCheckBox(SHELL_INVITATION, FINISH,
+            jidOfinvitee);
     }
 
     public void leaveTheSessionByPeer() throws RemoteException {
@@ -439,29 +387,20 @@ public class SessionViewComponentImp extends EclipseComponent implements
         waitUntilSessionClosed();
     }
 
+    public void confirmIncomingScreensharingSesionWindow()
+        throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
+        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
+    }
+
+    public void confirmErrorInSarosPluginWindow() throws RemoteException {
+        windowPart.confirmWindow(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
+    }
+
     public void confirmClosingTheSessionWindow() throws RemoteException {
         windowPart.waitUntilShellActive(CLOSING_THE_SESSION);
         windowPart.confirmWindow(CLOSING_THE_SESSION, OK);
         windowPart.waitUntilShellCloses(CLOSING_THE_SESSION);
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: open invitation interface
-     * 
-     **********************************************/
-    public void openInvitationInterface(String jidOfInvitee)
-        throws RemoteException {
-        precondition();
-        clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        comfirmInvitationWindow(jidOfInvitee);
-    }
-
-    public void comfirmInvitationWindow(String jidOfinvitee)
-        throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_INVITATION);
-        windowPart.confirmWindowWithCheckBox(SHELL_INVITATION, FINISH,
-            jidOfinvitee);
     }
 
     /**************************************************************
@@ -532,15 +471,15 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
     }
 
-    private boolean isToolbarButtonEnabled(String tooltip) {
+    protected boolean isToolbarButtonEnabled(String tooltip) {
         return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
     }
 
-    private void clickToolbarButtonWithTooltip(String tooltipText) {
+    protected void clickToolbarButtonWithTooltip(String tooltipText) {
         viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
     }
 
-    private List<SWTBotToolbarButton> getToolbarButtons() {
+    protected List<SWTBotToolbarButton> getToolbarButtons() {
         return viewPart.getToolbarButtonsOnView(VIEWNAME);
     }
 }

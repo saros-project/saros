@@ -149,6 +149,7 @@ public class PEViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void newProject(String projectName) throws RemoteException {
         if (!isProjectExist(projectName)) {
+            workbenchC.activateEclipseShell();
             menuPart.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
@@ -209,6 +210,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (pkg.matches("[\\w\\.]*\\w+")) {
             if (!isPkgExist(projectName, pkg))
                 try {
+                    workbenchC.activateEclipseShell();
                     menuPart.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {

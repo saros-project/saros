@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class IsShellClosed extends DefaultCondition {
 
@@ -20,11 +20,19 @@ public class IsShellClosed extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        try {
-            bot.shell(title);
-            return false;
-        } catch (WidgetNotFoundException e) {
-            return true;
+        final SWTBotShell[] shells = bot.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().equals(title))
+                return false;
         }
+        return true;
     }
+    // public boolean test() throws Exception {
+    // try {
+    // bot.shell(title);
+    // return false;
+    // } catch (WidgetNotFoundException e) {
+    // return true;
+    // }
+    // }
 }

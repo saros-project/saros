@@ -12,7 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -20,8 +19,6 @@ public class TestPackageExplorerViewComponent extends STFTest {
 
     private final static Logger log = Logger
         .getLogger(TestPackageExplorerViewComponent.class);
-
-    private static Musician alice;
 
     @BeforeClass
     public static void initMusican() {
@@ -79,7 +76,6 @@ public class TestPackageExplorerViewComponent extends STFTest {
         assertFalse(alice.pEV.isPkgExist(PROJECT1, PKG1 + ".subpkg"));
         alice.pEV.deletePkg(PROJECT1, PKG1);
         assertFalse(alice.pEV.isPkgExist(PROJECT1, PKG1));
-
     }
 
     @Test
@@ -185,6 +181,22 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(PROJECT1,
             SVN_URL, SPECIFIED_FODLER_NAME);
+    }
+
+    /**
+     * Create a project, rename it, see if rename worked, delete all projects.
+     */
+    @Test
+    public void testRenameProject() throws Exception {
+        alice.pEV.newJavaProject(PROJECT1);
+
+        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.isProjectExist(PROJECT2));
+
+        alice.pEV.renameJavaProject(PROJECT2, PROJECT1);
+
+        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.isProjectExist(PROJECT2));
     }
 
     /***********************************************************/
@@ -329,6 +341,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
     }
 
     @Test
+    @Ignore
+    // TODO Somehow verify that the external editor was actually opened, then
+    // close it.
     public void testOpenWith() throws RemoteException {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openFileWith("Text Editor",
