@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!--
+Saros build file for automatic plugin builds using ant4eclipse
+
+Florian Thiel <florian.thiel@fu-berlin.de>,
+created: 20100217
+
+use: ant -lib [ANT4ECLIPSE_LIBS]
+         -Declipse.plugin.dir=DIR
+         -Dant4eclipse.dir=DIR
+         -Dcobertura.dir=DIR
+         -Dfeature.version=DIR
+         TARGET
+
+NOTE:
+- requires following properties to be set
+  eclipse.plugin.dir=DIR (path to eclipse plugin libs)
+  cobertura.dir=DIR (cobertura libs)
+  ant4eclipse.dir=DIR (ant4eclipse root)
+  feature.version=VERSION (version # for feature (has to match plugin)
+- you can force the use of a specific JDK by uncommenting
+  the <ant4eclipse:installedJREs> section below
+-->
+
+<project name="build.saros" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
+
+	<!-- define ant-contrib macros -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	
+	<!-- define ant4eclipse tasks -->
+	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
+
+	<!-- import the ant4eclipse pde macros -->
+	<import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
+
+	<path id="cobertura.classpath">
+		<fileset dir="${cobertura.dir}">
+			<include name="cobertura.jar" />
+			<include name="lib/**/*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+
+	<!-- define the workspace location here -->
+	<property name="workspaceDirectory" value="${basedir}/.." />
+
+	<property name="cobertura.format" value="xml" />
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="report.dir" value="${build.dir}/report" />
+	<property name="instrumented.dir" value="${build.dir}/instrumented" />
+	<property name="uninstrumented.dir" value="${build.dir}/uninstrumented" />
+	<property name="cobertura.datafile" value="${report.dir}/cobertura.ser" />
+
+	<!-- define your jdk location here
+		<ant4eclipse:installedJREs>
+			<jre id="jdk16" location="R:/software/jdk/jdk16" />
+		</ant4eclipse:installedJREs>
+	-->
+
+	<!-- (define eclipse.plugin.dir using -D syntax) the target platform
+			  location (can be an Eclipse plugin dir or another set of JARs
+			  satisfying the Saros platform dependencies) -->
+	<ant4eclipse:targetPlatform id="saros.target.platform">
+		<location dir="${eclipse.plugin.dir}" />
+	</ant4eclipse:targetPlatform>
+
+	<!-- acquire access to the project classpath for unit tests -->
+	<ant4eclipse:getJdtClassPath pathId="saros.classpath" workspaceDirectory="${workspaceDirectory}" projectName="Saros" />
+
+	<!-- Targets -->
+	<target name="build">
+		<mkdir dir="${uninstrumented.dir}" />
+		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="Saros" targetplatformid="saros.target.platform" destination="${uninstrumented.dir}" />
+	</target>
+
+	<target name="test" depends="build">
+		<delete file="${cobertura.datafile}" />
+		<mkdir dir="${instrumented.dir}" />
+		<cobertura-instrument todir="${instrumented.dir}" datafile="${cobertura.datafile}">
+			<!-- only instrument Saros proper code -->
+			<includeClasses regex="de\.fu_berlin\.inf\.dpp.*" />
+			<!-- exclude classes ending in Test -->
+			<excludeClasses regex=".*Test" />
+			<!-- exclude classes starting with Test -->
+			<excludeClasses regex=".*\.Test.*" />
+			<!-- exclude classes in a test package -->
+			<excludeClasses regex=".*\.test\..*" />
+			<fileset dir="${uninstrumented.dir}/plugins">
+				<include name="de.fu_berlin.inf.dpp_*.jar" />
+			</fileset>
+		</cobertura-instrument>
+
+		<junit fork="yes">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
+			<!-- add instrumented binaries first -->
+			<classpath>
+				<fileset dir="${instrumented.dir}">
+					<include name="de.fu_berlin.inf.dpp_*.jar" />
+				</fileset>
+			</classpath>
+			<classpath refid="saros.classpath" />
+			<classpath refid="cobertura.classpath" />
+
+			<formatter type="xml" />
+
+			<test name="de.fu_berlin.inf.dpp.AllTestsSuite" todir="${report.dir}" />
+		</junit>
+
+		<!-- srcdir is only used for cyclomatic complexity, you have to exclude tests from instrumentation
+		     if you don't want them included in the report -->
+		<cobertura-report format="${cobertura.format}" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
+	</target>
+	
+	<!-- STF RmiTest -->
+	<target name="STFTest" depends="build">
+			<delete file="${cobertura.datafile}" />
+			<mkdir dir="${instrumented.dir}" />
+			<cobertura-instrument todir="${instrumented.dir}" datafile="${cobertura.datafile}">
+				<!-- only instrument Saros proper code -->
+				<includeClasses regex="de\.fu_berlin\.inf\.dpp.*" />
+				<!-- exclude classes ending in Test -->
+				<excludeClasses regex=".*Test" />
+				<!-- exclude classes starting with Test -->
+				<excludeClasses regex=".*\.Test.*" />
+				<!-- exclude classes in a test package -->
+				<excludeClasses regex=".*\.test\..*" />
+				<fileset dir="${uninstrumented.dir}/plugins">
+					<include name="de.fu_berlin.inf.dpp_*.jar" />
+				</fileset>
+			</cobertura-instrument>
+
+			<junit fork="yes">
+				<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
+				<!-- add instrumented binaries first -->
+				<classpath>
+					<fileset dir="${instrumented.dir}">
+						<include name="de.fu_berlin.inf.dpp_*.jar" />
+					</fileset>
+				</classpath>
+				<classpath refid="saros.classpath" />
+				<classpath refid="cobertura.classpath" />
+
+				<formatter type="xml" />
+
+				<test name="de.fu_berlin.inf.dpp.stf.test.RmiTest" todir="${report.dir}" />
+			</junit>
+
+			<!-- srcdir is only used for cyclomatic complexity, you have to exclude tests from instrumentation
+			     if you don't want them included in the report -->
+			<cobertura-report format="${cobertura.format}" datafile="${cobertura.datafile}" destdir="${report.dir}" srcdir="${src.dir}" />
+		</target>
+	
+	
+	<!-- NOTE: only executes if feature.version is set -->
+	<target name="buildSarosFeature">
+		<if>
+			<isset property="feature.version"/>
+			<then>
+				<mkdir dir="${uninstrumented.dir}" />
+				<buildFeature
+					workspaceDirectory="${workspaceDirectory}"
+					featureId="de.fu_berlin.inf.dpp.feature"
+					featureVersion="${feature.version}"
+					targetplatformid="saros.target.platform"
+					destination="${uninstrumented.dir}" />
+			</then>
+			<else>
+				<echo message="buildSarosFeature called without feature.version being set. Not executing!" />
+			</else>
+		</if>
+	</target>
+		
+	<target name="clean">
+		<delete failonerror="false" dir="${build.dir}" />
+	</target>
+</project>
