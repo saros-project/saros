@@ -594,33 +594,36 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
         String repositoryURL, String specifiedFolderName)
         throws RemoteException {
+        precondition();
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
             SHARE_PROJECT);
+
         windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
-        if (bot.table().containsItem(repositoryURL)) {
-            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
-                repositoryURL, NEXT);
-            bot.radio("Use specified folder name:").click();
-            bot.text().setText(specifiedFolderName);
-            bot.button(FINISH).click();
-            windowPart.waitUntilShellActive("Remote Project Exists");
-            windowPart.confirmWindow("Remote Project Exists", YES);
-            windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
-            windowPart.waitUntilShellOpen("Confirm Open Perspective");
-            windowPart.activateShellWithText("Confirm Open Perspective");
-            bot.button(NO).click();
-            // windowPart.confirmWindow("Confirm Open Perspective", NO);
-        } else {
-            bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
-            bot.button(NEXT).click();
+
+        try {
+            final SWTBotTable table = bot.table();
+            if (table.containsItem(repositoryURL)) {
+                windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+                    repositoryURL, NEXT);
+            } else {
+                bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+                bot.button(NEXT).click();
+                bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+                bot.button(NEXT).click();
+            }
+        } catch (WidgetNotFoundException e) {
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             bot.button(NEXT).click();
-            bot.radio("Use specified folder name:").click();
-            bot.text().setText(specifiedFolderName);
-            bot.button(FINISH).click();
         }
+
+        bot.radio("Use specified folder name:").click();
+        bot.text().setText(specifiedFolderName);
+        bot.button(FINISH).click();
+        windowPart.waitUntilShellActive("Remote Project Exists");
+        windowPart.confirmWindow("Remote Project Exists", YES);
+        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
     }
 
     public void importProjectFromSVN(String repositoryURL)
