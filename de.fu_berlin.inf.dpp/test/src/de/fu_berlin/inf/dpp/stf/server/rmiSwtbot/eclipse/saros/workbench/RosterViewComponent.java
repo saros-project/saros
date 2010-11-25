@@ -9,6 +9,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
+import de.fu_berlin.inf.dpp.ui.RosterView;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -42,6 +44,8 @@ public interface RosterViewComponent extends Remote {
 
     public void setFocusOnRosterView() throws RemoteException;
 
+    public boolean isRosterViewActive() throws RemoteException;
+
     public void closeRosterView() throws RemoteException;
 
     public void disconnect() throws RemoteException;
@@ -52,13 +56,13 @@ public interface RosterViewComponent extends Remote {
 
     public boolean isConnectedGUI() throws RemoteException;
 
+    /**
+     * This method returns true if {@link SarosStateImp} and the GUI
+     * {@link RosterView} having the connected state.
+     */
     public boolean isConnected() throws RemoteException;
 
     public void clickAddANewContactToolbarButton() throws RemoteException;
-
-    // public void connect() throws RemoteException;
-
-    // public void disconnect() throws RemoteException;
 
     public void waitUntilIsConnected() throws RemoteException;
 
@@ -75,8 +79,11 @@ public interface RosterViewComponent extends Remote {
 
     public void connect(JID jid, String password) throws RemoteException;
 
-    // public void confirmDeleteWindow(String buttonName) throws
-    // RemoteException;
+    /**
+     * Fill up the configuration wizard with title "Saros Configuration".
+     */
+    public void confirmWizardCreateXMPPAccount(String xmppServer, String jid,
+        String password) throws RemoteException;
 
     public void clickContextMenuOfBuddy(String context, String baseJID)
         throws RemoteException;

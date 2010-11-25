@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
 
@@ -275,17 +274,29 @@ public interface PEViewComponent extends Remote {
     public void newFile(String... filePath) throws RemoteException;
 
     /**
-     * please use the method
-     * {@link EclipseComponent#getClassPath(String, String, String)}to get the
-     * class path and the method {@link EclipseComponent#getPath(String...)} to
-     * get the file path.
-     * 
+     * @return <tt>true</tt>, if the file specified by the passed parameter
+     *         "filePath" exists.
      * @param filePath
      *            path of the file, e.g. "Foo_Saros/myFolder/myFile.xml" or path
      *            of a class file, e.g. "Foo_Saros/src/my/pkg/myClass.java
      * 
      */
     public boolean isFileExist(String filePath) throws RemoteException;
+
+    /**
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     * @return <tt>true</tt>, if the class file specified by the passed
+     *         parameters exists.
+     * @throws RemoteException
+     */
+    public boolean isClassExist(String projectName, String pkg, String className)
+        throws RemoteException;
 
     /**
      * Performs the action "create a new class" which should be done with the
@@ -405,7 +416,7 @@ public interface PEViewComponent extends Remote {
      * steps:
      * 
      * <ol>
-     * <li>if the class file is already open, return.</li>
+     * <li>if the file is already open, return.</li>
      * <li>selects the file, which you want to open, and then click the context
      * menu "Open".</li>
      * </ol>
@@ -417,6 +428,28 @@ public interface PEViewComponent extends Remote {
      * @throws RemoteException
      */
     public void openFile(String... fileNodes) throws RemoteException;
+
+    /**
+     * 
+     * Performs the action "open class file" which should be done with the
+     * following steps:
+     * 
+     * <ol>
+     * <li>if the class file is already open, return.</li>
+     * <li>selects the class file, which you want to open, and then click the
+     * context menu "Open".</li>
+     * </ol>
+     * 
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     * @throws RemoteException
+     */
+    public void openClass(String projectName, String pkg, String className)
+        throws RemoteException;
 
     /**
      * Performs the action "open file with" which should be done with the
@@ -926,8 +959,8 @@ public interface PEViewComponent extends Remote {
      *            the ID of the reversion to which you want to switch
      * @throws RemoteException
      */
-    public void updateProject(String projectName,
-        String versionID) throws RemoteException;
+    public void updateProject(String projectName, String versionID)
+        throws RemoteException;
 
     /**
      * Perform the action "switch to another Reversion" which should be done
@@ -963,8 +996,8 @@ public interface PEViewComponent extends Remote {
      *            the ID of the reversion to which you want to switch
      * @throws RemoteException
      */
-    public void updateClass(String projectName, String pkg,
-        String className, String versionID) throws RemoteException;
+    public void updateClass(String projectName, String pkg, String className,
+        String versionID) throws RemoteException;
 
     /**
      * Perform the action "switch to another Branch/Tag" which should be done
@@ -1015,7 +1048,8 @@ public interface PEViewComponent extends Remote {
      * @return <tt>true</tt>, if the given project is under SVN control
      * @throws RemoteException
      */
-    public boolean isProjectManagedBySVN(String prjectName) throws RemoteException;
+    public boolean isProjectManagedBySVN(String prjectName)
+        throws RemoteException;
 
     /**
      * waits until the given project is in SVN control

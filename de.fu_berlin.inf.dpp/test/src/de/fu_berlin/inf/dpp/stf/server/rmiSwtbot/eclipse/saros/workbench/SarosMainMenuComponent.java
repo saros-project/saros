@@ -7,6 +7,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuCompo
 
 public interface SarosMainMenuComponent extends MainMenuComponent {
 
-    public void creatNewAccount(JID jid, String password)
+    public void creatAccount(JID jid, String password)
         throws RemoteException;
 }

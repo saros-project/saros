@@ -45,7 +45,7 @@ public interface EditorComponent extends Remote {
 
     public void waitUntilEditorActive(String name) throws RemoteException;
 
-    public boolean isClassOpen(String className) throws RemoteException;
+    public boolean isJavaEditorOpen(String javaEditorName) throws RemoteException;
 
     public boolean isFileOpen(String fileName) throws RemoteException;
 

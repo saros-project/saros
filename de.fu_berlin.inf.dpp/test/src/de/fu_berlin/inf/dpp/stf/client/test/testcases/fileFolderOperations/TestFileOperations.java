@@ -20,28 +20,45 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestFileOperations extends STFTest {
 
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>alice (Host, Driver), aclice share a java project with bob and carl.</li>
+     * <li>bob (Observer)</li>
+     * <li>carl (Observer)</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
     @BeforeClass
     public static void initMusicians() throws RemoteException,
         InterruptedException {
+        /* initialize the musicians simultaneously */
         List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
 
+        /* alice build session with bob, and carl simultaneously */
+
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             carl, bob);
+
+        /* carl follow alice */
         carl.sessionV.followThisUser(alice.state);
     }
 
     @Before
     public void setup() throws RemoteException {
-        if (!alice.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)))
+        if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
             alice.pEV.newClass(PROJECT1, PKG1, CLS1);
-        if (alice.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)))
+        if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS2))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
         if (alice.pEV.isPkgExist(PROJECT1, PKG2))
             alice.pEV.deletePkg(PROJECT1, PKG2);
+
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
@@ -49,6 +66,7 @@ public class TestFileOperations extends STFTest {
 
     @After
     public void cleanUp() throws RemoteException {
+
         carl.workbench.resetWorkbench();
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
@@ -56,25 +74,52 @@ public class TestFileOperations extends STFTest {
 
     @AfterClass
     public static void resetSaros() throws RemoteException {
+
         carl.workbench.resetSaros();
         bob.workbench.resetSaros();
         alice.workbench.resetSaros();
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice rename the class "CLS1" to "CLS2"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>the class'name are renamed by bob and carl too</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testRenameFile() throws RemoteException {
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
         alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
 
         bob.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
 
         carl.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
-        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG1, CLS2));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice delete the class "CLS1"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>the class are deleted by bob and carl too</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testDeleteFile() throws RemoteException {
         alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
@@ -84,6 +129,23 @@ public class TestFileOperations extends STFTest {
         assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice create a new package "PKG2"</li>
+     * <li>alice create a new class "CLS1" under package "PKG2"</li>
+     * <li>alice set text in the class "CLS1"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>the package "PKG2" are created by bob and carl too</li>
+     * <li>the new class "CLS1" are created by bob and carl too</li>
+     * <li>carl and bob should see the change by alice</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
         alice.pEV.newPackage(PROJECT1, PKG2);
@@ -95,8 +157,8 @@ public class TestFileOperations extends STFTest {
         alice.pEV.newClass(PROJECT1, PKG2, CLS1);
         bob.pEV.waitUntilClassExist(PROJECT1, PKG2, CLS1);
         carl.pEV.waitUntilClassExist(PROJECT1, PKG2, CLS1);
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG2, CLS1)));
-        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG2, CLS1)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG2, CLS1));
+        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG2, CLS1));
 
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG2, CLS1);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG2,
@@ -113,6 +175,23 @@ public class TestFileOperations extends STFTest {
         assertTrue(clsContentOfCarl.equals(clsContentOfAlice));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice create a new package "PKG2" and under it create a new class
+     * "CLS2"</li>
+     * <li>alice move the class "CLS2" to the package "PKG1"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li></li>
+     * <li>the class "CLS2" should be moved into the package "PKG1" by carl and
+     * bob</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testMoveClass() throws RemoteException {
         alice.pEV.newPackage(PROJECT1, PKG2);
@@ -120,12 +199,25 @@ public class TestFileOperations extends STFTest {
         alice.pEV.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
         bob.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
         carl.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
-        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG2, CLS2)));
-        assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
-        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG2, CLS2)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG2, CLS2));
+        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG1, CLS2));
+        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG2, CLS2));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice rename the package "PKG1" to "PKG2"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>the package should be renamed by carl and bob</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testRenamePkg() throws RemoteException {
         alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
@@ -139,6 +231,19 @@ public class TestFileOperations extends STFTest {
         assertTrue(carl.pEV.isPkgExist(PROJECT1, PKG2));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice delete the package "PKG1"</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>the package should be deleted by carl and bob</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void testDeletePkg() throws RemoteException {
         alice.pEV.deletePkg(PROJECT1, PKG1);

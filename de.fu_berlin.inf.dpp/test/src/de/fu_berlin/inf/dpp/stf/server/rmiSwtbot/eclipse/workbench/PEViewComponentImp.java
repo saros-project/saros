@@ -287,6 +287,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         return file.exists();
     }
 
+    public boolean isClassExist(String projectName, String pkg, String className)
+        throws RemoteException {
+        return isFileExist(getClassPath(projectName, pkg, className));
+    }
+
     public boolean isFileExistWithGUI(String... nodes) throws RemoteException {
         workbenchC.activateEclipseShell();
         precondition();
@@ -362,11 +367,17 @@ public class PEViewComponentImp extends EclipseComponent implements
      * all related actions with the sub menus of the context menu "Open"
      * 
      **********************************************/
+
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
         if (!editorC.isFileOpen(fileNodes[fileNodes.length - 1])) {
             viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, fileNodes);
         }
+    }
+
+    public void openClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        openFile(getClassNodes(projectName, pkg, className));
     }
 
     public void openFileWith(String whichEditor, String... fileNodes)

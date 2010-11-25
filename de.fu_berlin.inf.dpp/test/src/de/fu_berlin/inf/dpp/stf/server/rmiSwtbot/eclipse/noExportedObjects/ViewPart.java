@@ -329,9 +329,11 @@ public class ViewPart extends EclipseComponent {
      */
     public SWTBotToolbarButton clickToolbarButtonWithTooltipInView(
         String viewName, String buttonTooltip) {
+
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
             .getToolbarButtons()) {
             if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
+
                 return toolbarButton.click();
             }
         }

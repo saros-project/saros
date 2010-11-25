@@ -5,51 +5,123 @@ import java.rmi.RemoteException;
 
 public interface MainMenuComponent extends Remote {
 
-    public void preference() throws RemoteException;
+    /**********************************************
+     * 
+     * all related actions with preferences
+     * 
+     **********************************************/
 
-    public void newTextFileLineDelimiter(String OS) throws RemoteException;
+    /**
+     * selects a new text file line delimiter on the preference page which
+     * should be done with the following steps:
+     * <ol>
+     * <li>Click menu "Window" -> "Preferences"</li>
+     * <li>In the preference page select "General" -> "Workspace"</li>
+     * <li>modify the text file line delimiter with the passed parameter "OS"</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the saros-instance is active.</li>
+     * </ol>
+     * 
+     * @param whichOS
+     *            the name of the OS, which you want to select.
+     * 
+     */
+    public void newTextFileLineDelimiter(String whichOS) throws RemoteException;
 
+    /**
+     * 
+     * @return the used text file line delimiter
+     * @throws RemoteException
+     */
     public String getTextFileLineDelimiter() throws RemoteException;
 
     /**
-     * Open the view "Problems". The name of the method is defined the same as
-     * the menu names. The name "showViewProblem" then means: hello guy, please
-     * click main menus Window -> Show view -> Problems.
+     * Open the view "Problems" using GUI which should be done with the
+     * following steps:
+     * <ol>
+     * <li>Click menu "Window" -> "show view" -> "other..."</li>
+     * <li>Select "Gernaral" -> "Problems" and click "Finish" to confirm the
+     * action</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the saros-instance is active.</li>
+     * </ol>
      * 
+     * @throws RemoteException
      */
     public void showViewProblems() throws RemoteException;
 
     /**
-     * Open the view "Project Explorer". The name of the method is defined the
-     * same as the menu names. The name "showViewProblem" then means: hello guy,
-     * please click main menus Window -> Show view -> Project Explorer.
+     * Open the view "Project Explorer" using GUI which should be done with the
+     * following steps:
+     * <ol>
+     * <li>Click menu "Window" -> "show view" -> "other..."</li>
+     * <li>Select "Gernaral" -> "Project Explorer" and click "Finish" to confirm
+     * the action</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the saros-instance is active.</li>
+     * </ol>
      * 
+     * @throws RemoteException
      */
     public void showViewProjectExplorer() throws RemoteException;
 
-    /**
-     * Open the perspective "Java". The name of the method is defined the same
-     * as the menu names. The name "openPerspectiveJava" then means: hello guy,
-     * please click main menus Window -> Open perspective -> Java.
+    /**********************************************
      * 
+     * open perspectives
+     * 
+     **********************************************/
+    /**
+     * Open the perspective "Java" using GUI which should be done with the
+     * following steps:
+     * <ol>
+     * <li>Click menu "Window" -> "Open Perspective" -> "other..."</li>
+     * <li>Select "Java (default)" and click "Finish" to confirm the action</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the saros-instance is active.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
      */
     public void openPerspectiveJava() throws RemoteException;
 
     /**
-     * test, if the java perspective is active.
+     * @return <tt>true</tt>, if the java perspective is active.
+     * @throws RemoteException
      */
     public boolean isJavaPerspectiveActive() throws RemoteException;
 
     /**
-     * Open the perspective "Debug". The name of the method is defined the same
-     * as the menu names. The name "openPerspectiveDebug" then means: hello guy,
-     * please click main menus Window -> Open perspective -> Debug.
+     * Open the perspective "Java" using GUI which should be done with the
+     * following steps:
+     * <ol>
+     * <li>Click menu "Window" -> "Open Perspective" -> "other..."</li>
+     * <li>Select "Debug" and click "Finish" to confirm the action</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the saros-instance is active.</li>
+     * </ol>
      * 
+     * @throws RemoteException
      */
     public void openPerspectiveDebug() throws RemoteException;
 
     /**
-     * test, if the debug perspective is active.
+     * @return <tt>true</tt>, if the debug perspective is active.
+     * @throws RemoteException
      */
     public boolean isDebugPerspectiveActive() throws RemoteException;
 

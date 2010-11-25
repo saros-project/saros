@@ -15,8 +15,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -43,14 +43,16 @@ public class TestAllParticipantsFollowDriver extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE);
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.editor.closejavaEditorWithoutSave(CLS1);
+        alice.editor.closeJavaEditorWithSave(CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -94,23 +96,22 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         carl.workbench.resetWorkbench();
         dave.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
-
     }
 
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        assertFalse(bob.editor.isClassOpen(CLS1));
-        assertFalse(carl.editor.isClassOpen(CLS1));
-        assertFalse(dave.editor.isClassOpen(CLS1));
+        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
+        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
+        assertFalse(dave.editor.isJavaEditorOpen(CLS1));
 
         alice.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS1));
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         carl.editor.waitUntilJavaEditorOpen(CLS1);
         dave.editor.waitUntilJavaEditorOpen(CLS1);
 
-        assertTrue(bob.editor.isClassOpen(CLS1));
-        assertTrue(carl.editor.isClassOpen(CLS1));
-        assertTrue(dave.editor.isClassOpen(CLS1));
+        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
+        assertTrue(carl.editor.isJavaEditorOpen(CLS1));
+        assertTrue(dave.editor.isJavaEditorOpen(CLS1));
 
     }
 
@@ -167,12 +168,15 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         alice.editor.closeJavaEditorWithSave(CLS1);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);
+        System.out.println("alice content: " + clsContentOfAlice);
         bob.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(bob.editor.isClassOpen(CLS1));
+        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
         carl.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(carl.editor.isClassOpen(CLS1));
+        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         dave.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(dave.editor.isClassOpen(CLS1));
+        assertFalse(dave.editor.isJavaEditorOpen(CLS1));
+        System.out.println("bob content: "
+            + bob.state.getClassContent(PROJECT1, PKG1, CLS1));
         assertTrue(bob.state.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));
         assertTrue(carl.state.getClassContent(PROJECT1, PKG1, CLS1).equals(

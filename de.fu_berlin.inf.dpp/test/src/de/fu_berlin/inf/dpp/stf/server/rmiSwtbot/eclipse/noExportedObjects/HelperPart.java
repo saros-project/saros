@@ -41,6 +41,7 @@ public class HelperPart extends EclipseComponent {
                 }
             } finally {
                 is.close();
+                writer.close();
             }
             return writer.toString();
         } else {

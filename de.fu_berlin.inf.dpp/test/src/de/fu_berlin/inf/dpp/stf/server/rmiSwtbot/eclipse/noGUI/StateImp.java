@@ -42,8 +42,7 @@ public class StateImp extends EclipseComponent implements State {
      */
     public String getClassContent(String projectName, String pkg,
         String className) throws RemoteException, IOException, CoreException {
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
+        IPath path = new Path(getClassPath(projectName, pkg, className));
         log.info("Checking existence of file \"" + path + "\"");
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);

@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponentImp;
 
@@ -11,6 +9,21 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     SarosMainMenuComponent {
 
     private static transient SarosMainMenuComponentImp self;
+
+    /* name of all the main menus */
+    private static final String MENU_SAROS = "Saros";
+    private static final String MENU_CREATE_ACCOUNT = "Create Account";
+    private static final String MENU_PREFERENCES = "Preferences";
+
+    /* title of shells which are pop up by clicking the main menus */
+    private static final String SHELL_PREFERNCES = "Preferences";
+
+    /* All infos about the shell "Create XMPP account" */
+    private static final String SHELL_CREATE_XMPP_ACCOUNT = "Create XMPP account";
+    private static final String LABEL_SERVER = "Server";
+    private static final String LABEL_USERNAME = "Username:";
+    private static final String LABEL_PASSWORD = "Password:";
+    private static final String LABEL_CONFIRM = "Confirm:";
 
     /**
      * {@link SarosMainMenuComponentImp} is a singleton, but inheritance is
@@ -23,26 +36,26 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         return self;
     }
 
-    public void creatNewAccount(JID jid, String password)
-        throws RemoteException {
-        workbenchC.getEclipseShell().activate().setFocus();
+    /***********************************************************************
+     * 
+     * exported functions
+     * 
+     ***********************************************************************/
+    public void creatAccount(JID jid, String password) throws RemoteException {
         menuPart.clickMenuWithTexts("Saros", "Create Account");
-        confirmCreateNewUserAccountWindow(jid.getDomain(), jid.getName(),
+        rosterVC.confirmWizardCreateXMPPAccount(jid.getDomain(), jid.getName(),
             password);
     }
 
-    public void confirmCreateNewUserAccountWindow(String server,
-        String username, String password) throws RemoteException {
-        try {
-            windowPart.activateShellWithText("Create New User Account");
-            bot.textWithLabel("Jabber Server").setText(server);
-            bot.textWithLabel("Username").setText(username);
-            bot.textWithLabel("Password").setText(password);
-            bot.textWithLabel("Repeat Password").setText(password);
-            bot.button(FINISH).click();
-        } catch (WidgetNotFoundException e) {
-            log.error("widget not found while accountBySarosMenu", e);
-        }
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
+
+    private void clickMenuSarosPreferences() throws RemoteException {
+        precondition();
+        menuPart.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
     }
 
 }

@@ -10,19 +10,33 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 public class MainMenuComponentImp extends EclipseComponent implements
     MainMenuComponent {
 
+    /* IDs of all the perspectives */
     public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
     public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
 
+    /* name of all the main menus */
+    private static final String MENU_WINDOW = "Window";
+    private static final String MENU_PREFERENCES = "Preferences";
     private static final String MENU_FILE = "File";
     private static final String MENU_IMPORT = "Import...";
 
-    public void preference() throws RemoteException {
-        workbenchC.activateEclipseShell();
-        menuPart.clickMenuWithTexts("Window", "Preferences");
-    }
+    /* title of shells which are pop up by clicking the main menus */
+    private static final String SHELL_PREFERNCES = "Preferences";
+
+    /***********************************************************************
+     * 
+     * exported functions
+     * 
+     ***********************************************************************/
+
+    /**********************************************
+     * 
+     * all related actions with preferences
+     * 
+     **********************************************/
 
     public void newTextFileLineDelimiter(String OS) throws RemoteException {
-        preference();
+        clickMenuPreferences();
         SWTBotTree tree = bot.tree();
         tree.expandNode("General").select("Workspace");
 
@@ -35,87 +49,77 @@ public class MainMenuComponentImp extends EclipseComponent implements
         }
         bot.button("Apply").click();
         bot.button("OK").click();
-        windowPart.waitUntilShellClosed("Preferences");
+        windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
     public String getTextFileLineDelimiter() throws RemoteException {
-        preference();
+        clickMenuPreferences();
         SWTBotTree tree = bot.tree();
         tree.expandNode("General").select("Workspace");
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            windowPart.closeShell("Preferences");
+            windowPart.closeShell(SHELL_PREFERNCES);
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            windowPart.closeShell("Preferences");
+            windowPart.closeShell(SHELL_PREFERNCES);
             return itemName;
         }
-        windowPart.closeShell("Preferences");
+        windowPart.closeShell(SHELL_PREFERNCES);
         return "";
     }
 
-    /**
-     * Open the view "Problems". The name of the method is defined the same as
-     * the menu names. The name "showViewProblem" then means: hello guy, please
-     * click main menus Window -> Show view -> Problems.
+    /**********************************************
      * 
-     */
+     * show view with main menu
+     * 
+     **********************************************/
     public void showViewProblems() throws RemoteException {
         menuPart.openViewWithName("General", "Problems");
     }
 
-    /**
-     * Open the view "Project Explorer". The name of the method is defined the
-     * same as the menu names. The name "showViewProblem" then means: hello guy,
-     * please click main menus Window -> Show view -> Project Explorer.
-     * 
-     */
     public void showViewProjectExplorer() throws RemoteException {
         menuPart.openViewWithName("General", "Project Explorer");
     }
 
-    /**
-     * Open the perspective "Java". The name of the method is defined the same
-     * as the menu names. The name "openPerspectiveJava" then means: hello guy,
-     * please click main menus Window -> Open perspective -> Java.
+    /**********************************************
      * 
-     */
+     * all related actions with perspective
+     * 
+     **********************************************/
     public void openPerspectiveJava() throws RemoteException {
         perspectivePart.openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
     }
 
-    /**
-     * test, if the java perspective is active.
-     */
     public boolean isJavaPerspectiveActive() throws RemoteException {
         return perspectivePart.isPerspectiveActive(ID_JAVA_PERSPECTIVE);
     }
 
-    /**
-     * Open the perspective "Debug". The name of the method is defined the same
-     * as the menu names. The name "openPerspectiveDebug" then means: hello guy,
-     * please click main menus Window -> Open perspective -> Debug.
-     * 
-     */
     public void openPerspectiveDebug() throws RemoteException {
         perspectivePart.openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
     }
 
-    /**
-     * test, if the debug perspective is active.
-     */
     public boolean isDebugPerspectiveActive() throws RemoteException {
         return perspectivePart.isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
     }
 
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
+
     @Override
     protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
+        workbenchC.activateEclipseShell();
+    }
 
+    private void clickMenuPreferences() throws RemoteException {
+        precondition();
+        menuPart.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
     }
 
 }

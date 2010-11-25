@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -40,7 +40,8 @@ public class TestCreatingNewFile extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
             MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -49,7 +50,7 @@ public class TestCreatingNewFile extends STFTest {
         carl.pEV.newProject(PROJECT1);
 
         /*
-         * build session with bob, and alice simultaneously
+         * carl build session with bob, and alice simultaneously
          */
         carl.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             bob, alice);

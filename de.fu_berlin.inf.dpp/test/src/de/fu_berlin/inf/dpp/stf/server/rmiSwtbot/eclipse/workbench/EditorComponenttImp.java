@@ -1,24 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -94,8 +80,9 @@ public class EditorComponenttImp extends EclipseComponent implements
         waitUntil(SarosConditions.isEditorActive(editorPart, name));
     }
 
-    public boolean isClassOpen(String className) throws RemoteException {
-        return editorPart.isEditorOpen(className + ".java");
+    public boolean isJavaEditorOpen(String javaEditorName)
+        throws RemoteException {
+        return editorPart.isEditorOpen(javaEditorName + ".java");
     }
 
     public boolean isFileOpen(String fileName) throws RemoteException {
@@ -103,7 +90,7 @@ public class EditorComponenttImp extends EclipseComponent implements
     }
 
     public boolean isJavaEditorActive(String className) throws RemoteException {
-        if (!isClassOpen(className))
+        if (!isJavaEditorOpen(className))
             return false;
         return editorPart.isEditorActive(className + ".java");
     }
@@ -232,30 +219,33 @@ public class EditorComponenttImp extends EclipseComponent implements
      */
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException {
-        final List<Boolean> results = new ArrayList<Boolean>();
-        IPath path = new Path(projectName + "/src/"
-            + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
-
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-
-                IWorkbenchPage page = win.getActivePage();
-                if (page != null) {
-                    IEditorInput editorInput = new FileEditorInput(file);
-                    try {
-                        page.openEditor(editorInput, idOfEditor);
-                    } catch (PartInitException e) {
-                        log.debug("", e);
-                    }
-                    results.add(page.findEditor(editorInput).isDirty());
-                }
-            }
-        });
-        return results.get(0);
+        if (!editorC.isJavaEditorOpen(className)) {
+            peVC.openClass(projectName, pkg, className);
+        }
+        return getJavaEditor(className).isDirty();
+        // final List<Boolean> results = new ArrayList<Boolean>();
+        // IPath path = new Path(getClassPath(projectName, pkg, className));
+        // final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+        // .getFile(path);
+        //
+        // Display.getDefault().syncExec(new Runnable() {
+        // public void run() {
+        // final IWorkbench wb = PlatformUI.getWorkbench();
+        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        //
+        // IWorkbenchPage page = win.getActivePage();
+        // if (page != null) {
+        // IEditorInput editorInput = new FileEditorInput(file);
+        // try {
+        // page.openEditor(editorInput, idOfEditor);
+        // } catch (PartInitException e) {
+        // log.debug("", e);
+        // }
+        // results.add(page.findEditor(editorInput).isDirty());
+        // }
+        // }
+        // });
+        // return results.get(0);
     }
 
     public void setTextInJavaEditorWithSave(String contentPath,

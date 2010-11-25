@@ -6,8 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestBasicSarosElements;
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestPackageExplorerViewComponent;
-import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestRosterViewObject;
-import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestSessionViewObject;
+import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestRosterViewComponent;
+import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestSessionViewComponent;
 
 /**
  * These are the test cases that test STF itself.
@@ -18,8 +18,8 @@ import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestSessionViewObject;
 // RmiTest.class,
     TestPackageExplorerViewComponent.class,//
     TestBasicSarosElements.class, //
-    TestRosterViewObject.class, //
-    TestSessionViewObject.class //
+    TestRosterViewComponent.class, //
+    TestSessionViewComponent.class //
 })
 public class AllSTFTests {
     // empty

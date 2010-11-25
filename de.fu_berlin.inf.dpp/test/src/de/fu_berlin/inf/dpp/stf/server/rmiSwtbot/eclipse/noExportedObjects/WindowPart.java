@@ -113,8 +113,6 @@ public class WindowPart extends EclipseComponent {
         if (windowPart.activateShellWithText(title)) {
             bot.button(buttonText).click();
             bot.sleep(sleepTime);
-        } else {
-            throw new RuntimeException("the popup window isn't active yet!");
         }
     }
 

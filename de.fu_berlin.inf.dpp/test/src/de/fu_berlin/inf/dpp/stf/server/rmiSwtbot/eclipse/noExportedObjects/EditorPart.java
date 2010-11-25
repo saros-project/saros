@@ -184,7 +184,8 @@ public class EditorPart extends EclipseComponent {
      */
     public void activateEditor(String fileName) {
         try {
-            bot.cTabItem(fileName).activate();
+            bot.editorByTitle(fileName).setFocus();
+            // bot.cTabItem(fileName).activate();
         } catch (TimeoutException e) {
             log.warn("The tab" + fileName + " does not activate '", e);
         }

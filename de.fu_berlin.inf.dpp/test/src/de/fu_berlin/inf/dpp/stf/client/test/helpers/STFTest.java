@@ -21,6 +21,7 @@ public class STFTest {
 
     /* Project name */
     public static final String PROJECT1 = "Foo_Saros1";
+    protected static final String PROJECT1_COPY = "copy_of_FOO_Saros1";
     /** Name chosen by Saros if {@link STFTest#PROJECT1} already exists. */
     public static final String PROJECT1_NEXT = "Foo_Saros 1";
     public static final String PROJECT2 = "Foo_Saros2";

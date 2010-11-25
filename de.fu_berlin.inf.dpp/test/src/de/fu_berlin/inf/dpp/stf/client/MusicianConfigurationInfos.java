@@ -18,6 +18,12 @@ import de.fu_berlin.inf.dpp.Saros;
 public class MusicianConfigurationInfos {
     public final static boolean DEVELOPMODE = true;
 
+    public final static accountType WHICH_ACCOUNT = accountType.USER_STF_WITH_SAROS_CON_SERVER;
+
+    public enum accountType {
+        USER1_FU_WITH_JABBER_CCC_SERVER, USER_STF_WITH_SAROS_CON_SERVER, USER1_FU_WITH_SAROS_CON_SERVER
+    }
+
     /**
      * VM test accounts
      */
@@ -47,40 +53,37 @@ public class MusicianConfigurationInfos {
     /**
      * Local test accounts
      */
-    private final static String JID_ALICE_LOCAL = ("alice1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    // private final static String PASSWORD_ALICE_LOCAL = "lin";
-    // private final static String JID_ALICE_LOCAL = ("alice1_fu@jabber.ccc.de/"
-    // + Saros.RESOURCE);
+    private final static String JID_ALICE_LOCAL_WITH_SAROS_CON = ("alice1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID2_ALICE_LOCAL_WITH_SAROS_CON = ("alice_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_ALICE_LOCAL_WITH_JABBER_CCC = ("alice1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_ALICE_LOCAL = "dddfffggg";
     private final static String HOST_ALICE_LOCAL = "localhost";
     private final static int PORT_ALICE_LOCAL = 12345;
 
-    private final static String JID_BOB_LOCAL = ("bob1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    // private final static String PASSWORD_BOB_LOCAL = "lin2";
-    // private final static String JID_BOB_LOCAL = ("bob1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
+    private final static String JID_BOB_LOCAL_WITH_SAROS_CON = ("bob1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID2_BOB_LOCAL_WITH_SAROS_CON = ("bob_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_BOB_LOCAL_WITH_JABBER_CCC = ("bob1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_BOB_LOCAL = "dddfffggg";
     private final static String HOST_BOB_LOCAL = "localhost";
     private final static int PORT_BOB_LOCAL = 12346;
 
-    private final static String JID_CARL_LOCAL = ("carl1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    // private final static String PASSWORD_CARL_LOCAL = "lin3";
-    // private final static String JID_CARL_LOCAL = ("carl1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
+    private final static String JID_CARL_LOCAL_WITH_SAROS_CON = ("carl1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID2_CARL_LOCAL_WITH_SAROS_CON = ("carl1_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_CARL_LOCAL_WITH_JABBER_CCC = ("carl1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_CARL_LOCAL = "dddfffggg";
     private final static String HOST_CARL_LOCAL = "localhost";
     private final static int PORT_CARL_LOCAL = 12347;
 
-    private final static String JID_DAVE_LOCAL = ("dave1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    // private final static String JID_DAVE_LOCAL = ("dave1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
+    private final static String JID_DAVE_LOCAL_WITH_SAROS_CON = ("dave1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID2_DAVE_LOCAL_WITH_SAROS_CON = ("dave_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_DAVE_LOCAL_WIHT_JABBER_CCC = ("dave1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_DAVE_LOCAL = "dddfffggg";
     private final static String HOST_DAVE_LOCAL = "localhost";
     private final static int PORT_DAVE_LOCAL = 12348;
 
-    private final static String JID_EDNA_LOCAL = ("edna1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
-    // private final static String JID_EDNA_LOCAL = ("edna1_fu@jabber.ccc.de/" +
-    // Saros.RESOURCE);
+    private final static String JID_EDNA_LOCAL_WITH_SAROS_CON = ("edna1_fu@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID2_EDNA_LOCAL_WITH_SAROS_CON = ("edna_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static String JID_EDNA_LOCAL_WITH_JABBER_CCC = ("edna1_fu@jabber.ccc.de/" + Saros.RESOURCE);
     private final static String PASSWORD_EDNA_LOCAL = "dddfffggg";
     private final static String HOST_EDNA_LOCAL = "localhost";
     private final static int PORT_EDNA_LOCAL = 12349;
@@ -115,23 +118,46 @@ public class MusicianConfigurationInfos {
 
     static {
         if (DEVELOPMODE) {
-            JID_ALICE = JID_ALICE_LOCAL;
+            switch (WHICH_ACCOUNT) {
+            case USER_STF_WITH_SAROS_CON_SERVER:
+                JID_ALICE = JID2_ALICE_LOCAL_WITH_SAROS_CON;
+                JID_BOB = JID2_BOB_LOCAL_WITH_SAROS_CON;
+                JID_CARL = JID2_CARL_LOCAL_WITH_SAROS_CON;
+                JID_DAVE = JID2_DAVE_LOCAL_WITH_SAROS_CON;
+                JID_EDNA = JID2_EDNA_LOCAL_WITH_SAROS_CON;
+                break;
+            case USER1_FU_WITH_JABBER_CCC_SERVER:
+                JID_ALICE = JID_ALICE_LOCAL_WITH_JABBER_CCC;
+                JID_BOB = JID_BOB_LOCAL_WITH_JABBER_CCC;
+                JID_CARL = JID_CARL_LOCAL_WITH_JABBER_CCC;
+                JID_DAVE = JID_DAVE_LOCAL_WIHT_JABBER_CCC;
+                JID_EDNA = JID_EDNA_LOCAL_WITH_JABBER_CCC;
+                break;
+            default:
+                JID_ALICE = JID_ALICE_LOCAL_WITH_SAROS_CON;
+                JID_BOB = JID_BOB_LOCAL_WITH_SAROS_CON;
+                JID_CARL = JID_CARL_LOCAL_WITH_SAROS_CON;
+                JID_DAVE = JID_DAVE_LOCAL_WITH_SAROS_CON;
+                JID_EDNA = JID_EDNA_LOCAL_WITH_SAROS_CON;
+                break;
+            }
+
             PASSWORD_ALICE = PASSWORD_ALICE_LOCAL;
             HOST_ALICE = HOST_ALICE_LOCAL;
             PORT_ALICE = PORT_ALICE_LOCAL;
-            JID_BOB = JID_BOB_LOCAL;
+
             PASSWORD_BOB = PASSWORD_BOB_LOCAL;
             HOST_BOB = HOST_BOB_LOCAL;
             PORT_BOB = PORT_BOB_LOCAL;
-            JID_CARL = JID_CARL_LOCAL;
+
             PASSWORD_CARL = PASSWORD_CARL_LOCAL;
             HOST_CARL = HOST_CARL_LOCAL;
             PORT_CARL = PORT_CARL_LOCAL;
-            JID_DAVE = JID_DAVE_LOCAL;
+
             PASSWORD_DAVE = PASSWORD_DAVE_LOCAL;
             HOST_DAVE = HOST_DAVE_LOCAL;
             PORT_DAVE = PORT_DAVE_LOCAL;
-            JID_EDNA = JID_EDNA_LOCAL;
+
             PASSWORD_EDNA = PASSWORD_EDNA_LOCAL;
             HOST_EDNA = HOST_EDNA_LOCAL;
             PORT_EDNA = PORT_EDNA_LOCAL;
