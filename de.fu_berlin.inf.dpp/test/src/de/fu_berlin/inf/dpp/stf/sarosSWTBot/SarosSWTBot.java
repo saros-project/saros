@@ -5,16 +5,20 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widget
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withStyle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.swtbot.eclipse.finder.SWTEclipseBot;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.hamcrest.Matcher;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
@@ -209,4 +213,19 @@ public class SarosSWTBot extends SWTWorkbenchBot {
             matcher);
     }
 
+    /**
+     * This method does the same as {@link SWTEclipseBot#shells()}, but doesn't
+     * throw an exception if a shell was already disposed.
+     */
+    @Override
+    public SWTBotShell[] shells() {
+        super.shells();
+        Shell[] shells = finder.getShells();
+        ArrayList<SWTBotShell> result = new ArrayList<SWTBotShell>();
+        for (Shell shell : shells) {
+            if (!shell.isDisposed())
+                result.add(new SWTBotShell(shell));
+        }
+        return result.toArray(new SWTBotShell[] {});
+    }
 }
