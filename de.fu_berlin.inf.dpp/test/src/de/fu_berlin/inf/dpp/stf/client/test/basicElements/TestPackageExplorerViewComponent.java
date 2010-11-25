@@ -21,7 +21,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         .getLogger(TestPackageExplorerViewComponent.class);
 
     @BeforeClass
-    public static void initMusican() {
+    public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
     }
 

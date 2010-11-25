@@ -26,7 +26,7 @@ public class RmiTest extends STFTest {
     // private static Musician bob;
 
     @BeforeClass
-    public static void initMusican() {
+    public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         // bob = InitMusician.newBob();
     }

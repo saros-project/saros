@@ -10,23 +10,20 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 
-public class InitMusician {
+public class InitMusician extends MusicianConfigurationInfos {
     private final static Logger log = Logger.getLogger(InitMusician.class);
 
-    public final static Musician newAlice() {
-        log.trace("new alice");
-        Musician alice = new Musician(new JID(MusicianConfigurationInfos.JID_ALICE),
-            MusicianConfigurationInfos.PASSWORD_ALICE, MusicianConfigurationInfos.HOST_ALICE,
-            MusicianConfigurationInfos.PORT_ALICE);
+    protected static Musician newMusician(String name, String jid, String pw,
+        String host, int port) throws RemoteException {
+        log.trace("new " + name);
+        Musician alice = new Musician(new JID(jid), pw, host, port);
         try {
             log.trace("initBot");
             alice.initBot();
         } catch (AccessException e) {
-            log.debug("", e);
-        } catch (RemoteException e) {
             log.debug("", e);
         } catch (NotBoundException e) {
             log.debug("", e);
@@ -34,68 +31,28 @@ public class InitMusician {
         return alice;
     }
 
-    public final static Musician newBob() {
-        Musician bob = new Musician(new JID(MusicianConfigurationInfos.JID_BOB),
-            MusicianConfigurationInfos.PASSWORD_BOB, MusicianConfigurationInfos.HOST_BOB,
-            MusicianConfigurationInfos.PORT_BOB);
-        try {
-            bob.initBot();
-        } catch (AccessException e) {
-            log.debug("", e);
-        } catch (RemoteException e) {
-            log.debug("", e);
-        } catch (NotBoundException e) {
-            log.debug("", e);
-        }
-        return bob;
+    public final static Musician newAlice() throws RemoteException {
+        return newMusician("alice", JID_ALICE, PASSWORD_ALICE, HOST_ALICE,
+            PORT_ALICE);
     }
 
-    public final static Musician newCarl() {
-        Musician carl = new Musician(new JID(MusicianConfigurationInfos.JID_CARL),
-            MusicianConfigurationInfos.PASSWORD_CARL, MusicianConfigurationInfos.HOST_CARL,
-            MusicianConfigurationInfos.PORT_CARL);
-        try {
-            carl.initBot();
-        } catch (AccessException e) {
-            log.debug("", e);
-        } catch (RemoteException e) {
-            log.debug("", e);
-        } catch (NotBoundException e) {
-            log.debug("", e);
-        }
-        return carl;
+    public final static Musician newBob() throws RemoteException {
+        return newMusician("bob", JID_BOB, PASSWORD_BOB, HOST_BOB, PORT_BOB);
     }
 
-    public final static Musician newDave() {
-        Musician dave = new Musician(new JID(MusicianConfigurationInfos.JID_DAVE),
-            MusicianConfigurationInfos.PASSWORD_DAVE, MusicianConfigurationInfos.HOST_DAVE,
-            MusicianConfigurationInfos.PORT_DAVE);
-        try {
-            dave.initBot();
-        } catch (AccessException e) {
-            log.debug("", e);
-        } catch (RemoteException e) {
-            log.debug("", e);
-        } catch (NotBoundException e) {
-            log.debug("", e);
-        }
-        return dave;
+    public final static Musician newCarl() throws RemoteException {
+        return newMusician("carl", JID_CARL, PASSWORD_CARL, HOST_CARL,
+            PORT_CARL);
     }
 
-    public final static Musician newEdna() {
-        Musician edna = new Musician(new JID(MusicianConfigurationInfos.JID_EDNA),
-            MusicianConfigurationInfos.PASSWORD_EDNA, MusicianConfigurationInfos.HOST_EDNA,
-            MusicianConfigurationInfos.PORT_EDNA);
-        try {
-            edna.initBot();
-        } catch (AccessException e) {
-            log.debug("", e);
-        } catch (RemoteException e) {
-            log.debug("", e);
-        } catch (NotBoundException e) {
-            log.debug("", e);
-        }
-        return edna;
+    public final static Musician newDave() throws RemoteException {
+        return newMusician("dave", JID_DAVE, PASSWORD_DAVE, HOST_DAVE,
+            PORT_DAVE);
+    }
+
+    public final static Musician newEdna() throws RemoteException {
+        return newMusician("edna", JID_EDNA, PASSWORD_EDNA, HOST_EDNA,
+            PORT_EDNA);
     }
 
     public static List<Musician> initAliceBobCarlConcurrently()
@@ -106,7 +63,6 @@ public class InitMusician {
         initTasks.add(newBobCallable());
         initTasks.add(newCarlCallable());
         return MakeOperationConcurrently.workAll(initTasks, 3);
-
     }
 
     public static List<Musician> initMusiciansConcurrently(int... ports)

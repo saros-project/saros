@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import de.fu_berlin.inf.dpp.project.TestResourceActivityFilter;
 import de.fu_berlin.inf.dpp.project.TestSharedProject;
 import de.fu_berlin.inf.dpp.project.TestSharedProject_UpdatableValue;
-import de.fu_berlin.inf.dpp.project.TestResourceActivityFilter;
 import de.fu_berlin.inf.dpp.vcs.TestVCSActivity;
 
 /**

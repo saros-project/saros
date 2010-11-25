@@ -296,7 +296,8 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public JID getJID() throws RemoteException {
-        return this.jid;
+        final JID result = saros.getMyJID();
+        return result;
     }
 
     public boolean isSameUser(JID otherJID) throws RemoteException {

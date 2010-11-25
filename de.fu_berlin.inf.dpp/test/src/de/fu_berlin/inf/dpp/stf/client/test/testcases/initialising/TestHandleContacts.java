@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 public class TestHandleContacts extends STFTest {
 
     @BeforeClass
-    public static void initMusicians() {
+    public static void initMusicians() throws RemoteException {
         bob = InitMusician.newBob();
         alice = InitMusician.newAlice();
     }

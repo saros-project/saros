@@ -19,7 +19,7 @@ public class TestBasicSarosElements {
     private static Musician alice;
 
     @BeforeClass
-    public static void initMusican() {
+    public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
     }
 

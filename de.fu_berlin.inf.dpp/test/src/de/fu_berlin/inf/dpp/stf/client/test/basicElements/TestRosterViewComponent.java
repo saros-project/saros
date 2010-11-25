@@ -16,7 +16,7 @@ public class TestRosterViewComponent extends STFTest {
         .getLogger(TestBasicSarosElements.class);
 
     @BeforeClass
-    public static void initMusican() {
+    public static void initMusican() throws RemoteException {
         edna = InitMusician.newEdna();
         // dave = InitMusician.newDave();
     }

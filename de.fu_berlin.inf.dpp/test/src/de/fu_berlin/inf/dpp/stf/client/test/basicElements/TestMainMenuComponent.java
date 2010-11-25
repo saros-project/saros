@@ -16,7 +16,7 @@ public class TestMainMenuComponent extends STFTest {
         .getLogger(TestMainMenuComponent.class);
 
     @BeforeClass
-    public static void initMusican() {
+    public static void initMusican() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
     }

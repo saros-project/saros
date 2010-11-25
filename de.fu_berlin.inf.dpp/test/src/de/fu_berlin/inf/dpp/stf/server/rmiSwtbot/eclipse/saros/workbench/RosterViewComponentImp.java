@@ -125,6 +125,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
                     password);
             }
             waitUntilIsConnected();
+
+            if (!jid.equals(state.getJID()))
+                throw new RemoteException("Wrong JID! Expected to be connected"
+                    + " as \"" + jid + "\", but was connected as \""
+                    + state.getJID() + "\" instead.");
         }
     }
 

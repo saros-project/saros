@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 public class TestShareProjectUsingExistingProject extends STFTest {
 
     @BeforeClass
-    public static void initMusicians() {
+    public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
     }
