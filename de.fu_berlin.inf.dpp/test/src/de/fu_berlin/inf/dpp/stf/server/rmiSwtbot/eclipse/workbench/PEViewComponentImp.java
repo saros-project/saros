@@ -19,6 +19,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.team.core.RepositoryProvider;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -498,7 +499,9 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] classNodes = getClassNodes(projectName, pkg, className);
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, classNodes,
             REFACTOR, RENAME);
+        windowPart.waitUntilShellOpen(SHELL_RENAME_COMPiIATION_UNIT);
         windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
+        windowPart.waitUntilShellActive(SHELL_RENAME_COMPiIATION_UNIT);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
@@ -657,7 +660,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.confirmWindow(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
     }
 
-    public void revert(String projectName) throws RemoteException {
+    public void revertProject(String projectName) throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
@@ -666,20 +669,20 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_REVERT);
     }
 
-    public void switchProjectToAnotherRevision(String projectName,
-        String versionID) throws RemoteException {
+    public void updateProject(String projectName, String versionID)
+        throws RemoteException {
         String[] nodes = { projectName + ".*" };
         switchToAnotherRevision(nodes, versionID);
     }
 
-    public void switchClassToAnotherRevision(String projectName, String pkg,
-        String className, String versionID) throws RemoteException {
+    public void updateClass(String projectName, String pkg, String className,
+        String revision) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
         nodes = helperPart.changeToRegex(nodes);
-        switchToAnotherRevision(nodes, versionID);
+        switchToAnotherRevision(nodes, revision);
     }
 
-    public void switchToAnotherBranchOrTag(String projectName, String url)
+    public void switchProject(String projectName, String url)
         throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
@@ -696,13 +699,15 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
-    public boolean isInSVN(String projectName) throws RemoteException {
+    public boolean isProjectManagedBySVN(String projectName)
+        throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
-        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        if (vcs == null)
-            return false;
-        return true;
+        return RepositoryProvider.isShared(project);
+        // final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        // if (vcs == null)
+        // return false;
+        // return true;
     }
 
     public void waitUntilProjectInSVN(String projectName)
@@ -715,19 +720,22 @@ public class PEViewComponentImp extends EclipseComponent implements
         waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
-    public String getReversion(String fullPath) throws RemoteException {
+    public String getRevision(String fullPath) throws RemoteException {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource \"" + fullPath
+                + "\" not found.");
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs != null)
             return vcs.getRevisionString(resource);
         return null;
     }
 
-    public void waitUntilReversionIsSame(String fullPath, String reversionID)
+    public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
-        waitUntil(SarosConditions.isReversionSame(fullPath, reversionID));
+        waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
     }
 
     public String getURLOfRemoteResource(String fullPath)
@@ -841,6 +849,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         bot.textWithLabel("Project name:").setText(target);
         bot.button(OK).click();
         windowPart.waitUntilShellClosed("Copy Project");
+        bot.sleep(1000);
     }
 
 }

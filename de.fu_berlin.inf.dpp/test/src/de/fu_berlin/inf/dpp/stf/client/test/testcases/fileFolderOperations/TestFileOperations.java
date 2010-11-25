@@ -63,11 +63,14 @@ public class TestFileOperations extends STFTest {
 
     @Test
     public void testRenameFile() throws RemoteException {
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
         alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
-        // bob.state.waitUntilClassExist(PROJECT, PKG, CLS2);
-        // carl.state.waitUntilClassExist(PROJECT, PKG, CLS2);
+
+        bob.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
         assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
         assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+
+        carl.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
         assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
         assertTrue(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
     }
@@ -126,10 +129,12 @@ public class TestFileOperations extends STFTest {
     @Test
     public void testRenamePkg() throws RemoteException {
         alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
-        // bob.state.waitUntilPkgExist(PROJECT, PKG2);
-        // carl.state.waitUntilPkgExist(PROJECT, PKG2);
+
+        bob.pEV.waitUntilPkgExist(PROJECT1, PKG2);
         assertFalse(bob.pEV.isPkgExist(PROJECT1, PKG1));
         assertTrue(bob.pEV.isPkgExist(PROJECT1, PKG2));
+
+        carl.pEV.waitUntilPkgExist(PROJECT1, PKG2);
         assertFalse(carl.pEV.isPkgExist(PROJECT1, PKG1));
         assertTrue(carl.pEV.isPkgExist(PROJECT1, PKG2));
     }

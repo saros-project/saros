@@ -215,16 +215,17 @@ public class ViewPart extends EclipseComponent {
      *            "my.pkg", "myClass.java"}
      * @param contexts
      *            all context menus'name.e.g. {"Team", "Commit..."}
+     * @throws RemoteException
      */
     public void clickContextMenusOfTreeItemInView(String viewTitle,
-        String[] nodes, String... contexts) {
+        String[] nodes, String... contexts) throws RemoteException {
         try {
             SWTBotTree tree = getTreeInView(viewTitle);
             SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
                 nodes);
             if (treeItem == null) {
-                log.error("Tree item not found. " + Arrays.asList(nodes));
-                return;
+                throw new RemoteException("Tree item not found. "
+                    + Arrays.asList(nodes));
             }
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);

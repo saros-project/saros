@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
@@ -42,6 +43,8 @@ public class TestSVNStateInitialization extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
+        // alice.rosterV.disconnect();
+        // alice.pEV.deleteProject(SVN_PROJECT);
         alice.workbench.resetSaros();
     }
 
@@ -58,17 +61,25 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Before
     public void setUp() throws RemoteException {
-        alice.pEV.copyProject(SVN_PROJECT_COPY, SVN_PROJECT);
+        alice.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
+        assertTrue(alice.pEV.isProjectExist(SVN_PROJECT));
+        assertTrue(alice.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(alice.pEV.isFileExist(SVN_CLS1_FULL_PATH));
     }
 
     @After
     public void cleanUp() throws RemoteException {
+        if (alice.pEV.isProjectExist(SVN_PROJECT))
+            alice.pEV.deleteProject(SVN_PROJECT);
         alice.workbench.resetWorkbench();
         bob.workbench.resetWorkbench();
     }
 
     /**
-     * Steps: <li>Alice invites Bob.</li>
+     * Steps:
+     * <ol>
+     * <li>Alice shared project SVN_PROJECT with Bob.</li>
+     * </ol>
      * 
      * Result:
      * <ol>
@@ -83,21 +94,42 @@ public class TestSVNStateInitialization extends STFTest {
         alice.shareProjectWithDone(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+
         assertTrue(alice.state.isDriver(alice.jid));
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(bob.state.isObserver(bob.jid));
-        assertTrue(bob.pEV.isInSVN(SVN_PROJECT));
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice updates {@link STFTest#SVN_CLS1} to revision
+     * {@link STFTest#SVN_CLS1_REV2}.</li>
+     * <li>Alice shared project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_CLS1} has revision
+     * {@link STFTest#SVN_CLS1_REV2}.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * 
+     */
     @Test
     public void testCheckoutWithUpdate() throws RemoteException {
+        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV2);
         alice.shareProjectWithDone(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         assertTrue(alice.state.isDriver(alice.jid));
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(bob.state.isObserver(bob.jid));
-        assertTrue(bob.pEV.isInSVN(SVN_PROJECT));
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(bob.pEV.getRevision(SVN_CLS1_FULL_PATH), SVN_CLS1_REV2);
     }
 
 }

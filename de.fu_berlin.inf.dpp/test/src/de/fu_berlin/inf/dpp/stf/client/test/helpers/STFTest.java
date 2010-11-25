@@ -20,7 +20,9 @@ public class STFTest {
     protected final static String NEXT = "Next >";
 
     /* Project name */
-    public static final String PROJECT1 = "Foo_Saros";
+    public static final String PROJECT1 = "Foo_Saros1";
+    /** Name chosen by Saros if {@link STFTest#PROJECT1} already exists. */
+    public static final String PROJECT1_NEXT = "Foo_Saros 1";
     public static final String PROJECT2 = "Foo_Saros2";
     public static final String PROJECT3 = "Foo_Saros3";
 
@@ -60,10 +62,13 @@ public class STFTest {
     /* SVN infos */
     protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
     protected static final String SVN_PROJECT = "stf_test_project";
-    protected static final String SVN_PROJECT_COPY = "stf_test_project_copy";
+    protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
     protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
-    protected static final String SVN_PKG = "org.eclipsecon.swtbot.example";
-    protected static final String SVN_CLS = "MyFirstTest01";
+    protected static final String SVN_CLS1 = "Test";
+    protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
+    protected static final String SVN_PKG = "pkg";
+    protected static final String SVN_CLS1_REV1 = "2737";
+    protected static final String SVN_CLS1_REV2 = "2735";
     protected static final String SVN_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
     protected static final String SVN_TAG_URL = SVN_URL
         + "/stf_tests/stf_test_project_copy";
@@ -73,7 +78,7 @@ public class STFTest {
     /*
      * Contextmenu "Saros"
      */
-    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
+    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project...";
     public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
 
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";

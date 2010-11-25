@@ -320,8 +320,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
      * @param projectName
      *            the name of the project, which you want to share with other
      *            peoples.
+     * @throws RemoteException
      */
-    private void clickContextMenuOfSaros(String projectName, String contextName) {
+    private void clickContextMenuOfSaros(String projectName, String contextName)
+        throws RemoteException {
         String[] matchTexts = helperPart.changeToRegex(projectName);
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
             contextName);

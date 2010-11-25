@@ -25,7 +25,7 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testSwitch() throws RemoteException {
-        alice.pEV.switchToAnotherBranchOrTag(SVN_PROJECT, SVN_TAG_URL);
+        alice.pEV.switchProject(SVN_PROJECT, SVN_TAG_URL);
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
         assertTrue(alice.pEV.getURLOfRemoteResource(SVN_CLS_PATH).equals(
             bob.pEV.getURLOfRemoteResource(SVN_CLS_PATH)));
@@ -47,12 +47,12 @@ public class TestSVNStateUpdates extends STFTest {
     public void testDisconnectAndConnect() throws RemoteException {
         alice.pEV.disConnect(SVN_PROJECT);
         bob.pEV.waitUntilProjectNotInSVN(SVN_PROJECT);
-        assertFalse(bob.pEV.isInSVN(SVN_PROJECT));
+        assertFalse(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
         alice.pEV.shareProjectWithSVNWhichIsConfiguredWithSVNInfos(SVN_PROJECT,
             SVN_URL);
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
         bob.pEV.waitUntilProjectInSVN(SVN_PROJECT);
-        assertTrue(bob.pEV.isInSVN(SVN_PROJECT));
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
     }
 
     /**
@@ -69,11 +69,11 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testUpdate() throws RemoteException {
-        alice.pEV.switchProjectToAnotherRevision(SVN_PROJECT, "115");
+        alice.pEV.updateProject(SVN_PROJECT, "115");
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
         assertTrue(alice.pEV.getURLOfRemoteResource(SVN_PROJECT).equals(
             bob.pEV.getURLOfRemoteResource(SVN_PROJECT)));
-        alice.pEV.switchProjectToAnotherRevision(SVN_PROJECT, "116");
+        alice.pEV.updateProject(SVN_PROJECT, "116");
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
     }
 
@@ -92,15 +92,15 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testUpdateSingleFile() throws RemoteException {
-        alice.pEV.switchClassToAnotherRevision(SVN_PROJECT, SVN_PKG, SVN_CLS,
+        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1,
             "102");
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        assertTrue(alice.pEV.getReversion(SVN_CLS_PATH).equals("102"));
-        bob.pEV.waitUntilReversionIsSame(SVN_CLS_PATH, "102");
-        assertTrue(bob.pEV.getReversion(SVN_CLS_PATH).equals("102"));
-        bob.pEV.waitUntilReversionIsSame(SVN_PROJECT, "116");
-        assertTrue(bob.pEV.getReversion(SVN_PROJECT).equals("116"));
-        alice.pEV.switchClassToAnotherRevision(SVN_PROJECT, SVN_PKG, SVN_CLS,
+        assertTrue(alice.pEV.getRevision(SVN_CLS_PATH).equals("102"));
+        bob.pEV.waitUntilRevisionIsSame(SVN_CLS_PATH, "102");
+        assertTrue(bob.pEV.getRevision(SVN_CLS_PATH).equals("102"));
+        bob.pEV.waitUntilRevisionIsSame(SVN_PROJECT, "116");
+        assertTrue(bob.pEV.getRevision(SVN_PROJECT).equals("116"));
+        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1,
             "116");
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
     }
@@ -122,10 +122,10 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testRevert() throws RemoteException {
         alice.pEV.deleteProject(SVN_CLS_PATH);
-        bob.pEV.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS);
+        bob.pEV.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.pEV.isFileExist(SVN_CLS_PATH));
-        alice.pEV.revert(SVN_PROJECT);
-        bob.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, SVN_CLS);
+        alice.pEV.revertProject(SVN_PROJECT);
+        bob.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertTrue(bob.pEV.isFileExist(SVN_CLS_PATH));
     }
 

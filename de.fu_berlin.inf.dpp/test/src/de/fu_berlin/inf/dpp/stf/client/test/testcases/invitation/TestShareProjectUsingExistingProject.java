@@ -68,10 +68,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
         assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
-        assertTrue(bob.pEV.isProjectExist(PROJECT1 + " 2"));
-        assertTrue(bob.pEV
-            .isFileExist(getClassPath(PROJECT1 + " 2", PKG1, CLS1)));
-        bob.pEV.deleteProject(PROJECT1 + " 2");
+        assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1_NEXT, PKG1, CLS1)));
+        bob.pEV.deleteProject(PROJECT1_NEXT);
 
     }
 
@@ -82,11 +81,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
         assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
-        assertTrue(bob.pEV.isProjectExist(PROJECT1 + " 2"));
-        assertTrue(bob.pEV
-            .isFileExist(getClassPath(PROJECT1 + " 2", PKG1, CLS1)));
+        assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
+        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1_NEXT, PKG1, CLS1)));
 
-        bob.pEV.deleteProject(PROJECT1 + " 2");
+        bob.pEV.deleteProject(PROJECT1_NEXT);
 
     }
 }

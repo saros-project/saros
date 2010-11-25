@@ -53,11 +53,11 @@ public class TreePart extends EclipseComponent {
             SWTBotTreeItem item = null;
             for (String regex : regexs) {
                 if (item == null) {
-                    for (int i = 0; i < tree.getAllItems().length; i++) {
-                        log.info("treeItem'name: "
-                            + tree.getAllItems()[i].getText());
-                        if (tree.getAllItems()[i].getText().matches(regex)) {
-                            item = tree.getAllItems()[i].expand();
+                    final SWTBotTreeItem[] allItems = tree.getAllItems();
+                    for (int i = 0; i < allItems.length; i++) {
+                        log.info("treeItem'name: " + allItems[i].getText());
+                        if (allItems[i].getText().matches(regex)) {
+                            item = allItems[i].expand();
                         }
                     }
                 } else {
@@ -65,6 +65,7 @@ public class TreePart extends EclipseComponent {
                         log.info("node'name: " + nodeName);
                         if (nodeName.matches(regex)) {
                             item = item.getNode(nodeName).expand();
+                            break;
                         }
                     }
                 }

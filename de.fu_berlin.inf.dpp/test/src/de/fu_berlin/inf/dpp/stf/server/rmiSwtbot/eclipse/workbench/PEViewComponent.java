@@ -738,7 +738,7 @@ public interface PEViewComponent extends Remote {
      * 
      * @throws RemoteException
      */
-    public void revert(String projectName) throws RemoteException;
+    public void revertProject(String projectName) throws RemoteException;
 
     /**
      * Perform the action "share project with SVN" which should be done with the
@@ -926,7 +926,7 @@ public interface PEViewComponent extends Remote {
      *            the ID of the reversion to which you want to switch
      * @throws RemoteException
      */
-    public void switchProjectToAnotherRevision(String projectName,
+    public void updateProject(String projectName,
         String versionID) throws RemoteException;
 
     /**
@@ -963,7 +963,7 @@ public interface PEViewComponent extends Remote {
      *            the ID of the reversion to which you want to switch
      * @throws RemoteException
      */
-    public void switchClassToAnotherRevision(String projectName, String pkg,
+    public void updateClass(String projectName, String pkg,
         String className, String versionID) throws RemoteException;
 
     /**
@@ -996,7 +996,7 @@ public interface PEViewComponent extends Remote {
      *            Update working copy to the url.
      * @throws RemoteException
      */
-    public void switchToAnotherBranchOrTag(String projectName, String url)
+    public void switchProject(String projectName, String url)
         throws RemoteException;
 
     /**
@@ -1015,7 +1015,7 @@ public interface PEViewComponent extends Remote {
      * @return <tt>true</tt>, if the given project is under SVN control
      * @throws RemoteException
      */
-    public boolean isInSVN(String prjectName) throws RemoteException;
+    public boolean isProjectManagedBySVN(String prjectName) throws RemoteException;
 
     /**
      * waits until the given project is in SVN control
@@ -1045,7 +1045,7 @@ public interface PEViewComponent extends Remote {
      * @return the reversion id of the given resource.
      * @throws RemoteException
      */
-    public String getReversion(String fullPath) throws RemoteException;
+    public String getRevision(String fullPath) throws RemoteException;
 
     /**
      * 
@@ -1057,7 +1057,7 @@ public interface PEViewComponent extends Remote {
      *            compare
      * @throws RemoteException
      */
-    public void waitUntilReversionIsSame(String fullPath, String reversionID)
+    public void waitUntilRevisionIsSame(String fullPath, String reversionID)
         throws RemoteException;
 
     /**
