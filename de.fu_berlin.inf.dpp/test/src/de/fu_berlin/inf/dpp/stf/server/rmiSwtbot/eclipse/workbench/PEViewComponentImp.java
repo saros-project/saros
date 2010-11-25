@@ -829,4 +829,18 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
+    public void copyProject(String target, String source)
+        throws RemoteException {
+        precondition();
+        String[] matchTexts = { source + ".*" };
+        viewPart
+            .clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, "Copy");
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
+            "Paste");
+        windowPart.waitUntilShellActive("Copy Project");
+        bot.textWithLabel("Project name:").setText(target);
+        bot.button(OK).click();
+        windowPart.waitUntilShellClosed("Copy Project");
+    }
+
 }

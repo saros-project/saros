@@ -1072,4 +1072,16 @@ public interface PEViewComponent extends Remote {
     public String getURLOfRemoteResource(String fullPath)
         throws RemoteException;
 
+    /**
+     * Uses Copy and Paste to create a copy of a project.
+     * 
+     * @param target
+     *            The name of the copy to be created.
+     * @param source
+     *            The project to create the copy from.
+     * @throws RemoteException
+     */
+    public void copyProject(String target, String source)
+        throws RemoteException;
+
 }

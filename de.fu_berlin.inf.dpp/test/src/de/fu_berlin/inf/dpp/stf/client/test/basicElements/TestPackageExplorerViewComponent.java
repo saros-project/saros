@@ -182,7 +182,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         assertFalse(alice.pEV.isInSVN(PROJECT1));
         alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(PROJECT1,
-            SVN_URL, SPECIFIED_FODLER_NAME);
+            SVN_URL, SVN_PROJECT_PATH);
         assertTrue(alice.pEV.isInSVN(PROJECT1));
     }
 
@@ -354,4 +354,11 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.openClassWithSystemEditor(PROJECT1, PKG1, CLS1);
     }
 
+    @Test
+    public void testCopyProject() throws RemoteException {
+        alice.pEV.newProject(PROJECT1);
+        assertFalse(alice.pEV.isProjectExist(PROJECT2));
+        alice.pEV.copyProject(PROJECT2, PROJECT1);
+        assertTrue(alice.pEV.isProjectExist(PROJECT2));
+    }
 }

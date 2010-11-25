@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
@@ -221,10 +222,14 @@ public class ViewPart extends EclipseComponent {
             SWTBotTree tree = getTreeInView(viewTitle);
             SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
                 nodes);
+            if (treeItem == null) {
+                log.error("Tree item not found. " + Arrays.asList(nodes));
+                return;
+            }
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, contexts);
         } catch (WidgetNotFoundException e) {
-            log.error("context menu can't be found.", e);
+            log.error("Context menu not found. " + Arrays.asList(contexts));
         }
     }
 
