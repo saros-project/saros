@@ -90,10 +90,11 @@ public class STFTest {
     public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
     public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
 
-    public String getClassPath(String projectName, String pkg, String className) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
-            + className + ".java";
-    }
+    // public String getClassPath(String projectName, String pkg, String
+    // className) {
+    // return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
+    // + className + ".java";
+    // }
 
     public String getPath(String... nodes) {
         String folderpath = "";

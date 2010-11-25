@@ -49,10 +49,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void testShareProjectUsingExistingProject() throws RemoteException {
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         bob.typeOfSharingProject = USE_EXISTING_PROJECT;
         alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT2, PKG1, CLS1)));
+        assertFalse(bob.pEV.isClassExist(PROJECT2, PKG1, CLS1));
         assertFalse(bob.pEV.isProjectExist(PROJECT2));
 
     }
@@ -67,9 +67,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
             .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
 
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1_NEXT, PKG1, CLS1)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1_NEXT, PKG1, CLS1));
         bob.pEV.deleteProject(PROJECT1_NEXT);
 
     }
@@ -80,9 +80,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         bob.typeOfSharingProject = USE_EXISTING_PROJECT_WITH_COPY;
         alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS2)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
-        assertTrue(bob.pEV.isFileExist(getClassPath(PROJECT1_NEXT, PKG1, CLS1)));
+        assertTrue(bob.pEV.isClassExist(PROJECT1_NEXT, PKG1, CLS1));
 
         bob.pEV.deleteProject(PROJECT1_NEXT);
 

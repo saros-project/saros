@@ -12,6 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -117,8 +118,9 @@ public class STFController {
      * the object in the server JVM.
      */
     public void initExportedObjects(int port, Saros saros,
-        SarosSessionManager sessionManager, DataTransferManager dataTransferManager,
-        EditorManager editorManager) throws RemoteException {
+        SarosSessionManager sessionManager,
+        DataTransferManager dataTransferManager, EditorManager editorManager,
+        XMPPAccountStore xmppAccountStore) throws RemoteException {
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
@@ -157,7 +159,7 @@ public class STFController {
 
         EclipseComponent.state = (SarosState) exportObject(
             SarosStateImp.getInstance(saros, sessionManager,
-                dataTransferManager, editorManager), "state");
+                dataTransferManager, editorManager, xmppAccountStore), "state");
     }
 
     /**

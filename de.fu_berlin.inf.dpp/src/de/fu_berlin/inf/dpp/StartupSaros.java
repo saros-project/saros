@@ -11,6 +11,7 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -64,6 +65,9 @@ public class StartupSaros implements IStartup {
     @Inject
     protected EditorManager editorManager;
 
+    @Inject
+    protected XMPPAccountStore xmppAccountStore;
+
     public StartupSaros() {
         Saros.reinject(this);
     }
@@ -113,8 +117,8 @@ public class StartupSaros implements IStartup {
                 STFController bot = STFController.getInstance();
                 bot.sleepTime = time;
                 try {
-                    bot.initExportedObjects(port, saros, sessionManager, dataTransferManager,
-                        editorManager);
+                    bot.initExportedObjects(port, saros, sessionManager,
+                        dataTransferManager, editorManager, xmppAccountStore);
                     bot.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);

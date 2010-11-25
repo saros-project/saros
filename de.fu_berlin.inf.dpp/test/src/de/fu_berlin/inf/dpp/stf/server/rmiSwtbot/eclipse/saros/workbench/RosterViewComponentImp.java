@@ -1,12 +1,23 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
+
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.hamcrest.Matcher;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -111,54 +122,18 @@ public class RosterViewComponentImp extends EclipseComponent implements
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
-
-            // if (!isConnectAccountExist(jid.getBase())) {
-            // mainMenuC.creatAccount(jid, password);
-            // }
-            // selectConnectAccount(jid.getBase());
-
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            bot.sleep(100);
-            if (isWizardCreateXMPPAccountActive()) {
-                log.trace("confirmSarosConfigurationWindow");
-                confirmWizardCreateXMPPAccount(jid.getDomain(), jid.getName(),
-                    password);
+            if (!state.isAccountExist(jid)) {
+                state.createAccount(jid.getName(), password, jid.getDomain());
             }
+            if (!state.isAccountActive(jid))
+                state.activateAccount(jid);
+            clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
 
             if (!jid.equals(state.getJID()))
                 throw new RemoteException("Wrong JID! Expected to be connected"
                     + " as \"" + jid + "\", but was connected as \""
                     + state.getJID() + "\" instead.");
-        }
-    }
-
-    private void selectConnectAccount(String baseJID) {
-        bot.viewByTitle(VIEWNAME).bot().toolbarDropDownButton(TB_CONNECT)
-            .click();
-
-        // bot.toolbarDropDownButtonWithTooltip(TB_CONNECT).menuItem(baseJID)
-        // .setFocus();
-        // clickToolbarButtonWithTooltip(TB_CONNECT);
-    }
-
-    // @SuppressWarnings({ "unchecked", "rawtypes" })
-    private boolean isConnectAccountExist(String baseJID) {
-        // Matcher matcher = allOf(widgetOfType(MenuItem.class));
-        // List<? extends SWTBotMenu> accounts = bot
-        // .toolbarDropDownButtonWithTooltip(TB_CONNECT).menuItems(matcher);
-        // if (bot == null)
-        // log.debug("ist etwas falsch");
-        // for (SWTBotMenu account : accounts) {
-        // log.debug("existed account: " + account.getText());
-        // return account.getText().equals(baseJID);
-        // }
-        // return false;
-        try {
-            bot.toolbarDropDownButtonWithTooltip(TB_CONNECT).menuItem(baseJID);
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
         }
     }
 
@@ -353,4 +328,34 @@ public class RosterViewComponentImp extends EclipseComponent implements
         return windowPart.isShellActive(SHELL_CREATE_XMPP_ACCOUNT);
     }
 
+    @SuppressWarnings("static-access")
+    private void selectConnectAccount(String baseJID) {
+        SWTBotToolbarDropDownButton b = bot.viewById(VIEWID)
+            .toolbarDropDownButton(TB_CONNECT);
+
+        Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
+            + ".*");
+        b.menuItem(withRegex).click();
+        try {
+            b.pressShortcut(KeyStroke.getInstance("ESC"));
+        } catch (ParseException e) {
+            log.debug("", e);
+        }
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private boolean isConnectAccountExist(String baseJID) {
+        Matcher matcher = allOf(widgetOfType(MenuItem.class));
+        SWTBotToolbarDropDownButton b = bot.viewById(VIEWID)
+            .toolbarDropDownButton(TB_CONNECT);
+        List<? extends SWTBotMenu> accounts = b.menuItems(matcher);
+        b.pressShortcut(Keystrokes.ESC);
+        for (SWTBotMenu account : accounts) {
+            log.debug("existed account: " + account.getText() + "hier");
+            if (account.getText().trim().equals(baseJID)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

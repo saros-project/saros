@@ -41,7 +41,6 @@ public class TestFileOperations extends STFTest {
         carl = musicians.get(2);
 
         /* alice build session with bob, and carl simultaneously */
-
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             carl, bob);
@@ -50,6 +49,14 @@ public class TestFileOperations extends STFTest {
         carl.sessionV.followThisUser(alice.state);
     }
 
+    /**
+     * <ol>
+     * <li>make sure, before every test there are only a package PKG1 and a
+     * class CLS1 under it in the shared project.</li>
+     * <li>make sure,all opened popup windows and editor should be closed.</li>
+     * 
+     * @throws RemoteException
+     */
     @Before
     public void setup() throws RemoteException {
         if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
@@ -124,9 +131,9 @@ public class TestFileOperations extends STFTest {
     public void testDeleteFile() throws RemoteException {
         alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
         bob.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(bob.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
         carl.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(carl.pEV.isFileExist(getClassPath(PROJECT1, PKG1, CLS1)));
+        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG1, CLS1));
     }
 
     /**

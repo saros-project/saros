@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -12,6 +13,8 @@ import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -41,20 +44,23 @@ public class SarosStateImp extends StateImp implements SarosState {
      */
     public static SarosStateImp getInstance(Saros saros,
         SarosSessionManager sessionManager,
-        DataTransferManager dataTransferManager, EditorManager editorManager) {
+        DataTransferManager dataTransferManager, EditorManager editorManager,
+        XMPPAccountStore xmppAccountStore) {
         if (self != null)
             return self;
         self = new SarosStateImp(saros, sessionManager, dataTransferManager,
-            editorManager);
+            editorManager, xmppAccountStore);
         return self;
     }
 
     public SarosStateImp(Saros saros, SarosSessionManager sessionManager,
-        DataTransferManager dataTransferManager, EditorManager editorManager) {
+        DataTransferManager dataTransferManager, EditorManager editorManager,
+        XMPPAccountStore xmppAccountStore) {
         this.saros = saros;
         this.sessionManager = sessionManager;
         this.dataTransferManager = dataTransferManager;
         this.editorManager = editorManager;
+        this.xmppAccountStore = xmppAccountStore;
         // this.messageManager = messageManger;
     }
 
@@ -65,6 +71,8 @@ public class SarosStateImp extends StateImp implements SarosState {
     protected transient DataTransferManager dataTransferManager;
 
     protected transient EditorManager editorManager;
+
+    protected transient XMPPAccountStore xmppAccountStore;
 
     public boolean areDrivers(List<JID> jids) {
         boolean result = true;
@@ -304,4 +312,54 @@ public class SarosStateImp extends StateImp implements SarosState {
         return this.jid.equals(otherJID);
     }
 
+    public boolean isAccountExist(JID jid) throws RemoteException {
+        ArrayList<XMPPAccount> allAccounts = xmppAccountStore.getAllAccounts();
+        for (XMPPAccount account : allAccounts) {
+            log.debug("account id: " + account.getId());
+            log.debug("account username: " + account.getUsername());
+            log.debug("account password: " + account.getPassword());
+            log.debug("account server: " + account.getServer());
+            if (jid.getName().equals(account.getUsername())
+                && jid.getDomain().equals(account.getServer())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAccountActive(JID jid) throws RemoteException {
+        XMPPAccount account = getXMPPAccount(jid);
+        return account.isActive();
+    }
+
+    public void activateAccount(JID jid) throws RemoteException {
+        XMPPAccount account = getXMPPAccount(jid);
+        xmppAccountStore.setAccountActive(account);
+    }
+
+    public void createAccount(String username, String password, String server)
+        throws RemoteException {
+        xmppAccountStore.createNewAccount(username, password, server);
+    }
+
+    public void changeAccount(JID jid, String newUserName, String newPassword,
+        String newServer) throws RemoteException {
+        xmppAccountStore.changeAccountData(getXMPPAccount(jid).getId(),
+            newUserName, newPassword, newServer);
+    }
+
+    public void deleteAccount(JID jid) throws RemoteException {
+        xmppAccountStore.deleteAccount(getXMPPAccount(jid));
+    }
+
+    private XMPPAccount getXMPPAccount(JID id) {
+        ArrayList<XMPPAccount> allAccounts = xmppAccountStore.getAllAccounts();
+        for (XMPPAccount account : allAccounts) {
+            if (jid.getName().equals(account.getUsername())
+                && jid.getDomain().equals(account.getServer())) {
+                return account;
+            }
+        }
+        return null;
+    }
 }

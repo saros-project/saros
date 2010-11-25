@@ -6,6 +6,8 @@ import java.util.List;
 import org.limewire.collection.Tuple;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -25,8 +27,9 @@ public interface SarosState extends State {
 
     /**
      * Test if you are now in a session. <br>
-     * You can also use another function {@link SessionViewComponent#isInSession()}
-     * , which test the session state with GUI.
+     * You can also use another function
+     * {@link SessionViewComponent#isInSession()} , which test the session state
+     * with GUI.
      * 
      * <p>
      * <b>Attention:</b> <br>
@@ -34,8 +37,8 @@ public interface SarosState extends State {
      * {@link SarosState#isInSession()} together in your junittests.
      * 
      * 
-     * @return <tt>true</tt> if {@link SarosSessionManager#getSarosSession()} is not
-     *         null.
+     * @return <tt>true</tt> if {@link SarosSessionManager#getSarosSession()} is
+     *         not null.
      * 
      * @throws RemoteException
      * @see SarosSessionManager#getSarosSession()
@@ -180,4 +183,80 @@ public interface SarosState extends State {
     public JID getJID() throws RemoteException;
 
     public boolean isSameUser(JID otherJID) throws RemoteException;
+
+    /**
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the account specified by the given jid exists in
+     *         preference store
+     * @throws RemoteException
+     * @see XMPPAccountStore#getAllAccounts()
+     */
+    public boolean isAccountExist(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the acount specified by the given jid is active
+     * @throws RemoteException
+     * @see XMPPAccount#isActive()
+     */
+    public boolean isAccountActive(JID jid) throws RemoteException;
+
+    /**
+     * activate the account specified by the given jid
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @throws RemoteException
+     * @see XMPPAccountStore#setAccountActive(XMPPAccount)
+     */
+    public void activateAccount(JID jid) throws RemoteException;
+
+    /**
+     * Creates an account.
+     * 
+     * @param username
+     *            the username of the new account.
+     * @param password
+     *            the password of the new account.
+     * @param server
+     *            the server of the new account.
+     * 
+     * @throws RemoteException
+     */
+    public void createAccount(String username, String password, String server)
+        throws RemoteException;
+
+    /**
+     * 
+     * change the account specified by the given jid
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param newUserName
+     *            the new username
+     * @param newPassword
+     *            the new password
+     * @param newServer
+     *            the new server
+     * @throws RemoteException
+     */
+    public void changeAccount(JID jid, String newUserName, String newPassword,
+        String newServer) throws RemoteException;
+
+    /**
+     * delete the account specified by the given jid
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @throws RemoteException
+     */
+    public void deleteAccount(JID jid) throws RemoteException;
 }
