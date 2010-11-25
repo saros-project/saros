@@ -81,23 +81,6 @@ class SubclipseAdapter extends VCSAdapter {
     }
 
     @Override
-    public String getRevisionString(IResource resource) {
-        if (!isManaged(resource))
-            return null;
-        if (!resource.exists())
-            return null;
-        try {
-            final SVNRevision revision = SVNWorkspaceRoot.getSVNResourceFor(
-                resource).getRevision();
-            if (revision != null)
-                return revision.toString();
-        } catch (SVNException e) {
-            log.error("Error retrieving revision for " + resource, e);
-        }
-        return null;
-    }
-
-    @Override
     public String getRepositoryString(IResource resource) {
         ISVNLocalResource svnResource = SVNWorkspaceRoot
             .getSVNResourceFor(resource);
