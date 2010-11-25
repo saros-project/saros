@@ -248,14 +248,13 @@ public class IncomingInvitationProcess extends InvitationProcess {
     private void acceptUnsafe(final IProject baseProject,
         final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws SarosCancellationException, IOException {
-        // If a base project is given, save it
         if (baseProject != null) {
-            log.debug("Inv" + Util.prefix(peer) + ": Saving base project...");
-            if (!EditorAPI.saveProject(baseProject, true)) {
-                // User cancelled saving the source project
-                throw new LocalCancellationException(
-                    "User cancelled saving the source project.",
-                    CancelOption.NOTIFY_PEER);
+            /*
+             * Saving unsaved files is supposed to be done in
+             * JoinSessionWizard#performFinish().
+             */
+            if( !EditorAPI.existUnsavedFiles(baseProject) ) {
+            	log.error("Unsaved files detected.");
             }
         }
 

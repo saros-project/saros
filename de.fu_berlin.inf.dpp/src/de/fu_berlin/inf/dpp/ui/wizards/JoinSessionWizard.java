@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -211,7 +212,27 @@ public class JoinSessionWizard extends Wizard {
                         e1);
                 }
             }
-
+            
+            if (EditorAPI.existUnsavedFiles(source)) {
+                boolean retVal = MessageDialog
+                    .openQuestion(
+                        getShell(),
+                        "Save all files now?",
+                        "The project \""
+                            + source.getName()
+                            + "\" has unsaved files. "
+                            + "All files must be saved before the invitation can proceed. "
+                            + "\nDo you wish to save all files now?");
+                if (!retVal)
+                    return retVal;
+                /*
+                 * Save the unsaved files now, otherwise the diff for
+                 * confirmOverwritingProjectResources() below wouldn't included
+                 * the unsaved files.
+                 */
+                EditorAPI.saveProject(source, false);
+            }
+            
             try {
                 diff = FileListDiff.diff(new FileList(source),
                     process.getRemoteFileList());

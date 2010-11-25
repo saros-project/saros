@@ -345,7 +345,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                     editorAPI.addEditorPartListener(EditorManager.this);
 
                     // Calling this method might cause openPart events
-                    Set<IEditorPart> allOpenEditorParts = editorAPI
+                    Set<IEditorPart> allOpenEditorParts = EditorAPI
                         .getOpenEditors();
 
                     Set<IEditorPart> editorsOpenedByRestoring = editorPool
@@ -430,18 +430,17 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected StopManager stopManager;
 
     public EditorManager(Saros saros, SarosSessionManager sessionManager,
-        StopManager stopManager) {
+        StopManager stopManager, EditorAPI editorApi) {
 
-        log.trace("EditorManager initialised");
+        log.trace("EditorManager initialized");
 
         this.saros = saros;
 
-        setEditorAPI(new EditorAPI(saros));
+        editorAPI = editorApi;
         sessionManager.addSarosSessionListener(this.sessionListener);
 
         stopManager.addBlockable(stopManagerListener);
         this.stopManager = stopManager;
-
     }
 
     public boolean isConnected(IFile file) {
@@ -497,10 +496,6 @@ public class EditorManager implements IActivityProvider, Disposable {
         documentProvider.disconnect(input);
 
         connectedFiles.remove(file);
-    }
-
-    public void setEditorAPI(IEditorAPI editorAPI) {
-        this.editorAPI = editorAPI;
     }
 
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
