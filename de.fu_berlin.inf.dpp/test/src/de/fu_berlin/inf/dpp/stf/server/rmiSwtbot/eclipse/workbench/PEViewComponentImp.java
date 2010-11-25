@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -19,7 +20,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.team.core.RepositoryProvider;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -705,6 +705,25 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
+    public void switchResource(String fullPath, String url)
+        throws RemoteException {
+        precondition();
+        final IPath path = new Path(fullPath);
+        final IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource \"" + path + "\" not found.");
+
+        final IProject project = resource.getProject();
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null) {
+            throw new RemoteException("No VCSAdapter found for \""
+                + project.getName() + "\".");
+        }
+
+        vcs.switch_(resource, url, "HEAD", new NullProgressMonitor());
+    }
+
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
         windowPart.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
@@ -714,11 +733,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
-        return RepositoryProvider.isShared(project);
-        // final VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        // if (vcs == null)
-        // return false;
-        // return true;
+        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null)
+            return false;
+        return true;
     }
 
     public void waitUntilProjectInSVN(String projectName)
@@ -845,7 +863,8 @@ public class PEViewComponentImp extends EclipseComponent implements
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
         bot.textWithLabel(LABEL_REVISION).setText(versionID);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+        if (windowPart.isShellOpen(SHELL_SVN_SWITCH))
+            windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
     public void copyProject(String target, String source)

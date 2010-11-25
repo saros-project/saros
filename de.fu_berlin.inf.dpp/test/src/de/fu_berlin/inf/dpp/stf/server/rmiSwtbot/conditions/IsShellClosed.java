@@ -16,7 +16,7 @@ public class IsShellClosed extends DefaultCondition {
 
     public String getFailureMessage() {
 
-        return "Can't find the shell " + title;
+        return "Shell \"" + title + "\" still open.";
     }
 
     public boolean test() throws Exception {
@@ -27,12 +27,4 @@ public class IsShellClosed extends DefaultCondition {
         }
         return true;
     }
-    // public boolean test() throws Exception {
-    // try {
-    // bot.shell(title);
-    // return false;
-    // } catch (WidgetNotFoundException e) {
-    // return true;
-    // }
-    // }
 }

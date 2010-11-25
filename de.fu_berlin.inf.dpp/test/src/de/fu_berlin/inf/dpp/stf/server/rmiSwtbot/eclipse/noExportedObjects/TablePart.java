@@ -91,10 +91,12 @@ public class TablePart extends EclipseComponent {
         for (int i = 0; i < bot.table().rowCount(); i++) {
             if (bot.table().getTableItem(i).getText(0).equals(text)) {
                 bot.table().getTableItem(i).check();
-                log.debug("found invitee: " + text);
+                log.debug("Found checkbox item \"" + text + "\".");
                 return;
             }
         }
+        throw new WidgetNotFoundException(
+            "No checkbox item found with label \"" + text + "\".");
     }
 
     public void selectCheckBoxsInTable(List<String> invitees) {

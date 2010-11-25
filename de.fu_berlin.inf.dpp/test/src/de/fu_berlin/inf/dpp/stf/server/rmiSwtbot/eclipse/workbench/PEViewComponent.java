@@ -1032,6 +1032,9 @@ public interface PEViewComponent extends Remote {
     public void switchProject(String projectName, String url)
         throws RemoteException;
 
+    public void switchResource(String fullPath, String url)
+        throws RemoteException;
+
     /**
      * waits until the window with the title "Saros running VCS operation" is
      * closed

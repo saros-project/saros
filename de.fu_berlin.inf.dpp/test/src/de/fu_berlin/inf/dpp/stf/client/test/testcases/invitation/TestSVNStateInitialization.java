@@ -14,6 +14,9 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
+/**
+ * Tests for the initial synchronization of the SVN state during the invitation.
+ */
 public class TestSVNStateInitialization extends STFTest {
 
     /**
@@ -68,11 +71,13 @@ public class TestSVNStateInitialization extends STFTest {
     }
 
     @After
-    public void cleanUp() throws RemoteException {
-        if (alice.pEV.isProjectExist(SVN_PROJECT))
-            alice.pEV.deleteProject(SVN_PROJECT);
+    public void tearDown() throws RemoteException {
+        alice.rosterV.disconnect();
         alice.workbench.resetWorkbench();
         bob.workbench.resetWorkbench();
+        if (alice.pEV.isProjectExist(SVN_PROJECT))
+            alice.pEV.deleteProject(SVN_PROJECT);
+        bob.state.deleteAllProjects();
     }
 
     /**
@@ -125,11 +130,40 @@ public class TestSVNStateInitialization extends STFTest {
         alice.shareProjectWithDone(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
-        assertTrue(alice.state.isDriver(alice.jid));
-        assertTrue(alice.state.isParticipant(bob.jid));
-        assertTrue(bob.state.isObserver(bob.jid));
+
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(bob.pEV.getRevision(SVN_CLS1_FULL_PATH), SVN_CLS1_REV2);
+    }
+
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice switches {@link STFTest#SVN_CLS1} to
+     * {@link STFTest#SVN_CLS1_SWITCHED_URL}.</li>
+     * <li>Alice shared project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_CLS1} is switched to
+     * {@link STFTest#SVN_CLS1_SWITCHED_URL}.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * 
+     */
+    @Test
+    public void testCheckoutWithSwitch() throws RemoteException {
+        alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        alice.shareProjectWithDone(SVN_PROJECT,
+            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        bob.sessionV.waitUntilSessionOpen();
+
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(SVN_CLS1_SWITCHED_URL,
+            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
     }
 
 }

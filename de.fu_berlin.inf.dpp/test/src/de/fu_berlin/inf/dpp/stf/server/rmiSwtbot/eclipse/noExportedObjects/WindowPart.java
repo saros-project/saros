@@ -30,7 +30,7 @@ public class WindowPart extends EclipseComponent {
         SWTBotShell[] shells = bot.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().equals(title)) {
-                log.debug("shell found");
+                log.debug("Shell \"" + title + "\" found.");
                 if (!shell.isActive()) {
                     shell.activate();
                 }

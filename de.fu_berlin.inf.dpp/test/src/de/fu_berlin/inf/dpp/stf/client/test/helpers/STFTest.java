@@ -67,6 +67,7 @@ public class STFTest {
     protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
     protected static final String SVN_CLS1 = "Test";
     protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
+    protected static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
     protected static final String SVN_PKG = "pkg";
     protected static final String SVN_CLS1_REV1 = "2737";
     protected static final String SVN_CLS1_REV2 = "2735";
