@@ -50,27 +50,27 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
 
         assert vcs != null && vcs.equals(sharedProject.getVCSAdapter());
 
+        /*
+         * Note that it is possible to get a delta with both a sync info change
+         * and a content change.
+         */
         if (isSync(delta)) {
             VCSResourceInfo info = vcs.getResourceInfo(resource);
             if (sharedProject.updateVcsUrl(resource, info.url)) {
                 sharedProject.updateRevision(resource, info.revision);
                 // Switch
-                if (!ignoreChildren(resource)) {
+                if (info.revision != null && !ignoreChildren(resource)) {
                     addActivity(VCSActivity.switch_(sarosSession, resource,
                         info.url, info.revision));
                     setIgnoreChildren(resource);
                 }
-                return true;
-            }
-
-            if (sharedProject.updateRevision(resource, info.revision)) {
+            } else if (sharedProject.updateRevision(resource, info.revision)) {
                 // Update
                 if (!ignoreChildren(resource)) {
                     addActivity(VCSActivity.update(sarosSession, resource,
                         info.revision));
                     setIgnoreChildren(resource);
                 }
-                return true;
             }
         }
 
@@ -105,10 +105,10 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
     }
 
     protected void updateInfo(IResource resource) {
-        VCSResourceInfo info = vcs.getResourceInfo(resource);
         if (!vcs.isManaged(resource)) {
             return;
         }
+        VCSResourceInfo info = vcs.getResourceInfo(resource);
         sharedProject.updateVcsUrl(resource, info.url);
         sharedProject.updateRevision(resource, info.revision);
     }

@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import java.util.Vector;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -8,6 +10,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IResourceActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -55,6 +58,8 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     protected String directory;
     protected SPath path;
     protected String param1;
+
+    public Vector<IResourceActivity> containedActivity = new Vector<IResourceActivity>();
 
     public VCSActivity(Type type, User source, SPath path, String url,
         String directory, String param1) {
@@ -109,8 +114,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         SPathDataObject sPathDataObject = path == null ? null : path
             .toSPathDataObject(sarosSession);
+        Vector<IResourceActivityDataObject> ados = new Vector<IResourceActivityDataObject>(
+            containedActivity.size());
+        for (IResourceActivity a : containedActivity) {
+            ados.add((IResourceActivityDataObject) a
+                .getActivityDataObject(sarosSession));
+        }
         return new VCSActivityDataObject(source.getJID(), getType(), url,
-            sPathDataObject, directory, param1);
+            sPathDataObject, directory, param1, ados);
     }
 
     public SPath getPath() {
@@ -154,8 +165,8 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             return false;
         }
         if (vcsPath.equals(otherPath)) {
-            // TODO
-            return false;
+            return otherActivity instanceof FileActivity
+                || otherActivity instanceof FolderActivity;
         }
 
         return true;

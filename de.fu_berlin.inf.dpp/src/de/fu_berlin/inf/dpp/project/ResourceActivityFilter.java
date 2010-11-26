@@ -90,6 +90,9 @@ class ResourceActivityFilter {
                 IResourceActivity otherActivity = result.get(j);
                 if (result.contains(otherActivity)
                     && vcsActivity.includes(otherActivity)) {
+                    if (!(otherActivity instanceof VCSActivity)) {
+                        vcsActivity.containedActivity.add(0, otherActivity);
+                    }
                     SharedResourcesManager.log
                         .debug("Ignoring redundant activity " + otherActivity);
                     result.remove(j);
