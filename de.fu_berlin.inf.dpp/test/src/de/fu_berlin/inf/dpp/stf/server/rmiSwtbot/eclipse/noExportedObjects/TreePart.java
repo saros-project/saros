@@ -30,32 +30,12 @@ public class TreePart extends EclipseComponent {
      */
     public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
         String... regexs) {
-        SWTBotTreeItem item = null;
-        for (String regex : regexs) {
-            boolean exist = false;
-            if (item == null) {
-                for (int i = 0; i < tree.getAllItems().length; i++) {
-                    log.info("treeItem'name: "
-                        + tree.getAllItems()[i].getText());
-                    if (tree.getAllItems()[i].getText().matches(regex)) {
-                        item = tree.getAllItems()[i].expand();
-                        exist = true;
-                    }
-                }
-            } else {
-                for (String nodeName : item.getNodes()) {
-                    log.info("node'name: " + nodeName);
-                    if (nodeName.matches(regex)) {
-                        item = item.getNode(nodeName).expand();
-                        exist = true;
-                    }
-                }
-            }
-            if (!exist) {
-                return false;
-            }
+        try {
+            getTreeItemWithMatchText(tree, regexs);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
         }
-        return item != null;
     }
 
     /**

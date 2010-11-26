@@ -32,6 +32,8 @@ public class TestHandleContacts extends STFTest {
     public void setUp() throws RemoteException {
         alice.addContactDone(bob);
         bob.addContactDone(alice);
+        assertTrue(alice.rosterV.isConnected());
+        assertTrue(bob.rosterV.isConnected());
     }
 
     @After
