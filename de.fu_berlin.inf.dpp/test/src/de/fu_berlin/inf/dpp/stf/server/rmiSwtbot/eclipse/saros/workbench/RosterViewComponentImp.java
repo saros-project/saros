@@ -129,11 +129,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
                 state.activateAccount(jid);
             clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
-
-            if (!jid.equals(state.getJID()))
-                throw new RemoteException("Wrong JID! Expected to be connected"
-                    + " as \"" + jid + "\", but was connected as \""
-                    + state.getJID() + "\" instead.");
         }
     }
 
@@ -217,7 +212,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions for all the contacts on the roster view: give/remove driver role
+     * select buddy on the roster view
      * 
      **********************************************/
     public SWTBotTreeItem selectBuddy(String baseJID) throws RemoteException {
@@ -247,12 +242,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void clickContextMenuOfBuddy(String context, String baseJID)
-        throws RemoteException {
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, CM_DELETE, BUDDIES,
-            baseJID);
-    }
-
     public void confirmRemovelOfSubscriptionWindow() throws RemoteException {
         windowPart.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
         windowPart.confirmWindow(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
@@ -279,6 +268,17 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * Inner functions
      * 
      **************************************************************/
+    /**
+     * 
+     * @param context
+     * @param baseJID
+     * @throws RemoteException
+     */
+    private void clickContextMenuOfBuddy(String context, String baseJID)
+        throws RemoteException {
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, CM_DELETE, BUDDIES,
+            baseJID);
+    }
 
     /**
      * 

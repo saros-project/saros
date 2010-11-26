@@ -2,12 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
 import org.limewire.collection.Tuple;
 import org.osgi.framework.Bundle;
 
@@ -35,9 +37,17 @@ public class SarosStateImp extends StateImp implements SarosState {
     private transient static final Logger log = Logger
         .getLogger(SarosStateImp.class);
 
-    // public static SarosStateObjectImp classVariable;
-
     private static transient SarosStateImp self;
+
+    protected transient Saros saros;
+
+    protected transient SarosSessionManager sessionManager;
+
+    protected transient DataTransferManager dataTransferManager;
+
+    protected transient EditorManager editorManager;
+
+    protected transient XMPPAccountStore xmppAccountStore;
 
     /**
      * {@link ChatViewComponentImp} is a singleton, but inheritance is possible.
@@ -63,16 +73,6 @@ public class SarosStateImp extends StateImp implements SarosState {
         this.xmppAccountStore = xmppAccountStore;
         // this.messageManager = messageManger;
     }
-
-    protected transient Saros saros;
-
-    protected transient SarosSessionManager sessionManager;
-
-    protected transient DataTransferManager dataTransferManager;
-
-    protected transient EditorManager editorManager;
-
-    protected transient XMPPAccountStore xmppAccountStore;
 
     public boolean areDrivers(List<JID> jids) {
         boolean result = true;
@@ -147,6 +147,13 @@ public class SarosStateImp extends StateImp implements SarosState {
     public boolean hasContactWith(JID jid) throws RemoteException {
         Roster roster = saros.getRoster();
         String jidBase = jid.getBase();
+        Collection<RosterEntry> entries = roster.getEntries();
+        for (RosterEntry entry : entries) {
+            log.debug("roster entry'name : " + entry.getName());
+            log.debug("roster entry'name : " + entry.getUser());
+            log.debug("roster entry'name : " + entry.getStatus());
+            log.debug("roster entry'name : " + entry.getType());
+        }
         return roster.contains(jidBase);
     }
 
@@ -303,6 +310,9 @@ public class SarosStateImp extends StateImp implements SarosState {
         this.jid = jid;
     }
 
+    /**
+     * TODO this method return null value... need to be fixed
+     */
     public JID getJID() throws RemoteException {
         final JID result = saros.getMyJID();
         return result;

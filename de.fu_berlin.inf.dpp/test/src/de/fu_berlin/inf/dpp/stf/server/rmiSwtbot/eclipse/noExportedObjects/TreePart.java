@@ -14,8 +14,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 public class TreePart extends EclipseComponent {
 
     /**
-     * test, if a tree node exist. This method ist very helpful, if you are not
-     * sure, how exactly is the tree node's name.
+     * This method ist very helpful, if you are not sure, how exactly is the
+     * tree item's name.
+     * 
+     * @param tree
+     *            a {@link SWTBotTree} with the specified <code>none</code> in
+     *            specified view.
+     * @param regexs
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array parameter.e.g.
+     *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
+     * @return <tt>true</tt>, if the three item specified with the given regexs
+     *         exists
      */
     public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
         String... regexs) {
