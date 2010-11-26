@@ -27,10 +27,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 
-/**
- * The goal of this class is to gather state and provide an RMI interface for
- * getting internal states from the outside.
- */
 public class SarosStateImp extends StateImp implements SarosState {
 
     private JID jid;
@@ -39,15 +35,15 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     private static transient SarosStateImp self;
 
-    protected transient Saros saros;
+    private transient Saros saros;
 
-    protected transient SarosSessionManager sessionManager;
+    private transient SarosSessionManager sessionManager;
 
-    protected transient DataTransferManager dataTransferManager;
+    private transient DataTransferManager dataTransferManager;
 
-    protected transient EditorManager editorManager;
+    private transient EditorManager editorManager;
 
-    protected transient XMPPAccountStore xmppAccountStore;
+    private transient XMPPAccountStore xmppAccountStore;
 
     /**
      * {@link ChatViewComponentImp} is a singleton, but inheritance is possible.
@@ -74,12 +70,57 @@ public class SarosStateImp extends StateImp implements SarosState {
         // this.messageManager = messageManger;
     }
 
+    /**********************************************
+     * 
+     * gather state and perform actions using {@link SarosSessionManager}
+     * 
+     * @throws RemoteException
+     * 
+     **********************************************/
+
+    private ISarosSession getSarosSession() {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            throw new RuntimeException("Not in a session.");
+        else
+            return sarosSession;
+    }
+
+    public boolean isDriver() throws RemoteException {
+        ISarosSession sarosSession = getSarosSession();
+        return sarosSession.isDriver();
+        // User user = sarosSession.getUser(this.jid);
+        // if (user == null) {
+        //
+        // return false;
+        // }
+        // boolean isDriver = sarosSession.getDrivers().contains(user);
+        // log.debug("isDriver(" + this.jid.toString() + ") == " + isDriver);
+        // return isDriver;
+    }
+
+    public boolean isDriver(JID jid) throws RemoteException {
+        ISarosSession sarosSession = getSarosSession();
+        User user = sarosSession.getUser(jid);
+        log.debug("isDriver(" + jid.toString() + ") == "
+            + sarosSession.getDrivers().contains(user));
+        return sarosSession.getDrivers().contains(user);
+    }
+
+    public boolean isExclusiveDriver() throws RemoteException {
+        try {
+            ISarosSession sarosSession = getSarosSession();
+            return sarosSession.isExclusiveDriver();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean areDrivers(List<JID> jids) {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = sessionManager.getSarosSession();
-
+                ISarosSession sarosSession = getSarosSession();
                 User user = sarosSession.getUser(jid);
                 result &= sarosSession.getDrivers().contains(user);
             } catch (Exception e) {
@@ -89,20 +130,27 @@ public class SarosStateImp extends StateImp implements SarosState {
         return result;
     }
 
-    public boolean isExclusiveDriver() throws RemoteException {
-        try {
-            ISarosSession sarosSession = sessionManager.getSarosSession();
-            return sarosSession.isExclusiveDriver();
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean isHost(JID jid) throws RemoteException {
+        ISarosSession sarosSession = getSarosSession();
+        final boolean result = sarosSession.getUser(jid) == sarosSession
+            .getHost();
+        log.debug("isHost(" + jid.toString() + ") == " + result);
+        return result;
+    }
+
+    public boolean isObserver(JID jid) throws RemoteException {
+        ISarosSession sarosSession = getSarosSession();
+        User user = sarosSession.getUser(jid);
+        log.debug("isObserver(" + jid.toString() + ") == "
+            + sarosSession.getObservers().contains(user));
+        return sarosSession.getObservers().contains(user);
     }
 
     public boolean areObservers(List<JID> jids) {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = sessionManager.getSarosSession();
+                ISarosSession sarosSession = getSarosSession();
                 User user = sarosSession.getUser(jid);
                 result &= sarosSession.getObservers().contains(user);
             } catch (Exception e) {
@@ -112,11 +160,26 @@ public class SarosStateImp extends StateImp implements SarosState {
         return result;
     }
 
-    public boolean areParticipants(List<JID> jids) {
+    public boolean isParticipant(JID jid) throws RemoteException {
+        try {
+            ISarosSession sarosSession = getSarosSession();
+            log.debug("isParticipant("
+                + jid.toString()
+                + ") == "
+                + sarosSession.getParticipants().contains(
+                    sarosSession.getUser(jid)));
+            return sarosSession.getParticipants().contains(
+                sarosSession.getUser(jid));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean areParticipants(List<JID> jids) throws RemoteException {
         boolean result = true;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = sessionManager.getSarosSession();
+                ISarosSession sarosSession = getSarosSession();
                 result &= sarosSession.getParticipants().contains(
                     sarosSession.getUser(jid));
             } catch (Exception e) {
@@ -131,82 +194,22 @@ public class SarosStateImp extends StateImp implements SarosState {
         return sessionManager.getSarosSession() != null;
     }
 
-    public Tuple<NetTransferMode, NetTransferMode> getConnection(JID destJid) {
+    public ISarosSession getProject() throws RemoteException {
+        return getSarosSession();
+    }
+
+    /**********************************************
+     * 
+     * gather state and perform actions using {@link DataTransferManager}
+     * 
+     **********************************************/
+    private Tuple<NetTransferMode, NetTransferMode> getConnection(JID destJid) {
         NetTransferMode outgoingMode = dataTransferManager
             .getTransferMode(destJid);
         NetTransferMode incomingMode = dataTransferManager
             .getTransferMode(destJid);
         return new Tuple<NetTransferMode, NetTransferMode>(incomingMode,
             outgoingMode);
-    }
-
-    public ConnectionState getXmppConnectionState() {
-        return saros.getConnectionState();
-    }
-
-    public boolean hasContactWith(JID jid) throws RemoteException {
-        Roster roster = saros.getRoster();
-        String jidBase = jid.getBase();
-        Collection<RosterEntry> entries = roster.getEntries();
-        for (RosterEntry entry : entries) {
-            log.debug("roster entry'name : " + entry.getName());
-            log.debug("roster entry'name : " + entry.getUser());
-            log.debug("roster entry'name : " + entry.getStatus());
-            log.debug("roster entry'name : " + entry.getType());
-        }
-        return roster.contains(jidBase);
-    }
-
-    public boolean isConnected() {
-        return saros.isConnected();
-    }
-
-    public boolean isInFollowMode() throws RemoteException {
-        return editorManager.isFollowing();
-    }
-
-    public boolean isFollowingUser(String plainJID) throws RemoteException {
-        if (getFollowedUserJID() == null)
-            return false;
-        else
-            return getFollowedUserJID().getBase().equals(plainJID);
-    }
-
-    public JID getFollowedUserJID() throws RemoteException {
-        if (editorManager.getFollowedUser() != null)
-            return editorManager.getFollowedUser().getJID();
-        else
-            return null;
-    }
-
-    public boolean isDriver(JID jid) throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        User user = sarosSession.getUser(jid);
-        log.debug("isDriver(" + jid.toString() + ") == "
-            + sarosSession.getDrivers().contains(user));
-        return sarosSession.getDrivers().contains(user);
-    }
-
-    public boolean isDriver() throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            throw new RemoteException("Not in a session.");
-        User user = sarosSession.getUser(this.jid);
-        if (user == null) {
-            // TODO here need to throw Exception.
-            return false;
-        }
-        boolean isDriver = sarosSession.getDrivers().contains(user);
-        log.debug("isDriver(" + this.jid.toString() + ") == " + isDriver);
-        return isDriver;
-    }
-
-    public boolean isHost(JID jid) throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        final boolean result = sarosSession.getUser(jid) == sarosSession
-            .getHost();
-        log.debug("isHost(" + jid.toString() + ") == " + result);
-        return result;
     }
 
     public boolean isIncomingConnectionIBB(JID destJid) throws RemoteException {
@@ -226,28 +229,10 @@ public class SarosStateImp extends StateImp implements SarosState {
             NetTransferMode.JINGLEUDP);
     }
 
-    // public boolean isClassDirty(String projectName, String pkg, String
-    // className)
-    // throws RemoteException, FileNotFoundException {
-    // IPath path = new Path(projectName + "/src/"
-    // + pkg.replaceAll("\\.", "/") + "/" + className + ".java");
-    // IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-    // .findMember(path);
-    // return editorManager.isDirty(new SPath(resource));
-    // }
-
     public boolean isIncomingConnectionSocks5ByteStream(JID destJid)
         throws RemoteException {
         throw new NotImplementedException(
             "We can not get NetTransferMode Socks5ByteStream connection in Saros yet.");
-    }
-
-    public boolean isObserver(JID jid) throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        User user = sarosSession.getUser(jid);
-        log.debug("isObserver(" + jid.toString() + ") == "
-            + sarosSession.getObservers().contains(user));
-        return sarosSession.getObservers().contains(user);
     }
 
     public boolean isOutgoingConnectionIBB(JID destJid) throws RemoteException {
@@ -273,32 +258,63 @@ public class SarosStateImp extends StateImp implements SarosState {
             "We can not get NetTransferMode Socks5ByteStream connection in Saros yet.");
     }
 
-    public boolean isParticipant(JID jid) throws RemoteException {
-        try {
-            ISarosSession sarosSession = sessionManager.getSarosSession();
-            log.debug("isParticipant("
-                + jid.toString()
-                + ") == "
-                + sarosSession.getParticipants().contains(
-                    sarosSession.getUser(jid)));
-            return sarosSession.getParticipants().contains(
-                sarosSession.getUser(jid));
-        } catch (Exception e) {
-            return false;
+    /**********************************************
+     * 
+     * gather state and perform actions using {@link Saros}
+     * 
+     **********************************************/
+    public boolean isConnecting() throws RemoteException {
+        return getXmppConnectionState() == ConnectionState.CONNECTING;
+    }
+
+    public boolean isConnected() throws RemoteException {
+        return saros.isConnected();
+    }
+
+    public boolean isDisConnecting() throws RemoteException {
+        return getXmppConnectionState() == ConnectionState.DISCONNECTING;
+    }
+
+    public boolean isDisConnected() throws RemoteException {
+        return getXmppConnectionState() == ConnectionState.NOT_CONNECTED;
+    }
+
+    public ConnectionState getXmppConnectionState() throws RemoteException {
+        return saros.getConnectionState();
+    }
+
+    public boolean hasBuddy(JID buddyJID) throws RemoteException {
+        Roster roster = saros.getRoster();
+        String baseJID = buddyJID.getBase();
+        Collection<RosterEntry> entries = roster.getEntries();
+        for (RosterEntry entry : entries) {
+            log.debug("roster entry.getName(): " + entry.getName());
+            log.debug("roster entry.getuser(): " + entry.getUser());
+            log.debug("roster entry.getStatus(): " + entry.getStatus());
+            log.debug("roster entry.getType(): " + entry.getType());
         }
+        return roster.contains(baseJID);
     }
 
-    public ISarosSession getProject() throws RemoteException {
-        return sessionManager.getSarosSession();
+    public String getBuddyNickName(JID buddyJID) throws RemoteException {
+        Roster roster = saros.getRoster();
+        return roster.getEntry(buddyJID.getBase()).getName();
     }
 
-    public String getContents(String path) throws RemoteException {
+    public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
+        if (!getBuddyNickName(buddyJID).equals(buddyJID.getBareJID()))
+            return true;
+        return false;
+    }
+
+    public String getTestFileContents(String testFilePath)
+        throws RemoteException {
         Bundle bundle = saros.getBundle();
         String contents;
         try {
-            contents = FileUtils.read(bundle.getEntry(path));
+            contents = FileUtils.read(bundle.getEntry(testFilePath));
         } catch (NullPointerException e) {
-            throw new RuntimeException("Could not open " + path);
+            throw new RuntimeException("Could not open " + testFilePath);
         }
         return contents;
     }
@@ -308,23 +324,41 @@ public class SarosStateImp extends StateImp implements SarosState {
         return bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
-    public void setJID(JID jid) throws RemoteException {
-        this.jid = jid;
-    }
-
-    /**
-     * TODO this method return null value... need to be fixed
-     */
-    public JID getJID() throws RemoteException {
+    public JID getMyJID() throws RemoteException {
         final JID result = saros.getMyJID();
         return result;
     }
 
-    public boolean isSameUser(JID otherJID) throws RemoteException {
-        return this.jid.equals(otherJID);
+    /**********************************************
+     * 
+     * gather state and perform actions using {@link EditorManager}
+     * 
+     **********************************************/
+    public boolean isInFollowMode() throws RemoteException {
+        return editorManager.isFollowing();
     }
 
-    public boolean isAccountExist(JID jid) throws RemoteException {
+    public boolean isFollowingUser(String baseJID) throws RemoteException {
+        if (getFollowedUserJID() == null)
+            return false;
+        else
+            return getFollowedUserJID().getBase().equals(baseJID);
+    }
+
+    public JID getFollowedUserJID() throws RemoteException {
+        if (editorManager.getFollowedUser() != null)
+            return editorManager.getFollowedUser().getJID();
+        else
+            return null;
+    }
+
+    /**********************************************
+     * 
+     * gather state and perform actions using {@link XMPPAccountStore}
+     * 
+     **********************************************/
+    public boolean isAccountExist(JID jid, String password)
+        throws RemoteException {
         ArrayList<XMPPAccount> allAccounts = xmppAccountStore.getAllAccounts();
         for (XMPPAccount account : allAccounts) {
             log.debug("account id: " + account.getId());
@@ -332,7 +366,8 @@ public class SarosStateImp extends StateImp implements SarosState {
             log.debug("account password: " + account.getPassword());
             log.debug("account server: " + account.getServer());
             if (jid.getName().equals(account.getUsername())
-                && jid.getDomain().equals(account.getServer())) {
+                && jid.getDomain().equals(account.getServer())
+                && password.equals(account.getPassword())) {
                 return true;
             }
         }
@@ -373,5 +408,22 @@ public class SarosStateImp extends StateImp implements SarosState {
             }
         }
         return null;
+    }
+
+    /**********************************************
+     * 
+     * infos about local user
+     * 
+     **********************************************/
+    public void setJID(JID jid) throws RemoteException {
+        this.jid = jid;
+    }
+
+    public JID getJID() throws RemoteException {
+        return jid;
+    }
+
+    public boolean isSameUser(JID otherJID) throws RemoteException {
+        return this.jid.equals(otherJID);
     }
 }

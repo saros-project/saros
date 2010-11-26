@@ -88,14 +88,10 @@ public class TestSessionViewComponent extends STFTest {
     @Test
     public void testIsInSession() throws RemoteException, InterruptedException {
         assertTrue(alice.sessionV.isInSession());
-        assertTrue(alice.state.isInSession());
         assertTrue(bob.sessionV.isInSession());
-        assertTrue(bob.state.isInSession());
         alice.leaveSessionFirst(bob);
         assertFalse(alice.sessionV.isInSession());
-        assertFalse(alice.state.isInSession());
         assertFalse(bob.sessionV.isInSession());
-        assertFalse(bob.state.isInSession());
     }
 
     @Test

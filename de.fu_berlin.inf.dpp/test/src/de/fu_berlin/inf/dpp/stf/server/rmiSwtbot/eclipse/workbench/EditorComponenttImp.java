@@ -253,7 +253,7 @@ public class EditorComponenttImp extends EclipseComponent implements
     public void setTextInJavaEditorWithSave(String contentPath,
         String projectName, String packageName, String className)
         throws RemoteException {
-        String contents = state.getContents(contentPath);
+        String contents = state.getTestFileContents(contentPath);
         // activateEclipseShell();
 
         peVC.openFile(getClassNodes(projectName, packageName, className));
@@ -287,7 +287,7 @@ public class EditorComponenttImp extends EclipseComponent implements
     public void setTextInEditorWithSave(String contentPath, String... filePath)
         throws RemoteException {
 
-        String contents = state.getContents(contentPath);
+        String contents = state.getTestFileContents(contentPath);
         String fileName = filePath[filePath.length - 1];
         peVC.openFile(filePath);
         activateEditor(fileName);
@@ -297,7 +297,7 @@ public class EditorComponenttImp extends EclipseComponent implements
     public void setTextInJavaEditorWithoutSave(String contentPath,
         String projectName, String packageName, String className)
         throws RemoteException {
-        String contents = state.getContents(contentPath);
+        String contents = state.getTestFileContents(contentPath);
         peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);
         editorPart.setTextinEditorWithoutSave(contents, className + ".java");
@@ -305,7 +305,7 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void typeTextInJavaEditor(String contentPath, String projectName,
         String packageName, String className) throws RemoteException {
-        String contents = state.getContents(contentPath);
+        String contents = state.getTestFileContents(contentPath);
         workbenchC.activateEclipseShell();
         peVC.openFile(getClassNodes(projectName, packageName, className));
         activateJavaEditor(className);

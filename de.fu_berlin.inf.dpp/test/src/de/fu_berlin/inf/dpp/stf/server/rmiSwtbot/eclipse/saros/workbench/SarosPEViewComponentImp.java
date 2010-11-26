@@ -134,11 +134,14 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK, projectName);
         windowPart.waitUntilShellCloses(FOLDER_SELECTION);
         bot.button(FINISH).click();
+        if (windowPart.isShellActive(WARNING_LOCAL_CHANGES_DELETED))
+            windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
         /*
          * if there are some files locally, which are not saved yet, you will
          * get a popup window with the title "Save Resource" after you comfirm
          * the window "Warning: Local changes will be deleted" with YES.
          */
+
         if (windowPart.isShellActive(SHELL_SAVE_RESOURCE)) {
             windowPart.confirmWindow(SHELL_SAVE_RESOURCE, YES);
             /*
@@ -148,8 +151,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
              */
             // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
         }
+        if (windowPart.isShellActive("Save Resource")) {
+            windowPart.confirmWindow("Save Resource", YES);
+        }
 
-        windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
+        // windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
 
         /*
          * after the release 10.10.28 it take less time for the session
@@ -163,6 +169,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         if (windowPart.isShellActive(SESSION_INVITATION)) {
             windowPart.waitUntilShellCloses(bot.shell(SESSION_INVITATION));
         }
+
     }
 
     public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(

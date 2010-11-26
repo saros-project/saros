@@ -122,7 +122,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
-            if (!state.isAccountExist(jid)) {
+            if (!state.isAccountExist(jid, password)) {
                 state.createAccount(jid.getName(), password, jid.getDomain());
             }
             if (!state.isAccountActive(jid))
@@ -189,7 +189,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public boolean hasContactWith(JID jid) throws RemoteException {
-        return state.hasContactWith(jid) && isBuddyExist(jid.getBase());
+        return state.hasBuddy(jid) && isBuddyExist(jid.getBase());
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {

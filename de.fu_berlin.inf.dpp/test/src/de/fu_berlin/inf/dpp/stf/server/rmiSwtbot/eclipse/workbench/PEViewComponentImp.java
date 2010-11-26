@@ -615,27 +615,40 @@ public class PEViewComponentImp extends EclipseComponent implements
             REPOSITORY_TYPE_SVN, NEXT);
 
         try {
-            final SWTBotTable table = bot.table();
+            final SWTBotTable table = bot.shell(SHELL_SHEARE_PROJECT).bot()
+                .table();
             if (table.containsItem(repositoryURL)) {
                 windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
                     repositoryURL, NEXT);
             } else {
                 bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+                /*
+                 * TODO Actually after clicking the button "Next" should be the
+                 * page to enter repository information appeared because of
+                 * activating the radio button with the title
+                 * "Create a new repository location".But it seem that
+                 * SWTbotRadio has a bug. So here you'wll get
+                 * WidgetNotfoundException. A not so good solution for it is
+                 * catch WidgetNotFoundException and do nothing
+                 */
                 bot.button(NEXT).click();
                 bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
                 bot.button(NEXT).click();
             }
         } catch (WidgetNotFoundException e) {
-            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
-            bot.button(NEXT).click();
+            // bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            // bot.button(NEXT).click();
         }
-
         bot.radio("Use specified folder name:").click();
         bot.text().setText(specifiedFolderName);
         bot.button(FINISH).click();
         windowPart.waitUntilShellActive("Remote Project Exists");
         windowPart.confirmWindow("Remote Project Exists", YES);
-        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+        bot.sleep(500);
+        if (windowPart.isShellOpen("Confirm Open Perspective"))
+            windowPart.confirmWindow("Confirm Open Perspective", NO);
+        else
+            windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
     }
 
     public void importProjectFromSVN(String repositoryURL)

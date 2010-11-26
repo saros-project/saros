@@ -212,7 +212,7 @@ public class WindowPart extends EclipseComponent {
         String buttonText) throws RemoteException {
         // waitUntilShellActive(shellName);
         try {
-            bot.table().select(itemName);
+            bot.shell(title).bot().table().select(itemName);
             basicPart.waitUntilButtonIsEnabled(buttonText);
             bot.button(buttonText).click();
             // waitUntilShellCloses(shellName);

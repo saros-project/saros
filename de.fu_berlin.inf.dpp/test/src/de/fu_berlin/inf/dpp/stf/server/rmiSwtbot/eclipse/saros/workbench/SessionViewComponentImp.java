@@ -112,7 +112,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
      **********************************************/
     public boolean isInSession() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
+        return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION)
+            && state.isInSession();
     }
 
     public void waitUntilSessionOpen() throws RemoteException {

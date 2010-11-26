@@ -52,7 +52,7 @@ public class XMPPAccountStore {
     }
 
     /**
-     * Loads the accounts from preferenceStore and put them into list: accounts.
+     * Loads the accounts from {@link IPreferenceStore}.
      */
     public void loadAccounts() {
         accounts.clear();
@@ -87,9 +87,9 @@ public class XMPPAccountStore {
     }
 
     /**
-     * Return true if an account exists in preference store.
+     * Return true if an account exists in {@link IPreferenceStore}.
      * 
-     * @return true if an account exist in preference store.
+     * @return true if an account exist.
      */
     public boolean accountsInPreferenceExist() {
         String username = preferenceStore
