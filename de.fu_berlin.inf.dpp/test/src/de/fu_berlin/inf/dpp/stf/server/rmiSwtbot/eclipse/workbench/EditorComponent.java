@@ -45,7 +45,8 @@ public interface EditorComponent extends Remote {
 
     public void waitUntilEditorActive(String name) throws RemoteException;
 
-    public boolean isJavaEditorOpen(String javaEditorName) throws RemoteException;
+    public boolean isJavaEditorOpen(String javaEditorName)
+        throws RemoteException;
 
     public boolean isFileOpen(String fileName) throws RemoteException;
 
@@ -106,6 +107,17 @@ public interface EditorComponent extends Remote {
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException;
 
+    /**
+     * Opens the specified class in an editor, changes the content to the
+     * provided content, and saves it.
+     * 
+     * @param contentPath
+     *            The new content.
+     * @param projectName
+     * @param packageName
+     * @param className
+     * @throws RemoteException
+     */
     public void setTextInJavaEditorWithSave(String contentPath,
         String projectName, String packageName, String className)
         throws RemoteException;

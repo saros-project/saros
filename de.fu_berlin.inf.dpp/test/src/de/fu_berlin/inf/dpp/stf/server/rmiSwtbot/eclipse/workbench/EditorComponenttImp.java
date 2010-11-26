@@ -136,7 +136,9 @@ public class EditorComponenttImp extends EclipseComponent implements
      */
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        peVC.openFile(getClassNodes(projectName, packageName, className));
+        String[] classNodes = getClassNodes(projectName, packageName, className);
+        String[] regexNodes = helperPart.changeToRegex(classNodes);
+        peVC.openFile(regexNodes);
         activateJavaEditor(className);
         return editorPart.getTextEditor(className + ".java").getText();
     }

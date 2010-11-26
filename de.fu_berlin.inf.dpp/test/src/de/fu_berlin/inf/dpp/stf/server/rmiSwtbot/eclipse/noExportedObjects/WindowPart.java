@@ -27,12 +27,14 @@ public class WindowPart extends EclipseComponent {
     }
 
     public boolean activateShellWithText(String title) {
+        waitUntilShellOpen(title);
         SWTBotShell[] shells = bot.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().equals(title)) {
                 log.debug("Shell \"" + title + "\" found.");
                 if (!shell.isActive()) {
                     shell.activate();
+                    waitUntilShellActive(title);
                 }
                 return true;
             }
@@ -109,7 +111,6 @@ public class WindowPart extends EclipseComponent {
      * 
      */
     public void confirmWindow(String title, String buttonText) {
-        // waitUntilShellActive(title);
         if (windowPart.activateShellWithText(title)) {
             bot.button(buttonText).click();
             bot.sleep(sleepTime);

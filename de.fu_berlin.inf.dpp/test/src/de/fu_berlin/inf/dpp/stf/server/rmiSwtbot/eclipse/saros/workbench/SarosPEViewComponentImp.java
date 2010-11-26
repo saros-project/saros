@@ -28,7 +28,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     private final static String SESSION_INVITATION = "Session Invitation";
     private final static String WARNING_LOCAL_CHANGES_DELETED = "Warning: Local changes will be deleted";
     private final static String FOLDER_SELECTION = "Folder Selection";
-    private final static String SHELL_SAVE_RESOURCE = "Save Resource";
+    private final static String SHELL_SAVE_RESOURCE = "Save all files now?";
 
     /* Context menu of a selected tree item on the package explorer view */
     private final static String SAROS = "Saros";
@@ -83,7 +83,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWindowInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        windowPart.waitUntilShellOpen(INVITATION);
         windowPart.activateShellWithText(INVITATION);
         windowPart.confirmWindowWithCheckBox(INVITATION, FINISH,
             baseJIDOfinvitees);
@@ -135,7 +134,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK, projectName);
         windowPart.waitUntilShellCloses(FOLDER_SELECTION);
         bot.button(FINISH).click();
-        windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
         /*
          * if there are some files locally, which are not saved yet, you will
          * get a popup window with the title "Save Resource" after you comfirm
@@ -148,8 +146,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
              * session invitation to complete. So waitUntilShellCloses is
              * necessary here.
              */
-            windowPart.waitUntilShellCloses(bot.shell(SESSION_INVITATION));
+            // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
         }
+
+        windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
 
         /*
          * after the release 10.10.28 it take less time for the session

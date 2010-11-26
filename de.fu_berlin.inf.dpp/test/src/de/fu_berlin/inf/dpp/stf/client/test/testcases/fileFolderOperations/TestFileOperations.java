@@ -230,10 +230,12 @@ public class TestFileOperations extends STFTest {
         alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
 
         bob.pEV.waitUntilPkgExist(PROJECT1, PKG2);
+        bob.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
         assertFalse(bob.pEV.isPkgExist(PROJECT1, PKG1));
         assertTrue(bob.pEV.isPkgExist(PROJECT1, PKG2));
 
         carl.pEV.waitUntilPkgExist(PROJECT1, PKG2);
+        carl.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
         assertFalse(carl.pEV.isPkgExist(PROJECT1, PKG1));
         assertTrue(carl.pEV.isPkgExist(PROJECT1, PKG2));
     }

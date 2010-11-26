@@ -23,7 +23,7 @@ public class HelperPart extends EclipseComponent {
     public String[] changeToRegex(String... texts) {
         String[] matchTexts = new String[texts.length];
         for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + ".*";
+            matchTexts[i] = texts[i] + "( .*)?";
         }
         return matchTexts;
     }

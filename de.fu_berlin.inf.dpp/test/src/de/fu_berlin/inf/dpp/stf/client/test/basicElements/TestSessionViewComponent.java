@@ -10,9 +10,9 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -20,8 +20,6 @@ public class TestSessionViewComponent extends STFTest {
 
     private static final Logger log = Logger
         .getLogger(TestSessionViewComponent.class);
-    private static Musician alice;
-    private static Musician bob;
 
     @BeforeClass
     public static void initMusican() throws RemoteException {
@@ -48,21 +46,26 @@ public class TestSessionViewComponent extends STFTest {
             alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
                 bob);
         }
-        if (bob.state.isDriver()) {
-            alice.sessionV.removeDriverRole(bob.state);
+        if (bob.sessionV.isInFollowMode()) {
+            bob.sessionV.stopFollowing();
+            // FIXME warten
         }
-        if (!alice.state.isDriver()) {
-            alice.sessionV.giveDriverRole(alice.state);
-        }
-
     }
 
     @After
     public void cleanUp() throws RemoteException {
+        if (bob.state.isInSession() && bob.state.isDriver()) {
+            alice.sessionV.removeDriverRole(bob.state);
+            // FIXME warten
+        }
+        if (alice.state.isInSession() && !alice.state.isDriver()) {
+            alice.sessionV.giveDriverRole(alice.state);
+        }
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
         // bob.sessionV.stopFollowing();
         // alice.sessionV.stopFollowing();
+
     }
 
     @Test
@@ -158,6 +161,7 @@ public class TestSessionViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
+    @Ignore
     public void testShareYourScreenWithSelectedUser() throws RemoteException {
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
@@ -11,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -46,9 +48,12 @@ public class TestSVNStateInitialization extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
-        // alice.rosterV.disconnect();
-        // alice.pEV.deleteProject(SVN_PROJECT);
-        alice.workbench.resetSaros();
+        if (MusicianConfigurationInfos.DEVELOPMODE) {
+            alice.rosterV.disconnect();
+            // don't delete SVN_PROJECT_COPY
+        } else {
+            alice.workbench.resetSaros();
+        }
     }
 
     /**
@@ -72,18 +77,20 @@ public class TestSVNStateInitialization extends STFTest {
 
     @After
     public void tearDown() throws RemoteException {
-        alice.rosterV.disconnect();
-        alice.workbench.resetWorkbench();
+        bob.sessionV.leaveTheSessionByPeer();
         bob.workbench.resetWorkbench();
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
         bob.state.deleteAllProjects();
+
+        alice.sessionV.leaveTheSessionByHost();
+        alice.workbench.resetWorkbench();
     }
 
     /**
      * Steps:
      * <ol>
-     * <li>Alice shared project SVN_PROJECT with Bob.</li>
+     * <li>Alice shares project SVN_PROJECT with Bob.</li>
      * </ol>
      * 
      * Result:
@@ -111,7 +118,7 @@ public class TestSVNStateInitialization extends STFTest {
      * <ol>
      * <li>Alice updates {@link STFTest#SVN_CLS1} to revision
      * {@link STFTest#SVN_CLS1_REV2}.</li>
-     * <li>Alice shared project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
      * </ol>
      * 
      * Result:
@@ -140,7 +147,7 @@ public class TestSVNStateInitialization extends STFTest {
      * <ol>
      * <li>Alice switches {@link STFTest#SVN_CLS1} to
      * {@link STFTest#SVN_CLS1_SWITCHED_URL}.</li>
-     * <li>Alice shared project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
      * </ol>
      * 
      * Result:
@@ -164,6 +171,44 @@ public class TestSVNStateInitialization extends STFTest {
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
             bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+    }
+
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice modifies her working copy by changing the content of the file
+     * {@link STFTest#SVN_CLS1} to {@link STFTest#CP1}.</li>
+     * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_CLS1} has the same content as
+     * Alice's copy.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * 
+     */
+    @Test
+    public void testCheckoutWithModification() throws RemoteException {
+        String cls1_content_before = alice.editor.getTextOfJavaEditor(
+            SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        alice.editor.setTextInJavaEditorWithSave(CP1, SVN_PROJECT, SVN_PKG,
+            SVN_CLS1);
+        String cls1_content_after = alice.editor.getTextOfJavaEditor(
+            SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        assertFalse(cls1_content_after.equals(cls1_content_before));
+
+        alice.shareProjectWithDone(SVN_PROJECT,
+            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        bob.sessionV.waitUntilSessionOpen();
+
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(cls1_content_after,
+            bob.editor.getTextOfJavaEditor(SVN_PROJECT, SVN_PKG, SVN_CLS1));
     }
 
 }

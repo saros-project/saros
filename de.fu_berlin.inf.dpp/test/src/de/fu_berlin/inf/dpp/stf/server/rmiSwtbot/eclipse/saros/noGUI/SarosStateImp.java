@@ -189,6 +189,8 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean isDriver() throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            throw new RemoteException("Not in a session.");
         User user = sarosSession.getUser(this.jid);
         if (user == null) {
             // TODO here need to throw Exception.

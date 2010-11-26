@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -57,34 +58,40 @@ public class TreePart extends EclipseComponent {
         return item != null;
     }
 
+    /**
+     * 
+     * @param tree
+     * @param regexs
+     * @return
+     * @throws WidgetNotFoundException
+     *             If the item wasn't found.
+     */
     public SWTBotTreeItem getTreeItemWithMatchText(SWTBotTree tree,
         String... regexs) {
-        try {
-            SWTBotTreeItem item = null;
-            for (String regex : regexs) {
-                if (item == null) {
-                    final SWTBotTreeItem[] allItems = tree.getAllItems();
-                    for (int i = 0; i < allItems.length; i++) {
-                        log.info("treeItem'name: " + allItems[i].getText());
-                        if (allItems[i].getText().matches(regex)) {
-                            item = allItems[i].expand();
-                        }
-                    }
-                } else {
-                    for (String nodeName : item.getNodes()) {
-                        log.info("node'name: " + nodeName);
-                        if (nodeName.matches(regex)) {
-                            item = item.getNode(nodeName).expand();
-                            break;
-                        }
-                    }
+        SWTBotTreeItem currentItem = null;
+        SWTBotTreeItem[] allItems;
+        for (String regex : regexs) {
+            if (currentItem == null) {
+                allItems = tree.getAllItems();
+            } else {
+                allItems = currentItem.getItems();
+            }
+            boolean itemFound = false;
+            for (SWTBotTreeItem item : allItems) {
+                log.info("treeItem name: " + item.getText());
+                if (item.getText().matches(regex)) {
+                    currentItem = item.expand();
+                    itemFound = true;
+                    break;
                 }
             }
-            return item;
-        } catch (WidgetNotFoundException e) {
-            log.error("gematched Context menu can't be found!", e);
-            return null;
+
+            if (!itemFound) {
+                throw new WidgetNotFoundException("Tree item \"" + regex
+                    + "\" not found. Nodes: " + Arrays.asList(regexs));
+            }
         }
+        return currentItem;
     }
 
     public SWTBotTreeItem selectTreeWithLabelsWithWaitungExpand(

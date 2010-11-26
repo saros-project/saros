@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.client.test.testcases.enteringAndExitingSession;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.rmi.AccessException;
@@ -14,8 +14,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -41,7 +41,8 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
             MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -138,6 +139,8 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         bob.pEV
             .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
 
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+
         String CLSContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);
         String CLS2ContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
@@ -148,8 +151,7 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         String CLS2ContentOfBob = bob.state.getClassContent(PROJECT1, PKG1,
             CLS2);
 
-        assertTrue(CLSContentOfAlice.equals(CLSContentOfBob));
-        assertTrue(CLS2ContentOfAlice.equals(CLS2ContentOfBob));
-
+        assertEquals(CLSContentOfAlice, CLSContentOfBob);
+        assertEquals(CLS2ContentOfAlice, CLS2ContentOfBob);
     }
 }

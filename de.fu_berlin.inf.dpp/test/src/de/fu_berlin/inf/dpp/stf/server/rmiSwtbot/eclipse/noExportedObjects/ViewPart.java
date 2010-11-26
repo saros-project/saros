@@ -2,14 +2,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -219,19 +217,13 @@ public class ViewPart extends EclipseComponent {
      */
     public void clickContextMenusOfTreeItemInView(String viewTitle,
         String[] nodes, String... contexts) throws RemoteException {
-        try {
-            SWTBotTree tree = getTreeInView(viewTitle);
-            SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
-                nodes);
-            if (treeItem == null) {
-                throw new RemoteException("Tree item not found. "
-                    + Arrays.asList(nodes));
-            }
-            treeItem.select();
-            ContextMenuHelper.clickContextMenu(tree, contexts);
-        } catch (WidgetNotFoundException e) {
-            log.error("Context menu not found. " + Arrays.asList(contexts));
-        }
+        SWTBotTree tree = getTreeInView(viewTitle);
+        SWTBotTreeItem treeItem = treePart
+            .getTreeItemWithMatchText(tree, nodes);
+        treeItem.select();
+
+        ContextMenuHelper.clickContextMenu(tree, contexts);
+
     }
 
     /**
@@ -403,7 +395,11 @@ public class ViewPart extends EclipseComponent {
 
     public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
         String... labels) {
-        return getTreeInView(viewName).expandNode(labels).select();
+        try {
+            return getTreeInView(viewName).expandNode(labels).select();
+        } catch (WidgetNotFoundException e) {
+            return null;
+        }
     }
 
     public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
@@ -440,17 +436,8 @@ public class ViewPart extends EclipseComponent {
      */
     public void clickContextMenuOfTreeInView(String viewName, String context,
         String... nodes) throws RemoteException {
-        SWTBotTreeItem treeItem = selectTreeWithLabelsInView(viewName, nodes);
-        if (treeItem == null) {
-            log.error("Tree item not found " + nodes.toString());
-            return;
-        }
-        final SWTBotMenu contextMenu = treeItem.contextMenu(context);
-        if (contextMenu == null) {
-            log.error("Context menu \"" + context + "\" not found");
-            return;
-        }
-        contextMenu.click();
+        String[] contexts = { context };
+        clickContextMenusOfTreeItemInView(viewName, nodes, contexts);
     }
 
     public boolean isToolbarInViewEnabled(String viewName, String buttonTooltip) {

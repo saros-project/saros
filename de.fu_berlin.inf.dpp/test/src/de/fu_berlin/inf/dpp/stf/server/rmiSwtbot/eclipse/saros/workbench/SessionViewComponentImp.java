@@ -202,6 +202,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         tablePart.clickContextMenuOfTable(InviteeJID.getBase() + ROLENAME,
             CM_REMOVE_DRIVER_ROLE);
+        windowPart.waitUntilShellOpen(PROGRESSINFORMATION);
         windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
     }
 

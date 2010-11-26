@@ -411,6 +411,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         IPath path = new Path(projectName);
         final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         IResource resource = root.findMember(path);
+        if (resource == null) {
+            log.debug("File " + projectName + " not found for deletion");
+            return;
+        }
         if (resource.isAccessible()) {
             try {
                 FileUtil.delete(resource);
@@ -505,65 +509,43 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_MOVE);
     }
 
+    public void rename(String shellTitle, String confirmLabel, String newName,
+            String[] nodes) throws RemoteException {
+            precondition();
+            viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
+                RENAME);
+            windowPart.activateShellWithText(shellTitle);
+            bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
+            basicPart.waitUntilButtonIsEnabled(confirmLabel);
+            bot.button(confirmLabel).click();
+            windowPart.waitUntilShellClosed(shellTitle);
+        }
+
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException {
-        String[] classNodes = getClassNodes(projectName, pkg, className);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, classNodes,
-            REFACTOR, RENAME);
-        windowPart.waitUntilShellOpen(SHELL_RENAME_COMPiIATION_UNIT);
-        windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
-        windowPart.waitUntilShellActive(SHELL_RENAME_COMPiIATION_UNIT);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(FINISH);
-        bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_RENAME_COMPiIATION_UNIT);
+        String[] nodes = getClassNodes(projectName, pkg, className);
+        rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName, nodes);
     }
 
     public void renameFile(String newName, String... nodes)
         throws RemoteException {
-        precondition();
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
-            RENAME);
-        windowPart.activateShellWithText(SHELL_RENAME_COMPiIATION_UNIT);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(OK);
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_RENAME_COMPiIATION_UNIT);
+        rename(SHELL_RENAME_RESOURCE, OK, newName, nodes);
     }
 
     public void renameFolder(String newName, String... nodes)
         throws RemoteException {
-        rename(SHELL_RENAME_RESOURCE, newName, nodes);
+        rename(SHELL_RENAME_RESOURCE, OK, newName, nodes);
     }
 
     public void renameJavaProject(String newName, String... nodes)
         throws RemoteException {
-        rename("Rename Java Project", newName, nodes);
-    }
-
-    public void rename(String shellTitle, String newName, String[] nodes)
-        throws RemoteException {
-        precondition();
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
-            RENAME);
-        windowPart.waitUntilShellActive(shellTitle);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(OK);
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed(shellTitle);
+        rename("Rename Java Project", OK, newName, nodes);
     }
 
     public void renamePkg(String newName, String projectName, String pkg)
         throws RemoteException {
-        precondition();
         String[] pkgNodes = getPkgNodes(projectName, pkg);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, pkgNodes,
-            REFACTOR, RENAME);
-        windowPart.activateShellWithText(SHELL_RENAME_PACKAGE);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(OK);
-        bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_RENAME_PACKAGE);
+        rename(SHELL_RENAME_PACKAGE, OK, newName, pkgNodes);
     }
 
     /**********************************************
