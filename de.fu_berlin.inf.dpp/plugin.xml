@@ -189,13 +189,6 @@
                menubarPath="sarosSubMenu/group1">
          </action>
          <action
-               class="de.fu_berlin.inf.dpp.ui.actions.NewSessionActionWithVCS"
-               icon="icons/transmit.png"
-               id="Saros.action2"
-               label="Share project with VCS support..."
-               menubarPath="sarosSubMenu/group1">
-         </action>
-         <action
                class="de.fu_berlin.inf.dpp.ui.actions.NewSessionAction"
                icon="icons/transmit.png"
                id="Saros.action1"

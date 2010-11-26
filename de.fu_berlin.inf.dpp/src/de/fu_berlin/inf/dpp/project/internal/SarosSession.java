@@ -104,7 +104,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected SarosProjectMapper projectMapper = new SarosProjectMapper();
 
-    protected final boolean useVersionControl;
+    protected final boolean useVersionControl = true;
 
     private BlockingQueue<IActivity> pendingActivities = new LinkedBlockingQueue<IActivity>();
 
@@ -184,8 +184,7 @@ public class SarosSession implements ISarosSession, Disposable {
     protected SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, StopManager stopManager,
-        JID myJID, int myColorID, DateTime sessionStart,
-        boolean useVersionControl) {
+        JID myJID, int myColorID, DateTime sessionStart) {
 
         assert transmitter != null;
         assert myJID != null;
@@ -199,7 +198,6 @@ public class SarosSession implements ISarosSession, Disposable {
         this.localUser = new User(this, myJID, myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager, threadContext);
-        this.useVersionControl = useVersionControl;
 
         stopManager.addBlockable(stopManagerListener);
         activityDispatcher.setDaemon(true);
@@ -212,10 +210,10 @@ public class SarosSession implements ISarosSession, Disposable {
     public SarosSession(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager,
         DispatchThreadContext threadContext, JID myID, StopManager stopManager,
-        DateTime sessionStart, boolean useVersionControl) {
+        DateTime sessionStart) {
 
         this(saros, transmitter, transferManager, threadContext, stopManager,
-            myID, 0, sessionStart, useVersionControl);
+            myID, 0, sessionStart);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
         localUser.setUserRole(UserRole.DRIVER);
@@ -238,7 +236,7 @@ public class SarosSession implements ISarosSession, Disposable {
         int myColorID, StopManager stopManager, DateTime sessionStart) {
 
         this(saros, transmitter, transferManager, threadContext, stopManager,
-            myID, myColorID, sessionStart, true);
+            myID, myColorID, sessionStart);
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();

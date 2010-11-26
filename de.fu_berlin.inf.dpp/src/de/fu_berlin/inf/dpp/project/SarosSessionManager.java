@@ -152,7 +152,7 @@ public class SarosSessionManager implements IConnectionListener,
     protected static final Random sessionRandom = new Random();
 
     public void startSession(IProject project,
-        List<IResource> partialProjectResources, boolean useVersionControl)
+        List<IResource> partialProjectResources)
         throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
@@ -169,7 +169,7 @@ public class SarosSessionManager implements IConnectionListener,
 
         SarosSession sarosSession = new SarosSession(saros, this.transmitter,
             this.transferManager, dispatchThreadContext, myJID, stopManager,
-            new DateTime(), useVersionControl);
+            new DateTime());
         // TODO Add project after starting the session.
         sarosSession.addSharedProject(project, project.getName());
 
