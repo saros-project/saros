@@ -545,6 +545,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (vcs != null) {
             this.localProject = vcs.checkoutProject(newProjectName,
                 this.remoteFileList, monitor);
+            /*
+             * HACK: After checking out a project, give Eclipse/the Team
+             * provider time to realize that the project is now managed. The
+             * problem was that when checking later to see if we have to
+             * switch/update individual resources in initVcState, the project
+             * appeared as unmanaged. It might work to wrap initVcState in a
+             * job, such that it is scheduled after the project is marked as
+             * managed.
+             */
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
             if (this.localProject != null)
                 return;
         }
