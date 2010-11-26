@@ -60,7 +60,9 @@ public class TreePart extends EclipseComponent {
             for (SWTBotTreeItem item : allItems) {
                 log.info("treeItem name: " + item.getText());
                 if (item.getText().matches(regex)) {
-                    currentItem = item.expand();
+                    currentItem = item;
+                    if (!item.isExpanded())
+                        item.expand();
                     itemFound = true;
                     break;
                 }

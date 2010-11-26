@@ -27,13 +27,14 @@ public class TestSVNStateInitialization extends STFTest {
      * <li>Alice (Host, Driver)</li>
      * <li>Bob (Observer)</li>
      * <li>Alice has the project {@link STFTest#SVN_PROJECT_COPY}, which is
-     * checked out from SVN</li>
-     * <li>repository: {@link STFTest#SVN_REPOSITORY_URL}</li>
-     * <li>path: {@link STFTest#SVN_PROJECT_PATH}</li>
+     * checked out from SVN:<br>
+     * repository: {@link STFTest#SVN_REPOSITORY_URL}<br>
+     * path: {@link STFTest#SVN_PROJECT_PATH}
      * </ol>
      * 
      * @throws RemoteException
      */
+
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();

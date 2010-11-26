@@ -500,9 +500,9 @@ public class PEViewComponentImp extends EclipseComponent implements
         String className, String targetProject, String targetPkg)
         throws RemoteException {
         precondition();
-        String[] classNodes = getClassNodes(sourceProject, sourcePkg, className);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, classNodes,
-            REFACTOR, MOVE);
+        String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME,
+            helperPart.changeToRegex(nodes), REFACTOR, MOVE);
         windowPart.waitUntilShellActive(SHELL_MOVE);
         windowPart.confirmWindowWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
@@ -510,21 +510,37 @@ public class PEViewComponentImp extends EclipseComponent implements
     }
 
     public void rename(String shellTitle, String confirmLabel, String newName,
-            String[] nodes) throws RemoteException {
-            precondition();
-            viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, nodes, REFACTOR,
-                RENAME);
-            windowPart.activateShellWithText(shellTitle);
-            bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-            basicPart.waitUntilButtonIsEnabled(confirmLabel);
-            bot.button(confirmLabel).click();
-            windowPart.waitUntilShellClosed(shellTitle);
-        }
+        String[] nodes) throws RemoteException {
+        precondition();
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME,
+            helperPart.changeToRegex(nodes), REFACTOR, RENAME);
+        windowPart.activateShellWithText(shellTitle);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
+        basicPart.waitUntilButtonIsEnabled(confirmLabel);
+        bot.button(confirmLabel).click();
+        windowPart.waitUntilShellClosed(shellTitle);
+    }
 
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
-        rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName, nodes);
+        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME,
+            helperPart.changeToRegex(nodes), REFACTOR, RENAME);
+        String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
+        windowPart.activateShellWithText(shellTitle);
+        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
+        basicPart.waitUntilButtonIsEnabled(FINISH);
+        bot.button(FINISH).click();
+        /*
+         * TODO Sometimes the window doesn't close when clicking on Finish, but
+         * stays open with the warning 'class contains a main method blabla'. In
+         * this case just click Finish again.
+         */
+        bot.sleep(50);
+        if (windowPart.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
+            bot.button(FINISH).click();
+        }
+        windowPart.waitUntilShellClosed(shellTitle);
     }
 
     public void renameFile(String newName, String... nodes)
@@ -857,7 +873,7 @@ public class PEViewComponentImp extends EclipseComponent implements
             .clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, "Copy");
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,
             "Paste");
-        windowPart.waitUntilShellActive("Copy Project");
+        windowPart.activateShellWithText("Copy Project");
         bot.textWithLabel("Project name:").setText(target);
         bot.button(OK).click();
         windowPart.waitUntilShellClosed("Copy Project");
