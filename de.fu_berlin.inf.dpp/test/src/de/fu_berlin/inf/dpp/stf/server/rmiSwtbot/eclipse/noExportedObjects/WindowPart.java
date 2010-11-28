@@ -26,6 +26,12 @@ public class WindowPart extends EclipseComponent {
         return tablePart.existTableItem(label);
     }
 
+    /**
+     * Wait for the window to open, activate it, wait for it to become active.
+     * 
+     * @param title
+     * @return
+     */
     public boolean activateShellWithText(String title) {
         waitUntilShellOpen(title);
         SWTBotShell[] shells = bot.shells();
@@ -48,8 +54,18 @@ public class WindowPart extends EclipseComponent {
         bot.sleep(10);
     }
 
+    public void waitLongUntilShellCloses(SWTBotShell shell) {
+        waitLongUntil(shellCloses(shell));
+        bot.sleep(10);
+    }
+
     public void waitUntilShellCloses(String shellText) {
         waitUntil(SarosConditions.isShellClosed(bot, shellText));
+        bot.sleep(10);
+    }
+
+    public void waitLongUntilShellCloses(String shellText) {
+        waitLongUntil(SarosConditions.isShellClosed(bot, shellText));
         bot.sleep(10);
     }
 
@@ -86,8 +102,7 @@ public class WindowPart extends EclipseComponent {
         String... nodes) {
         bot.shell(title).activate();
         SWTBotTree tree = bot.tree();
-        log.info("allItems " + tree.getAllItems().length);
-        tree.expandNode(nodes).select();
+        treePart.getTreeItemWithMatchText(tree, nodes).select();
         basicPart.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
     }

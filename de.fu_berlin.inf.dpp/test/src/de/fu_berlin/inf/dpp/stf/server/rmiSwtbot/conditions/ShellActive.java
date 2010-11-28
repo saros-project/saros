@@ -14,7 +14,7 @@ public class ShellActive extends DefaultCondition {
     }
 
     public String getFailureMessage() {
-        return null;
+        return "Shell " + title + " not found.";
     }
 
     public boolean test() throws Exception {

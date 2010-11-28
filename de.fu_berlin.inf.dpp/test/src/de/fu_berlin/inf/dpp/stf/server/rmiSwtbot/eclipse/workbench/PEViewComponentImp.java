@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -81,9 +79,9 @@ public class PEViewComponentImp extends EclipseComponent implements
     private final static String TEAM = "Team";
 
     /* All the sub menus of the context menu "Open with" */
-    private final static String TEXT_EDITOR = "Text Editor";
-    private final static String SYSTEM_EDITOR = "System Editor";
-    private final static String DEFAULT_EDITOR = "Default Editor";
+    // private final static String TEXT_EDITOR = "Text Editor";
+    // private final static String SYSTEM_EDITOR = "System Editor";
+    // private final static String DEFAULT_EDITOR = "Default Editor";
     private final static String OTHER = "Other...";
 
     /* All the sub menus of the context menu "Team" */
@@ -704,7 +702,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         switchToAnotherRevision(nodes, revision);
     }
 
-    public void switchProject(String projectName, String url)
+    public void switchProjectWithGui(String projectName, String url)
         throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
@@ -716,7 +714,17 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
+    public void switchProject(String projectName, String url)
+        throws RemoteException {
+        switchResource(projectName, url, "HEAD");
+    }
+
     public void switchResource(String fullPath, String url)
+        throws RemoteException {
+        switchResource(fullPath, url, "HEAD");
+    }
+
+    public void switchResource(String fullPath, String url, String revision)
         throws RemoteException {
         precondition();
         final IPath path = new Path(fullPath);
@@ -732,7 +740,7 @@ public class PEViewComponentImp extends EclipseComponent implements
                 + project.getName() + "\".");
         }
 
-        vcs.switch_(resource, url, "HEAD", new NullProgressMonitor());
+        vcs.switch_(resource, url, revision, new NullProgressMonitor());
     }
 
     public void waitUntilWindowSarosRunningVCSOperationClosed()
@@ -768,9 +776,12 @@ public class PEViewComponentImp extends EclipseComponent implements
             throw new RemoteException("Resource \"" + fullPath
                 + "\" not found.");
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs != null)
-            return vcs.getRevisionString(resource);
-        return null;
+        if (vcs == null)
+            return null;
+        // return vcs.getRevisionString(resource);
+        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
+        String result = info != null ? info.revision : null;
+        return result;
     }
 
     public void waitUntilRevisionIsSame(String fullPath, String revision)
@@ -778,11 +789,19 @@ public class PEViewComponentImp extends EclipseComponent implements
         waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
     }
 
+    public void waitUntilUrlIsSame(String fullPath, String url)
+        throws RemoteException {
+        waitUntil(SarosConditions.isUrlSame(fullPath, url));
+    }
+
     public String getURLOfRemoteResource(String fullPath)
         throws RemoteException {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource not found at \"" + fullPath
+                + "\"");
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs == null)
             return null;
@@ -800,15 +819,6 @@ public class PEViewComponentImp extends EclipseComponent implements
     protected void precondition() throws RemoteException {
         openPEView();
         setFocusOnPEView();
-    }
-
-    private List<String> getAllProjects() {
-        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        List<String> projectNames = new ArrayList<String>();
-        for (int i = 0; i < tree.getAllItems().length; i++) {
-            projectNames.add(tree.getAllItems()[i].getText());
-        }
-        return projectNames;
     }
 
     private void confirmWindowNewJavaProject(String projectName) {
@@ -880,8 +890,13 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void copyProject(String target, String source)
         throws RemoteException {
+
+        if (isProjectExist(target)) {
+            throw new RemoteException("Can't copy project from " + source
+                + " to " + target + " , the target already exists.");
+        }
         precondition();
-        String[] matchTexts = { source + ".*" };
+        String[] matchTexts = helperPart.changeToRegex(source);
         viewPart
             .clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, "Copy");
         viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts,

@@ -16,7 +16,7 @@ public class ExistResource extends DefaultCondition {
 
     public String getFailureMessage() {
 
-        return null;
+        return "Waiting for resource \"" + resourcePath + "\"";
     }
 
     public boolean test() throws Exception {

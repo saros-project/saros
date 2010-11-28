@@ -13,6 +13,9 @@ public interface SarosWorkbenchComponent extends Remote {
 
     public SWTBotShell getEclipseShell() throws RemoteException;
 
+    /**
+     * Open Java perspective, close all editors and dialogs.
+     */
     public void resetWorkbench() throws RemoteException;
 
     public void activateEclipseShell() throws RemoteException;

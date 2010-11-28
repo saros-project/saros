@@ -1,5 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.client.test.helpers;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 
 public class STFTest {
@@ -65,17 +73,20 @@ public class STFTest {
     protected static final String SVN_PROJECT = "stf_test_project";
     protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
     protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
+    protected static final String SVN_PROJECT_URL_SWITCHED = SVN_REPOSITORY_URL
+        + "/stf_tests/stf_test_project_copy";
+    protected static final String SVN_PKG = "pkg";
     protected static final String SVN_CLS1 = "Test";
     protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
     protected static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
-    protected static final String SVN_PKG = "pkg";
-    protected static final String SVN_CLS1_REV1 = "2737";
-    protected static final String SVN_CLS1_REV2 = "2735";
-    protected static final String SVN_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
-    protected static final String SVN_TAG_URL = SVN_URL
-        + "/stf_tests/stf_test_project_copy";
-    protected static final String SVN_CLS_PATH = SVN_PROJECT
-        + "/src/org/eclipsecon/swtbot/example/MyFirstTest01.java";
+    /** Initial commit in stf_test_project. */
+    protected static final String SVN_CLS1_REV1 = "2735";
+    /** copy from stf_test_project to stf_test_project_copy */
+    protected static final String SVN_CLS1_REV2 = "2736";
+    /** modified in stf_test_project_copy */
+    protected static final String SVN_CLS1_REV3 = "2737";
+    /** modified in stf_test_project_copy */
+    protected static final String SVN_CLS1_REV4 = "2767";
 
     /*
      * Contextmenu "Saros"
@@ -111,5 +122,29 @@ public class STFTest {
         String className) {
         String[] nodes = { projectName, SRC, pkg, className + SUFIX_JAVA };
         return nodes;
+    }
+
+    public static List<Musician> activeMusicians() {
+        Musician[] m = { alice, bob, carl, dave, edna };
+        List<Musician> result = new ArrayList<Musician>();
+        for (Musician musician : m) {
+            if (musician != null)
+                result.add(musician);
+        }
+        return result;
+    }
+
+    @Before
+    @After
+    public void resetWorkbenches() throws RemoteException {
+        for (Musician musician : activeMusicians()) {
+            if (musician != null)
+                musician.workbench.resetWorkbench();
+        }
+    }
+
+    @AfterClass
+    public static void resetAllBots() {
+        alice = bob = carl = dave = edna = null;
     }
 }

@@ -82,6 +82,10 @@ public abstract class EclipseComponent {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
 
+    protected void waitLongUntil(ICondition condition) {
+        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+    }
+
     abstract protected void precondition() throws RemoteException;
 
     public String getClassPath(String projectName, String pkg, String className) {

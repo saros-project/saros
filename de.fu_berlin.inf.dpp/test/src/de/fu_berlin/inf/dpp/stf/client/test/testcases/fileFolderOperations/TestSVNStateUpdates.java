@@ -1,9 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -12,8 +16,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestSVNStateUpdates extends STFTest {
@@ -22,8 +28,8 @@ public class TestSVNStateUpdates extends STFTest {
      * <ol>
      * <li>Alice (Host, Driver)</li>
      * <li>Bob (Observer)</li>
-     * <li>Alice has the project {@link STFTest#SVN_PROJECT_COPY}, which is
-     * checked out from SVN:<br>
+     * <li>Alice and Bob both have the project {@link STFTest#SVN_PROJECT_COPY},
+     * which is checked out from SVN:<br>
      * repository: {@link STFTest#SVN_REPOSITORY_URL}<br>
      * path: {@link STFTest#SVN_PROJECT_PATH}
      * </ol>
@@ -31,20 +37,33 @@ public class TestSVNStateUpdates extends STFTest {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void beforeClass() throws RemoteException {
+    public static void beforeClass() throws Exception {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        if (!alice.pEV.isProjectExist(SVN_PROJECT_COPY)) {
-            alice.pEV.newJavaProject(SVN_PROJECT_COPY);
-            alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(
-                SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+
+        List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
+        for (final Musician musician : activeMusicians()) {
+            initTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    if (!musician.pEV.isProjectExist(SVN_PROJECT_COPY)) {
+                        musician.pEV.newJavaProject(SVN_PROJECT_COPY);
+                        musician.pEV
+                            .shareProjectWithSVNUsingSpecifiedFolderName(
+                                SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
+                                SVN_PROJECT_PATH);
+                    }
+                    return null;
+                }
+            });
         }
+        MakeOperationConcurrently.workAll(initTasks, 2);
+        bob.typeOfSharingProject = USE_EXISTING_PROJECT;
     }
 
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice copied {@link STFTest#SVN_PROJECT_COPY} to
+     * <li>Alice and Bob copied {@link STFTest#SVN_PROJECT_COPY} to
      * {@link STFTest#SVN_PROJECT}.</li>
      * </ol>
      * Only SVN_PROJECT is used in the tests. Copying from SVN_PROJECT_COPY is
@@ -53,33 +72,50 @@ public class TestSVNStateUpdates extends STFTest {
      * @throws RemoteException
      */
     @Before
-    public void before() throws RemoteException {
-        alice.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
-        assertTrue(alice.pEV.isProjectExist(SVN_PROJECT));
-        assertTrue(alice.pEV.isProjectManagedBySVN(SVN_PROJECT));
-        assertTrue(alice.pEV.isFileExist(SVN_CLS1_FULL_PATH));
+    public void before() throws Exception {
+        List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
+        for (final Musician musician : activeMusicians()) {
+            initTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
+                    assertTrue(musician.pEV.isProjectExist(SVN_PROJECT));
+                    assertTrue(musician.pEV.isProjectManagedBySVN(SVN_PROJECT));
+                    assertTrue(musician.pEV.isFileExist(SVN_CLS1_FULL_PATH));
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(initTasks, 1);
+
+        alice.shareProjectWithDone(SVN_PROJECT,
+            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
     }
 
     @After
     public void after() throws RemoteException {
-        bob.sessionV.leaveTheSessionByPeer();
         bob.workbench.resetWorkbench();
+        if (bob.sessionV.isInSession())
+            bob.sessionV.leaveTheSessionByPeer();
+        if (bob.pEV.isProjectExist(SVN_PROJECT))
+            bob.pEV.deleteProject(SVN_PROJECT);
+
+        alice.workbench.resetWorkbench();
+        if (alice.sessionV.isInSession())
+            alice.sessionV.leaveTheSessionByHost();
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
-        bob.state.deleteAllProjects();
-
-        alice.sessionV.leaveTheSessionByHost();
-        alice.workbench.resetWorkbench();
     }
 
     @AfterClass
     public static void afterClass() throws RemoteException {
-        bob.workbench.resetSaros();
         if (MusicianConfigurationInfos.DEVELOPMODE) {
-            alice.rosterV.disconnect();
             // don't delete SVN_PROJECT_COPY
+            alice.rosterV.disconnect();
+            bob.rosterV.disconnect();
         } else {
             alice.workbench.resetSaros();
+            bob.workbench.resetSaros();
         }
     }
 
@@ -99,13 +135,11 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testChangeDriverAndRenameClass() throws Exception {
-        alice.shareProjectWithDone(SVN_PROJECT,
-            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
         alice.sessionV.giveExclusiveDriverRole(bob.state);
+        assertTrue(bob.state.isDriver());
         bob.pEV.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
-        alice.pEV.waitUntilFileExist(SVN_PROJECT, "src", SVN_PKG, "Asdf.java");
+        alice.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, "Asdf");
         assertTrue(alice.pEV.isClassExist(SVN_PROJECT, SVN_PKG, "Asdf"));
     }
 
@@ -127,13 +161,11 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testChangeDriverAndMoveClass() throws Exception {
-        alice.shareProjectWithDone(SVN_PROJECT,
-            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
         alice.sessionV.giveExclusiveDriverRole(bob.state);
+        assertTrue(bob.state.isExclusiveDriver());
 
         bob.pEV.newPackage(SVN_PROJECT, "new_package");
-        alice.pEV.waitUntilFolderExist(SVN_PROJECT, "src", "new_package");
+        alice.pEV.waitUntilPkgExist(SVN_PROJECT, "new_package");
 
         bob.pEV.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
             "new_package");
@@ -145,22 +177,25 @@ public class TestSVNStateUpdates extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>Alice switches to branch "testing".</li>
+     * <li>Alice switches SVN_PROJECT to SVN_PROJECT_URL_SWITCHED.</li>
      * </ol>
      * Result:
      * <ol>
-     * <li>Make sure Bob is switched to branch "testing".</li>
+     * <li>Bob's copy of SVN_PROJECT gets switched to SVN_PROJECT_URL_SWITCHED.</li>
      * </ol>
      * 
      * @throws RemoteException
      */
     @Test
-    @Ignore
-    public void testSwitch() throws RemoteException {
-        alice.pEV.switchProject(SVN_PROJECT, SVN_TAG_URL);
+    public void testSwitch() throws Exception {
+        alice.pEV.switchProject(SVN_PROJECT, SVN_PROJECT_URL_SWITCHED);
+        alice.pEV.waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        assertTrue(alice.pEV.getURLOfRemoteResource(SVN_CLS_PATH).equals(
-            bob.pEV.getURLOfRemoteResource(SVN_CLS_PATH)));
+        bob.pEV.waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+
+        assertEquals(SVN_CLS1_SWITCHED_URL,
+            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -182,7 +217,7 @@ public class TestSVNStateUpdates extends STFTest {
         bob.pEV.waitUntilProjectNotInSVN(SVN_PROJECT);
         assertFalse(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
         alice.pEV.shareProjectWithSVNWhichIsConfiguredWithSVNInfos(SVN_PROJECT,
-            SVN_URL);
+            STFTest.SVN_REPOSITORY_URL);
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
         bob.pEV.waitUntilProjectInSVN(SVN_PROJECT);
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
@@ -229,9 +264,11 @@ public class TestSVNStateUpdates extends STFTest {
     public void testUpdateSingleFile() throws RemoteException {
         alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "102");
         bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        assertTrue(alice.pEV.getRevision(SVN_CLS_PATH).equals("102"));
-        bob.pEV.waitUntilRevisionIsSame(SVN_CLS_PATH, "102");
-        assertTrue(bob.pEV.getRevision(SVN_CLS_PATH).equals("102"));
+        assertTrue(alice.pEV.getRevision(STFTest.SVN_CLS1_FULL_PATH).equals(
+            "102"));
+        bob.pEV.waitUntilRevisionIsSame(STFTest.SVN_CLS1_FULL_PATH, "102");
+        assertTrue(bob.pEV.getRevision(STFTest.SVN_CLS1_FULL_PATH)
+            .equals("102"));
         bob.pEV.waitUntilRevisionIsSame(SVN_PROJECT, "116");
         assertTrue(bob.pEV.getRevision(SVN_PROJECT).equals("116"));
         alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "116");
@@ -255,12 +292,12 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testRevert() throws RemoteException {
-        alice.pEV.deleteProject(SVN_CLS_PATH);
+        alice.pEV.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
         bob.pEV.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertFalse(bob.pEV.isFileExist(SVN_CLS_PATH));
+        assertFalse(bob.pEV.isFileExist(STFTest.SVN_CLS1_FULL_PATH));
         alice.pEV.revertProject(SVN_PROJECT);
         bob.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertTrue(bob.pEV.isFileExist(SVN_CLS_PATH));
+        assertTrue(bob.pEV.isFileExist(STFTest.SVN_CLS1_FULL_PATH));
     }
 
 }

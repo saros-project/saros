@@ -79,10 +79,14 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
                 if (page != null) {
                     page.closeAllEditors(false);
                 }
-                Shell activateShell = Display.getCurrent().getActiveShell();
-                if (activateShell != null && activateShell != win.getShell()) {
-                    activateShell.close();
+                Shell[] shells = Display.getCurrent().getShells();
+                for (Shell shell : shells) {
+                    if (shell != null && shell != win.getShell()) {
+                        shell.close();
+                    }
                 }
+                // Shell activateShell = Display.getCurrent().getActiveShell();
+
             }
         });
     }

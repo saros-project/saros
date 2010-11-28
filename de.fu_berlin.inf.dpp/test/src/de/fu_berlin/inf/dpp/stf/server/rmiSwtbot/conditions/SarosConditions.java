@@ -139,7 +139,11 @@ public class SarosConditions extends Conditions {
         return new IsFollowingUser(state, plainJID);
     }
 
-    public static ICondition isRevisionSame(String fullPath, String reversionID) {
-        return new IsReversionSame(fullPath, reversionID);
+    public static ICondition isRevisionSame(String fullPath, String revisionID) {
+        return new IsRevisionSame(fullPath, revisionID);
+    }
+
+    public static ICondition isUrlSame(String fullPath, String url) {
+        return new IsUrlSame(fullPath, url);
     }
 }

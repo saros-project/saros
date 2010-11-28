@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -113,7 +112,7 @@ public class Musician extends STFTest {
 
     }
 
-    /*************** Component, which consist of other simple functions ******************/
+    // ********** Component, which consist of other simple functions ***********
 
     public void shareProjectWithDone(String projectName,
         String howToShareProject, Musician... invitees) throws RemoteException {
@@ -131,18 +130,15 @@ public class Musician extends STFTest {
     public void buildSessionConcurrently(final String projectName,
         String shareProjectWith, Musician... invitees) throws RemoteException,
         InterruptedException {
-        List<Musician> peers = new LinkedList<Musician>();
         String[] peersName = new String[invitees.length];
         for (int i = 0; i < invitees.length; i++) {
-            peers.add(invitees[i]);
             peersName[i] = invitees[i].getBaseJid();
         }
         log.trace("alice.shareProjectParallel");
         this.pEV.shareProject(projectName, peersName);
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < peers.size(); i++) {
-            final Musician musician = peers.get(i);
+        for (final Musician musician : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV

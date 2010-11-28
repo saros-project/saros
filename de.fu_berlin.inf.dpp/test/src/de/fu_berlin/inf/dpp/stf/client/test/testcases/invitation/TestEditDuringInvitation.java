@@ -11,8 +11,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -39,7 +39,8 @@ public class TestEditDuringInvitation extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
             MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -96,7 +97,6 @@ public class TestEditDuringInvitation extends STFTest {
         alice.sessionV.openInvitationInterface(carl.getBaseJid());
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
-        // waitUntilShellActive(SarosConstant.SHELL_TITLE_SESSION_INVITATION);
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
 
         log.trace("bob.setTextInJavaEditor");

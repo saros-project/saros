@@ -930,8 +930,8 @@ public interface PEViewComponent extends Remote {
     public void disConnect(String projectName) throws RemoteException;
 
     /**
-     * Perform the action "switch to another Reversion" which should be done
-     * with the following steps:
+     * Perform the action "switch to another revision" which should be done with
+     * the following steps:
      * 
      * <ol>
      * <li>Select the given project and click "Team" >
@@ -941,7 +941,7 @@ public interface PEViewComponent extends Remote {
      * "Revision:"</li>
      * <li>click "OK" to confirm the switch</li>
      * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
-     * "switch to another Reversion" action is completely done.</li>
+     * "switch to another revision" action is completely done.</li>
      * </ol>
      * <p>
      * <b>Attention:</b>
@@ -949,22 +949,22 @@ public interface PEViewComponent extends Remote {
      * <li>Makes sure, the package explorer view is open and active.</li>
      * <li>The function should treat all the recursive following actions, which
      * are activated or indirectly activated by clicking the sub menu
-     * "switch to another Reversion" . I mean, after clicking the sub menu you
+     * "switch to another revision" . I mean, after clicking the sub menu you
      * need to treat the following popup window too.</li>
      * 
      * 
      * @param projectName
      *            name of the java project, e.g. Foo-Saros.
      * @param versionID
-     *            the ID of the reversion to which you want to switch
+     *            the ID of the revision to which you want to switch
      * @throws RemoteException
      */
     public void updateProject(String projectName, String versionID)
         throws RemoteException;
 
     /**
-     * Perform the action "switch to another Reversion" which should be done
-     * with the following steps:
+     * Perform the action "switch to another revision" which should be done with
+     * the following steps:
      * 
      * <ol>
      * <li>Select the given project and click "Team" >
@@ -974,7 +974,7 @@ public interface PEViewComponent extends Remote {
      * "Revision:"</li>
      * <li>click "OK" to confirm the switch</li>
      * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
-     * "switch to another Reversion" action is completely done.</li>
+     * "switch to another revision" action is completely done.</li>
      * </ol>
      * <p>
      * <b>Attention:</b>
@@ -982,7 +982,7 @@ public interface PEViewComponent extends Remote {
      * <li>Makes sure, the package explorer view is open and active.</li>
      * <li>The function should treat all the recursive following actions, which
      * are activated or indirectly activated by clicking the sub menu
-     * "switch to another Reversion" . I mean, after clicking the sub menu you
+     * "switch to another revision" . I mean, after clicking the sub menu you
      * need to treat the following popup window too.</li>
      * 
      * 
@@ -993,7 +993,7 @@ public interface PEViewComponent extends Remote {
      * @param className
      *            name of the class, e.g. myClass.
      * @param versionID
-     *            the ID of the reversion to which you want to switch
+     *            the ID of the revision to which you want to switch
      * @throws RemoteException
      */
     public void updateClass(String projectName, String pkg, String className,
@@ -1010,7 +1010,7 @@ public interface PEViewComponent extends Remote {
      * "To URL:"</li>
      * <li>click "OK" to confirm the switch</li>
      * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
-     * "switch to another Branch/Tag/Reversion" action is completely done.</li>
+     * "switch to another Branch/Tag/revision" action is completely done.</li>
      * </ol>
      * <p>
      * <b>Attention:</b>
@@ -1030,6 +1030,9 @@ public interface PEViewComponent extends Remote {
      * @throws RemoteException
      */
     public void switchProject(String projectName, String url)
+        throws RemoteException;
+
+    public void switchResource(String fullPath, String url, String revision)
         throws RemoteException;
 
     public void switchResource(String fullPath, String url)
@@ -1077,9 +1080,9 @@ public interface PEViewComponent extends Remote {
     /**
      * 
      * @param fullPath
-     *            the path of the resource, e.g.
-     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @return the reversion id of the given resource.
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @return the revision id of the given resource.
      * @throws RemoteException
      */
     public String getRevision(String fullPath) throws RemoteException;
@@ -1087,20 +1090,32 @@ public interface PEViewComponent extends Remote {
     /**
      * 
      * @param fullPath
-     *            the path of the resource, e.g.
-     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @param reversionID
-     *            the ID of the reversion,with which your reversion should
-     *            compare
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param revisionID
+     *            the expected revision.
      * @throws RemoteException
      */
-    public void waitUntilRevisionIsSame(String fullPath, String reversionID)
+    public void waitUntilRevisionIsSame(String fullPath, String revisionID)
+        throws RemoteException;
+
+    /**
+     * 
+     * @param fullPath
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param url
+     *            the expected URL of the remote resource, e.g.
+     *            "http://myhost.com/svn/trunk/.../MyFirstTest01.java".
+     * @throws RemoteException
+     */
+    public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException;
 
     /**
      * @param fullPath
-     *            the path of the resource, e.g.
-     *            "examples/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
      * 
      * @return the VCS specific URL information for the given resource specified
      *         by the passed parameter"fullPath".
@@ -1110,7 +1125,9 @@ public interface PEViewComponent extends Remote {
         throws RemoteException;
 
     /**
-     * Uses Copy and Paste to create a copy of a project.
+     * Uses Copy and Paste to create a copy of a project.<br>
+     * Warning: This method is not thread safe if the threads run on the same
+     * host because it uses the global clipboard to copy the project.
      * 
      * @param target
      *            The name of the copy to be created.

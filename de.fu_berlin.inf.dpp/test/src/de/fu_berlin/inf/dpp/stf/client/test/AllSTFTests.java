@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestBasicSarosElements
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.enteringAndExitingSession.TestHostAsDriverInvitesBelatedly;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestFileOperations;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestFolderOperations;
+import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestSVNStateUpdates;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.initialising.TestHandleContacts;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestEditDuringInvitation;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.TestSVNStateInitialization;
@@ -23,11 +24,11 @@ import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.permutations.Te
     TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
     TestShare3UsersConcurrently.class,
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
-    TestFileOperations.class, TestFolderOperations.class,
-    TestHostAsDriverInvitesBelatedly.class,
+    TestSVNStateInitialization.class, TestFileOperations.class,
+    TestFolderOperations.class, TestHostAsDriverInvitesBelatedly.class,
     TestParallelInvitationWithTerminationByHost.class,
     TestParallelInvitationWithTerminationByInvitees.class,
-    TestSVNStateInitialization.class, })
+    TestSVNStateUpdates.class })
 public class AllSTFTests {
     /**
      * Run AllTests in the list of SuiteClasses annotation

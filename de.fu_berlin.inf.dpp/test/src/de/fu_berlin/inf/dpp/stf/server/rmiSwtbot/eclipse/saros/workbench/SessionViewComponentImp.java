@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
@@ -150,61 +151,83 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * context menu of a contact on the view: give/remove driver role
      * 
      **********************************************/
-    public void giveDriverRole(SarosState stateOfInvitee)
+    public void giveDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
-        JID InviteeJID = stateOfInvitee.getJID();
-        if (stateOfInvitee.isDriver(InviteeJID)) {
+        final JID jid = stateOfInvitee.getJID();
+        if (stateOfInvitee.isDriver(jid)) {
             throw new RuntimeException(
                 "User \""
-                    + InviteeJID.getBase()
+                    + jid.getBase()
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        if (stateOfInvitee.isHost(InviteeJID))
+        if (stateOfInvitee.isHost(jid))
             tablePart.clickContextMenuOfTable("You", CM_GIVE_DRIVER_ROLE);
         else
-            tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
+            tablePart.clickContextMenuOfTable(jid.getBase(),
                 CM_GIVE_DRIVER_ROLE);
-        windowPart.waitUntilShellActive(PROGRESSINFORMATION);
-        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
-        bot.sleep(sleepTime);
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return stateOfInvitee.isDriver();
+            }
+
+            public String getFailureMessage() {
+                return jid.getBase() + " is not a driver.";
+            }
+        });
+
     }
 
-    public void giveExclusiveDriverRole(SarosState stateOfInvitee)
+    public void giveExclusiveDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
-        JID InviteeJID = stateOfInvitee.getJID();
-        if (stateOfInvitee.isDriver(InviteeJID)) {
+        final JID jid = stateOfInvitee.getJID();
+        if (stateOfInvitee.isDriver(jid)) {
             throw new RuntimeException(
                 "User \""
-                    + InviteeJID.getBase()
+                    + jid.getBase()
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        if (stateOfInvitee.isHost(InviteeJID))
+        if (stateOfInvitee.isHost(jid))
             tablePart.clickContextMenuOfTable("You",
                 CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         else
-            tablePart.clickContextMenuOfTable(InviteeJID.getBase(),
+            tablePart.clickContextMenuOfTable(jid.getBase(),
                 CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
-        windowPart.waitUntilShellActive(PROGRESSINFORMATION);
-        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
-        bot.sleep(sleepTime);
+        waitUntil(new DefaultCondition() {
+
+            public boolean test() throws Exception {
+                return stateOfInvitee.isExclusiveDriver();
+            }
+
+            public String getFailureMessage() {
+                return jid.getBase() + " is not the exclusive driver.";
+            }
+        });
     }
 
-    public void removeDriverRole(SarosState stateOfInvitee)
+    public void removeDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
-        JID InviteeJID = stateOfInvitee.getJID();
-        if (!stateOfInvitee.isDriver(InviteeJID)) {
+        final JID jid = stateOfInvitee.getJID();
+        if (!stateOfInvitee.isDriver(jid)) {
             throw new RuntimeException(
                 "User \""
-                    + InviteeJID.getBase()
+                    + jid.getBase()
                     + "\" is  no driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tablePart.clickContextMenuOfTable(InviteeJID.getBase() + ROLENAME,
+        tablePart.clickContextMenuOfTable(jid.getBase() + ROLENAME,
             CM_REMOVE_DRIVER_ROLE);
-        windowPart.waitUntilShellOpen(PROGRESSINFORMATION);
-        windowPart.waitUntilShellClosed(PROGRESSINFORMATION);
+        waitUntil(new DefaultCondition() {
+
+            public boolean test() throws Exception {
+                return !stateOfInvitee.isDriver();
+            }
+
+            public String getFailureMessage() {
+                return jid.getBase() + " is still a driver.";
+            }
+        });
     }
 
     /**********************************************

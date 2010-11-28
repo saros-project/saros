@@ -23,9 +23,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
      */
     private final static String INVITATION = "Invitation";
     private final static String INVITATIONCANCELLED = "Invitation Cancelled";
-    private final static String SESSIONINVITATION = "Session Invitation";
-    private final static String PROBLEMOCCURRED = "Problem Occurred";
     private final static String SESSION_INVITATION = "Session Invitation";
+    private final static String PROBLEMOCCURRED = "Problem Occurred";
     private final static String WARNING_LOCAL_CHANGES_DELETED = "Warning: Local changes will be deleted";
     private final static String FOLDER_SELECTION = "Folder Selection";
     private final static String SHELL_SAVE_RESOURCE = "Save all files now?";
@@ -90,7 +89,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
         throws RemoteException {
-        windowPart.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingNewproject(projectname);
     }
@@ -115,7 +113,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmFirstPageOfWizardSessionInvitation()
         throws RemoteException {
-        basicPart.waitUntilButtonIsEnabled(NEXT);
         bot.button(NEXT).click();
         basicPart.waitUntilButtonIsEnabled(FINISH);
     }
@@ -124,18 +121,20 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         String projectName) throws RemoteException {
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
-        windowPart.waitUntilShellCloses(bot.shell(SESSIONINVITATION));
+        windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingExistProject(
         String projectName) throws RemoteException {
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
+
         bot.button(BUTTON_BROWSE).click();
-        windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK, projectName);
+        windowPart.activateShellWithText(FOLDER_SELECTION);
+        windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK,
+            helperPart.changeToRegex(projectName));
         windowPart.waitUntilShellCloses(FOLDER_SELECTION);
+
         bot.button(FINISH).click();
-        if (windowPart.isShellActive(WARNING_LOCAL_CHANGES_DELETED))
-            windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
         /*
          * if there are some files locally, which are not saved yet, you will
          * get a popup window with the title "Save Resource" after you comfirm
@@ -151,6 +150,9 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
              */
             // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
         }
+        if (windowPart.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
+            windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
+
         if (windowPart.isShellActive("Save Resource")) {
             windowPart.confirmWindow("Save Resource", YES);
         }
@@ -167,7 +169,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * window "Session Invitation" is still open at all.
          */
         if (windowPart.isShellActive(SESSION_INVITATION)) {
-            windowPart.waitUntilShellCloses(bot.shell(SESSION_INVITATION));
+            windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
         }
 
     }
@@ -189,7 +191,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        windowPart.waitUntilShellCloses(SESSIONINVITATION);
+        windowPart.waitLongUntilShellCloses(SESSION_INVITATION);
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
@@ -201,7 +203,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWizardSessionInvitationUsingWhichProject(String baseJID,
         String projectName, int usingWhichProject) throws RemoteException {
-        windowPart.waitUntilShellActive(SESSIONINVITATION);
+        windowPart.waitUntilShellActive(SESSION_INVITATION);
         switch (usingWhichProject) {
         case CREATE_NEW_PROJECT:
             confirmWirzardSessionInvitationWithNewProject(projectName);
@@ -234,15 +236,15 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     }
 
     public boolean isWIndowSessionInvitationActive() throws RemoteException {
-        return windowPart.isShellActive(SESSIONINVITATION);
+        return windowPart.isShellActive(SESSION_INVITATION);
     }
 
     public void closeWIndowSessionInvitation() throws RemoteException {
-        windowPart.closeShell(SESSIONINVITATION);
+        windowPart.closeShell(SESSION_INVITATION);
     }
 
     public void waitUntilWIndowSessionInvitationActive() throws RemoteException {
-        windowPart.waitUntilShellActive(SESSIONINVITATION);
+        windowPart.waitUntilShellActive(SESSION_INVITATION);
     }
 
     public void waitUntilIsWindowProblemOccurredActive() throws RemoteException {

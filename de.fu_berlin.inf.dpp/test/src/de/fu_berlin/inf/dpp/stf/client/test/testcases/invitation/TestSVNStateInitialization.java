@@ -17,7 +17,27 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 /**
- * Tests for the initial synchronization of the SVN state during the invitation.
+ * Tests for the initial synchronization of the SVN state during the invitation.<br>
+ * <br>
+ * Bob doesn't have a project, Alice has an SVN project, AND<br>
+ * <br>
+ * Alice has one resource updated to another revision<br>
+ * Alice has one resource switched to another URL<br>
+ * Alice has one resource switched and updated<br>
+ * Alice has one resource modified<br>
+ * TODO Alice has one resource added (not promoted)<br>
+ * TODO Alice has one resource added (promoted)<br>
+ * TODO Alice has one resource removed<br>
+ * <br>
+ * use existing:<br>
+ * TODO Alice has an SVN project, Bob has the non-SVN project (connect during
+ * invitation)<br>
+ * TODO Alice has a non-SVN project, Bob has the SVN project (disconnect during
+ * invitation)<br>
+ * TODO Alice has an SVN project, one resource switched and updated, Bob has the
+ * unmodified project<br>
+ * TODO Alice has an SVN project, one resource switched and updated, Bob has the
+ * managed project with other resources switched/updated/deleted.<br>
  */
 public class TestSVNStateInitialization extends STFTest {
 
@@ -50,7 +70,8 @@ public class TestSVNStateInitialization extends STFTest {
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
         if (MusicianConfigurationInfos.DEVELOPMODE) {
-            alice.rosterV.disconnect();
+            if (alice.sessionV.isInSession())
+                alice.sessionV.leaveTheSessionByHost();
             // don't delete SVN_PROJECT_COPY
         } else {
             alice.workbench.resetSaros();
@@ -78,14 +99,16 @@ public class TestSVNStateInitialization extends STFTest {
 
     @After
     public void tearDown() throws RemoteException {
-        bob.sessionV.leaveTheSessionByPeer();
         bob.workbench.resetWorkbench();
-        if (alice.pEV.isProjectExist(SVN_PROJECT))
-            alice.pEV.deleteProject(SVN_PROJECT);
+        if (bob.sessionV.isInSession())
+            bob.sessionV.leaveTheSessionByPeer();
         bob.state.deleteAllProjects();
 
-        alice.sessionV.leaveTheSessionByHost();
         alice.workbench.resetWorkbench();
+        if (alice.sessionV.isInSession())
+            alice.sessionV.leaveTheSessionByHost();
+        if (alice.pEV.isProjectExist(SVN_PROJECT))
+            alice.pEV.deleteProject(SVN_PROJECT);
     }
 
     /**
@@ -96,7 +119,7 @@ public class TestSVNStateInitialization extends STFTest {
      * 
      * Result:
      * <ol>
-     * <li>Bob's copy of SVN_PROJECT is managed with SVN.</li>
+     * <li>Bob's copy of SVN_PROJECT is managed by SVN.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -118,15 +141,15 @@ public class TestSVNStateInitialization extends STFTest {
      * Steps:
      * <ol>
      * <li>Alice updates {@link STFTest#SVN_CLS1} to revision
-     * {@link STFTest#SVN_CLS1_REV2}.</li>
+     * {@link STFTest#SVN_CLS1_REV1}.</li>
      * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed by SVN.</li>
      * <li>Bob's copy of {@link STFTest#SVN_CLS1} has revision
-     * {@link STFTest#SVN_CLS1_REV2}.</li>
+     * {@link STFTest#SVN_CLS1_REV1}.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -134,13 +157,14 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithUpdate() throws RemoteException {
-        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV2);
+        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV1);
+        assertEquals(SVN_CLS1_REV1, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
         alice.shareProjectWithDone(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
 
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(bob.pEV.getRevision(SVN_CLS1_FULL_PATH), SVN_CLS1_REV2);
+        assertEquals(SVN_CLS1_REV1, bob.pEV.getRevision(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -153,7 +177,7 @@ public class TestSVNStateInitialization extends STFTest {
      * 
      * Result:
      * <ol>
-     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed by SVN.</li>
      * <li>Bob's copy of {@link STFTest#SVN_CLS1} is switched to
      * {@link STFTest#SVN_CLS1_SWITCHED_URL}.</li>
      * </ol>
@@ -164,6 +188,8 @@ public class TestSVNStateInitialization extends STFTest {
     @Test
     public void testCheckoutWithSwitch() throws RemoteException {
         alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        assertEquals(SVN_CLS1_SWITCHED_URL,
+            alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         alice.shareProjectWithDone(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
@@ -177,6 +203,42 @@ public class TestSVNStateInitialization extends STFTest {
     /**
      * Steps:
      * <ol>
+     * <li>Alice switches {@link STFTest#SVN_CLS1} to
+     * {@link STFTest#SVN_CLS1_SWITCHED_URL}@{@link STFTest#SVN_CLS1_REV3}.</li>
+     * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed by SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_CLS1} is switched to
+     * {@link STFTest#SVN_CLS1_SWITCHED_URL}@{@link STFTest#SVN_CLS1_REV3}.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * 
+     */
+    @Test
+    public void testCheckoutWithSwitch2() throws RemoteException {
+        alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL,
+            SVN_CLS1_REV3);
+        assertEquals(SVN_CLS1_SWITCHED_URL,
+            alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
+        alice.shareProjectWithDone(SVN_PROJECT,
+            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        bob.sessionV.waitUntilSessionOpen();
+
+        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(SVN_CLS1_SWITCHED_URL,
+            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, bob.pEV.getRevision(SVN_CLS1_FULL_PATH));
+    }
+
+    /**
+     * Steps:
+     * <ol>
      * <li>Alice modifies her working copy by changing the content of the file
      * {@link STFTest#SVN_CLS1} to {@link STFTest#CP1}.</li>
      * <li>Alice shares project {@link STFTest#SVN_PROJECT} with Bob.</li>
@@ -184,7 +246,7 @@ public class TestSVNStateInitialization extends STFTest {
      * 
      * Result:
      * <ol>
-     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed with SVN.</li>
+     * <li>Bob's copy of {@link STFTest#SVN_PROJECT} is managed by SVN.</li>
      * <li>Bob's copy of {@link STFTest#SVN_CLS1} has the same content as
      * Alice's copy.</li>
      * </ol>
@@ -194,6 +256,7 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithModification() throws RemoteException {
+        assertTrue(alice.pEV.isClassExist(SVN_PROJECT, SVN_PKG, SVN_CLS1));
         String cls1_content_before = alice.editor.getTextOfJavaEditor(
             SVN_PROJECT, SVN_PKG, SVN_CLS1);
         alice.editor.setTextInJavaEditorWithSave(CP1, SVN_PROJECT, SVN_PKG,
