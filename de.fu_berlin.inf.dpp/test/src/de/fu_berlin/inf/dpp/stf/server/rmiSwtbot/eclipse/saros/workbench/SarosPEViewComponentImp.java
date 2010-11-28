@@ -128,12 +128,12 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         String projectName) throws RemoteException {
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
 
-        bot.button(BUTTON_BROWSE).click();
-        windowPart.activateShellWithText(FOLDER_SELECTION);
-        windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK,
-            helperPart.changeToRegex(projectName));
-        windowPart.waitUntilShellCloses(FOLDER_SELECTION);
-
+        // bot.button(BUTTON_BROWSE).click();
+        // windowPart.activateShellWithText(FOLDER_SELECTION);
+        // windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK,
+        // helperPart.changeToRegex(projectName));
+        // windowPart.waitUntilShellCloses(FOLDER_SELECTION);
+        bot.textWithLabel("Project name", 1).setText(projectName);
         bot.button(FINISH).click();
         /*
          * if there are some files locally, which are not saved yet, you will
@@ -141,15 +141,14 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * the window "Warning: Local changes will be deleted" with YES.
          */
 
-        if (windowPart.isShellActive(SHELL_SAVE_RESOURCE)) {
-            windowPart.confirmWindow(SHELL_SAVE_RESOURCE, YES);
-            /*
-             * If there are local unsaved files, it take more time for the
-             * session invitation to complete. So waitUntilShellCloses is
-             * necessary here.
-             */
-            // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
-        }
+        // if (windowPart.isShellActive(SHELL_SAVE_RESOURCE)) {
+        // windowPart.confirmWindow(SHELL_SAVE_RESOURCE, YES);
+        /*
+         * If there are local unsaved files, it take more time for the session
+         * invitation to complete. So waitUntilShellCloses is necessary here.
+         */
+        // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
+        // }
         if (windowPart.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
             windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
 

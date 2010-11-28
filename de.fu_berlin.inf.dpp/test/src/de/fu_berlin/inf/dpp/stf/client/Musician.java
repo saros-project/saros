@@ -292,8 +292,15 @@ public class Musician extends STFTest {
         return jid.getDomain();
     }
 
-    public void addContactDone(Musician peer) throws RemoteException {
-        if (!rosterV.hasContactWith(peer.jid)) {
+    /**
+     * the "add buddy" action should be performed by both the users.
+     * 
+     * @param peer
+     *            the musician, which should be added in your contact list
+     * @throws RemoteException
+     */
+    public void addBuddyDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasBuddyWith(peer.jid)) {
             rosterV.addANewContact(peer.jid);
             peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
             rosterV.confirmRequestOfSubscriptionReceivedWindow();
@@ -303,10 +310,10 @@ public class Musician extends STFTest {
     /**
      * Remove given contact from Roster, if contact was added before.
      */
-    public void deleteContactDone(Musician peer) throws RemoteException {
-        if (!rosterV.hasContactWith(peer.jid))
+    public void deleteBuddyDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasBuddyWith(peer.jid))
             return;
-        rosterV.deleteContact(peer.jid);
+        rosterV.deleteBuddy(peer.jid);
         peer.rosterV.confirmRemovelOfSubscriptionWindow();
     }
 

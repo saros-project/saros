@@ -14,40 +14,59 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestChangingNameInRosterView extends STFTest {
 
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>Alice (Host, Driver)</li>
+     * <li>Bob (Observer)</li>
+     * <li>Alice share a java project with bob</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
-        // carl = InitMusician.newCarl();
-        // alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        // alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-        // bob);
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
+    /**
+     * make sure, all opened xmppConnects, popup windows and editor should be
+     * closed. <br/>
+     * make sure, all existed projects should be deleted.
+     * 
+     * @throws RemoteException
+     */
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
-        // carl.workbench.resetSaros();
         alice.workbench.resetSaros();
     }
 
+    /**
+     * make sure,all opened popup windows and editor should be closed.
+     * 
+     * @throws RemoteException
+     */
     @After
     public void cleanUp() throws RemoteException {
-        // alice.rosterV.renameContact(bob.jid.getName(), bob.jid.getBase());
-        // bob.workbench.resetWorkbench();
-        // carl.workbench.resetWorkbench();
+        alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
+        bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
 
     @Test
-    public void testReanmeInRosterView() throws RemoteException {
-        assertTrue(alice.rosterV.hasContactWith(bob.jid));
-        // alice.rosterV.renameContact(bob.jid.getBase(), bob.jid.getName());
-        // assertTrue(alice.state.hasContactWith(bob.jid));
-        // assertFalse(alice.rosterV.hasContactWith(bob.jid));
-        // // assertTrue(alice.bot.hasContactWith(bob.jid.));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getBase()));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid.getName()));
-
+    public void testRenameInRosterView() throws RemoteException {
+        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        alice.rosterV.renameBuddy(bob.jid, bob.getName());
+        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(alice.state.getBuddyNickName(bob.jid).equals(bob.getName()));
+        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
+        alice.rosterV.renameBuddy(bob.jid, "new bob");
+        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(alice.state.getBuddyNickName(bob.jid).equals("new bob"));
+        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 }

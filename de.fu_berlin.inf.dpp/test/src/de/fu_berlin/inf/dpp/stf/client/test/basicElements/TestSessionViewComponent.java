@@ -39,33 +39,32 @@ public class TestSessionViewComponent extends STFTest {
 
     @Before
     public void startUp() throws RemoteException {
-        bob.workbench.openSarosViews();
-        alice.workbench.openSarosViews();
         if (!alice.state.isInSession()) {
             bob.typeOfSharingProject = USE_EXISTING_PROJECT;
             alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
                 bob);
         }
-        if (bob.sessionV.isInFollowMode()) {
-            bob.sessionV.stopFollowing();
-            // FIXME warten
-        }
+        bob.workbench.openSarosViews();
+        alice.workbench.openSarosViews();
     }
 
     @After
     public void cleanUp() throws RemoteException {
+
         if (bob.state.isInSession() && bob.state.isDriver()) {
             alice.sessionV.removeDriverRole(bob.state);
-            // FIXME warten
         }
         if (alice.state.isInSession() && !alice.state.isDriver()) {
             alice.sessionV.giveDriverRole(alice.state);
         }
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
-        // bob.sessionV.stopFollowing();
-        // alice.sessionV.stopFollowing();
-
+        if (bob.state.isInSession() && bob.state.isInFollowMode()) {
+            bob.sessionV.stopFollowing();
+        }
+        if (alice.state.isInSession() && alice.state.isInFollowMode()) {
+            alice.sessionV.stopFollowing();
+        }
     }
 
     @Test
@@ -86,59 +85,55 @@ public class TestSessionViewComponent extends STFTest {
     }
 
     @Test
-    public void testIsInSession() throws RemoteException, InterruptedException {
-        assertTrue(alice.sessionV.isInSession());
-        assertTrue(bob.sessionV.isInSession());
-        alice.leaveSessionFirst(bob);
-        assertFalse(alice.sessionV.isInSession());
-        assertFalse(bob.sessionV.isInSession());
-    }
-
-    @Test
     public void testGiveDriverRole() throws RemoteException {
-        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
-            + ROLE_NAME));
-        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
-        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLE_NAME));
+        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME);
+        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            bob.getBaseJid());
+        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME);
+        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            alice.getBaseJid() + ROLE_NAME);
 
-        log.trace("alice give bob driver role.");
         alice.sessionV.giveDriverRole(bob.state);
         assertTrue(alice.state.isDriver());
+        assertTrue(alice.state.isDriver(bob.jid));
         assertTrue(bob.state.isDriver());
 
-        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
-            + ROLE_NAME));
-        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
-            + ROLE_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME
-            + ROLE_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLE_NAME));
-
+        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME);
+        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            bob.getBaseJid() + ROLE_NAME);
+        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME);
+        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            alice.getBaseJid() + ROLE_NAME);
     }
 
     @Test
     public void testGiveExclusiveDriverRole() throws RemoteException {
-        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME
-            + ROLE_NAME));
-        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()));
-        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()
-            + ROLE_NAME));
+        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME);
+        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            bob.getBaseJid());
+        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME);
+        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            alice.getBaseJid() + ROLE_NAME);
 
         log.trace("alice give bob exclusive driver role.");
         alice.sessionV.giveExclusiveDriverRole(bob.state);
         assertFalse(alice.state.isDriver());
         assertTrue(bob.state.isDriver());
 
-        assertTrue(alice.sessionV.isContactInSessionView(OWN_CONTACT_NAME));
-        assertTrue(alice.sessionV.isContactInSessionView(bob.getBaseJid()
-            + ROLE_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(OWN_CONTACT_NAME
-            + ROLE_NAME));
-        assertTrue(bob.sessionV.isContactInSessionView(alice.getBaseJid()));
+        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            OWN_CONTACT_NAME);
+        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            bob.getBaseJid() + ROLE_NAME);
+        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME);
+        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
+            alice.getBaseJid());
     }
 
     @Test
@@ -163,6 +158,15 @@ public class TestSessionViewComponent extends STFTest {
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
         alice.sessionV.stopSessionWithUser(bob.state);
+    }
+
+    @Test
+    public void testIsInSession() throws RemoteException, InterruptedException {
+        assertTrue(alice.sessionV.isInSession());
+        assertTrue(bob.sessionV.isInSession());
+        alice.leaveSessionFirst(bob);
+        assertFalse(alice.sessionV.isInSession());
+        assertFalse(bob.sessionV.isInSession());
     }
 
 }

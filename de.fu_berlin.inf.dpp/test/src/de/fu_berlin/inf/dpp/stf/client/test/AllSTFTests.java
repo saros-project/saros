@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestBasicSarosElements;
-import de.fu_berlin.inf.dpp.stf.client.test.testcases.enteringAndExitingSession.TestHostAsDriverInvitesBelatedly;
+import de.fu_berlin.inf.dpp.stf.client.test.testcases.RosterViewBehaviour.TestChangingNameInRosterView;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestFileOperations;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestFolderOperations;
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.fileFolderOperations.TestSVNStateUpdates;
@@ -20,12 +20,13 @@ import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.permutations.Te
 import de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation.permutations.TestParallelInvitationWithTerminationByInvitees;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestBasicSarosElements.class, TestHandleContacts.class,
+@SuiteClasses({ TestBasicSarosElements.class,
+    TestChangingNameInRosterView.class, TestHandleContacts.class,
     TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
     TestShare3UsersConcurrently.class,
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
     TestSVNStateInitialization.class, TestFileOperations.class,
-    TestFolderOperations.class, TestHostAsDriverInvitesBelatedly.class,
+    TestFolderOperations.class,
     TestParallelInvitationWithTerminationByHost.class,
     TestParallelInvitationWithTerminationByInvitees.class,
     TestSVNStateUpdates.class })

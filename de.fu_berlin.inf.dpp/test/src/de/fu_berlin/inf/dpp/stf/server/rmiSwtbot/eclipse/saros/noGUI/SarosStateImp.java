@@ -74,20 +74,13 @@ public class SarosStateImp extends StateImp implements SarosState {
      * 
      * gather state and perform actions using {@link SarosSessionManager}
      * 
-     * @throws RemoteException
      * 
      **********************************************/
 
-    private ISarosSession getSarosSession() {
+    public boolean isDriver() throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
-            throw new RuntimeException("Not in a session.");
-        else
-            return sarosSession;
-    }
-
-    public boolean isDriver() throws RemoteException {
-        ISarosSession sarosSession = getSarosSession();
+            return false;
         return sarosSession.isDriver();
         // User user = sarosSession.getUser(this.jid);
         // if (user == null) {
@@ -100,7 +93,9 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public boolean isDriver(JID jid) throws RemoteException {
-        ISarosSession sarosSession = getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         User user = sarosSession.getUser(jid);
         log.debug("isDriver(" + jid.toString() + ") == "
             + sarosSession.getDrivers().contains(user));
@@ -109,7 +104,9 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean isExclusiveDriver() throws RemoteException {
         try {
-            ISarosSession sarosSession = getSarosSession();
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            if (sarosSession == null)
+                return false;
             return sarosSession.isExclusiveDriver();
         } catch (Exception e) {
             return false;
@@ -118,9 +115,11 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean areDrivers(List<JID> jids) {
         boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = getSarosSession();
                 User user = sarosSession.getUser(jid);
                 result &= sarosSession.getDrivers().contains(user);
             } catch (Exception e) {
@@ -131,7 +130,9 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public boolean isHost(JID jid) throws RemoteException {
-        ISarosSession sarosSession = getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         final boolean result = sarosSession.getUser(jid) == sarosSession
             .getHost();
         log.debug("isHost(" + jid.toString() + ") == " + result);
@@ -139,7 +140,9 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public boolean isObserver(JID jid) throws RemoteException {
-        ISarosSession sarosSession = getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         User user = sarosSession.getUser(jid);
         log.debug("isObserver(" + jid.toString() + ") == "
             + sarosSession.getObservers().contains(user));
@@ -148,9 +151,11 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean areObservers(List<JID> jids) {
         boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = getSarosSession();
                 User user = sarosSession.getUser(jid);
                 result &= sarosSession.getObservers().contains(user);
             } catch (Exception e) {
@@ -162,7 +167,9 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean isParticipant(JID jid) throws RemoteException {
         try {
-            ISarosSession sarosSession = getSarosSession();
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            if (sarosSession == null)
+                return false;
             log.debug("isParticipant("
                 + jid.toString()
                 + ") == "
@@ -177,9 +184,11 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public boolean areParticipants(List<JID> jids) throws RemoteException {
         boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
         for (JID jid : jids) {
             try {
-                ISarosSession sarosSession = getSarosSession();
                 result &= sarosSession.getParticipants().contains(
                     sarosSession.getUser(jid));
             } catch (Exception e) {
@@ -195,7 +204,7 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public ISarosSession getProject() throws RemoteException {
-        return getSarosSession();
+        return sessionManager.getSarosSession();
     }
 
     /**********************************************
@@ -298,11 +307,13 @@ public class SarosStateImp extends StateImp implements SarosState {
 
     public String getBuddyNickName(JID buddyJID) throws RemoteException {
         Roster roster = saros.getRoster();
+        if (roster.getEntry(buddyJID.getBase()) == null)
+            return null;
         return roster.getEntry(buddyJID.getBase()).getName();
     }
 
     public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
-        if (!getBuddyNickName(buddyJID).equals(buddyJID.getBareJID()))
+        if (!getBuddyNickName(buddyJID).equals(buddyJID.getBase()))
             return true;
         return false;
     }

@@ -143,6 +143,10 @@ public class SarosConditions extends Conditions {
         return new IsRevisionSame(fullPath, revisionID);
     }
 
+    public static ICondition isDriver(SarosState state) {
+        return new IsDriver(state);
+    }
+
     public static ICondition isUrlSame(String fullPath, String url) {
         return new IsUrlSame(fullPath, url);
     }

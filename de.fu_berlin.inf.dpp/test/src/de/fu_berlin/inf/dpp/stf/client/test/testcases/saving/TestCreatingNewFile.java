@@ -148,10 +148,8 @@ public class TestCreatingNewFile extends STFTest {
         CoreException {
         carl.sessionV.giveExclusiveDriverRole(alice.state);
 
-        assertFalse(carl.state.isDriver(carl.jid));
-        assertTrue(alice.state.isDriver(alice.jid));
-        assertTrue(carl.state.isDriver(alice.jid));
-        assertTrue(bob.state.isDriver(alice.jid));
+        assertFalse(carl.state.isDriver());
+        assertTrue(alice.state.isDriver());
 
         carl.pEV.newFolder(FOLDER1, PROJECT1);
         carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);

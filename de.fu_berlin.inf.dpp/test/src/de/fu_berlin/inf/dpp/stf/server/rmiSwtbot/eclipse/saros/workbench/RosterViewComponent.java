@@ -161,14 +161,14 @@ public interface RosterViewComponent extends Remote {
 
     /**
      * 
-     * @param jid
+     * @param buddyJID
      *            a Jabber ID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt>, if you have already contained the contact
      *         specified by the given jid.
      * @throws RemoteException
      */
-    public boolean hasContactWith(JID jid) throws RemoteException;
+    public boolean hasBuddyWith(JID buddyJID) throws RemoteException;
 
     /**
      * click only the tool bar button with the tooltip text "Add a new contact"
@@ -226,14 +226,14 @@ public interface RosterViewComponent extends Remote {
 
     /**
      * 
-     * @param baseJID
+     * @param buddyNickName
      *            the base JID of the contact showed under Buddies which you
      *            want to select
      * @return <tt>true</tt>, if the buddy specified with the given baseJID
      *         exists.
      * @throws RemoteException
      */
-    public boolean isBuddyExist(String baseJID) throws RemoteException;
+    public boolean hasBuddy(String buddyNickName) throws RemoteException;
 
     /**********************************************
      * 
@@ -259,14 +259,14 @@ public interface RosterViewComponent extends Remote {
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
-    public void deleteContact(JID jid) throws RemoteException;
+    public void deleteBuddy(JID jid) throws RemoteException;
 
     /**
      * This popup window should be appeared by you, after someone else deleted
      * your contact from his buddies.
      * 
      * This method should be called by
-     * {@link Musician#deleteContactDone(Musician)}
+     * {@link Musician#deleteBuddyDone(Musician)}
      * 
      * @throws RemoteException
      */
@@ -281,14 +281,14 @@ public interface RosterViewComponent extends Remote {
      * rename the buddy'name specified with the given baseJID to the given
      * newName
      * 
-     * @param baseJID
+     * @param buddyJID
      *            the baseJID of the user, whose contact under the buddies you
      *            want to change
-     * @param newName
+     * @param newBuddyName
      *            the new name , to which the contact should be changed
      * @throws RemoteException
      */
-    public void renameContact(String baseJID, String newName)
+    public void renameBuddy(JID buddyJID, String newBuddyName)
         throws RemoteException;
 
     public void waitUntilContactLookupFailedIsActive() throws RemoteException;

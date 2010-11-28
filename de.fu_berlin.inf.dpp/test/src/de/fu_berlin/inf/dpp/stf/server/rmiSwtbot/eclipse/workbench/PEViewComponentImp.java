@@ -779,7 +779,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (vcs == null)
             return null;
         // return vcs.getRevisionString(resource);
-        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
+        VCSResourceInfo info = vcs.getResourceInfo(resource);
         String result = info != null ? info.revision : null;
         return result;
     }
@@ -841,6 +841,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
         shell.activate();
         bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
+        basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
     }

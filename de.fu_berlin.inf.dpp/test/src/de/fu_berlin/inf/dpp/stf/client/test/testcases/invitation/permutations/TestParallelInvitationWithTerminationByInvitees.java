@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -42,8 +42,10 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE,
             MusicianConfigurationInfos.PORT_EDNA);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -106,7 +108,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
      * @throws IOException
      * @throws InterruptedException
      */
-
     @Test
     public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
         throws IOException, CoreException, InterruptedException {
@@ -146,6 +147,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.pEV
             .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
-        assertFalse(alice.state.isDriver(edna.jid));
+        assertFalse(edna.state.isDriver());
     }
 }

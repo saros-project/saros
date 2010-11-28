@@ -43,9 +43,10 @@ public abstract class EclipseComponent {
 
     public static final String SRC = "src";
     public final static String SUFIX_JAVA = ".java";
-    protected final static String PROGRESSINFORMATION = "Progress Information";
+    protected final static String PROGRESS_INFORMATION = "Progress Information";
 
     // Role:Driver
+    public static final String OWN_CONTACT_NAME = "You";
     protected final static String ROLENAME = " (Driver)";
 
     // exported objects

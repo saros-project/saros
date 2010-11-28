@@ -57,7 +57,7 @@ public class TestShare2UsersSequentially extends STFTest {
         assertTrue(bob.state.isParticipant(bob.jid));
         assertTrue(bob.state.isObserver(bob.jid));
         assertTrue(bob.state.isParticipant(alice.jid));
-        assertTrue(bob.state.isDriver(alice.jid));
+        assertTrue(alice.state.isDriver());
 
         assertTrue(alice.state.isParticipant(alice.jid));
         assertTrue(alice.state.isDriver(alice.jid));

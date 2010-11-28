@@ -175,7 +175,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void addANewContact(JID jid) throws RemoteException {
-        if (!hasContactWith(jid)) {
+        if (!hasBuddyWith(jid)) {
             clickAddANewContactToolbarButton();
             confirmNewContactWindow(jid.getBase());
         }
@@ -188,8 +188,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
         basicPart.clickButton(FINISH);
     }
 
-    public boolean hasContactWith(JID jid) throws RemoteException {
-        return state.hasBuddy(jid) && isBuddyExist(jid.getBase());
+    public boolean hasBuddyWith(JID jid) throws RemoteException {
+        String buddyNickName = state.getBuddyNickName(jid);
+        if (buddyNickName == null)
+            return false;
+        return state.hasBuddy(jid) && hasBuddy(buddyNickName);
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {
@@ -219,11 +222,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
         return viewPart.selectTreeWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
     }
 
-    public boolean isBuddyExist(String baseJID) throws RemoteException {
+    public boolean hasBuddy(String buddyNickName) throws RemoteException {
         precondition();
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        return treePart.isTreeItemWithMatchTextExist(tree, BUDDIES, baseJID
-            + ".*");
+        return treePart.isTreeItemWithMatchTextExist(tree, BUDDIES,
+            buddyNickName + ".*");
     }
 
     /**********************************************
@@ -231,14 +234,15 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * context menu of a contact on the view: delete Contact
      * 
      **********************************************/
-    public void deleteContact(JID jid) throws RemoteException {
-        if (!hasContactWith(jid))
+    public void deleteBuddy(JID buddyJID) throws RemoteException {
+        String buddyNickName = state.getBuddyNickName(buddyJID);
+        if (!hasBuddyWith(buddyJID))
             return;
         try {
-            clickContextMenuOfBuddy(CM_DELETE, jid.getBase());
+            clickContextMenuOfBuddy(CM_DELETE, buddyNickName);
             windowPart.confirmDeleteWindow(YES);
         } catch (WidgetNotFoundException e) {
-            log.info("Contact not found: " + jid.getBase(), e);
+            log.info("Contact not found: " + buddyJID.getBase(), e);
         }
     }
 
@@ -252,14 +256,19 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * context menu of a contact on the view: rename Contact
      * 
      **********************************************/
-    public void renameContact(String contact, String newName)
+    public void renameBuddy(JID buddyJID, String newBuddyName)
         throws RemoteException {
+        precondition();
+        String buddyNickName = state.getBuddyNickName(buddyJID);
+        if (buddyNickName == null)
+            throw new RuntimeException(
+                "the buddy dones't exist, which you want to rename.");
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
         SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
-            + ".*", contact + ".*");
+            + ".*", buddyNickName + ".*");
         item.contextMenu(CM_RENAME).click();
         windowPart.waitUntilShellActive("Set new nickname");
-        bot.text(contact).setText(newName);
+        bot.text(buddyNickName).setText(newBuddyName);
         bot.button(OK).click();
     }
 

@@ -163,14 +163,17 @@ public interface SessionViewComponent extends Remote {
      * <li>Make sure, the session view is open and active.</li>
      * </ol>
      * 
-     * @param contactName
-     *            the name, which listed in the session view. e.g. "You" or
-     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     * @param contactJID
+     *            JID of a contact whose nick name listed in the session view.
+     *            e.g. "You" or "bob_stf@saros-con.imp.fu-berlin.de (Driver)" or
+     *            "bob_stf@saros-con.imp.fu-berlin.de" or
+     *            "(nickNameOfBob (bob_stf@saros-con.imp.fu-berlin.de) (Driver)"
+     *            .
      * @return <tt>true</tt> if the passed contactName is in the contact list in
      *         the session view.
      * @throws RemoteException
      */
-    public boolean isContactInSessionView(String contactName)
+    public boolean isContactInSessionView(JID contactJID)
         throws RemoteException;
 
     /**
@@ -186,12 +189,22 @@ public interface SessionViewComponent extends Remote {
      * </ol>
      * 
      * @param stateOfInvitee
-     *            the {@link SarosState} of the user whom you want to give
-     *            drive role.
+     *            the {@link SarosState} of the user whom you want to give drive
+     *            role.
      * @throws RemoteException
      */
-    public void giveDriverRole(SarosState stateOfInvitee)
+    public void giveDriverRole(final SarosState stateOfInvitee)
         throws RemoteException;
+
+    /**
+     * waits until the invitee is driver after host give him the driver role.
+     * This method should be used after performing the action
+     * {@link SessionViewComponent#giveDriverRole(JID)} to guarantee the invitee
+     * has really got the driver role.
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilIsDriver() throws RemoteException;
 
     /**
      * Using this function host can perform the action
@@ -227,11 +240,21 @@ public interface SessionViewComponent extends Remote {
      * </ol>
      * 
      * @param stateOfInvitee
-     *            the {@link SarosState} of the user whose drive role you
-     *            want to remove.
+     *            the {@link SarosState} of the user whom you want to remove
+     *            drive role.
      * @throws RemoteException
      */
-    public void removeDriverRole(SarosState stateOfInvitee)
+    public void removeDriverRole(final SarosState stateOfInvitee)
+        throws RemoteException;
+
+    /**
+     * @param contactJID
+     *            the JID of a user, who is sharing a session with you.
+     * @return the text of the table item specified with the given parameter
+     *         "contactJID" which listed in the session view.
+     * @throws RemoteException
+     */
+    public String getContactStatusInSessionView(JID contactJID)
         throws RemoteException;
 
     /**
@@ -255,15 +278,15 @@ public interface SessionViewComponent extends Remote {
      * Test if you are in follow mode. <br>
      * This function check if the context menu "Stop following this user" of
      * every contact listed in the session view is existed and enabled. You can
-     * also use another function {@link SarosState#isInFollowMode()}, which
-     * test the following state without GUI.
+     * also use another function {@link SarosState#isInFollowMode()}, which test
+     * the following state without GUI.
      * 
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use only the function{@link SarosState#isInSession()} for
-     * your junittests, because the method
+     * <li>Try to use only the function{@link SarosState#isInSession()} for your
+     * junittests, because the method
      * {@link TablePart#existsContextOfTableItem(String, String)} isn't really
      * optimal implemented.</li>
      * </ol>
@@ -277,10 +300,10 @@ public interface SessionViewComponent extends Remote {
 
     /**
      * This function do same as the
-     * {@link SessionViewComponent#stopFollowingThisUser(SarosState)} except
-     * you don't need to pass the {@link SarosState} of the followed user to
-     * the function. It is very useful, if you don't exactly know whom you are
-     * now following. Instead, we get the followed user JID from the method
+     * {@link SessionViewComponent#stopFollowingThisUser(SarosState)} except you
+     * don't need to pass the {@link SarosState} of the followed user to the
+     * function. It is very useful, if you don't exactly know whom you are now
+     * following. Instead, we get the followed user JID from the method
      * {@link SarosState#getFollowedUserJID()}.
      * <p>
      * <b>Attention:</b>
@@ -373,8 +396,8 @@ public interface SessionViewComponent extends Remote {
      * </ol>
      * 
      * @param stateOfPeer
-     *            the {@link SarosState} of the user with whom you want to
-     *            share your screen.
+     *            the {@link SarosState} of the user with whom you want to share
+     *            your screen.
      * @throws RemoteException
      */
     public void shareYourScreenWithSelectedUser(SarosState stateOfPeer)
@@ -393,8 +416,8 @@ public interface SessionViewComponent extends Remote {
      * </ol>
      * 
      * @param stateOfselectedUser
-     *            the {@link SarosState} of the user with whom you want to
-     *            stop the screen session.
+     *            the {@link SarosState} of the user with whom you want to stop
+     *            the screen session.
      * @throws RemoteException
      */
     public void stopSessionWithUser(SarosState stateOfselectedUser)
@@ -418,8 +441,8 @@ public interface SessionViewComponent extends Remote {
      * performed.
      * 
      * @param stateOfselectedUser
-     *            the {@link SarosState} of the user with whom you want to
-     *            share your screen.
+     *            the {@link SarosState} of the user with whom you want to share
+     *            your screen.
      * @throws RemoteException
      */
     public void sendAFileToSelectedUser(SarosState stateOfselectedUser)
@@ -442,8 +465,8 @@ public interface SessionViewComponent extends Remote {
      * 
      * 
      * @param stateOfselectedUser
-     *            the {@link SarosState} of the user with whom you want to
-     *            share your screen.
+     *            the {@link SarosState} of the user with whom you want to share
+     *            your screen.
      * @throws RemoteException
      */
     public void startAVoIPSession(SarosState stateOfselectedUser)

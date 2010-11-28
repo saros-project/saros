@@ -91,7 +91,7 @@ public class TestEditDuringInvitation extends STFTest {
         log.trace("alice.giveDriverRole");
         alice.sessionV.giveDriverRole(bob.state);
 
-        assertTrue(bob.state.isDriver(alice.jid));
+        assertTrue(alice.state.isDriver());
 
         log.trace("alice.inviteUser(carl");
         alice.sessionV.openInvitationInterface(carl.getBaseJid());

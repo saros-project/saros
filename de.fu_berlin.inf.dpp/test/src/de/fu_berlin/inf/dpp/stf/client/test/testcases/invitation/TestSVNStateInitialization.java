@@ -54,7 +54,6 @@ public class TestSVNStateInitialization extends STFTest {
      * 
      * @throws RemoteException
      */
-
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
@@ -132,7 +131,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.state.isDriver(alice.jid));
+        assertTrue(alice.state.isDriver());
         assertTrue(alice.state.isParticipant(bob.jid));
         assertTrue(bob.state.isObserver(bob.jid));
     }

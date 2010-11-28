@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -135,12 +136,13 @@ public class SessionViewComponentImp extends EclipseComponent implements
         waitUntil(SarosConditions.isSessionClosed(stateOfPeer));
     }
 
-    public boolean isContactInSessionView(String contactName)
+    public boolean isContactInSessionView(JID contactJID)
         throws RemoteException {
         precondition();
-        SWTBotTable table = tablePart.getTable();
+        String contactLabel = getContactStatusInSessionView(contactJID);
+        SWTBotTable table = viewPart.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
-            if (table.getTableItem(i).getText().equals(contactName))
+            if (table.getTableItem(i).getText().equals(contactLabel))
                 return true;
         }
         return false;
@@ -154,18 +156,15 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void giveDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
         final JID jid = stateOfInvitee.getJID();
-        if (stateOfInvitee.isDriver(jid)) {
+        if (state.isDriver(jid)) {
             throw new RuntimeException(
                 "User \""
                     + jid.getBase()
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        if (stateOfInvitee.isHost(jid))
-            tablePart.clickContextMenuOfTable("You", CM_GIVE_DRIVER_ROLE);
-        else
-            tablePart.clickContextMenuOfTable(jid.getBase(),
-                CM_GIVE_DRIVER_ROLE);
+        String contactLabel = getContactStatusInSessionView(jid);
+        tablePart.clickContextMenuOfTable(contactLabel, CM_GIVE_DRIVER_ROLE);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return stateOfInvitee.isDriver();
@@ -175,27 +174,26 @@ public class SessionViewComponentImp extends EclipseComponent implements
                 return jid.getBase() + " is not a driver.";
             }
         });
+    }
 
+    public void waitUntilIsDriver() throws RemoteException {
+        waitUntil(SarosConditions.isDriver(state));
     }
 
     public void giveExclusiveDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
         final JID jid = stateOfInvitee.getJID();
-        if (stateOfInvitee.isDriver(jid)) {
+        if (stateOfInvitee.isDriver()) {
             throw new RuntimeException(
                 "User \""
                     + jid.getBase()
                     + "\" is already a driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        if (stateOfInvitee.isHost(jid))
-            tablePart.clickContextMenuOfTable("You",
-                CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
-        else
-            tablePart.clickContextMenuOfTable(jid.getBase(),
-                CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
+        String contactLabel = getContactStatusInSessionView(jid);
+        tablePart.clickContextMenuOfTable(contactLabel,
+            CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         waitUntil(new DefaultCondition() {
-
             public boolean test() throws Exception {
                 return stateOfInvitee.isExclusiveDriver();
             }
@@ -209,17 +207,16 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void removeDriverRole(final SarosState stateOfInvitee)
         throws RemoteException {
         final JID jid = stateOfInvitee.getJID();
-        if (!stateOfInvitee.isDriver(jid)) {
+        if (!stateOfInvitee.isDriver()) {
             throw new RuntimeException(
                 "User \""
                     + jid.getBase()
                     + "\" is  no driver! Please pass a correct Musician Object to the method.");
         }
         precondition();
-        tablePart.clickContextMenuOfTable(jid.getBase() + ROLENAME,
-            CM_REMOVE_DRIVER_ROLE);
+        String contactLabel = getContactStatusInSessionView(jid);
+        tablePart.clickContextMenuOfTable(contactLabel, CM_REMOVE_DRIVER_ROLE);
         waitUntil(new DefaultCondition() {
-
             public boolean test() throws Exception {
                 return !stateOfInvitee.isDriver();
             }
@@ -228,6 +225,30 @@ public class SessionViewComponentImp extends EclipseComponent implements
                 return jid.getBase() + " is still a driver.";
             }
         });
+    }
+
+    public String getContactStatusInSessionView(JID contactJID)
+        throws RemoteException {
+        String contactLabel;
+        if (state.getJID().equals(contactJID)) {
+            if (state.isDriver())
+                contactLabel = OWN_CONTACT_NAME + ROLENAME;
+            else
+                contactLabel = OWN_CONTACT_NAME;
+        } else if (state.hasBuddyNickName(contactJID)) {
+            if (state.isDriver(contactJID))
+                contactLabel = state.getBuddyNickName(contactJID) + " ("
+                    + contactJID.getBase() + ")" + ROLENAME;
+            else
+                contactLabel = state.getBuddyNickName(contactJID) + " ("
+                    + contactJID.getBase() + ")";
+        } else {
+            if (state.isDriver(contactJID))
+                contactLabel = contactJID.getBase() + ROLENAME;
+            else
+                contactLabel = contactJID.getBase();
+        }
+        return contactLabel;
     }
 
     /**********************************************
@@ -251,33 +272,43 @@ public class SessionViewComponentImp extends EclipseComponent implements
     }
 
     public boolean isInFollowMode() throws RemoteException {
-        precondition();
-        List<String> allContactsName = getAllContactsInSessionView();
-        for (String contactName : allContactsName) {
-            // SWTBotTable table = tableObject.getTable();
-            if (!tablePart.existsContextOfTableItem(contactName,
-                CM_STOP_FOLLOWING_THIS_USER))
-                continue;
-            if (isStopFollowingThisUserEnabled(contactName))
-                return true;
+        try {
+            precondition();
+            SWTBotTable table = viewPart.getTableInView(VIEWNAME);
+            for (int i = 0; i < table.rowCount(); i++) {
+                try {
+                    return table.getTableItem(i)
+                        .contextMenu(CM_STOP_FOLLOWING_THIS_USER).isEnabled();
+                } catch (WidgetNotFoundException e) {
+                    continue;
+                }
+            }
+        } catch (WidgetNotFoundException e) {
+            return false;
         }
         return false;
     }
 
     public void stopFollowing() throws RemoteException {
-        JID followedUserJID = state.getFollowedUserJID();
+        final JID followedUserJID = state.getFollowedUserJID();
         if (followedUserJID == null) {
             log.debug(" You are not in follow mode, so you don't need to perform thhe function.");
             return;
         }
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
-        if (state.isDriver(followedUserJID))
-            tablePart.clickContextMenuOfTable(followedUserJID.getBase()
-                + ROLENAME, CM_STOP_FOLLOWING_THIS_USER);
-        else
-            tablePart.clickContextMenuOfTable(followedUserJID.getBase(),
-                CM_STOP_FOLLOWING_THIS_USER);
+        String contactLabel = getContactStatusInSessionView(followedUserJID);
+        tablePart.clickContextMenuOfTable(contactLabel,
+            CM_STOP_FOLLOWING_THIS_USER);
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !state.isInFollowMode();
+            }
+
+            public String getFailureMessage() {
+                return followedUserJID.getBase() + " is still followed.";
+            }
+        });
     }
 
     public void stopFollowingThisUser(SarosState stateOfFollowedUser)
@@ -395,7 +426,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTEN_CYDETECTED);
-        windowPart.waitUntilShellCloses(PROGRESSINFORMATION);
+        windowPart.waitUntilShellCloses(PROGRESS_INFORMATION);
     }
 
     public boolean isInconsistencyDetectedEnabled() throws RemoteException {
@@ -530,7 +561,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private List<String> getAllContactsInSessionView() throws RemoteException {
         precondition();
         List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = tablePart.getTable();
+        SWTBotTable table = viewPart.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
             allContactsName.add(table.getTableItem(i).getText());
         }
@@ -544,12 +575,9 @@ public class SessionViewComponentImp extends EclipseComponent implements
             throw new RuntimeException(message);
         }
         precondition();
-        if (stateOfselectedUser.isDriver(jidOfSelectedUser))
-            tablePart.clickContextMenuOfTable(jidOfSelectedUser.getBase()
-                + ROLENAME, context);
-        else
-            tablePart.clickContextMenuOfTable(jidOfSelectedUser.getBase(),
-                context);
+        String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
+        tablePart.clickContextMenuOfTable(contactLabel, context);
+
     }
 
     private void selectUser(SarosState stateOfselectedUser, String message)
@@ -579,4 +607,5 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private List<SWTBotToolbarButton> getToolbarButtons() {
         return viewPart.getToolbarButtonsOnView(VIEWNAME);
     }
+
 }
