@@ -253,8 +253,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
              * Saving unsaved files is supposed to be done in
              * JoinSessionWizard#performFinish().
              */
-            if( !EditorAPI.existUnsavedFiles(baseProject) ) {
-            	log.error("Unsaved files detected.");
+            if (EditorAPI.existUnsavedFiles(baseProject)) {
+                log.error("Unsaved files detected.");
             }
         }
 
