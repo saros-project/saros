@@ -366,7 +366,7 @@ public class RosterView extends ViewPart {
                 final NetTransferMode transferMode = dataTransferManager
                     .getTransferMode(jid);
 
-                if (transferMode != null) {
+                if (transferMode != NetTransferMode.NONE) {
                     result.append(" Connected using: " + transferMode,
                         StyledString.QUALIFIER_STYLER);
                 }

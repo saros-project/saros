@@ -513,7 +513,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             log.error("UTF-8 is unsupported", e);
         }
 
-        if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
+        // if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
+        if (data == null
+            || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
             // send as XMPP Message
             sendMessageToProjectUser(recipient, extensionToSend);
         } else {

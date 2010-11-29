@@ -426,7 +426,7 @@ public class DataTransferManager implements IConnectionListener,
     public NetTransferMode getTransferMode(JID jid) {
         IBytestreamConnection connection = connections.get(jid);
         if (connection == null)
-            return null;
+            return NetTransferMode.NONE;
         return connection.getMode();
     }
 
@@ -521,13 +521,13 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     public enum NetTransferMode {
-        UNKNOWN("???", "???", false), //
+        NONE("", "", false), UNKNOWN("???", "???", false), //
         IBB("IBB", "XEP 47 In-Band Bytestream", false), //
         JINGLETCP("Jingle/TCP", "XEP 166 Jingle (TCP)", true), //
         JINGLEUDP("Jingle/UDP", "XEP 166 Jingle (UDP)", true), //
         HANDMADE("Chat", "Chat", false), //
         SOCKS5("SOCKS5", "XEP 65 SOCKS5", true), //
-        SOCKS5_MEDIATED("SOCKS5 (mediated)", "XEP 65 SOCKS5", true), //
+        SOCKS5_MEDIATED("SOCKS5 (mediated)", "XEP 65 SOCKS5", false), //
         SOCKS5_DIRECT("SOCKS5 (direct)", "XEP 65 SOCKS5", true);//
 
         private String name;
