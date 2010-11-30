@@ -156,8 +156,8 @@ public class ConcurrentDocumentClient implements Disposable {
 
         assert Util.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
 
-        TransformationResult result = new TransformationResult(sarosSession
-            .getLocalUser());
+        TransformationResult result = new TransformationResult(
+            sarosSession.getLocalUser());
 
         for (IActivity activityDataObject : activityDataObjects) {
             try {
@@ -187,8 +187,8 @@ public class ConcurrentDocumentClient implements Disposable {
      */
     protected TransformationResult receiveChecksum(ChecksumActivity activity) {
 
-        TransformationResult result = new TransformationResult(sarosSession
-            .getLocalUser());
+        TransformationResult result = new TransformationResult(
+            sarosSession.getLocalUser());
 
         try {
             if (jupiterClient.isCurrent(activity))
@@ -216,8 +216,8 @@ public class ConcurrentDocumentClient implements Disposable {
     protected TransformationResult receiveActivity(
         JupiterActivity jupiterActivity) {
 
-        TransformationResult result = new TransformationResult(sarosSession
-            .getLocalUser());
+        TransformationResult result = new TransformationResult(
+            sarosSession.getLocalUser());
 
         Operation op;
         try {
@@ -229,8 +229,8 @@ public class ConcurrentDocumentClient implements Disposable {
         }
 
         // Transform to TextEdit so it can be executed locally
-        for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
-            .getEditorPath(), jupiterActivity.getSource())) {
+        for (TextEditActivity textEdit : op.toTextEdit(
+            jupiterActivity.getEditorPath(), jupiterActivity.getSource())) {
 
             result.executeLocally.add(textEdit);
         }
@@ -239,9 +239,10 @@ public class ConcurrentDocumentClient implements Disposable {
         if (sarosSession.isHost()) {
             List<User> observers = sarosSession.getObservers();
             observers.remove(host);
-            for (IActivity activity : result.executeLocally) {
-                result.add(new QueueItem(observers, activity));
-            }
+            if (!observers.isEmpty())
+                for (IActivity activity : result.executeLocally) {
+                    result.add(new QueueItem(observers, activity));
+                }
         }
         return result;
     }
