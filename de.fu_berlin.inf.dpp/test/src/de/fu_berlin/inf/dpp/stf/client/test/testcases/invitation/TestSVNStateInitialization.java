@@ -126,7 +126,7 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testSimpleCheckout() throws RemoteException {
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
@@ -158,7 +158,7 @@ public class TestSVNStateInitialization extends STFTest {
     public void testCheckoutWithUpdate() throws RemoteException {
         alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV1);
         assertEquals(SVN_CLS1_REV1, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
 
@@ -189,7 +189,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
         assertEquals(SVN_CLS1_SWITCHED_URL,
             alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         bob.sessionV.waitUntilSessionOpen();
@@ -224,7 +224,7 @@ public class TestSVNStateInitialization extends STFTest {
         assertEquals(SVN_CLS1_SWITCHED_URL,
             alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         assertEquals(SVN_CLS1_REV3, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         bob.sessionV.waitUntilSessionOpen();
@@ -264,7 +264,7 @@ public class TestSVNStateInitialization extends STFTest {
             SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(cls1_content_after.equals(cls1_content_before));
 
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
         bob.sessionV.waitUntilSessionOpen();

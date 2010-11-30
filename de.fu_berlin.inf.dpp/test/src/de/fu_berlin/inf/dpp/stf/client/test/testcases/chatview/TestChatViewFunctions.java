@@ -45,7 +45,7 @@ public class TestChatViewFunctions extends STFTest {
         /*
          * alice build session with bob.
          */
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     /**

@@ -28,7 +28,7 @@ public class TestSessionViewComponent extends STFTest {
         log.trace("alice create a new proejct and a new class.");
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         log.trace("alice share session with bob.");
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     @AfterClass
@@ -41,7 +41,7 @@ public class TestSessionViewComponent extends STFTest {
     public void startUp() throws RemoteException {
         if (!alice.state.isInSession()) {
             bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-            alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
                 bob);
         }
         bob.workbench.openSarosViews();

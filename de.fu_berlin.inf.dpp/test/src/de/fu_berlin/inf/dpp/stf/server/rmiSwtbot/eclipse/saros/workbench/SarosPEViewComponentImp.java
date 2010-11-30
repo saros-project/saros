@@ -90,7 +90,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
         throws RemoteException {
         confirmFirstPageOfWizardSessionInvitation();
-        confirmSecondPageOfWizardSessionInvitationUsingNewproject(projectname);
+        confirmSecondPageOfWizardSessionInvitationUsingNewproject();
     }
 
     public void confirmWizardSessionInvitationUsingExistProject(
@@ -102,7 +102,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException {
         confirmFirstPageOfWizardSessionInvitation();
-        confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
+        confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
     }
 
     public void confirmWizardSessionInvitationUsingExistProjectWithCopy(
@@ -117,8 +117,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         basicPart.waitUntilButtonIsEnabled(FINISH);
     }
 
-    public void confirmSecondPageOfWizardSessionInvitationUsingNewproject(
-        String projectName) throws RemoteException {
+    public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()
+        throws RemoteException {
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
         windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
@@ -173,11 +173,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     }
 
-    public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
+    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException {
         bot.radio("Use existing project").click();
-        bot.button("Browse").click();
-        windowPart.confirmWindowWithTree("Folder Selection", OK, projectName);
+        bot.textWithLabel("Project name", 1).setText(projectName);
         bot.button(FINISH).click();
         windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, NO);
     }
@@ -185,12 +184,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
         bot.radio("Use existing project").click();
-        bot.button("Browse").click();
-        windowPart.confirmWindowWithTree("Folder Selection", OK, projectName);
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        windowPart.waitLongUntilShellCloses(SESSION_INVITATION);
+        windowPart.waitUntilShellCloses(SESSION_INVITATION);
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
@@ -225,11 +222,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         return windowPart.isShellActive(INVITATIONCANCELLED);
     }
 
-    public void closeWindowInvitaitonCancelled() throws RemoteException {
+    public void closeWindowInvitationCancelled() throws RemoteException {
         windowPart.closeShell(INVITATIONCANCELLED);
     }
 
-    public void waitUntilIsWindowInvitationCnacelledActive()
+    public void waitUntilWindowInvitationCnacelledActive()
         throws RemoteException {
         windowPart.waitUntilShellActive(INVITATIONCANCELLED);
     }
@@ -242,11 +239,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         windowPart.closeShell(SESSION_INVITATION);
     }
 
-    public void waitUntilWIndowSessionInvitationActive() throws RemoteException {
+    public void waitUntilWindowSessionInvitationActive() throws RemoteException {
         windowPart.waitUntilShellActive(SESSION_INVITATION);
     }
 
-    public void waitUntilIsWindowProblemOccurredActive() throws RemoteException {
+    public void waitUntilWindowProblemOccurredActive() throws RemoteException {
         windowPart.isShellActive(PROBLEMOCCURRED);
     }
 

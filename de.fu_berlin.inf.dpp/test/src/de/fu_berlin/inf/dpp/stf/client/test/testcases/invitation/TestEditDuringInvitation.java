@@ -49,6 +49,12 @@ public class TestEditDuringInvitation extends STFTest {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
+    /**
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
+     * 
+     * @throws RemoteException
+     */
     @AfterClass
     public static void resetSaros() throws RemoteException {
         carl.workbench.resetSaros();
@@ -56,6 +62,11 @@ public class TestEditDuringInvitation extends STFTest {
         alice.workbench.resetSaros();
     }
 
+    /**
+     * Closes all opened popup windows and editor.
+     * 
+     * @throws RemoteException
+     */
     @After
     public void cleanUp() throws RemoteException {
         carl.workbench.resetWorkbench();
@@ -86,12 +97,12 @@ public class TestEditDuringInvitation extends STFTest {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
 
         log.trace("alice.giveDriverRole");
         alice.sessionV.giveDriverRole(bob.state);
 
-        assertTrue(alice.state.isDriver());
+        assertTrue(bob.state.isDriver());
 
         log.trace("alice.inviteUser(carl");
         alice.sessionV.openInvitationInterface(carl.getBaseJid());
@@ -103,15 +114,19 @@ public class TestEditDuringInvitation extends STFTest {
         bob.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.pEV
-            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PKG1);
+        carl.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject();
 
         log.trace("getTextOfJavaEditor");
         String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,
             CLS1);
         String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
             CLS1);
+
+        String textFormBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
         assertTrue(textFromCarl.equals(textFormAlice));
+        assertTrue(textFromCarl.equals(textFormBob));
+        assertTrue(carl.sessionV.isInconsistencyDetectedEnabled());
 
         log.trace("testEditDuringInvitation done");
     }

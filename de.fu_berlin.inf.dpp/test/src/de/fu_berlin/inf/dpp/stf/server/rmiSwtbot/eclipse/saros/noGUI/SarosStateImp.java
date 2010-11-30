@@ -89,6 +89,8 @@ public class SarosStateImp extends StateImp implements SarosState {
         if (sarosSession == null)
             return false;
         User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
         log.debug("isDriver(" + jid.toString() + ") == "
             + sarosSession.getDrivers().contains(user));
         return sarosSession.getDrivers().contains(user);
@@ -121,14 +123,24 @@ public class SarosStateImp extends StateImp implements SarosState {
         return result;
     }
 
+    public boolean isHost() throws RemoteException {
+        return isHost(getJID());
+    }
+
     public boolean isHost(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
             return false;
-        final boolean result = sarosSession.getUser(jid) == sarosSession
-            .getHost();
+        User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
+        final boolean result = user == sarosSession.getHost();
         log.debug("isHost(" + jid.toString() + ") == " + result);
         return result;
+    }
+
+    public boolean isObserver() throws RemoteException {
+        return isObserver(getJID());
     }
 
     public boolean isObserver(JID jid) throws RemoteException {
@@ -136,6 +148,8 @@ public class SarosStateImp extends StateImp implements SarosState {
         if (sarosSession == null)
             return false;
         User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
         log.debug("isObserver(" + jid.toString() + ") == "
             + sarosSession.getObservers().contains(user));
         return sarosSession.getObservers().contains(user);
@@ -157,18 +171,21 @@ public class SarosStateImp extends StateImp implements SarosState {
         return result;
     }
 
+    public boolean isParticipant() throws RemoteException {
+        return isParticipant(getJID());
+    }
+
     public boolean isParticipant(JID jid) throws RemoteException {
         try {
             ISarosSession sarosSession = sessionManager.getSarosSession();
             if (sarosSession == null)
                 return false;
-            log.debug("isParticipant("
-                + jid.toString()
-                + ") == "
-                + sarosSession.getParticipants().contains(
-                    sarosSession.getUser(jid)));
-            return sarosSession.getParticipants().contains(
-                sarosSession.getUser(jid));
+            User user = sarosSession.getUser(jid);
+            if (user == null)
+                return false;
+            log.debug("isParticipant(" + jid.toString() + ") == "
+                + sarosSession.getParticipants().contains(user));
+            return sarosSession.getParticipants().contains(user);
         } catch (Exception e) {
             return false;
         }

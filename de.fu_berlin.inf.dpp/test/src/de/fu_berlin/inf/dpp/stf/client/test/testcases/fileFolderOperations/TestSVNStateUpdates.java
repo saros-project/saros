@@ -87,7 +87,7 @@ public class TestSVNStateUpdates extends STFTest {
         }
         MakeOperationConcurrently.workAll(initTasks, 1);
 
-        alice.shareProjectWithDone(SVN_PROJECT,
+        alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.state);
     }

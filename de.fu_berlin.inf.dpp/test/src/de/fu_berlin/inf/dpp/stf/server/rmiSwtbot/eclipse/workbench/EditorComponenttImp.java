@@ -115,7 +115,7 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {
-        closeEditorWithoutSave(className + SUFIX_JAVA);
+        closeEditorWithSave(className + SUFIX_JAVA);
         // Display.getDefault().syncExec(new Runnable() {
         // public void run() {
         // final IWorkbench wb = PlatformUI.getWorkbench();

@@ -31,7 +31,7 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     /**

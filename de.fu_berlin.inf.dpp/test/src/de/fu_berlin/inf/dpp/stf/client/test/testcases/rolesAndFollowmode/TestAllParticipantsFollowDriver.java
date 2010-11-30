@@ -64,8 +64,8 @@ public class TestAllParticipantsFollowDriver extends STFTest {
     }
 
     /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
      * 
      * @throws RemoteException
      */
@@ -77,16 +77,16 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         alice.workbench.resetSaros();
     }
 
+    /**
+     * bob, carl and dave follow alice.
+     */
     @Before
     public void setFollowMode() throws RemoteException, InterruptedException {
-        /*
-         * bob, carl and dave follow alice.
-         */
         alice.followedBy(bob, carl, dave);
     }
 
     /**
-     * make sure,all opened popup windows and editor should be closed.
+     * Closes all opened popup windows and editor.
      * 
      * @throws RemoteException
      */
@@ -98,13 +98,28 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         alice.workbench.resetWorkbench();
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice open a editor</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>bob, carl and dave's editor would be opened too.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
-    public void testFollowModeByOpenClassbyAlice() throws RemoteException {
+    public void followingUserOpenClassWhenFollowedUserOpenClass()
+        throws RemoteException {
         assertFalse(bob.editor.isJavaEditorOpen(CLS1));
         assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         assertFalse(dave.editor.isJavaEditorOpen(CLS1));
 
-        alice.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS1));
+        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         carl.editor.waitUntilJavaEditorOpen(CLS1);
         dave.editor.waitUntilJavaEditorOpen(CLS1);
@@ -116,7 +131,17 @@ public class TestAllParticipantsFollowDriver extends STFTest {
     }
 
     /**
-     * TODO it takes a lot of time to run the test, codes need to be optimized.
+     * Steps:
+     * <ol>
+     * <li>Alice open a editor and set text in the opened java editor without
+     * save.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>bob, carl and dave have the same dirty content as alice and their
+     * editor would be opened and activated too.</li>
+     * </ol>
      * 
      * @throws RemoteException
      */
@@ -149,34 +174,55 @@ public class TestAllParticipantsFollowDriver extends STFTest {
             ID_JAVA_EDITOR));
         assertTrue(dave.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1)
             .equals(dirtyClsContentOfAlice));
+
         bob.editor.closeJavaEditorWithSave(CLS1);
         carl.editor.closeJavaEditorWithSave(CLS1);
         dave.editor.closeJavaEditorWithSave(CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice open a class.</li>
+     * <li>Alice set text in the opened java editor and then close it with save.
+     * </li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>bob, carl and dave open the class too</li>
+     * <li>bob, carl and dave have the same class content as alice and their
+     * opened editor are closed too.</li>
+     * </ol>
+     * 
+     * @throws CoreException
+     * @throws IOException
+     */
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS1));
+        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         carl.editor.waitUntilJavaEditorOpen(CLS1);
         dave.editor.waitUntilJavaEditorOpen(CLS1);
+        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
+        assertTrue(carl.editor.isJavaEditorOpen(CLS1));
+        assertTrue(dave.editor.isJavaEditorOpen(CLS1));
+
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
-
         alice.editor.closeJavaEditorWithSave(CLS1);
         String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);
-        System.out.println("alice content: " + clsContentOfAlice);
+
         bob.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
         carl.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         dave.editor.waitUntilJavaEditorClosed(CLS1);
+        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
+        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         assertFalse(dave.editor.isJavaEditorOpen(CLS1));
-        System.out.println("bob content: "
-            + bob.state.getClassContent(PROJECT1, PKG1, CLS1));
+
         assertTrue(bob.state.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));
         assertTrue(carl.state.getClassContent(PROJECT1, PKG1, CLS1).equals(

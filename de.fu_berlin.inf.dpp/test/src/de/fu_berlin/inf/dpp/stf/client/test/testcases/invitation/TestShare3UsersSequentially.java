@@ -14,7 +14,16 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestShare3UsersSequentially extends STFTest {
-
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>Alice (Host, Driver)</li>
+     * <li>Bob (Observer)</li>
+     * <li>Carl (Observer)</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
@@ -23,6 +32,12 @@ public class TestShare3UsersSequentially extends STFTest {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
+    /**
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
+     * 
+     * @throws RemoteException
+     */
     @AfterClass
     public static void resetSaros() throws RemoteException {
         carl.workbench.resetSaros();
@@ -30,6 +45,11 @@ public class TestShare3UsersSequentially extends STFTest {
         alice.workbench.resetSaros();
     }
 
+    /**
+     * Closes all opened popup windows and editor.
+     * 
+     * @throws RemoteException
+     */
     @After
     public void cleanUp() throws RemoteException {
         carl.workbench.resetWorkbench();
@@ -37,38 +57,54 @@ public class TestShare3UsersSequentially extends STFTest {
         alice.workbench.resetWorkbench();
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice share project with bob and carl sequentially.</li>
+     * <li>Alice and bob leave the session.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Alice has the Role as participant and driver, bob has the role as
+     * participant and observer</li>
+     * <li>Alice and bob have no Role after leaving the session.</li>
+     * </ol>
+     * 
+     * @throws InterruptedException
+     */
     @Test
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
 
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl,
-            bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            carl, bob);
 
-        assertTrue(carl.state.isParticipant(carl.jid));
-        assertTrue(carl.state.isObserver(carl.jid));
-        assertTrue(carl.state.isParticipant(bob.jid));
-        assertTrue(carl.state.isObserver(bob.jid));
-        assertTrue(carl.state.isParticipant(alice.jid));
+        assertTrue(carl.state.isParticipant());
+        assertTrue(carl.state.isObserver());
+        assertFalse(carl.state.isDriver());
+
+        assertTrue(bob.state.isParticipant());
+        assertTrue(bob.state.isObserver());
+        assertFalse(bob.state.isDriver());
+
+        assertTrue(alice.state.isParticipant());
+        assertFalse(alice.state.isObserver());
         assertTrue(alice.state.isDriver());
 
-        assertTrue(bob.state.isParticipant(bob.jid));
-        assertTrue(bob.state.isObserver(bob.jid));
-        assertTrue(bob.state.isParticipant(carl.jid));
-        assertTrue(bob.state.isObserver(carl.jid));
-        assertTrue(bob.state.isParticipant(alice.jid));
-        assertTrue(bob.state.isDriver(alice.jid));
-
-        assertTrue(alice.state.isParticipant(alice.jid));
-        assertTrue(alice.state.isDriver(alice.jid));
-        assertTrue(alice.state.isParticipant(carl.jid));
-        assertTrue(alice.state.isObserver(carl.jid));
-        assertTrue(alice.state.isParticipant(bob.jid));
-        assertTrue(alice.state.isObserver(bob.jid));
-
         alice.leaveSessionFirstByPeers(carl, bob);
-        assertFalse(carl.state.isParticipant(carl.jid));
-        assertFalse(bob.state.isParticipant(bob.jid));
-        assertFalse(alice.state.isParticipant(alice.jid));
+
+        assertFalse(carl.state.isParticipant());
+        assertFalse(carl.state.isObserver());
+        assertFalse(carl.state.isDriver());
+
+        assertFalse(bob.state.isParticipant());
+        assertFalse(bob.state.isObserver());
+        assertFalse(bob.state.isDriver());
+
+        assertFalse(alice.state.isParticipant());
+        assertFalse(alice.state.isObserver());
+        assertFalse(alice.state.isDriver());
 
     }
 }

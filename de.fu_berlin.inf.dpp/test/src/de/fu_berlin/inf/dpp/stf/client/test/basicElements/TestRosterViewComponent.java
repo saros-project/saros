@@ -36,7 +36,7 @@ public class TestRosterViewComponent extends STFTest {
         bob = InitMusician.newBob();
         carl = InitMusician.newCarl();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
 
     /**

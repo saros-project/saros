@@ -16,6 +16,15 @@ import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestShareProjectUsingExistingProject extends STFTest {
 
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>Alice (Host, Driver)</li>
+     * <li>Bob (Observer)</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
@@ -32,6 +41,13 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
     }
 
+    /**
+     * Alice and bob leave the session<br/>
+     * alice and bob delete the PROJECT1<br/>
+     * Closes all opened popup windows and editor.
+     * 
+     * @throws RemoteException
+     */
     @After
     public void cleanUp() throws RemoteException, InterruptedException {
         alice.leaveSessionFirst(bob);
@@ -41,6 +57,12 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         alice.workbench.resetWorkbench();
     }
 
+    /**
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
+     * 
+     * @throws RemoteException
+     */
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
@@ -48,20 +70,24 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     }
 
     @Test
-    public void testShareProjectUsingExistingProject() throws RemoteException {
+    public void shareProjectUsingExistingProject() throws RemoteException {
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
         assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
-        assertFalse(bob.pEV.isClassExist(PROJECT2, PKG1, CLS1));
-        assertFalse(bob.pEV.isProjectExist(PROJECT2));
-
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
     }
 
     @Test
-    public void testShareProjectUsingExistingProjectWithCancelLocalChange()
+    public void testShareProjectFirstUsingExistingProjectWithCancelLocalChangeThenWithCopy()
         throws RemoteException {
+        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         bob.typeOfSharingProject = USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE;
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
         assertTrue(bob.pEV.isWIndowSessionInvitationActive());
         bob.pEV
             .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
@@ -71,19 +97,18 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
         assertTrue(bob.pEV.isClassExist(PROJECT1_NEXT, PKG1, CLS1));
         bob.pEV.deleteProject(PROJECT1_NEXT);
-
     }
 
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
         bob.typeOfSharingProject = USE_EXISTING_PROJECT_WITH_COPY;
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
         assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
         assertTrue(bob.pEV.isProjectExist(PROJECT1_NEXT));
         assertTrue(bob.pEV.isClassExist(PROJECT1_NEXT, PKG1, CLS1));
-
         bob.pEV.deleteProject(PROJECT1_NEXT);
 
     }

@@ -11,8 +11,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -38,7 +38,8 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
             MusicianConfigurationInfos.PORT_CARL);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -48,8 +49,8 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     }
 
     /**
-     * make sure, all opened xmppConnects, popup windows and editor are closed
-     * and all existed projects are deleted.
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
      * 
      * @throws RemoteException
      */
@@ -61,8 +62,8 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     }
 
     /**
-     * make sure,all opened popup windows and editors are closed.Set the line
-     * delimiter to default.
+     * Closes all opened popup windows and editors.<br/>
+     * Set the line delimiter to default.
      * 
      * @throws RemoteException
      */
@@ -107,7 +108,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         InterruptedException {
         alice.mainMenu.newTextFileLineDelimiter("Unix");
 
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl,
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl,
             bob);
 
         String delimiterByAlice = alice.mainMenu.getTextFileLineDelimiter();

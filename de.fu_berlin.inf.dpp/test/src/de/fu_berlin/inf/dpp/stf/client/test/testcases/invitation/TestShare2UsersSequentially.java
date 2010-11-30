@@ -18,6 +18,15 @@ public class TestShare2UsersSequentially extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestShare2UsersSequentially.class);
 
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>Alice (Host, Driver)</li>
+     * <li>Bob (Observer)</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @BeforeClass
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
@@ -25,24 +34,51 @@ public class TestShare2UsersSequentially extends STFTest {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
+    /**
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
+     * 
+     * @throws RemoteException
+     */
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
         alice.workbench.resetSaros();
     }
 
+    /**
+     * Closes all opened popup windows and editor.
+     * 
+     * @throws RemoteException
+     */
     @After
     public void cleanUp() throws RemoteException {
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>Alice share project with bob.</li>
+     * <li>Alice and bob leave the session.</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>Alice has the Role as participant and driver, bob has the role as
+     * participant and observer</li>
+     * <li>Alice and bob have no Role after leaving the session.</li>
+     * </ol>
+     * 
+     * @throws InterruptedException
+     */
     @Test
-    public void testShareProject2UsersSequentially() throws RemoteException,
+    public void aliceShareProjectWithBobSequentially() throws RemoteException,
         InterruptedException {
         log.trace("testShareProject enter");
 
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
         bob.basic
             .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice.basic
@@ -51,21 +87,27 @@ public class TestShare2UsersSequentially extends STFTest {
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
 
         log.trace("invitee.openFile");
-        bob.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS1));
+        bob.pEV.openClass(PROJECT1, PKG1, CLS1);
 
-        // invitee.sleep(2000);
-        assertTrue(bob.state.isParticipant(bob.jid));
-        assertTrue(bob.state.isObserver(bob.jid));
-        assertTrue(bob.state.isParticipant(alice.jid));
+        assertTrue(bob.state.isParticipant());
+        assertTrue(alice.state.isParticipant());
+
+        assertTrue(bob.state.isObserver());
+        assertFalse(alice.state.isObserver());
+
         assertTrue(alice.state.isDriver());
-
-        assertTrue(alice.state.isParticipant(alice.jid));
-        assertTrue(alice.state.isDriver(alice.jid));
-        assertTrue(alice.state.isParticipant(bob.jid));
-        assertTrue(alice.state.isObserver(bob.jid));
+        assertFalse(bob.state.isDriver());
 
         alice.leaveSessionFirstByPeers(bob);
-        assertFalse(bob.state.isParticipant(bob.jid));
-        assertFalse(alice.state.isParticipant(alice.jid));
+
+        assertFalse(bob.state.isParticipant());
+        assertFalse(alice.state.isParticipant());
+
+        assertFalse(bob.state.isObserver());
+        assertFalse(alice.state.isObserver());
+
+        assertFalse(alice.state.isDriver());
+        assertFalse(bob.state.isDriver());
+
     }
 }

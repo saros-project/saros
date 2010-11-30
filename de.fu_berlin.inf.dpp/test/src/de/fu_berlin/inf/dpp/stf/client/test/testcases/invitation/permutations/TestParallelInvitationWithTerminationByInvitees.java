@@ -52,12 +52,11 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         carl = musicians.get(2);
         dave = musicians.get(3);
         edna = musicians.get(4);
-
     }
 
     /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
      * 
      * @throws RemoteException
      */
@@ -71,7 +70,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
     }
 
     /**
-     * make sure,all opened popup windows and editor should be closed.
+     * Closes all opened popup windows and editor.
      * 
      * @throws RemoteException
      */
@@ -109,7 +108,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
      * @throws InterruptedException
      */
     @Test
-    public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
+    public void parallelInvitationWihtTerminationByInvitees()
         throws IOException, CoreException, InterruptedException {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
@@ -118,35 +117,35 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
          */
         alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid(), edna.getBaseJid());
-        bob.pEV.waitUntilWIndowSessionInvitationActive();
+
+        bob.pEV.waitUntilWindowSessionInvitationActive();
         bob.basic.clickButton(CANCEL);
-        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             bob.getName() + ".*"));
+
         alice.basic.clickButton(OK);
 
-        carl.pEV.waitUntilWIndowSessionInvitationActive();
+        carl.pEV.waitUntilWindowSessionInvitationActive();
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
         carl.basic.clickButton(CANCEL);
-        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             carl.getName() + ".*"));
         alice.basic.clickButton(OK);
 
         dave.pEV.isWIndowSessionInvitationActive();
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
-        // dave.bot.clickButton(SarosConstant.BUTTON_FINISH);
         dave.basic.clickButton(CANCEL);
-        alice.pEV.waitUntilIsWindowProblemOccurredActive();
+        alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             dave.getName() + ".*"));
         alice.basic.clickButton(OK);
 
         edna.pEV.isWIndowSessionInvitationActive();
-        edna.pEV.confirmFirstPageOfWizardSessionInvitation();
-        edna.pEV
-            .confirmSecondPageOfWizardSessionInvitationUsingNewproject(PROJECT1);
+        edna.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
-        assertFalse(edna.state.isDriver());
+        assertFalse(edna.sessionV.isInSession());
+        assertFalse(alice.state.isObserver(edna.jid));
     }
 }

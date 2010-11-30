@@ -52,7 +52,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * and then the invited users confirm the popup window
      * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
      * . Since the share session process is very often used, so a convenient
-     * method {@link Musician#shareProjectWithDone(String, String, Musician...)}
+     * method {@link Musician#buildSessionSequentially(String, String, Musician...)}
      * is defined, which build the sharing session completely.</li>
      * </ol>
      * 
@@ -68,7 +68,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
-     * @see Musician#shareProjectWithDone(String, String, Musician...)
+     * @see Musician#buildSessionSequentially(String, String, Musician...)
      */
     public void shareProjectWith(String projectName, String howToShareProject,
         String[] inviteeBaseJIDs) throws RemoteException;
@@ -90,7 +90,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * then the invited users confirm the popup window
      * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
      * . Since the share session process is very often used, so a convenient
-     * method {@link Musician#shareProjectWithDone(String, String, Musician...)}
+     * method {@link Musician#buildSessionSequentially(String, String, Musician...)}
      * is defined, which build the sharing session completely.</li>
      * </ol>
      * 
@@ -101,7 +101,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
-     * @see Musician#shareProjectWithDone(String, String, Musician...)
+     * @see Musician#buildSessionSequentially(String, String, Musician...)
      */
     public void shareProject(String projectName, String... inviteeBaseJIDS)
         throws RemoteException;
@@ -120,7 +120,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * @throws RemoteException
      * @see WindowPart#closeShell(String)
      */
-    public void closeWindowInvitaitonCancelled() throws RemoteException;
+    public void closeWindowInvitationCancelled() throws RemoteException;
 
     /**
      * waits until the popup window with the title "Invitation cancel" is
@@ -129,7 +129,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * @throws RemoteException
      * @see WindowPart#waitUntilShellActive(String)
      */
-    public void waitUntilIsWindowInvitationCnacelledActive()
+    public void waitUntilWindowInvitationCnacelledActive()
         throws RemoteException;
 
     /**
@@ -156,7 +156,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * @throws RemoteException
      * @see WindowPart#waitUntilShellActive(String)
      */
-    public void waitUntilWIndowSessionInvitationActive() throws RemoteException;
+    public void waitUntilWindowSessionInvitationActive() throws RemoteException;
 
     /**
      * After host canceled the invitation process of a invitee, a popup window
@@ -196,13 +196,11 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * by the invitees' side. This method confirm the second page of the wizard,
      * whereas check the radio button "Create new project".
      * 
-     * @param projectName
-     *            the name of the project located in the packageExplorer view
-     *            which you want to share with others.
+     * 
      * @throws RemoteException
      */
-    public void confirmSecondPageOfWizardSessionInvitationUsingNewproject(
-        String projectName) throws RemoteException;
+    public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()
+        throws RemoteException;
 
     /**
      * After the {@link SarosPEViewComponent#confirmWindowInvitation(String...)}
@@ -249,7 +247,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            which you want to share with others.
      * @throws RemoteException
      */
-    public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
+    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException;
 
     /**
@@ -320,7 +318,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsWindowProblemOccurredActive() throws RemoteException;
+    public void waitUntilWindowProblemOccurredActive() throws RemoteException;
 
     /**
      * 

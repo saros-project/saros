@@ -15,9 +15,9 @@ public interface ProgressViewComponent extends Remote {
 
     public boolean isProgressViewOpen() throws RemoteException;
 
-    public void cancelInvitation() throws RemoteException;
+    // public void cancelInvitation() throws RemoteException;
 
-    public void cancelInvitation(int index) throws RemoteException;
+    public void removeProcess(int index) throws RemoteException;
 
     public void waitUntilNoInvitationProgress() throws RemoteException;
 }

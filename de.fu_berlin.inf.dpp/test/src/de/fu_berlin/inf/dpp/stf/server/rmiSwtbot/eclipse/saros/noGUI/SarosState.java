@@ -63,13 +63,25 @@ public interface SarosState extends State {
 
     /**
      * 
+     * @return <tt>true</tt>, if the local user is a host.
+     * @throws RemoteException
+     */
+    public boolean isHost() throws RemoteException;
+
+    /**
+     * 
      * @param jid
-     * @return <tt>true</tt>, if the host specifed by the given jid is the
-     *         person that initiated this SarosSession and holds all original
-     *         files.
+     *            the JID of the user.
+     * @return <tt>true</tt>, if the user specified by the given jid is a host.
      * @throws RemoteException
      */
     public boolean isHost(JID jid) throws RemoteException;
+
+    /**
+     * @return <tt>true</tt>, if the local user is a observer in this
+     *         {@link SharedProject}.
+     */
+    public boolean isObserver() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the given {@link JID} is a observer in this
@@ -83,7 +95,15 @@ public interface SarosState extends State {
     public boolean areObservers(List<JID> jids) throws RemoteException;
 
     /**
-     * @return <tt>true</tt>, if the given {@link JID} is a participant of our
+     * 
+     * @return <tt>true</tt>, if the local user is a participant of the
+     *         {@link SharedProject}.
+     * @throws RemoteException
+     */
+    public boolean isParticipant() throws RemoteException;
+
+    /**
+     * @return <tt>true</tt>, if the given {@link JID} is a participant of the
      *         {@link SharedProject}.
      */
     public boolean isParticipant(JID jid) throws RemoteException;

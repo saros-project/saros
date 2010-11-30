@@ -57,7 +57,7 @@ public class ProgressViewComponentImp extends EclipseComponent implements
     public void removeProgress() throws RemoteException {
         openProgressView();
         activateProgressView();
-        SWTBotView view = bot.viewByTitle("Progress");
+        SWTBotView view = bot.viewByTitle(VIEWNAME);
         view.setFocus();
         SWTBot bot = view.bot();
         SWTBotToolbarButton b = bot.toolbarButton();
@@ -68,23 +68,23 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         return viewPart.isViewOpen("Progress");
     }
 
-    /**
-     * end the invitation process. ie. Click the red stop icon in Progress view.
-     */
-    public void cancelInvitation() throws RemoteException {
-        openProgressView();
-        activateProgressView();
-        SWTBotView view = bot.viewByTitle("Progress");
-        view.setFocus();
-        SWTBot bot = view.bot();
-        SWTBotToolbarButton b = bot.toolbarButton();
-        b.click();
-    }
+    // /**
+    // * end the invitation process. ie. Click the red stop icon in Progress
+    // view.
+    // */
+    // public void cancelInvitation() throws RemoteException {
+    // openProgressView();
+    // activateProgressView();
+    // SWTBotView view = bot.viewByTitle(VIEWNAME);
+    // view.setFocus();
+    // SWTBot bot = view.bot();
+    // SWTBotToolbarButton b = bot.toolbarButton();
+    // b.click();
+    // }
 
-    public void cancelInvitation(int index) throws RemoteException {
-        openProgressView();
-        activateProgressView();
-        SWTBotView view = bot.viewByTitle("Progress");
+    public void removeProcess(int index) throws RemoteException {
+        preCondition();
+        SWTBotView view = bot.viewByTitle(VIEWNAME);
         view.toolbarButton("Remove All Finished Operations").click();
         view.setFocus();
         SWTBot bot = view.bot();
@@ -102,6 +102,11 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         openProgressView();
         activateProgressView();
         bot.waitUntil(SarosConditions.existNoInvitationProgress(bot), 100000);
+    }
+
+    private void preCondition() throws RemoteException {
+        openProgressView();
+        activateProgressView();
     }
 
 }

@@ -57,7 +57,7 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
          * alice build session with carl and is followed by carl.
          */
         bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-        alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl);
         alice.followedBy(carl);
     }
 

@@ -13,8 +13,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -40,18 +40,19 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE);
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
         dave = musicians.get(3);
-
     }
 
     /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
+     * Closes all opened xmppConnects, popup windows and editor.<br/>
+     * Delete all existed projects.
      * 
      * @throws RemoteException
      */
@@ -64,7 +65,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
     }
 
     /**
-     * make sure,all opened popup windows and editor should be closed.
+     * Closes all opened popup windows and editor.
      * 
      * @throws RemoteException
      */
@@ -104,10 +105,9 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
      * @throws IOException
      * @throws InterruptedException
      */
-
     @Test
-    public void testExistDirtyFlagByDaveAndEdnaDuringAlicMakeChange()
-        throws IOException, CoreException, InterruptedException {
+    public void parallelInvitationWithTerminationByHost() throws IOException,
+        CoreException, InterruptedException {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
 
         /*
@@ -116,26 +116,26 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid());
 
-        bob.pEV.waitUntilWIndowSessionInvitationActive();
-        alice.progressV.cancelInvitation(0);
-        bob.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        bob.pEV.waitUntilWindowSessionInvitationActive();
+        alice.progressV.removeProcess(0);
+        bob.pEV.waitUntilWindowInvitationCnacelledActive();
         assertTrue(bob.pEV.isWindowInvitationCancelledActive());
-        bob.pEV.closeWindowInvitaitonCancelled();
+        bob.pEV.closeWindowInvitationCancelled();
 
-        carl.pEV.waitUntilWIndowSessionInvitationActive();
+        carl.pEV.waitUntilWindowSessionInvitationActive();
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
-        alice.progressV.cancelInvitation(0);
-        carl.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        alice.progressV.removeProcess(0);
+        carl.pEV.waitUntilWindowInvitationCnacelledActive();
         assertTrue(carl.pEV.isWindowInvitationCancelledActive());
-        carl.pEV.closeWindowInvitaitonCancelled();
+        carl.pEV.closeWindowInvitationCancelled();
 
-        dave.pEV.waitUntilWIndowSessionInvitationActive();
+        dave.pEV.waitUntilWindowSessionInvitationActive();
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
         dave.basic.clickButton(FINISH);
-        alice.progressV.cancelInvitation(0);
-        dave.pEV.waitUntilIsWindowInvitationCnacelledActive();
+        alice.progressV.removeProcess(0);
+        dave.pEV.waitUntilWindowInvitationCnacelledActive();
         assertTrue(dave.pEV.isWindowInvitationCancelledActive());
-        dave.pEV.closeWindowInvitaitonCancelled();
+        dave.pEV.closeWindowInvitationCancelled();
 
     }
 }

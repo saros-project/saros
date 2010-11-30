@@ -114,7 +114,7 @@ public class Musician extends STFTest {
 
     // ********** Component, which consist of other simple functions ***********
 
-    public void shareProjectWithDone(String projectName,
+    public void buildSessionSequentially(String projectName,
         String howToShareProject, Musician... invitees) throws RemoteException {
         String[] inviteeBaseJIDs = new String[invitees.length];
         for (int i = 0; i < invitees.length; i++) {
