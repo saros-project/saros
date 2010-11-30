@@ -28,6 +28,7 @@ public class TestChangingNameInRosterView extends STFTest {
     public static void initMusicians() throws RemoteException {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
+        carl = InitMusician.newCarl();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.shareProjectWithDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
     }
@@ -42,6 +43,7 @@ public class TestChangingNameInRosterView extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
+        carl.workbench.resetSaros();
         alice.workbench.resetSaros();
     }
 
@@ -52,13 +54,34 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @After
     public void cleanUp() throws RemoteException {
-        alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
+        if (alice.state.hasBuddyNickName(bob.jid)) {
+            alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
+        }
+        if (!alice.rosterV.hasBuddy(bob.jid)) {
+            alice.addBuddyDone(bob);
+        }
         bob.workbench.resetWorkbench();
+        carl.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
 
+    /**
+     * Steps:
+     * <ol>
+     * <li>alice rename bob to "bob_stf".</li>
+     * <li>alice rename bob to "new bob".</li>
+     * </ol>
+     * 
+     * Result:
+     * <ol>
+     * <li>alice hat contact with bob and bob'name is changed.</li>
+     * <li>alice hat contact with bob and bob'name is changed.</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     @Test
-    public void testRenameInRosterView() throws RemoteException {
+    public void renameBuddyInRosterView() throws RemoteException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
         alice.rosterV.renameBuddy(bob.jid, bob.getName());
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
@@ -69,4 +92,5 @@ public class TestChangingNameInRosterView extends STFTest {
         assertTrue(alice.state.getBuddyNickName(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
+
 }

@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.HelperPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.MenuPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.PerspectivePart;
@@ -103,7 +102,6 @@ public class STFController {
         EclipseComponent.treePart = new TreePart();
         EclipseComponent.viewPart = new ViewPart();
         EclipseComponent.perspectivePart = new PerspectivePart();
-        EclipseComponent.editorPart = new EditorPart();
         EclipseComponent.helperPart = new HelperPart();
         EclipseComponent.menuPart = new MenuPart();
         EclipseComponent.windowPart = new WindowPart();

@@ -4,33 +4,27 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 
-public class IsClassContentsSame extends DefaultCondition {
+public class IsFileContentsSame extends DefaultCondition {
 
     private StateImp state;
 
-    private String projectName;
-    private String pkg;
-    private String className;
+    private String[] fileNodes;
     private String otherClassContent;
 
-    IsClassContentsSame(StateImp state, String projectName, String pkg,
-        String className, String otherClassContent) {
+    IsFileContentsSame(StateImp state, String otherClassContent,
+        String... fileNodes) {
         this.state = state;
-        this.projectName = projectName;
-        this.pkg = pkg;
-        this.className = className;
+        this.fileNodes = fileNodes;
         this.otherClassContent = otherClassContent;
 
     }
 
     public String getFailureMessage() {
-
         return null;
     }
 
     public boolean test() throws Exception {
-        String classContent = state
-            .getClassContent(projectName, pkg, className);
+        String classContent = state.getFileContent(fileNodes);
         return classContent.equals(otherClassContent);
     }
 }

@@ -1,17 +1,20 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class EditorComponenttImp extends EclipseComponent implements
     EditorComponent {
-    // public static EclipseEditorObjectImp classVariable;
 
     private static transient EditorComponenttImp self;
 
@@ -25,154 +28,94 @@ public class EditorComponenttImp extends EclipseComponent implements
         return self;
     }
 
-    /**
-     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
-     * file, which is modified by another peer (e.g. Alice). Because of data
-     * transfer delay Bob need to wait a minute to see the changes . So it will
-     * be a good idea that you give bob some time before you compare the two
-     * files from Alice and Bob.
+    /***********************************************************************
      * 
-     * <p>
-     * <b>Note:</b> the mothod is different from
-     * {@link #waitUntilClassContentsSame(String, String, String, String)}. this
-     * method compare only the contents of the class files which may be not
-     * saved.
-     * </p>
-     * * *
-     */
-    public void waitUntilEditorContentSame(String otherClassContent,
-        String... filePath) throws RemoteException {
-        waitUntil(SarosConditions.isEditorContentsSame(this, otherClassContent,
-            filePath));
+     * exported functions
+     * 
+     ***********************************************************************/
+
+    /**********************************************
+     * 
+     * open/activate/close a editor
+     * 
+     **********************************************/
+
+    public boolean isEditorOpen(String fileName) throws RemoteException {
+        return getTitlesOfAllOpenedEditors().contains(fileName);
     }
 
-    public void waitUntilJavaEditorContentSame(String otherClassContent,
-        String projectName, String pkg, String className)
-        throws RemoteException {
-        waitUntil(SarosConditions.isEditorContentsSame(this, otherClassContent,
-            projectName, "src", pkg, className + ".java"));
+    public void waitUntilEditorOpen(String fileName) throws RemoteException {
+        waitUntil(SarosConditions.isEditorOpen(this, fileName));
     }
 
-    public void waitUntilJavaEditorActive(String className)
-        throws RemoteException {
-        waitUntilEditorActive(className + ".java");
+    public boolean isJavaEditorOpen(String className) throws RemoteException {
+        return isEditorOpen(className + SUFIX_JAVA);
     }
 
     public void waitUntilJavaEditorOpen(String className)
         throws RemoteException {
-        waitUntilEditorOpen(className + ".java");
+        waitUntilEditorOpen(className + SUFIX_JAVA);
     }
 
-    public void waitUntilJavaEditorClosed(String className)
-        throws RemoteException {
-        waitUntilEditorClosed(className + ".java");
-    }
-
-    public void waitUntilEditorClosed(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorClosed(this, name));
-    }
-
-    public void waitUntilEditorOpen(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorOpen(this, name));
+    public void activateEditor(String fileName) throws RemoteException {
+        try {
+            bot.editorByTitle(fileName).setFocus();
+        } catch (TimeoutException e) {
+            log.warn("The tab" + fileName + " does not activate '", e);
+        }
     }
 
     public void waitUntilEditorActive(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorActive(editorPart, name));
+        waitUntil(SarosConditions.isEditorActive(this, name));
     }
 
-    public boolean isJavaEditorOpen(String javaEditorName)
+    public void activateJavaEditor(String className) throws RemoteException {
+        activateEditor(className + SUFIX_JAVA);
+    }
+
+    public void waitUntilJavaEditorActive(String className)
         throws RemoteException {
-        return editorPart.isEditorOpen(javaEditorName + ".java");
+        waitUntilEditorActive(className + SUFIX_JAVA);
     }
 
-    public boolean isFileOpen(String fileName) throws RemoteException {
-        return editorPart.isEditorOpen(fileName);
+    public boolean isEditorActive(String fileName) throws RemoteException {
+        try {
+            return bot.activeEditor().getTitle().equals(fileName);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
     }
 
     public boolean isJavaEditorActive(String className) throws RemoteException {
         if (!isJavaEditorOpen(className))
             return false;
-        return editorPart.isEditorActive(className + ".java");
+        return isEditorActive(className + SUFIX_JAVA);
     }
 
-    public String getJavaTextOnLine(String projectName, String packageName,
-        String className, int line) throws RemoteException {
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        return getJavaEditor(className).getTextOnLine(line);
+    public void closeEditorWithSave(String fileName) throws RemoteException {
+        if (isEditorOpen(fileName)) {
+            activateEditor(fileName);
+            getEditor(fileName).save();
+            getEditor(fileName).close();
+        }
     }
 
-    public int getJavaCursorLinePosition(String projectName,
-        String packageName, String className) throws RemoteException {
-        // openJavaFileWithEditor(projectName, packageName, className);
-        activateJavaEditor(className);
-        SWTBotEclipseEditor editor = getJavaEditor(className);
-        log.info("cursorPosition: " + editor.cursorPosition().line);
-        return editor.cursorPosition().line;
+    public void closeEditorWithoutSave(String fileName) throws RemoteException {
+        if (isEditorOpen(fileName)) {
+            activateEditor(fileName);
+            getEditor(fileName).close();
+            if (windowPart.isShellActive("Save Resource"))
+                confirmWindowSaveSource(YES);
+        }
     }
 
-    public RGB getJavaLineBackground(String projectName, String packageName,
-        String className, int line) throws RemoteException {
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        return getJavaEditor(className).getLineBackground(line);
+    public void waitUntilEditorClosed(String fileName) throws RemoteException {
+        waitUntil(SarosConditions.isEditorClosed(this, fileName));
     }
-
-    public SWTBotEclipseEditor getJavaEditor(String className)
-        throws RemoteException {
-        return editorPart.getTextEditor(className + ".java");
-    }
-
-    public void activateJavaEditor(String className) throws RemoteException {
-        editorPart.activateEditor(className + ".java");
-    }
-
-    public void activateEditor(String fileName) throws RemoteException {
-        editorPart.activateEditor(fileName);
-    }
-
-    /**
-     * get content of a class file, which may be not saved.
-     */
-    public String getTextOfJavaEditor(String projectName, String packageName,
-        String className) throws RemoteException {
-        String[] classNodes = getClassNodes(projectName, packageName, className);
-        String[] regexNodes = helperPart.changeToRegex(classNodes);
-        peVC.openFile(regexNodes);
-        activateJavaEditor(className);
-        return editorPart.getTextEditor(className + ".java").getText();
-    }
-
-    public String getTextOfEditor(String... filepath) throws RemoteException {
-        peVC.openFile(filepath);
-        String fileName = filepath[filepath.length - 1];
-        activateEditor(fileName);
-        return editorPart.getTextEditor(fileName).getText();
-    }
-
-    public void selectLineInJavaEditor(int line, String fileName)
-        throws RemoteException {
-        editorPart.selectLineInEditor(line, fileName + ".java");
-    }
-
-    public void setBreakPoint(int line, String projectName, String packageName,
-        String className) throws RemoteException {
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        selectLineInJavaEditor(line, className);
-        menuPart.clickMenuWithTexts("Run", "Toggle Breakpoint");
-
-    }
-
-    // public void closeAllOpenedEditors() throws RemoteException {
-    // delegate.closeAllEditors();
-    // }
 
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {
-        activateJavaEditor(className);
-        getJavaEditor(className).save();
-        getJavaEditor(className).close();
+        closeEditorWithoutSave(className + SUFIX_JAVA);
         // Display.getDefault().syncExec(new Runnable() {
         // public void run() {
         // final IWorkbench wb = PlatformUI.getWorkbench();
@@ -188,43 +131,201 @@ public class EditorComponenttImp extends EclipseComponent implements
         // });
     }
 
-    public void closeEditorWithSave(String fileName) throws RemoteException {
-        activateEditor(fileName);
-        editorPart.getTextEditor(fileName).save();
-        editorPart.getTextEditor(fileName).close();
-    }
-
-    public void closeEditorWithoutSave(String fileName) throws RemoteException {
-        activateEditor(fileName);
-        editorPart.getTextEditor(fileName).close();
-        windowPart.confirmWindow("Save Resource", YES);
-    }
-
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
-        activateJavaEditor(className);
-        getJavaEditor(className).close();
-        windowPart.confirmWindow("Save Resource", YES);
+        closeEditorWithoutSave(className + SUFIX_JAVA);
     }
 
-    /**
-     * Returns whether the contents of this class file have changed since the
-     * last save operation.
-     * <p>
-     * <b>Note:</b> if the class file isn't open, it will be opened first using
-     * the defined editor (parameter: idOfEditor).
-     * </p>
+    public void waitUntilJavaEditorClosed(String className)
+        throws RemoteException {
+        waitUntilEditorClosed(className + SUFIX_JAVA);
+    }
+
+    public void confirmWindowSaveSource(String buttonType)
+        throws RemoteException {
+        windowPart.waitUntilShellActive("Save Resource");
+        windowPart.confirmWindow("Save Resource", buttonType);
+    }
+
+    // public void closeAllOpenedEditors() throws RemoteException {
+    // bot.closeAllEditors();
+    // }
+
+    /**********************************************
      * 
-     * @return <code>true</code> if the contents have been modified and need
-     *         saving, and <code>false</code> if they have not changed since the
-     *         last save
-     */
+     * get contents infos of a editor
+     * 
+     **********************************************/
+
+    public String getTextOfEditor(String... fileNodes) throws RemoteException {
+        String fileName = fileNodes[fileNodes.length - 1];
+        precondition(fileNodes);
+        return getEditor(fileName).getText();
+    }
+
+    public String getTextOfJavaEditor(String projectName, String packageName,
+        String className) throws RemoteException {
+        return getTextOfEditor(getClassNodes(projectName, packageName,
+            className));
+    }
+
+    public String getJavaTextOnLine(String projectName, String pkg,
+        String className, int line) throws RemoteException {
+        precondition(getClassNodes(projectName, pkg, className));
+        return getJavaEditor(className).getTextOnLine(line);
+    }
+
+    public void selectLineInEditor(int line, String fileName)
+        throws RemoteException {
+        getEditor(fileName).selectLine(line);
+    }
+
+    public void selectLineInJavaEditor(int line, String className)
+        throws RemoteException {
+        selectLineInEditor(line, className + SUFIX_JAVA);
+    }
+
+    public int getJavaCursorLinePosition(String className)
+        throws RemoteException {
+        activateJavaEditor(className);
+        return getJavaEditor(className).cursorPosition().line;
+    }
+
+    public RGB getJavaLineBackground(String className, int line)
+        throws RemoteException {
+        return getJavaEditor(className).getLineBackground(line);
+    }
+
+    public SWTBotEclipseEditor getEditor(String fileName)
+        throws RemoteException {
+        SWTBotEditor editor = bot.editorByTitle(fileName);
+        return editor.toTextEditor();
+    }
+
+    public SWTBotEclipseEditor getJavaEditor(String className)
+        throws RemoteException {
+        return getEditor(className + SUFIX_JAVA);
+    }
+
+    /**********************************************
+     * 
+     * set contents of a editor
+     * 
+     **********************************************/
+    public void setTextInEditorWithSave(String contentPath, String... fileNodes)
+        throws RemoteException {
+        String contents = state.getTestFileContents(contentPath);
+        String fileName = fileNodes[fileNodes.length - 1];
+        precondition(fileNodes);
+        // e.setFocus();
+        // e.pressShortcut(Keystrokes.LF);
+        getEditor(fileName).setText(contents);
+        getEditor(fileName).save();
+    }
+
+    public void waitUntilEditorContentSame(String otherClassContent,
+        String... fileNodes) throws RemoteException {
+        waitUntil(SarosConditions.isEditorContentsSame(this, otherClassContent,
+            fileNodes));
+    }
+
+    public void setTextInJavaEditorWithSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
+        setTextInEditorWithSave(contentPath,
+            getClassNodes(projectName, packageName, className));
+        // Display.getDefault().syncExec(new Runnable() {
+        // public void run() {
+        // final IWorkbench wb = PlatformUI.getWorkbench();
+        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+        // log.debug("shell name: " + win.getShell().getText());
+        // win.getShell().forceActive();
+        // win.getShell().forceFocus();
+        // }
+        // });
+        // e.setFocus();
+
+        // e.typeText("hallo wie geht es dir !%%%");
+        // e.pressShortcut(Keystrokes.LF);
+        // e.typeText("mir geht es gut!");
+        // delegate.sleep(2000);
+        //
+        // delegate.sleep(2000);
+
+        // editorObject.setTextinEditorWithSave(contents, className + ".java");
+    }
+
+    public void waitUntilJavaEditorContentSame(String otherClassContent,
+        String projectName, String pkg, String className)
+        throws RemoteException {
+        waitUntilEditorContentSame(otherClassContent,
+            getClassNodes(projectName, pkg, className));
+    }
+
+    public void setTextInEditorWithoutSave(String contentPath,
+        String... fileNodes) throws RemoteException {
+        String contents = state.getTestFileContents(contentPath);
+        String fileName = fileNodes[fileNodes.length - 1];
+        precondition(fileNodes);
+        getEditor(fileName).setText(contents);
+    }
+
+    public void setTextInJavaEditorWithoutSave(String contentPath,
+        String projectName, String packageName, String className)
+        throws RemoteException {
+        setTextInEditorWithoutSave(contentPath,
+            getClassNodes(projectName, packageName, className));
+    }
+
+    public void typeTextInEditor(String text, String... fileNodes)
+        throws RemoteException {
+        String fileName = fileNodes[fileNodes.length - 1];
+        precondition(fileNodes);
+        getEditor(fileName).typeText(text);
+        // e.navigateTo(3, 0);
+        // e.autoCompleteProposal("main", "main - main method");
+        // e.autoCompleteProposal("sys", "sysout - print to standard out");
+        // e.typeText("System.currentTimeMillis()");
+        // // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
+        // // SWTBotEclipseEditor e = getTextEditor(fileName);
+        // // e.navigateTo(3, 0);
+        // // e.pressShortcut(SWT.CTRL, '.');
+        // // e.quickfix("Add unimplemented methods");
+        // // e.navigateTo(7, 0);
+        // //
+        // // e.navigateTo(3, 0);
+        // // e.autoCompleteProposal("main", "main - main method");
+        // // e.autoCompleteProposal("sys", "sysout - print to standard out");
+        // // e.typeText("System.currentTimeMillis()");
+        //
+        // // e.typeText("thread.start();\n");
+        // // e.typeText("thread.join();");
+        // // SWTBotPreferences.KEYBOARD_LAYOUT = "DE_DE";
+        // // e.quickfix("Add throws declaration");
+        // // e.pressShortcut(SWT.NONE, (char) 27);
+        // // e.pressShortcut(SWT.NmainONE, '\n');
+        // //
+        // // e.pressShortcut(SWT.CTRL, 's');
+        // //
+        // // e.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
+        // // e.pressShortcut(SWT.NONE, 'j');
+    }
+
+    public void typeTextInJavaEditor(String text, String projectName,
+        String packageName, String className) throws RemoteException {
+        typeTextInEditor(text,
+            getClassNodes(projectName, packageName, className));
+    }
+
+    public boolean isFileDirty(String... fileNodes) throws RemoteException {
+        String fileName = fileNodes[fileNodes.length - 1];
+        precondition(fileNodes);
+        return getEditor(fileName).isDirty();
+    }
+
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException {
-        if (!editorC.isJavaEditorOpen(className)) {
-            peVC.openClass(projectName, pkg, className);
-        }
-        return getJavaEditor(className).isDirty();
+        return isFileDirty(getClassNodes(projectName, pkg, className));
         // final List<Boolean> results = new ArrayList<Boolean>();
         // IPath path = new Path(getClassPath(projectName, pkg, className));
         // final IFile file = ResourcesPlugin.getWorkspace().getRoot()
@@ -250,77 +351,39 @@ public class EditorComponenttImp extends EclipseComponent implements
         // return results.get(0);
     }
 
-    public void setTextInJavaEditorWithSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        String contents = state.getTestFileContents(contentPath);
-        // activateEclipseShell();
-
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        SWTBotEditor editor;
-        editor = bot.editorByTitle(className + ".java");
-        SWTBotEclipseEditor e = editor.toTextEditor();
-
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // log.debug("shell name: " + win.getShell().getText());
-        // win.getShell().forceActive();
-        // win.getShell().forceFocus();
-        // }
-        // });
-        // e.setFocus();
-        e.setText(contents);
-        // e.typeText("hallo wie geht es dir !%%%");
-        // e.pressShortcut(Keystrokes.LF);
-        // e.typeText("mir geht es gut!");
-        // delegate.sleep(2000);
-        //
-        // delegate.sleep(2000);
-
-        e.save();
-        // editorObject.setTextinEditorWithSave(contents, className + ".java");
+    /**********************************************
+     * 
+     * infos about debug
+     * 
+     **********************************************/
+    public void setBreakPoint(int line, String projectName, String packageName,
+        String className) throws RemoteException {
+        precondition(getClassNodes(projectName, packageName, className));
+        selectLineInJavaEditor(line, className);
+        menuPart.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
-    public void setTextInEditorWithSave(String contentPath, String... filePath)
-        throws RemoteException {
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
 
-        String contents = state.getTestFileContents(contentPath);
-        String fileName = filePath[filePath.length - 1];
-        peVC.openFile(filePath);
-        activateEditor(fileName);
-        editorPart.setTextInEditorWithSave(contents, fileName);
+    private void precondition(String... fileNodes) throws RemoteException {
+        String fileName = fileNodes[fileNodes.length - 1];
+        if (!isEditorOpen(fileName))
+            peVC.openFile(fileNodes);
+        if (!isEditorActive(fileName))
+            activateEditor(fileName);
     }
 
-    public void setTextInJavaEditorWithoutSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        String contents = state.getTestFileContents(contentPath);
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        editorPart.setTextinEditorWithoutSave(contents, className + ".java");
-    }
-
-    public void typeTextInJavaEditor(String contentPath, String projectName,
-        String packageName, String className) throws RemoteException {
-        String contents = state.getTestFileContents(contentPath);
-        workbenchC.activateEclipseShell();
-        peVC.openFile(getClassNodes(projectName, packageName, className));
-        activateJavaEditor(className);
-        editorPart.typeTextInEditor(contents, className + ".java");
-    }
-
-    public void confirmSaveSourceWindow(String buttonType)
-        throws RemoteException {
-        windowPart.waitUntilShellActive("Save Resource");
-        windowPart.confirmWindow("Save Resource", buttonType);
-    }
-
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
+    /**
+     * @return all filenames on the editors which are opened currently
+     */
+    public List<String> getTitlesOfAllOpenedEditors() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotEditor editor : bot.editors())
+            list.add(editor.getTitle());
+        return list;
     }
 }

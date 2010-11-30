@@ -95,10 +95,4 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
         viewPart.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
 }

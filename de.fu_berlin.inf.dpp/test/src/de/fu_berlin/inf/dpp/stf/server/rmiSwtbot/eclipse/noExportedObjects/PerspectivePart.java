@@ -66,12 +66,6 @@ public class PerspectivePart extends EclipseComponent {
         return bot.perspectiveById(id).isActive();
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
     // public boolean isPerspectiveOpen(String title) {
     // return getPerspectiveTitles().contains(title);
     // try {

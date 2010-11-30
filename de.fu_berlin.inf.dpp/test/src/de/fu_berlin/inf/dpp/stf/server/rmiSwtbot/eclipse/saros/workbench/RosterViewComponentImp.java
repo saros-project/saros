@@ -153,6 +153,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void waitUntilIsConnected() throws RemoteException {
+        precondition();
         waitUntil(SarosConditions.isConnect(getToolbarButtons(), TB_DISCONNECT));
     }
 
@@ -239,7 +240,10 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (!hasBuddy(buddyJID))
             return;
         try {
-            clickContextMenuOfBuddy(CM_DELETE, buddyNickName);
+            SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+            SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree,
+                BUDDIES + ".*", buddyNickName + ".*");
+            item.contextMenu(CM_DELETE).click();
             windowPart.confirmDeleteWindow(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
@@ -272,6 +276,33 @@ public class RosterViewComponentImp extends EclipseComponent implements
         bot.button(OK).click();
     }
 
+    /**********************************************
+     * 
+     * context menu of a contact on the view: invite user
+     * 
+     **********************************************/
+
+    public void inviteUser(JID buddyJID) throws RemoteException {
+        precondition();
+        String buddyNickName = state.getBuddyNickName(buddyJID);
+        if (buddyNickName == null)
+            throw new RuntimeException(
+                "the buddy dones't exist, which you want to invite.");
+        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+        SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
+            + ".*", buddyNickName + ".*");
+        if (!item.isEnabled()) {
+            throw new RuntimeException("You can't invite this user "
+                + buddyNickName + ", he isn't conntected yet");
+        }
+        if (!item.contextMenu(CM_RENAME).isEnabled()) {
+            throw new RuntimeException("You can't invite this user "
+                + buddyNickName
+                + ", it's possible that you've already invite him");
+        }
+        item.contextMenu(CM_INVITE_USER).click();
+    }
+
     /**************************************************************
      * 
      * Inner functions
@@ -296,7 +327,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      * @throws RemoteException
      */
-    @Override
     protected void precondition() throws RemoteException {
         openRosterView();
         setFocusOnRosterView();

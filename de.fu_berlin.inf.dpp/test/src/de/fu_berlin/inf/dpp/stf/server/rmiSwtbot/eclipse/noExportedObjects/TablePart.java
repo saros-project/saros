@@ -5,7 +5,6 @@ import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Control;
@@ -201,12 +200,6 @@ public class TablePart extends EclipseComponent {
         SWTBotTableItem tableItem, String context) {
         waitUntil(SarosConditions.ExistContextMenuOfTableItem(tableItem,
             context));
-    }
-
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
     }
 
     // /**

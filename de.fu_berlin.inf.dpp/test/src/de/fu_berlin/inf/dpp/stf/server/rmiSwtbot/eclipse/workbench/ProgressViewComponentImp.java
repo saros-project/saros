@@ -104,10 +104,4 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         bot.waitUntil(SarosConditions.existNoInvitationProgress(bot), 100000);
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
 }

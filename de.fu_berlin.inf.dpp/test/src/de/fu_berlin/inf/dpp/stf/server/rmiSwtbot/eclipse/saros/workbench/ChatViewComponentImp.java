@@ -140,10 +140,5 @@ public class ChatViewComponentImp extends EclipseComponent implements
         return text.equals(message);
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
+   
 }

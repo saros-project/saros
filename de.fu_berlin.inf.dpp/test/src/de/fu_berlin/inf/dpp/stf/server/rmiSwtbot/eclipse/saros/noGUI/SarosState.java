@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.ui.part.EditorPart;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -14,7 +15,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.State;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
 

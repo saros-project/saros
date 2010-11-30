@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +63,7 @@ public class TreePart extends EclipseComponent {
                     if (!item.isExpanded())
                         item.expand();
                     itemFound = true;
-                    break;
+                    continue;
                 }
             }
 
@@ -151,12 +150,6 @@ public class TreePart extends EclipseComponent {
     public void waitUntilTreeNodeExisted(SWTBotTreeItem treeItem,
         String nodeName) {
         waitUntil(SarosConditions.existTreeItem(treeItem, nodeName));
-    }
-
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
     }
 
     // /**

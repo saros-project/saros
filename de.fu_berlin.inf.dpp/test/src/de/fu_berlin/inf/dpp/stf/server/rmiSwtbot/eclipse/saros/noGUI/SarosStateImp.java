@@ -82,14 +82,6 @@ public class SarosStateImp extends StateImp implements SarosState {
         if (sarosSession == null)
             return false;
         return sarosSession.isDriver();
-        // User user = sarosSession.getUser(this.jid);
-        // if (user == null) {
-        //
-        // return false;
-        // }
-        // boolean isDriver = sarosSession.getDrivers().contains(user);
-        // log.debug("isDriver(" + this.jid.toString() + ") == " + isDriver);
-        // return isDriver;
     }
 
     public boolean isDriver(JID jid) throws RemoteException {
@@ -309,6 +301,8 @@ public class SarosStateImp extends StateImp implements SarosState {
     }
 
     public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
+        if (getBuddyNickName(buddyJID) == null)
+            return false;
         if (!getBuddyNickName(buddyJID).equals(buddyJID.getBase()))
             return true;
         return false;

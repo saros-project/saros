@@ -121,8 +121,8 @@ public class TestDriverResetsFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
 
         alice.editor.closejavaEditorWithoutSave(CLS1);
-        dave.editor.confirmSaveSourceWindow(NO);
-        edna.editor.confirmSaveSourceWindow(NO);
+        dave.editor.confirmWindowSaveSource(NO);
+        edna.editor.confirmWindowSaveSource(NO);
 
         String contentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);

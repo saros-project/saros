@@ -11,6 +11,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -18,10 +19,48 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 
 public class StateImp extends EclipseComponent implements State {
 
-    public void waitUntilClassContentsSame(String projectName, String pkg,
-        String className, String otherClassContent) throws RemoteException {
-        waitUntil(SarosConditions.isClassContentsSame(this, projectName, pkg,
-            className, otherClassContent));
+    public void waitUntilFileContentSame(String otherClassContent,
+        String... fileNodes) throws RemoteException {
+        waitUntil(SarosConditions.isFileContentsSame(this, otherClassContent,
+            fileNodes));
+    }
+
+    public void waitUntilClassContentsSame(final String projectName,
+        final String pkg, final String className, final String otherClassContent)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getClassContent(projectName, pkg, className).equals(
+                    otherClassContent);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+    }
+
+    public String getClassContent(String projectName, String pkg,
+        String className) throws RemoteException, IOException, CoreException {
+        IPath path = new Path(getClassPath(projectName, pkg, className));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return helperPart.ConvertStreamToString(file.getContents());
+    }
+
+    public String getFileContent(String... fileNodes) throws RemoteException,
+        IOException, CoreException {
+        IPath path = new Path(getPath(fileNodes));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return helperPart.ConvertStreamToString(file.getContents());
     }
 
     public void deleteAllProjects() throws RemoteException {
@@ -35,26 +74,5 @@ public class StateImp extends EclipseComponent implements State {
                 log.debug("Couldn't delete files ", e);
             }
         }
-    }
-
-    /**
-     * get the content of the class file, which is saved.
-     */
-    public String getClassContent(String projectName, String pkg,
-        String className) throws RemoteException, IOException, CoreException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
-
-        log.info("Checking full path: \"" + file.getFullPath().toOSString()
-            + "\"");
-        return helperPart.ConvertStreamToString(file.getContents());
-    }
-
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
     }
 }

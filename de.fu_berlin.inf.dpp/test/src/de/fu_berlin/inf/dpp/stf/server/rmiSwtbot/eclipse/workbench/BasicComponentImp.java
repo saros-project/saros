@@ -7,14 +7,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 public class BasicComponentImp extends EclipseComponent implements
     BasicComponent {
 
-    // public static EclipseBasicObjectImp classVariable;
     private static final boolean SCREENSHOTS = true;
 
     private static transient BasicComponentImp eclipseBasicObjectImp;
 
     /**
-     * {@link BasicComponentImp} is a singleton, but inheritance is
-     * possible.
+     * {@link BasicComponentImp} is a singleton, but inheritance is possible.
      */
     public static BasicComponentImp getInstance() {
         if (eclipseBasicObjectImp != null)
@@ -49,12 +47,6 @@ public class BasicComponentImp extends EclipseComponent implements
 
     public void clickButton(String mnemonicText) throws RemoteException {
         bot.button(mnemonicText).click();
-    }
-
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
     }
 
 }

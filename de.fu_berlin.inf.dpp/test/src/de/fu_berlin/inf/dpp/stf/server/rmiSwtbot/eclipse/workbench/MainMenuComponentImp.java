@@ -48,7 +48,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
                 .setSelection(OS);
         }
         bot.button("Apply").click();
-        bot.button("OK").click();
+        bot.button(OK).click();
         windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
@@ -112,7 +112,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      **************************************************************/
 
-    @Override
+  
     protected void precondition() throws RemoteException {
         workbenchC.activateEclipseShell();
     }

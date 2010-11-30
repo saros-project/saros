@@ -544,7 +544,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * 
      * @throws RemoteException
      */
-    @Override
     protected void precondition() throws RemoteException {
         openSessionView();
         setFocusOnSessionView();

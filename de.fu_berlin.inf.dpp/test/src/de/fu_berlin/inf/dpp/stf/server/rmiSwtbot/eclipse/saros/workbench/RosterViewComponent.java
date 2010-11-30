@@ -160,6 +160,16 @@ public interface RosterViewComponent extends Remote {
     public void confirmNewContactWindow(String baseJID) throws RemoteException;
 
     /**
+     * After adding a new contact the added user should get this popup window
+     * with the title "Request of subscription received", which should be run by
+     * {@link Musician#addBuddyDone(Musician)}
+     * 
+     * @throws RemoteException
+     */
+    public void confirmRequestOfSubscriptionReceivedWindow()
+        throws RemoteException;
+
+    /**
      * 
      * @param buddyJID
      *            a Jabber ID which is used to identify the users of the Jabber
@@ -200,12 +210,36 @@ public interface RosterViewComponent extends Remote {
     public boolean isWindowContactLookupFailedActive() throws RemoteException;
 
     /**
+     * waits until the popup window with the title "Contact lookup failed" is
+     * active
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilContactLookupFailedIsActive() throws RemoteException;
+
+    /**
      * 
      * @return<tt>true</tt>, is the popup window with the title
      *                       "Contact already added" is active
      * @throws RemoteException
      */
     public boolean isWindowContactAlreadyAddedActive() throws RemoteException;
+
+    /**
+     * waits until the popup window with the title "Contact already added" is
+     * active
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilWindowContactAlreadyAddedIsActive()
+        throws RemoteException;
+
+    /**
+     * close the popup window with the title "Contact already added"
+     * 
+     * @throws RemoteException
+     */
+    public void closeWindowContactAlreadyAdded() throws RemoteException;
 
     /**********************************************
      * 
@@ -291,13 +325,10 @@ public interface RosterViewComponent extends Remote {
     public void renameBuddy(JID buddyJID, String newBuddyName)
         throws RemoteException;
 
-    public void waitUntilContactLookupFailedIsActive() throws RemoteException;
-
-    public void waitUntilWindowContactAlreadyAddedIsActive()
-        throws RemoteException;
-
-    public void closeWindowContactAlreadyAdded() throws RemoteException;
-
-    public void confirmRequestOfSubscriptionReceivedWindow()
-        throws RemoteException;
+    /**********************************************
+     * 
+     * context menu of a contact on the view: invite user
+     * 
+     **********************************************/
+    public void inviteUser(JID buddyJID) throws RemoteException;
 }

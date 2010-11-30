@@ -6,22 +6,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorCompone
 
 public class IsEditorClosed extends DefaultCondition {
 
-    private EditorComponent editor;
-    private String name;
+    private EditorComponent editorComponent;
+    private String fileName;
 
-    IsEditorClosed(EditorComponent editor, String name) {
+    IsEditorClosed(EditorComponent editorComponent, String name) {
 
-        this.name = name;
-        this.editor = editor;
+        this.fileName = name;
+        this.editorComponent = editorComponent;
     }
 
     public String getFailureMessage() {
-
-        return null;
+        return "The editor " + fileName + " is not open.";
     }
 
     public boolean test() throws Exception {
-        return !editor.isFileOpen(name);
+        return !editorComponent.isEditorOpen(fileName);
     }
 
 }

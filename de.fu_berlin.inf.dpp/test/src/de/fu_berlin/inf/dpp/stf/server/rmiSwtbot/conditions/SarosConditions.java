@@ -13,7 +13,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
@@ -58,12 +57,17 @@ public class SarosConditions extends Conditions {
         return new ExistContextMenuOfTableItem(tableItem, text);
     }
 
-    public static ICondition isEditorActive(EditorPart editor, String name) {
-        return new isEditorActive(editor, name);
-    }
-
+    /**********************************************
+     * 
+     * conditions for editor
+     * 
+     **********************************************/
     public static ICondition isEditorOpen(EditorComponent editor, String name) {
         return new IsEditorOpen(editor, name);
+    }
+
+    public static ICondition isEditorActive(EditorComponent editor, String name) {
+        return new isEditorActive(editor, name);
     }
 
     public static ICondition isEditorClosed(EditorComponent editor, String name) {
@@ -86,11 +90,9 @@ public class SarosConditions extends Conditions {
         return new isViewActive(bot, name);
     }
 
-    public static ICondition isClassContentsSame(StateImp state,
-        String projectName, String pkg, String className,
-        String otherClassContent) {
-        return new IsClassContentsSame(state, projectName, pkg, className,
-            otherClassContent);
+    public static ICondition isFileContentsSame(StateImp state,
+        String otherClassContent, String... fileNodes) {
+        return new IsFileContentsSame(state, otherClassContent, fileNodes);
     }
 
     public static ICondition isNotInSVN(String projectName) {

@@ -1,14 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.HelperPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.MenuPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.PerspectivePart;
@@ -71,7 +68,7 @@ public abstract class EclipseComponent {
     public static ViewPart viewPart;
     public static HelperPart helperPart;
     public static PerspectivePart perspectivePart;
-    public static EditorPart editorPart;
+
     public static ToolbarPart toolbarPart;
 
     public static SarosSWTBot bot;
@@ -86,8 +83,6 @@ public abstract class EclipseComponent {
     protected void waitLongUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
-
-    abstract protected void precondition() throws RemoteException;
 
     public String getClassPath(String projectName, String pkg, String className) {
         return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
@@ -113,11 +108,11 @@ public abstract class EclipseComponent {
         String folderpath = "";
         for (int i = 0; i < nodes.length; i++) {
             if (i == nodes.length - 1) {
+
                 folderpath += nodes[i];
             } else
                 folderpath += nodes[i] + "/";
         }
         return folderpath;
     }
-
 }

@@ -38,11 +38,6 @@ public class MenuPart extends EclipseComponent {
             selectedmenu.click();
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-    }
-
     /**
      * Open a view using menus Window->Show View->Other... The method is defined
      * as helper method and should not be exported by rmi. <br/>

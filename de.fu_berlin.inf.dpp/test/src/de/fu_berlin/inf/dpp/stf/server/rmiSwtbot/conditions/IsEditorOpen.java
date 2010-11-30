@@ -20,7 +20,7 @@ public class IsEditorOpen extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return editor.isFileOpen(name);
+        return editor.isEditorOpen(name);
     }
 
 }

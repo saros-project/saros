@@ -265,11 +265,6 @@ public class WindowPart extends EclipseComponent {
         // waitUntilShellCloses(shellName);
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-    }
-
     // Title of Shells
     protected final static String CONFIRM_DELETE = "Confirm Delete";
 

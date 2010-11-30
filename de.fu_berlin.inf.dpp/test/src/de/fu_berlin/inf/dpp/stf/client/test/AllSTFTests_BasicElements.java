@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestBasicSarosElements;
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestPackageExplorerViewComponent;
+import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestRosterViewComponent;
 import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestSessionViewComponent;
 
 /**
@@ -17,7 +18,7 @@ import de.fu_berlin.inf.dpp.stf.client.test.basicElements.TestSessionViewCompone
 // RmiTest.class,
     TestPackageExplorerViewComponent.class,//
     TestBasicSarosElements.class, //
-    // TestRosterViewComponent.class, //
+    TestRosterViewComponent.class, //
     TestSessionViewComponent.class //
 })
 public class AllSTFTests_BasicElements {

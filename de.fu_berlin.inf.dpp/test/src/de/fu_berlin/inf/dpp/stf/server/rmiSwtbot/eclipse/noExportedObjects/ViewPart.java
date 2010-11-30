@@ -460,10 +460,4 @@ public class ViewPart extends EclipseComponent {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
 }

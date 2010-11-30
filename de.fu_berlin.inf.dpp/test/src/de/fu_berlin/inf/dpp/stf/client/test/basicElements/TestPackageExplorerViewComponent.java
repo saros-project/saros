@@ -103,13 +103,13 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isFileOpen(FILE1));
+        assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.editor.closeEditorWithSave(FILE1);
-        assertFalse(alice.editor.isFileOpen(FILE1));
+        assertFalse(alice.editor.isEditorOpen(FILE1));
         alice.pEV.openFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isFileOpen(FILE1));
+        assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.pEV.deleteFile(PROJECT1, FOLDER1, FILE1);
-        assertFalse(alice.editor.isFileOpen(FILE1));
+        assertFalse(alice.editor.isEditorOpen(FILE1));
     }
 
     @Test
@@ -119,9 +119,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.editor.closeEditorWithSave(FILE1);
         alice.pEV.openFileWith("Text Editor", PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isFileOpen(FILE1));
+        assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.pEV.deleteFile(PROJECT1, FOLDER1, FILE1);
-        assertFalse(alice.editor.isFileOpen(FILE1));
+        assertFalse(alice.editor.isEditorOpen(FILE1));
     }
 
     /**********************************************

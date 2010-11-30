@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 
-import java.rmi.RemoteException;
-
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -44,9 +42,4 @@ public class BasicPart extends EclipseComponent {
         bot.button(mnemonicText).click();
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
 }

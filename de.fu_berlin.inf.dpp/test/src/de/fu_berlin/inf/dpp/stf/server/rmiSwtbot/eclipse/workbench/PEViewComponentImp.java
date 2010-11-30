@@ -368,9 +368,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
-        if (!editorC.isFileOpen(fileNodes[fileNodes.length - 1])) {
-            viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, fileNodes);
-        }
+        viewPart.clickContextMenuOfTreeInView(VIEWNAME, OPEN, fileNodes);
     }
 
     public void openClass(String projectName, String pkg, String className)
@@ -815,7 +813,6 @@ public class PEViewComponentImp extends EclipseComponent implements
      * 
      **************************************************************/
 
-    @Override
     protected void precondition() throws RemoteException {
         openPEView();
         setFocusOnPEView();

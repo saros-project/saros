@@ -98,9 +98,4 @@ public class RSViewComponentImp extends EclipseComponent implements
             .confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
-    @Override
-    protected void precondition() throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
 }
