@@ -39,10 +39,14 @@ public interface ISarosSessionManager {
      * 
      * @param project
      *            the local Eclipse project which should become shared.
+     * @param useVersionControl
+     *            true iff this session uses Version Control, see
+     *            {@link ISarosSession#useVersionControl()}.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(IProject project, List<IResource> resources) throws XMPPException;
+    public void startSession(IProject project, List<IResource> resources,
+        boolean useVersionControl) throws XMPPException;
 
     /**
      * Creates a Saros session for a shared project hosted remotely. The

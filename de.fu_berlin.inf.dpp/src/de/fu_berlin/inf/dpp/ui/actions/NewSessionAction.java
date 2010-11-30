@@ -45,7 +45,7 @@ public class NewSessionAction extends GeneralNewSessionAction {
     public void run(IAction action) {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runNewSession(null);
+                runNewSession(null, false);
             }
         });
     }

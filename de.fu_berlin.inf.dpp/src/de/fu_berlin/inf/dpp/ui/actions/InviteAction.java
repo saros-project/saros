@@ -119,7 +119,7 @@ public class InviteAction extends SelectionProviderAction {
 
             // Start new Saros session, invite selected user
             try {
-                sessionManager.startSession(chosenProject, null);
+                sessionManager.startSession(chosenProject, null, false);
                 sessionManager.invite(getSelected(), makeDescription());
             } catch (final XMPPException e) {
                 Util.runSafeSWTSync(log, new Runnable() {
