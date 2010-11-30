@@ -1,13 +1,12 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.jivesoftware.smack.XMPPConnection;
@@ -16,11 +15,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -54,30 +51,39 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         updateStatus();
     }
 
-    // user click on Button
+    protected final AtomicBoolean running = new AtomicBoolean();
+
+    // user clicks on Button
     @Override
     public void run() {
-        if (accountService.hasActiveAccount()) {
-            runConnectDisconnect();
-        } else {
-            WizardDialog wizard = new WizardDialog(EditorAPI.getShell(),
-                new CreateNewAccountWizard());
-            if (Window.OK == wizard.open()) {
-                saros.connect(false);
-            }
-        }
-    }
 
-    protected void runConnectDisconnect() {
-        Util.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() {
+        Util.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
             public void run() {
-                if (saros.isConnected()) {
-                    disconnect();
-                } else {
-                    saros.connect(false);
+                try {
+                    if (running.getAndSet(true)) {
+                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        return;
+                    }
+                    runConnectDisconnect();
+                } finally {
+                    running.set(false);
                 }
             }
         });
+    }
+
+    protected void runConnectDisconnect() {
+        try {
+            if (saros.isConnected()) {
+                saros.disconnect();
+            } else {
+                log.debug("Connect!!!");
+                saros.connect(false);
+            }
+
+        } catch (RuntimeException e) {
+            log.error("Internal error in ConnectDisconnectAction:", e);
+        }
     }
 
     protected void disconnect() {

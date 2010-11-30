@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
@@ -30,8 +29,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.LinkListener;
@@ -42,7 +44,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     private static final Logger log = Logger
         .getLogger(RegisterAccountPage.class.getName());
 
-    public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/#PublicServers";
+    public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/InstallUsing#Using_Public_XMPP_Servers";
 
     protected Text serverText;
 
@@ -56,24 +58,39 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
     protected final boolean createAccount;
 
-    protected final boolean showPrefButton;
+    protected final boolean showUseNowButton;
 
-    protected final boolean storePreferences;
+    protected final boolean useNow;
 
     protected final Saros saros;
 
     protected final PreferenceUtils preferenceUtils;
 
+    @Inject
+    protected XMPPAccountStore accountStore;
+
+    /**
+     * 
+     * @param createAccount
+     *          are we going to create a new account?
+     * @param showUseNowButton
+     *          show button for setting "useNow"
+     * @param useNow
+     *          default value for activating this account
+     * @param preferenceUtils
+     */
     public RegisterAccountPage(Saros saros, boolean createAccount,
-        boolean showPrefButton, boolean storePreferences,
+        boolean showUseNowButton, boolean useNow,
         PreferenceUtils preferenceUtils) {
 
         super("create");
         this.createAccount = createAccount;
-        this.showPrefButton = showPrefButton;
-        this.storePreferences = storePreferences;
+        this.showUseNowButton = showUseNowButton;
+        this.useNow = useNow;
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
+
+        Saros.reinject(this);
     }
 
     public void createControl(Composite parent) {
@@ -130,12 +147,13 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 SWT.CENTER, true, false));
             this.repeatPasswordText.setEchoChar('*');
         }
-
-        if (this.showPrefButton) {
+        
+        
+        if (this.showUseNowButton) {
             this.prefButton = new Button(root, SWT.CHECK | SWT.SEPARATOR);
-            this.prefButton.setSelection(this.storePreferences);
+            this.prefButton.setSelection(this.useNow);
             this.prefButton
-                .setText("Store the new configuration in your preferences.");
+                .setText("Use this account now. (Will disconnect if you are already connected with another account.)");
             this.prefButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
                 true, false, 2, 1));
         }
@@ -236,11 +254,11 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         return this.passwordText.getText();
     }
 
-    public boolean isStoreInPreferences() {
-        if (this.showPrefButton) {
+    public boolean useNow() {
+        if (this.showUseNowButton) {
             return this.prefButton.getSelection();
         }
-        return this.storePreferences;
+        return this.useNow;
     }
 
     private void hookListeners() {
@@ -255,24 +273,6 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.passwordText.addModifyListener(listener);
         if (this.createAccount)
             this.repeatPasswordText.addModifyListener(listener);
-
-        if (this.showPrefButton) {
-            this.prefButton.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    if (preferenceUtils.hasUserName()
-                        && RegisterAccountPage.this.prefButton.getSelection()) {
-                        setMessage(
-                            "Storing the configuration will override the existing settings.",
-                            IMessageProvider.WARNING);
-                    } else {
-                        setMessage(null);
-                    }
-                }
-
-            });
-        }
     }
 
     private void updateNextEnablement() {
@@ -304,9 +304,6 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             .getString(PreferenceConstants.USERNAME);
         this.serverText.setText(serverText);
         this.userText.setText(usernameText);
-        if (this.showPrefButton) {
-            this.prefButton.setSelection(!preferenceUtils.hasUserName());
-        }
     }
 
     public boolean performFinish() {
@@ -326,13 +323,15 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 return false;
         }
 
-        if (isStoreInPreferences()) {
-            IPreferenceStore preferences = saros.getPreferenceStore();
-            preferences.setValue(PreferenceConstants.SERVER, server);
-            preferences.setValue(PreferenceConstants.USERNAME, username);
-            preferences.setValue(PreferenceConstants.PASSWORD, password);
+        
+        XMPPAccount account = accountStore.createNewAccount(username, password,
+            server);
+        accountStore.saveAccounts();
+        // TODO warn user when already connected
+        if (this.useNow()) {
+            accountStore.setAccountActive(account);
+            saros.connect(false);
         }
-
         return true;
     }
 

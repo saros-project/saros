@@ -202,8 +202,6 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected void add(IResource resource) {
         sharedProject.add(resource);
         final SPath spath = new SPath(resource);
-        if (ignoreChildren(resource))
-            return;
 
         if (resource instanceof IFile) {
             try {
@@ -220,17 +218,12 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected void move(IResource resource, IPath oldFullPath,
         IProject oldProject, boolean contentChange) throws IOException {
         sharedProject.move(resource, oldFullPath);
-        if (!ignoreChildren(resource)) {
-            addActivity(FileActivity.moved(user, new SPath(resource),
-                new SPath(oldProject, oldFullPath.removeFirstSegments(1)),
-                contentChange));
-        }
+        addActivity(FileActivity.moved(user, new SPath(resource), new SPath(
+            oldProject, oldFullPath.removeFirstSegments(1)), contentChange));
     }
 
     protected void remove(IResource resource) {
         sharedProject.remove(resource);
-        if (ignoreChildren(resource))
-            return;
         if (resource instanceof IFile) {
             addActivity(FileActivity.removed(user, new SPath(resource),
                 Purpose.ACTIVITY));
@@ -247,19 +240,10 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     /**
-     * Adds an activity to {@link ProjectDeltaVisitor#pendingActivities}. It
-     * should only be called if ignoreChildren returns false: don't create an
-     * activity if it's not supposed to be sent anyways.
+     * Adds an activity to {@link ProjectDeltaVisitor#pendingActivities}.
      */
     protected void addActivity(IResourceActivity activity) {
-        final SPath path = activity.getPath();
-        boolean ignoreActivity = ignoreChildren(path.getFullPath());
-        if (!ignoreActivity) {
-            pendingActivities.add(activity);
-        } else {
-            log.error("Shouldn't create an activity if it's ignored anyways. "
-                + activity);
-        }
+        pendingActivities.add(activity);
     }
 
     /**

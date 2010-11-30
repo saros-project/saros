@@ -82,7 +82,6 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
-import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -805,12 +804,7 @@ public class RosterView extends ViewPart {
         menuManager.add(new Separator());
 
         final IToolBarManager toolBarManager = bars.getToolBarManager();
-        final ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
-            sarosUI, saros, bars.getStatusLineManager(), statisticManager,
-            errorLogManager, preferenceUtils);
-        disposables.add(connectAction);
         toolBarManager.add(new ChangeXMPPAccountAction());
-        // toolBarManager.add(connectAction);
         toolBarManager.add(new NewContactAction(saros));
     }
 

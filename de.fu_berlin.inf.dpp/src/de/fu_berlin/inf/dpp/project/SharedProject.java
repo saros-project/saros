@@ -30,9 +30,12 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * <br>
  * Saros replicates a shared project, i.e. keeps copies of the project on the
  * peers in sync with the local project. A SharedProject represents the state
- * that these remote copies are supposed to be in. Whenever we detect a mismatch
- * between the IProject and the corresponding SharedProject, we know that we
- * need to send activities.
+ * that these remote copies are supposed to be in. Whenever a driver detects a
+ * mismatch between the IProject and the corresponding SharedProject, we know
+ * that we need to send activities.<br>
+ * <br>
+ * Currently, the SharedProject is only accessed (updated) when the client is a
+ * driver.
  */
 /*
  * What if SharedProject became a little smarter, what if SharedProject actually
@@ -114,7 +117,7 @@ public class SharedProject {
 
     /** Maps the project relative path of a resource. */
     @SuppressWarnings("serial")
-    protected Map<IPath, ResourceInfo> resourceMap = new HashMap<IPath, SharedProject.ResourceInfo>() {
+    protected Map<IPath, ResourceInfo> resourceMap = new HashMap<IPath, ResourceInfo>() {
         /**
          * This override is intended for debugging output only.
          */
@@ -142,14 +145,19 @@ public class SharedProject {
     protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
         false);
 
+    /**
+     * Note that this listener is only registered if VCS support is enabled for
+     * the session.
+     */
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user) {
             boolean driver = sarosSession.isDriver();
-            // The order of the operands is supposed to be like that, we want to
-            // call update even if driver is false.
-            if (isDriver.update(driver) && driver) {
-                initializeVCSInfo();
+            if (!isDriver.update(driver))
+                return;
+            if (driver) {
+                resourceMap.clear();
+                initializeResources();
             }
         }
     };
@@ -195,6 +203,21 @@ public class SharedProject {
         this.sarosSession = sarosSession;
         this.project = project;
 
+        projectIsOpen.update(project.isOpen());
+
+        boolean isDriver = sarosSession.isDriver();
+        this.isDriver.update(isDriver);
+
+        if (sarosSession.useVersionControl()) {
+            sarosSession.addListener(sharedProjectListener);
+        }
+        if (isDriver) {
+            initializeResources();
+        }
+    }
+
+    /** Initialize the ResourceInfo for every resource in the SharedProject. */
+    protected void initializeResources() {
         try {
             addAll(project);
         } catch (CoreException e) {
@@ -202,20 +225,9 @@ public class SharedProject {
                 e);
         }
 
-        projectIsOpen = new UpdatableValue<Boolean>(project.isOpen());
-        boolean useVersionControl = sarosSession.useVersionControl();
-        if (useVersionControl) {
-            sarosSession.addListener(sharedProjectListener);
-            boolean isDriver = sarosSession.isDriver();
-            this.isDriver.update(isDriver);
-            if (isDriver)
-                initializeVCSInfo();
-        }
-        assert checkIntegrity();
-    }
+        if (!sarosSession.useVersionControl())
+            return;
 
-    /** Initialize the ResourceInfo for every resource in the SharedProject. */
-    protected void initializeVCSInfo() {
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
         this.vcs.update(vcs);
         if (vcs == null)
@@ -238,6 +250,8 @@ public class SharedProject {
             updateVcsUrl(resource, info.url);
             updateRevision(resource, info.revision);
         }
+
+        assert checkIntegrity();
     }
 
     /** Updates the current VCSAdapter, and returns true if the value changed. */

@@ -308,6 +308,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(DiscoveryManager.class);
+        this.container.addComponent(EditorAPI.class);
         this.container.addComponent(EditorManager.class);
         this.container.addComponent(ErrorLogManager.class);
         this.container.addComponent(FeedbackManager.class);

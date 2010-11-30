@@ -36,18 +36,18 @@ public class CreateAccountWizard extends Wizard {
     protected final RegisterAccountPage page;
 
     protected final Saros saros;
-
+    
     public CreateAccountWizard(Saros saros, PreferenceUtils preferenceUtils,
-        boolean createAccount, boolean showStoreInPrefsButton,
-        boolean storeInPrefsDefault) {
-
+        boolean createAccount, boolean showUseNowButton,
+        boolean useNowDefault) {
+        
         if (createAccount) {
             setWindowTitle("Create New User Account");
         } else {
             setWindowTitle("Enter User Account");
         }
         this.page = new RegisterAccountPage(saros, createAccount,
-            showStoreInPrefsButton, storeInPrefsDefault, preferenceUtils);
+            showUseNowButton, useNowDefault, preferenceUtils);
         setNeedsProgressMonitor(true);
         setHelpAvailable(false);
         this.saros = saros;

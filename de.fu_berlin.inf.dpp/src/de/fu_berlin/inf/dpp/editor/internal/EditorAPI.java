@@ -46,6 +46,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -62,6 +63,7 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
@@ -82,6 +84,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * 
  */
+@Component(module = "core")
 public class EditorAPI implements IEditorAPI {
 
     protected Saros saros;
@@ -147,8 +150,8 @@ public class EditorAPI implements IEditorAPI {
 
         // TODO This can fail if a shared project is started when no
         // Eclipse Window is open!
-        EditorAPI.getActiveWindow().getPartService().addPartListener(
-            partListener);
+        EditorAPI.getActiveWindow().getPartService()
+            .addPartListener(partListener);
     }
 
     /**
@@ -251,14 +254,20 @@ public class EditorAPI implements IEditorAPI {
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
             page.closeEditor(part, true); // Close AND let user decide if saving
-                                          // is necessary
+            // is necessary
         }
     }
 
     /**
-     * {@inheritDoc}
+     * This method will return all editors open in all IWorkbenchWindows.
+     * 
+     * This method will ask Eclipse to restore editors which have not been
+     * loaded yet (if Eclipse is started editors are loaded lazily). So calling
+     * this method might cause partOpen events to be sent.
+     * 
+     * @return all editors that are currently opened
      */
-    public Set<IEditorPart> getOpenEditors() {
+    public static Set<IEditorPart> getOpenEditors() {
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
 
         IWorkbenchWindow[] windows = EditorAPI.getWindows();
@@ -272,11 +281,10 @@ public class EditorAPI implements IEditorAPI {
 
                     IEditorPart editorPart = reference.getEditor(false);
                     if (editorPart == null) {
-                        log
-                            .debug("IWorkbenchPage."
-                                + "getEditorReferences()"
-                                + " returned IEditorPart which needs to be restored: "
-                                + reference.getTitle());
+                        log.debug("IWorkbenchPage."
+                            + "getEditorReferences()"
+                            + " returned IEditorPart which needs to be restored: "
+                            + reference.getTitle());
                         // Making this call might cause partOpen events
                         editorPart = reference.getEditor(true);
                     }
@@ -423,8 +431,8 @@ public class EditorAPI implements IEditorAPI {
                     && model instanceof IAnnotationModelExtension) {
                     IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
                     extension.replaceAnnotations(
-                        new Annotation[] { oldAnnotation }, Collections
-                            .singletonMap(newAnnotation, position));
+                        new Annotation[] { oldAnnotation },
+                        Collections.singletonMap(newAnnotation, position));
                     return;
                 }
                 model.removeAnnotation(annotation);
@@ -448,11 +456,10 @@ public class EditorAPI implements IEditorAPI {
     public static void reveal(IEditorPart editorPart, ITextSelection selection) {
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
-        IRegion visible = new Region(viewer.getTopIndexStartOffset(), viewer
-            .getBottomIndexEndOffset()
-            - viewer.getTopIndexStartOffset());
-        IRegion newSelection = new Region(selection.getOffset(), selection
-            .getLength());
+        IRegion visible = new Region(viewer.getTopIndexStartOffset(),
+            viewer.getBottomIndexEndOffset() - viewer.getTopIndexStartOffset());
+        IRegion newSelection = new Region(selection.getOffset(),
+            selection.getLength());
 
         /*
          * log.debug("Visible: " + visible + " - Selected: " + newSelection);
@@ -474,21 +481,20 @@ public class EditorAPI implements IEditorAPI {
             // newSelection is below viewport
 
             if (newSelection.getOffset() + newSelection.getLength() > visible
-                .getOffset()
-                + visible.getLength()) {
+                .getOffset() + visible.getLength()) {
                 // there is space to go down
 
                 int visibleStartLine = getLine(viewer5, visible.getOffset());
-                int selectionStartLine = getLine(viewer5, newSelection
-                    .getOffset());
+                int selectionStartLine = getLine(viewer5,
+                    newSelection.getOffset());
                 int visibleEndLine = getLine(viewer5, visible.getOffset()
                     + visible.getLength());
 
                 int targetLine = visibleEndLine
                     + (selectionStartLine - visibleStartLine);
 
-                targetLine = Math.min(targetLine, getLine(viewer5, viewer
-                    .getDocument().getLength()));
+                targetLine = Math.min(targetLine,
+                    getLine(viewer5, viewer.getDocument().getLength()));
 
                 int targetOffset = visible.getOffset() + visible.getLength();
                 while (getLine(viewer5, targetOffset) < targetLine) {
@@ -504,14 +510,12 @@ public class EditorAPI implements IEditorAPI {
                 // newSelection is above viewport
 
                 if (newSelection.getOffset() + newSelection.getLength() < visible
-                    .getOffset()
-                    + visible.getLength()) {
+                    .getOffset() + visible.getLength()) {
                     // there is space to go up
 
                     int visibleStartLine = getLine(viewer5, visible.getOffset());
-                    int selectionEndLine = getLine(viewer5, newSelection
-                        .getOffset()
-                        + newSelection.getLength());
+                    int selectionEndLine = getLine(viewer5,
+                        newSelection.getOffset() + newSelection.getLength());
                     int visibleEndLine = getLine(viewer5, visible.getOffset()
                         + visible.getLength());
 
@@ -618,8 +622,9 @@ public class EditorAPI implements IEditorAPI {
             editorManager, editorPart);
 
         if (editorListeners.containsKey(key)) {
-            log.error("SharedEditorListener was added twice: "
-                + editorPart.getTitle(), new StackTrace());
+            log.error(
+                "SharedEditorListener was added twice: "
+                    + editorPart.getTitle(), new StackTrace());
             removeSharedEditorListener(editorManager, editorPart);
         }
         EditorListener listener = new EditorListener(editorManager);
@@ -661,8 +666,8 @@ public class EditorAPI implements IEditorAPI {
 
         try {
             // Show the middle of the driver's viewport.
-            viewer.revealRange(document.getLineOffset(top
-                + ((bottom - top) / 2)), 0);
+            viewer.revealRange(
+                document.getLineOffset(top + ((bottom - top) / 2)), 0);
         } catch (BadLocationException e) {
             log.error("Internal Error: BadLocationException - ", e);
         }
@@ -848,6 +853,24 @@ public class EditorAPI implements IEditorAPI {
             // The operation does not throw an exception, thus this is an error.
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean existUnsavedFiles(IProject proj) {
+        Set<IEditorPart> openEditors = getOpenEditors();
+
+        for (Iterator<IEditorPart> iterator = openEditors.iterator(); iterator
+            .hasNext();) {
+            IEditorPart editorPart = iterator.next();
+            final IEditorInput editorInput = editorPart.getEditorInput();
+            if (editorInput instanceof IFileEditorInput) {
+                IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+                // Object identity instead of using equals is sufficient.
+                if (fileEditorInput.getFile().getProject() == proj
+                    && editorPart.isDirty())
+                    return true;
+            }
+        }
+        return false;
     }
 
     public static IWorkbenchWindow getAWorkbenchWindow() {

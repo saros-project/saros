@@ -248,14 +248,13 @@ public class IncomingInvitationProcess extends InvitationProcess {
     private void acceptUnsafe(final IProject baseProject,
         final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws SarosCancellationException, IOException {
-        // If a base project is given, save it
         if (baseProject != null) {
-            log.debug("Inv" + Util.prefix(peer) + ": Saving base project...");
-            if (!EditorAPI.saveProject(baseProject, true)) {
-                // User cancelled saving the source project
-                throw new LocalCancellationException(
-                    "User cancelled saving the source project.",
-                    CancelOption.NOTIFY_PEER);
+            /*
+             * Saving unsaved files is supposed to be done in
+             * JoinSessionWizard#performFinish().
+             */
+            if (EditorAPI.existUnsavedFiles(baseProject)) {
+                log.error("Unsaved files detected.");
             }
         }
 
@@ -546,6 +545,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (vcs != null) {
             this.localProject = vcs.checkoutProject(newProjectName,
                 this.remoteFileList, monitor);
+            /*
+             * HACK: After checking out a project, give Eclipse/the Team
+             * provider time to realize that the project is now managed. The
+             * problem was that when checking later to see if we have to
+             * switch/update individual resources in initVcState, the project
+             * appeared as unmanaged. It might work to wrap initVcState in a
+             * job, such that it is scheduled after the project is marked as
+             * managed.
+             */
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
             if (this.localProject != null)
                 return;
         }

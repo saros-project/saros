@@ -57,7 +57,7 @@ public class ConfigurationWizard extends Wizard {
     protected List<IWizardPage2> pages = new LinkedList<IWizardPage2>();
 
     public ConfigurationWizard(boolean askForAccount,
-        boolean askAboutStatisticSubmission) {
+        boolean askAboutStatisticSubmission, boolean showUseNowButton) {
 
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
@@ -70,9 +70,9 @@ public class ConfigurationWizard extends Wizard {
          * use PicoContainer directly.
          */
         Saros.reinject(this);
-
+        
         if (askForAccount) {
-            this.pages.add(new RegisterAccountPage(saros, false, false, true,
+            this.pages.add(new RegisterAccountPage(saros, false, showUseNowButton, !showUseNowButton,
                 preferenceUtils));
             this.pages.add(new GeneralSettingsPage(saros, preferenceUtils));
         }

@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import java.util.Set;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
@@ -41,17 +39,6 @@ public interface IEditorAPI {
      * @return the editor that is currently activated.
      */
     public IEditorPart getActiveEditor();
-
-    /**
-     * This method will return all editors open in all IWorkbenchWindows.
-     * 
-     * This method will ask Eclipse to restore editors which have not been
-     * loaded yet (if Eclipse is started editors are loaded lazily). So calling
-     * this method might cause partOpen events to be sent.
-     * 
-     * @return all editors that are currently opened
-     */
-    public Set<IEditorPart> getOpenEditors();
 
     /**
      * Sets the text selection in given editor.

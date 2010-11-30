@@ -11,7 +11,8 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class IMBeepAction extends Action {
     public IMBeepAction(String text) {
         super(text);
-        updateIcon();
+        this.updateIcon();
+        this.updateTooltip();
     }
 
     @Override
@@ -19,7 +20,6 @@ public class IMBeepAction extends Action {
         PlatformUI.getPreferenceStore();
 
         this.setOn(!this.isOn());
-
         this.updateIcon();
     }
 
@@ -31,6 +31,8 @@ public class IMBeepAction extends Action {
     protected void setOn(boolean on) {
         PlatformUI.getPreferenceStore().setValue(
             PreferenceConstants.BEEP_UPON_IM, on);
+
+        updateTooltip();
     }
 
     public void beep() {
@@ -46,5 +48,12 @@ public class IMBeepAction extends Action {
             this.setImageDescriptor(SarosUI
                 .getImageDescriptor("/icons/speaker_off.png"));
         }
+    }
+
+    protected void updateTooltip() {
+        if (this.isOn())
+            setToolTipText("Turn beep notificaton off.");
+        else
+            setToolTipText("Turn beep notification on.");
     }
 }

@@ -282,7 +282,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             log.trace("Adding new activities " + visitor.pendingActivities);
             pendingActivities.enterAll(visitor.pendingActivities);
 
-            assert postpone || sharedProject.checkIntegrity();
+            if (!postpone)
+                assert sharedProject.checkIntegrity();
+
             log.trace("sharedProject.resourceMap: \n"
                 + sharedProject.resourceMap);
         }
@@ -424,7 +426,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected String deltaToString(IResourceDelta delta) {
         ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
         try {
-            delta.accept(visitor);
+            delta.accept(visitor, IContainer.INCLUDE_PHANTOMS
+                | IContainer.INCLUDE_HIDDEN
+                | IContainer.INCLUDE_TEAM_PRIVATE_MEMBERS);
         } catch (CoreException e) {
             log.error("ToStringResourceDelta visitor crashed", e);
             return "";
@@ -563,7 +567,14 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapter
             .getAdapter(revision) : VCSAdapter.getAdapter(project);
         if (vcs == null) {
-            log.error("Could not execute VCS activity.");
+            log.warn("Could not execute VCS activity. Do you have the Subclipse plug-in installed?");
+            if (activity.containedActivity.size() > 0) {
+                log.trace("contained activities: "
+                    + activity.containedActivity.toString());
+            }
+            for (IResourceActivity a : activity.containedActivity) {
+                exec(a);
+            }
             return;
         }
 
