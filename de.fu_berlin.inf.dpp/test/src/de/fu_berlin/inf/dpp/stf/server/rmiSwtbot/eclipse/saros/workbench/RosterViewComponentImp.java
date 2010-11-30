@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.ui.RosterView;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
 
 /**
  * This implementation of {@link RosterViewComponent}
@@ -39,7 +38,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
     private final static String SHELL_CONTACT_ALREADY_ADDED = "Contact already added";
-    private final static String SHELL_CREATE_XMPP_ACCOUNT = CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
+    private final static String SHELL_CREATE_XMPP_ACCOUNT = ""; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
     private final static String SHELL_NEW_CONTACT = "New Contact";
     private final static String SHELL_CONTACT_LOOKUP_FAILED = "Contact look-up failed";
     private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";

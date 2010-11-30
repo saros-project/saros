@@ -147,11 +147,12 @@ public class StartupSaros implements IStartup {
                 boolean hasAgreement = statisticManager.hasStatisticAgreement()
                     && errorLogManager.hasErrorLogAgreement();
 
-                if (!hasUsername || !hasAgreement) {
+                 if (!hasUsername || !hasAgreement) {
                     Wizard wiz = new ConfigurationWizard(!hasUsername,
-                        !hasAgreement);
+                        !hasAgreement,false);
                     WizardDialog dialog = new WizardDialog(
                         EditorAPI.getShell(), wiz);
+                    dialog.setHelpAvailable(false);
                     dialog.open();
                 }
             }

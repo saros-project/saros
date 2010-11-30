@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.wizards.ChangeWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateNewAccountWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
 /**
  * Contains the basic preferences for Saros.
@@ -315,8 +315,10 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     protected void openNewAccountWizard() {
+        ConfigurationWizard wiz = new ConfigurationWizard(true, false, true);
         WizardDialog wizard = new WizardDialog(parent.getShell(),
-            new CreateNewAccountWizard());
+            wiz);
+        wizard.setHelpAvailable(false);
         if (Window.OK == wizard.open()) {
             updateInfoLabel();
             updateList();
@@ -394,7 +396,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     public void init(IWorkbench workbench) {
-        // Nothing to initialise
+        // Nothing to initialize
     }
 
     @Override
