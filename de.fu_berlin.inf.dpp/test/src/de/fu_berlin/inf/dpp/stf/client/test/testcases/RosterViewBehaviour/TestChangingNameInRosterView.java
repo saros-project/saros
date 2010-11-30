@@ -59,13 +59,13 @@ public class TestChangingNameInRosterView extends STFTest {
 
     @Test
     public void testRenameInRosterView() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
         alice.rosterV.renameBuddy(bob.jid, bob.getName());
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
         assertTrue(alice.state.getBuddyNickName(bob.jid).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
         alice.rosterV.renameBuddy(bob.jid, "new bob");
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
         assertTrue(alice.state.getBuddyNickName(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }

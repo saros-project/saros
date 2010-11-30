@@ -300,7 +300,7 @@ public class Musician extends STFTest {
      * @throws RemoteException
      */
     public void addBuddyDone(Musician peer) throws RemoteException {
-        if (!rosterV.hasBuddyWith(peer.jid)) {
+        if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContact(peer.jid);
             peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
             rosterV.confirmRequestOfSubscriptionReceivedWindow();
@@ -311,7 +311,7 @@ public class Musician extends STFTest {
      * Remove given contact from Roster, if contact was added before.
      */
     public void deleteBuddyDone(Musician peer) throws RemoteException {
-        if (!rosterV.hasBuddyWith(peer.jid))
+        if (!rosterV.hasBuddy(peer.jid))
             return;
         rosterV.deleteBuddy(peer.jid);
         peer.rosterV.confirmRemovelOfSubscriptionWindow();

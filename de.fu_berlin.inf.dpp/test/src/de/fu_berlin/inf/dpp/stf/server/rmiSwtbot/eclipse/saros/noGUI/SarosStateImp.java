@@ -203,10 +203,6 @@ public class SarosStateImp extends StateImp implements SarosState {
         return sessionManager.getSarosSession() != null;
     }
 
-    public ISarosSession getProject() throws RemoteException {
-        return sessionManager.getSarosSession();
-    }
-
     /**********************************************
      * 
      * gather state and perform actions using {@link DataTransferManager}

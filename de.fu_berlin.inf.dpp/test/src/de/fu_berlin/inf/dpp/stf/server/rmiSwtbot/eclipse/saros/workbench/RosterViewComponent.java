@@ -168,7 +168,7 @@ public interface RosterViewComponent extends Remote {
      *         specified by the given jid.
      * @throws RemoteException
      */
-    public boolean hasBuddyWith(JID buddyJID) throws RemoteException;
+    public boolean hasBuddy(JID buddyJID) throws RemoteException;
 
     /**
      * click only the tool bar button with the tooltip text "Add a new contact"

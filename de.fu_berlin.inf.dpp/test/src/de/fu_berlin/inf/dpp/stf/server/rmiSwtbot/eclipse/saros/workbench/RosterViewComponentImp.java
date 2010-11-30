@@ -175,7 +175,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void addANewContact(JID jid) throws RemoteException {
-        if (!hasBuddyWith(jid)) {
+        if (!hasBuddy(jid)) {
             clickAddANewContactToolbarButton();
             confirmNewContactWindow(jid.getBase());
         }
@@ -188,7 +188,14 @@ public class RosterViewComponentImp extends EclipseComponent implements
         basicPart.clickButton(FINISH);
     }
 
-    public boolean hasBuddyWith(JID jid) throws RemoteException {
+    public boolean hasBuddy(String buddyNickName) throws RemoteException {
+        precondition();
+        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+        return treePart.isTreeItemWithMatchTextExist(tree, BUDDIES,
+            buddyNickName + ".*");
+    }
+
+    public boolean hasBuddy(JID jid) throws RemoteException {
         String buddyNickName = state.getBuddyNickName(jid);
         if (buddyNickName == null)
             return false;
@@ -222,13 +229,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
         return viewPart.selectTreeWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
     }
 
-    public boolean hasBuddy(String buddyNickName) throws RemoteException {
-        precondition();
-        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        return treePart.isTreeItemWithMatchTextExist(tree, BUDDIES,
-            buddyNickName + ".*");
-    }
-
     /**********************************************
      * 
      * context menu of a contact on the view: delete Contact
@@ -236,7 +236,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void deleteBuddy(JID buddyJID) throws RemoteException {
         String buddyNickName = state.getBuddyNickName(buddyJID);
-        if (!hasBuddyWith(buddyJID))
+        if (!hasBuddy(buddyJID))
             return;
         try {
             clickContextMenuOfBuddy(CM_DELETE, buddyNickName);

@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.EditorPart;
@@ -113,14 +112,6 @@ public interface SarosState extends State {
      * @see SarosSessionManager#getSarosSession()
      */
     public boolean isInSession() throws RemoteException;
-
-    /**
-     * 
-     * @return the active SarosSession object or null if there is no active
-     *         session.
-     * @throws RemoteException
-     */
-    public ISarosSession getProject() throws RemoteException;
 
     /**********************************************
      * 

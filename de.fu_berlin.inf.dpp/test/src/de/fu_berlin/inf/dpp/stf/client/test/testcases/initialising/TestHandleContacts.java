@@ -84,11 +84,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
-        assertTrue(bob.rosterV.hasBuddyWith(alice.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
         bob.deleteBuddyDone(alice);
-        assertFalse(bob.rosterV.hasBuddyWith(alice.jid));
-        assertFalse(alice.rosterV.hasBuddyWith(bob.jid));
+        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.rosterV.hasBuddy(bob.jid));
     }
 
     /**
@@ -106,11 +106,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
-        assertTrue(bob.rosterV.hasBuddyWith(alice.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
         alice.deleteBuddyDone(bob);
-        assertFalse(bob.rosterV.hasBuddyWith(alice.jid));
-        assertFalse(alice.rosterV.hasBuddyWith(bob.jid));
+        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.rosterV.hasBuddy(bob.jid));
     }
 
     /**
@@ -130,8 +130,8 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         alice.deleteBuddyDone(bob);
         alice.addBuddyDone(bob);
-        assertTrue(bob.rosterV.hasBuddyWith(alice.jid));
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
     }
 
     /**
@@ -151,8 +151,8 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         bob.deleteBuddyDone(alice);
         bob.addBuddyDone(alice);
-        assertTrue(bob.rosterV.hasBuddyWith(alice.jid));
-        assertTrue(alice.rosterV.hasBuddyWith(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
     }
 
     /**

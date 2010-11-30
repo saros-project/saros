@@ -98,7 +98,7 @@ public class InitMusician extends MusicianConfigurationInfos {
             Musician musican = musicians.get(i);
             for (int j = i + 1; j < musicians.size(); j++) {
                 Musician addedMuscian = musicians.get(j);
-                if (!musican.rosterV.hasBuddyWith(addedMuscian.jid))
+                if (!musican.rosterV.hasBuddy(addedMuscian.jid))
                     musican.addBuddyDone(addedMuscian);
             }
         }
