@@ -15,7 +15,14 @@ public class ChatDemoContainer extends DemoContainer {
 		super.createPartControls(parent);
 
 		new ChatControlDemo(this, "ChatControl");
-		open(new ChatRoomDemo(this, "Chat Room"));
+		/*
+		 * User can either display ChatDemo or MultiUserChatDemo Both cannot be
+		 * active in the same application because each connects its users
+		 * automatically leading to multiple connections with the same
+		 * credentials.
+		 */
+		// new ChatDemo(this, "Chat");
+		open(new MultiUserChatDemo(this, "MultiUserChat"));
 	}
 
 }

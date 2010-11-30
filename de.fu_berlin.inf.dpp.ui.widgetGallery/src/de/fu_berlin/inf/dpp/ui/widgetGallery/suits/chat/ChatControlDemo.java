@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatListener;
+import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
@@ -174,7 +174,7 @@ public class ChatControlDemo extends Demo {
 		
 		explanatoryComposite.setContentControl(this.chatControl);
 		
-		this.chatControl.addChatListener(new IChatListener() {
+		this.chatControl.addChatControlListener(new IChatControlListener() {
 			public void messageEntered(MessageEnteredEvent event) {
 				System.out.println("Message entered: "
 						+ event.getEnteredMessage());
