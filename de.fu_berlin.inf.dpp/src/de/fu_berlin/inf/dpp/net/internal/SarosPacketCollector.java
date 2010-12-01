@@ -12,6 +12,11 @@ import org.jivesoftware.smack.packet.Packet;
  * SarosPacketCollector is a special version of a Packet Collector and does not
  * depend on a PacketReader for registration.
  */
+/*
+ * Note, at current state this class is only used during the invitation process
+ * and synchronization and we might want to hide its functionality of a blocking
+ * receive inside the XMPPTransmitter.receive() method.
+ */
 public class SarosPacketCollector implements PacketListener {
 
     public static interface CancelHook {
@@ -101,7 +106,11 @@ public class SarosPacketCollector implements PacketListener {
      * collector is canceled using the proved {@link CancelHook}.
      * 
      * @param packet
-     *            the packet to process.
+     *            the packet to process
+     * @singleThreaded should only be accessed by the single threaded executer
+     *                 of
+     *                 {@link de.fu_berlin.inf.dpp.net.business.DispatchThreadContext}
+     * 
      */
     public void processPacket(Packet packet) {
         if (packet == null)
