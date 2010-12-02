@@ -194,6 +194,9 @@ public class InviteAction extends SelectionProviderAction {
         if (usersSelected.isEmpty())
             return false;
 
+        if (!saros.isConnected())
+            return false;
+
         // Test if each user is reachable and available
         boolean sarosSupported = false;
         for (final JID jid : usersSelected) {

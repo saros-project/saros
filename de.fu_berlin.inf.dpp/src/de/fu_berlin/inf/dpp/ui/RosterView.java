@@ -708,8 +708,14 @@ public class RosterView extends ViewPart {
      * @swt Needs to called from an UI thread.
      */
     protected void updateEnablement() {
-        this.label.setEnabled(saros.isConnected());
-        if (saros.isConnected()) {
+        boolean connected = saros.isConnected();
+
+        this.label.setEnabled(connected);
+        this.renameContactAction.setEnabled(connected);
+        this.deleteContactAction.setEnabled(connected);
+        this.testAction.setEnabled(connected);
+
+        if (connected) {
             label.setToolTipText("Connected using Saros " + saros.getVersion());
         } else {
             label.setToolTipText(null);
@@ -818,6 +824,7 @@ public class RosterView extends ViewPart {
         manager.add(this.testAction);
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        updateEnablement();
     }
 
     private void makeActions() {
