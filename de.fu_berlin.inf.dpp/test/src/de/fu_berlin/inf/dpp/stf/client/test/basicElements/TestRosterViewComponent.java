@@ -7,13 +7,16 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewComponent;
 
 public class TestRosterViewComponent extends STFTest {
     private static final Logger log = Logger
@@ -36,7 +39,8 @@ public class TestRosterViewComponent extends STFTest {
         bob = InitMusician.newBob();
         carl = InitMusician.newCarl();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
     }
 
     /**
@@ -57,14 +61,15 @@ public class TestRosterViewComponent extends STFTest {
      * make sure,all opened popup windows and editor should be closed.
      * 
      * @throws RemoteException
+     * @throws XMPPException
      */
     @After
-    public void cleanUp() throws RemoteException {
-        if (alice.state.hasBuddyNickName(bob.jid)) {
+    public void cleanUp() throws RemoteException, XMPPException {
+        if (alice.rosterV.hasBuddyNickName(bob.jid)) {
             alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
         }
         if (!alice.rosterV.hasBuddy(bob.jid)) {
-            alice.addBuddyDone(bob);
+            alice.addBuddyGUIDone(bob);
         }
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
@@ -109,16 +114,59 @@ public class TestRosterViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void renameBuddyInRosterView() throws RemoteException {
+    public void renameBuddyWithGUI() throws RemoteException {
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        alice.rosterV.renameBuddyGUI(bob.jid, bob.getName());
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
+            .equals(bob.getName()));
+        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
+        alice.rosterV.renameBuddyGUI(bob.jid, "new bob");
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
+        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
+    }
+
+    @Test
+    public void renameBuddyWithoutGUI() throws RemoteException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
         alice.rosterV.renameBuddy(bob.jid, bob.getName());
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.state.getBuddyNickName(bob.jid).equals(bob.getName()));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
+            .equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
         alice.rosterV.renameBuddy(bob.jid, "new bob");
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.state.getBuddyNickName(bob.jid).equals("new bob"));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
+    }
+
+    @Test
+    public void addBuddyWithGUI() throws RemoteException {
+        alice.deleteBuddyGUIDone(bob);
+        assertFalse(alice.rosterV.hasBuddy(bob.jid));
+        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        alice.addBuddyGUIDone(bob);
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+    }
+
+    /**
+     * FIXME the method
+     * {@link RosterViewComponent#addANewContact(de.fu_berlin.inf.dpp.net.JID)}
+     * 
+     * @throws RemoteException
+     * @throws XMPPException
+     */
+    @Test
+    @Ignore
+    public void addBuddyWithoutGUI() throws RemoteException, XMPPException {
+        alice.deleteBuddyGUIDone(bob);
+        assertFalse(alice.rosterV.hasBuddy(bob.jid));
+        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        alice.addBuddyDone(bob);
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.rosterV.hasBuddy(alice.jid));
     }
 
     /**
@@ -135,7 +183,15 @@ public class TestRosterViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void deleteBuddyInRosterView() throws RemoteException {
+    public void deleteBuddyWithGUI() throws RemoteException {
+        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        alice.deleteBuddyGUIDone(bob);
+        assertFalse(alice.rosterV.hasBuddy(bob.jid));
+        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+    }
+
+    @Test
+    public void deleteBuddyWithoutGUI() throws RemoteException, XMPPException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
         alice.deleteBuddyDone(bob);
         assertFalse(alice.rosterV.hasBuddy(bob.jid));
@@ -156,9 +212,9 @@ public class TestRosterViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void inviteUserInRosterView() throws RemoteException {
+    public void inviteUserWithGUI() throws RemoteException {
         assertFalse(carl.sessionV.isInSession());
-        alice.rosterV.inviteUser(carl.jid);
+        alice.rosterV.inviteUserGUI(carl.jid);
         carl.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         assertTrue(carl.sessionV.isInSession());
     }

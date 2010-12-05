@@ -3,6 +3,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
@@ -68,9 +74,19 @@ public abstract class EclipseComponent {
     public static ViewPart viewPart;
     public static HelperPart helperPart;
     public static PerspectivePart perspectivePart;
-
     public static ToolbarPart toolbarPart;
 
+    // Picocontainer
+    public static Saros saros;
+    public static SarosSessionManager sessionManager;
+    public static DataTransferManager dataTransferManager;
+    public static EditorManager editorManager;
+    public static XMPPAccountStore xmppAccountStore;
+
+    // local JID
+    public static JID localJID;
+
+    // SWTBot framework
     public static SarosSWTBot bot;
     public static int sleepTime = 750;
 

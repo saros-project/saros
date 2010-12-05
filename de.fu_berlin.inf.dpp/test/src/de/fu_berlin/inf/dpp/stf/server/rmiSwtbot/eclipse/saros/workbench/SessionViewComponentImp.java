@@ -235,12 +235,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
                 contactLabel = OWN_CONTACT_NAME + ROLENAME;
             else
                 contactLabel = OWN_CONTACT_NAME;
-        } else if (state.hasBuddyNickName(contactJID)) {
+        } else if (rosterVC.hasBuddyNickName(contactJID)) {
             if (state.isDriver(contactJID))
-                contactLabel = state.getBuddyNickName(contactJID) + " ("
+                contactLabel = rosterVC.getBuddyNickName(contactJID) + " ("
                     + contactJID.getBase() + ")" + ROLENAME;
             else
-                contactLabel = state.getBuddyNickName(contactJID) + " ("
+                contactLabel = rosterVC.getBuddyNickName(contactJID) + " ("
                     + contactJID.getBase() + ")";
         } else {
             if (state.isDriver(contactJID))

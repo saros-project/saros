@@ -60,8 +60,8 @@ public class TestHandleContacts extends STFTest {
      */
     @After
     public void cleanUp() throws RemoteException {
-        alice.addBuddyDone(bob);
-        bob.addBuddyDone(alice);
+        alice.addBuddyGUIDone(bob);
+        bob.addBuddyGUIDone(alice);
         alice.workbench.resetWorkbench();
         bob.workbench.resetWorkbench();
     }
@@ -86,7 +86,7 @@ public class TestHandleContacts extends STFTest {
     public void testBobRemoveBuddyAlice() throws RemoteException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
         assertTrue(bob.rosterV.hasBuddy(alice.jid));
-        bob.deleteBuddyDone(alice);
+        bob.deleteBuddyGUIDone(alice);
         assertFalse(bob.rosterV.hasBuddy(alice.jid));
         assertFalse(alice.rosterV.hasBuddy(bob.jid));
     }
@@ -108,7 +108,7 @@ public class TestHandleContacts extends STFTest {
     public void testAliceRemoveBuddyBob() throws RemoteException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
         assertTrue(bob.rosterV.hasBuddy(alice.jid));
-        alice.deleteBuddyDone(bob);
+        alice.deleteBuddyGUIDone(bob);
         assertFalse(bob.rosterV.hasBuddy(alice.jid));
         assertFalse(alice.rosterV.hasBuddy(bob.jid));
     }
@@ -128,8 +128,8 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceAddBuddyBob() throws RemoteException {
-        alice.deleteBuddyDone(bob);
-        alice.addBuddyDone(bob);
+        alice.deleteBuddyGUIDone(bob);
+        alice.addBuddyGUIDone(bob);
         assertTrue(bob.rosterV.hasBuddy(alice.jid));
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
     }
@@ -149,8 +149,8 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobAddBuddyAlice() throws RemoteException {
-        bob.deleteBuddyDone(alice);
-        bob.addBuddyDone(alice);
+        bob.deleteBuddyGUIDone(alice);
+        bob.addBuddyGUIDone(alice);
         assertTrue(bob.rosterV.hasBuddy(alice.jid));
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
     }

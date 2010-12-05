@@ -38,6 +38,6 @@ public class TestMainMenuComponent extends STFTest {
      **********************************************/
     @Test
     public void testCreateAccountWithMainMenu() throws RemoteException {
-        alice.mainMenu.creatAccount(bob.jid, bob.password);
+        alice.mainMenu.creatAccountGUI(bob.jid, bob.password);
     }
 }

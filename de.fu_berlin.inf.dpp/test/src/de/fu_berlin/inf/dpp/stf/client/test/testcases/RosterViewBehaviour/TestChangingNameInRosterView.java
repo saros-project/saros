@@ -30,7 +30,8 @@ public class TestChangingNameInRosterView extends STFTest {
         bob = InitMusician.newBob();
         carl = InitMusician.newCarl();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
     }
 
     /**
@@ -54,11 +55,11 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @After
     public void cleanUp() throws RemoteException {
-        if (alice.state.hasBuddyNickName(bob.jid)) {
-            alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
+        if (alice.rosterV.hasBuddyNickName(bob.jid)) {
+            alice.rosterV.renameBuddyGUI(bob.jid, bob.jid.getBase());
         }
         if (!alice.rosterV.hasBuddy(bob.jid)) {
-            alice.addBuddyDone(bob);
+            alice.addBuddyGUIDone(bob);
         }
         bob.workbench.resetWorkbench();
         carl.workbench.resetWorkbench();
@@ -83,13 +84,14 @@ public class TestChangingNameInRosterView extends STFTest {
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        alice.rosterV.renameBuddy(bob.jid, bob.getName());
+        alice.rosterV.renameBuddyGUI(bob.jid, bob.getName());
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.state.getBuddyNickName(bob.jid).equals(bob.getName()));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
+            .equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.rosterV.renameBuddy(bob.jid, "new bob");
+        alice.rosterV.renameBuddyGUI(bob.jid, "new bob");
         assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.state.getBuddyNickName(bob.jid).equals("new bob"));
+        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 

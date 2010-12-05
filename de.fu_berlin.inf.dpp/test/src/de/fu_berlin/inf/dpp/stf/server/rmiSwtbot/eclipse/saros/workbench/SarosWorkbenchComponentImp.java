@@ -38,7 +38,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void resetSaros() throws RemoteException {
-        rosterVC.disconnect();
+        rosterVC.disconnectGUI();
         state.deleteAllProjects();
     }
 

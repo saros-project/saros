@@ -119,6 +119,11 @@ public class STFController {
         SarosSessionManager sessionManager,
         DataTransferManager dataTransferManager, EditorManager editorManager,
         XMPPAccountStore xmppAccountStore) throws RemoteException {
+        EclipseComponent.saros = saros;
+        EclipseComponent.sessionManager = sessionManager;
+        EclipseComponent.dataTransferManager = dataTransferManager;
+        EclipseComponent.editorManager = editorManager;
+        EclipseComponent.xmppAccountStore = xmppAccountStore;
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
@@ -156,8 +161,7 @@ public class STFController {
             SarosWorkbenchComponentImp.getInstance(), "workbench");
 
         EclipseComponent.state = (SarosState) exportObject(
-            SarosStateImp.getInstance(saros, sessionManager,
-                dataTransferManager, editorManager, xmppAccountStore), "state");
+            SarosStateImp.getInstance(), "state");
     }
 
     /**

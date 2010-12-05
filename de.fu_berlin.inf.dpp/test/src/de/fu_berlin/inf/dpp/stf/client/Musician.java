@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
@@ -293,13 +294,15 @@ public class Musician extends STFTest {
     }
 
     /**
-     * the "add buddy" action should be performed by both the users.
+     * add buddy with GUI, which should be performed by both the users.
      * 
      * @param peer
      *            the musician, which should be added in your contact list
      * @throws RemoteException
+     * @throws XMPPException
      */
-    public void addBuddyDone(Musician peer) throws RemoteException {
+    public void addBuddyDone(Musician peer) throws RemoteException,
+        XMPPException {
         if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContact(peer.jid);
             peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
@@ -308,9 +311,37 @@ public class Musician extends STFTest {
     }
 
     /**
-     * Remove given contact from Roster, if contact was added before.
+     * add buddy with GUI, which should be performed by both the users.
+     * 
+     * @param peer
+     *            the musician, which should be added in your contact list
+     * @throws RemoteException
      */
-    public void deleteBuddyDone(Musician peer) throws RemoteException {
+    public void addBuddyGUIDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasBuddy(peer.jid)) {
+            rosterV.addANewContactGUI(peer.jid);
+            peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
+            rosterV.confirmRequestOfSubscriptionReceivedWindow();
+        }
+    }
+
+    /**
+     * Remove given contact from Roster with GUI, if contact was added before.
+     */
+    public void deleteBuddyGUIDone(Musician peer) throws RemoteException {
+        if (!rosterV.hasBuddy(peer.jid))
+            return;
+        rosterV.deleteBuddyGUI(peer.jid);
+        peer.rosterV.confirmRemovelOfSubscriptionWindow();
+    }
+
+    /**
+     * Remove given contact from Roster without GUI, if contact was added before
+     * 
+     * @throws XMPPException
+     */
+    public void deleteBuddyDone(Musician peer) throws RemoteException,
+        XMPPException {
         if (!rosterV.hasBuddy(peer.jid))
             return;
         rosterV.deleteBuddy(peer.jid);

@@ -89,6 +89,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
         throws RemoteException {
+        if (!windowPart.activateShellWithText(SESSION_INVITATION))
+            windowPart.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingNewproject();
     }

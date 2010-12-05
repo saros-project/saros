@@ -111,8 +111,8 @@ public class TestSVNStateUpdates extends STFTest {
     public static void afterClass() throws RemoteException {
         if (MusicianConfigurationInfos.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
-            alice.rosterV.disconnect();
-            bob.rosterV.disconnect();
+            alice.rosterV.disconnectGUI();
+            bob.rosterV.disconnectGUI();
         } else {
             alice.workbench.resetSaros();
             bob.workbench.resetSaros();

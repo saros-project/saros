@@ -40,7 +40,7 @@ public class WindowPart extends EclipseComponent {
                 log.debug("Shell \"" + title + "\" found.");
                 if (!shell.isActive()) {
                     shell.activate();
-                    waitUntilShellActive(title);
+                    // waitUntilShellActive(title);
                 }
                 return true;
             }
@@ -264,7 +264,8 @@ public class WindowPart extends EclipseComponent {
     protected final static String CONFIRM_DELETE = "Confirm Delete";
 
     public void confirmDeleteWindow(String buttonName) {
-        windowPart.waitUntilShellActive(CONFIRM_DELETE);
+        if (!windowPart.activateShellWithText(CONFIRM_DELETE))
+            windowPart.waitUntilShellActive(CONFIRM_DELETE);
         windowPart.confirmWindow(CONFIRM_DELETE, buttonName);
     }
 
