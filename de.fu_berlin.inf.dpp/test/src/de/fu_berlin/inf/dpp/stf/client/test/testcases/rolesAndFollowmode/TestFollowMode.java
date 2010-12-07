@@ -21,7 +21,8 @@ public class TestFollowMode extends STFTest {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
     }
 
     @AfterClass
@@ -32,10 +33,10 @@ public class TestFollowMode extends STFTest {
 
     @After
     public void cleanUp() throws RemoteException {
-        if (bob.state.isInFollowMode())
-            bob.sessionV.stopFollowingThisUser(alice.state);
-        if (alice.state.isInFollowMode())
-            alice.sessionV.stopFollowingThisUser(bob.state);
+        if (bob.sessionV.isInFollowMode())
+            bob.sessionV.stopFollowingThisUserGUI(alice.jid);
+        if (alice.sessionV.isInFollowMode())
+            alice.sessionV.stopFollowingThisUserGUI(bob.jid);
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
     }
@@ -50,9 +51,9 @@ public class TestFollowMode extends STFTest {
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
-        bob.sessionV.followThisUser(alice.state);
+        bob.sessionV.followThisUserGUI(alice.jid);
         bob.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.state.isInFollowMode());
+        assertTrue(bob.sessionV.isInFollowMode());
         assertTrue(bob.editor.isJavaEditorActive(CLS1));
 
         String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
@@ -77,10 +78,10 @@ public class TestFollowMode extends STFTest {
         // alice.sessionV.followThisUser(bob.state);
         bob.editor.activateJavaEditor(CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(alice.state.isInFollowMode());
+        assertTrue(alice.sessionV.isInFollowMode());
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
 
-        bob.sessionV.followThisUser(alice.state);
+        bob.sessionV.followThisUserGUI(alice.jid);
         alice.pEV.newClass(PROJECT1, PKG1, CLS3);
         alice.editor.waitUntilJavaEditorActive(CLS3);
         alice.editor.setTextInJavaEditorWithSave(CP3, PROJECT1, PKG1, CLS3);

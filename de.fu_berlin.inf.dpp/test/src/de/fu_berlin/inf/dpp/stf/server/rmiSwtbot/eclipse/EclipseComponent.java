@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
@@ -84,7 +86,7 @@ public abstract class EclipseComponent {
     public static XMPPAccountStore xmppAccountStore;
 
     // local JID
-    public static JID localJID;
+    public JID localJID;
 
     // SWTBot framework
     public static SarosSWTBot bot;
@@ -130,5 +132,16 @@ public abstract class EclipseComponent {
                 folderpath += nodes[i] + "/";
         }
         return folderpath;
+    }
+
+    public String getTestFileContents(String testFilePath) {
+        Bundle bundle = saros.getBundle();
+        String contents;
+        try {
+            contents = FileUtils.read(bundle.getEntry(testFilePath));
+        } catch (NullPointerException e) {
+            throw new RuntimeException("Could not open " + testFilePath);
+        }
+        return contents;
     }
 }

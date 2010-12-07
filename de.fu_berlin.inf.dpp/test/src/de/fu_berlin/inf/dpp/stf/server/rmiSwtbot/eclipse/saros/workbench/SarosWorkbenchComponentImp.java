@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -38,6 +39,11 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void resetSaros() throws RemoteException {
+        List<String> allBuddies = rosterVC.getAllBuddies();
+        if (allBuddies != null && !allBuddies.isEmpty())
+            for (String buddyName : allBuddies) {
+                rosterVC.renameBuddy(buddyName, buddyName);
+            }
         rosterVC.disconnectGUI();
         state.deleteAllProjects();
     }

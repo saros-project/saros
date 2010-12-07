@@ -11,10 +11,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 
@@ -74,14 +72,6 @@ public class SarosConditions extends Conditions {
         return new IsEditorClosed(editor, name);
     }
 
-    public static ICondition isSessionClosed(SarosState state) {
-        return new isSessionclosed(state);
-    }
-
-    public static ICondition isInSession(SarosState state) {
-        return new IsInSession(state);
-    }
-
     public static ICondition isShellClosed(SWTWorkbenchBot bot, String name) {
         return new IsShellClosed(bot, name);
     }
@@ -111,11 +101,6 @@ public class SarosConditions extends Conditions {
         return new ExistNoResource(resourcePath);
     }
 
-    public static ICondition existsNoParticipants(SarosState state,
-        List<JID> jidsOfAllParticipants) {
-        return new ExistsNoParticipants(state, jidsOfAllParticipants);
-    }
-
     public static ICondition isChatMessageExist(ChatViewComponentImp chatV,
         String jid, String message) {
         return new IsChatMessageExist(chatV, jid, message);
@@ -137,16 +122,8 @@ public class SarosConditions extends Conditions {
         return new IsEditorContentsSame(editor, otherContent, filePath);
     }
 
-    public static ICondition isFollowingUser(SarosState state, String plainJID) {
-        return new IsFollowingUser(state, plainJID);
-    }
-
     public static ICondition isRevisionSame(String fullPath, String revisionID) {
         return new IsRevisionSame(fullPath, revisionID);
-    }
-
-    public static ICondition isDriver(SarosState state) {
-        return new IsDriver(state);
     }
 
     public static ICondition isUrlSame(String fullPath, String url) {

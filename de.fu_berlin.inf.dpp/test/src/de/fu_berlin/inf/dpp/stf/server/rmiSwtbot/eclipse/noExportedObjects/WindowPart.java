@@ -97,7 +97,7 @@ public class WindowPart extends EclipseComponent {
         String... nodes) {
         bot.shell(title).activate();
         SWTBotTree tree = bot.tree();
-        treePart.getTreeItemWithMatchText(tree, nodes).select();
+        treePart.getTreeItemWithRegexNodes(tree, nodes).select();
         basicPart.waitUntilButtonIsEnabled(buttonText);
         bot.button(buttonText).click();
     }

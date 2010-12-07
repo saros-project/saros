@@ -13,8 +13,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -41,8 +41,10 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE);
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE);
         alice = musicians.get(0);
         bob = musicians.get(1);
         carl = musicians.get(2);
@@ -123,7 +125,7 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
     @Test
     public void testChanginDriverWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.sessionV.giveExclusiveDriverRole(carl.state);
+        alice.sessionV.giveExclusiveDriverRoleGUI(carl.sessionV);
         /*
          * After new release 10.10.28 all of the observer is automatically in
          * follow mode(are the observers really in follow mode???) when host

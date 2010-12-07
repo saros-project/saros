@@ -46,7 +46,7 @@ public class TestFileOperations extends STFTest {
             carl, bob);
 
         /* carl follow alice */
-        carl.sessionV.followThisUser(alice.state);
+        carl.sessionV.followThisUserGUI(alice.jid);
     }
 
     /**

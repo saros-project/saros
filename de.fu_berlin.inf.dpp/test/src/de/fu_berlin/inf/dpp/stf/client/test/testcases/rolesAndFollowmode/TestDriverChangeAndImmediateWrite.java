@@ -31,7 +31,8 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
     }
 
     /**
@@ -73,7 +74,7 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        alice.sessionV.giveDriverRole(bob.state);
+        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.basic.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());

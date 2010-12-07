@@ -4,9 +4,11 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.widgets.MenuItem;
@@ -147,14 +149,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean isConnecting() throws RemoteException {
-        return getXmppConnectionState() == ConnectionState.CONNECTING;
-    }
-
-    public boolean isConnected() throws RemoteException {
-        return saros.isConnected();
-    }
-
     /**
      * connect using GUI-variant.
      * <p>
@@ -196,9 +190,25 @@ public class RosterViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellClosed(SHELL_CREATE_XMPP_ACCOUNT);
     }
 
+    public boolean isConnected() throws RemoteException {
+        return saros.isConnected();
+    }
+
     public boolean isConnectedGUI() throws RemoteException {
         precondition();
         return isToolbarButtonEnabled(TB_DISCONNECT);
+    }
+
+    public void waitUntilConnected() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isConnected();
+            }
+
+            public String getFailureMessage() {
+                return "can't connect.";
+            }
+        });
     }
 
     public void waitUntilConnectedGUI() throws RemoteException {
@@ -207,27 +217,10 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void disconnect() throws RemoteException {
-        precondition();
         if (isConnected()) {
             saros.disconnect();
-            waitUntil(new DefaultCondition() {
-                public boolean test() throws Exception {
-                    return !isConnected();
-                }
-
-                public String getFailureMessage() {
-                    return "It is still connecting.";
-                }
-            });
+            waitUntilDisConnected();
         }
-    }
-
-    public boolean isDisConnecting() throws RemoteException {
-        return getXmppConnectionState() == ConnectionState.DISCONNECTING;
-    }
-
-    public boolean isDisConnected() throws RemoteException {
-        return getXmppConnectionState() == ConnectionState.NOT_CONNECTED;
     }
 
     public void disconnectGUI() throws RemoteException {
@@ -236,6 +229,27 @@ public class RosterViewComponentImp extends EclipseComponent implements
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
             waitUntilDisConnectedGUI();
         }
+    }
+
+    public boolean isDisConnected() throws RemoteException {
+        return getXmppConnectionState() == ConnectionState.NOT_CONNECTED;
+    }
+
+    public boolean isDisConnectedGUI() throws RemoteException {
+        precondition();
+        return isToolbarButtonEnabled(TB_CONNECT);
+    }
+
+    public void waitUntilDisConnected() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isConnected();
+            }
+
+            public String getFailureMessage() {
+                return "can't connect.";
+            }
+        });
     }
 
     public void waitUntilDisConnectedGUI() throws RemoteException {
@@ -251,10 +265,9 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void addANewContact(JID jid) throws RemoteException, XMPPException {
-
         // TODO add the correct implementation
         // saros.addContact(jid, jid.getBase(), null, null);
-
+        throw new NotImplementedException();
     }
 
     public void addANewContactGUI(JID jid) throws RemoteException {
@@ -291,6 +304,15 @@ public class RosterViewComponentImp extends EclipseComponent implements
         windowPart.confirmWindow(SHELL_CONTACT_LOOKUP_FAILED, buttonType);
     }
 
+    public void waitUntilContactLookupFailedIsActive() throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
+    }
+
+    public void waitUntilWindowContactAlreadyAddedIsActive()
+        throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
+    }
+
     public boolean isWindowContactLookupFailedActive() throws RemoteException {
         return windowPart.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
@@ -305,11 +327,12 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * operations about buddy on the roster view
+     * get buddy /buddyNickName on the roster view
      * 
      **********************************************/
     public SWTBotTreeItem selectBuddyGUI(String baseJID) throws RemoteException {
-        return viewPart.selectTreeWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
+        return viewPart.selectTreeItemWithLabelsInView(VIEWNAME, BUDDIES,
+            baseJID);
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
@@ -323,6 +346,20 @@ public class RosterViewComponentImp extends EclipseComponent implements
             log.debug("roster entry.getType(): " + entry.getType());
         }
         return roster.contains(baseJID);
+    }
+
+    public List<String> getAllBuddies() throws RemoteException {
+        Roster roster = saros.getRoster();
+        if (roster == null)
+            return null;
+        if (roster.getEntries() == null)
+            return null;
+        List<String> allBuddyBaseJIDs = new ArrayList<String>();
+        Collection<RosterEntry> entries = roster.getEntries();
+        for (RosterEntry entry : entries) {
+            allBuddyBaseJIDs.add(entry.getUser());
+        }
+        return allBuddyBaseJIDs;
     }
 
     public boolean hasBuddyGUI(String buddyNickName) throws RemoteException {
@@ -366,7 +403,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void deleteBuddy(JID buddyJID) throws RemoteException, XMPPException {
         saros.removeContact(saros.getRoster().getEntry(buddyJID.getBase()));
-
     }
 
     public void deleteBuddyGUI(JID buddyJID) throws RemoteException {
@@ -375,7 +411,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
             return;
         try {
             SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-            SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree,
+            SWTBotTreeItem item = treePart.getTreeItemWithRegexNodes(tree,
                 BUDDIES + ".*", buddyNickName + ".*");
             item.contextMenu(CM_DELETE).click();
             windowPart.confirmDeleteWindow(YES);
@@ -397,8 +433,13 @@ public class RosterViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void renameBuddy(JID buddyJID, String newBuddyName)
         throws RemoteException {
+        renameBuddy(buddyJID.getBase(), newBuddyName);
+    }
+
+    public void renameBuddy(String baseJID, String newBuddyName)
+        throws RemoteException {
         Roster roster = saros.getRoster();
-        roster.getEntry(buddyJID.getBase()).setName(newBuddyName);
+        roster.getEntry(baseJID).setName(newBuddyName);
     }
 
     public void renameBuddyGUI(JID buddyJID, String newBuddyName)
@@ -409,7 +450,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
+        SWTBotTreeItem item = treePart.getTreeItemWithRegexNodes(tree, BUDDIES
             + ".*", buddyNickName + ".*");
         item.contextMenu(CM_RENAME).click();
         if (!windowPart.activateShellWithText("Set new nickname")) {
@@ -427,7 +468,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void inviteUser(JID buddyJID) throws RemoteException {
         // add the implementation.
-
     }
 
     public void inviteUserGUI(JID buddyJID) throws RemoteException {
@@ -437,7 +477,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = treePart.getTreeItemWithMatchText(tree, BUDDIES
+        SWTBotTreeItem item = treePart.getTreeItemWithRegexNodes(tree, BUDDIES
             + ".*", buddyNickName + ".*");
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
@@ -468,20 +508,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     /**
      * 
-     * @param context
-     * @param baseJID
-     * @throws RemoteException
-     */
-    private void clickContextMenuOfBuddy(String context, String baseJID)
-        throws RemoteException {
-        viewPart.clickContextMenuOfTreeInView(VIEWNAME, CM_DELETE, BUDDIES,
-            baseJID);
-    }
-
-    /**
-     * 
-     * Define the precondition which should be guaranteed when you want to
-     * perform actions within the roster view.
+     * Define the basic precondition that guarantees you can perform actions
+     * within the roster view successfully.
      * 
      * @throws RemoteException
      */
@@ -490,25 +518,36 @@ public class RosterViewComponentImp extends EclipseComponent implements
         setFocusOnRosterView();
     }
 
-    public void waitUntilContactLookupFailedIsActive() throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
-    }
-
-    public void waitUntilWindowContactAlreadyAddedIsActive()
-        throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
-    }
-
+    /**
+     * 
+     * @param tooltip
+     *            the tooltip text of the toolbar button which you want to know,
+     *            if it is enabled.
+     * @return <tt>true</tt>, if the toolbar button specified with the given
+     *         tooltip is enabled
+     */
     protected boolean isToolbarButtonEnabled(String tooltip) {
         return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
     }
 
+    /**
+     * click the toolbar button specified with the given tooltip.
+     * 
+     * @param tooltipText
+     *            the tooltip text of the toolbar button which you want to
+     *            click.
+     */
     protected void clickToolbarButtonWithTooltip(String tooltipText) {
         viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
     }
 
+    /**
+     * 
+     * @return all the {@link SWTBotToolbarButton} in this view.
+     */
+
     protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return viewPart.getToolbarButtonsOnView(VIEWNAME);
+        return viewPart.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
     private boolean isWizardCreateXMPPAccountActive() {
@@ -519,7 +558,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
     private void selectConnectAccount(String baseJID) {
         SWTBotToolbarDropDownButton b = bot.viewById(VIEWID)
             .toolbarDropDownButton(TB_CONNECT);
-
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
         b.menuItem(withRegex).click();

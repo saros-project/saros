@@ -28,7 +28,8 @@ public class TestSessionViewComponent extends STFTest {
         log.trace("alice create a new proejct and a new class.");
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         log.trace("alice share session with bob.");
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
     }
 
     @AfterClass
@@ -39,10 +40,10 @@ public class TestSessionViewComponent extends STFTest {
 
     @Before
     public void startUp() throws RemoteException {
-        if (!alice.state.isInSession()) {
+        if (!alice.sessionV.isInSession()) {
             bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-            alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-                bob);
+            alice.buildSessionSequentially(PROJECT1,
+                CONTEXT_MENU_SHARE_PROJECT, bob);
         }
         bob.workbench.openSarosViews();
         alice.workbench.openSarosViews();
@@ -51,19 +52,19 @@ public class TestSessionViewComponent extends STFTest {
     @After
     public void cleanUp() throws RemoteException {
 
-        if (bob.state.isInSession() && bob.state.isDriver()) {
-            alice.sessionV.removeDriverRole(bob.state);
+        if (bob.sessionV.isInSession() && bob.sessionV.isDriver()) {
+            alice.sessionV.removeDriverRoleGUI(bob.sessionV);
         }
-        if (alice.state.isInSession() && !alice.state.isDriver()) {
-            alice.sessionV.giveDriverRole(alice.state);
+        if (alice.sessionV.isInSession() && !alice.sessionV.isDriver()) {
+            alice.sessionV.giveDriverRoleGUI(alice.sessionV);
         }
         bob.workbench.resetWorkbench();
         alice.workbench.resetWorkbench();
-        if (bob.state.isInSession() && bob.state.isInFollowMode()) {
-            bob.sessionV.stopFollowing();
+        if (bob.sessionV.isInSession() && bob.sessionV.isInFollowMode()) {
+            bob.sessionV.stopFollowingGUI();
         }
-        if (alice.state.isInSession() && alice.state.isInFollowMode()) {
-            alice.sessionV.stopFollowing();
+        if (alice.sessionV.isInSession() && alice.sessionV.isInFollowMode()) {
+            alice.sessionV.stopFollowingGUI();
         }
     }
 
@@ -95,10 +96,10 @@ public class TestSessionViewComponent extends STFTest {
         bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
             alice.getBaseJid() + ROLE_NAME);
 
-        alice.sessionV.giveDriverRole(bob.state);
-        assertTrue(alice.state.isDriver());
-        assertTrue(alice.state.isDriver(bob.jid));
-        assertTrue(bob.state.isDriver());
+        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        assertTrue(alice.sessionV.isDriver());
+        assertTrue(alice.sessionV.isDriver(bob.jid));
+        assertTrue(bob.sessionV.isDriver());
 
         alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
             OWN_CONTACT_NAME + ROLE_NAME);
@@ -112,38 +113,56 @@ public class TestSessionViewComponent extends STFTest {
 
     @Test
     public void testGiveExclusiveDriverRole() throws RemoteException {
-        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME);
-        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            bob.getBaseJid());
-        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME);
-        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            alice.getBaseJid() + ROLE_NAME);
+        assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(OWN_CONTACT_NAME + ROLE_NAME));
+        assertTrue(alice.sessionV.getContactStatusInSessionView(bob.jid)
+            .equals(bob.getBaseJid()));
+        assertTrue(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME));
+        assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(alice.getBaseJid() + ROLE_NAME));
 
         log.trace("alice give bob exclusive driver role.");
-        alice.sessionV.giveExclusiveDriverRole(bob.state);
-        assertFalse(alice.state.isDriver());
-        assertTrue(bob.state.isDriver());
+        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
+        assertFalse(alice.sessionV.isDriver());
+        assertTrue(bob.sessionV.isDriver());
 
-        alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            OWN_CONTACT_NAME);
-        alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            bob.getBaseJid() + ROLE_NAME);
-        bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME);
-        bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            alice.getBaseJid());
+        assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(OWN_CONTACT_NAME));
+        assertTrue(alice.sessionV.getContactStatusInSessionView(bob.jid)
+            .equals(bob.getBaseJid() + ROLE_NAME));
+        assertTrue(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME));
+        assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(alice.getBaseJid()));
+    }
+
+    @Test
+    public void removeDriverRole() throws RemoteException {
+        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        assertTrue(alice.sessionV.isDriver());
+        assertTrue(bob.sessionV.isDriver());
+        alice.sessionV.removeDriverRoleGUI(bob.sessionV);
+        assertTrue(alice.sessionV.isDriver());
+        assertFalse(bob.sessionV.isDriver());
+        assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(OWN_CONTACT_NAME + ROLE_NAME));
+        assertFalse(alice.sessionV.getContactStatusInSessionView(bob.jid)
+            .equals(bob.getBaseJid() + ROLE_NAME));
+        assertFalse(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
+            OWN_CONTACT_NAME + ROLE_NAME));
+        assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
+            .equals(alice.getBaseJid() + ROLE_NAME));
     }
 
     @Test
     public void testIsInFollowMode() throws RemoteException {
-        assertFalse(alice.state.isInFollowMode());
-        assertFalse(bob.state.isInFollowMode());
-        bob.sessionV.followThisUser(alice.state);
-        assertTrue(bob.state.isInFollowMode());
-        alice.sessionV.followThisUser(bob.state);
-        assertTrue(alice.state.isInFollowMode());
+        assertFalse(alice.sessionV.isInFollowMode());
+        assertFalse(bob.sessionV.isInFollowMode());
+        bob.sessionV.followThisUserGUI(alice.jid);
+        assertTrue(bob.sessionV.isInFollowMode());
+        alice.sessionV.followThisUserGUI(bob.jid);
+        assertTrue(alice.sessionV.isInFollowMode());
     }
 
     /**
@@ -157,16 +176,20 @@ public class TestSessionViewComponent extends STFTest {
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
-        alice.sessionV.stopSessionWithUser(bob.state);
+        alice.sessionV.stopSessionWithUser(bob.jid);
     }
 
     @Test
     public void testIsInSession() throws RemoteException, InterruptedException {
         assertTrue(alice.sessionV.isInSession());
+        assertTrue(alice.sessionV.isInSessionGUI());
         assertTrue(bob.sessionV.isInSession());
+        assertTrue(bob.sessionV.isInSessionGUI());
         alice.leaveSessionFirst(bob);
         assertFalse(alice.sessionV.isInSession());
         assertFalse(bob.sessionV.isInSession());
+        assertFalse(alice.sessionV.isInSessionGUI());
+        assertFalse(bob.sessionV.isInSessionGUI());
     }
 
 }

@@ -22,7 +22,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
@@ -37,12 +36,52 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
  */
 public class ViewPart extends EclipseComponent {
 
-    public SWTBotView getView(String title) {
-        return bot.viewByTitle(title);
+    /**********************************************
+     * 
+     * open/activate/close view
+     * 
+     **********************************************/
+    /**
+     * open the given view specified with the viewId.
+     * 
+     * @param viewId
+     *            the id of the view, which you want to open.
+     */
+    public void openViewById(final String viewId) {
+        try {
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    final IWorkbench wb = PlatformUI.getWorkbench();
+                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+
+                    IWorkbenchPage page = win.getActivePage();
+                    try {
+                        IViewReference[] registeredViews = page
+                            .getViewReferences();
+                        for (IViewReference registeredView : registeredViews) {
+                            log.debug("registered view ID: "
+                                + registeredView.getId());
+                        }
+
+                        page.showView(viewId);
+                    } catch (PartInitException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            log.debug("Couldn't initialize " + viewId, e.getCause());
+        }
     }
 
-    public List<SWTBotToolbarButton> getToolbarButtonsOnView(String title) {
-        return getView(title).getToolbarButtons();
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @return <tt>true</tt> if the specified view is open.
+     * @see ViewPart#getTitlesOfOpenedViews()
+     */
+    public boolean isViewOpen(String title) {
+        return getTitlesOfOpenedViews().contains(title);
     }
 
     /**
@@ -77,24 +116,88 @@ public class ViewPart extends EclipseComponent {
     }
 
     /**
+     * close the specified view
+     * 
      * @param title
      *            the title on the view tab.
-     * @return <tt>true</tt> if the specified view is open.
-     * @see ViewPart#getTitlesOfAllOpenedViews()
      */
-    public boolean isViewOpen(String title) {
-        return getTitlesOfAllOpenedViews().contains(title);
+    public void closeViewByTitle(String title) {
+        if (isViewOpen(title)) {
+            bot.viewByTitle(title).close();
+        }
     }
 
     /**
-     * @return all titles of the views which are opened currently.
+     * close the given view specified with the viewId.
+     * 
+     * @param viewId
+     *            the id of the view, which you want to close.
+     */
+    public void closeViewById(final String viewId) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                final IViewPart view = page.findView(viewId);
+                if (view != null) {
+                    page.hideView(view);
+                }
+            }
+        });
+    }
+
+    /**********************************************
+     * 
+     * get Widget on the given view
+     * 
+     **********************************************/
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @return the {@link SWTBotView} specified with the given title.
+     */
+    public SWTBotView getView(String title) {
+        return bot.viewByTitle(title);
+    }
+
+    /**
+     * @return the title list of all the views which are opened currently.
      * @see SWTWorkbenchBot#views()
      */
-    public List<String> getTitlesOfAllOpenedViews() {
+    public List<String> getTitlesOfOpenedViews() {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotView view : bot.views())
             list.add(view.getTitle());
         return list;
+    }
+
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @param tooltipText
+     *            the tool tip text of the toolbar_button.
+     * @return the toolbar_button with the specified tooltipText on the given
+     *         view.
+     */
+    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String title,
+        String tooltipText) {
+        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(title)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(tooltipText)) {
+                return toolbarButton;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @return all {@link SWTBotToolbarButton} located in the given view.
+     */
+    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String title) {
+        return getView(title).getToolbarButtons();
     }
 
     /**
@@ -119,49 +222,81 @@ public class ViewPart extends EclipseComponent {
         return bot.viewByTitle(title).bot().table();
     }
 
+    /**********************************************
+     * 
+     * select Widget on the given view
+     * 
+     **********************************************/
     /**
-     * @param title
+     * Select a table item specified with the given label in the given view.
+     * 
+     * @param viewName
      *            the title on the view tab.
-     * @param tooltipText
-     *            the tooltip text of the button.
-     * @return the toolbar_button with the specified tooltipText.
+     * @param label
+     *            the table item' name, which you want to select.
      */
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String title,
-        String tooltipText) {
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(title)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(tooltipText)) {
-                return toolbarButton;
-            }
+    public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
+        String label) {
+        try {
+            SWTBotTable table = getTableInView(viewName);
+            return table.getTableItem(label).select();
+        } catch (WidgetNotFoundException e) {
+            log.warn(" table item " + label + " on View " + viewName
+                + " not found.", e);
         }
         return null;
     }
 
     /**
-     * close the specified view
-     * 
-     * @param title
+     * @param viewName
      *            the title on the view tab.
+     * @param labels
+     *            all labels on the treeitem widget
+     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
      */
-    public void closeViewByTitle(String title) {
-        if (isViewOpen(title)) {
-            bot.viewByTitle(title).close();
+
+    public SWTBotTreeItem selectTreeItemWithLabelsInView(String viewName,
+        String... labels) {
+        try {
+            return getTreeInView(viewName).expandNode(labels).select();
+        } catch (WidgetNotFoundException e) {
+            return null;
         }
     }
 
     /**
-     * Click a context menu of the selected table item. The method is defined as
-     * helper method for other clickTB*In*View methods in {@link SarosSWTBot}
-     * and should not be exported by rmi. <br/>
+     * {@link ViewPart#selectTreeItemWithLabelsInView(String, String...)}is
+     * different as this method, which need to wait until a selected treeitem is
+     * really expanded and then going on.
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param labels
+     *            all labels on the treeitem widget
+     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
+     */
+    public SWTBotTreeItem selectTreeItemWithLabelsInViewWithWaitungExpand(
+        String viewName, String... labels) {
+        return treePart.selectTreeWithLabelsWithWaitungExpand(
+            getTreeInView(viewName), labels);
+    }
+
+    /**********************************************
+     * 
+     * click Widget on the given view
+     * 
+     **********************************************/
+    /**
+     * Click a context menu of the selected table item in the given view..
+     * <p>
      * Operational steps:
      * <ol>
      * <li>select a table item</li>
-     * 
      * <li>then click the specified context menu on it</li>
      * </ol>
      * 
      * @param viewName
-     * 
+     *            the title on the view tab.
      * @param itemName
      *            the table item' name, whose context menu you want to click.
      * @see #selectTableItemWithLabelInView(String, String)
@@ -179,233 +314,29 @@ public class ViewPart extends EclipseComponent {
     }
 
     /**
-     * Select a table item in a view. The method is defined as helper method for
-     * other selectTB*In*View methods in {@link SarosSWTBot} and should not be
-     * exported by rmi. <br/>
-     * 
-     * @param viewName
-     * 
-     * @param label
-     *            the table item' name, which you want to select.
-     */
-    public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
-        String label) {
-        try {
-            SWTBotTable table = getTableInView(viewName);
-            return tablePart.selectTableItemWithLabel(table, label).select();
-        } catch (WidgetNotFoundException e) {
-            log.warn(" table item " + label + " on View " + viewName
-                + " not found.", e);
-        }
-        return null;
-    }
-
-    /**
-     * This method is very useful, if you want to click a submenu of the context
-     * menu of a selected treeitem.e.g. the context menu "Team->Commit...". You
-     * should first select the project that his context menu you want to click.
+     * This method is very useful, if you want to click a sub menu of a context
+     * menu of the treeitem specified with the given nodes. e.g. the sub menu
+     * "Team->Commit...".
      * 
      * @param viewTitle
-     *            the view title
+     *            the title on the view tab.
      * @param nodes
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the node array parameter.e.g.{"Foo-saros",
      *            "my.pkg", "myClass.java"}
      * @param contexts
-     *            all context menus'name.e.g. {"Team", "Commit..."}
+     *            context menu of the given treeitem and his sub menus. e.g.
+     *            {"Team", "Commit..."}
      * @throws RemoteException
      */
-    public void clickContextMenusOfTreeItemInView(String viewTitle,
+    public void clickSubmenusOfContextMenuOfTreeItemInView(String viewTitle,
         String[] nodes, String... contexts) throws RemoteException {
         SWTBotTree tree = getTreeInView(viewTitle);
-        SWTBotTreeItem treeItem = treePart
-            .getTreeItemWithMatchText(tree, nodes);
+        SWTBotTreeItem treeItem = treePart.getTreeItemWithRegexNodes(tree,
+            nodes);
         treeItem.select();
-
         ContextMenuHelper.clickContextMenu(tree, contexts);
 
-    }
-
-    /**
-     * @param viewName
-     *            the view title.
-     * @return <tt>true</tt> if the specified table item exists.
-     * 
-     */
-    public boolean isTableItemInViewExist(String viewName, String itemName) {
-        return tablePart.existTableItem(itemName);
-    }
-
-    /**
-     * 
-     * @param viewName
-     *            the view title.
-     * @param itemName
-     *            the table item name.
-     * @param contextName
-     * @return <tt>true</tt> if the specified context menu of the select table
-     *         item exists.
-     */
-    public boolean isContextMenuOfTableItemInViewExist(String viewName,
-        String itemName, String contextName) {
-        setFocusOnViewByTitle(viewName);
-        SWTBotTableItem item = selectTableItemWithLabelInView(viewName,
-            itemName);
-        try {
-            item.contextMenu(contextName);
-            return true;
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-    /**
-     * 
-     * @param viewName
-     * @param contextName
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "my.pkg", "myClass.java"}
-     * @return <tt>true</tt> if the specified context menu of the select tree
-     *         item exists.
-     * @throws RemoteException
-     */
-    public boolean isContextMenuOfTreeItemInViewExist(String viewName,
-        String contextName, String... nodes) throws RemoteException {
-        setFocusOnViewByTitle(viewName);
-        SWTBotTreeItem item = selectTreeWithLabelsInView(viewName, nodes);
-        try {
-            item.contextMenu(contextName);
-            return true;
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param viewTitle
-     *            the view title
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "my.pkg", "myClass.java"}.
-     * @param contexts
-     *            all context menus'name.e.g. {"Team", "Commit..."}.
-     * @return <tt>true</tt>, if the submenus of the selected treeitem's context
-     *         exists.
-     */
-    public boolean isMenusOfContextMenuOfTreeItemInViewExist(String viewTitle,
-        String[] nodes, String... contexts) {
-        try {
-            SWTBotTree tree = getTreeInView(viewTitle);
-            // you should first select the project,whose context you want to
-            // click.
-            SWTBotTreeItem treeItem = treePart.getTreeItemWithMatchText(tree,
-                nodes);
-            treeItem.select();
-            ContextMenuHelper.clickContextMenu(tree, contexts);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * click toolbar button in view. e.g. connect. if you don't know the tooltip
-     * exactly, please use this method.
-     * 
-     * @param viewName
-     * @param buttonTooltip
-     * @return
-     */
-    public SWTBotToolbarButton clickToolbarButtonWithTooltipInView(
-        String viewName, String buttonTooltip) {
-
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
-
-                return toolbarButton.click();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * click toolbar button in view. e.g. connect. You need to pass the full
-     * name of the tooltip. exactly.
-     * 
-     * @param viewName
-     * @param tooltip
-     */
-    public void clickToolbarPushButtonWithTooltipInView(String viewName,
-        String tooltip) {
-        bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
-    }
-
-    public void closeViewById(final String viewId) {
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                IWorkbenchPage page = win.getActivePage();
-                final IViewPart view = page.findView(viewId);
-                if (view != null) {
-                    page.hideView(view);
-                }
-            }
-        });
-    }
-
-    public void openViewById(final String viewId) {
-        try {
-            Display.getDefault().syncExec(new Runnable() {
-                public void run() {
-                    final IWorkbench wb = PlatformUI.getWorkbench();
-                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-
-                    IWorkbenchPage page = win.getActivePage();
-                    try {
-                        IViewReference[] registeredViews = page
-                            .getViewReferences();
-                        for (IViewReference registeredView : registeredViews) {
-                            log.debug("registered view ID: "
-                                + registeredView.getId());
-                        }
-
-                        page.showView(viewId);
-                    } catch (PartInitException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                }
-            });
-        } catch (IllegalArgumentException e) {
-            log.debug("Couldn't initialize " + viewId, e.getCause());
-        }
-    }
-
-    /**
-     * @param viewName
-     *            the title of the specified view
-     * @param labels
-     *            all labels on the widget
-     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
-     */
-
-    public SWTBotTreeItem selectTreeWithLabelsInView(String viewName,
-        String... labels) {
-        try {
-            return getTreeInView(viewName).expandNode(labels).select();
-        } catch (WidgetNotFoundException e) {
-            return null;
-        }
-    }
-
-    public SWTBotTreeItem selectTreeWithLabelsInViewWithWaitungExpand(
-        String viewName, String... labels) {
-        return treePart.selectTreeWithLabelsWithWaitungExpand(
-            getTreeInView(viewName), labels);
     }
 
     /**
@@ -428,18 +359,161 @@ public class ViewPart extends EclipseComponent {
      * 2. then click the context menu.
      * 
      * @param viewName
-     *            e.g. Package Explorer view or Resource Explorer view
+     *            the title on the view tab. e.g. Package Explorer view or
+     *            Resource Explorer view
      * @param nodes
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void clickContextMenuOfTreeInView(String viewName, String context,
-        String... nodes) throws RemoteException {
+    public void clickContextMenuOfTreeItemInView(String viewName,
+        String context, String... nodes) throws RemoteException {
         String[] contexts = { context };
-        clickContextMenusOfTreeItemInView(viewName, nodes, contexts);
+        clickSubmenusOfContextMenuOfTreeItemInView(viewName, nodes, contexts);
     }
 
+    /**
+     * click toolbar button in view. e.g. connect. if you don't know the tooltip
+     * exactly, please use this method.
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param buttonTooltip
+     *            the tooltip of the toolbar button which you want to click.
+     * @return
+     */
+    public SWTBotToolbarButton clickToolbarButtonWithTooltipInView(
+        String viewName, String buttonTooltip) {
+        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
+                return toolbarButton.click();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * click the toolbar button specified with the given tooltip in the given
+     * view. e.g. connect. You need to pass the full tooltiptext.
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param tooltip
+     *            the tooltip of the toolbar button which you want to click.
+     */
+    public void clickToolbarPushButtonWithTooltipInView(String viewName,
+        String tooltip) {
+        bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
+    }
+
+    /**********************************************
+     * 
+     * is widget existed on the given view
+     * 
+     **********************************************/
+    /**
+     * @param viewName
+     *            the title on the view tab.
+     * @return <tt>true</tt> if the specified table item exists.
+     * 
+     */
+    public boolean isTableItemInViewExist(String viewName, String itemName) {
+        return getTableInView(viewName).containsItem(itemName);
+    }
+
+    /**
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param itemName
+     *            the name of the table item.
+     * @param contextName
+     *            the name of the context menu of the given tableItem specified
+     *            with the given itemName
+     * @return <tt>true</tt> if the specified context menu of the select table
+     *         item exists.
+     */
+    public boolean isContextMenuOfTableItemInViewExist(String viewName,
+        String itemName, String contextName) {
+
+        if (!isTableItemInViewExist(viewName, itemName))
+            return false;
+        SWTBotTableItem item = selectTableItemWithLabelInView(viewName,
+            itemName);
+        try {
+            item.contextMenu(contextName);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param contextName
+     *            then name of the context menu of the selected treeitem
+     *            specified with the given nodes.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{"Foo-saros",
+     *            "my.pkg", "myClass.java"}
+     * @return <tt>true</tt> if the specified context menu of the select tree
+     *         item exists.
+     * @throws RemoteException
+     */
+    public boolean isContextMenuOfTreeItemInViewExist(String viewName,
+        String contextName, String... nodes) throws RemoteException {
+        setFocusOnViewByTitle(viewName);
+        SWTBotTreeItem item = selectTreeItemWithLabelsInView(viewName, nodes);
+        try {
+            item.contextMenu(contextName);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.{"Foo-saros",
+     *            "my.pkg", "myClass.java"}.
+     * @param contexts
+     *            context menu of the given treeitem and his sub menus. e.g.
+     *            {"Team", "Commit..."}
+     * @return <tt>true</tt>, if the submenus of the selected treeitem's context
+     *         exists.
+     */
+    public boolean isSubmenusOfContextMenuOfTreeItemInViewExist(
+        String viewTitle, String[] nodes, String... contexts) {
+        try {
+            SWTBotTree tree = getTreeInView(viewTitle);
+            // you should first select the project,whose context you want to
+            // click.
+            SWTBotTreeItem treeItem = treePart.getTreeItemWithRegexNodes(tree,
+                nodes);
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, contexts);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param buttonTooltip
+     *            the tooltip of the toolbar button which you want to know, if
+     *            it is enabled.
+     * @return <tt>true</tt>, if the given toolbar button is enabled.
+     */
     public boolean isToolbarInViewEnabled(String viewName, String buttonTooltip) {
         SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
             viewName, buttonTooltip);
@@ -447,6 +521,12 @@ public class ViewPart extends EclipseComponent {
             return false;
         return button.isEnabled();
     }
+
+    /**********************************************
+     * 
+     * wait until widget is *
+     * 
+     **********************************************/
 
     /**
      * 

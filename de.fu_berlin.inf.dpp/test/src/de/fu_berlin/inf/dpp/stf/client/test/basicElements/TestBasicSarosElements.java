@@ -40,7 +40,7 @@ public class TestBasicSarosElements {
         assertEquals(false, alice.sessionV.isSessionViewOpen());
         alice.sessionV.openSessionView();
         alice.basic
-            .captureScreenshot((alice.state.getPathToScreenShot() + "/session_view.png"));
+            .captureScreenshot((alice.basic.getPathToScreenShot() + "/session_view.png"));
         assertEquals(true, alice.sessionV.isSessionViewOpen());
     }
 
@@ -50,7 +50,7 @@ public class TestBasicSarosElements {
         assertEquals(false, alice.rosterV.isRosterViewOpen());
         alice.rosterV.openRosterView();
         alice.basic
-            .captureScreenshot((alice.state.getPathToScreenShot() + "/roster_view.png"));
+            .captureScreenshot((alice.basic.getPathToScreenShot() + "/roster_view.png"));
         assertEquals(true, alice.rosterV.isRosterViewOpen());
     }
 
@@ -76,7 +76,7 @@ public class TestBasicSarosElements {
         alice.rosterV.connect(alice.jid, alice.password);
         log.trace("captureScreenshot");
         alice.basic
-            .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_connected.png"));
+            .captureScreenshot((alice.basic.getPathToScreenShot() + "/xmpp_connected.png"));
         assertEquals(true, alice.rosterV.isConnected());
     }
 
@@ -92,7 +92,7 @@ public class TestBasicSarosElements {
         alice.rosterV.connect(alice.jid, alice.password);
         alice.rosterV.disconnectGUI();
         alice.basic
-            .captureScreenshot((alice.state.getPathToScreenShot() + "/xmpp_disconnected.png"));
+            .captureScreenshot((alice.basic.getPathToScreenShot() + "/xmpp_disconnected.png"));
         assertEquals(false, alice.rosterV.isConnected());
     }
 }

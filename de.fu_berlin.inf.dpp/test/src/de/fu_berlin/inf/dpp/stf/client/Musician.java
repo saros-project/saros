@@ -86,16 +86,18 @@ public class Musician extends STFTest {
         try {
             // bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
             state = (SarosState) registry.lookup("state");
+
+            workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
+            chatV = (ChatViewComponent) registry.lookup("chatView");
+            rosterV = (RosterViewComponent) registry.lookup("rosterView");
+            sessionV = (SessionViewComponent) registry.lookup("sessionView");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it
              * work for the remote tests too.
              */
-            state.setJID(jid);
-            workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
-            chatV = (ChatViewComponent) registry.lookup("chatView");
-            rosterV = (RosterViewComponent) registry.lookup("rosterView");
-            sessionV = (SessionViewComponent) registry.lookup("sessionView");
+
+            sessionV.setJID(jid);
             rSV = (RSViewComponent) registry.lookup("remoteScreenView");
             // popupWindow = (ExWindowObject) registry.lookup("popUpWindow");
 
@@ -235,7 +237,7 @@ public class Musician extends STFTest {
             final Musician musician = musicians[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.followThisUser(state);
+                    musician.sessionV.followThisUserGUI(jid);
                     return null;
                 }
             });
@@ -259,7 +261,7 @@ public class Musician extends STFTest {
             final Musician musician = musicians[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.stopFollowingThisUser(state);
+                    musician.sessionV.stopFollowingThisUserGUI(jid);
                     return null;
                 }
             });
@@ -300,6 +302,7 @@ public class Musician extends STFTest {
      *            the musician, which should be added in your contact list
      * @throws RemoteException
      * @throws XMPPException
+     * 
      */
     public void addBuddyDone(Musician peer) throws RemoteException,
         XMPPException {
@@ -350,7 +353,7 @@ public class Musician extends STFTest {
 
     public void shareYourScreenWithSelectedUserDone(Musician peer)
         throws RemoteException {
-        sessionV.shareYourScreenWithSelectedUser(peer.state);
+        sessionV.shareYourScreenWithSelectedUserGUI(peer.jid);
         peer.sessionV.confirmIncomingScreensharingSesionWindow();
     }
 

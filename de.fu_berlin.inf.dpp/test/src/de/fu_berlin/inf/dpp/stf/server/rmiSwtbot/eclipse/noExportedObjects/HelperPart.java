@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -25,17 +28,35 @@ public class HelperPart extends EclipseComponent {
     }
 
     public String ConvertStreamToString(InputStream is) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(
-            new InputStreamReader(is));
-        StringBuilder stringBuilder = new StringBuilder();
-        String line = null;
-
-        while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line + "\n");
+        // BufferedReader bufferedReader = new BufferedReader(
+        // new InputStreamReader(is));
+        // StringBuilder stringBuilder = new StringBuilder();
+        // String line = null;
+        //
+        // while ((line = bufferedReader.readLine()) != null) {
+        // stringBuilder.append(line + "\n");
+        // }
+        //
+        // bufferedReader.close();
+        // return stringBuilder.toString();
+        if (is != null) {
+            Writer writer = new StringWriter();
+            char[] buffer = new char[5024];
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(is,
+                    "UTF-8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } finally {
+                is.close();
+                writer.close();
+            }
+            return writer.toString();
+        } else {
+            return "";
         }
-
-        bufferedReader.close();
-        return stringBuilder.toString();
     }
 
     public boolean isSame(InputStream input1, InputStream input2)

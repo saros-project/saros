@@ -13,8 +13,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -42,8 +42,10 @@ public class TestDriverResetsFiles extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE,
             MusicianConfigurationInfos.PORT_EDNA);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -107,7 +109,7 @@ public class TestDriverResetsFiles extends STFTest {
      * <li></li>
      * <li>Dave and Edna verify that the dirty flag of the file disappears and
      * that the conent is the same as Carl</li>
-     * <li>bob verifies that th content of the file is the same as carl</li>
+     * <li>bob verifies that the content of the file is the same as carl</li>
      * </ol>
      * 
      * @throws CoreException
@@ -116,8 +118,8 @@ public class TestDriverResetsFiles extends STFTest {
 
     @Test
     public void testAliceResetsFile() throws IOException, CoreException {
-        dave.sessionV.followThisUser(alice.state);
-        edna.sessionV.followThisUser(alice.state);
+        dave.sessionV.followThisUserGUI(alice.jid);
+        edna.sessionV.followThisUserGUI(alice.jid);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
 
         alice.editor.closejavaEditorWithoutSave(CLS1);
@@ -126,13 +128,12 @@ public class TestDriverResetsFiles extends STFTest {
 
         String contentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);
-        System.out.println("alice's class content" + contentOfAlice);
         String contentOfDave = dave.state.getClassContent(PROJECT1, PKG1, CLS1);
-        System.out.println("dave's class content" + contentOfDave);
+
         String contentOfEdna = edna.state.getClassContent(PROJECT1, PKG1, CLS1);
-        System.out.println("dave's class content" + contentOfDave);
+
         String contentOfBob = bob.state.getClassContent(PROJECT1, PKG1, CLS1);
-        System.out.println("bob's class content" + contentOfBob);
+
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));
         assertTrue(contentOfAlice.equals(contentOfBob));

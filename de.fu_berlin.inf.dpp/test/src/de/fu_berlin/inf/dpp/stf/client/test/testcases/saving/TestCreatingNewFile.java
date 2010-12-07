@@ -146,10 +146,10 @@ public class TestCreatingNewFile extends STFTest {
     @Test
     public void testCarlGiveExclusiveDriverRole() throws IOException,
         CoreException {
-        carl.sessionV.giveExclusiveDriverRole(alice.state);
+        carl.sessionV.giveExclusiveDriverRoleGUI(alice.sessionV);
 
-        assertFalse(carl.state.isDriver());
-        assertTrue(alice.state.isDriver());
+        assertFalse(carl.sessionV.isDriver());
+        assertTrue(alice.sessionV.isDriver());
 
         carl.pEV.newFolder(FOLDER1, PROJECT1);
         carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
@@ -158,10 +158,10 @@ public class TestCreatingNewFile extends STFTest {
         bob.basic.sleep(500);
         assertFalse(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
 
-        if (!carl.state.isFollowingUser(alice.getBaseJid()))
-            carl.sessionV.followThisUser(alice.state);
-        if (!bob.state.isFollowingUser(alice.getBaseJid()))
-            bob.sessionV.followThisUser(alice.state);
+        if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))
+            carl.sessionV.followThisUserGUI(alice.jid);
+        if (!bob.sessionV.isFollowingUser(alice.getBaseJid()))
+            bob.sessionV.followThisUserGUI(alice.jid);
 
         alice.pEV.newFolder(PROJECT1, FOLDER2);
         alice.pEV.newFile(PROJECT1, FOLDER2, FILE2);

@@ -78,36 +78,37 @@ public class TestShare2UsersSequentially extends STFTest {
         InterruptedException {
         log.trace("testShareProject enter");
 
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            bob);
         bob.basic
-            .captureScreenshot((bob.state.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
+            .captureScreenshot((bob.basic.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice.basic
-            .captureScreenshot((alice.state.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
+            .captureScreenshot((alice.basic.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
         log.trace("inviter.setTextInClass");
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
 
         log.trace("invitee.openFile");
         bob.pEV.openClass(PROJECT1, PKG1, CLS1);
 
-        assertTrue(bob.state.isParticipant());
-        assertTrue(alice.state.isParticipant());
+        assertTrue(bob.sessionV.isParticipant());
+        assertTrue(alice.sessionV.isParticipant());
 
-        assertTrue(bob.state.isObserver());
-        assertFalse(alice.state.isObserver());
+        assertTrue(bob.sessionV.isObserver());
+        assertFalse(alice.sessionV.isObserver());
 
-        assertTrue(alice.state.isDriver());
-        assertFalse(bob.state.isDriver());
+        assertTrue(alice.sessionV.isDriver());
+        assertFalse(bob.sessionV.isDriver());
 
         alice.leaveSessionFirstByPeers(bob);
 
-        assertFalse(bob.state.isParticipant());
-        assertFalse(alice.state.isParticipant());
+        assertFalse(bob.sessionV.isParticipant());
+        assertFalse(alice.sessionV.isParticipant());
 
-        assertFalse(bob.state.isObserver());
-        assertFalse(alice.state.isObserver());
+        assertFalse(bob.sessionV.isObserver());
+        assertFalse(alice.sessionV.isObserver());
 
-        assertFalse(alice.state.isDriver());
-        assertFalse(bob.state.isDriver());
+        assertFalse(alice.sessionV.isDriver());
+        assertFalse(bob.sessionV.isDriver());
 
     }
 }

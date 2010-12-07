@@ -273,7 +273,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         throws RemoteException {
         precondition();
         String[] matchTexts = helperPart.changeToRegex(projectName);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
             SHARE_PROJECT);
     }
 
@@ -333,7 +333,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     private void clickContextMenuOfSaros(String projectName, String contextName)
         throws RemoteException {
         String[] matchTexts = helperPart.changeToRegex(projectName);
-        viewPart.clickContextMenusOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
             contextName);
     }
 

@@ -74,12 +74,10 @@ public class TablePart extends EclipseComponent {
         return null;
     }
 
-    public SWTBotTableItem selectTableItemWithLabel(SWTBotTable table,
-        String label) {
+    public SWTBotTableItem getTableItemWithLabel(SWTBotTable table, String label) {
         try {
             waitUntilTableItemExisted(table, label);
             return table.getTableItem(label);
-
         } catch (WidgetNotFoundException e) {
             log.warn("table item " + label + " not found.", e);
         }

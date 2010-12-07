@@ -145,7 +145,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.pEV.isWIndowSessionInvitationActive();
         edna.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
-        assertFalse(edna.sessionV.isInSession());
-        assertFalse(alice.state.isObserver(edna.jid));
+        assertFalse(edna.sessionV.isInSessionGUI());
+        assertFalse(alice.sessionV.isObserver(edna.jid));
     }
 }

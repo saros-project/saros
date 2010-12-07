@@ -213,10 +213,10 @@ public class TestRosterViewComponent extends STFTest {
      */
     @Test
     public void inviteUserWithGUI() throws RemoteException {
-        assertFalse(carl.sessionV.isInSession());
+        assertFalse(carl.sessionV.isInSessionGUI());
         alice.rosterV.inviteUserGUI(carl.jid);
         carl.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
-        assertTrue(carl.sessionV.isInSession());
+        assertTrue(carl.sessionV.isInSessionGUI());
     }
 
 }

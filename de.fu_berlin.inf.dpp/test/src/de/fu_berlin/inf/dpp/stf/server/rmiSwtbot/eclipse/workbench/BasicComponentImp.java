@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
+import org.osgi.framework.Bundle;
+
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class BasicComponentImp extends EclipseComponent implements
@@ -28,6 +30,11 @@ public class BasicComponentImp extends EclipseComponent implements
     public void captureScreenshot(String filename) throws RemoteException {
         if (SCREENSHOTS)
             bot.captureScreenshot(filename);
+    }
+
+    public String getPathToScreenShot() throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
     // // FIXME If the file doesn't exist, this method hits the

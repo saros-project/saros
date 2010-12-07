@@ -69,7 +69,7 @@ public class TestSVNStateInitialization extends STFTest {
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
         if (MusicianConfigurationInfos.DEVELOPMODE) {
-            if (alice.sessionV.isInSession())
+            if (alice.sessionV.isInSessionGUI())
                 alice.sessionV.leaveTheSessionByHost();
             // don't delete SVN_PROJECT_COPY
         } else {
@@ -99,12 +99,12 @@ public class TestSVNStateInitialization extends STFTest {
     @After
     public void tearDown() throws RemoteException {
         bob.workbench.resetWorkbench();
-        if (bob.sessionV.isInSession())
+        if (bob.sessionV.isInSessionGUI())
             bob.sessionV.leaveTheSessionByPeer();
         bob.state.deleteAllProjects();
 
         alice.workbench.resetWorkbench();
-        if (alice.sessionV.isInSession())
+        if (alice.sessionV.isInSessionGUI())
             alice.sessionV.leaveTheSessionByHost();
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
@@ -128,12 +128,12 @@ public class TestSVNStateInitialization extends STFTest {
     public void testSimpleCheckout() throws RemoteException {
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.state.isDriver());
-        assertTrue(alice.state.isParticipant(bob.jid));
-        assertTrue(bob.state.isObserver(bob.jid));
+        assertTrue(alice.sessionV.isDriver());
+        assertTrue(alice.sessionV.isParticipant(bob.jid));
+        assertTrue(bob.sessionV.isObserver(bob.jid));
     }
 
     /**
@@ -160,7 +160,7 @@ public class TestSVNStateInitialization extends STFTest {
         assertEquals(SVN_CLS1_REV1, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
 
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_REV1, bob.pEV.getRevision(SVN_CLS1_FULL_PATH));
@@ -191,7 +191,7 @@ public class TestSVNStateInitialization extends STFTest {
             alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
@@ -226,7 +226,7 @@ public class TestSVNStateInitialization extends STFTest {
         assertEquals(SVN_CLS1_REV3, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
@@ -266,7 +266,7 @@ public class TestSVNStateInitialization extends STFTest {
 
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
         assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));

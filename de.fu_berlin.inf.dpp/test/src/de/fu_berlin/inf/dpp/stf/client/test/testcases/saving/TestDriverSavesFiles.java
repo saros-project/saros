@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -42,8 +42,10 @@ public class TestDriverSavesFiles extends STFTest {
          * initialize the musicians simultaneously
          */
         List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL, MusicianConfigurationInfos.PORT_DAVE,
+            MusicianConfigurationInfos.PORT_ALICE,
+            MusicianConfigurationInfos.PORT_BOB,
+            MusicianConfigurationInfos.PORT_CARL,
+            MusicianConfigurationInfos.PORT_DAVE,
             MusicianConfigurationInfos.PORT_EDNA);
         alice = musicians.get(0);
         bob = musicians.get(1);
@@ -62,8 +64,8 @@ public class TestDriverSavesFiles extends STFTest {
             edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
-        dave.sessionV.followThisUser(alice.state);
-        edna.sessionV.followThisUser(alice.state);
+        dave.sessionV.followThisUserGUI(alice.jid);
+        edna.sessionV.followThisUserGUI(alice.jid);
     }
 
     /**
@@ -132,12 +134,12 @@ public class TestDriverSavesFiles extends STFTest {
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS1);
 
-        dave.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS1,
-            dirtyClsContentOfAlice);
+        dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
+            PROJECT1, PKG1, CLS1);
         assertTrue(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
-        edna.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS1,
-            dirtyClsContentOfAlice);
+        edna.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
+            PROJECT1, PKG1, CLS1);
         assertTrue(edna.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
     }
@@ -192,8 +194,8 @@ public class TestDriverSavesFiles extends STFTest {
         carl.pEV.openFileWith("Text Editor",
             getClassNodes(PROJECT1, PKG1, CLS2));
 
-        carl.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS2,
-            dirtyCls2ContentOfAlice);
+        carl.editor.waitUntilJavaEditorContentSame(dirtyCls2ContentOfAlice,
+            PROJECT1, PKG1, CLS2);
         assertTrue(carl.editor.isClassDirty(PROJECT1, PKG1, CLS2,
             ID_TEXT_EDITOR));
         String dirtyCls2ContentOfCarl = carl.editor.getTextOfJavaEditor(
@@ -233,24 +235,26 @@ public class TestDriverSavesFiles extends STFTest {
             CLS2);
         String dirtyCls2ChangeContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT1, PKG1, CLS2);
-        dave.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS2,
-            dirtyCls2ChangeContentOfAlice);
+        dave.editor.waitUntilJavaEditorContentSame(
+            dirtyCls2ChangeContentOfAlice, PROJECT1, PKG1, CLS2);
         assertFalse(dave.editor.isClassDirty(PROJECT1, PKG1, CLS2,
             ID_JAVA_EDITOR));
-        edna.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS2,
-            dirtyCls2ChangeContentOfAlice);
+        edna.editor.waitUntilJavaEditorContentSame(
+            dirtyCls2ChangeContentOfAlice, PROJECT1, PKG1, CLS2);
         assertFalse(edna.editor.isClassDirty(PROJECT1, PKG1, CLS2,
             ID_JAVA_EDITOR));
 
-        bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS2,
-            dirtyCls2ChangeContentOfAlice);
+        // bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS2,
+        // dirtyCls2ChangeContentOfAlice);
         String contentChangeOfBob = bob.state.getClassContent(PROJECT1, PKG1,
             CLS2);
+        System.out.println(contentChangeOfBob);
+        System.out.println(dirtyCls2ChangeContentOfAlice);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
         carl.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS2));
-        carl.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS2,
-            dirtyCls2ChangeContentOfAlice);
+        carl.editor.waitUntilJavaEditorContentSame(
+            dirtyCls2ChangeContentOfAlice, PROJECT1, PKG1, CLS2);
         String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,
             CLS2);
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
@@ -286,8 +290,8 @@ public class TestDriverSavesFiles extends STFTest {
             clsConentOfAlice);
         assertFalse(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
-        edna.editor.waitUntilEditorContentSame(PROJECT1, PKG1, CLS1,
-            clsConentOfAlice);
+        edna.editor.waitUntilJavaEditorContentSame(clsConentOfAlice, PROJECT1,
+            PKG1, CLS1);
         assertFalse(edna.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
 

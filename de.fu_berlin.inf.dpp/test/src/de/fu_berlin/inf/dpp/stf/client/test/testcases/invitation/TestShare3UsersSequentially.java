@@ -80,31 +80,31 @@ public class TestShare3UsersSequentially extends STFTest {
         alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             carl, bob);
 
-        assertTrue(carl.state.isParticipant());
-        assertTrue(carl.state.isObserver());
-        assertFalse(carl.state.isDriver());
+        assertTrue(carl.sessionV.isParticipant());
+        assertTrue(carl.sessionV.isObserver());
+        assertFalse(carl.sessionV.isDriver());
 
-        assertTrue(bob.state.isParticipant());
-        assertTrue(bob.state.isObserver());
-        assertFalse(bob.state.isDriver());
+        assertTrue(bob.sessionV.isParticipant());
+        assertTrue(bob.sessionV.isObserver());
+        assertFalse(bob.sessionV.isDriver());
 
-        assertTrue(alice.state.isParticipant());
-        assertFalse(alice.state.isObserver());
-        assertTrue(alice.state.isDriver());
+        assertTrue(alice.sessionV.isParticipant());
+        assertFalse(alice.sessionV.isObserver());
+        assertTrue(alice.sessionV.isDriver());
 
         alice.leaveSessionFirstByPeers(carl, bob);
 
-        assertFalse(carl.state.isParticipant());
-        assertFalse(carl.state.isObserver());
-        assertFalse(carl.state.isDriver());
+        assertFalse(carl.sessionV.isParticipant());
+        assertFalse(carl.sessionV.isObserver());
+        assertFalse(carl.sessionV.isDriver());
 
-        assertFalse(bob.state.isParticipant());
-        assertFalse(bob.state.isObserver());
-        assertFalse(bob.state.isDriver());
+        assertFalse(bob.sessionV.isParticipant());
+        assertFalse(bob.sessionV.isObserver());
+        assertFalse(bob.sessionV.isDriver());
 
-        assertFalse(alice.state.isParticipant());
-        assertFalse(alice.state.isObserver());
-        assertFalse(alice.state.isDriver());
+        assertFalse(alice.sessionV.isParticipant());
+        assertFalse(alice.sessionV.isObserver());
+        assertFalse(alice.sessionV.isDriver());
 
     }
 }

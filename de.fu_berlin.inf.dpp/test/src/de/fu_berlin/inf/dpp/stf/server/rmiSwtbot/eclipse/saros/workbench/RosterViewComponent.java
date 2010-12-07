@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jivesoftware.smack.Roster;
@@ -79,19 +80,6 @@ public interface RosterViewComponent extends Remote {
     public void connect(JID jid, String password) throws RemoteException;
 
     /**
-     * 
-     * @return <tt>true</tt>, if Saros is in the process of connecting
-     * @throws RemoteException
-     */
-    public boolean isConnecting() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if Saros is connected to a XMPP server.
-     * @throws RemoteException
-     */
-    public boolean isConnected() throws RemoteException;
-
-    /**
      * Fill up the configuration wizard to create a new account.
      * 
      * TODO how/when to activate the configuration wizard is still not clear to
@@ -111,12 +99,25 @@ public interface RosterViewComponent extends Remote {
         String password) throws RemoteException;
 
     /**
+     * @return <tt>true</tt>, if Saros is connected to a XMPP server.
+     * @throws RemoteException
+     */
+    public boolean isConnected() throws RemoteException;
+
+    /**
      * 
      * @return<tt>true</tt>, if the toolbarbutton with the tooltip text
      *                       "Disconnect.*" is visible.
      * @throws RemoteException
      */
     public boolean isConnectedGUI() throws RemoteException;
+
+    /**
+     * waits until the xmpp connection is really created without GUI
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilConnected() throws RemoteException;
 
     /**
      * waits until the xmpp connection is really created
@@ -134,13 +135,6 @@ public interface RosterViewComponent extends Remote {
 
     /**
      * 
-     * @return<tt>true</tt>, if Saros is in the process of disconnecting
-     * @throws RemoteException
-     */
-    public boolean isDisConnecting() throws RemoteException;
-
-    /**
-     * 
      * @return<tt>true</tt>, if Saros is not connected to a XMPP Server
      * @throws RemoteException
      */
@@ -152,6 +146,13 @@ public interface RosterViewComponent extends Remote {
      * @throws RemoteException
      */
     public void disconnectGUI() throws RemoteException;
+
+    /**
+     * Waits until the connection is disconnected without GUI
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilDisConnected() throws RemoteException;
 
     /**
      * Waits until the connection is disconnected using GUI
@@ -235,6 +236,8 @@ public interface RosterViewComponent extends Remote {
         throws RemoteException;
 
     /**
+     * This popup window is only activated if man try to add a invalid contact
+     * using the {@link RosterViewComponent#addANewContactGUI}
      * 
      * @return <tt>true</tt>, is the popup window with the title
      *         "Contact lookup failed" is active
@@ -244,13 +247,16 @@ public interface RosterViewComponent extends Remote {
 
     /**
      * waits until the popup window with the title "Contact lookup failed" is
-     * active
+     * active. This popup window is only activated if man try to add a invalid
+     * contact using the {@link RosterViewComponent#addANewContactGUI}
      * 
      * @throws RemoteException
      */
     public void waitUntilContactLookupFailedIsActive() throws RemoteException;
 
     /**
+     * This popup window is only activated if man try to add a already existed
+     * contact using the {@link RosterViewComponent#addANewContactGUI}
      * 
      * @return<tt>true</tt>, is the popup window with the title
      *                       "Contact already added" is active
@@ -260,7 +266,8 @@ public interface RosterViewComponent extends Remote {
 
     /**
      * waits until the popup window with the title "Contact already added" is
-     * active
+     * active. This popup window is only activated if man try to add a already
+     * existed contact using the {@link RosterViewComponent#addANewContactGUI}
      * 
      * @throws RemoteException
      */
@@ -301,6 +308,13 @@ public interface RosterViewComponent extends Remote {
      * @throws RemoteException
      */
     public boolean hasBuddy(JID buddyJID) throws RemoteException;
+
+    /**
+     * 
+     * @return the BaseJID list of all the buddies existed in the roster view.
+     * @throws RemoteException
+     */
+    public List<String> getAllBuddies() throws RemoteException;
 
     /**
      * 
@@ -395,6 +409,18 @@ public interface RosterViewComponent extends Remote {
      *            the new name , to which the contact should be changed
      */
     public void renameBuddy(JID buddyJID, String newBuddyName)
+        throws RemoteException;
+
+    /**
+     * rename the buddy'name specified with the given baseJID without GUI
+     * 
+     * @param buddyBaseJID
+     *            the baseJID of the user, whose contact under the buddies you
+     *            want to change
+     * @param newBuddyName
+     *            the new name , to which the contact should be changed
+     */
+    public void renameBuddy(String buddyBaseJID, String newBuddyName)
         throws RemoteException;
 
     /**

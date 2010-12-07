@@ -13,4 +13,12 @@ public interface BasicComponent extends Remote {
         throws RemoteException;
 
     public void clickButton(String mnemonicText) throws RemoteException;
+
+    /**
+     * TODO don't work now
+     * 
+     * @return the path, in which the screenshot located.
+     * @throws RemoteException
+     */
+    public String getPathToScreenShot() throws RemoteException;
 }

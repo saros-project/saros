@@ -18,8 +18,7 @@ public class TreePart extends EclipseComponent {
      * tree item's name.
      * 
      * @param tree
-     *            a {@link SWTBotTree} with the specified <code>none</code> in
-     *            specified view.
+     *            a {@link SWTBotTree} with the specified <code>none</code>
      * @param regexs
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the regex array parameter.e.g.
@@ -30,7 +29,7 @@ public class TreePart extends EclipseComponent {
     public boolean isTreeItemWithMatchTextExist(SWTBotTree tree,
         String... regexs) {
         try {
-            getTreeItemWithMatchText(tree, regexs);
+            getTreeItemWithRegexNodes(tree, regexs);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
@@ -40,23 +39,27 @@ public class TreePart extends EclipseComponent {
     /**
      * 
      * @param tree
-     * @param regexs
-     * @return
+     *            a {@link SWTBotTree} with the specified <code>none</code>
+     * @param regexNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array
+     *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
+     * @return the {@link SWTBotTree} with the given regexNodes
      * @throws WidgetNotFoundException
      *             If the item wasn't found.
      */
-    public SWTBotTreeItem getTreeItemWithMatchText(SWTBotTree tree,
-        String... regexs) {
+    public SWTBotTreeItem getTreeItemWithRegexNodes(SWTBotTree tree,
+        String... regexNodes) {
         SWTBotTreeItem currentItem = null;
-        SWTBotTreeItem[] allItems;
-        for (String regex : regexs) {
+        SWTBotTreeItem[] allTreeItems;
+        for (String regex : regexNodes) {
             if (currentItem == null) {
-                allItems = tree.getAllItems();
+                allTreeItems = tree.getAllItems();
             } else {
-                allItems = currentItem.getItems();
+                allTreeItems = currentItem.getItems();
             }
             boolean itemFound = false;
-            for (SWTBotTreeItem item : allItems) {
+            for (SWTBotTreeItem item : allTreeItems) {
                 log.info("treeItem name: " + item.getText());
                 if (item.getText().matches(regex)) {
                     currentItem = item;
@@ -66,10 +69,9 @@ public class TreePart extends EclipseComponent {
                     continue;
                 }
             }
-
             if (!itemFound) {
                 throw new WidgetNotFoundException("Tree item \"" + regex
-                    + "\" not found. Nodes: " + Arrays.asList(regexs));
+                    + "\" not found. Nodes: " + Arrays.asList(regexNodes));
             }
         }
         return currentItem;

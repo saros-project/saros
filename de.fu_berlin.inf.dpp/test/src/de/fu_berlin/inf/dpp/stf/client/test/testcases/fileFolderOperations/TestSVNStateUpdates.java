@@ -89,19 +89,19 @@ public class TestSVNStateUpdates extends STFTest {
 
         alice.buildSessionSequentially(SVN_PROJECT,
             CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
     }
 
     @After
     public void after() throws RemoteException {
         bob.workbench.resetWorkbench();
-        if (bob.sessionV.isInSession())
+        if (bob.sessionV.isInSessionGUI())
             bob.sessionV.leaveTheSessionByPeer();
         if (bob.pEV.isProjectExist(SVN_PROJECT))
             bob.pEV.deleteProject(SVN_PROJECT);
 
         alice.workbench.resetWorkbench();
-        if (alice.sessionV.isInSession())
+        if (alice.sessionV.isInSessionGUI())
             alice.sessionV.leaveTheSessionByHost();
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
@@ -135,8 +135,8 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testChangeDriverAndRenameClass() throws Exception {
-        alice.sessionV.giveExclusiveDriverRole(bob.state);
-        assertTrue(bob.state.isDriver());
+        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
+        assertTrue(bob.sessionV.isDriver());
         bob.pEV.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
         alice.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, "Asdf");
@@ -161,8 +161,8 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testChangeDriverAndMoveClass() throws Exception {
-        alice.sessionV.giveExclusiveDriverRole(bob.state);
-        assertTrue(bob.state.isExclusiveDriver());
+        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
+        assertTrue(bob.sessionV.isExclusiveDriver());
 
         bob.pEV.newPackage(SVN_PROJECT, "new_package");
         alice.pEV.waitUntilPkgExist(SVN_PROJECT, "new_package");

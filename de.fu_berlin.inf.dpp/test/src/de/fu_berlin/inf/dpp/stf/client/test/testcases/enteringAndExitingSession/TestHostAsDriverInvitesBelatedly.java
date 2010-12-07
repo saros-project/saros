@@ -57,7 +57,8 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
          * alice build session with carl and is followed by carl.
          */
         bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, carl);
+        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            carl);
         alice.followedBy(carl);
     }
 
@@ -140,7 +141,7 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
             .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
 
         bob.basic.sleep(500);
-        alice.sessionV.waitUntilSessionOpenBy(bob.state);
+        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
 
         String CLSContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
             CLS1);

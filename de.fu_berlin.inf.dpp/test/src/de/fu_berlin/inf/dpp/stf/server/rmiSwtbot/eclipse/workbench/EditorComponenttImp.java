@@ -165,8 +165,11 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException {
-        return getTextOfEditor(getClassNodes(projectName, packageName,
-            className));
+        if (!isJavaEditorOpen(className))
+            peVC.openClass(projectName, packageName, className);
+        if (!isJavaEditorActive(className))
+            activateJavaEditor(className);
+        return getJavaEditor(className).getText();
     }
 
     public String getJavaTextOnLine(String projectName, String pkg,
@@ -214,7 +217,7 @@ public class EditorComponenttImp extends EclipseComponent implements
      **********************************************/
     public void setTextInEditorWithSave(String contentPath, String... fileNodes)
         throws RemoteException {
-        String contents = state.getTestFileContents(contentPath);
+        String contents = getTestFileContents(contentPath);
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
         // e.setFocus();
@@ -264,7 +267,7 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void setTextInEditorWithoutSave(String contentPath,
         String... fileNodes) throws RemoteException {
-        String contents = state.getTestFileContents(contentPath);
+        String contents = getTestFileContents(contentPath);
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
         getEditor(fileName).setText(contents);
@@ -325,7 +328,12 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException {
-        return isFileDirty(getClassNodes(projectName, pkg, className));
+        if (!isJavaEditorOpen(className))
+            peVC.openClass(projectName, pkg, className);
+        if (!isJavaEditorActive(className))
+            activateJavaEditor(className);
+        return getJavaEditor(className).isDirty();
+        // return isFileDirty(getClassNodes(projectName, pkg, className));
         // final List<Boolean> results = new ArrayList<Boolean>();
         // IPath path = new Path(getClassPath(projectName, pkg, className));
         // final IFile file = ResourcesPlugin.getWorkspace().getRoot()
