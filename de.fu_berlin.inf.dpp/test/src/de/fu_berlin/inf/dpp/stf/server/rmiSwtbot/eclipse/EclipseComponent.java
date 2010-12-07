@@ -86,7 +86,7 @@ public abstract class EclipseComponent {
     public static XMPPAccountStore xmppAccountStore;
 
     // local JID
-    public JID localJID;
+    public static JID localJID;
 
     // SWTBot framework
     public static SarosSWTBot bot;

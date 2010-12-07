@@ -822,7 +822,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     private void clickContextMenuOfSelectedUser(JID jidOfSelectedUser,
         String context, String message) throws RemoteException {
-
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }

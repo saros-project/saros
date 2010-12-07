@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -44,8 +45,18 @@ public class EditorComponenttImp extends EclipseComponent implements
         return getTitlesOfAllOpenedEditors().contains(fileName);
     }
 
-    public void waitUntilEditorOpen(String fileName) throws RemoteException {
-        waitUntil(SarosConditions.isEditorOpen(this, fileName));
+    public void waitUntilEditorOpen(final String fileName)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isEditorOpen(fileName);
+            }
+
+            public String getFailureMessage() {
+                return "The editor " + fileName + "is not open.";
+            }
+        });
+
     }
 
     public boolean isJavaEditorOpen(String className) throws RemoteException {
@@ -59,7 +70,7 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void activateEditor(String fileName) throws RemoteException {
         try {
-            bot.editorByTitle(fileName).setFocus();
+            getEditor(fileName).setFocus();
         } catch (TimeoutException e) {
             log.warn("The tab" + fileName + " does not activate '", e);
         }
@@ -70,7 +81,13 @@ public class EditorComponenttImp extends EclipseComponent implements
     }
 
     public void activateJavaEditor(String className) throws RemoteException {
-        activateEditor(className + SUFIX_JAVA);
+        try {
+            getJavaEditor(className).setFocus();
+        } catch (TimeoutException e) {
+            log.warn("The tab" + className + SUFIX_JAVA
+                + " does not activate '", e);
+        }
+
     }
 
     public void waitUntilJavaEditorActive(String className)

@@ -165,6 +165,26 @@ public class TestSessionViewComponent extends STFTest {
         assertTrue(alice.sessionV.isInFollowMode());
     }
 
+    @Test
+    public void jumpToSelectedUser() throws RemoteException {
+        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
+        alice.editor.waitUntilJavaEditorOpen(CLS2);
+        assertTrue(alice.editor.isJavaEditorOpen(CLS2));
+        assertFalse(bob.editor.isJavaEditorOpen(CLS2));
+        bob.sessionV.jumpToPositionOfSelectedUserGUI(alice.jid);
+        bob.editor.waitUntilJavaEditorActive(CLS2);
+        assertTrue(bob.editor.isJavaEditorActive(CLS2));
+
+        // bob.editor.activateJavaEditor(CLS1);
+        // bob.editor.waitUntilJavaEditorOpen(CLS1);
+        // assertTrue(bob.editor.isJavaEditorOpen(CLS1));
+        // assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        // alice.sessionV.jumpToPositionOfSelectedUserGUI(bob.jid);
+        // alice.editor.waitUntilJavaEditorOpen(CLS1);
+        // assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+
+    }
+
     /**
      * TODO there are some exception.
      * 
