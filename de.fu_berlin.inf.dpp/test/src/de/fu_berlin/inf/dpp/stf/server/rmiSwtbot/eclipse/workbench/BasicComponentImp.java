@@ -34,7 +34,9 @@ public class BasicComponentImp extends EclipseComponent implements
 
     public String getPathToScreenShot() throws RemoteException {
         Bundle bundle = saros.getBundle();
-        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        log.debug("screenshot's directory: "
+            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
+        return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
     // // FIXME If the file doesn't exist, this method hits the

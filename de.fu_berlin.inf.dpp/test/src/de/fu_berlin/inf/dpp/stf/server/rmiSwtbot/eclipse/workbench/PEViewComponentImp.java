@@ -18,6 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
@@ -421,9 +422,24 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
+    public void deleteAllProjectsWithGUI() throws RemoteException {
+        precondition();
+        SWTBotTreeItem[] allTreeItems = viewPart.getView(VIEWNAME).bot().tree()
+            .getAllItems();
+        if (allTreeItems != null) {
+            for (SWTBotTreeItem item : allTreeItems) {
+                item.contextMenu(DELETE).click();
+                windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
+                    true);
+                windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+            }
+        }
+    }
+
     public void deleteProjectWithGUI(String projectName) throws RemoteException {
         precondition();
-        viewPart.clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, projectName);
+        viewPart
+            .clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, projectName);
         windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
@@ -568,8 +584,8 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void shareProjectWithSVN(String projectName, String repositoryURL)
         throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SHARE_PROJECT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, SHARE_PROJECT);
         windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
@@ -589,8 +605,8 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
         String projectName, String repositoryURL) throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SHARE_PROJECT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, SHARE_PROJECT);
         windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
@@ -604,8 +620,8 @@ public class PEViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SHARE_PROJECT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, SHARE_PROJECT);
 
         windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
@@ -673,16 +689,16 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void disConnect(String projectName) throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            DISCONNECT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, DISCONNECT);
         windowPart.confirmWindow(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
     }
 
     public void revertProject(String projectName) throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            REVERT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, REVERT);
         windowPart.confirmWindow(SHELL_REVERT, OK);
         windowPart.waitUntilShellClosed(SHELL_REVERT);
     }
@@ -704,8 +720,8 @@ public class PEViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         precondition();
         String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
         windowPart.waitUntilShellActive(SHELL_SWITCH);
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
         bot.button(OK).click();
@@ -875,8 +891,8 @@ public class PEViewComponentImp extends EclipseComponent implements
     private void switchToAnotherRevision(String[] matchTexts, String versionID)
         throws RemoteException {
         precondition();
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, TEAM,
-            SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
         windowPart.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
@@ -895,10 +911,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String[] matchTexts = helperPart.changeToRegex(source);
-        viewPart
-            .clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, "Copy");
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts,
-            "Paste");
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, "Copy");
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, "Paste");
         windowPart.activateShellWithText("Copy Project");
         bot.textWithLabel("Project name:").setText(target);
         bot.button(OK).click();

@@ -505,6 +505,13 @@ public interface PEViewComponent extends Remote {
     public void deleteProject(String projectName) throws RemoteException;
 
     /**
+     * Delete all the projects existed in the package explorer view.
+     * 
+     * @throws RemoteException
+     */
+    public void deleteAllProjectsWithGUI() throws RemoteException;
+
+    /**
      * Perform the action "delete project" which should be done with the
      * following steps:
      * <ol>

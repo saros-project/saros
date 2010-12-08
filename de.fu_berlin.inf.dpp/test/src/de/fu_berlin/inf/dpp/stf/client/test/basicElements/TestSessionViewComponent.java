@@ -23,8 +23,11 @@ public class TestSessionViewComponent extends STFTest {
 
     @BeforeClass
     public static void initMusican() throws RemoteException {
+
         alice = InitMusician.newAlice();
         bob = InitMusician.newBob();
+        alice.workbench.setUpWorkbench();
+        bob.workbench.setUpWorkbench();
         log.trace("alice create a new proejct and a new class.");
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         log.trace("alice share session with bob.");
@@ -165,23 +168,37 @@ public class TestSessionViewComponent extends STFTest {
         assertTrue(alice.sessionV.isInFollowMode());
     }
 
+    /**
+     * FIXME if this test would be performed more than one time on the same
+     * saros-instance, you may get the TimeoutException.
+     * 
+     * under mac_os it work well, when the view window isn't too small.
+     * 
+     * 
+     * @throws RemoteException
+     */
     @Test
     public void jumpToSelectedUser() throws RemoteException {
         alice.pEV.newClass(PROJECT1, PKG1, CLS2);
         alice.editor.waitUntilJavaEditorOpen(CLS2);
         assertTrue(alice.editor.isJavaEditorOpen(CLS2));
         assertFalse(bob.editor.isJavaEditorOpen(CLS2));
+        bob.basic.captureScreenshot(bob.basic.getPathToScreenShot()
+            + "/vor_jump_to_position.png");
         bob.sessionV.jumpToPositionOfSelectedUserGUI(alice.jid);
+        bob.basic.captureScreenshot(bob.basic.getPathToScreenShot()
+            + "/after_jump_to_position.png");
         bob.editor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
-        // bob.editor.activateJavaEditor(CLS1);
-        // bob.editor.waitUntilJavaEditorOpen(CLS1);
-        // assertTrue(bob.editor.isJavaEditorOpen(CLS1));
-        // assertFalse(alice.editor.isJavaEditorOpen(CLS1));
-        // alice.sessionV.jumpToPositionOfSelectedUserGUI(bob.jid);
-        // alice.editor.waitUntilJavaEditorOpen(CLS1);
-        // assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.editor.activateJavaEditor(CLS1);
+        alice.editor.waitUntilJavaEditorActive(CLS1);
+        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
+        bob.sessionV.jumpToPositionOfSelectedUserGUI(alice.jid);
+        bob.editor.waitUntilJavaEditorOpen(CLS1);
+        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
 
     }
 

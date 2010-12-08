@@ -21,4 +21,7 @@ public interface SarosWorkbenchComponent extends Remote {
     public void activateEclipseShell() throws RemoteException;
 
     public void closeWelcomeView() throws RemoteException;
+
+    public void setUpWorkbench() throws RemoteException;
+
 }

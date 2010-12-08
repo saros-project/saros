@@ -825,9 +825,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
+        workbenchC.activateEclipseShell();
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        tablePart.clickContextMenuOfTable(contactLabel, context);
+        basicC.captureScreenshot(basicC.getPathToScreenShot()
+            + "/serverside_vor_jump_to_position.png");
+        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
 
     }
 

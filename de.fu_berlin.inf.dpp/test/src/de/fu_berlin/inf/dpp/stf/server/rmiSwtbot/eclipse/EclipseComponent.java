@@ -92,7 +92,7 @@ public abstract class EclipseComponent {
     public static SarosSWTBot bot;
     public static int sleepTime = 750;
 
-    public final static String SCREENSHOTDIR = "screenshot";
+    public final static String SCREENSHOTDIR = "test/STF/screenshot";
 
     protected void waitUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
