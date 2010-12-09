@@ -97,10 +97,6 @@ public class EditorAPI implements IEditorAPI {
 
     protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         public void verifyKey(VerifyEvent event) {
-
-            // log.debug(((int) event.character) + " - " + event.keyCode + " - "
-            // + event.stateMask);
-
             if (event.character > 0) {
                 event.doit = false;
 
@@ -262,12 +258,29 @@ public class EditorAPI implements IEditorAPI {
      * This method will return all editors open in all IWorkbenchWindows.
      * 
      * This method will ask Eclipse to restore editors which have not been
-     * loaded yet (if Eclipse is started editors are loaded lazily). So calling
-     * this method might cause partOpen events to be sent.
+     * loaded yet (if Eclipse is started editors are loaded lazily), which is
+     * why it must run in the SWT thread. So calling this method might cause
+     * partOpen events to be sent.
      * 
      * @return all editors that are currently opened
+     * @swt
      */
     public static Set<IEditorPart> getOpenEditors() {
+        return getOpenEditors(true);
+    }
+
+    /**
+     * If <code>restore</code> is <code>true</code>, this method will ask
+     * Eclipse to restore editors which have not been loaded yet, and must be
+     * run in the SWT thread. If false, only editors which are already loaded
+     * are returned.
+     * 
+     * @param restore
+     * @return
+     * @see EditorAPI#getOpenEditors()
+     */
+    private static Set<IEditorPart> getOpenEditors(boolean restore) {
+
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
 
         IWorkbenchWindow[] windows = EditorAPI.getWindows();
@@ -280,6 +293,8 @@ public class EditorAPI implements IEditorAPI {
                 for (IEditorReference reference : editorRefs) {
 
                     IEditorPart editorPart = reference.getEditor(false);
+                    if (!restore)
+                        continue;
                     if (editorPart == null) {
                         log.debug("IWorkbenchPage."
                             + "getEditorReferences()"
@@ -856,18 +871,16 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public static boolean existUnsavedFiles(IProject proj) {
-        Set<IEditorPart> openEditors = getOpenEditors();
-
-        for (Iterator<IEditorPart> iterator = openEditors.iterator(); iterator
-            .hasNext();) {
-            IEditorPart editorPart = iterator.next();
+        // Note: We don't need to check editors that aren't loaded.
+        for (IEditorPart editorPart : getOpenEditors(false)) {
             final IEditorInput editorInput = editorPart.getEditorInput();
-            if (editorInput instanceof IFileEditorInput) {
-                IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-                // Object identity instead of using equals is sufficient.
-                if (fileEditorInput.getFile().getProject() == proj
-                    && editorPart.isDirty())
-                    return true;
+            if (!(editorInput instanceof IFileEditorInput)) {
+                continue;
+            }
+            // Object identity instead of using equals is sufficient.
+            IFile file = ((IFileEditorInput) editorInput).getFile();
+            if (file.getProject() == proj && editorPart.isDirty()) {
+                return true;
             }
         }
         return false;
