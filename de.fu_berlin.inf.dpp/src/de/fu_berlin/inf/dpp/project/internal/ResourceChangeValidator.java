@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,26 +20,41 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * This model provider is responsible for preventing an session observer from
- * modifying the file tree of a shared project on his own.
- * 
- * @author rdjemili
+ * This model provider is responsible for warning a session participant when
+ * trying to modify the file tree of a shared project in an unsupported way.<br>
+ * <br>
+ * Ignoring the warnings will lead to inconsistencies. Note that we can't
+ * prevent these actions, just detect them. Currently detected: File/folder
+ * activities as an observer, and deletion of a shared project.
  */
 @Component(module = "core")
-public class SharedModelProvider extends ModelProvider {
-
+public class ResourceChangeValidator extends ModelProvider {
     private static final Logger log = Logger
-        .getLogger(SharedModelProvider.class.getName());
+        .getLogger(ResourceChangeValidator.class.getName());
 
-    private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
-    private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
+    private static final String ERROR_TEXT = "Only the driver should edit"
+        + " the resources of this shared project.";
+    private static final String EXCLUSIVE_ERROR_TEXT = "The project host"
+        + " should be the exclusive driver to edit resources of this shared"
+        + " project.";
+    private static final String DELETE_PROJECT_ERROR_TEXT = "You should leave"
+        + " the Saros session before deleting a shared project. Deleting a"
+        + " project has no effect on the other session participants, so the"
+        + " session will become inconsistent.";
+
+    /** Error code for internal use, but we don't need it. */
+    private static final int ERROR_CODE = 0;
 
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-        "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
+        "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null);
 
     private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(
-        IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
-        SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
+        EXCLUSIVE_ERROR_TEXT, null);
+
+    private static final IStatus DELETE_PROJECT_ERROR_STATUS = new Status(
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
+        DELETE_PROJECT_ERROR_TEXT, null);
 
     /** the currently running shared project */
     private ISarosSession sarosSession;
@@ -52,6 +67,8 @@ public class SharedModelProvider extends ModelProvider {
 
         private boolean isAffectingSharedProjectFiles = false;
 
+        private boolean isDeletingSharedProject = false;
+
         /*
          * (non-Javadoc)
          * 
@@ -60,24 +77,31 @@ public class SharedModelProvider extends ModelProvider {
         public boolean visit(IResourceDelta delta) throws CoreException {
 
             // We already check this in validateChange
-            assert SharedModelProvider.this.sarosSession != null;
+            assert sarosSession != null;
 
             IResource resource = delta.getResource();
 
-            // If workspace root continue
-            if (resource.getProject() == null) {
+            if (resource instanceof IWorkspaceRoot) {
                 return true;
             }
 
-            if (!sarosSession.isShared(resource.getProject()))
-                return false;
+            if (resource instanceof IProject) {
+                if (!sarosSession.isShared((IProject) resource))
+                    return false;
 
-            if ((resource instanceof IFile) || (resource instanceof IFolder)) {
-                this.isAffectingSharedProjectFiles = true;
-                return false;
+                if (delta.getKind() == IResourceDelta.REMOVED) {
+                    isDeletingSharedProject = true;
+                    return false;
+                }
+
+                if (sarosSession.isExclusiveDriver()) {
+                    return false;
+                }
+                return true;
             }
 
-            return true;
+            isAffectingSharedProjectFiles = true;
+            return false;
         }
     }
 
@@ -102,7 +126,7 @@ public class SharedModelProvider extends ModelProvider {
                     sarosSession = null;
                 }
             });
-        this.sarosSession = sessionManager.getSarosSession();
+        sarosSession = sessionManager.getSarosSession();
     }
 
     @Override
@@ -110,10 +134,7 @@ public class SharedModelProvider extends ModelProvider {
 
         // If we are currently not sharing a project, we don't have to prevent
         // any file operations
-        if (this.sarosSession == null)
-            return Status.OK_STATUS;
-
-        if (this.sarosSession.isExclusiveDriver())
+        if (sarosSession == null)
             return Status.OK_STATUS;
 
         ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
@@ -125,11 +146,14 @@ public class SharedModelProvider extends ModelProvider {
         }
 
         if (!sarosSession.isDriver() && visitor.isAffectingSharedProjectFiles) {
-            return SharedModelProvider.ERROR_STATUS;
+            return ERROR_STATUS;
         }
         if (!sarosSession.isExclusiveDriver()
             && visitor.isAffectingSharedProjectFiles) {
-            return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
+            return EXCLUSIVE_ERROR_STATUS;
+        }
+        if (visitor.isDeletingSharedProject) {
+            return DELETE_PROJECT_ERROR_STATUS;
         }
         return Status.OK_STATUS;
     }

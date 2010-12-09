@@ -640,7 +640,7 @@
    <extension
          id="de.fu_berlin.inf.dpp.modelProvider"
          point="org.eclipse.core.resources.modelProviders">
-      <modelProvider class="de.fu_berlin.inf.dpp.project.internal.SharedModelProvider"/>
+      <modelProvider class="de.fu_berlin.inf.dpp.project.internal.ResourceChangeValidator"/>
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
