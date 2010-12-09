@@ -42,7 +42,7 @@ public class TestSVNStateUpdates extends STFTest {
         bob = InitMusician.newBob();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : activeMusicians()) {
+        for (final Musician musician : initTesters()) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     if (!musician.pEV.isProjectExist(SVN_PROJECT_COPY)) {
@@ -74,7 +74,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Before
     public void before() throws Exception {
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : activeMusicians()) {
+        for (final Musician musician : initTesters()) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);

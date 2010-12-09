@@ -60,7 +60,7 @@ public class TestDriverSavesFiles extends STFTest {
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 
@@ -191,8 +191,7 @@ public class TestDriverSavesFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
         String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS2);
-        carl.pEV.openFileWith("Text Editor",
-            getClassNodes(PROJECT1, PKG1, CLS2));
+        carl.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS2);
 
         carl.editor.waitUntilJavaEditorContentSame(dirtyCls2ContentOfAlice,
             PROJECT1, PKG1, CLS2);
@@ -227,8 +226,7 @@ public class TestDriverSavesFiles extends STFTest {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
-        carl.pEV.openFileWith("Text Editor",
-            getClassNodes(PROJECT1, PKG1, CLS2));
+        carl.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS2);
         carl.editor.closeJavaEditorWithSave(CLS2);
 
         alice.editor.setTextInJavaEditorWithSave(CP2_CHANGE, PROJECT1, PKG1,
@@ -252,7 +250,7 @@ public class TestDriverSavesFiles extends STFTest {
         System.out.println(dirtyCls2ChangeContentOfAlice);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.pEV.openFile(getClassNodes(PROJECT1, PKG1, CLS2));
+        carl.pEV.openClass(PROJECT1, PKG1, CLS2);
         carl.editor.waitUntilJavaEditorContentSame(
             dirtyCls2ChangeContentOfAlice, PROJECT1, PKG1, CLS2);
         String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,

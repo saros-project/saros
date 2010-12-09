@@ -285,6 +285,18 @@ public interface PEViewComponent extends Remote {
 
     /**
      * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
+     * @return<tt>true</tt>, if the file specified by the passed array parameter
+     *                       exists.
+     * @throws RemoteException
+     */
+    public boolean isFileExist(String... nodes) throws RemoteException;
+
+    /**
+     * 
      * @param projectName
      *            name of the project, e.g. Foo_Saros.
      * @param pkg
@@ -450,6 +462,22 @@ public interface PEViewComponent extends Remote {
      */
     public void openClass(String projectName, String pkg, String className)
         throws RemoteException;
+
+    /**
+     * 
+     * @param whichEditor
+     *            the name of the editor, with which you want to open the file.
+     * @param projectName
+     *            name of the project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     * @throws RemoteException
+     * @see PEViewComponent#openFileWith(String, String...)
+     */
+    public void openClassWith(String whichEditor, String projectName,
+        String pkg, String className) throws RemoteException;
 
     /**
      * Performs the action "open file with" which should be done with the

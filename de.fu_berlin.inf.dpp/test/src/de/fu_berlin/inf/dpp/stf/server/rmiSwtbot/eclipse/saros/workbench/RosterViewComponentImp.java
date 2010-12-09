@@ -57,7 +57,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
 
     /* Tool tip text of toolbar buttons on the session view */
-    private final static String TB_DISCONNECT = "Disconnect.*";
+    private final static String TB_DISCONNECT = "Disconnect";
     private final static String TB_ADD_A_NEW_CONTACT = "Add a new contact";
     private final static String TB_CONNECT = "Connect";
 
@@ -440,6 +440,14 @@ public class RosterViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         Roster roster = saros.getRoster();
         roster.getEntry(baseJID).setName(newBuddyName);
+    }
+
+    public void resetAllBuddyName() throws RemoteException {
+        List<String> allBuddies = getAllBuddies();
+        if (allBuddies != null && !allBuddies.isEmpty())
+            for (String buddyName : allBuddies) {
+                renameBuddy(buddyName, buddyName);
+            }
     }
 
     public void renameBuddyGUI(JID buddyJID, String newBuddyName)

@@ -54,7 +54,7 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 

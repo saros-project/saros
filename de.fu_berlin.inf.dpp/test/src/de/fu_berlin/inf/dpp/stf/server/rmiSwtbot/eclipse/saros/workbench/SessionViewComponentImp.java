@@ -47,7 +47,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private final static String TB_STOP_SESSION_WITH_USER = "Stop session with user";
     private final static String TB_SEND_A_FILE_TO_SELECTED_USER = "Send a file to selected user";
     private final static String TB_START_VOIP_SESSION = "Start a VoIP Session...";
-    private final static String TB_INCONSISTEN_CYDETECTED = "Inconsistency Detected in.*";
+    private final static String TB_INCONSISTENCY_DETECTED = "Inconsistency Detected in";
     private final static String TB_OPEN_INVITATION_INTERFACE = "Open invitation interface";
     private final static String TB_REMOVE_ALL_DRIVER_ROLES = "Remove all driver roles";
     private final static String TB_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
@@ -158,7 +158,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * contact in the session view
+     * informations in the session view's field
      * 
      **********************************************/
     public boolean isContactInSessionViewGUI(JID contactJID)
@@ -205,6 +205,17 @@ public class SessionViewComponentImp extends EclipseComponent implements
                 contactLabel = contactJID.getBase();
         }
         return contactLabel;
+    }
+
+    public boolean existsLabelTextInSessionView() throws RemoteException {
+        precondition();
+        return viewPart.existsLabelTextInView(VIEWNAME);
+    }
+
+    public String getFirstLabelTextInSessionview() throws RemoteException {
+        if (existsLabelTextInSessionView())
+            return viewPart.getView(VIEWNAME).bot().label().getText();
+        return null;
     }
 
     /**********************************************
@@ -270,15 +281,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
         tablePart.clickContextMenuOfTable(contactLabel, CM_REMOVE_DRIVER_ROLE);
-        waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return !sessionV.isDriver();
-            }
-
-            public String getFailureMessage() {
-                return jidOfPeer.getBase() + " is not a driver.";
-            }
-        });
+        sessionV.waitUntilIsNoDriver();
     }
 
     public void waitUntilIsDriver() throws RemoteException {
@@ -301,6 +304,18 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
             public String getFailureMessage() {
                 return jid.getBase() + " is not a driver.";
+            }
+        });
+    }
+
+    public void waitUntilIsNoDriver() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isDriver();
+            }
+
+            public String getFailureMessage() {
+                return localJID.getBase() + " is still a driver.";
             }
         });
     }
@@ -596,22 +611,17 @@ public class SessionViewComponentImp extends EclipseComponent implements
         clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_USER);
     }
 
-    public void confirmIncomingScreensharingSesionWindow()
-        throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
-        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
-    }
-
-    /**********************************************
-     * 
-     * toolbar button on the view: stop session with user
-     * 
-     **********************************************/
-    public void stopSessionWithUser(JID jidOfPeer) throws RemoteException {
+    public void stopSessionWithUserGUI(JID jidOfPeer) throws RemoteException {
         selectUser(
             jidOfPeer,
             "Hi guy, you can't stop screen session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_USER);
+    }
+
+    public void confirmIncomingScreensharingSesionWindow()
+        throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
+        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
     }
 
     /**********************************************
@@ -651,15 +661,29 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * toolbar button on the view: inconsistence detected
      * 
      **********************************************/
-    public void inconsistencyDetected() throws RemoteException {
+    public void inconsistencyDetectedGUI() throws RemoteException {
         precondition();
-        clickToolbarButtonWithTooltip(TB_INCONSISTEN_CYDETECTED);
-        windowPart.waitUntilShellCloses(PROGRESS_INFORMATION);
+        clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
+        windowPart.waitUntilShellCloses(SHELL_PROGRESS_INFORMATION);
     }
 
     public boolean isInconsistencyDetectedEnabled() throws RemoteException {
         precondition();
-        return isToolbarButtonEnabled(TB_INCONSISTEN_CYDETECTED);
+        return isToolbarButtonEnabled(TB_INCONSISTENCY_DETECTED);
+    }
+
+    public void waitUntilInconsistencyDetected() throws RemoteException {
+        precondition();
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isToolbarButtonEnabled(TB_INCONSISTENCY_DETECTED);
+            }
+
+            public String getFailureMessage() {
+                return "The toolbar button " + TB_INCONSISTENCY_DETECTED
+                    + " isn't enabled.";
+            }
+        });
     }
 
     /**********************************************
@@ -669,8 +693,10 @@ public class SessionViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void removeAllRriverRolesGUI() throws RemoteException {
         precondition();
-        if (isRemoveAllRiverEnabled())
+        if (isRemoveAllRiverEnabled()) {
             clickToolbarButtonWithTooltip(TB_REMOVE_ALL_DRIVER_ROLES);
+            windowPart.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
+        }
     }
 
     public boolean isRemoveAllRiverEnabled() throws RemoteException {
@@ -756,18 +782,11 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * toolbar button on the view: open invitation interface
      * 
      **********************************************/
-    public void openInvitationInterface(String jidOfInvitee)
+    public void openInvitationInterface(String... jidOfInvitees)
         throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        comfirmInvitationWindow(jidOfInvitee);
-    }
-
-    public void comfirmInvitationWindow(String jidOfinvitee)
-        throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_INVITATION);
-        windowPart.confirmWindowWithCheckBox(SHELL_INVITATION, FINISH,
-            jidOfinvitee);
+        peVC.confirmWindowInvitation(jidOfInvitees);
     }
 
     /**************************************************************
@@ -836,18 +855,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     private void selectUser(JID jidOfSelectedUser, String message)
         throws RemoteException {
-
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
         precondition();
-        if (isDriver(jidOfSelectedUser)) {
-            viewPart.selectTableItemWithLabelInView(VIEWNAME,
-                jidOfSelectedUser.getBase() + ROLENAME);
-        } else {
-            viewPart.selectTableItemWithLabelInView(VIEWNAME,
-                jidOfSelectedUser.getBase());
-        }
+        String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
+        viewPart.selectTableItemWithLabelInView(VIEWNAME, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip) {

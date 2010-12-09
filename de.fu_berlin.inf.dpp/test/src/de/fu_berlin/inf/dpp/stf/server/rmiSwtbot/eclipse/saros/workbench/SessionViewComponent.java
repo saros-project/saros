@@ -318,6 +318,17 @@ public interface SessionViewComponent extends Remote {
     public void waitUntilIsDriver(final JID jid) throws RemoteException;
 
     /**
+     * waits until the local user is no driver after host remove his driver
+     * role. This method should be used after performing the action
+     * {@link SessionViewComponent#removeDriverRoleGUI(SessionViewComponent)} or
+     * {@link SessionViewComponent#removeAllRriverRolesGUI()} to guarantee the
+     * invitee's driver role is really removed
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilIsNoDriver() throws RemoteException;
+
+    /**
      * Using this function host can perform the action
      * "Give exclusive driver Role" which should be activated by clicking the
      * context menu "Give exclusive driver Role" of the tableItem with itemText
@@ -367,6 +378,22 @@ public interface SessionViewComponent extends Remote {
      */
     public String getContactStatusInSessionView(JID contactJID)
         throws RemoteException;
+
+    /**
+     * 
+     * @return<tt>true</tt>, if there are some label texts existed in the
+     *                       session view. You can only see the label texts when
+     *                       you are not in a session.
+     * @throws RemoteException
+     */
+    public boolean existsLabelTextInSessionView() throws RemoteException;
+
+    /**
+     * @return the first label text on the session view, which should be showed
+     *         if there are no session.
+     * @throws RemoteException
+     */
+    public String getFirstLabelTextInSessionview() throws RemoteException;
 
     /**
      * Performs the action "Follow this user" which should be activated by
@@ -538,7 +565,7 @@ public interface SessionViewComponent extends Remote {
     /**
      * performs the action "Stop share session with user" which should be
      * activated by clicking the tool bar button with the tooltip text
-     * "Stop share session with user" on the session view. This toolbar button
+     * "Stop share session with user" on the session view, This toolbar button
      * is only visible after clicking the
      * {@link SessionViewComponent#shareYourScreenWithSelectedUserGUI(JID)}
      * <p>
@@ -552,7 +579,7 @@ public interface SessionViewComponent extends Remote {
      *            screen session.
      * @throws RemoteException
      */
-    public void stopSessionWithUser(JID jidOfPeer) throws RemoteException;
+    public void stopSessionWithUserGUI(JID jidOfPeer) throws RemoteException;
 
     /**
      * performs the action "Send a file to selected user" which should be
@@ -620,7 +647,7 @@ public interface SessionViewComponent extends Remote {
      * 
      * @throws RemoteException
      */
-    public void inconsistencyDetected() throws RemoteException;
+    public void inconsistencyDetectedGUI() throws RemoteException;
 
     /**
      * performs the action "Remove all river roles" which should be activated by
@@ -639,6 +666,14 @@ public interface SessionViewComponent extends Remote {
      * @throws RemoteException
      */
     public void removeAllRriverRolesGUI() throws RemoteException;
+
+    /**
+     * 
+     * @return <tt>true</tt>, if the toolbar button "Remove all river roles" is
+     *         enabled
+     * @throws RemoteException
+     */
+    public boolean isRemoveAllRiverEnabled() throws RemoteException;
 
     /**
      * performs the action "Enable/disable follow mode" which should be
@@ -705,6 +740,13 @@ public interface SessionViewComponent extends Remote {
     public boolean isInconsistencyDetectedEnabled() throws RemoteException;
 
     /**
+     * waits until the toolbar button "inconsistency detected..." is enabled.
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilInconsistencyDetected() throws RemoteException;
+
+    /**
      * performs the action "Open invitation interface" which should be activated
      * by clicking the tool bar button with the tooltip text
      * "Open invitation interface" on the session view. The button is only
@@ -718,20 +760,11 @@ public interface SessionViewComponent extends Remote {
      * method should handle the popup window too.</li>
      * </ol>
      * 
-     * @param jidOfInvitee
+     * @param jidOfInvitees
+     *            the users whom you want to invite to your session.
      * @throws RemoteException
      */
-    public void openInvitationInterface(String jidOfInvitee)
-        throws RemoteException;
-
-    /**
-     * After perform the
-     * {@link SessionViewComponent#openInvitationInterface(String)} you should
-     * get this popup window.
-     * 
-     * @throws RemoteException
-     */
-    public void comfirmInvitationWindow(String jidOfinvitee)
+    public void openInvitationInterface(String... jidOfInvitees)
         throws RemoteException;
 
     /**

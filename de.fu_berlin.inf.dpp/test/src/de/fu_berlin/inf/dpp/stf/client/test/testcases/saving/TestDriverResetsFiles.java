@@ -58,7 +58,7 @@ public class TestDriverResetsFiles extends STFTest {
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
 

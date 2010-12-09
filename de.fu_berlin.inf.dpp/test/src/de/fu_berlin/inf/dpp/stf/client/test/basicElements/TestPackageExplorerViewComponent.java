@@ -83,7 +83,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        assertTrue(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
     }
 
     @Test
@@ -154,8 +154,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.pEV.renameFile(FILE2, PROJECT1, FOLDER1, FILE1);
-        assertFalse(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
-        assertTrue(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE2)));
+        assertFalse(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE2));
     }
 
     @Test
@@ -346,8 +346,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
     // close it.
     public void testOpenWith() throws RemoteException {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openFileWith("Text Editor",
-            getClassNodes(PROJECT1, PKG1, CLS1));
+        alice.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS1);
         alice.pEV.openClassWithSystemEditor(PROJECT1, PKG1, CLS1);
     }
 

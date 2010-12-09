@@ -40,7 +40,7 @@ public class TestFolderOperations extends STFTest {
 
         /* alice build session with bob, and carl simultaneously */
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             carl, bob);
     }
 

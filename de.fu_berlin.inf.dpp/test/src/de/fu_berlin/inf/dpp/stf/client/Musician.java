@@ -130,7 +130,7 @@ public class Musician extends STFTest {
         }
     }
 
-    public void buildSessionConcurrently(final String projectName,
+    public void buildSessionConcurrentlyDone(final String projectName,
         String shareProjectWith, Musician... invitees) throws RemoteException,
         InterruptedException {
         String[] peersName = new String[invitees.length];
@@ -159,12 +159,12 @@ public class Musician extends STFTest {
      * Define the leave session with the following steps.
      * <ol>
      * <li>The host(alice) leave session first.</li>
-     * <li>Then confirm the windonws "Closing the Session" for musicians carl
-     * and bob concurrently</li>
+     * <li>Then other invitees confirm the windonws "Closing the Session"
+     * concurrently</li>
      * </ol>
      * 
      * @param musicians
-     *            bob and carl.
+     *            the invitees
      * @throws RemoteException
      * @throws InterruptedException
      */
@@ -219,6 +219,14 @@ public class Musician extends STFTest {
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
         sessionV.leaveTheSessionByHost();
+    }
+
+    private String[] getPeersBaseJID(Musician... peers) {
+        String[] peerBaseJIDs = new String[peers.length];
+        for (int i = 0; i < peers.length; i++) {
+            peerBaseJIDs[i] = peers[i].getBaseJid();
+        }
+        return peerBaseJIDs;
     }
 
     /**
@@ -357,4 +365,36 @@ public class Musician extends STFTest {
         peer.sessionV.confirmIncomingScreensharingSesionWindow();
     }
 
+    /**
+     * This method is same as
+     * {@link Musician#buildSessionConcurrentlyDone(String, String, Musician...)}.
+     * The difference to buildSessionConcurrently is that the invitation process
+     * is activated by clicking the toolbarbutton "open invitation interface" in
+     * the roster view.
+     * 
+     * @param projectName
+     *            the name of the project which is in a session now.
+     * @param peers
+     *            the user whom you want to invite to your session.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public void inviteUsersInYourSessionDone(final String projectName,
+        Musician... peers) throws RemoteException, InterruptedException {
+        sessionV.openInvitationInterface(getPeersBaseJID(peers));
+        List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+        for (final Musician musician : peers) {
+            joinSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    musician.pEV
+                        .confirmWirzardSessionInvitationWithNewProject(projectName);
+                    return null;
+                }
+            });
+        }
+        log.trace("workAll(joinSessionTasks)");
+        MakeOperationConcurrently.workAll(joinSessionTasks,
+            joinSessionTasks.size());
+
+    }
 }

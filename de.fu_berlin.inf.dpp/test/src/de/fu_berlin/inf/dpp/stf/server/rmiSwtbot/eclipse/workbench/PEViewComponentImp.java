@@ -286,6 +286,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         return file.exists();
     }
 
+    public boolean isFileExist(String... nodes) throws RemoteException {
+        return isFileExist(getPath(nodes));
+    }
+
     public boolean isClassExist(String projectName, String pkg, String className)
         throws RemoteException {
         return isFileExist(getClassPath(projectName, pkg, className));
@@ -375,6 +379,11 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void openClass(String projectName, String pkg, String className)
         throws RemoteException {
         openFile(getClassNodes(projectName, pkg, className));
+    }
+
+    public void openClassWith(String whichEditor, String projectName,
+        String pkg, String className) throws RemoteException {
+        openFileWith(whichEditor, getClassNodes(projectName, pkg, className));
     }
 
     public void openFileWith(String whichEditor, String... fileNodes)

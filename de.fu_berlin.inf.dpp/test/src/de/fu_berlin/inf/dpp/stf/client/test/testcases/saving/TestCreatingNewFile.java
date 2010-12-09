@@ -52,7 +52,7 @@ public class TestCreatingNewFile extends STFTest {
         /*
          * carl build session with bob, and alice simultaneously
          */
-        carl.buildSessionConcurrently(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        carl.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
             bob, alice);
 
     }
@@ -115,9 +115,9 @@ public class TestCreatingNewFile extends STFTest {
         carl.pEV.newFolder(FOLDER1, PROJECT1);
         carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.pEV.waitUntilFileExist(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        assertTrue(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
         bob.pEV.waitUntilFileExist(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        assertTrue(bob.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
     }
 
     /**
@@ -154,9 +154,9 @@ public class TestCreatingNewFile extends STFTest {
         carl.pEV.newFolder(FOLDER1, PROJECT1);
         carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.basic.sleep(500);
-        assertFalse(alice.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        assertFalse(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
         bob.basic.sleep(500);
-        assertFalse(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER1, FILE1)));
+        assertFalse(bob.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
 
         if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))
             carl.sessionV.followThisUserGUI(alice.jid);
@@ -167,9 +167,9 @@ public class TestCreatingNewFile extends STFTest {
         alice.pEV.newFile(PROJECT1, FOLDER2, FILE2);
 
         carl.pEV.waitUntilFileExist(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.pEV.isFileExist(getPath(PROJECT1, FOLDER2, FILE2)));
+        assertTrue(carl.pEV.isFileExist(PROJECT1, FOLDER2, FILE2));
         bob.pEV.waitUntilFileExist(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.pEV.isFileExist(getPath(PROJECT1, FOLDER2, FILE2)));
+        assertTrue(bob.pEV.isFileExist(PROJECT1, FOLDER2, FILE2));
 
         alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
 

@@ -13,7 +13,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestSessionViewComponent extends STFTest {
@@ -22,53 +21,29 @@ public class TestSessionViewComponent extends STFTest {
         .getLogger(TestSessionViewComponent.class);
 
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        alice.workbench.setUpWorkbench();
-        bob.workbench.setUpWorkbench();
-        log.trace("alice create a new proejct and a new class.");
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        log.trace("alice share session with bob.");
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            bob);
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
+        initTesters(tester.ALICE, tester.BOB, tester.CARL);
+        setUpWorkbenchs();
+        setUpSession(alice, bob);
     }
 
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        resetSaros(alice, bob);
     }
 
     @Before
-    public void startUp() throws RemoteException {
-        if (!alice.sessionV.isInSession()) {
-            bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-            alice.buildSessionSequentially(PROJECT1,
-                CONTEXT_MENU_SHARE_PROJECT, bob);
-        }
-        bob.workbench.openSarosViews();
-        alice.workbench.openSarosViews();
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     @After
-    public void cleanUp() throws RemoteException {
-
-        if (bob.sessionV.isInSession() && bob.sessionV.isDriver()) {
-            alice.sessionV.removeDriverRoleGUI(bob.sessionV);
-        }
-        if (alice.sessionV.isInSession() && !alice.sessionV.isDriver()) {
-            alice.sessionV.giveDriverRoleGUI(alice.sessionV);
-        }
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
-        if (bob.sessionV.isInSession() && bob.sessionV.isInFollowMode()) {
-            bob.sessionV.stopFollowingGUI();
-        }
-        if (alice.sessionV.isInSession() && alice.sessionV.isInFollowMode()) {
-            alice.sessionV.stopFollowingGUI();
-        }
+    public void runAfterEveryTest() throws RemoteException {
+        resetDriverRole(alice, bob);
+        resetFollowModel(alice, bob);
+        resetWorkbenches();
     }
 
     @Test
@@ -178,7 +153,8 @@ public class TestSessionViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void jumpToSelectedUser() throws RemoteException {
+    @Ignore
+    public void jumpToSelectedUserGUI() throws RemoteException {
         alice.pEV.newClass(PROJECT1, PKG1, CLS2);
         alice.editor.waitUntilJavaEditorOpen(CLS2);
         assertTrue(alice.editor.isJavaEditorOpen(CLS2));
@@ -202,18 +178,80 @@ public class TestSessionViewComponent extends STFTest {
 
     }
 
-    /**
-     * TODO there are some exception.
-     * 
-     * @throws RemoteException
-     */
     @Test
-    @Ignore
-    public void testShareYourScreenWithSelectedUser() throws RemoteException {
+    public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
-        alice.sessionV.stopSessionWithUser(bob.jid);
+        alice.sessionV.stopSessionWithUserGUI(bob.jid);
+    }
+
+    @Test
+    public void inconsistencyDetectedGUI() throws RemoteException {
+        String editorTextOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
+            PKG1, CLS1);
+        bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
+        String editorTextOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
+        assertFalse(editorTextOfAlice.equals(editorTextOfBob));
+        bob.sessionV.waitUntilInconsistencyDetected();
+        bob.sessionV.inconsistencyDetectedGUI();
+        editorTextOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
+        editorTextOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1);
+        assertTrue(editorTextOfAlice.equals(editorTextOfBob));
+    }
+
+    @Test
+    public void removeAllDriverGUI() throws RemoteException {
+        assertTrue(alice.sessionV.isHost());
+        assertTrue(alice.sessionV.isRemoveAllRiverEnabled());
+        assertFalse(bob.sessionV.isRemoveAllRiverEnabled());
+        assertTrue(alice.sessionV.isDriver());
+        assertFalse(bob.sessionV.isDriver());
+        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        assertTrue(bob.sessionV.isDriver());
+        alice.sessionV.removeAllRriverRolesGUI();
+        assertFalse(alice.sessionV.isDriver());
+        bob.sessionV.waitUntilIsNoDriver();
+        assertFalse(bob.sessionV.isDriver());
+    }
+
+    /**
+     * alice(host) first leave the session then bob confirm the windonws
+     * "Closing the Session".
+     * 
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    @Test
+    public void leaveSessionProcessDonebyAllUsersWithHostFirstLeave()
+        throws RemoteException, InterruptedException {
+        assertTrue(alice.sessionV.isInSession());
+        assertTrue(bob.sessionV.isInSession());
+        alice.leaveSessionFirst(bob);
+        assertFalse(alice.sessionV.isInSession());
+        assertFalse(bob.sessionV.isInSession());
+    }
+
+    /**
+     * peer(bob) first leave the session then host(alice) leave.
+     * 
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    @Test
+    public void leaveSessionProcessDonebyAllUsersWithPeersFirstLeave()
+        throws RemoteException, InterruptedException {
+        assertFalse(alice.sessionV.existsLabelTextInSessionView());
+        assertFalse(bob.sessionV.existsLabelTextInSessionView());
+        assertTrue(alice.sessionV.isInSession());
+        assertTrue(bob.sessionV.isInSession());
+        alice.leaveSessionFirstByPeers(bob);
+        assertFalse(alice.sessionV.isInSession());
+        assertFalse(bob.sessionV.isInSession());
+        assertTrue(alice.sessionV.existsLabelTextInSessionView());
+        assertTrue(bob.sessionV.existsLabelTextInSessionView());
     }
 
     @Test
@@ -227,6 +265,16 @@ public class TestSessionViewComponent extends STFTest {
         assertFalse(bob.sessionV.isInSession());
         assertFalse(alice.sessionV.isInSessionGUI());
         assertFalse(bob.sessionV.isInSessionGUI());
+    }
+
+    @Test
+    public void inviteUsersInYourSession() throws RemoteException,
+        InterruptedException {
+        bob.sessionV.leaveTheSessionByPeer();
+        assertFalse(bob.sessionV.isInSession());
+        alice.inviteUsersInYourSessionDone(PROJECT1, bob, carl);
+        assertTrue(carl.sessionV.isInSession());
+        assertTrue(bob.sessionV.isInSession());
     }
 
 }

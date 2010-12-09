@@ -184,7 +184,8 @@ public class ViewPart extends EclipseComponent {
         String tooltipText) {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(title)
             .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(tooltipText)) {
+            if (toolbarButton.getToolTipText().matches(
+                ".*" + tooltipText + ".*")) {
                 return toolbarButton;
             }
         }
@@ -373,8 +374,11 @@ public class ViewPart extends EclipseComponent {
     }
 
     /**
-     * click toolbar button in view. e.g. connect. if you don't know the tooltip
-     * exactly, please use this method.
+     * click the toolbar button specified with the given buttonTooltip in the
+     * passed view.<br/>
+     * 
+     * <b>NOTE</b>, when you are not sure about the full tooltipText of the
+     * toolbarButton, please use this method.
      * 
      * @param viewName
      *            the title on the view tab.
@@ -386,11 +390,15 @@ public class ViewPart extends EclipseComponent {
         String viewName, String buttonTooltip) {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
             .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(buttonTooltip)) {
+            if (toolbarButton.getToolTipText().matches(
+                ".*" + buttonTooltip + ".*")) {
                 return toolbarButton.click();
             }
         }
-        return null;
+        throw new WidgetNotFoundException(
+            "The toolbarbutton with the tooltipText "
+                + buttonTooltip
+                + " doesn't exist. Are you sure that the passed tooltip text is correct?");
     }
 
     /**
@@ -409,7 +417,7 @@ public class ViewPart extends EclipseComponent {
 
     /**********************************************
      * 
-     * is widget existed on the given view
+     * Does the given widget exist on the given view?
      * 
      **********************************************/
     /**
@@ -418,7 +426,7 @@ public class ViewPart extends EclipseComponent {
      * @return <tt>true</tt> if the specified table item exists.
      * 
      */
-    public boolean isTableItemInViewExist(String viewName, String itemName) {
+    public boolean existsTableItemInView(String viewName, String itemName) {
         return getTableInView(viewName).containsItem(itemName);
     }
 
@@ -434,10 +442,10 @@ public class ViewPart extends EclipseComponent {
      * @return <tt>true</tt> if the specified context menu of the select table
      *         item exists.
      */
-    public boolean isContextMenuOfTableItemInViewExist(String viewName,
+    public boolean existsContextMenuOfTableItemInView(String viewName,
         String itemName, String contextName) {
 
-        if (!isTableItemInViewExist(viewName, itemName))
+        if (!existsTableItemInView(viewName, itemName))
             return false;
         SWTBotTableItem item = selectTableItemWithLabelInView(viewName,
             itemName);
@@ -464,7 +472,7 @@ public class ViewPart extends EclipseComponent {
      *         item exists.
      * @throws RemoteException
      */
-    public boolean isContextMenuOfTreeItemInViewExist(String viewName,
+    public boolean existsContextMenuOfTreeItemInView(String viewName,
         String contextName, String... nodes) throws RemoteException {
         setFocusOnViewByTitle(viewName);
         SWTBotTreeItem item = selectTreeItemWithLabelsInView(viewName, nodes);
@@ -489,7 +497,7 @@ public class ViewPart extends EclipseComponent {
      * @return <tt>true</tt>, if the submenus of the selected treeitem's context
      *         exists.
      */
-    public boolean isSubmenusOfContextMenuOfTreeItemInViewExist(
+    public boolean existsSubmenusOfContextMenuOfTreeItemInView(
         String viewTitle, String[] nodes, String... contexts) {
         try {
             SWTBotTree tree = getTreeInView(viewTitle);
@@ -505,6 +513,28 @@ public class ViewPart extends EclipseComponent {
         return true;
     }
 
+    /**
+     * @return<tt>true</tt>, if there are some label texts existed in the given
+     *                       view. You can only see the label texts when you are
+     *                       not in a session.
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     */
+    public boolean existsLabelTextInView(String viewName) {
+        try {
+            viewPart.getView(viewName).bot().label();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**********************************************
+     * 
+     * Is the given widget enabled on the given view?
+     * 
+     **********************************************/
     /**
      * 
      * @param viewName

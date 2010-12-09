@@ -424,6 +424,13 @@ public interface RosterViewComponent extends Remote {
         throws RemoteException;
 
     /**
+     * reset all buddies's nickname to their baseJID.
+     * 
+     * @throws RemoteException
+     */
+    public void resetAllBuddyName() throws RemoteException;
+
+    /**
      * rename the buddy'name specified with the given baseJID to the given
      * newName
      * 

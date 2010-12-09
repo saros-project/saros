@@ -4,13 +4,13 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 
 public class STFTest {
+
+    public enum tester {
+        ALICE, BOB, CARL, DAVE, EDNA
+    }
 
     /* Musicians */
     public static Musician alice;
@@ -18,6 +18,12 @@ public class STFTest {
     public static Musician carl;
     public static Musician dave;
     public static Musician edna;
+
+    // views
+    protected final static String SESSION_VIEW = "Shared Project Session";
+    protected final static String CHAT_VIEW = "Chat View";
+    protected final static String ROSTER_VIEW = "Roster";
+    protected final static String REMOTE_SCREEN_VIEW = "Remote Screen";
 
     // Title of Buttons
     protected final static String YES = "Yes";
@@ -101,49 +107,112 @@ public class STFTest {
     public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
     public final static int USE_EXISTING_PROJECT_WITH_COPY = 4;
 
-    // public String getClassPath(String projectName, String pkg, String
-    // className) {
-    // return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
-    // + className + ".java";
-    // }
+    public static List<Musician> acitveTesters = new ArrayList<Musician>();
 
-    public String getPath(String... nodes) {
-        String folderpath = "";
-        for (int i = 0; i < nodes.length; i++) {
-            if (i == nodes.length - 1) {
-                folderpath += nodes[i];
-            } else
-                folderpath += nodes[i] + "/";
-        }
-        return folderpath;
-    }
-
-    public String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + SUFIX_JAVA };
-        return nodes;
-    }
-
-    public static List<Musician> activeMusicians() {
-        Musician[] m = { alice, bob, carl, dave, edna };
+    public static List<Musician> initTesters(tester... testers)
+        throws RemoteException {
         List<Musician> result = new ArrayList<Musician>();
-        for (Musician musician : m) {
-            if (musician != null)
-                result.add(musician);
+        for (tester t : testers) {
+            switch (t) {
+            case ALICE:
+                alice = InitMusician.newAlice();
+                result.add(alice);
+                break;
+            case BOB:
+                bob = InitMusician.newBob();
+                result.add(bob);
+                break;
+            case CARL:
+                carl = InitMusician.newCarl();
+                result.add(carl);
+                break;
+            case DAVE:
+                dave = InitMusician.newDave();
+                result.add(dave);
+                break;
+            case EDNA:
+                edna = InitMusician.newEdna();
+                result.add(edna);
+                break;
+            default:
+                break;
+            }
         }
+        acitveTesters = result;
         return result;
     }
 
-    @Before
-    @After
-    public void resetWorkbenches() throws RemoteException {
-        for (Musician musician : activeMusicians()) {
+    public static void setUpWorkbenchs() throws RemoteException {
+        for (Musician musician : acitveTesters) {
+            musician.workbench.setUpWorkbench();
+        }
+    }
+
+    public static void setUpSession(Musician host, Musician... invitees)
+        throws RemoteException, InterruptedException {
+        host.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        host.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+            invitees);
+    }
+
+    public static void reBuildSession(Musician host, Musician... invitees)
+        throws RemoteException {
+        if (!host.sessionV.isInSession()) {
+            for (Musician musician : invitees) {
+                musician.typeOfSharingProject = USE_EXISTING_PROJECT;
+                host.buildSessionSequentially(PROJECT1,
+                    CONTEXT_MENU_SHARE_PROJECT, musician);
+            }
+
+        }
+    }
+
+    public static void resetDriverRole(Musician host, Musician... invitees)
+        throws RemoteException {
+        for (Musician musician : invitees) {
+            if (musician.sessionV.isInSession() && musician.sessionV.isDriver()) {
+                host.sessionV.removeDriverRoleGUI(musician.sessionV);
+            }
+        }
+
+        if (host.sessionV.isInSession() && !host.sessionV.isDriver()) {
+            host.sessionV.giveDriverRoleGUI(host.sessionV);
+        }
+    }
+
+    public static void resetFollowModel(Musician... activeTesters)
+        throws RemoteException {
+        for (Musician tester : activeTesters) {
+            if (tester.sessionV.isInSession()
+                && tester.sessionV.isInFollowMode()) {
+                tester.sessionV.stopFollowingGUI();
+            }
+        }
+    }
+
+    public static void resetSaros(Musician host, Musician... invitees)
+        throws RemoteException, InterruptedException {
+        for (Musician musician : acitveTesters) {
+            if (musician != null)
+                musician.rosterV.resetAllBuddyName();
+        }
+        host.leaveSessionFirst(invitees);
+        for (Musician musician : acitveTesters) {
+            if (musician != null) {
+                musician.rosterV.disconnectGUI();
+                musician.state.deleteAllProjects();
+            }
+        }
+        resetWorkbenches();
+    }
+
+    public static void resetWorkbenches() throws RemoteException {
+        for (Musician musician : acitveTesters) {
             if (musician != null)
                 musician.workbench.resetWorkbench();
         }
     }
 
-    @AfterClass
     public static void resetAllBots() {
         alice = bob = carl = dave = edna = null;
     }
