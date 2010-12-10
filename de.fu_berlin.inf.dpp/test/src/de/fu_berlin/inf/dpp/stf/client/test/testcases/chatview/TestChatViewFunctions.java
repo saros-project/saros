@@ -2,16 +2,13 @@ package de.fu_berlin.inf.dpp.stf.client.test.testcases.chatview;
 
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestChatViewFunctions extends STFTest {
@@ -29,48 +26,30 @@ public class TestChatViewFunctions extends STFTest {
      * @throws RemoteException
      * @throws InterruptedException
      */
+
     @BeforeClass
-    public static void initMusicans() throws AccessException, RemoteException,
+    public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE, MusicianConfigurationInfos.PORT_BOB);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-
-        /*
-         * alice build session with bob.
-         */
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT, bob);
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob);
     }
 
-    /**
-     * make sure, all opened xmppConnects, pop up windows and editor should be
-     * closed.
-     * <p>
-     * make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure,all opened pop up windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**

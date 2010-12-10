@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
@@ -14,9 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestHostAsDriverInvitesBelatedly extends STFTest {
@@ -34,20 +30,13 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    @BeforeClass
-    public static void initMusican() throws AccessException, RemoteException,
-        InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE,
-            MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
 
+    @BeforeClass
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.newClass(PROJECT1, PKG1, CLS2);
         bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
@@ -56,46 +45,31 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         /*
          * alice build session with carl and is followed by carl.
          */
-        bob.typeOfSharingProject = USE_EXISTING_PROJECT;
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionDoneSequentially(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl);
         alice.followedBy(carl);
     }
 
-    /**
-     * make sure, all opened xmppConnects, pop up windows and editor should be
-     * closed.
-     * <p>
-     * make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
     @Before
-    public void setFollowMode() throws RemoteException, InterruptedException {
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
         /*
          * bob, carl and dave follow alice.
          */
-
     }
 
-    /**
-     * make sure,all opened pop up windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     */
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
-
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        alice.addBuddyGUIDone(bob);
+        bob.addBuddyGUIDone(alice);
     }
 
     /**

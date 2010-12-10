@@ -57,7 +57,6 @@ public class TestSVNStateUpdates extends STFTest {
             });
         }
         MakeOperationConcurrently.workAll(initTasks, 2);
-        bob.typeOfSharingProject = USE_EXISTING_PROJECT;
     }
 
     /**
@@ -87,8 +86,9 @@ public class TestSVNStateUpdates extends STFTest {
         }
         MakeOperationConcurrently.workAll(initTasks, 1);
 
-        alice.buildSessionSequentially(SVN_PROJECT,
-            CONTEXT_MENU_SHARE_PROJECT_WITH_VCS, bob);
+        alice.buildSessionDoneSequentially(SVN_PROJECT,
+            TypeOfShareProject.SHARE_PROJECT_WITH_VCS,
+            TypeOfCreateProject.EXIST_PROJECT, bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
     }
 

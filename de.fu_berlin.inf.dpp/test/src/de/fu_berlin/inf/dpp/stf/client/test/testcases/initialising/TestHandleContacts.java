@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestHandleContacts extends STFTest {
@@ -26,44 +25,28 @@ public class TestHandleContacts extends STFTest {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException {
-        bob = InitMusician.newBob();
-        alice = InitMusician.newAlice();
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
     }
 
-    /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure, alice and bob are connected
-     */
     @Before
-    public void setUp() throws RemoteException {
-        assertTrue(alice.rosterV.isConnected());
-        assertTrue(bob.rosterV.isConnected());
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
-    /**
-     * make sure, bob and alice contact each other. <br>
-     * make sure,all opened popup windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     */
     @After
-    public void cleanUp() throws RemoteException {
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
         alice.addBuddyGUIDone(bob);
         bob.addBuddyGUIDone(alice);
-        alice.workbench.resetWorkbench();
-        bob.workbench.resetWorkbench();
     }
 
     // FIXME these testAddContact assumes that testRemoveContact succeeds

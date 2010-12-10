@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -54,9 +55,9 @@ public class WindowPart extends EclipseComponent {
         bot.sleep(10);
     }
 
-    public void waitLongUntilShellCloses(SWTBotShell shell) {
+    public void waitLongUntilShellCloses(SWTBotShell shell)
+        throws TimeoutException {
         waitLongUntil(shellCloses(shell));
-        bot.sleep(10);
     }
 
     public void waitUntilShellCloses(String shellText) {

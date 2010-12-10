@@ -4,16 +4,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestShare3UsersConcurrently extends STFTest {
@@ -31,38 +29,26 @@ public class TestShare3UsersConcurrently extends STFTest {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException,
-        InterruptedException {
-        List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
     }
 
-    /**
-     * Closes all opened xmppConnects, popup windows and editor.<br/>
-     * Delete all existed projects.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * Closes all opened popup windows and editor.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**
@@ -84,7 +70,9 @@ public class TestShare3UsersConcurrently extends STFTest {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.buildSessionDoneConcurrently(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, carl);
         assertTrue(carl.sessionV.isParticipant());
         assertTrue(carl.sessionV.isObserver());

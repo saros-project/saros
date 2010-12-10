@@ -5,17 +5,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestParallelInvitationWithTerminationByHost extends STFTest {
@@ -31,50 +28,29 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
      * 
      * @throws AccessException
      * @throws RemoteException
-     * @throws InterruptedException
      */
     @BeforeClass
-    public static void initMusican() throws AccessException, RemoteException,
-        InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE,
-            MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL,
-            MusicianConfigurationInfos.PORT_DAVE);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-        dave = musicians.get(3);
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
+            TypeOfTester.DAVE);
+        setUpWorkbenchs();
+        setUpSaros();
     }
 
-    /**
-     * Closes all opened xmppConnects, popup windows and editor.<br/>
-     * Delete all existed projects.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        dave.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * Closes all opened popup windows and editor.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        dave.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**

@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse;
 
+import java.util.concurrent.TimeoutException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
@@ -102,7 +104,7 @@ public abstract class EclipseComponent {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
 
-    protected void waitLongUntil(ICondition condition) {
+    protected void waitLongUntil(ICondition condition) throws TimeoutException {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 

@@ -23,22 +23,22 @@ public class TestSessionViewComponent extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        initTesters(tester.ALICE, tester.BOB, tester.CARL);
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
         setUpSession(alice, bob);
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        resetSaros(alice, bob);
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
         resetWorkbenches();
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         resetWorkbenches();
+        reBuildSession(alice, bob);
     }
 
     @After
@@ -277,6 +277,7 @@ public class TestSessionViewComponent extends STFTest {
         alice.inviteUsersInYourSessionDone(PROJECT1, bob, carl);
         assertTrue(carl.sessionV.isInSession());
         assertTrue(bob.sessionV.isInSession());
+        alice.leaveSessionHostFirstDone(bob, carl);
     }
 
 }

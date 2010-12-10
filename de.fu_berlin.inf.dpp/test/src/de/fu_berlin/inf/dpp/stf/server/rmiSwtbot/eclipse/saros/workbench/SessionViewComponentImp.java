@@ -101,6 +101,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void setFocusOnSessionView() throws RemoteException {
         viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.captureScreenshot(basicC.getPathToScreenShot()
+            + "/focusOnsessionView.png");
         viewPart.waitUntilViewActive(VIEWNAME);
     }
 

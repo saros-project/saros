@@ -4,95 +4,50 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestCreatingNewFile extends STFTest {
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>carl (Host, Driver), carl share a java project with alice and bob.</li>
-     * <li>alice (Observer)</li>
-     * <li>bob (Observer)</li>
-     * </ol>
-     * 
-     * @throws AccessException
-     * @throws RemoteException
-     * @throws InterruptedException
-     */
     @BeforeClass
-    public static void initMusican() throws AccessException, RemoteException,
+    public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE,
-            MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
         carl.pEV.newProject(PROJECT1);
 
         /*
          * carl build session with bob, and alice simultaneously
          */
-        carl.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        carl.buildSessionDoneConcurrently(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, alice);
-
     }
 
-    /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
-        carl.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure,all opened pop up windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     */
-    @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        if (bob.pEV.isFolderExist(PROJECT1, FOLDER1))
-            bob.pEV.deleteFolder(PROJECT1, FOLDER1);
-        if (bob.pEV.isFolderExist(PROJECT1, FOLDER2))
-            bob.pEV.deleteFolder(PROJECT1, FOLDER2);
-        if (alice.pEV.isFolderExist(PROJECT1, FOLDER1))
-            alice.pEV.deleteFolder(PROJECT1, FOLDER1);
-        if (alice.pEV.isFolderExist(PROJECT1, FOLDER2))
-            alice.pEV.deleteFolder(PROJECT1, FOLDER2);
-        if (carl.pEV.isFolderExist(PROJECT1, FOLDER1))
-            carl.pEV.deleteFolder(PROJECT1, FOLDER1);
-        if (carl.pEV.isFolderExist(PROJECT1, FOLDER2))
-            carl.pEV.deleteFolder(PROJECT1, FOLDER2);
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
 
+    @After
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        deleteFolders(FOLDER1, FOLDER2);
     }
 
     /**

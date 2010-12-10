@@ -51,7 +51,6 @@ public class Musician extends STFTest {
     public String password;
     public String host;
     public int port;
-    public int typeOfSharingProject = CREATE_NEW_PROJECT;
 
     public Musician(JID jid, String password, String host, int port) {
         super();
@@ -106,35 +105,36 @@ public class Musician extends STFTest {
 
     // ********** Component, which consist of other simple functions ***********
 
-    public void buildSessionSequentially(String projectName,
-        String howToShareProject, Musician... invitees) throws RemoteException {
-        String[] inviteeBaseJIDs = new String[invitees.length];
-        for (int i = 0; i < invitees.length; i++) {
-            inviteeBaseJIDs[i] = invitees[i].getBaseJid();
-        }
-        pEV.shareProjectWith(projectName, howToShareProject, inviteeBaseJIDs);
+    public void buildSessionDoneSequentially(String projectName,
+        TypeOfShareProject howToShareProject,
+        TypeOfCreateProject usingWhichProject, Musician... invitees)
+        throws RemoteException {
+        String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
+
+        pEV.shareProjectWith(projectName, howToShareProject, baseJIDOfInvitees);
         for (Musician invitee : invitees) {
             invitee.pEV.confirmWizardSessionInvitationUsingWhichProject(
-                getBaseJid(), projectName, invitee.typeOfSharingProject);
+                projectName, usingWhichProject);
         }
     }
 
-    public void buildSessionConcurrentlyDone(final String projectName,
-        String shareProjectWith, Musician... invitees) throws RemoteException,
-        InterruptedException {
-        String[] peersName = new String[invitees.length];
-        for (int i = 0; i < invitees.length; i++) {
-            peersName[i] = invitees[i].getBaseJid();
-        }
+    public void buildSessionDoneConcurrently(final String projectName,
+        TypeOfShareProject howToShareProject,
+        final TypeOfCreateProject usingWhichProject, Musician... invitees)
+        throws RemoteException, InterruptedException {
+
         log.trace("alice.shareProjectParallel");
-        this.pEV.shareProject(projectName, peersName);
+        this.pEV.shareProjectWith(projectName, howToShareProject,
+            getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : invitees) {
+        for (final Musician invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.pEV
-                        .confirmWirzardSessionInvitationWithNewProject(projectName);
+                    invitee.pEV
+                        .confirmWizardSessionInvitationUsingWhichProject(
+                            projectName, usingWhichProject);
+                    invitee.sessionV.waitUntilSessionOpen();
                     return null;
                 }
             });
@@ -208,6 +208,7 @@ public class Musician extends STFTest {
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
         sessionV.clickTBleaveTheSession();
+        sessionV.waitUntilSessionClosed();
     }
 
     private String[] getPeersBaseJID(Musician... peers) {
@@ -356,7 +357,7 @@ public class Musician extends STFTest {
 
     /**
      * This method is same as
-     * {@link Musician#buildSessionConcurrentlyDone(String, String, Musician...)}
+     * {@link Musician#buildSessionDoneConcurrently(String, String, Musician...)}
      * . The difference to buildSessionConcurrently is that the invitation
      * process is activated by clicking the toolbarbutton
      * "open invitation interface" in the roster view.

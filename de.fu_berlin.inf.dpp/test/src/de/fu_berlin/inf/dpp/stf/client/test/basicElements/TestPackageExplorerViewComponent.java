@@ -8,11 +8,11 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestPackageExplorerViewComponent extends STFTest {
@@ -21,18 +21,25 @@ public class TestPackageExplorerViewComponent extends STFTest {
         .getLogger(TestPackageExplorerViewComponent.class);
 
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-        alice = InitMusician.newAlice();
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE);
+        setUpWorkbenchs();
     }
 
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        alice.workbench.resetWorkbench();
+    public static void runAfterClass() throws RemoteException {
+        resetWorkbenches();
+    }
+
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     @After
-    public void cleanup() throws RemoteException {
-        alice.workbench.resetSaros();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        deleteProjectsByActiveTesters();
     }
 
     /**********************************************

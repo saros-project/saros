@@ -3,17 +3,14 @@ package de.fu_berlin.inf.dpp.stf.client.test.testcases.invitation;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestEditDuringInvitation extends STFTest {
@@ -30,48 +27,30 @@ public class TestEditDuringInvitation extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
-     * @throws InterruptedException
+     * 
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException,
-        InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE,
-            MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
-    /**
-     * Closes all opened xmppConnects, popup windows and editor.<br/>
-     * Delete all existed projects.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        carl.workbench.resetSaros();
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * Closes all opened popup windows and editor.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        carl.workbench.resetWorkbench();
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**
@@ -97,7 +76,8 @@ public class TestEditDuringInvitation extends STFTest {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionDoneSequentially(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
 
         log.trace("alice.giveDriverRole");

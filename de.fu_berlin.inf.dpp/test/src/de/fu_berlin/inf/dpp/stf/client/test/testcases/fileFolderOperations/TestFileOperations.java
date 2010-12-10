@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
@@ -14,8 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestFileOperations extends STFTest {
@@ -32,59 +29,37 @@ public class TestFileOperations extends STFTest {
      * @throws InterruptedException
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException,
+    public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        /* initialize the musicians simultaneously */
-        List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-
-        /* alice build session with bob, and carl simultaneously */
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            carl, bob);
-
-        /* carl follow alice */
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob, carl);
         carl.sessionV.followThisUserGUI(alice.jid);
     }
 
-    /**
-     * <ol>
-     * <li>make sure, before every test there are only a package PKG1 and a
-     * class CLS1 under it in the shared project.</li>
-     * <li>make sure,all opened popup windows and editor should be closed.</li>
-     * 
-     * @throws RemoteException
-     */
+    @AfterClass
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
+    }
+
     @Before
-    public void setup() throws RemoteException {
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
         if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
             alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS2))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
         if (alice.pEV.isPkgExist(PROJECT1, PKG2))
             alice.pEV.deletePkg(PROJECT1, PKG2);
-
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
     }
 
     @After
-    public void cleanUp() throws RemoteException {
-
-        carl.workbench.resetWorkbench();
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
-    }
-
-    @AfterClass
-    public static void resetSaros() throws RemoteException {
-
-        carl.workbench.resetSaros();
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        alice.addBuddyGUIDone(bob);
+        bob.addBuddyGUIDone(alice);
     }
 
     /**

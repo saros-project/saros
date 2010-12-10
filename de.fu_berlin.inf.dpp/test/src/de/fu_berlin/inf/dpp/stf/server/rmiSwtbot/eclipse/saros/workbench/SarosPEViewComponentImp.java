@@ -1,10 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponentImp;
 
@@ -61,16 +64,25 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
      * 
      **************************************************************/
 
-    public void shareProjectWith(String projectName, String howToshareProject,
-        String[] baseJIDOfInvitees) throws RemoteException {
-        if (howToshareProject.equals(SHARE_PROJECT)) {
+    public void shareProjectWith(String projectName,
+        TypeOfShareProject howToshareProject, String[] baseJIDOfInvitees)
+        throws RemoteException {
+        switch (howToshareProject) {
+        case SHARE_PROJECT:
             clickContextMenushareProject(projectName);
-        } else if (howToshareProject.equals(SHARE_PROJECT_WITH_VCS))
+            break;
+        case SHARE_PROJECT_WITH_VCS:
             clickContextMenuShareprojectWithVCSSupport(projectName);
-        else if (howToshareProject.equals(SHARE_PROJECT_PARTIALLY))
+            break;
+        case SHARE_PROJECT_PARTICALLY:
             clickContextMemnuShareProjectPartically(projectName);
-        else
+            break;
+        case ADD_SESSION:
             clickContextMenuAddToSession(projectName);
+            break;
+        default:
+            break;
+        }
         confirmWindowInvitation(baseJIDOfInvitees);
     }
 
@@ -101,7 +113,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         confirmSecondPageOfWizardSessionInvitationUsingExistProject(projectName);
     }
 
-    public void confirmWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
+    public void confirmWizardSessionInvitationUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
@@ -123,7 +135,24 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         throws RemoteException {
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
-        windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
+        try {
+            windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
+        } catch (TimeoutException e) {
+            /*
+             * sometimes session can not be completely builded because of
+             * unclear reason, so after timeout STF try to close
+             * "the sesion invitation" window, but it can't close the window
+             * before stopping the invitation process. In this case a Special
+             * treatment should be done, so that the following tests still will
+             * be run.
+             */
+            basicC.captureScreenshot(basicC.getPathToScreenShot()
+                + "/sessionInvitationFailedUsingNewProject.png");
+            if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+                bot.activeShell().bot().toggleButton().click();
+            }
+            throw new RuntimeException("session invitation is failed!");
+        }
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingExistProject(
@@ -170,9 +199,17 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * window "Session Invitation" is still open at all.
          */
         if (windowPart.isShellActive(SESSION_INVITATION)) {
-            windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
+            try {
+                windowPart.waitLongUntilShellCloses(bot
+                    .shell(SESSION_INVITATION));
+            } catch (TimeoutException e) {
+                basicC.captureScreenshot(basicC.getPathToScreenShot()
+                    + "/sessionInvitationFailedUsingExistProject.png");
+                if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+                    bot.activeShell().bot().toggleButton().click();
+                }
+            }
         }
-
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
@@ -199,21 +236,22 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         button.click();
     }
 
-    public void confirmWizardSessionInvitationUsingWhichProject(String baseJID,
-        String projectName, int usingWhichProject) throws RemoteException {
+    public void confirmWizardSessionInvitationUsingWhichProject(
+        String projectName, TypeOfCreateProject usingWhichProject)
+        throws RemoteException {
         windowPart.waitUntilShellActive(SESSION_INVITATION);
         switch (usingWhichProject) {
-        case CREATE_NEW_PROJECT:
+        case NEW_PROJECT:
             confirmWirzardSessionInvitationWithNewProject(projectName);
             break;
-        case USE_EXISTING_PROJECT:
+        case EXIST_PROJECT:
             confirmWizardSessionInvitationUsingExistProject(projectName);
             break;
-        case USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE:
-            confirmWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
-            break;
-        case USE_EXISTING_PROJECT_WITH_COPY:
+        case EXIST_PROJECT_WITH_COPY:
             confirmWizardSessionInvitationUsingExistProjectWithCopy(projectName);
+            break;
+        case EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE:
+            confirmWizardSessionInvitationUsingExistProjectWithCopyAfterCancelLocalChange(projectName);
             break;
         default:
             break;
@@ -273,8 +311,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         throws RemoteException {
         precondition();
         String[] matchTexts = helperPart.changeToRegex(projectName);
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
-            SHARE_PROJECT);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, SAROS, SHARE_PROJECT);
     }
 
     /**
@@ -333,8 +371,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     private void clickContextMenuOfSaros(String projectName, String contextName)
         throws RemoteException {
         String[] matchTexts = helperPart.changeToRegex(projectName);
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME, matchTexts, SAROS,
-            contextName);
+        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
+            matchTexts, SAROS, contextName);
     }
 
 }

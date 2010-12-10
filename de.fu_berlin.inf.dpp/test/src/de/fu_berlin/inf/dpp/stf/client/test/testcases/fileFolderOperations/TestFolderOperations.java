@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -12,8 +11,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestFolderOperations extends STFTest {
@@ -30,63 +27,34 @@ public class TestFolderOperations extends STFTest {
      * @throws InterruptedException
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException,
+    public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        /* initialize the musicians simultaneously */
-        List<Musician> musicians = InitMusician.initAliceBobCarlConcurrently();
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-
-        /* alice build session with bob, and carl simultaneously */
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            carl, bob);
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob, carl);
     }
 
-    /**
-     * <ol>
-     * <li>make sure, before every test there are only a package PKG1 and a
-     * class CLS1 under it in the shared project.</li>
-     * <li>make sure,all opened popup windows and editor should be closed.</li>
-     * 
-     * @throws RemoteException
-     */
+    @AfterClass
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
+    }
+
     @Before
-    public void setup() throws RemoteException {
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
         if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
             alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         if (!alice.pEV.isFolderExist(PROJECT1, FOLDER1))
             alice.pEV.newFolder(FOLDER1, PROJECT1);
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
     }
 
-    /**
-     * make sure,all opened popup windows and editor should be closed. if you
-     * need some more after condition for your tests, please add it.
-     * 
-     * @throws RemoteException
-     */
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
-    }
-
-    /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
-    @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        alice.addBuddyGUIDone(bob);
+        bob.addBuddyGUIDone(alice);
     }
 
     /**

@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
@@ -48,18 +50,19 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * "Share project" you need to treat the following popup window too.</li>
      * <li>The share session process is only completely done after host first
      * run
-     * {@link SarosPEViewComponent#shareProjectWith(String, String, String[])},
-     * and then the invited users confirm the popup window
-     * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
+     * {@link SarosPEViewComponent#shareProjectWith(String, TypeOfShareProject, String[])}
+     * , and then the invited users confirm the popup window
+     * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, TypeOfCreateProject)}
      * . Since the share session process is very often used, so a convenient
-     * method {@link Musician#buildSessionSequentially(String, String, Musician...)}
+     * method
+     * {@link Musician#buildSessionDoneSequentially(String, TypeOfShareProject, TypeOfCreateProject, Musician...)}
      * is defined, which build the sharing session completely.</li>
      * </ol>
      * 
      * @param projectName
      *            the name of the project located in the package explorer view,
      *            which you want to share with other peers.
-     * @param howToShareProject
+     * @param howToshareProject
      *            with the parameter you can tell the method how to share your
      *            project with "Share project","Share project with VCS support",
      *            "Share project partially (experimental)..." or "Add to session
@@ -68,10 +71,12 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
-     * @see Musician#buildSessionSequentially(String, String, Musician...)
+     * @see Musician#buildSessionDoneSequentially(String, TypeOfShareProject,
+     *      TypeOfCreateProject, Musician...)
      */
-    public void shareProjectWith(String projectName, String howToShareProject,
-        String[] inviteeBaseJIDs) throws RemoteException;
+    public void shareProjectWith(String projectName,
+        TypeOfShareProject howToshareProject, String[] inviteeBaseJIDs)
+        throws RemoteException;
 
     /**
      * Perform the action "Share project" which should be activated by clicking
@@ -90,8 +95,9 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * then the invited users confirm the popup window
      * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
      * . Since the share session process is very often used, so a convenient
-     * method {@link Musician#buildSessionSequentially(String, String, Musician...)}
-     * is defined, which build the sharing session completely.</li>
+     * method
+     * {@link Musician#buildSessionSequentially(String, String, Musician...)} is
+     * defined, which build the sharing session completely.</li>
      * </ol>
      * 
      * @param projectName
@@ -282,7 +288,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * 
      * @throws RemoteException
      */
-    public void confirmWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
+    public void confirmWizardSessionInvitationUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException;
 
     /**
@@ -303,14 +309,10 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * "Session Invitation" using a new project or a existed project according
      * the passed parameter "usingWhichProject".
      * 
-     * 
-     * @param baseJIDOfInvitee
-     *            the base JID of the invitee, who confirm the invitation
-     *            session
      * @throws RemoteException
      */
     public void confirmWizardSessionInvitationUsingWhichProject(
-        String baseJIDOfInvitee, String projectName, int usingWhichProject)
+        String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException;
 
     /**

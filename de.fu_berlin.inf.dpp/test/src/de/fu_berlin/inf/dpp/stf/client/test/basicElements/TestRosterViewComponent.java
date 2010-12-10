@@ -10,11 +10,11 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RosterViewComponent;
 
@@ -33,47 +33,36 @@ public class TestRosterViewComponent extends STFTest {
      * 
      * @throws RemoteException
      */
+
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        carl = InitMusician.newCarl();
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            bob);
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob);
     }
 
-    /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. <br/>
-     * make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure,all opened popup windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     * @throws XMPPException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException, XMPPException {
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
         if (alice.rosterV.hasBuddyNickName(bob.jid)) {
             alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
         }
         if (!alice.rosterV.hasBuddy(bob.jid)) {
             alice.addBuddyGUIDone(bob);
         }
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
     }
 
     @Test

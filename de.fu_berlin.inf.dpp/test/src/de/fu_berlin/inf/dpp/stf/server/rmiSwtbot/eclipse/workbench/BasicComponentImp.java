@@ -36,7 +36,12 @@ public class BasicComponentImp extends EclipseComponent implements
         Bundle bundle = saros.getBundle();
         log.debug("screenshot's directory: "
             + bundle.getLocation().substring(16) + SCREENSHOTDIR);
-        return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        String osName = System.getProperty("os.name");
+        log.debug("Name of the OS: " + osName);
+        if (osName.matches("Windows.*"))
+            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        else
+            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
     // // FIXME If the file doesn't exist, this method hits the

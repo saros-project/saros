@@ -7,57 +7,39 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestDriverChangeAndImmediateWrite extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestDriverChangeAndImmediateWrite.class);
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            bob);
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob);
     }
 
-    /**
-     * make sure, all opened xmppConnects, pop up windows and editor should be
-     * closed.
-     * <p>
-     * make sure, all existed projects should be deleted.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure,all opened pop up windows and editor should be closed.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**

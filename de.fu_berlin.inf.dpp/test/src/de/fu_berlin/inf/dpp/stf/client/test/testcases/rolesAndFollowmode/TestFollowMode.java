@@ -8,37 +8,38 @@ import java.rmi.RemoteException;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestFollowMode extends STFTest {
 
     @BeforeClass
-    public static void initMusicians() throws RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionSequentially(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
-            bob);
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
+        setUpSession(alice, bob);
     }
 
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
+    }
+
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     @After
-    public void cleanUp() throws RemoteException {
-        if (bob.sessionV.isInFollowMode())
-            bob.sessionV.stopFollowingThisUserGUI(alice.jid);
-        if (alice.sessionV.isInFollowMode())
-            alice.sessionV.stopFollowingThisUserGUI(bob.jid);
-        bob.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
+        resetFollowModel(bob, alice);
     }
 
     /**

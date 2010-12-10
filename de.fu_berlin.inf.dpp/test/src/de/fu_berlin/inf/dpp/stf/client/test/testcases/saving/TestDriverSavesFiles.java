@@ -6,17 +6,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class TestDriverSavesFiles extends STFTest {
@@ -36,23 +33,12 @@ public class TestDriverSavesFiles extends STFTest {
      * @throws InterruptedException
      */
     @BeforeClass
-    public static void initMusican() throws AccessException, RemoteException,
+    public static void runBeforeClass() throws RemoteException,
         InterruptedException {
-        /*
-         * initialize the musicians simultaneously
-         */
-        List<Musician> musicians = InitMusician.initMusiciansConcurrently(
-            MusicianConfigurationInfos.PORT_ALICE,
-            MusicianConfigurationInfos.PORT_BOB,
-            MusicianConfigurationInfos.PORT_CARL,
-            MusicianConfigurationInfos.PORT_DAVE,
-            MusicianConfigurationInfos.PORT_EDNA);
-        alice = musicians.get(0);
-        bob = musicians.get(1);
-        carl = musicians.get(2);
-        dave = musicians.get(3);
-        edna = musicians.get(4);
-
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
+            TypeOfTester.DAVE, TypeOfTester.EDNA);
+        setUpWorkbenchs();
+        setUpSaros();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.newClass(PROJECT1, PKG1, CLS2);
         alice.pEV.newClass(PROJECT1, PKG1, CLS3);
@@ -60,43 +46,27 @@ public class TestDriverSavesFiles extends STFTest {
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionConcurrentlyDone(PROJECT1, CONTEXT_MENU_SHARE_PROJECT,
+        alice.buildSessionDoneConcurrently(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
-
-        dave.sessionV.followThisUserGUI(alice.jid);
-        edna.sessionV.followThisUserGUI(alice.jid);
+        alice.followedBy(dave, edna);
     }
 
-    /**
-     * make sure, all opened xmppConnects, popup windows and editor should be
-     * closed. make sure, all existed projects should be deleted. if you need
-     * some more after class condition for your tests, please add it.
-     * 
-     * @throws RemoteException
-     */
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        dave.workbench.resetSaros();
-        edna.workbench.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
-    /**
-     * make sure,all opened popup windows and editor should be closed. if you
-     * need some more after condition for your tests, please add it.
-     * 
-     * @throws RemoteException
-     */
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
+    }
+
     @After
-    public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        dave.workbench.resetWorkbench();
-        edna.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     /**

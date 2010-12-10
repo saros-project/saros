@@ -7,30 +7,36 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
+import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
-public class TestBasicSarosElements {
+public class TestBasicSarosElements extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestBasicSarosElements.class);
-    private static Musician alice;
 
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-        alice = InitMusician.newAlice();
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE);
+        setUpWorkbenchs();
     }
 
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
+    }
+
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     @After
-    public void cleanUp() throws RemoteException {
-        alice.workbench.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
         alice.rosterV.disconnectGUI();
     }
 

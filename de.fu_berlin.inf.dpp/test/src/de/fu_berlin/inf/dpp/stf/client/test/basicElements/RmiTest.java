@@ -10,38 +10,37 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 public class RmiTest extends STFTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);
 
-    private static Musician alice;
-
-    // private static Musician bob;
-
     @BeforeClass
-    public static void initMusican() throws RemoteException {
-        alice = InitMusician.newAlice();
-        // bob = InitMusician.newBob();
+    public static void runBeforeClass() throws RemoteException {
+        initTesters(TypeOfTester.ALICE);
+        setUpWorkbenchs();
     }
 
     @AfterClass
-    public static void resetSaros() throws RemoteException {
-        // bob.bot.resetSaros();
-        alice.workbench.resetSaros();
+    public static void runAfterClass() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
+    }
+
+    @Before
+    public void runBeforeEveryTest() throws RemoteException {
+        resetWorkbenches();
     }
 
     @After
-    public void cleanup() throws RemoteException {
-        alice.workbench.resetWorkbench();
-        alice.workbench.resetSaros();
-        // bob.bot.resetWorkbench();
+    public void runAfterEveryTest() throws RemoteException {
+        resetSaros();
+        resetWorkbenches();
     }
 
     // @Test
