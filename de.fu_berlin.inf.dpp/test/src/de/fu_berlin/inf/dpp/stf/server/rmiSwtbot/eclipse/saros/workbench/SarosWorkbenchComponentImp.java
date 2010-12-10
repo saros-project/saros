@@ -37,6 +37,19 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
         rsVC.openRemoteScreenView();
     }
 
+    public void closeUnnecessaryViews() throws RemoteException {
+        if (viewPart.isViewOpen("Problems"))
+            viewPart.closeViewByTitle("Problems");
+        if (viewPart.isViewOpen("Javadoc"))
+            viewPart.closeViewByTitle("Javadoc");
+        if (viewPart.isViewOpen("Declaration"))
+            viewPart.closeViewByTitle("Declaration");
+        if (viewPart.isViewOpen("Task List"))
+            viewPart.closeViewByTitle("Task List");
+        if (viewPart.isViewOpen("Outline"))
+            viewPart.closeViewByTitle("Outline");
+    }
+
     public void resetSaros() throws RemoteException {
         rosterVC.resetAllBuddyName();
         rosterVC.disconnectGUI();
@@ -76,26 +89,25 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
                 final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                IWorkbenchPage page = win.getActivePage();
-                if (page != null) {
-                    page.closeAllEditors(false);
-                }
                 Shell[] shells = Display.getCurrent().getShells();
                 for (Shell shell : shells) {
                     if (shell != null && shell != win.getShell()) {
                         shell.close();
                     }
                 }
-                // Shell activateShell = Display.getCurrent().getActiveShell();
-
+                IWorkbenchPage page = win.getActivePage();
+                if (page != null) {
+                    page.closeAllEditors(false);
+                }
             }
         });
     }
 
     public void setUpWorkbench() throws RemoteException {
+        resetWorkbench();
         state.deleteAllProjects();
         peVC.deleteAllProjectsWithGUI();
-        resetWorkbench();
+
     }
 
     public void closeWelcomeView() throws RemoteException {

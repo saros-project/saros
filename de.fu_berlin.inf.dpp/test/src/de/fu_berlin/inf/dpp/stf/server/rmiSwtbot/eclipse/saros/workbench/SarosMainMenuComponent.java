@@ -4,12 +4,14 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponent;
 
 public interface SarosMainMenuComponent extends MainMenuComponent {
 
-    public void creatAccountGUI(JID jid, String password) throws RemoteException;
+    public void creatAccountGUI(JID jid, String password)
+        throws RemoteException;
 
     /**
      * @param jid
@@ -87,4 +89,47 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      * @throws RemoteException
      */
     public void deleteAccount(JID jid) throws RemoteException;
+
+    /**********************************************
+     * 
+     * setting for screensharing
+     * 
+     **********************************************/
+    /**
+     * 
+     * @throws RemoteException
+     */
+    public void setupSettingForScreensharing(int encoder, int videoResolution,
+        int bandWidth, int capturedArea) throws RemoteException;
+
+    /**********************************************
+     * 
+     * setting for Feedback
+     * 
+     **********************************************/
+    /**
+     * Set feeback disabled without GUI.<br/>
+     * To simplify Testing you can disable the automatic reminder, so that you
+     * will never get the feedback popup window.
+     * 
+     * @see FeedbackManager#setFeedbackDisabled(boolean)
+     * 
+     * @throws RemoteException
+     */
+    public void disableAutomaticReminder() throws RemoteException;
+
+    /**
+     * Set feeback disabled using GUI.<br/>
+     * To simplify Testing you can disable the automatic reminder, so that you
+     * will never get the feedback popup window.
+     * <ol>
+     * <li>open Preferences dialog by clicking main menu Saros -> preferences</li>
+     * <li>click the treenodes: Saros-> Feedback</li>
+     * <li>then select the radio button "Disable automatic reminder" in the
+     * right page</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
+    public void disableAutomaticReminderGUI() throws RemoteException;
 }

@@ -126,7 +126,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         assertTrue(delimiterByAlice.equals(delimiterByCarl));
         assertTrue(delimiterByAlice.equals(delimiterByBob));
 
-        alice.leaveSessionFirstByPeers(carl, bob);
+        alice.leaveSessionPeersFirstDone(carl, bob);
 
     }
 }

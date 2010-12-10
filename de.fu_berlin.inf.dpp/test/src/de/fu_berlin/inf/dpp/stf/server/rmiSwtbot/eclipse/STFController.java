@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Musician;
@@ -118,12 +119,14 @@ public class STFController {
     public void initExportedObjects(int port, Saros saros,
         SarosSessionManager sessionManager,
         DataTransferManager dataTransferManager, EditorManager editorManager,
-        XMPPAccountStore xmppAccountStore) throws RemoteException {
+        XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
+        throws RemoteException {
         EclipseComponent.saros = saros;
         EclipseComponent.sessionManager = sessionManager;
         EclipseComponent.dataTransferManager = dataTransferManager;
         EclipseComponent.editorManager = editorManager;
         EclipseComponent.xmppAccountStore = xmppAccountStore;
+        EclipseComponent.feedbackManager = feedbackManager;
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {

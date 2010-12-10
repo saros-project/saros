@@ -67,17 +67,6 @@ public class Musician extends STFTest {
         NotBoundException {
         log.trace("initBot enter, initRmi");
         initRmi();
-        log.trace("activeEclipseShell");
-        workbench.activateEclipseShell();
-        log.trace("closeWelcomeView");
-        workbench.closeWelcomeView();
-        log.trace("openJavaPerspective");
-        mainMenu.openPerspectiveJava();
-        log.trace("openSarosViews");
-        workbench.openSarosViews();
-        log.trace("xmppConnect");
-        rosterV.connect(jid, password);
-        log.trace("initBot leave");
     }
 
     private void initRmi() throws RemoteException, NotBoundException,
@@ -163,17 +152,17 @@ public class Musician extends STFTest {
      * concurrently</li>
      * </ol>
      * 
-     * @param musicians
+     * @param peers
      *            the invitees
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void leaveSessionFirst(Musician... musicians)
+    public void leaveSessionHostFirstDone(Musician... peers)
         throws RemoteException, InterruptedException {
         sessionV.leaveTheSessionByHost();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < musicians.length; i++) {
-            final Musician musician = musicians[i];
+        for (int i = 0; i < peers.length; i++) {
+            final Musician musician = peers[i];
             closeSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     // Need to check for isDriver before leaving.
@@ -200,7 +189,7 @@ public class Musician extends STFTest {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void leaveSessionFirstByPeers(Musician... musicians)
+    public void leaveSessionPeersFirstDone(Musician... musicians)
         throws RemoteException, InterruptedException {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < musicians.length; i++) {
@@ -218,7 +207,7 @@ public class Musician extends STFTest {
         }
         MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-        sessionV.leaveTheSessionByHost();
+        sessionV.clickTBleaveTheSession();
     }
 
     private String[] getPeersBaseJID(Musician... peers) {
@@ -367,10 +356,10 @@ public class Musician extends STFTest {
 
     /**
      * This method is same as
-     * {@link Musician#buildSessionConcurrentlyDone(String, String, Musician...)}.
-     * The difference to buildSessionConcurrently is that the invitation process
-     * is activated by clicking the toolbarbutton "open invitation interface" in
-     * the roster view.
+     * {@link Musician#buildSessionConcurrentlyDone(String, String, Musician...)}
+     * . The difference to buildSessionConcurrently is that the invitation
+     * process is activated by clicking the toolbarbutton
+     * "open invitation interface" in the roster view.
      * 
      * @param projectName
      *            the name of the project which is in a session now.

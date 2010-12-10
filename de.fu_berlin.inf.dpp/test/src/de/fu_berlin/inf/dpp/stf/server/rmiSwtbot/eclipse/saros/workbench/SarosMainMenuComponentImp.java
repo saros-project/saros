@@ -3,7 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponentImp;
 
@@ -44,6 +47,11 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
      * 
      ***********************************************************************/
 
+    /**********************************************
+     * 
+     * actions about Account.
+     * 
+     **********************************************/
     public void createAccount(String username, String password, String server)
         throws RemoteException {
         xmppAccountStore.createNewAccount(username, password, server);
@@ -125,6 +133,56 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         /*
          * TODO add the implementation
          */
+    }
+
+    /**********************************************
+     * 
+     * setting for screensharing
+     * 
+     **********************************************/
+
+    public void setupSettingForScreensharing(int encoder, int videoResolution,
+        int bandWidth, int capturedArea) throws RemoteException {
+        clickMenuSarosPreferences();
+        SWTBotTree tree = bot.tree();
+        tree.expandNode("Saros").select("Screensharing");
+        bot.ccomboBox(0).setSelection(encoder);
+        bot.ccomboBox(1).setSelection(videoResolution);
+        bot.button("Apply").click();
+        bot.button(OK).click();
+        windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+    }
+
+    /**********************************************
+     * 
+     * setting for Feedback
+     * 
+     **********************************************/
+    public void disableAutomaticReminder() throws RemoteException {
+        if (feedbackManager.isFeedbackDisabled()) {
+            feedbackManager.setFeedbackDisabled(true);
+            // clickMenuSarosPreferences();
+            // SWTBotTree tree = bot.tree();
+            // tree.expandNode("Saros").select("Feedback");
+            // bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
+            // Messages.getString("feedback.page.group.interval")).click();
+            // bot.button("Apply").click();
+            // bot.button(OK).click();
+            // windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+        }
+    }
+
+    public void disableAutomaticReminderGUI() throws RemoteException {
+        if (feedbackManager.isFeedbackDisabled()) {
+            clickMenuSarosPreferences();
+            SWTBotTree tree = bot.tree();
+            tree.expandNode("Saros").select("Feedback");
+            bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
+                Messages.getString("feedback.page.group.interval")).click();
+            bot.button("Apply").click();
+            bot.button(OK).click();
+            windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+        }
     }
 
     /**************************************************************

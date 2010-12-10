@@ -694,6 +694,13 @@ public interface SessionViewComponent extends Remote {
     public void enableDisableFollowModeGUI() throws RemoteException;
 
     /**
+     * click the toolbar button "Leave the session" on the sesion view
+     * 
+     * @throws RemoteException
+     */
+    public void clickTBleaveTheSession() throws RemoteException;
+
+    /**
      * Waits until all the given users are not in the session.
      * <p>
      * <b>Attention</b>:<br/>
@@ -709,7 +716,7 @@ public interface SessionViewComponent extends Remote {
      * 
      * @param jids
      * @throws RemoteException
-     * @see Musician#leaveSessionFirstByPeers(Musician...)
+     * @see Musician#leaveSessionPeersFirstDone(Musician...)
      */
     public void waitUntilAllPeersLeaveSession(List<JID> jids)
         throws RemoteException;
@@ -831,6 +838,15 @@ public interface SessionViewComponent extends Remote {
      * @see Musician#shareYourScreenWithSelectedUserDone(Musician)
      */
     public void confirmIncomingScreensharingSesionWindow()
+        throws RemoteException;
+
+    /**
+     * during sharing screen you will get this error popup window, when Xuggler
+     * is not isntalled by you.
+     * 
+     * @throws RemoteException
+     */
+    public void confirmWindowScreensharingAErrorOccured()
         throws RemoteException;
 
     public void confirmClosingTheSessionWindow() throws RemoteException;

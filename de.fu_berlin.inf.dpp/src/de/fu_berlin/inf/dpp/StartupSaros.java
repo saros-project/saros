@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -68,6 +69,9 @@ public class StartupSaros implements IStartup {
     @Inject
     protected XMPPAccountStore xmppAccountStore;
 
+    @Inject
+    protected FeedbackManager feedbackManager;
+
     public StartupSaros() {
         Saros.reinject(this);
     }
@@ -118,7 +122,8 @@ public class StartupSaros implements IStartup {
                 bot.sleepTime = time;
                 try {
                     bot.initExportedObjects(port, saros, sessionManager,
-                        dataTransferManager, editorManager, xmppAccountStore);
+                        dataTransferManager, editorManager, xmppAccountStore,
+                        feedbackManager);
                     bot.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);
@@ -151,9 +156,9 @@ public class StartupSaros implements IStartup {
                 boolean hasAgreement = statisticManager.hasStatisticAgreement()
                     && errorLogManager.hasErrorLogAgreement();
 
-                 if (!hasUsername || !hasAgreement) {
+                if (!hasUsername || !hasAgreement) {
                     Wizard wiz = new ConfigurationWizard(!hasUsername,
-                        !hasAgreement,false);
+                        !hasAgreement, false);
                     WizardDialog dialog = new WizardDialog(
                         EditorAPI.getShell(), wiz);
                     dialog.setHelpAvailable(false);

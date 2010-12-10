@@ -138,9 +138,13 @@ public class WindowPart extends EclipseComponent {
     public boolean isShellActive(String title) {
         if (!isShellOpen(title))
             return false;
-        SWTBotShell activeShell = bot.activeShell();
-        String shellTitle = activeShell.getText();
-        return shellTitle.equals(title);
+        try {
+            SWTBotShell activeShell = bot.activeShell();
+            String shellTitle = activeShell.getText();
+            return shellTitle.equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
     }
 
     public void closeShell(String title) {

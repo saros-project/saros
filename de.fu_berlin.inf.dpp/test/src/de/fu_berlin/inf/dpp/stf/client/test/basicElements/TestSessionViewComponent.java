@@ -25,6 +25,7 @@ public class TestSessionViewComponent extends STFTest {
         InterruptedException {
         initTesters(tester.ALICE, tester.BOB, tester.CARL);
         setUpWorkbenchs();
+        setUpSaros();
         setUpSession(alice, bob);
     }
 
@@ -32,6 +33,7 @@ public class TestSessionViewComponent extends STFTest {
     public static void runAfterClass() throws RemoteException,
         InterruptedException {
         resetSaros(alice, bob);
+        resetWorkbenches();
     }
 
     @Before
@@ -41,9 +43,9 @@ public class TestSessionViewComponent extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
+        resetWorkbenches();
         resetDriverRole(alice, bob);
         resetFollowModel(alice, bob);
-        resetWorkbenches();
     }
 
     @Test
@@ -175,11 +177,11 @@ public class TestSessionViewComponent extends STFTest {
         bob.sessionV.jumpToPositionOfSelectedUserGUI(alice.jid);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         assertTrue(bob.editor.isJavaEditorOpen(CLS1));
-
     }
 
     @Test
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
+        // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
@@ -229,7 +231,7 @@ public class TestSessionViewComponent extends STFTest {
         throws RemoteException, InterruptedException {
         assertTrue(alice.sessionV.isInSession());
         assertTrue(bob.sessionV.isInSession());
-        alice.leaveSessionFirst(bob);
+        alice.leaveSessionHostFirstDone(bob);
         assertFalse(alice.sessionV.isInSession());
         assertFalse(bob.sessionV.isInSession());
     }
@@ -247,7 +249,7 @@ public class TestSessionViewComponent extends STFTest {
         assertFalse(bob.sessionV.existsLabelTextInSessionView());
         assertTrue(alice.sessionV.isInSession());
         assertTrue(bob.sessionV.isInSession());
-        alice.leaveSessionFirstByPeers(bob);
+        alice.leaveSessionPeersFirstDone(bob);
         assertFalse(alice.sessionV.isInSession());
         assertFalse(bob.sessionV.isInSession());
         assertTrue(alice.sessionV.existsLabelTextInSessionView());
@@ -260,7 +262,7 @@ public class TestSessionViewComponent extends STFTest {
         assertTrue(alice.sessionV.isInSessionGUI());
         assertTrue(bob.sessionV.isInSession());
         assertTrue(bob.sessionV.isInSessionGUI());
-        alice.leaveSessionFirst(bob);
+        alice.leaveSessionHostFirstDone(bob);
         assertFalse(alice.sessionV.isInSession());
         assertFalse(bob.sessionV.isInSession());
         assertFalse(alice.sessionV.isInSessionGUI());

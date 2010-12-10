@@ -98,7 +98,7 @@ public class TestShare3UsersConcurrently extends STFTest {
         assertFalse(alice.sessionV.isObserver());
         assertTrue(alice.sessionV.isDriver());
 
-        alice.leaveSessionFirstByPeers(bob, carl);
+        alice.leaveSessionPeersFirstDone(bob, carl);
 
         assertFalse(carl.sessionV.isParticipant());
         assertFalse(carl.sessionV.isObserver());

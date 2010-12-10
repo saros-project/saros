@@ -68,9 +68,6 @@ public class STFTest {
     public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
         + ".java";
 
-    public static final String SRC = "src";
-    public final static String SUFIX_JAVA = ".java";
-
     public static final String ROLE_NAME = " (Driver)";
     public static final String OWN_CONTACT_NAME = "You";
 
@@ -102,6 +99,7 @@ public class STFTest {
 
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
     public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
+
     public final static int CREATE_NEW_PROJECT = 1;
     public final static int USE_EXISTING_PROJECT = 2;
     public final static int USE_EXISTING_PROJECT_WITH_CANCEL_LOCAL_CHANGE = 3;
@@ -142,9 +140,37 @@ public class STFTest {
         return result;
     }
 
+    /**
+     * <ul>
+     * <li>activate saros-instance</li>
+     * <li>close all opened popup windows</li>
+     * <li>close all opened editors</li>
+     * <li>delete all existed projects</li>
+     * <li>close welcome view, if it is open</li>
+     * <li>open java perspective</li>
+     * <li>close all unnecessary views</li>
+     * <li>open saros views</li>
+     * <li>xmpp connection</li>
+     * </ul>
+     * 
+     * @throws RemoteException
+     */
     public static void setUpWorkbenchs() throws RemoteException {
         for (Musician musician : acitveTesters) {
+            musician.workbench.activateEclipseShell();
             musician.workbench.setUpWorkbench();
+            musician.workbench.closeWelcomeView();
+            musician.mainMenu.openPerspectiveJava();
+            musician.workbench.closeUnnecessaryViews();
+
+        }
+    }
+
+    public static void setUpSaros() throws RemoteException {
+        for (Musician musician : acitveTesters) {
+            musician.mainMenu.disableAutomaticReminder();
+            musician.workbench.openSarosViews();
+            musician.rosterV.connect(musician.jid, musician.password);
         }
     }
 
@@ -196,14 +222,13 @@ public class STFTest {
             if (musician != null)
                 musician.rosterV.resetAllBuddyName();
         }
-        host.leaveSessionFirst(invitees);
+        // host.leaveSessionFirst(invitees);
         for (Musician musician : acitveTesters) {
             if (musician != null) {
                 musician.rosterV.disconnectGUI();
                 musician.state.deleteAllProjects();
             }
         }
-        resetWorkbenches();
     }
 
     public static void resetWorkbenches() throws RemoteException {

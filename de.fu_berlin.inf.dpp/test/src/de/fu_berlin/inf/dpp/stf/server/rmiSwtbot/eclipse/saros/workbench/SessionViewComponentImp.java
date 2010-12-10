@@ -35,6 +35,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
      */
     private final static String SHELL_CONFIRM_CLOSING_SESSION = "Confirm Closing Session";
     private final static String SHELL_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
+    private final static String SHELL_SCREENSHARING_ERROR_OCCURED = "Screensharing: An error occured";
     private final static String SHELL_INVITATION = "Invitation";
     private final static String SHELL_ERROR_IN_SAROS_PLUGIN = "Error in Saros-Plugin";
     private final static String CLOSING_THE_SESSION = "Closing the Session";
@@ -259,7 +260,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        tablePart.clickContextMenuOfTable(contactLabel,
+        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -280,7 +281,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        tablePart.clickContextMenuOfTable(contactLabel, CM_REMOVE_DRIVER_ROLE);
+        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+            CM_REMOVE_DRIVER_ROLE);
         sessionV.waitUntilIsNoDriver();
     }
 
@@ -545,7 +547,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getContactStatusInSessionView(followedUserJID);
-        tablePart.clickContextMenuOfTable(contactLabel,
+        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_STOP_FOLLOWING_THIS_USER);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -622,6 +624,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
         windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
+    }
+
+    public void confirmWindowScreensharingAErrorOccured()
+        throws RemoteException {
+        windowPart.waitUntilShellActive(SHELL_SCREENSHARING_ERROR_OCCURED);
+        windowPart.confirmWindow(SHELL_SCREENSHARING_ERROR_OCCURED, OK);
     }
 
     /**********************************************
@@ -725,7 +733,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
      * toolbar button on the view: leave the session
      * 
      **********************************************/
-    private void leaveTheSessionGUI() {
+    public void clickTBleaveTheSession() throws RemoteException {
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
     }
 
@@ -748,14 +756,16 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
-        leaveTheSessionGUI();
+        clickTBleaveTheSession();
+        if (!windowPart.activateShellWithText(CONFIRM_LEAVING_SESSION))
+            windowPart.waitUntilShellActive(CONFIRM_LEAVING_SESSION);
         windowPart.confirmWindow(CONFIRM_LEAVING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
-        leaveTheSessionGUI();
+        clickTBleaveTheSession();
         // Util.runSafeAsync(log, new Runnable() {
         // public void run() {
         // try {
@@ -766,8 +776,9 @@ public class SessionViewComponentImp extends EclipseComponent implements
         // }
         // }
         // });
-        if (windowPart.isShellActive(SHELL_CONFIRM_CLOSING_SESSION))
-            windowPart.confirmWindow(SHELL_CONFIRM_CLOSING_SESSION, YES);
+        if (!windowPart.activateShellWithText(SHELL_CONFIRM_CLOSING_SESSION))
+            windowPart.waitUntilShellActive(SHELL_CONFIRM_CLOSING_SESSION);
+        windowPart.confirmWindow(SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilSessionClosed();
     }
 

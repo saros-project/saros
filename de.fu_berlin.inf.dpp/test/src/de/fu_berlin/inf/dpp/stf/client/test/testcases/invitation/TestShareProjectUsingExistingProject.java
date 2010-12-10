@@ -50,7 +50,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
      */
     @After
     public void cleanUp() throws RemoteException, InterruptedException {
-        alice.leaveSessionFirst(bob);
+        alice.leaveSessionHostFirstDone(bob);
         alice.pEV.deleteProject(PROJECT1);
         bob.pEV.deleteProject(PROJECT1);
         bob.workbench.resetWorkbench();

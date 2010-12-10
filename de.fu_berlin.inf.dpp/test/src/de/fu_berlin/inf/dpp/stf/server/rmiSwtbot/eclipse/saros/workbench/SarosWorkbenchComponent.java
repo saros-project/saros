@@ -9,6 +9,8 @@ public interface SarosWorkbenchComponent extends Remote {
 
     public void openSarosViews() throws RemoteException;
 
+    public void closeUnnecessaryViews() throws RemoteException;
+
     public void resetSaros() throws RemoteException;
 
     public SWTBotShell getEclipseShell() throws RemoteException;
