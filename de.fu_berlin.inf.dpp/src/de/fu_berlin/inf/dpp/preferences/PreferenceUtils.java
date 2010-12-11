@@ -140,6 +140,16 @@ public class PreferenceUtils {
             PreferenceConstants.PING_PONG);
     }
 
+    public boolean useVersionControl() {
+        return !saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.DISABLE_VERSION_CONTROL);
+    }
+
+    public void setUseVersionControl(boolean value) {
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.DISABLE_VERSION_CONTROL, !value);
+    }
+
     public Mixer getRecordingMixer() {
         return mixerManager.getMixerByName(saros.getPreferenceStore()
             .getString(PreferenceConstants.AUDIO_RECORD_DEVICE));

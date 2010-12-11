@@ -17,8 +17,8 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
- * An interface behind which the {@link SarosSessionManager} hides its non-public
- * methods.
+ * An interface behind which the {@link SarosSessionManager} hides its
+ * non-public methods.
  * 
  * The (I)SessionManager is responsible for providing a link between the
  * basically static world managed by PicoContainer where every class has just a
@@ -39,14 +39,11 @@ public interface ISarosSessionManager {
      * 
      * @param project
      *            the local Eclipse project which should become shared.
-     * @param useVersionControl
-     *            true iff this session uses Version Control, see
-     *            {@link ISarosSession#useVersionControl()}.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(IProject project, List<IResource> resources,
-        boolean useVersionControl) throws XMPPException;
+    public void startSession(IProject project, List<IResource> resources)
+        throws XMPPException;
 
     /**
      * Creates a Saros session for a shared project hosted remotely. The
@@ -62,7 +59,6 @@ public interface ISarosSessionManager {
      *            the host of the session.
      * @param myColorID
      *            Color ID of the local user
-     * 
      * @return the new Saros session.
      */
     public ISarosSession joinSession(String projectID, IProject project,
@@ -110,7 +106,7 @@ public interface ISarosSessionManager {
      * @param colorID
      *            the assigned color id for the invited participant.
      * @param comPrefs
-     *            TODO
+     *            multi user chat parameters.
      */
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,

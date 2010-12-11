@@ -51,6 +51,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.joda.time.DateTime;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
@@ -65,9 +66,9 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
@@ -93,15 +94,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
      * The project ID sent to us by the host with this invitation.
      */
     protected String projectName;
-    protected SarosSessionManager sessionManager;
     protected JoinSessionWizard inInvitationUI;
-    protected VersionManager versionManager;
     protected DateTime sessionStart;
     protected ISarosSession sarosSession;
     protected String invitationID;
-    protected Saros saros;
-
     protected boolean doStream = false;
+
+    @Inject
+    protected Saros saros;
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+    @Inject
+    protected VersionManager versionManager;
+    @Inject
+    protected SarosSessionManager sessionManager;
 
     /**
      * {@link VersionInfo#compatibility} applies to our client and
@@ -111,23 +117,18 @@ public class IncomingInvitationProcess extends InvitationProcess {
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SarosCancellationException cancellationCause;
 
-    public IncomingInvitationProcess(SarosSessionManager sessionManager,
-        ITransmitter transmitter, JID from, String projectName,
-        String description, int colorID,
+    public IncomingInvitationProcess(ITransmitter transmitter, JID from,
+        String projectName, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
-        VersionManager versionManager, VersionInfo remoteVersionInfo,
-        DateTime sessionStart, SarosUI sarosUI, String invitationID,
-        Saros saros, boolean doStream) {
+        VersionInfo remoteVersionInfo, DateTime sessionStart,
+        String invitationID, boolean doStream) {
 
         super(transmitter, from, description, colorID, invitationProcesses);
 
-        this.sessionManager = sessionManager;
         this.projectName = projectName;
-        this.versionManager = versionManager;
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;
         this.invitationID = invitationID;
-        this.saros = saros;
         this.doStream = doStream;
     }
 
@@ -176,6 +177,11 @@ public class IncomingInvitationProcess extends InvitationProcess {
 
             transmitter.sendFileListRequest(peer, invitationID);
 
+            /*
+             * Assuming that waiting takes most of the time, and receiving the
+             * list is pretty much instant.
+             */
+            monitor.subTask("Waiting for file list...");
             remoteFileList = transmitter.receiveFileList(fileListCollector,
                 monitor.newChild(95, SubMonitor.SUPPRESS_ALL_LABELS), true);
 
@@ -258,8 +264,9 @@ public class IncomingInvitationProcess extends InvitationProcess {
             }
         }
 
-        VCSAdapter vcs = VCSAdapter.getAdapter(this.remoteFileList
-            .getVcsProviderID());
+        VCSAdapter vcs = null;
+        if (preferenceUtils.useVersionControl())
+            vcs = VCSAdapter.getAdapter(this.remoteFileList.getVcsProviderID());
 
         assignLocalProject(baseProject, newProjectName, vcs, monitor);
 
@@ -351,8 +358,12 @@ public class IncomingInvitationProcess extends InvitationProcess {
             return;
         }
         if (!info.url.equals(url)) {
+            log.trace("Switching " + resource.getName() + " from " + info.url
+                + " to " + url);
             vcs.switch_(resource, url, revision, monitor);
         } else if (!info.revision.equals(revision)) {
+            log.trace("Updating " + resource.getName() + " from "
+                + info.revision + " to " + revision);
             vcs.update(resource, revision, monitor);
         }
         if (monitor.isCanceled())
@@ -545,6 +556,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (vcs != null) {
             this.localProject = vcs.checkoutProject(newProjectName,
                 this.remoteFileList, monitor);
+
             /*
              * HACK: After checking out a project, give Eclipse/the Team
              * provider time to realize that the project is now managed. The
@@ -555,7 +567,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
              * managed.
              */
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // do nothing
             }

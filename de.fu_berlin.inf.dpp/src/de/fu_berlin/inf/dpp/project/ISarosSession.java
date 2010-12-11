@@ -347,11 +347,13 @@ public interface ISarosSession extends IActivityListener {
     public boolean isShared(IProject project);
 
     /**
-     * Returns true if this session uses VCS support. Clients are required to
-     * have all the necessary plugins (e.g. Subclipse if it's an SVN project),
-     * otherwise they won't be able to participate in the session.
+     * Returns true if VCS support is enabled for this session.<br>
+     * <br>
+     * This setting can be changed in the Preferences. VCS support can be
+     * disabled during a running session, but enabling VCS support doesn't have
+     * any effect.
      * 
-     * @return true iff this session uses Version Control.
+     * @return true if this session uses Version Control, otherwise false.
      */
     public boolean useVersionControl();
 

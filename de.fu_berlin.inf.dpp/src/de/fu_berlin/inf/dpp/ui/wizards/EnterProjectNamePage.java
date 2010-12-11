@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -36,11 +37,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 class EnterProjectNamePage extends WizardPage {
 
-    @SuppressWarnings("unused")
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
-
-    private final JoinSessionWizard joinSessionWizard = null;
 
     protected final FileList fileList;
     protected final JID peer;
@@ -61,6 +59,8 @@ class EnterProjectNamePage extends WizardPage {
     protected Label updateProjectStatusResult;
     protected Label updateProjectNameLabel;
     protected Button scanWorkspaceProjectsButton;
+
+    protected Button disableVCSCheckbox;
 
     protected int pageChanges = 0;
 
@@ -95,7 +95,6 @@ class EnterProjectNamePage extends WizardPage {
             log.warn("WizardDialog is null");
         }
 
-        // TODO: set fileList to something useful
         this.fileList = fileList;
 
         setPageComplete(false);
@@ -317,7 +316,7 @@ class EnterProjectNamePage extends WizardPage {
         if (result == null || result.length == 0) {
             return null;
         }
-        // TODO More error Checking
+
         return ResourcesPlugin.getWorkspace().getRoot()
             .findMember((Path) result[0]).getProject().getName();
     }
@@ -362,6 +361,13 @@ class EnterProjectNamePage extends WizardPage {
                 }
             });
         }
+
+        disableVCSCheckbox = new Button(composite, SWT.CHECK);
+        disableVCSCheckbox
+            .setText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TEXT);
+        disableVCSCheckbox
+            .setToolTipText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TOOLTIP);
+        disableVCSCheckbox.setSelection(!preferenceUtils.useVersionControl());
 
         attachListeners();
 
@@ -546,6 +552,10 @@ class EnterProjectNamePage extends WizardPage {
         } else {
             return this.newProjectNameText.getText();
         }
+    }
+
+    public boolean useVersionControl() {
+        return !disableVCSCheckbox.getSelection();
     }
 
     /**

@@ -65,6 +65,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.putBoolean(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);
         prefs.putBoolean(PreferenceConstants.CONCURRENT_UNDO, false);
         prefs.putBoolean(PreferenceConstants.PING_PONG, false);
+        prefs.putBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
         // InvitationDialog
         prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);

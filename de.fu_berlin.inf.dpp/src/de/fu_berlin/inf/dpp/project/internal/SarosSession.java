@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -52,6 +53,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -73,7 +75,17 @@ public class SarosSession implements ISarosSession, Disposable {
     public static final int MAX_USERCOLORS = 5;
 
     /* Dependencies */
+    @Inject
     protected Saros saros;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected DataTransferManager transferManager;
+
+    @Inject
+    protected StopManager stopManager;
 
     protected ITransmitter transmitter;
 
@@ -84,10 +96,6 @@ public class SarosSession implements ISarosSession, Disposable {
     protected ConcurrentDocumentServer concurrentDocumentServer;
 
     protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
-
-    protected DataTransferManager transferManager;
-
-    protected StopManager stopManager;
 
     /* Instance fields */
     protected User localUser;
@@ -104,7 +112,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected SarosProjectMapper projectMapper = new SarosProjectMapper();
 
-    protected final boolean useVersionControl;
+    protected boolean useVersionControl = true;
 
     private BlockingQueue<IActivity> pendingActivities = new LinkedBlockingQueue<IActivity>();
 
@@ -181,25 +189,21 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Common constructor code for host and client side.
      */
-    protected SarosSession(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager,
-        DispatchThreadContext threadContext, StopManager stopManager,
-        JID myJID, int myColorID, DateTime sessionStart,
-        boolean useVersionControl) {
+    protected SarosSession(ITransmitter transmitter,
+        DispatchThreadContext threadContext, int myColorID,
+        DateTime sessionStart) {
+
+        Saros.reinject(this);
 
         assert transmitter != null;
-        assert myJID != null;
+        assert saros.getMyJID() != null;
 
-        this.saros = saros;
         this.transmitter = transmitter;
-        this.transferManager = transferManager;
-        this.stopManager = stopManager;
         this.sessionStart = sessionStart;
 
-        this.localUser = new User(this, myJID, myColorID);
+        this.localUser = new User(this, saros.getMyJID(), myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager, threadContext);
-        this.useVersionControl = useVersionControl;
 
         stopManager.addBlockable(stopManagerListener);
         activityDispatcher.setDaemon(true);
@@ -209,13 +213,11 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Constructor called for SarosSession of the host
      */
-    public SarosSession(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager,
-        DispatchThreadContext threadContext, JID myID, StopManager stopManager,
-        DateTime sessionStart, boolean useVersionControl) {
+    public SarosSession(ITransmitter transmitter,
+        DispatchThreadContext threadContext,
+        DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, stopManager,
-            myID, 0, sessionStart, useVersionControl);
+        this(transmitter, threadContext, 0, sessionStart);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
         localUser.setUserRole(UserRole.DRIVER);
@@ -232,20 +234,18 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Constructor of client
      */
-    public SarosSession(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager,
-        DispatchThreadContext threadContext, JID myID, JID hostID,
-        int myColorID, StopManager stopManager, DateTime sessionStart) {
+    public SarosSession(ITransmitter transmitter,
+        DispatchThreadContext threadContext, JID hostID, int myColorID,
+        DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, threadContext, stopManager,
-            myID, myColorID, sessionStart, true);
+        this(transmitter, threadContext, myColorID, sessionStart);
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();
         host.setUserRole(UserRole.DRIVER);
 
         participants.put(hostID, host);
-        participants.put(myID, localUser);
+        participants.put(saros.getMyJID(), localUser);
 
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
@@ -731,7 +731,13 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public boolean useVersionControl() {
-        return useVersionControl;
+        /*
+         * It is not possible to enable version control support during a
+         * session.
+         */
+        if (!useVersionControl)
+            return false;
+        return useVersionControl = preferenceUtils.useVersionControl();
     }
 
     public SharedProject getSharedProject(IProject project) {

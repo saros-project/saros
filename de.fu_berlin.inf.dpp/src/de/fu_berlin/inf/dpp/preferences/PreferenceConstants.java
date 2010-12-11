@@ -74,6 +74,8 @@ public class PreferenceConstants {
 
     public static final String SKIP_SYNC_SELECTABLE = "invitation.dialog.skip.enabled";
 
+    public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
+
     /*
      * Preferences of the feedback preferences page
      * 

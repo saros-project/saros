@@ -152,13 +152,11 @@ public class SarosSessionManager implements IConnectionListener,
     protected static final Random sessionRandom = new Random();
 
     public void startSession(IProject project,
-        List<IResource> partialProjectResources, boolean useVersionControl)
-        throws XMPPException {
+        List<IResource> partialProjectResources) throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
         }
 
-        JID myJID = saros.getMyJID();
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
         this.partialProjectResources = partialProjectResources;
@@ -167,9 +165,8 @@ public class SarosSessionManager implements IConnectionListener,
         this.doStreamingInvitation = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
 
-        SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, myJID, stopManager,
-            new DateTime(), useVersionControl);
+        SarosSession sarosSession = new SarosSession(this.transmitter, dispatchThreadContext,
+            new DateTime());
         // TODO Add project after starting the session.
         sarosSession.addSharedProject(project, project.getName());
 
@@ -187,9 +184,8 @@ public class SarosSessionManager implements IConnectionListener,
     public ISarosSession joinSession(String projectID, IProject project,
         JID host, int colorID, DateTime sessionStart) {
 
-        SarosSession sarosSession = new SarosSession(saros, this.transmitter,
-            this.transferManager, dispatchThreadContext, saros.getMyJID(),
-            host, colorID, stopManager, sessionStart);
+        SarosSession sarosSession = new SarosSession(this.transmitter, dispatchThreadContext,
+            host, colorID, sessionStart);
         sarosSession.addSharedProject(project, projectID);
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -270,9 +266,8 @@ public class SarosSessionManager implements IConnectionListener,
         this.sessionID.setValue(sessionID);
 
         final IncomingInvitationProcess process = new IncomingInvitationProcess(
-            this, this.transmitter, from, projectName, description, colorID,
-            invitationProcesses, versionManager, versionInfo, sessionStart,
-            sarosUI, invitationID, saros, doStream);
+            this.transmitter, from, projectName, description, colorID, invitationProcesses,
+            versionInfo, sessionStart, invitationID, doStream);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Util.runSafeSWTAsync(log, new Runnable() {

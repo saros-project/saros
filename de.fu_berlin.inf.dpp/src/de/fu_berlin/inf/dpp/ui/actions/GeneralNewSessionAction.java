@@ -39,7 +39,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -69,12 +68,8 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
     }
 
     /**
-     * @param useVersionControl
-     *            true iff this session uses Version Control, see
-     *            {@link ISarosSession#useVersionControl()}.
      */
-    public void runNewSession(List<IResource> resource,
-        boolean useVersionControl) {
+    public void runNewSession(List<IResource> resource) {
         try {
             boolean running = sessionManager.getSarosSession() != null;
             boolean connected = saros.isConnected();
@@ -85,8 +80,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
             if (running) {
                 sessionManager.openInviteDialog(null);
             } else {
-                sessionManager.startSession(this.selectedProject, resource,
-                    useVersionControl);
+                sessionManager.startSession(this.selectedProject, resource);
                 sessionManager.openInviteDialog(preferenceUtils
                     .getAutoInviteUsers());
             }
@@ -105,6 +99,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
 
     public void selectionChanged(IAction action, ISelection selection) {
         this.selectedProject = getProject(selection);
+        action.setEnabled(true);
     }
 
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {

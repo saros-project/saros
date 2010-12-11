@@ -65,9 +65,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
  * 
  * TODO Automatically switch to follow mode
  * 
- * TODO Suggest if the project is a CVS project that the user checks it out and
- * offers an option to transfer the settings
- * 
  * TODO Create a separate Wizard class with the following concerns implemented
  * more nicely: Long-Running Operation after each step, cancellation by a remote
  * party, auto-advance.
@@ -190,6 +187,8 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
+        // Set the preferences setting.
+        preferenceUtils.setUseVersionControl(namePage.useVersionControl());
 
         final IProject source = namePage.getSourceProject();
         final String target = namePage.getTargetProjectName();
@@ -212,7 +211,7 @@ public class JoinSessionWizard extends Wizard {
                         e1);
                 }
             }
-            
+
             if (EditorAPI.existUnsavedFiles(source)) {
                 boolean retVal = MessageDialog
                     .openQuestion(
@@ -232,7 +231,7 @@ public class JoinSessionWizard extends Wizard {
                  */
                 EditorAPI.saveProject(source, false);
             }
-            
+
             try {
                 diff = FileListDiff.diff(new FileList(source),
                     process.getRemoteFileList());

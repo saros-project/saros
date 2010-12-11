@@ -35,6 +35,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -77,6 +78,12 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String ROLE_CHANGE_TEXT = "On role changes follow exclusive driver automatically.";
     public static final String MULTI_DRIVER_SUPPORT_TEXT = "Enable multi driver support";
     public static final String CONCURRENT_UNDO_TEXT = "Enable concurrent undo (only local changes are undone, session restart necessary).";
+    public static final String DISABLE_VERSION_CONTROL_TEXT = "Disable Version Control support";
+    public static final String DISABLE_VERSION_CONTROL_TOOLTIP = "Saros tries to share VCS operations"
+        + " like checkout during the invitation, or switch or update during a session. (Currently, only SVN "
+        + "is supported.) You can disable VCS support in case you have problems with the repository.\n"
+        + "Disabling VCS support during a running session is possible, but enabling VCS support won't have"
+        + " any effect until you rejoin the session (restart if you're the host).";
 
     // icons
     public static final Image ADD_IMAGE = SarosUI.getImage("icons/invites.png");
@@ -111,6 +118,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         layoutParent();
         createAccountsGroup();
         createAutomaticConnectField(this.parent);
+        createVersionControlPreferences(this.parent);
         createFollowModePreferences();
         createMultiDriverPreferences();
     }
@@ -316,8 +324,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     protected void openNewAccountWizard() {
         ConfigurationWizard wiz = new ConfigurationWizard(true, false, true);
-        WizardDialog wizard = new WizardDialog(parent.getShell(),
-            wiz);
+        WizardDialog wizard = new WizardDialog(parent.getShell(), wiz);
         wizard.setHelpAvailable(false);
         if (Window.OK == wizard.open()) {
             updateInfoLabel();
@@ -372,6 +379,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     protected void createAutomaticConnectField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
             STARTUP_CONNECT_TEXT, group));
+    }
+
+    protected void createVersionControlPreferences(Composite group) {
+        BooleanFieldEditor editor = new BooleanFieldEditor(
+            PreferenceConstants.DISABLE_VERSION_CONTROL,
+            DISABLE_VERSION_CONTROL_TEXT, group);
+        Control descriptionControl = editor.getDescriptionControl(group);
+        descriptionControl.setToolTipText(DISABLE_VERSION_CONTROL_TOOLTIP);
+        addField(editor);
     }
 
     protected void createFollowModePreferences() {
