@@ -140,8 +140,7 @@ public class Musician extends STFTest {
             });
         }
         log.trace("workAll(joinSessionTasks)");
-        MakeOperationConcurrently.workAll(joinSessionTasks,
-            joinSessionTasks.size());
+        MakeOperationConcurrently.workAll(joinSessionTasks);
     }
 
     /**
@@ -171,8 +170,7 @@ public class Musician extends STFTest {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(closeSessionTasks,
-            closeSessionTasks.size());
+        MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
     /**
@@ -205,7 +203,7 @@ public class Musician extends STFTest {
         for (Musician musician : musicians) {
             peerJIDs.add(musician.jid);
         }
-        MakeOperationConcurrently.workAll(leaveTasks, leaveTasks.size());
+        MakeOperationConcurrently.workAll(leaveTasks);
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
         sessionV.clickTBleaveTheSession();
         sessionV.waitUntilSessionClosed();
@@ -240,7 +238,7 @@ public class Musician extends STFTest {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(followTasks, followTasks.size());
+        MakeOperationConcurrently.workAll(followTasks);
     }
 
     /**
@@ -264,8 +262,7 @@ public class Musician extends STFTest {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(stopFollowTasks,
-            stopFollowTasks.size());
+        MakeOperationConcurrently.workAll(stopFollowTasks);
     }
 
     /**
@@ -383,8 +380,7 @@ public class Musician extends STFTest {
             });
         }
         log.trace("workAll(joinSessionTasks)");
-        MakeOperationConcurrently.workAll(joinSessionTasks,
-            joinSessionTasks.size());
+        MakeOperationConcurrently.workAll(joinSessionTasks);
 
     }
 }

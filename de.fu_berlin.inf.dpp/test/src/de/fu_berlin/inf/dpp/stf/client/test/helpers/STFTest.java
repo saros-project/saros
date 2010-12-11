@@ -4,6 +4,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 
 public class STFTest {
@@ -108,7 +113,7 @@ public class STFTest {
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
     public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
 
-    public static List<Musician> acitveTesters = new ArrayList<Musician>();
+    public static List<Musician> activeTesters = new ArrayList<Musician>();
 
     public static List<Musician> initTesters(TypeOfTester... testers)
         throws RemoteException {
@@ -139,7 +144,7 @@ public class STFTest {
                 break;
             }
         }
-        acitveTesters = result;
+        activeTesters = result;
         return result;
     }
 
@@ -157,7 +162,7 @@ public class STFTest {
      * @throws RemoteException
      */
     public static void setUpWorkbenchs() throws RemoteException {
-        for (Musician musician : acitveTesters) {
+        for (Musician musician : activeTesters) {
             musician.workbench.activateEclipseShell();
             musician.workbench.setUpWorkbench();
             musician.workbench.closeWelcomeView();
@@ -167,7 +172,7 @@ public class STFTest {
     }
 
     public static void setUpSaros() throws RemoteException {
-        for (Musician musician : acitveTesters) {
+        for (Musician musician : activeTesters) {
             musician.mainMenu.disableAutomaticReminder();
             musician.workbench.openSarosViews();
             musician.rosterV.connect(musician.jid, musician.password);
@@ -194,13 +199,13 @@ public class STFTest {
     }
 
     public static void createProjectByActiveTesters() throws RemoteException {
-        for (Musician tester : acitveTesters) {
+        for (Musician tester : activeTesters) {
             tester.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         }
     }
 
     public static void deleteProjectsByActiveTesters() throws RemoteException {
-        for (Musician tester : acitveTesters) {
+        for (Musician tester : activeTesters) {
             tester.state.deleteAllProjects();
         }
     }
@@ -229,12 +234,12 @@ public class STFTest {
     }
 
     public static void resetSaros() throws RemoteException {
-        for (Musician musician : acitveTesters) {
+        for (Musician musician : activeTesters) {
             if (musician != null)
                 musician.rosterV.resetAllBuddyName();
         }
         // host.leaveSessionHostFirstDone(invitees);
-        for (Musician musician : acitveTesters) {
+        for (Musician musician : activeTesters) {
             if (musician != null) {
                 musician.rosterV.disconnectGUI();
                 musician.state.deleteAllProjects();
@@ -244,14 +249,14 @@ public class STFTest {
     }
 
     public static void resetWorkbenches() throws RemoteException {
-        for (Musician musician : acitveTesters) {
+        for (Musician musician : activeTesters) {
             if (musician != null)
                 musician.workbench.resetWorkbench();
         }
     }
 
     public static void deleteFolders(String... folders) throws RemoteException {
-        for (Musician tester : acitveTesters) {
+        for (Musician tester : activeTesters) {
             for (String folder : folders) {
                 if (tester.pEV.isFolderExist(PROJECT1, folder))
                     tester.pEV.deleteFolder(PROJECT1, folder);
@@ -262,4 +267,26 @@ public class STFTest {
     public static void resetAllBots() {
         alice = bob = carl = dave = edna = null;
     }
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        resetSaros();
+    }
+
+    @Before
+    public void before() throws Exception {
+        resetWorkbenches();
+    }
+
+    @After
+    public void after() throws Exception {
+        resetWorkbenches();
+        resetSaros();
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        resetSaros();
+    }
+
 }

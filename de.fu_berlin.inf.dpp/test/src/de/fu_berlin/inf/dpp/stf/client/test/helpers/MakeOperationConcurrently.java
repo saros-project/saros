@@ -18,9 +18,16 @@ public class MakeOperationConcurrently {
     private final static Logger log = Logger
         .getLogger(MakeOperationConcurrently.class);
 
+    public static <T> List<T> workAll(List<Callable<T>> tasks) throws InterruptedException {
+//        if(System.getProperty("").equals("MAC"))
+//            return workAll(tasks, 1);
+//        else
+            return workAll(tasks,tasks.size());
+    }
+    
     public static <T> List<T> workAll(List<Callable<T>> tasks,
-        int numberOfThread) throws InterruptedException {
-        ExecutorService pool = Executors.newFixedThreadPool(numberOfThread);
+        int numberOfThreads) throws InterruptedException {
+        ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
         final List<Future<T>> futureResult;
         futureResult = pool.invokeAll(tasks);
 
@@ -56,7 +63,7 @@ public class MakeOperationConcurrently {
             });
         }
         log.trace("workAll(leaveTasks)");
-        final List<Boolean> workAll = workAll(leaveTasks, leaveTasks.size());
+        final List<Boolean> workAll = workAll(leaveTasks);
 
         return workAll;
     }

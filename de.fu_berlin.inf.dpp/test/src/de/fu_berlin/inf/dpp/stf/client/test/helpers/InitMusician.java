@@ -62,7 +62,7 @@ public class InitMusician extends MusicianConfigurationInfos {
         initTasks.add(newAliceCallable());
         initTasks.add(newBobCallable());
         initTasks.add(newCarlCallable());
-        return MakeOperationConcurrently.workAll(initTasks, 3);
+        return MakeOperationConcurrently.workAll(initTasks);
     }
 
     public static List<Musician> initMusiciansConcurrently(int... ports)
@@ -89,7 +89,7 @@ public class InitMusician extends MusicianConfigurationInfos {
                 break;
             }
         }
-        return MakeOperationConcurrently.workAll(initTasks, initTasks.size());
+        return MakeOperationConcurrently.workAll(initTasks);
     }
 
     public static void addContacts(List<Musician> musicians)

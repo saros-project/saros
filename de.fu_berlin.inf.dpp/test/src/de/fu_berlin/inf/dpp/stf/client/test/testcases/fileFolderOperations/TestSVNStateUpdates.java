@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
@@ -38,11 +37,12 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @BeforeClass
     public static void beforeClass() throws Exception {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : initTesters()) {
+        for (final Musician musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     if (!musician.pEV.isProjectExist(SVN_PROJECT_COPY)) {
@@ -56,7 +56,7 @@ public class TestSVNStateUpdates extends STFTest {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(initTasks, 2);
+        MakeOperationConcurrently.workAll(initTasks);
     }
 
     /**
@@ -70,10 +70,11 @@ public class TestSVNStateUpdates extends STFTest {
      * 
      * @throws RemoteException
      */
+    @Override
     @Before
     public void before() throws Exception {
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : initTesters()) {
+        for (final Musician musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
@@ -84,7 +85,9 @@ public class TestSVNStateUpdates extends STFTest {
                 }
             });
         }
-        MakeOperationConcurrently.workAll(initTasks, 1);
+        // copyProject is not thread safe :-/
+        int numberOfThreads = 1;
+        MakeOperationConcurrently.workAll(initTasks, numberOfThreads);
 
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
@@ -92,17 +95,13 @@ public class TestSVNStateUpdates extends STFTest {
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
     }
 
+    @Override
     @After
-    public void after() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        if (bob.sessionV.isInSessionGUI())
-            bob.sessionV.leaveTheSessionByPeer();
+    public void after() throws RemoteException, InterruptedException {
+        alice.leaveSessionHostFirstDone(bob);
         if (bob.pEV.isProjectExist(SVN_PROJECT))
             bob.pEV.deleteProject(SVN_PROJECT);
-
-        alice.workbench.resetWorkbench();
-        if (alice.sessionV.isInSessionGUI())
-            alice.sessionV.leaveTheSessionByHost();
+        
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
     }
@@ -117,6 +116,11 @@ public class TestSVNStateUpdates extends STFTest {
             alice.workbench.resetSaros();
             bob.workbench.resetSaros();
         }
+    }
+
+    @Test
+    public void asdf() {
+        //
     }
 
     /**
