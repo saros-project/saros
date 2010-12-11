@@ -37,7 +37,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     /* All the sub menus of the context menu "Saros" */
     private final static String SHARE_PROJECT = "Share project...";
-    private final static String SHARE_PROJECT_WITH_VCS = "Share project with VCS support...";
     private final static String SHARE_PROJECT_PARTIALLY = "Share project partially (experimental)...";
     private final static String ADD_TO_SESSION = "Add to session (experimental)...";
     private final static String BUTTON_BROWSE = "Browse";
@@ -70,9 +69,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         switch (howToshareProject) {
         case SHARE_PROJECT:
             clickContextMenushareProject(projectName);
-            break;
-        case SHARE_PROJECT_WITH_VCS:
-            clickContextMenuShareprojectWithVCSSupport(projectName);
             break;
         case SHARE_PROJECT_PARTICALLY:
             clickContextMemnuShareProjectPartically(projectName);
@@ -313,21 +309,6 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         String[] matchTexts = helperPart.changeToRegex(projectName);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, SAROS, SHARE_PROJECT);
-    }
-
-    /**
-     * Clicks the sub menu "Share project with VCS support" of the context menu
-     * "Saros" of the given project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     * @throws RemoteException
-     */
-    private void clickContextMenuShareprojectWithVCSSupport(String projectName)
-        throws RemoteException {
-        precondition();
-        clickContextMenuOfSaros(projectName, SHARE_PROJECT_WITH_VCS);
     }
 
     /**

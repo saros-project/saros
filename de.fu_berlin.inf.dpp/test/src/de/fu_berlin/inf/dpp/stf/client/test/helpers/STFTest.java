@@ -17,7 +17,7 @@ public class STFTest {
     }
 
     public enum TypeOfShareProject {
-        SHARE_PROJECT, SHARE_PROJECT_WITH_VCS, SHARE_PROJECT_PARTICALLY, ADD_SESSION
+        SHARE_PROJECT, SHARE_PROJECT_PARTICALLY, ADD_SESSION
     }
 
     /* Musicians */

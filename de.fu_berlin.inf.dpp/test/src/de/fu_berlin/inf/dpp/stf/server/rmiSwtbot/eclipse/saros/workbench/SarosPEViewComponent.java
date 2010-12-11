@@ -35,7 +35,6 @@ public interface SarosPEViewComponent extends PEViewComponent {
 
     /**
      * Perform one of the actions "Share project",
-     * "Share project with VCS support",
      * "Share project partially (experimental)..." and "Add to session
      * (experimental)..." according to the passed parameter "howToShareProject"
      * which should be activated by clicking the corresponding sub menu of the
@@ -64,7 +63,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            which you want to share with other peers.
      * @param howToshareProject
      *            with the parameter you can tell the method how to share your
-     *            project with "Share project","Share project with VCS support",
+     *            project with "Share project",
      *            "Share project partially (experimental)..." or "Add to session
      *            (experimental)...".
      * @param inviteeBaseJIDs
