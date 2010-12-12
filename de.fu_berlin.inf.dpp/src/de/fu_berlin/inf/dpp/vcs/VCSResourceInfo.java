@@ -5,9 +5,9 @@ package de.fu_berlin.inf.dpp.vcs;
  */
 // TODO Encapsulate fields?
 public class VCSResourceInfo {
-    /** @see VCSAdapter#getUrl(org.eclipse.core.resources.IResource) */
+    /** The URL of the remote resource in the repository, or null. */
     public String url;
-    /** @see VCSAdapter#getRevisionString(org.eclipse.core.resources.IResource) */
+    /** The revision of the resource as a String, or null. */
     public String revision;
 
     @Override

@@ -135,6 +135,8 @@ public class InvitationWizardUserSelection extends WizardPage {
         onlySaros = new Button(composite, SWT.CHECK);
         onlySaros.setSelection(false);
         onlySaros.setText("Hide users without Saros support");
+        onlySaros
+            .setToolTipText("Hide users who are not logged in with Saros, but e.g. with a chat client.");
         onlySarosListener = new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
                 // do nothing

@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
@@ -298,8 +299,9 @@ public class StopManager implements IActivityProvider, Disposable {
      * @throws CancellationException
      * @throws InterruptedException
      */
-    public StartHandle stop(User user, String cause, final SubMonitor progress)
-        throws CancellationException, InterruptedException {
+    public StartHandle stop(User user, String cause,
+        final IProgressMonitor progress) throws CancellationException,
+        InterruptedException {
 
         if (sarosSession == null)
             throw new IllegalStateException(

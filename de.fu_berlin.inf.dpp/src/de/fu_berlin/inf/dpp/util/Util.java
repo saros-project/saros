@@ -1142,8 +1142,11 @@ public class Util {
             return Util.runSWTSync(new Callable<Boolean>() {
 
                 public Boolean call() {
-                    // showUseNowButton is set to false because this method is called only by saros.connect()
-                    // and if the connection failed you sure want to use your new settings now
+                    /*
+                     * showUseNowButton is set to false because this method is
+                     * called only by Saros.connect(), and if the connection
+                     * failed you sure want to use your new settings now.
+                     */
                     Wizard wiz = new ConfigurationWizard(askForAccount,
                         askAboutStatisticTransfer, false);
                     WizardDialog dialog = new WizardDialog(
