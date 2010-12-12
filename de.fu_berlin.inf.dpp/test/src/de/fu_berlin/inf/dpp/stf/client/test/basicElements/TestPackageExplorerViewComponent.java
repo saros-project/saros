@@ -184,7 +184,6 @@ public class TestPackageExplorerViewComponent extends STFTest {
     }
 
     @Test
-    // @Ignore
     public void testShareProjectWithSVN() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         assertFalse(alice.pEV.isProjectManagedBySVN(PROJECT1));

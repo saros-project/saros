@@ -674,7 +674,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void inconsistencyDetectedGUI() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        windowPart.waitUntilShellCloses(SHELL_PROGRESS_INFORMATION);
+        windowPart.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     public boolean isInconsistencyDetectedEnabled() throws RemoteException {
@@ -787,7 +787,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void confirmClosingTheSessionWindow() throws RemoteException {
         windowPart.waitUntilShellActive(CLOSING_THE_SESSION);
         windowPart.confirmWindow(CLOSING_THE_SESSION, OK);
-        windowPart.waitUntilShellCloses(CLOSING_THE_SESSION);
+        windowPart.waitUntilShellClosed(CLOSING_THE_SESSION);
     }
 
     /**********************************************

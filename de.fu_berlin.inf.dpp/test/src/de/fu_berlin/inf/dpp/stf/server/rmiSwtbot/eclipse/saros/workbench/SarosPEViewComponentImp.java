@@ -222,7 +222,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        windowPart.waitUntilShellCloses(SESSION_INVITATION);
+        windowPart.waitUntilShellClosed(SESSION_INVITATION);
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {

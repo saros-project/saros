@@ -13,7 +13,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.InitMusician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
 
 /**
@@ -56,8 +55,9 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @BeforeClass
     public static void initMusicians() throws RemoteException {
-        alice = InitMusician.newAlice();
-        bob = InitMusician.newBob();
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
+        setUpWorkbenchs();
+        setUpSaros();
         if (!alice.pEV.isProjectExist(SVN_PROJECT_COPY)) {
             alice.pEV.newJavaProject(SVN_PROJECT_COPY);
             alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(
@@ -97,17 +97,12 @@ public class TestSVNStateInitialization extends STFTest {
     }
 
     @After
-    public void tearDown() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        if (bob.sessionV.isInSessionGUI())
-            bob.sessionV.leaveTheSessionByPeer();
-        bob.state.deleteAllProjects();
+    public void tearDown() throws RemoteException, InterruptedException {
+        alice.leaveSessionHostFirstDone(bob);
 
-        alice.workbench.resetWorkbench();
-        if (alice.sessionV.isInSessionGUI())
-            alice.sessionV.leaveTheSessionByHost();
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
+        bob.state.deleteAllProjects();
     }
 
     /**

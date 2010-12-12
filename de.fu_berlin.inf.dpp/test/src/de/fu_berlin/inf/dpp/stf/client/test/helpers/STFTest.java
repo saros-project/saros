@@ -233,6 +233,12 @@ public class STFTest {
         }
     }
 
+    /**
+     * For all active testers, reset buddy names, disconnect, delete all
+     * projects.
+     * 
+     * @throws RemoteException
+     */
     public static void resetSaros() throws RemoteException {
         for (Musician musician : activeTesters) {
             if (musician != null)
@@ -266,22 +272,23 @@ public class STFTest {
 
     public static void resetAllBots() {
         alice = bob = carl = dave = edna = null;
+        activeTesters = null;
     }
 
     @BeforeClass
     public static void beforeClass() throws Exception {
+        resetWorkbenches();
         resetSaros();
     }
 
     @Before
     public void before() throws Exception {
-        resetWorkbenches();
+        //
     }
 
     @After
     public void after() throws Exception {
         resetWorkbenches();
-        resetSaros();
     }
 
     @AfterClass

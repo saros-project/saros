@@ -60,11 +60,6 @@ public class WindowPart extends EclipseComponent {
         waitLongUntil(shellCloses(shell));
     }
 
-    public void waitUntilShellCloses(String shellText) {
-        waitUntil(SarosConditions.isShellClosed(bot, shellText));
-        bot.sleep(10);
-    }
-
     public void waitUntilShellActive(String title) {
         waitUntil(SarosConditions.ShellActive(bot, title));
         // if (!isShellActive(title))

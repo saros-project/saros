@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -42,7 +43,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     private final static String SHELL_EDITOR_SELECTION = "Editor Selection";
     private final static String SHELL_MOVE = "Move";
     private final static String SHELL_REVERT = "Revert";
-    private final static String SHELL_SHEARE_PROJECT = "Share Project";
+    private final static String SHELL_SHARE_PROJECT = "Share Project";
     private final static String SHELL_SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
     private final static String SHELL_RENAME_PACKAGE = "Rename Package";
     private final static String SHELL_RENAME_RESOURCE = "Rename Resource";
@@ -378,7 +379,8 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void openClass(String projectName, String pkg, String className)
         throws RemoteException {
-        openFile(getClassNodes(projectName, pkg, className));
+        String[] classNodes = getClassNodes(projectName, pkg, className);
+        openFile(helperPart.changeToRegex(classNodes));
     }
 
     public void openClassWith(String whichEditor, String projectName,
@@ -595,11 +597,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
-        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
         if (bot.table().containsItem(repositoryURL)) {
-            windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+            windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
                 repositoryURL, NEXT);
         } else {
             bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
@@ -608,7 +610,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+        windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
@@ -616,12 +618,12 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
-        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
         basicPart.waitUntilButtonIsEnabled(FINISH);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+        windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
@@ -632,34 +634,44 @@ public class PEViewComponentImp extends EclipseComponent implements
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
 
-        windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
+        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
             REPOSITORY_TYPE_SVN, NEXT);
 
+        SWTBotTable table = null;
+        final SWTBotShell shareProjectShell = bot.shell(SHELL_SHARE_PROJECT);
         try {
-            final SWTBotTable table = bot.shell(SHELL_SHEARE_PROJECT).bot()
-                .table();
-            if (table.containsItem(repositoryURL)) {
-                windowPart.confirmWindowWithTable(SHELL_SHEARE_PROJECT,
-                    repositoryURL, NEXT);
-            } else {
-                bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
-                /*
-                 * TODO Actually after clicking the button "Next" should be the
-                 * page to enter repository information appeared because of
-                 * activating the radio button with the title
-                 * "Create a new repository location".But it seem that
-                 * SWTbotRadio has a bug. So here you'wll get
-                 * WidgetNotfoundException. A not so good solution for it is
-                 * catch WidgetNotFoundException and do nothing
-                 */
-                bot.button(NEXT).click();
-                bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
-                bot.button(NEXT).click();
-            }
+            table = shareProjectShell.bot().table();
         } catch (WidgetNotFoundException e) {
-            // bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
-            // bot.button(NEXT).click();
+            //
         }
+
+        if (table == null || !table.containsItem(repositoryURL)) {
+            // close window
+            shareProjectShell.close();
+            // in svn repos view: enter url
+            viewPart
+                .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
+            viewPart.setFocusOnViewByTitle("SVN Repositories");
+            final boolean viewWasOpen = viewPart.isViewOpen("SVN Repositories");
+            final SWTBotView repoView = viewPart.getView("SVN Repositories");
+            repoView.toolbarButton("Add SVN Repository").click();
+            if (!windowPart.activateShellWithText("Add SVN Repository")) {
+                windowPart.waitUntilShellActive("Add SVN Repository");
+            }
+            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            bot.button(FINISH).click();
+            windowPart.waitUntilShellClosed("Add SVN Repository");
+            if (!viewWasOpen)
+                repoView.close();
+            // recur...
+            shareProjectWithSVNUsingSpecifiedFolderName(projectName,
+                repositoryURL, specifiedFolderName);
+            return;
+        }
+
+        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT, repositoryURL,
+            NEXT);
+
         bot.radio("Use specified folder name:").click();
         bot.text().setText(specifiedFolderName);
         bot.button(FINISH).click();
@@ -669,7 +681,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (windowPart.isShellOpen("Confirm Open Perspective"))
             windowPart.confirmWindow("Confirm Open Perspective", NO);
         else
-            windowPart.waitUntilShellClosed(SHELL_SHEARE_PROJECT);
+            windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void importProjectFromSVN(String repositoryURL)
@@ -801,7 +813,6 @@ public class PEViewComponentImp extends EclipseComponent implements
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs == null)
             return null;
-        // return vcs.getRevisionString(resource);
         VCSResourceInfo info = vcs.getResourceInfo(resource);
         String result = info != null ? info.revision : null;
         return result;
