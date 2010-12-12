@@ -51,7 +51,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
     private final static String SHELL_CONTACT_ALREADY_ADDED = "Contact already added";
-    private final static String SHELL_CREATE_XMPP_ACCOUNT = ""; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
+    private final static String SHELL_CREATE_XMPP_ACCOUNT = "Create New User Account"; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
     private final static String SHELL_NEW_CONTACT = "New Contact";
     private final static String SHELL_CONTACT_LOOKUP_FAILED = "Contact look-up failed";
     private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
@@ -70,11 +70,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     private final static String BUDDIES = "Buddies";
 
-    private final static String SERVER = "Server";
-    private final static String USERNAME = "Username:";
-    private final static String PASSWORD = "Password:";
+    private final static String SERVER = "Jabber Server";
+    private final static String USERNAME = "Username";
+    private final static String PASSWORD = "Password";
     private final static String JABBERID = "Jabber ID";
-    private final static String CONFIRM = "Confirm:";
+    private final static String REPEAT_PASSWORD = "Repeat Password";
 
     /**
      * {@link RosterViewComponentImp} is a singleton, but inheritance is
@@ -178,14 +178,14 @@ public class RosterViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void confirmWizardCreateXMPPAccount(String xmppServer, String jid,
+    public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
         String password) throws RemoteException {
         if (!windowPart.activateShellWithText(SHELL_CREATE_XMPP_ACCOUNT))
             windowPart.waitUntilShellActive(SHELL_CREATE_XMPP_ACCOUNT);
         basicPart.setTextInTextWithLabel(xmppServer, SERVER);
         basicPart.setTextInTextWithLabel(jid, USERNAME);
         basicPart.setTextInTextWithLabel(password, PASSWORD);
-        basicPart.setTextInTextWithLabel(password, CONFIRM);
+        basicPart.setTextInTextWithLabel(password, REPEAT_PASSWORD);
         basicPart.clickButton(FINISH);
         windowPart.waitUntilShellClosed(SHELL_CREATE_XMPP_ACCOUNT);
     }
@@ -314,15 +314,15 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public boolean isWindowContactLookupFailedActive() throws RemoteException {
-        return windowPart.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
+        return basicC.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
 
     public void closeWindowContactAlreadyAdded() throws RemoteException {
-        windowPart.closeShell(SHELL_CONTACT_ALREADY_ADDED);
+        basicC.closeShell(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public boolean isWindowContactAlreadyAddedActive() throws RemoteException {
-        return windowPart.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
+        return basicC.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     /**********************************************
@@ -558,8 +558,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
         return viewPart.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
-    private boolean isWizardCreateXMPPAccountActive() {
-        return windowPart.isShellActive(SHELL_CREATE_XMPP_ACCOUNT);
+    private boolean isWizardCreateXMPPAccountActive() throws RemoteException {
+        return basicC.isShellActive(SHELL_CREATE_XMPP_ACCOUNT);
     }
 
     @SuppressWarnings("static-access")

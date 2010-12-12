@@ -125,4 +125,10 @@ public interface MainMenuComponent extends Remote {
      */
     public boolean isDebugPerspectiveActive() throws RemoteException;
 
+    public void clickMenuWithTexts(String... texts) throws RemoteException;
+
+    public void clickMenuPreferences() throws RemoteException;
+
+    public void openViewWithName(String category, String nodeName)
+        throws RemoteException;
 }

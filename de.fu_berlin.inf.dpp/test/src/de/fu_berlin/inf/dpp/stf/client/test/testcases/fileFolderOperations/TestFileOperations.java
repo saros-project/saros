@@ -39,14 +39,13 @@ public class TestFileOperations extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob, carl);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
         // Make sure CLS1 always has the same content
         if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
@@ -62,7 +61,6 @@ public class TestFileOperations extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         alice.addBuddyGUIDone(bob);
         bob.addBuddyGUIDone(alice);
     }

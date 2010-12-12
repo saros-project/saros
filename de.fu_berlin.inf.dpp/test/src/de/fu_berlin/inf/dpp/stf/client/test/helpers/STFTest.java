@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
@@ -247,12 +246,8 @@ public class STFTest {
      */
     public static void resetSaros() throws RemoteException {
         for (Musician musician : activeTesters) {
-            if (musician != null)
-                musician.rosterV.resetAllBuddyName();
-        }
-        // host.leaveSessionHostFirstDone(invitees);
-        for (Musician musician : activeTesters) {
             if (musician != null) {
+                musician.rosterV.resetAllBuddyName();
                 musician.rosterV.disconnectGUI();
                 musician.state.deleteAllProjects();
             }
@@ -282,11 +277,11 @@ public class STFTest {
         assertTrue(activeTesters.isEmpty());
     }
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        resetWorkbenches();
-        resetSaros();
-    }
+    // @BeforeClass
+    // public static void beforeClass() throws Exception {
+    // setUpWorkbenchs();
+    // setUpSaros();
+    // }
 
     @Before
     public void before() throws Exception {

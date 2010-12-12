@@ -33,14 +33,12 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() {
+        //
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
     }
@@ -48,7 +46,6 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @After
     public void runAfterEveryTest() throws RemoteException,
         InterruptedException {
-        resetWorkbenches();
         alice.leaveSessionHostFirstDone(bob);
         deleteProjectsByActiveTesters();
 

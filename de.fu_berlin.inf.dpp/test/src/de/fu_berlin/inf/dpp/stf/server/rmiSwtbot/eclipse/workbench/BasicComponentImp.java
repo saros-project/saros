@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class BasicComponentImp extends EclipseComponent implements
     BasicComponent {
-
-    private static final boolean SCREENSHOTS = true;
 
     private static transient BasicComponentImp eclipseBasicObjectImp;
 
@@ -28,8 +28,7 @@ public class BasicComponentImp extends EclipseComponent implements
     }
 
     public void captureScreenshot(String filename) throws RemoteException {
-        if (SCREENSHOTS)
-            bot.captureScreenshot(filename);
+        bot.captureScreenshot(filename);
     }
 
     public String getPathToScreenShot() throws RemoteException {
@@ -63,4 +62,27 @@ public class BasicComponentImp extends EclipseComponent implements
         bot.button(mnemonicText).click();
     }
 
+    public boolean isShellOpen(String title) throws RemoteException {
+        SWTBotShell[] shells = bot.shells();
+        for (SWTBotShell shell : shells)
+            if (shell.getText().equals(title))
+                return true;
+        return false;
+    }
+
+    public boolean isShellActive(String title) throws RemoteException {
+        if (!isShellOpen(title))
+            return false;
+        try {
+            SWTBotShell activeShell = bot.activeShell();
+            String shellTitle = activeShell.getText();
+            return shellTitle.equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public void closeShell(String title) throws RemoteException {
+        bot.shell(title).close();
+    }
 }

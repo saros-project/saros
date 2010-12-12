@@ -123,30 +123,6 @@ public class WindowPart extends EclipseComponent {
         }
     }
 
-    public boolean isShellOpen(String title) {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells)
-            if (shell.getText().equals(title))
-                return true;
-        return false;
-    }
-
-    public boolean isShellActive(String title) {
-        if (!isShellOpen(title))
-            return false;
-        try {
-            SWTBotShell activeShell = bot.activeShell();
-            String shellTitle = activeShell.getText();
-            return shellTitle.equals(title);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    public void closeShell(String title) {
-        bot.shell(title).close();
-    }
-
     public boolean activateShellWithMatchText(String matchText)
         throws RemoteException {
         SWTBotShell[] shells = bot.shells();

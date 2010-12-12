@@ -26,19 +26,18 @@ public class TestFollowMode extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob);
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         resetFollowModel(bob, alice);
     }
 

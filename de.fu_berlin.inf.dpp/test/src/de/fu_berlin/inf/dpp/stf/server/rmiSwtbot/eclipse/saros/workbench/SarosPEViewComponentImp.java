@@ -176,10 +176,10 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          */
         // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
         // }
-        if (windowPart.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
+        if (basicC.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
             windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
 
-        if (windowPart.isShellActive("Save Resource")) {
+        if (basicC.isShellActive("Save Resource")) {
             windowPart.confirmWindow("Save Resource", YES);
         }
 
@@ -194,7 +194,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (windowPart.isShellActive(SESSION_INVITATION)) {
+        if (basicC.isShellActive(SESSION_INVITATION)) {
             try {
                 windowPart.waitLongUntilShellCloses(bot
                     .shell(SESSION_INVITATION));
@@ -255,11 +255,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     }
 
     public boolean isWindowInvitationCancelledActive() throws RemoteException {
-        return windowPart.isShellActive(INVITATIONCANCELLED);
+        return basicC.isShellActive(INVITATIONCANCELLED);
     }
 
     public void closeWindowInvitationCancelled() throws RemoteException {
-        windowPart.closeShell(INVITATIONCANCELLED);
+        basicC.closeShell(INVITATIONCANCELLED);
     }
 
     public void waitUntilWindowInvitationCnacelledActive()
@@ -268,11 +268,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     }
 
     public boolean isWIndowSessionInvitationActive() throws RemoteException {
-        return windowPart.isShellActive(SESSION_INVITATION);
+        return basicC.isShellActive(SESSION_INVITATION);
     }
 
     public void closeWIndowSessionInvitation() throws RemoteException {
-        windowPart.closeShell(SESSION_INVITATION);
+        basicC.closeShell(SESSION_INVITATION);
     }
 
     public void waitUntilWindowSessionInvitationActive() throws RemoteException {
@@ -280,7 +280,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     }
 
     public void waitUntilWindowProblemOccurredActive() throws RemoteException {
-        windowPart.isShellActive(PROBLEMOCCURRED);
+        basicC.isShellActive(PROBLEMOCCURRED);
     }
 
     public String getSecondLabelOfWindowProblemOccurred()

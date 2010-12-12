@@ -27,18 +27,17 @@ public class TestPackageExplorerViewComponent extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetWorkbenches();
+    public static void runAfterClass() {
+        //
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         deleteProjectsByActiveTesters();
     }
 

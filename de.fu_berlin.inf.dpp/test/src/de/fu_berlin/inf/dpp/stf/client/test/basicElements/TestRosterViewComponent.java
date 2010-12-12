@@ -44,19 +44,18 @@ public class TestRosterViewComponent extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob);
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         if (alice.rosterV.hasBuddyNickName(bob.jid)) {
             alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
         }

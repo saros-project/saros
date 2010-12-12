@@ -42,19 +42,18 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() {
+        //
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runAfterEveryTest() {
+        //
     }
 
     /**

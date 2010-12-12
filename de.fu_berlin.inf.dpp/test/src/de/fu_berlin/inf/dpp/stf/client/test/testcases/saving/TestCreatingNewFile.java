@@ -34,19 +34,18 @@ public class TestCreatingNewFile extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        carl.leaveSessionHostFirstDone(bob, alice);
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         deleteFolders(FOLDER1, FOLDER2);
     }
 

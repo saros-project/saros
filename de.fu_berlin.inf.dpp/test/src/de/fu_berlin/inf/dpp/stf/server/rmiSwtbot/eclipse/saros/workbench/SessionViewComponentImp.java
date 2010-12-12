@@ -657,7 +657,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (windowPart.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
+        if (basicC.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
             confirmErrorInSarosPluginWindow();
         }
     }

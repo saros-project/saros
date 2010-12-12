@@ -151,7 +151,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void newProject(String projectName) throws RemoteException {
         if (!isProjectExist(projectName)) {
             workbenchC.activateEclipseShell();
-            menuPart.clickMenuWithTexts(FILE, NEW, PROJECT);
+            mainMenuC.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
     }
@@ -159,7 +159,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void newJavaProject(String projectName) throws RemoteException {
         if (!isProjectExist(projectName)) {
             workbenchC.activateEclipseShell();
-            menuPart.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
+            mainMenuC.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
     }
@@ -181,7 +181,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (!isFolderExist(folderNodes)) {
             try {
                 viewPart.selectTreeItemWithLabelsInView(VIEWNAME, parentNodes);
-                menuPart.clickMenuWithTexts(FILE, NEW, FOLDER);
+                mainMenuC.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -212,7 +212,7 @@ public class PEViewComponentImp extends EclipseComponent implements
             if (!isPkgExist(projectName, pkg))
                 try {
                     workbenchC.activateEclipseShell();
-                    menuPart.clickMenuWithTexts(FILE, NEW, PACKAGE);
+                    mainMenuC.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
                     final String cause = "error creating new package";
@@ -270,7 +270,7 @@ public class PEViewComponentImp extends EclipseComponent implements
                         parentNodes[i] = fileNodes[i];
                 }
                 viewPart.selectTreeItemWithLabelsInView(VIEWNAME, parentNodes);
-                menuPart.clickMenuWithTexts(FILE, NEW, FILE);
+                mainMenuC.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -313,7 +313,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (!isFileExist(getClassPath(projectName, pkg, className))) {
             try {
                 workbenchC.activateEclipseShell();
-                menuPart.clickMenuWithTexts(FILE, NEW, CLASS);
+                mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
                 confirmWindowNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
@@ -339,7 +339,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         String className) throws RemoteException {
         if (!isFileExist(getClassPath(projectName, pkg, className))) {
             precondition();
-            menuPart.clickMenuWithTexts(FILE, NEW, CLASS);
+            mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
         }
         SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
@@ -560,7 +560,7 @@ public class PEViewComponentImp extends EclipseComponent implements
          * this case just click Finish again.
          */
         bot.sleep(50);
-        if (windowPart.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
+        if (basicC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
             bot.button(FINISH).click();
         }
         windowPart.waitUntilShellClosed(shellTitle);
@@ -678,7 +678,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         windowPart.waitUntilShellActive("Remote Project Exists");
         windowPart.confirmWindow("Remote Project Exists", YES);
         bot.sleep(500);
-        if (windowPart.isShellOpen("Confirm Open Perspective"))
+        if (basicC.isShellOpen("Confirm Open Perspective"))
             windowPart.confirmWindow("Confirm Open Perspective", NO);
         else
             windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
@@ -687,7 +687,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         precondition();
-        menuPart.clickMenuWithTexts("File", "Import...");
+        mainMenuC.clickMenuWithTexts("File", "Import...");
         windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {
@@ -918,7 +918,7 @@ public class PEViewComponentImp extends EclipseComponent implements
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
         bot.textWithLabel(LABEL_REVISION).setText(versionID);
         bot.button(OK).click();
-        if (windowPart.isShellOpen(SHELL_SVN_SWITCH))
+        if (basicC.isShellOpen(SHELL_SVN_SWITCH))
             windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 

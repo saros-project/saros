@@ -14,6 +14,12 @@ public interface BasicComponent extends Remote {
 
     public void clickButton(String mnemonicText) throws RemoteException;
 
+    public boolean isShellOpen(String title) throws RemoteException;
+
+    public boolean isShellActive(String title) throws RemoteException;
+
+    public void closeShell(String title) throws RemoteException;
+
     /**
      * TODO don't work now
      * 

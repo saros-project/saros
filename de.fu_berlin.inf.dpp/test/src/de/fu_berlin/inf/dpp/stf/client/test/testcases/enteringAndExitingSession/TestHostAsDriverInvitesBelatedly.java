@@ -52,22 +52,18 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob, carl);
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
-        /*
-         * bob, carl and dave follow alice.
-         */
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         alice.addBuddyGUIDone(bob);
         bob.addBuddyGUIDone(alice);
     }

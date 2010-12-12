@@ -121,7 +121,7 @@ public class EditorComponenttImp extends EclipseComponent implements
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).close();
-            if (windowPart.isShellActive("Save Resource"))
+            if (basicC.isShellActive("Save Resource"))
                 confirmWindowSaveSource(YES);
         }
     }
@@ -385,7 +385,7 @@ public class EditorComponenttImp extends EclipseComponent implements
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
         selectLineInJavaEditor(line, className);
-        menuPart.clickMenuWithTexts("Run", "Toggle Breakpoint");
+        mainMenuC.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
     /**********************************************

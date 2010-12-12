@@ -8,9 +8,6 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,23 +21,6 @@ public class RmiTest extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
-    }
-
-    @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
-    }
-
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
     }
 
     // @Test

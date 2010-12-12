@@ -19,23 +19,22 @@ public class TestMainMenuComponent extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
+        setUpSaros();
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() {
+        //
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runBeforeEveryTest() {
+        //
     }
 
     @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public void runAfterEveryTest() {
+        //
     }
 
     /**********************************************

@@ -59,8 +59,8 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public void creatAccountGUI(JID jid, String password)
         throws RemoteException {
-        menuPart.clickMenuWithTexts("Saros", "Create Account");
-        rosterVC.confirmWizardCreateXMPPAccount(jid.getDomain(), jid.getName(),
+        mainMenuC.clickMenuWithTexts("Saros", "Create Account");
+        rosterVC.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
             password);
     }
 
@@ -204,7 +204,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     private void clickMenuSarosPreferences() throws RemoteException {
         precondition();
-        menuPart.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        mainMenuC.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
     }
 
 }

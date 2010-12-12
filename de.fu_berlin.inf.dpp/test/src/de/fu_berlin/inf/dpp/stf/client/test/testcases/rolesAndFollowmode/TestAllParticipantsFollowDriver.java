@@ -43,21 +43,20 @@ public class TestAllParticipantsFollowDriver extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob, carl, dave);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException,
         InterruptedException {
-        resetWorkbenches();
         alice.followedBy(bob, carl, dave);
     }
 
     @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
+    public void runAfterEveryTest() {
+        //
     }
 
     /**

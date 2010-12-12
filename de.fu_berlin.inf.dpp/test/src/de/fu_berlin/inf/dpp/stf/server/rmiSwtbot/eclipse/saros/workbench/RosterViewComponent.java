@@ -95,7 +95,7 @@ public interface RosterViewComponent extends Remote {
      *            the password of the given jid
      * @throws RemoteException
      */
-    public void confirmWizardCreateXMPPAccount(String xmppServer, String jid,
+    public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
         String password) throws RemoteException;
 
     /**

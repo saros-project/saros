@@ -36,14 +36,13 @@ public class TestFolderOperations extends STFTest {
     }
 
     @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        resetSaros();
-        resetWorkbenches();
+    public static void runAfterClass() throws RemoteException,
+        InterruptedException {
+        alice.leaveSessionHostFirstDone(bob, carl);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        resetWorkbenches();
         if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
             alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         if (!alice.pEV.isFolderExist(PROJECT1, FOLDER1))
@@ -52,7 +51,6 @@ public class TestFolderOperations extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetWorkbenches();
         alice.addBuddyGUIDone(bob);
         bob.addBuddyGUIDone(alice);
     }
