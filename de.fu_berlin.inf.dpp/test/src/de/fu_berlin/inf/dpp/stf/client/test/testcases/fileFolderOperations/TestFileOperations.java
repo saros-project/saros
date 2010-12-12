@@ -47,12 +47,17 @@ public class TestFileOperations extends STFTest {
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         resetWorkbenches();
-        if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
-            alice.pEV.newClass(PROJECT1, PKG1, CLS1);
+        // Make sure CLS1 always has the same content
+        if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
+            alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
+        alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS2))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
         if (alice.pEV.isPkgExist(PROJECT1, PKG2))
             alice.pEV.deletePkg(PROJECT1, PKG2);
+        // FIXME This method assumes that all the file operations (like
+        // deleteClass) work...
+        // Need to make sure that the preconditions are met by bob and carl too.
     }
 
     @After
