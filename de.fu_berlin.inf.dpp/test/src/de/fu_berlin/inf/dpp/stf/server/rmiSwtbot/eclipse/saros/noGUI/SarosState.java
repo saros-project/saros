@@ -112,4 +112,14 @@ public interface SarosState extends State {
      * 
      **********************************************/
 
+    /**
+     * @see org.apache.log4j.Category#debug(Object)
+     */
+    public void debug(Object message) throws RemoteException;
+
+    /**
+     * @see org.apache.log4j.Category#debug(Object, Throwable)
+     */
+    public void debug(Object message, Throwable t) throws RemoteException;
+
 }

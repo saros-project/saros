@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.client.test.helpers;
 
+import static org.junit.Assert.assertTrue;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +10,14 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
 
 public class STFTest {
+    @Rule
+    public TestName name = new TestName();
 
     public enum TypeOfTester {
         ALICE, BOB, CARL, DAVE, EDNA
@@ -272,7 +278,8 @@ public class STFTest {
 
     public static void resetAllBots() {
         alice = bob = carl = dave = edna = null;
-        activeTesters = null;
+        activeTesters.clear();
+        assertTrue(activeTesters.isEmpty());
     }
 
     @BeforeClass
@@ -284,6 +291,13 @@ public class STFTest {
     @Before
     public void before() throws Exception {
         //
+        for (Musician m : activeTesters) {
+            m.state
+                .debug("\n---------------------------------------------------"
+                    + "\nExecuting @Test " + name.getMethodName() + " in "
+                    + getClass().getSimpleName()
+                    + "\n---------------------------------------------------");
+        }
     }
 
     @After

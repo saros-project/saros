@@ -89,4 +89,11 @@ public class SarosStateImp extends StateImp implements SarosState {
             "We can not get NetTransferMode Socks5ByteStream connection in Saros yet.");
     }
 
+    public void debug(Object message) {
+        log.debug(message);
+    }
+
+    public void debug(Object message, Throwable t) {
+        log.debug(message, t);
+    }
 }
