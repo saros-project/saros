@@ -8,7 +8,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 
 /**

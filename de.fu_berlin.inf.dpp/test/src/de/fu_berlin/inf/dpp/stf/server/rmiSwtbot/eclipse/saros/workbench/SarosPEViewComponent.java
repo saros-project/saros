@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfShareProject;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
 

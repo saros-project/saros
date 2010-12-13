@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponent;
