@@ -25,6 +25,13 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     private static transient EditorComponenttImp self;
 
+    /* error messages */
+    private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
+    private static String ERROR_MESSAGE_FOR_INVALID_CLASSNAME = "You need to only pass the className without sufix like e.g MyClass";
+
+    /* Title of shells */
+    private static String SHELL_SAVE_RESOURCE = "Save Resource";
+
     /**
      * {@link EditorComponenttImp} is a singleton, but inheritance is possible.
      */
@@ -43,16 +50,18 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * open/activate/close a editor
+     * operations about opening a editor
      * 
      **********************************************/
 
     public boolean isEditorOpen(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         return getTitlesOfAllOpenedEditors().contains(fileName);
     }
 
     public void waitUntilEditorOpen(final String fileName)
         throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isEditorOpen(fileName);
@@ -62,46 +71,42 @@ public class EditorComponenttImp extends EclipseComponent implements
                 return "The editor " + fileName + "is not open.";
             }
         });
-
     }
 
     public boolean isJavaEditorOpen(String className) throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         return isEditorOpen(className + SUFIX_JAVA);
     }
 
     public void waitUntilJavaEditorOpen(String className)
         throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         waitUntilEditorOpen(className + SUFIX_JAVA);
     }
 
+    /**********************************************
+     * 
+     * operations about activating a editor
+     * 
+     **********************************************/
+
     public void activateEditor(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         try {
             getEditor(fileName).setFocus();
         } catch (TimeoutException e) {
-            log.warn("The tab" + fileName + " does not activate '", e);
+            log.warn("The tab of the editor with the title " + fileName
+                + " can't be activated.", e);
         }
     }
 
-    public void waitUntilEditorActive(String name) throws RemoteException {
-        waitUntil(SarosConditions.isEditorActive(this, name));
-    }
-
-    public void activateJavaEditor(String className) throws RemoteException {
-        try {
-            getJavaEditor(className).setFocus();
-        } catch (TimeoutException e) {
-            log.warn("The tab" + className + SUFIX_JAVA
-                + " does not activate '", e);
-        }
-
-    }
-
-    public void waitUntilJavaEditorActive(String className)
-        throws RemoteException {
-        waitUntilEditorActive(className + SUFIX_JAVA);
+    public void waitUntilEditorActive(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        waitUntil(SarosConditions.isEditorActive(this, fileName));
     }
 
     public boolean isEditorActive(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         try {
             return bot.activeEditor().getTitle().equals(fileName);
         } catch (WidgetNotFoundException e) {
@@ -109,13 +114,36 @@ public class EditorComponenttImp extends EclipseComponent implements
         }
     }
 
+    public void activateJavaEditor(String className) throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
+        try {
+            getJavaEditor(className).setFocus();
+        } catch (TimeoutException e) {
+            log.warn("The tab of the editor with the title " + className
+                + SUFIX_JAVA + " can't be activated.", e);
+        }
+    }
+
+    public void waitUntilJavaEditorActive(String className)
+        throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
+        waitUntilEditorActive(className + SUFIX_JAVA);
+    }
+
     public boolean isJavaEditorActive(String className) throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         if (!isJavaEditorOpen(className))
             return false;
         return isEditorActive(className + SUFIX_JAVA);
     }
 
+    /**********************************************
+     * 
+     * operations about deleting a editor
+     * 
+     **********************************************/
     public void closeEditorWithSave(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).save();
@@ -124,6 +152,7 @@ public class EditorComponenttImp extends EclipseComponent implements
     }
 
     public void closeEditorWithoutSave(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).close();
@@ -133,11 +162,13 @@ public class EditorComponenttImp extends EclipseComponent implements
     }
 
     public void waitUntilEditorClosed(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
         waitUntil(SarosConditions.isEditorClosed(this, fileName));
     }
 
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         closeEditorWithSave(className + SUFIX_JAVA);
         // Display.getDefault().syncExec(new Runnable() {
         // public void run() {
@@ -156,19 +187,21 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         closeEditorWithoutSave(className + SUFIX_JAVA);
     }
 
     public void waitUntilJavaEditorClosed(String className)
         throws RemoteException {
+        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         waitUntilEditorClosed(className + SUFIX_JAVA);
     }
 
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
-        shellC.waitUntilShellOpen("Save Resource");
-        shellC.activateShellWithText("Save Resource");
-        shellC.confirmShell("Save Resource", buttonType);
+        shellC.waitUntilShellOpen(SHELL_SAVE_RESOURCE);
+        shellC.activateShellWithText(SHELL_SAVE_RESOURCE);
+        shellC.confirmShell(SHELL_SAVE_RESOURCE, buttonType);
     }
 
     // public void closeAllOpenedEditors() throws RemoteException {

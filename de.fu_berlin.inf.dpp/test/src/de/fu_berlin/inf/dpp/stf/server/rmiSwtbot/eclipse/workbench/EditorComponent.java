@@ -43,7 +43,8 @@ public interface EditorComponent extends Remote {
     /**
      * 
      * @param fileName
-     *            the filename on the editor tab
+     *            the filename on the editor tab, e.g. myFile.xml or
+     *            MyClass.java
      * @return <tt>true</tt>, if the editor specified with the given fileName is
      *         open
      * @throws RemoteException
@@ -54,15 +55,18 @@ public interface EditorComponent extends Remote {
      * waits until the editor specified with the given fileName is open
      * 
      * @param fileName
-     *            the filename on the editor tab
+     *            the filename on the editor tab, e.g. myFile.xml or
+     *            MyClass.java
      * @throws RemoteException
      */
     public void waitUntilEditorOpen(String fileName) throws RemoteException;
 
     /**
+     * This method is special for java file, you need to only pass the name of
+     * the java file without suffix ".java".
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @return<tt>true</tt>, if the java editor specified with the given
      *                       className is open
      * @throws RemoteException
@@ -73,7 +77,7 @@ public interface EditorComponent extends Remote {
      * waits until the java editor specified with the given className is open
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void waitUntilJavaEditorOpen(String className)
@@ -101,7 +105,7 @@ public interface EditorComponent extends Remote {
      * activate the java editor specified with the given className
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void activateJavaEditor(String className) throws RemoteException;
@@ -110,7 +114,7 @@ public interface EditorComponent extends Remote {
      * waits until the java editor specified with the given className is active
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void waitUntilJavaEditorActive(String className)
@@ -129,7 +133,7 @@ public interface EditorComponent extends Remote {
     /**
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @return<tt>true</tt>, if the java editor specified with the given
      *                       className is active
      * @throws RemoteException
@@ -171,7 +175,7 @@ public interface EditorComponent extends Remote {
      * Save the java editor and close it.
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void closeJavaEditorWithSave(String className)
@@ -181,7 +185,7 @@ public interface EditorComponent extends Remote {
      * close the java editor without saving it.
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void closejavaEditorWithoutSave(String className)
@@ -191,7 +195,7 @@ public interface EditorComponent extends Remote {
      * waits until the java editor specified with the given className is closed
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @throws RemoteException
      */
     public void waitUntilJavaEditorClosed(String className)
@@ -246,7 +250,7 @@ public interface EditorComponent extends Remote {
      * @param packageName
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @param line
      *            the line number, 0 based.
      * @return the text on the given line number, without the line delimiters.
@@ -291,7 +295,7 @@ public interface EditorComponent extends Remote {
     /**
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @param line
      *            the line number, 0 based.
      * @return the color of the background on the specified line.
@@ -314,7 +318,7 @@ public interface EditorComponent extends Remote {
     /**
      * 
      * @param className
-     *            the filename on the editor tab
+     *            the name of the java file without the suffix ".java".
      * @return an editor specified by the given className which provides methods
      *         for text editors.
      * @throws RemoteException
@@ -356,10 +360,10 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * 
      * @throws RemoteException
-     * @see State#waitUntilFileContentSame(String, String...)
+     * @see EditorComponent#waitUntilFileContentSame(String, String...)
      */
     public void waitUntilClassContentsSame(String projectName, String pkg,
         String className, String otherClassContent) throws RemoteException;
@@ -388,7 +392,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @return only the saved content of the specified class file, if it is
      *         dirty. This method is different from
      *         {@link EditorComponent#getTextOfJavaEditor(String, String, String)}
@@ -428,9 +432,16 @@ public interface EditorComponent extends Remote {
      * files between Alice and Bob.
      * <p>
      * <b>Note:</b> the method is different from
-     * {@link StateImp#waitUntilClassContentsSame(String, String, String, String)}
+     * {@link EditorComponent#waitUntilClassContentsSame(String, String, String, String)}
      * , which compare the contents of the class files which isn't dirty.
      * </p>
+     * 
+     * @param otherClassContent
+     *            the content of another class, to which you want to compare.
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder"}.
      */
     public void waitUntilEditorContentSame(String otherClassContent,
         String... fileNodes) throws RemoteException;
@@ -448,7 +459,7 @@ public interface EditorComponent extends Remote {
      * @param packageName
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
      */
     public void setTextInJavaEditorWithSave(String contentPath,
@@ -463,7 +474,7 @@ public interface EditorComponent extends Remote {
      * class files between Alice and Bob.
      * <p>
      * <b>Note:</b> the method is different from
-     * {@link StateImp#waitUntilClassContentsSame(String, String, String, String)}
+     * {@link EditorComponent#waitUntilClassContentsSame(String, String, String, String)}
      * , which compare the contents of the class files which isn't dirty.
      * </p>
      * 
@@ -475,7 +486,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      */
     public void waitUntilJavaEditorContentSame(String otherClassContent,
         String projectName, String pkg, String className)
@@ -509,7 +520,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
      */
     public void setTextInJavaEditorWithoutSave(String contentPath,
@@ -542,7 +553,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
      * @see EditorComponent#typeTextInEditor(String, String...)
      */
@@ -572,7 +583,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @return <code>true</code> if the contents have been modified and need
      *         saving, and <code>false</code> if they have not changed since the
      *         last save
@@ -595,7 +606,7 @@ public interface EditorComponent extends Remote {
      * @param pkg
      *            name of the package, e.g. my.pkg
      * @param className
-     *            name of the class, e.g. MyClass
+     *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
      */
     public void setBreakPoint(int line, String projectName, String pkg,

@@ -77,15 +77,19 @@ public class STFTest {
     public static final String CLS2 = "MyClass2";
     public static final String CLS3 = "MyClass3";
 
-    /* content path */
-    public static final String CP1 = "test/STF/" + CLS1 + ".java";
-    public static final String CP2 = "test/STF/" + CLS2 + ".java";
-    public static final String CP3 = "test/STF/" + CLS3 + ".java";
-    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
-        + ".java";
-    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
-        + ".java";
+    /* file sufix */
+    public static final String CLASS_SUFIX = ".java";
 
+    /* content path */
+    public static final String CP1 = "test/STF/" + CLS1 + CLASS_SUFIX;
+    public static final String CP2 = "test/STF/" + CLS2 + CLASS_SUFIX;
+    public static final String CP3 = "test/STF/" + CLS3 + CLASS_SUFIX;
+    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
+        + CLASS_SUFIX;
+    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
+        + CLASS_SUFIX;
+
+    /* Role */
     public static final String ROLE_NAME = " (Driver)";
     public static final String OWN_CONTACT_NAME = "You";
 
