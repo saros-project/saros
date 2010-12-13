@@ -314,7 +314,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     private void clickContextMenushareProject(String projectName)
         throws RemoteException {
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(projectName);
+        String[] matchTexts = changeToRegex(projectName);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, SAROS, SHARE_PROJECT);
     }
@@ -359,7 +359,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
      */
     private void clickContextMenuOfSaros(String projectName, String contextName)
         throws RemoteException {
-        String[] matchTexts = helperPart.changeToRegex(projectName);
+        String[] matchTexts = changeToRegex(projectName);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, SAROS, contextName);
     }

@@ -134,9 +134,9 @@ public class TestDriverSavesFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
         String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS2);
-        String cls2ContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
-            CLS2);
-        String cls2ContentOfBob = bob.state.getClassContent(PROJECT1, PKG1,
+        String cls2ContentOfAlice = alice.editor.getClassContent(PROJECT1,
+            PKG1, CLS2);
+        String cls2ContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
             CLS2);
         assertFalse(cls2ContentOfBob.equals(dirtyCls2ContentOfAlice));
         assertTrue(cls2ContentOfBob.equals(cls2ContentOfAlice));
@@ -214,7 +214,7 @@ public class TestDriverSavesFiles extends STFTest {
 
         // bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS2,
         // dirtyCls2ChangeContentOfAlice);
-        String contentChangeOfBob = bob.state.getClassContent(PROJECT1, PKG1,
+        String contentChangeOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
             CLS2);
         System.out.println(contentChangeOfBob);
         System.out.println(dirtyCls2ChangeContentOfAlice);
@@ -248,13 +248,14 @@ public class TestDriverSavesFiles extends STFTest {
     @Test
     public void testCloseDirtyFileByAlice() throws RemoteException,
         IOException, CoreException {
-        String clsConentofBob = bob.state.getClassContent(PROJECT1, PKG1, CLS1);
+        String clsConentofBob = bob.editor
+            .getClassContent(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
-        String clsConentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsConentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 
-        dave.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
+        dave.editor.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
             clsConentOfAlice);
         assertFalse(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));

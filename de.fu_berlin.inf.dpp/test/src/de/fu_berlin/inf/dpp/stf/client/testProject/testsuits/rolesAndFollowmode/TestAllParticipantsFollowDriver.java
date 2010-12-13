@@ -174,7 +174,7 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 
         bob.editor.waitUntilJavaEditorClosed(CLS1);
@@ -184,11 +184,11 @@ public class TestAllParticipantsFollowDriver extends STFTest {
         assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         assertFalse(dave.editor.isJavaEditorOpen(CLS1));
 
-        assertTrue(bob.state.getClassContent(PROJECT1, PKG1, CLS1).equals(
+        assertTrue(bob.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));
-        assertTrue(carl.state.getClassContent(PROJECT1, PKG1, CLS1).equals(
+        assertTrue(carl.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));
-        assertTrue(bob.state.getClassContent(PROJECT1, PKG1, CLS1).equals(
+        assertTrue(bob.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));
     }
 }

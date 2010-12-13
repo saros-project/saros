@@ -56,13 +56,13 @@ public class TestFollowMode extends STFTest {
         assertTrue(bob.sessionV.isInFollowMode());
         assertTrue(bob.editor.isJavaEditorActive(CLS1));
 
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 
-        bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
+        bob.editor.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
             clsContentOfAlice);
-        String clsContentOfBob = bob.state
-            .getClassContent(PROJECT1, PKG1, CLS1);
+        String clsContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
+            CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
         alice.pEV.newClass(PROJECT1, PKG1, CLS2);

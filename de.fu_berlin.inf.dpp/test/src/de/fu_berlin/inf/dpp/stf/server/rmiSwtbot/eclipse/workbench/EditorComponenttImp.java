@@ -1,9 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -226,6 +232,50 @@ public class EditorComponenttImp extends EclipseComponent implements
     public SWTBotEclipseEditor getJavaEditor(String className)
         throws RemoteException {
         return getEditor(className + SUFIX_JAVA);
+    }
+
+    public void waitUntilFileContentSame(String otherClassContent,
+        String... fileNodes) throws RemoteException {
+        waitUntil(SarosConditions.isFileContentsSame(this, otherClassContent,
+            fileNodes));
+    }
+
+    public void waitUntilClassContentsSame(final String projectName,
+        final String pkg, final String className, final String otherClassContent)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getClassContent(projectName, pkg, className).equals(
+                    otherClassContent);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+    }
+
+    public String getClassContent(String projectName, String pkg,
+        String className) throws RemoteException, IOException, CoreException {
+        IPath path = new Path(getClassPath(projectName, pkg, className));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return ConvertStreamToString(file.getContents());
+    }
+
+    public String getFileContent(String... fileNodes) throws RemoteException,
+        IOException, CoreException {
+        IPath path = new Path(getPath(fileNodes));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return ConvertStreamToString(file.getContents());
     }
 
     /**********************************************

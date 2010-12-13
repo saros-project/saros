@@ -113,14 +113,14 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         bob.workbench.sleep(500);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
 
-        String CLSContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String CLSContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
-        String CLS2ContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
-            CLS2);
+        String CLS2ContentOfAlice = alice.editor.getClassContent(PROJECT1,
+            PKG1, CLS2);
 
-        String CLSContentOfBob = bob.state
-            .getClassContent(PROJECT1, PKG1, CLS1);
-        String CLS2ContentOfBob = bob.state.getClassContent(PROJECT1, PKG1,
+        String CLSContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
+            CLS1);
+        String CLS2ContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
             CLS2);
 
         assertEquals(CLSContentOfAlice, CLSContentOfBob);

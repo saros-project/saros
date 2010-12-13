@@ -2,6 +2,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -12,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 
 public class SarosWorkbenchComponentImp extends EclipseComponent implements
     SarosWorkbenchComponent {
@@ -76,7 +82,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     public void resetSaros() throws RemoteException {
         rosterVC.resetAllBuddyName();
         rosterVC.disconnectGUI();
-        state.deleteAllProjects();
+        deleteAllProjects();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -127,13 +133,26 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
 
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
-        state.deleteAllProjects();
+        deleteAllProjects();
         peVC.deleteAllProjectsWithGUI();
 
     }
 
     public void closeWelcomeView() throws RemoteException {
         viewPart.closeViewByTitle(VIEW_TITLE_WELCOME);
+    }
+
+    public void deleteAllProjects() throws RemoteException {
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IProject[] projects = root.getProjects();
+        for (int i = 0; i < projects.length; i++) {
+            try {
+                FileUtil.delete(projects[i]);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete files ", e);
+            }
+        }
     }
 
 }

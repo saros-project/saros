@@ -1,24 +1,25 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 
 /**
  * This interface contains convenience API to perform actions in the editor
  * area, then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test.
- * (How to do it please look at the javadoc in class {@link TestPattern} or read
- * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link Tester} object in your junit-test. (How
+ * to do it please look at the javadoc in class {@link TestPattern} or read the
+ * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
  * then you can use the object editor initialized in {@link Tester} to access
  * the API :), e.g.
@@ -320,6 +321,84 @@ public interface EditorComponent extends Remote {
      */
     public SWTBotEclipseEditor getJavaEditor(String className)
         throws RemoteException;
+
+    /**
+     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
+     * file, which is modified by another peer (e.g. Alice). Because of data
+     * transfer delay Bob need to wait a minute to see the changes . So it will
+     * be a good idea that you give bob some time before you compare the two
+     * files from Alice and Bob.
+     * 
+     * <p>
+     * <b>Note:</b> the mothod is different from
+     * {@link EditorComponent#waitUntilEditorContentSame(String, String...)},
+     * which compare the contents which may be dirty.
+     * </p>
+     * 
+     * @param otherFileContent
+     *            the file content of another peer, with which you want to
+     *            compare your file content.
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     */
+    public void waitUntilFileContentSame(String otherFileContent,
+        String... fileNodes) throws RemoteException;
+
+    /**
+     * 
+     * @param otherClassContent
+     *            the class content of another peer, with which you want to
+     *            compare your class content.
+     * @param projectName
+     *            name of the java project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     * 
+     * @throws RemoteException
+     * @see State#waitUntilFileContentSame(String, String...)
+     */
+    public void waitUntilClassContentsSame(String projectName, String pkg,
+        String className, String otherClassContent) throws RemoteException;
+
+    /**
+     * 
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     * @return only the saved content of the specified file, if it is dirty.
+     *         This method is different from
+     *         {@link EditorComponent#getTextOfEditor(String...)}, which can
+     *         return a not saved content.
+     * @throws RemoteException
+     * @throws IOException
+     * @throws CoreException
+     */
+    public String getFileContent(String... fileNodes) throws RemoteException,
+        IOException, CoreException;
+
+    /**
+     * 
+     * @param projectName
+     *            name of the java project, e.g. Foo_Saros.
+     * @param pkg
+     *            name of the package, e.g. my.pkg
+     * @param className
+     *            name of the class, e.g. MyClass
+     * @return only the saved content of the specified class file, if it is
+     *         dirty. This method is different from
+     *         {@link EditorComponent#getTextOfJavaEditor(String, String, String)}
+     *         , which can return a not saved content.
+     * @throws RemoteException
+     * @throws IOException
+     * @throws CoreException
+     */
+    public String getClassContent(String projectName, String pkg,
+        String className) throws RemoteException, IOException, CoreException;
 
     /**********************************************
      * 

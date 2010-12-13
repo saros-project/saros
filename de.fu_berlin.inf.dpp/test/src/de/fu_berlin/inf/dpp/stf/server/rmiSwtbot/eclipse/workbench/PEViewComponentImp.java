@@ -380,7 +380,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void openClass(String projectName, String pkg, String className)
         throws RemoteException {
         String[] classNodes = getClassNodes(projectName, pkg, className);
-        openFile(helperPart.changeToRegex(classNodes));
+        openFile(changeToRegex(classNodes));
     }
 
     public void openClassWith(String whichEditor, String projectName,
@@ -525,7 +525,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
         String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            helperPart.changeToRegex(nodes), REFACTOR, MOVE);
+            changeToRegex(nodes), REFACTOR, MOVE);
         shellC.waitUntilShellActive(SHELL_MOVE);
         shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
@@ -536,7 +536,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] nodes) throws RemoteException {
         precondition();
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            helperPart.changeToRegex(nodes), REFACTOR, RENAME);
+            changeToRegex(nodes), REFACTOR, RENAME);
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicC.waitUntilButtonEnabled(confirmLabel);
@@ -548,7 +548,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            helperPart.changeToRegex(nodes), REFACTOR, RENAME);
+            changeToRegex(nodes), REFACTOR, RENAME);
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
@@ -732,7 +732,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void updateClass(String projectName, String pkg, String className,
         String revision) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
-        nodes = helperPart.changeToRegex(nodes);
+        nodes = changeToRegex(nodes);
         switchToAnotherRevision(nodes, revision);
     }
 
@@ -933,7 +933,7 @@ public class PEViewComponentImp extends EclipseComponent implements
                 + " to " + target + " , the target already exists.");
         }
         precondition();
-        String[] matchTexts = helperPart.changeToRegex(source);
+        String[] matchTexts = changeToRegex(source);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, "Copy");
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,

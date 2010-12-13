@@ -217,7 +217,7 @@ public class STFTest {
 
     public static void deleteProjectsByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.state.deleteAllProjects();
+            tester.workbench.deleteAllProjects();
         }
     }
 
@@ -255,7 +255,7 @@ public class STFTest {
             if (tester != null) {
                 tester.rosterV.resetAllBuddyName();
                 tester.rosterV.disconnectGUI();
-                tester.state.deleteAllProjects();
+                tester.workbench.deleteAllProjects();
             }
         }
         resetAllBots();

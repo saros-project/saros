@@ -89,13 +89,15 @@ public class TestDriverResetsFiles extends STFTest {
         dave.editor.confirmWindowSaveSource(NO);
         edna.editor.confirmWindowSaveSource(NO);
 
-        String contentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String contentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
-        String contentOfDave = dave.state.getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfDave = dave.editor
+            .getClassContent(PROJECT1, PKG1, CLS1);
 
-        String contentOfEdna = edna.state.getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfEdna = edna.editor
+            .getClassContent(PROJECT1, PKG1, CLS1);
 
-        String contentOfBob = bob.state.getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfBob = bob.editor.getClassContent(PROJECT1, PKG1, CLS1);
 
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

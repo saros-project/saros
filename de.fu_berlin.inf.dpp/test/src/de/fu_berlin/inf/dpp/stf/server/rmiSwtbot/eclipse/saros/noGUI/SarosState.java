@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -8,7 +9,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.State;
 
 /**
  * The goal of this class is to gather state and perform actions using
@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.State;
  * {@link EditorManager} and {@link XMPPAccountStore} from the inside and
  * provide an RMI interface for getting internal states from the outside.
  */
-public interface SarosState extends State {
+public interface SarosState extends Remote {
 
     /**********************************************
      * 

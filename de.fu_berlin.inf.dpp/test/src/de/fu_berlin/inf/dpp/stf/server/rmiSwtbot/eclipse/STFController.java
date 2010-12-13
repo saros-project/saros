@@ -19,11 +19,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.BasicPart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.HelperPart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.PerspectivePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TablePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ToolbarPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
@@ -99,13 +95,9 @@ public class STFController {
 
     private void initNoExportedObects() {
         EclipseComponent.tablePart = new TablePart();
-        EclipseComponent.toolbarPart = new ToolbarPart();
         EclipseComponent.treePart = new TreePart();
         EclipseComponent.viewPart = new ViewPart();
-        EclipseComponent.perspectivePart = new PerspectivePart();
-        EclipseComponent.helperPart = new HelperPart();
         EclipseComponent.shellC = new ShellComponentImp();
-        EclipseComponent.basicPart = new BasicPart();
     }
 
     /*

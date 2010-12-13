@@ -102,7 +102,7 @@ public class TestSVNStateInitialization extends STFTest {
 
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
-        bob.state.deleteAllProjects();
+        bob.workbench.deleteAllProjects();
     }
 
     /**

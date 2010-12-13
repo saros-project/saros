@@ -81,7 +81,7 @@ public class RmiTest extends STFTest {
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
         assertTrue(dirtyClsContentOfAlice.equals(clsContentOfAlice));
     }
@@ -94,7 +94,7 @@ public class RmiTest extends STFTest {
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
         alice.editor.closejavaEditorWithoutSave(CLS1);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
         assertFalse(dirtyClsContentOfAlice.equals(clsContentOfAlice));
     }
@@ -115,14 +115,14 @@ public class RmiTest extends STFTest {
         IOException {
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.newClass(PROJECT1, PKG2, CLS1);
-        String clsOfPkgProject = alice.state.getClassContent(PROJECT1, PKG1,
+        String clsOfPkgProject = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
-        String clsOfpkg2Project = alice.state.getClassContent(PROJECT1, PKG2,
+        String clsOfpkg2Project = alice.editor.getClassContent(PROJECT1, PKG2,
             CLS1);
         assertFalse(clsOfPkgProject.equals(clsOfpkg2Project));
 
         alice.pEV.newJavaProjectWithClass(PROJECT2, PKG1, CLS1);
-        String clsOfPkgProject2 = alice.state.getClassContent(PROJECT2, PKG1,
+        String clsOfPkgProject2 = alice.editor.getClassContent(PROJECT2, PKG1,
             CLS1);
         assertTrue(clsOfPkgProject.equals(clsOfPkgProject2));
     }

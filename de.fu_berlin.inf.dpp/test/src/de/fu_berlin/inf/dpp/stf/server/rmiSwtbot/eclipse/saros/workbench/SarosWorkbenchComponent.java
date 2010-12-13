@@ -37,4 +37,11 @@ public interface SarosWorkbenchComponent extends Remote {
 
     public void setUpWorkbench() throws RemoteException;
 
+    /**
+     * Delete all the projects in this workspace.
+     * 
+     * @throws RemoteException
+     */
+    public void deleteAllProjects() throws RemoteException;
+
 }

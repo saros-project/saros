@@ -146,15 +146,15 @@ public class TestFileOperations extends STFTest {
         assertTrue(carl.pEV.isClassExist(PROJECT1, PKG2, CLS1));
 
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG2, CLS1);
-        String clsContentOfAlice = alice.state.getClassContent(PROJECT1, PKG2,
+        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG2,
             CLS1);
-        carl.state.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
+        carl.editor.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
             clsContentOfAlice);
-        bob.state.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
+        bob.editor.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
             clsContentOfAlice);
-        String clsContentOfBob = bob.state
-            .getClassContent(PROJECT1, PKG2, CLS1);
-        String clsContentOfCarl = carl.state.getClassContent(PROJECT1, PKG2,
+        String clsContentOfBob = bob.editor.getClassContent(PROJECT1, PKG2,
+            CLS1);
+        String clsContentOfCarl = carl.editor.getClassContent(PROJECT1, PKG2,
             CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
         assertTrue(clsContentOfCarl.equals(clsContentOfAlice));

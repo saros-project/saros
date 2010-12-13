@@ -12,7 +12,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noGUI.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 
@@ -80,7 +79,7 @@ public class SarosConditions extends Conditions {
         return new isViewActive(bot, name);
     }
 
-    public static ICondition isFileContentsSame(StateImp state,
+    public static ICondition isFileContentsSame(EditorComponent state,
         String otherClassContent, String... fileNodes) {
         return new IsFileContentsSame(state, otherClassContent, fileNodes);
     }
