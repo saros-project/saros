@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
+import de.fu_berlin.inf.dpp.stf.client.TesterConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
 
 /**
@@ -68,7 +68,7 @@ public class TestSVNStateInitialization extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
-        if (MusicianConfigurationInfos.DEVELOPMODE) {
+        if (TesterConfigurationInfos.DEVELOPMODE) {
             if (alice.sessionV.isInSessionGUI())
                 alice.sessionV.leaveTheSessionByHost();
             // don't delete SVN_PROJECT_COPY

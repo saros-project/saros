@@ -29,12 +29,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewC
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
 
 /**
- * Musician encapsulates a test instance of Saros. It takes use of all RMI
+ * Tester encapsulates a test instance of Saros. It takes use of all RMI
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Musician extends STFTest {
-    private static final Logger log = Logger.getLogger(Musician.class);
+public class Tester extends STFTest {
+    private static final Logger log = Logger.getLogger(Tester.class);
 
     public SarosPEViewComponent pEV;
     public ProgressViewComponent progressV;
@@ -54,7 +54,7 @@ public class Musician extends STFTest {
     public String host;
     public int port;
 
-    public Musician(JID jid, String password, String host, int port) {
+    public Tester(JID jid, String password, String host, int port) {
         super();
         this.jid = jid;
         this.password = password;
@@ -106,12 +106,12 @@ public class Musician extends STFTest {
 
     public void buildSessionDoneSequentially(String projectName,
         TypeOfShareProject howToShareProject,
-        TypeOfCreateProject usingWhichProject, Musician... invitees)
+        TypeOfCreateProject usingWhichProject, Tester... invitees)
         throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
         pEV.shareProjectWith(projectName, howToShareProject, baseJIDOfInvitees);
-        for (Musician invitee : invitees) {
+        for (Tester invitee : invitees) {
             invitee.pEV.confirmWizardSessionInvitationUsingWhichProject(
                 projectName, usingWhichProject);
         }
@@ -119,7 +119,7 @@ public class Musician extends STFTest {
 
     public void buildSessionDoneConcurrently(final String projectName,
         TypeOfShareProject howToShareProject,
-        final TypeOfCreateProject usingWhichProject, Musician... invitees)
+        final TypeOfCreateProject usingWhichProject, Tester... invitees)
         throws RemoteException, InterruptedException {
 
         log.trace("alice.shareProjectParallel");
@@ -127,7 +127,7 @@ public class Musician extends STFTest {
             getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
-        for (final Musician invitee : invitees) {
+        for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     invitee.pEV
@@ -155,16 +155,16 @@ public class Musician extends STFTest {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void leaveSessionHostFirstDone(Musician... peers)
+    public void leaveSessionHostFirstDone(Tester... peers)
         throws RemoteException, InterruptedException {
         sessionV.leaveTheSessionByHost();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < peers.length; i++) {
-            final Musician musician = peers[i];
+            final Tester tester = peers[i];
             closeSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     // Need to check for isDriver before leaving.
-                    musician.sessionV.confirmClosingTheSessionWindow();
+                    tester.sessionV.confirmClosingTheSessionWindow();
                     return null;
                 }
             });
@@ -181,26 +181,26 @@ public class Musician extends STFTest {
      * </ol>
      * make sure,
      * 
-     * @param musicians
+     * @param testers
      *            bob and carl
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void leaveSessionPeersFirstDone(Musician... musicians)
+    public void leaveSessionPeersFirstDone(Tester... testers)
         throws RemoteException, InterruptedException {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < musicians.length; i++) {
-            final Musician musician = musicians[i];
+        for (int i = 0; i < testers.length; i++) {
+            final Tester tester = testers[i];
             leaveTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.leaveTheSessionByPeer();
+                    tester.sessionV.leaveTheSessionByPeer();
                     return null;
                 }
             });
         }
         List<JID> peerJIDs = new ArrayList<JID>();
-        for (Musician musician : musicians) {
-            peerJIDs.add(musician.jid);
+        for (Tester tester : testers) {
+            peerJIDs.add(tester.jid);
         }
         MakeOperationConcurrently.workAll(leaveTasks);
         sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
@@ -208,7 +208,7 @@ public class Musician extends STFTest {
         sessionV.waitUntilSessionClosed();
     }
 
-    private String[] getPeersBaseJID(Musician... peers) {
+    private String[] getPeersBaseJID(Tester... peers) {
         String[] peerBaseJIDs = new String[peers.length];
         for (int i = 0; i < peers.length; i++) {
             peerBaseJIDs[i] = peers[i].getBaseJid();
@@ -219,20 +219,20 @@ public class Musician extends STFTest {
     /**
      * the local user can be concurrently followed by many other users.
      * 
-     * @param musicians
+     * @param testers
      *            the list of the remote Users who want to follow the local
      *            user.
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void followedBy(Musician... musicians) throws RemoteException,
+    public void followedBy(Tester... testers) throws RemoteException,
         InterruptedException {
         List<Callable<Void>> followTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < musicians.length; i++) {
-            final Musician musician = musicians[i];
+        for (int i = 0; i < testers.length; i++) {
+            final Tester tester = testers[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.followThisUserGUI(jid);
+                    tester.sessionV.followThisUserGUI(jid);
                     return null;
                 }
             });
@@ -244,19 +244,19 @@ public class Musician extends STFTest {
      * stop the follow-mode of the remote users who are following the local
      * user.
      * 
-     * @param musicians
+     * @param testers
      *            the list of the remote Users who are following the local user.
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void stopFollowedBy(Musician... musicians) throws RemoteException,
+    public void stopFollowedBy(Tester... testers) throws RemoteException,
         InterruptedException {
         List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < musicians.length; i++) {
-            final Musician musician = musicians[i];
+        for (int i = 0; i < testers.length; i++) {
+            final Tester tester = testers[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.sessionV.stopFollowingThisUserGUI(jid);
+                    tester.sessionV.stopFollowingThisUserGUI(jid);
                     return null;
                 }
             });
@@ -293,13 +293,12 @@ public class Musician extends STFTest {
      * add buddy with GUI, which should be performed by both the users.
      * 
      * @param peer
-     *            the musician, which should be added in your contact list
+     *            the user, which should be added in your contact list
      * @throws RemoteException
      * @throws XMPPException
      * 
      */
-    public void addBuddyDone(Musician peer) throws RemoteException,
-        XMPPException {
+    public void addBuddyDone(Tester peer) throws RemoteException, XMPPException {
         if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContact(peer.jid);
             peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
@@ -311,10 +310,10 @@ public class Musician extends STFTest {
      * add buddy with GUI, which should be performed by both the users.
      * 
      * @param peer
-     *            the musician, which should be added in your contact list
+     *            the user, which should be added in your contact list
      * @throws RemoteException
      */
-    public void addBuddyGUIDone(Musician peer) throws RemoteException {
+    public void addBuddyGUIDone(Tester peer) throws RemoteException {
         if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContactGUI(peer.jid);
             peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
@@ -325,7 +324,7 @@ public class Musician extends STFTest {
     /**
      * Remove given contact from Roster with GUI, if contact was added before.
      */
-    public void deleteBuddyGUIDone(Musician peer) throws RemoteException {
+    public void deleteBuddyGUIDone(Tester peer) throws RemoteException {
         if (!rosterV.hasBuddy(peer.jid))
             return;
         rosterV.deleteBuddyGUI(peer.jid);
@@ -337,7 +336,7 @@ public class Musician extends STFTest {
      * 
      * @throws XMPPException
      */
-    public void deleteBuddyDone(Musician peer) throws RemoteException,
+    public void deleteBuddyDone(Tester peer) throws RemoteException,
         XMPPException {
         if (!rosterV.hasBuddy(peer.jid))
             return;
@@ -345,7 +344,7 @@ public class Musician extends STFTest {
         peer.rosterV.confirmRemovelOfSubscriptionWindow();
     }
 
-    public void shareYourScreenWithSelectedUserDone(Musician peer)
+    public void shareYourScreenWithSelectedUserDone(Tester peer)
         throws RemoteException {
         sessionV.shareYourScreenWithSelectedUserGUI(peer.jid);
         peer.sessionV.confirmIncomingScreensharingSesionWindow();
@@ -353,10 +352,10 @@ public class Musician extends STFTest {
 
     /**
      * This method is same as
-     * {@link Musician#buildSessionDoneConcurrently(String, String, Musician...)}
-     * . The difference to buildSessionConcurrently is that the invitation
-     * process is activated by clicking the toolbarbutton
-     * "open invitation interface" in the roster view.
+     * {@link Tester#buildSessionDoneConcurrently(String, String, Tester...)} .
+     * The difference to buildSessionConcurrently is that the invitation process
+     * is activated by clicking the toolbarbutton "open invitation interface" in
+     * the roster view.
      * 
      * @param projectName
      *            the name of the project which is in a session now.
@@ -366,13 +365,13 @@ public class Musician extends STFTest {
      * @throws InterruptedException
      */
     public void inviteUsersInYourSessionDone(final String projectName,
-        Musician... peers) throws RemoteException, InterruptedException {
+        Tester... peers) throws RemoteException, InterruptedException {
         sessionV.openInvitationInterface(getPeersBaseJID(peers));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : peers) {
+        for (final Tester tester : peers) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.pEV
+                    tester.pEV
                         .confirmWirzardSessionInvitationWithNewProject(projectName);
                     return null;
                 }

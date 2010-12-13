@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * 
  * On the bottom you will find the used configurations which is used by STF.
  */
-public class MusicianConfigurationInfos {
+public class TesterConfigurationInfos {
     public final static boolean DEVELOPMODE = true;
 
     public final static accountType WHICH_ACCOUNT = accountType.USER_STF_WITH_SAROS_CON_SERVER;

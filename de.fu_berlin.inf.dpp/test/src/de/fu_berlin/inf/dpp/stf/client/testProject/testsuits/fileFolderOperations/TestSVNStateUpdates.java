@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
-import de.fu_berlin.inf.dpp.stf.client.MusicianConfigurationInfos;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.TesterConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
 
@@ -42,7 +42,7 @@ public class TestSVNStateUpdates extends STFTest {
         setUpSaros();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : activeTesters) {
+        for (final Tester musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     if (!musician.pEV.isProjectExist(SVN_PROJECT_COPY)) {
@@ -74,7 +74,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Before
     public void before() throws Exception {
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Musician musician : activeTesters) {
+        for (final Tester musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
@@ -109,7 +109,7 @@ public class TestSVNStateUpdates extends STFTest {
 
     @AfterClass
     public static void afterClass() throws RemoteException {
-        if (MusicianConfigurationInfos.DEVELOPMODE) {
+        if (TesterConfigurationInfos.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
             alice.rosterV.disconnectGUI();
             bob.rosterV.disconnectGUI();

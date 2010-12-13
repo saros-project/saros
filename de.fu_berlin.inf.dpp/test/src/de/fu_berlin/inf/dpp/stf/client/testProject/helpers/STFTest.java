@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
 
 public class STFTest {
     @Rule
@@ -31,11 +31,11 @@ public class STFTest {
     }
 
     /* Musicians */
-    public static Musician alice;
-    public static Musician bob;
-    public static Musician carl;
-    public static Musician dave;
-    public static Musician edna;
+    public static Tester alice;
+    public static Tester bob;
+    public static Tester carl;
+    public static Tester dave;
+    public static Tester edna;
 
     // views
     protected final static String SESSION_VIEW = "Shared Project Session";
@@ -118,11 +118,11 @@ public class STFTest {
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
     public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
 
-    public static List<Musician> activeTesters = new ArrayList<Musician>();
+    public static List<Tester> activeTesters = new ArrayList<Tester>();
 
-    public static List<Musician> initTesters(TypeOfTester... testers)
+    public static List<Tester> initTesters(TypeOfTester... testers)
         throws RemoteException {
-        List<Musician> result = new ArrayList<Musician>();
+        List<Tester> result = new ArrayList<Tester>();
         for (TypeOfTester t : testers) {
             switch (t) {
             case ALICE:
@@ -167,24 +167,24 @@ public class STFTest {
      * @throws RemoteException
      */
     public static void setUpWorkbenchs() throws RemoteException {
-        for (Musician musician : activeTesters) {
-            musician.workbench.activateEclipseShell();
-            musician.workbench.setUpWorkbench();
-            musician.workbench.closeWelcomeView();
-            musician.mainMenu.openPerspectiveJava();
-            musician.workbench.closeUnnecessaryViews();
+        for (Tester tester : activeTesters) {
+            tester.workbench.activateEclipseShell();
+            tester.workbench.setUpWorkbench();
+            tester.workbench.closeWelcomeView();
+            tester.mainMenu.openPerspectiveJava();
+            tester.workbench.closeUnnecessaryViews();
         }
     }
 
     public static void setUpSaros() throws RemoteException {
-        for (Musician musician : activeTesters) {
-            musician.mainMenu.disableAutomaticReminder();
-            musician.workbench.openSarosViews();
-            musician.rosterV.connect(musician.jid, musician.password);
+        for (Tester tester : activeTesters) {
+            tester.mainMenu.disableAutomaticReminder();
+            tester.workbench.openSarosViews();
+            tester.rosterV.connect(tester.jid, tester.password);
         }
     }
 
-    public static void setUpSession(Musician host, Musician... invitees)
+    public static void setUpSession(Tester host, Tester... invitees)
         throws RemoteException, InterruptedException {
         host.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         host.buildSessionDoneConcurrently(PROJECT1,
@@ -192,34 +192,34 @@ public class STFTest {
             invitees);
     }
 
-    public static void reBuildSession(Musician host, Musician... invitees)
+    public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
         if (!host.sessionV.isInSession()) {
-            for (Musician musician : invitees) {
+            for (Tester tester : invitees) {
                 host.buildSessionDoneSequentially(PROJECT1,
                     TypeOfShareProject.SHARE_PROJECT,
-                    TypeOfCreateProject.EXIST_PROJECT, musician);
+                    TypeOfCreateProject.EXIST_PROJECT, tester);
             }
         }
     }
 
     public static void createProjectByActiveTesters() throws RemoteException {
-        for (Musician tester : activeTesters) {
+        for (Tester tester : activeTesters) {
             tester.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         }
     }
 
     public static void deleteProjectsByActiveTesters() throws RemoteException {
-        for (Musician tester : activeTesters) {
+        for (Tester tester : activeTesters) {
             tester.state.deleteAllProjects();
         }
     }
 
-    public static void resetDriverRole(Musician host, Musician... invitees)
+    public static void resetDriverRole(Tester host, Tester... invitees)
         throws RemoteException {
-        for (Musician musician : invitees) {
-            if (musician.sessionV.isInSession() && musician.sessionV.isDriver()) {
-                host.sessionV.removeDriverRoleGUI(musician.sessionV);
+        for (Tester tester : invitees) {
+            if (tester.sessionV.isInSession() && tester.sessionV.isDriver()) {
+                host.sessionV.removeDriverRoleGUI(tester.sessionV);
             }
         }
 
@@ -228,9 +228,9 @@ public class STFTest {
         }
     }
 
-    public static void resetFollowModel(Musician... activeTesters)
+    public static void resetFollowModel(Tester... activeTesters)
         throws RemoteException {
-        for (Musician tester : activeTesters) {
+        for (Tester tester : activeTesters) {
             if (tester.sessionV.isInSession()
                 && tester.sessionV.isInFollowMode()) {
                 tester.sessionV.stopFollowingGUI();
@@ -245,25 +245,25 @@ public class STFTest {
      * @throws RemoteException
      */
     public static void resetSaros() throws RemoteException {
-        for (Musician musician : activeTesters) {
-            if (musician != null) {
-                musician.rosterV.resetAllBuddyName();
-                musician.rosterV.disconnectGUI();
-                musician.state.deleteAllProjects();
+        for (Tester tester : activeTesters) {
+            if (tester != null) {
+                tester.rosterV.resetAllBuddyName();
+                tester.rosterV.disconnectGUI();
+                tester.state.deleteAllProjects();
             }
         }
         resetAllBots();
     }
 
     public static void resetWorkbenches() throws RemoteException {
-        for (Musician musician : activeTesters) {
-            if (musician != null)
-                musician.workbench.resetWorkbench();
+        for (Tester tester : activeTesters) {
+            if (tester != null)
+                tester.workbench.resetWorkbench();
         }
     }
 
     public static void deleteFolders(String... folders) throws RemoteException {
-        for (Musician tester : activeTesters) {
+        for (Tester tester : activeTesters) {
             for (String folder : folders) {
                 if (tester.pEV.isFolderExist(PROJECT1, folder))
                     tester.pEV.deleteFolder(PROJECT1, folder);
@@ -286,7 +286,7 @@ public class STFTest {
     @Before
     public void before() throws Exception {
         //
-        for (Musician m : activeTesters) {
+        for (Tester m : activeTesters) {
             m.state
                 .debug("\n---------------------------------------------------"
                     + "\nExecuting @Test " + name.getMethodName() + " in "

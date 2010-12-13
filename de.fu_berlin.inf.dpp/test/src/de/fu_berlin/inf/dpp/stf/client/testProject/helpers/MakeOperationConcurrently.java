@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
 
 public class MakeOperationConcurrently {
     private final static Logger log = Logger
@@ -45,15 +45,15 @@ public class MakeOperationConcurrently {
         return result;
     }
 
-    public static List<Boolean> leaveSessionConcurrently(Musician... invitees)
+    public static List<Boolean> leaveSessionConcurrently(Tester... invitees)
         throws RemoteException, InterruptedException {
-        List<Musician> peers = new LinkedList<Musician>();
-        for (Musician invitee : invitees) {
+        List<Tester> peers = new LinkedList<Tester>();
+        for (Tester invitee : invitees) {
             peers.add(invitee);
         }
         List<Callable<Boolean>> leaveTasks = new ArrayList<Callable<Boolean>>();
         for (int i = 0; i < peers.size(); i++) {
-            final Musician musician = peers.get(i);
+            final Tester musician = peers.get(i);
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     // Need to check for isDriver before leaving.

@@ -9,7 +9,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
@@ -19,11 +19,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
  * the roster view. then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Musician} object in your junit-test.
+ * At first you need to create a {@link Tester} object in your junit-test.
  * (How to do it please look at the javadoc in class {@link TestPattern} or read
  * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * after then you can use the object rosterV initialized in {@link Musician} to
+ * after then you can use the object rosterV initialized in {@link Tester} to
  * access the API :), e.g.
  * 
  * <pre>
@@ -196,7 +196,7 @@ public interface RosterViewComponent extends Remote {
     /**
      * After adding a new contact the added user should get this popup window
      * with the title "Request of subscription received", which should be run by
-     * {@link Musician#addBuddyGUIDone(Musician)}
+     * {@link Tester#addBuddyGUIDone(Tester)}
      * 
      * @throws RemoteException
      */
@@ -387,7 +387,7 @@ public interface RosterViewComponent extends Remote {
      * your contact from his buddies.
      * 
      * This method should be called by
-     * {@link Musician#deleteBuddyGUIDone(Musician)}
+     * {@link Tester#deleteBuddyGUIDone(Tester)}
      * 
      * @throws RemoteException
      */

@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.stf.client.Musician;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TablePart;
@@ -20,11 +20,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
  * session view. then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Musician} object in your junit-test.
+ * At first you need to create a {@link Tester} object in your junit-test.
  * (How to do it please look at the javadoc in class {@link TestPattern} or read
  * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * then you can use the object sessionV initialized in {@link Musician} to
+ * then you can use the object sessionV initialized in {@link Tester} to
  * access the API :), e.g.
  * 
  * <pre>
@@ -716,7 +716,7 @@ public interface SessionViewComponent extends Remote {
      * 
      * @param jids
      * @throws RemoteException
-     * @see Musician#leaveSessionPeersFirstDone(Musician...)
+     * @see Tester#leaveSessionPeersFirstDone(Tester...)
      */
     public void waitUntilAllPeersLeaveSession(List<JID> jids)
         throws RemoteException;
@@ -835,7 +835,7 @@ public interface SessionViewComponent extends Remote {
      * the selected user should get this popup window.
      * 
      * @throws RemoteException
-     * @see Musician#shareYourScreenWithSelectedUserDone(Musician)
+     * @see Tester#shareYourScreenWithSelectedUserDone(Tester)
      */
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException;
