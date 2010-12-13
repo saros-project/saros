@@ -101,7 +101,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void setFocusOnSessionView() throws RemoteException {
         viewPart.setFocusOnViewByTitle(VIEWNAME);
-        basicC.captureScreenshot(basicC.getPathToScreenShot()
+        workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/focusOnsessionView.png");
         viewPart.waitUntilViewActive(VIEWNAME);
     }
@@ -785,7 +785,8 @@ public class SessionViewComponentImp extends EclipseComponent implements
     }
 
     public void confirmClosingTheSessionWindow() throws RemoteException {
-        shellC.waitUntilShellActive(CLOSING_THE_SESSION);
+        shellC.waitUntilShellOpen(CLOSING_THE_SESSION);
+        shellC.activateShellWithText(CLOSING_THE_SESSION);
         shellC.confirmShell(CLOSING_THE_SESSION, OK);
         shellC.waitUntilShellClosed(CLOSING_THE_SESSION);
     }
@@ -860,7 +861,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         workbenchC.activateEclipseShell();
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        basicC.captureScreenshot(basicC.getPathToScreenShot()
+        workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
         viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
 

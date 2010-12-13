@@ -204,7 +204,7 @@ public class TestRosterViewComponent extends STFTest {
         assertFalse(carl.sessionV.isInSessionGUI());
         alice.rosterV.inviteUserGUI(carl.jid);
         carl.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
-        carl.basic.sleep(1000);
+        carl.workbench.sleep(1000);
 
         assertTrue(carl.sessionV.isInSessionGUI());
     }

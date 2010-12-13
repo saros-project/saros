@@ -110,7 +110,7 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         bob.pEV
             .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
 
-        bob.basic.sleep(500);
+        bob.workbench.sleep(500);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
 
         String CLSContentOfAlice = alice.state.getClassContent(PROJECT1, PKG1,

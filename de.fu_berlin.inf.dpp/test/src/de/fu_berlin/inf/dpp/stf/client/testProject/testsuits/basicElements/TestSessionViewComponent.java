@@ -159,10 +159,10 @@ public class TestSessionViewComponent extends STFTest {
         alice.editor.waitUntilJavaEditorOpen(CLS2);
         assertTrue(alice.editor.isJavaEditorOpen(CLS2));
         assertFalse(bob.editor.isJavaEditorOpen(CLS2));
-        bob.basic.captureScreenshot(bob.basic.getPathToScreenShot()
+        bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
             + "/vor_jump_to_position.png");
         bob.sessionV.jumpToPositionOfSelectedUserGUI(alice.jid);
-        bob.basic.captureScreenshot(bob.basic.getPathToScreenShot()
+        bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
             + "/after_jump_to_position.png");
         bob.editor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.editor.isJavaEditorActive(CLS2));

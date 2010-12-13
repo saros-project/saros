@@ -73,10 +73,10 @@ public class TestShare2UsersSequentially extends STFTest {
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        bob.basic
-            .captureScreenshot((bob.basic.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
-        alice.basic
-            .captureScreenshot((alice.basic.getPathToScreenShot() + "/inviter_in_sharedproject.png"));
+        bob.workbench
+            .captureScreenshot((bob.workbench.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
+        alice.workbench.captureScreenshot((alice.workbench
+            .getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
         assertTrue(bob.sessionV.isParticipant());
         assertTrue(alice.sessionV.isParticipant());

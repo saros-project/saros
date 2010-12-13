@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.osgi.framework.Bundle;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
@@ -22,43 +24,23 @@ public class BasicComponentImp extends EclipseComponent implements
         return eclipseBasicObjectImp;
     }
 
-    public void sleep(long millis) throws RemoteException {
-        bot.sleep(millis);
-    }
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
-    public void captureScreenshot(String filename) throws RemoteException {
-        bot.captureScreenshot(filename);
-    }
-
-    public String getPathToScreenShot() throws RemoteException {
-        Bundle bundle = saros.getBundle();
-        log.debug("screenshot's directory: "
-            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
-        String osName = System.getProperty("os.name");
-        log.debug("Name of the OS: " + osName);
-        if (osName.matches("Windows.*"))
-            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
-        else
-            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
-    }
-
-    // // FIXME If the file doesn't exist, this method hits the
-    // // SWTBotPreferences.TIMEOUT (5000ms) while waiting on a tree node.
-    // public boolean isJavaClassExistInGui(String projectName, String pkg,
-    // String className) throws RemoteException {
-    // showViewPackageExplorer();
-    // activatePackageExplorerView();
-    // return isTreeItemExist(SarosConstant.VIEW_TITLE_PACKAGE_EXPLORER,
-    // projectName, "src", pkg, className + ".java");
-    // }
-
-    public boolean isTextWithLabelEqualWithText(String label, String text)
-        throws RemoteException {
-        return bot.textWithLabel(label).getText().equals(text);
-    }
-
+    /**********************************************
+     * 
+     * basic widget: {@link SWTBotButton}.
+     * 
+     **********************************************/
     public void clickButton(String mnemonicText) throws RemoteException {
         bot.button(mnemonicText).click();
+    }
+
+    public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
+        return bot.button(mnemonicText).isEnabled();
     }
 
     public void waitUntilButtonEnabled(String mnemonicText)
@@ -66,29 +48,34 @@ public class BasicComponentImp extends EclipseComponent implements
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
     }
 
-    /**
-     * Waits until the button is enabled.
-     * 
-     * @param tooltipText
-     *            the tooltip on the widget.
-     */
     public void waitUnitButtonWithTooltipIsEnabled(String tooltipText)
         throws RemoteException {
         waitUntil(Conditions
             .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
     }
 
-    public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
-        return bot.button(mnemonicText).isEnabled();
-    }
-
+    /**********************************************
+     * 
+     * basic widget: {@link SWTBotText}.
+     * 
+     **********************************************/
     public void setTextInTextWithLabel(String text, String label)
         throws RemoteException {
         bot.textWithLabel(label).setText(text);
     }
 
-    public String getLabelText() throws RemoteException {
+    public String getTextInTextWithLabel(String label) throws RemoteException {
+        return bot.textWithLabel(label).getText();
+    }
+
+    /**********************************************
+     * 
+     * basic widget: {@link SWTBotLabel}.
+     * 
+     **********************************************/
+    public String geFirsttLabelText() throws RemoteException {
         return bot.label().getText();
+
     }
 
 }

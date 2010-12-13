@@ -96,10 +96,10 @@ public class TestChatViewFunctions extends STFTest {
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
-        alice.basic.sleep(2000);
+        alice.workbench.sleep(2000);
         System.out.println(alice.chatV.getTextOfLastChatLine());
 
-        bob.basic.sleep(2000);
+        bob.workbench.sleep(2000);
         System.out.println(bob.chatV.getTextOfLastChatLine());
         System.out.println(bob.chatV
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));

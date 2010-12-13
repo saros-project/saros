@@ -73,6 +73,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Override
     @Before
     public void before() throws Exception {
+        super.before();
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
         for (final Tester musician : activeTesters) {
             initTasks.add(new Callable<Void>() {

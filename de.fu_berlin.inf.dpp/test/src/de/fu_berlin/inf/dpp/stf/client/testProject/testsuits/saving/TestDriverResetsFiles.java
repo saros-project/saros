@@ -21,11 +21,11 @@ public class TestDriverResetsFiles extends STFTest {
      * Preconditions:
      * <ol>
      * 
-     * <li>alice1_fu (Host, Driver, all files are closed)</li>
-     * <li>bob1_fu (Observer)</li>
-     * <li>carl1_fu (Observer)</li>
-     * <li>dave1_fu (Observer in Follow-Mode)</li>
-     * <li>edna1_fu (Observer in Follow-Mode)</li>
+     * <li>alice (Host, Driver, all files are closed)</li>
+     * <li>bob (Observer)</li>
+     * <li>carl (Observer)</li>
+     * <li>dave (Observer in Follow-Mode)</li>
+     * <li>edna (Observer in Follow-Mode)</li>
      * </ol>
      * 
      * @throws AccessException

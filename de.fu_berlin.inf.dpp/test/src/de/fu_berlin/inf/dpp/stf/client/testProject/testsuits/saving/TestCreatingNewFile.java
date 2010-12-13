@@ -107,9 +107,9 @@ public class TestCreatingNewFile extends STFTest {
 
         carl.pEV.newFolder(FOLDER1, PROJECT1);
         carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.basic.sleep(500);
+        alice.workbench.sleep(500);
         assertFalse(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
-        bob.basic.sleep(500);
+        bob.workbench.sleep(500);
         assertFalse(bob.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
 
         if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))

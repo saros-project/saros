@@ -91,23 +91,31 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid());
 
-        bob.pEV.waitUntilWindowSessionInvitationActive();
+        bob.shell.waitUntilShellOpen(SESSION_INVITATION);
+        bob.shell.activateShellWithText(SESSION_INVITATION);
         alice.progressV.removeProcess(0);
-        bob.pEV.waitUntilWindowInvitationCnacelledActive();
-        assertTrue(bob.pEV.isWindowInvitationCancelledActive());
+        bob.shell.waitUntilShellOpen(INVITATIONCANCELLED);
+        bob.shell.activateShellWithText(INVITATIONCANCELLED);
         bob.pEV.closeWindowInvitationCancelled();
 
-        carl.pEV.waitUntilWindowSessionInvitationActive();
+        carl.shell.waitUntilShellOpen(SESSION_INVITATION);
+        carl.shell.activateShellWithText(SESSION_INVITATION);
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
         alice.progressV.removeProcess(0);
         carl.pEV.waitUntilWindowInvitationCnacelledActive();
         assertTrue(carl.pEV.isWindowInvitationCancelledActive());
         carl.pEV.closeWindowInvitationCancelled();
 
-        dave.pEV.waitUntilWindowSessionInvitationActive();
+        dave.shell.waitUntilShellOpen(SESSION_INVITATION);
+        dave.shell.activateShellWithText(SESSION_INVITATION);
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
+
         dave.basic.clickButton(FINISH);
         alice.progressV.removeProcess(0);
+        // FIXME Timeout exception by MAC OS X, the building session under MAS
+        // is sofast that the session process is already done after canceling
+        // this process, so dave should never get the window
+        // "Invitation canceled".
         dave.pEV.waitUntilWindowInvitationCnacelledActive();
         assertTrue(dave.pEV.isWindowInvitationCancelledActive());
         dave.pEV.closeWindowInvitationCancelled();

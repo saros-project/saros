@@ -18,13 +18,14 @@ public class MakeOperationConcurrently {
     private final static Logger log = Logger
         .getLogger(MakeOperationConcurrently.class);
 
-    public static <T> List<T> workAll(List<Callable<T>> tasks) throws InterruptedException {
-//        if(System.getProperty("").equals("MAC"))
-//            return workAll(tasks, 1);
-//        else
-            return workAll(tasks,tasks.size());
+    public static <T> List<T> workAll(List<Callable<T>> tasks)
+        throws InterruptedException {
+        if (System.getProperty("os.name").equals("Mac OS X"))
+            return workAll(tasks, 1);
+        else
+            return workAll(tasks, tasks.size());
     }
-    
+
     public static <T> List<T> workAll(List<Callable<T>> tasks,
         int numberOfThreads) throws InterruptedException {
         ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);

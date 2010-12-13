@@ -160,7 +160,8 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
-        shellC.waitUntilShellActive("Save Resource");
+        shellC.waitUntilShellOpen("Save Resource");
+        shellC.activateShellWithText("Save Resource");
         shellC.confirmShell("Save Resource", buttonType);
     }
 

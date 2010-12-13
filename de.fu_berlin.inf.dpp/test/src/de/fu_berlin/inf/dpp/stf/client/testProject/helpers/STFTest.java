@@ -115,6 +115,12 @@ public class STFTest {
     public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project...";
     public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
 
+    /*
+     * Shell title
+     */
+    protected final static String SESSION_INVITATION = "Session Invitation";
+    protected final static String INVITATIONCANCELLED = "Invitation Cancelled";
+
     public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
     public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
 

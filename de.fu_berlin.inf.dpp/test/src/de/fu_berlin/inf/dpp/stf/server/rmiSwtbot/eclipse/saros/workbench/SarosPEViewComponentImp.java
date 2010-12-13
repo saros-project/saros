@@ -104,24 +104,32 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWizardSessionInvitationUsingExistProject(
         String projectName) throws RemoteException {
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingExistProject(projectName);
     }
 
     public void confirmWizardSessionInvitationUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(projectName);
     }
 
     public void confirmWizardSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(projectName);
     }
 
     public void confirmFirstPageOfWizardSessionInvitation()
         throws RemoteException {
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
         bot.button(NEXT).click();
         basicC.waitUntilButtonEnabled(FINISH);
     }
@@ -234,7 +242,8 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWizardSessionInvitationUsingWhichProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
-        shellC.waitUntilShellActive(SESSION_INVITATION);
+        shellC.waitUntilShellOpen(SESSION_INVITATION);
+        shellC.activateShellWithText(SESSION_INVITATION);
         switch (usingWhichProject) {
         case NEW_PROJECT:
             confirmWirzardSessionInvitationWithNewProject(projectName);

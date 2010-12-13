@@ -58,13 +58,13 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
         alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        bob.basic.sleep(5000);
+        bob.workbench.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
 
-        bob.basic.sleep(5000);
+        bob.workbench.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
 
     }

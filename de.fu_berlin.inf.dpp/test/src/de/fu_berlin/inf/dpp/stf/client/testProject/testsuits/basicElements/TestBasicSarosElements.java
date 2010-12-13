@@ -43,8 +43,8 @@ public class TestBasicSarosElements extends STFTest {
         alice.sessionV.closeSessionView();
         assertEquals(false, alice.sessionV.isSessionViewOpen());
         alice.sessionV.openSessionView();
-        alice.basic
-            .captureScreenshot((alice.basic.getPathToScreenShot() + "/session_view.png"));
+        alice.workbench.captureScreenshot((alice.workbench
+            .getPathToScreenShot() + "/session_view.png"));
         assertEquals(true, alice.sessionV.isSessionViewOpen());
     }
 
@@ -53,8 +53,8 @@ public class TestBasicSarosElements extends STFTest {
         alice.rosterV.closeRosterView();
         assertEquals(false, alice.rosterV.isRosterViewOpen());
         alice.rosterV.openRosterView();
-        alice.basic
-            .captureScreenshot((alice.basic.getPathToScreenShot() + "/roster_view.png"));
+        alice.workbench.captureScreenshot((alice.workbench
+            .getPathToScreenShot() + "/roster_view.png"));
         assertEquals(true, alice.rosterV.isRosterViewOpen());
     }
 
@@ -79,8 +79,8 @@ public class TestBasicSarosElements extends STFTest {
         log.trace("xmppConnect");
         alice.rosterV.connect(alice.jid, alice.password);
         log.trace("captureScreenshot");
-        alice.basic
-            .captureScreenshot((alice.basic.getPathToScreenShot() + "/xmpp_connected.png"));
+        alice.workbench.captureScreenshot((alice.workbench
+            .getPathToScreenShot() + "/xmpp_connected.png"));
         assertEquals(true, alice.rosterV.isConnected());
     }
 
@@ -95,8 +95,8 @@ public class TestBasicSarosElements extends STFTest {
     public void disconnectGUI() throws RemoteException {
         alice.rosterV.connect(alice.jid, alice.password);
         alice.rosterV.disconnectGUI();
-        alice.basic
-            .captureScreenshot((alice.basic.getPathToScreenShot() + "/xmpp_disconnected.png"));
+        alice.workbench.captureScreenshot((alice.workbench
+            .getPathToScreenShot() + "/xmpp_disconnected.png"));
         assertEquals(false, alice.rosterV.isConnected());
     }
 }

@@ -6,6 +6,17 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public interface SarosWorkbenchComponent extends Remote {
+    public void sleep(long millis) throws RemoteException;
+
+    public void captureScreenshot(String filename) throws RemoteException;
+
+    /**
+     * TODO don't work now
+     * 
+     * @return the path, in which the screenshot located.
+     * @throws RemoteException
+     */
+    public String getPathToScreenShot() throws RemoteException;
 
     public void openSarosViews() throws RemoteException;
 

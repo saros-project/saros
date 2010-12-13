@@ -9,6 +9,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
@@ -28,6 +29,28 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
             return self;
         self = new SarosWorkbenchComponentImp();
         return self;
+    }
+
+    public void sleep(long millis) throws RemoteException {
+        bot.sleep(millis);
+    }
+
+    public void captureScreenshot(String filename) throws RemoteException {
+        bot.captureScreenshot(filename);
+    }
+
+    public String getPathToScreenShot() throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        log.debug("screenshot's directory: "
+            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
+        String osName = System.getProperty("os.name");
+        log.debug("Name of the OS: " + osName);
+        if (osName.matches("Windows.*"))
+            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        else if (osName.matches("Mac OS X.*")) {
+            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        }
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
     public void openSarosViews() throws RemoteException {
@@ -80,7 +103,6 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
         // win.getShell().setActive();
         // }
         // });
-
     }
 
     public void resetWorkbench() throws RemoteException {

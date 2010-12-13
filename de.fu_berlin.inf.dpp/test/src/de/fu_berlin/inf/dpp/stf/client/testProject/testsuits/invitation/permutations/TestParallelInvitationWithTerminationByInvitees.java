@@ -91,7 +91,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
             carl.getBaseJid(), edna.getBaseJid());
 
-        bob.pEV.waitUntilWindowSessionInvitationActive();
+        bob.shell.waitUntilShellOpen(SESSION_INVITATION);
+        bob.shell.activateShellWithText(SESSION_INVITATION);
         bob.basic.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
@@ -99,7 +100,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         alice.basic.clickButton(OK);
 
-        carl.pEV.waitUntilWindowSessionInvitationActive();
+        carl.shell.waitUntilShellOpen(SESSION_INVITATION);
+        carl.shell.activateShellWithText(SESSION_INVITATION);
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
         carl.basic.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
@@ -107,7 +109,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             carl.getName() + ".*"));
         alice.basic.clickButton(OK);
 
-        dave.pEV.isWIndowSessionInvitationActive();
+        dave.shell.waitUntilShellOpen(SESSION_INVITATION);
+        dave.shell.activateShellWithText(SESSION_INVITATION);
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
         dave.basic.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
@@ -115,7 +118,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             dave.getName() + ".*"));
         alice.basic.clickButton(OK);
 
-        edna.pEV.isWIndowSessionInvitationActive();
+        edna.shell.waitUntilShellOpen(SESSION_INVITATION);
+        edna.shell.activateShellWithText(SESSION_INVITATION);
         edna.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(edna.sessionV.isInSessionGUI());
