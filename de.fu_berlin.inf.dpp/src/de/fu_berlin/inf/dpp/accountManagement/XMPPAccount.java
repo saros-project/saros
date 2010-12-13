@@ -70,10 +70,9 @@ public class XMPPAccount implements Serializable {
         this.id = id;
     }
 
-    // to save the @ need to use \t
     @Override
     public String toString() {
-        return String.format("%s@%s\t", username, server);
+        return String.format("%s@%s", username, server);
     }
 
     @Override

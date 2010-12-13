@@ -101,6 +101,10 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     }
 
     private void addMenuItem(String account) {
+        // The additional @ is needed because @ has special meaning in
+        // Action#setText(), see JavaDoc of Action().
+        if (account.contains("@"))
+            account = account + "@";
         Action action = new Action(account) {
             int id = currentAccountId;
 
