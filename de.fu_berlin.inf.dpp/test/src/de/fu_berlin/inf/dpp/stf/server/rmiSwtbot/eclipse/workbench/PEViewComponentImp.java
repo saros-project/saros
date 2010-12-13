@@ -347,7 +347,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         bot.textWithLabel("Package:").setText(pkg);
         bot.textWithLabel("Name:").setText(className);
         bot.button("Add...").click();
-        windowPart.waitUntilShellActive("Implemented Interfaces Selection");
+        shellC.waitUntilShellActive("Implemented Interfaces Selection");
         bot.shell("Implemented Interfaces Selection").activate();
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
@@ -394,11 +394,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
         tree.expandNode(fileNodes).select();
         ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
-        windowPart.waitUntilShellActive(SHELL_EDITOR_SELECTION);
+        shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
-        basicPart.waitUntilButtonIsEnabled(OK);
-        windowPart.confirmWindow(SHELL_EDITOR_SELECTION, OK);
+        basicC.waitUntilButtonEnabled(OK);
+        shellC.confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
     public void openClassWithSystemEditor(String projectName, String pkg,
@@ -440,9 +440,9 @@ public class PEViewComponentImp extends EclipseComponent implements
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
                 item.contextMenu(DELETE).click();
-                windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
+                shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
                     true);
-                windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+                shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }
@@ -451,8 +451,8 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
         viewPart
             .clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, projectName);
-        windowPart.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        windowPart.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+        shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
+        shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteFolder(String... folderNodes) throws RemoteException {
@@ -494,7 +494,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void deleteFile(String... nodes) throws RemoteException {
         precondition();
         viewPart.clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, nodes);
-        windowPart.confirmDeleteWindow(OK);
+        shellC.confirmShellDelete(OK);
     }
 
     public void deleteClass(String projectName, String pkg, String className)
@@ -526,10 +526,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             helperPart.changeToRegex(nodes), REFACTOR, MOVE);
-        windowPart.waitUntilShellActive(SHELL_MOVE);
-        windowPart.confirmWindowWithTree(SHELL_MOVE, OK, targetProject, SRC,
+        shellC.waitUntilShellActive(SHELL_MOVE);
+        shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
-        windowPart.waitUntilShellClosed(SHELL_MOVE);
+        shellC.waitUntilShellClosed(SHELL_MOVE);
     }
 
     public void rename(String shellTitle, String confirmLabel, String newName,
@@ -537,11 +537,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             helperPart.changeToRegex(nodes), REFACTOR, RENAME);
-        windowPart.activateShellWithText(shellTitle);
+        shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(confirmLabel);
+        basicC.waitUntilButtonEnabled(confirmLabel);
         bot.button(confirmLabel).click();
-        windowPart.waitUntilShellClosed(shellTitle);
+        shellC.waitUntilShellClosed(shellTitle);
     }
 
     public void renameClass(String newName, String projectName, String pkg,
@@ -550,9 +550,9 @@ public class PEViewComponentImp extends EclipseComponent implements
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             helperPart.changeToRegex(nodes), REFACTOR, RENAME);
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
-        windowPart.activateShellWithText(shellTitle);
+        shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicC.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         /*
          * TODO Sometimes the window doesn't close when clicking on Finish, but
@@ -560,10 +560,10 @@ public class PEViewComponentImp extends EclipseComponent implements
          * this case just click Finish again.
          */
         bot.sleep(50);
-        if (basicC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
+        if (shellC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
             bot.button(FINISH).click();
         }
-        windowPart.waitUntilShellClosed(shellTitle);
+        shellC.waitUntilShellClosed(shellTitle);
     }
 
     public void renameFile(String newName, String... nodes)
@@ -597,20 +597,20 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
-        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
-            REPOSITORY_TYPE_SVN, NEXT);
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+            NEXT);
         log.debug("SVN share project text: " + bot.text());
         if (bot.table().containsItem(repositoryURL)) {
-            windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
-                repositoryURL, NEXT);
+            shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, repositoryURL,
+                NEXT);
         } else {
             bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
             bot.button(NEXT).click();
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
         }
-        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicC.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
+        shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
@@ -618,12 +618,12 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
-        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
-            REPOSITORY_TYPE_SVN, NEXT);
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+            NEXT);
         log.debug("SVN share project text: " + bot.text());
-        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicC.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
+        shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
@@ -634,8 +634,8 @@ public class PEViewComponentImp extends EclipseComponent implements
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SHARE_PROJECT);
 
-        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT,
-            REPOSITORY_TYPE_SVN, NEXT);
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+            NEXT);
 
         SWTBotTable table = null;
         final SWTBotShell shareProjectShell = bot.shell(SHELL_SHARE_PROJECT);
@@ -655,12 +655,12 @@ public class PEViewComponentImp extends EclipseComponent implements
             final boolean viewWasOpen = viewPart.isViewOpen("SVN Repositories");
             final SWTBotView repoView = viewPart.getView("SVN Repositories");
             repoView.toolbarButton("Add SVN Repository").click();
-            if (!windowPart.activateShellWithText("Add SVN Repository")) {
-                windowPart.waitUntilShellActive("Add SVN Repository");
+            if (!shellC.activateShellWithText("Add SVN Repository")) {
+                shellC.waitUntilShellActive("Add SVN Repository");
             }
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             bot.button(FINISH).click();
-            windowPart.waitUntilShellClosed("Add SVN Repository");
+            shellC.waitUntilShellClosed("Add SVN Repository");
             if (!viewWasOpen)
                 repoView.close();
             // recur...
@@ -669,50 +669,49 @@ public class PEViewComponentImp extends EclipseComponent implements
             return;
         }
 
-        windowPart.confirmWindowWithTable(SHELL_SHARE_PROJECT, repositoryURL,
-            NEXT);
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, repositoryURL, NEXT);
 
         bot.radio("Use specified folder name:").click();
         bot.text().setText(specifiedFolderName);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellActive("Remote Project Exists");
-        windowPart.confirmWindow("Remote Project Exists", YES);
+        shellC.waitUntilShellActive("Remote Project Exists");
+        shellC.confirmShell("Remote Project Exists", YES);
         bot.sleep(500);
-        if (basicC.isShellOpen("Confirm Open Perspective"))
-            windowPart.confirmWindow("Confirm Open Perspective", NO);
+        if (shellC.isShellOpen("Confirm Open Perspective"))
+            shellC.confirmShell("Confirm Open Perspective", NO);
         else
-            windowPart.waitUntilShellClosed(SHELL_SHARE_PROJECT);
+            shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         precondition();
         mainMenuC.clickMenuWithTexts("File", "Import...");
-        windowPart.confirmWindowWithTreeWithFilterText(SHELL_IMPORT,
+        shellC.confirmShellWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {
-            windowPart.confirmWindowWithTable("Checkout from SVN",
-                repositoryURL, NEXT);
+            shellC.confirmShellWithTable("Checkout from SVN", repositoryURL,
+                NEXT);
         } else {
             bot.radio("Create a new repository location").click();
             bot.button(NEXT).click();
             bot.comboBoxWithLabel("Url:").setText(repositoryURL);
             bot.button(NEXT).click();
-            windowPart.waitUntilShellActive("Checkout from SVN");
+            shellC.waitUntilShellActive("Checkout from SVN");
         }
-        windowPart.confirmWindowWithTreeWithWaitingExpand("Checkout from SVN",
+        shellC.confirmShellWithTreeWithWaitingExpand("Checkout from SVN",
             FINISH, repositoryURL, "trunk", "examples");
-        windowPart.waitUntilShellActive("SVN Checkout");
+        shellC.waitUntilShellActive("SVN Checkout");
 
         SWTBotShell shell2 = bot.shell("SVN Checkout");
-        windowPart.waitUntilShellCloses(shell2);
+        shellC.waitUntilShellClosed(shell2);
     }
 
     public void disConnect(String projectName) throws RemoteException {
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, DISCONNECT);
-        windowPart.confirmWindow(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
+        shellC.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
     }
 
     public void revertProject(String projectName) throws RemoteException {
@@ -720,8 +719,8 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, REVERT);
-        windowPart.confirmWindow(SHELL_REVERT, OK);
-        windowPart.waitUntilShellClosed(SHELL_REVERT);
+        shellC.confirmShell(SHELL_REVERT, OK);
+        shellC.waitUntilShellClosed(SHELL_REVERT);
     }
 
     public void updateProject(String projectName, String versionID)
@@ -743,10 +742,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         String[] matchTexts = { projectName + ".*" };
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
-        windowPart.waitUntilShellActive(SHELL_SWITCH);
+        shellC.waitUntilShellActive(SHELL_SWITCH);
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+        shellC.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
     public void switchProject(String projectName, String url)
@@ -780,7 +779,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
-        windowPart.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+        shellC.waitUntilShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
     public boolean isProjectManagedBySVN(String projectName)
@@ -854,12 +853,13 @@ public class PEViewComponentImp extends EclipseComponent implements
         setFocusOnPEView();
     }
 
-    private void confirmWindowNewJavaProject(String projectName) {
+    private void confirmWindowNewJavaProject(String projectName)
+        throws RemoteException {
         SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_PROJECT);
         shell.activate();
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_NEW_JAVA_PROJECT);
+        shellC.waitUntilShellClosed(SHELL_NEW_JAVA_PROJECT);
     }
 
     private void confirmWindowNewFolder(String newFolderName) {
@@ -870,22 +870,24 @@ public class PEViewComponentImp extends EclipseComponent implements
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
-    private void confirmWindowNewFile(String newFileName) {
+    private void confirmWindowNewFile(String newFileName)
+        throws RemoteException {
         SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
         shell.activate();
         bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
-        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicC.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
-    private void confirmWindowNewJavaPackage(String projectName, String pkg) {
+    private void confirmWindowNewJavaPackage(String projectName, String pkg)
+        throws RemoteException {
         SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_PACKAGE);
         shell.activate();
         bot.textWithLabel("Source folder:").setText((projectName + "/src"));
         bot.textWithLabel("Name:").setText(pkg);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
+        shellC.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
     }
 
     private void confirmWindowNewJavaClass(String projectName, String pkg,
@@ -899,12 +901,13 @@ public class PEViewComponentImp extends EclipseComponent implements
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
-    private void confirmWizardNewProject(String projectName) {
-        windowPart.confirmWindowWithTree(SHELL_NEW_PROJECT, NEXT,
-            CATEGORY_GENERAL, NODE_PROJECT);
+    private void confirmWizardNewProject(String projectName)
+        throws RemoteException {
+        shellC.confirmShellWithTree(SHELL_NEW_PROJECT, NEXT, CATEGORY_GENERAL,
+            NODE_PROJECT);
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SHELL_NEW_PROJECT);
+        shellC.waitUntilShellClosed(SHELL_NEW_PROJECT);
         bot.sleep(50);
     }
 
@@ -913,13 +916,13 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
-        windowPart.waitUntilShellActive(SHELL_SWITCH);
+        shellC.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
         bot.textWithLabel(LABEL_REVISION).setText(versionID);
         bot.button(OK).click();
-        if (basicC.isShellOpen(SHELL_SVN_SWITCH))
-            windowPart.waitUntilShellClosed(SHELL_SVN_SWITCH);
+        if (shellC.isShellOpen(SHELL_SVN_SWITCH))
+            shellC.waitUntilShellClosed(SHELL_SVN_SWITCH);
     }
 
     public void copyProject(String target, String source)
@@ -935,10 +938,10 @@ public class PEViewComponentImp extends EclipseComponent implements
             matchTexts, "Copy");
         viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
             matchTexts, "Paste");
-        windowPart.activateShellWithText("Copy Project");
+        shellC.activateShellWithText("Copy Project");
         bot.textWithLabel("Project name:").setText(target);
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed("Copy Project");
+        shellC.waitUntilShellClosed("Copy Project");
         bot.sleep(1000);
     }
 

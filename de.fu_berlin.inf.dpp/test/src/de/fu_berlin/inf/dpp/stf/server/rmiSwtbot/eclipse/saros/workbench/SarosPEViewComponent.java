@@ -6,8 +6,8 @@ import de.fu_berlin.inf.dpp.stf.client.Musician;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.client.test.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.WindowPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
 
 /**
  * This interface contains convenience API to perform a action using the
@@ -115,7 +115,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * 
      * @return <tt>true</tr>, if the popup window with the title "Invitation cancel" is active
      * @throws RemoteException
-     * @see WindowPart#isShellActive(String)
+     * @see ShellComponentImp#isShellActive(String)
      */
     public boolean isWindowInvitationCancelledActive() throws RemoteException;
 
@@ -123,7 +123,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * close the popup window with the title "Invitation cancel".
      * 
      * @throws RemoteException
-     * @see WindowPart#closeShell(String)
+     * @see ShellComponentImp#closeShell(String)
      */
     public void closeWindowInvitationCancelled() throws RemoteException;
 
@@ -132,7 +132,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * active.
      * 
      * @throws RemoteException
-     * @see WindowPart#waitUntilShellActive(String)
+     * @see ShellComponentImp#waitUntilShellActive(String)
      */
     public void waitUntilWindowInvitationCnacelledActive()
         throws RemoteException;
@@ -142,7 +142,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * @return <tt><true</tt>, if the popup window with the title
      *         "Session Invitation" is active
      * @throws RemoteException
-     * @see WindowPart#isShellActive(String)
+     * @see ShellComponentImp#isShellActive(String)
      */
     public boolean isWIndowSessionInvitationActive() throws RemoteException;
 
@@ -150,7 +150,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * close the popup window with the title "Session Invitation".
      * 
      * @throws RemoteException
-     * @see WindowPart#closeShell(String)
+     * @see ShellComponentImp#closeShell(String)
      */
     public void closeWIndowSessionInvitation() throws RemoteException;
 
@@ -159,7 +159,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * active.
      * 
      * @throws RemoteException
-     * @see WindowPart#waitUntilShellActive(String)
+     * @see ShellComponentImp#waitUntilShellActive(String)
      */
     public void waitUntilWindowSessionInvitationActive() throws RemoteException;
 
@@ -233,7 +233,7 @@ public interface SarosPEViewComponent extends PEViewComponent {
      *            which you want to share with others.
      * @throws RemoteException
      */
-    public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(
+    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException;
 
     /**

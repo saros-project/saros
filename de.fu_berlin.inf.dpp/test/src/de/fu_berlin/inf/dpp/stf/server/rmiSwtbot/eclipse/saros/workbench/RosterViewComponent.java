@@ -96,7 +96,7 @@ public interface RosterViewComponent extends Remote {
      * @throws RemoteException
      */
     public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
-        String password) throws RemoteException;
+        String password, boolean usesThisAccountNow) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if Saros is connected to a XMPP server.

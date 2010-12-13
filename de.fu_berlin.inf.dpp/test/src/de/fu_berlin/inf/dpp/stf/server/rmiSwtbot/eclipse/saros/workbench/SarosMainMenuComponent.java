@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuCompo
 
 public interface SarosMainMenuComponent extends MainMenuComponent {
 
-    public void creatAccountGUI(JID jid, String password)
-        throws RemoteException;
+    public void creatAccountGUI(JID jid, String password,
+        boolean usesThisAccountNow) throws RemoteException;
 
     /**
      * @param jid

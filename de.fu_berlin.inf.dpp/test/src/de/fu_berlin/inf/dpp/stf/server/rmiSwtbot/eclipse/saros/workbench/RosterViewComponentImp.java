@@ -51,7 +51,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
     private final static String SHELL_CONTACT_ALREADY_ADDED = "Contact already added";
-    private final static String SHELL_CREATE_XMPP_ACCOUNT = "Create New User Account"; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
+    private final static String SHELL_CREATE_NEW_USER_ACCOUNT = "Create New User Account"; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
     private final static String SHELL_NEW_CONTACT = "New Contact";
     private final static String SHELL_CONTACT_LOOKUP_FAILED = "Contact look-up failed";
     private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
@@ -70,8 +70,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     private final static String BUDDIES = "Buddies";
 
-    private final static String SERVER = "Jabber Server";
-    private final static String USERNAME = "Username";
+    private final static String JABBER_SERVER = "Jabber Server";
+    private final static String USER_NAME = "Username";
     private final static String PASSWORD = "Password";
     private final static String JABBERID = "Jabber ID";
     private final static String REPEAT_PASSWORD = "Repeat Password";
@@ -179,15 +179,15 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
-        String password) throws RemoteException {
-        if (!windowPart.activateShellWithText(SHELL_CREATE_XMPP_ACCOUNT))
-            windowPart.waitUntilShellActive(SHELL_CREATE_XMPP_ACCOUNT);
-        basicPart.setTextInTextWithLabel(xmppServer, SERVER);
-        basicPart.setTextInTextWithLabel(jid, USERNAME);
-        basicPart.setTextInTextWithLabel(password, PASSWORD);
-        basicPart.setTextInTextWithLabel(password, REPEAT_PASSWORD);
-        basicPart.clickButton(FINISH);
-        windowPart.waitUntilShellClosed(SHELL_CREATE_XMPP_ACCOUNT);
+        String password, boolean usesThisAccountNow) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
+            shellC.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
+        basicC.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
+        basicC.setTextInTextWithLabel(jid, USER_NAME);
+        basicC.setTextInTextWithLabel(password, PASSWORD);
+        basicC.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        basicC.clickButton(FINISH);
+        shellC.waitUntilShellClosed(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
     public boolean isConnected() throws RemoteException {
@@ -279,19 +279,18 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void confirmRequestOfSubscriptionReceivedWindow()
         throws RemoteException {
-        if (!windowPart
+        if (!shellC
             .activateShellWithText(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED))
-            windowPart
-                .waitUntilShellActive(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        windowPart.confirmWindow(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+            shellC.waitUntilShellActive(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+        shellC.confirmShell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
     }
 
-    public void confirmNewContactWindow(String baseJID) {
-        if (!windowPart.activateShellWithText(SHELL_NEW_CONTACT))
-            windowPart.waitUntilShellActive(SHELL_NEW_CONTACT);
-        basicPart.setTextInTextWithLabel(baseJID, JABBERID);
-        basicPart.waitUntilButtonIsEnabled(FINISH);
-        basicPart.clickButton(FINISH);
+    public void confirmNewContactWindow(String baseJID) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_NEW_CONTACT))
+            shellC.waitUntilShellActive(SHELL_NEW_CONTACT);
+        basicC.setTextInTextWithLabel(baseJID, JABBERID);
+        basicC.waitUntilButtonEnabled(FINISH);
+        basicC.clickButton(FINISH);
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {
@@ -301,28 +300,28 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void confirmContactLookupFailedWindow(String buttonType)
         throws RemoteException {
-        windowPart.confirmWindow(SHELL_CONTACT_LOOKUP_FAILED, buttonType);
+        shellC.confirmShell(SHELL_CONTACT_LOOKUP_FAILED, buttonType);
     }
 
     public void waitUntilContactLookupFailedIsActive() throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
+        shellC.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
 
     public void waitUntilWindowContactAlreadyAddedIsActive()
         throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
+        shellC.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public boolean isWindowContactLookupFailedActive() throws RemoteException {
-        return basicC.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
+        return shellC.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
     }
 
     public void closeWindowContactAlreadyAdded() throws RemoteException {
-        basicC.closeShell(SHELL_CONTACT_ALREADY_ADDED);
+        shellC.closeShell(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     public boolean isWindowContactAlreadyAddedActive() throws RemoteException {
-        return basicC.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
+        return shellC.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
     }
 
     /**********************************************
@@ -414,16 +413,16 @@ public class RosterViewComponentImp extends EclipseComponent implements
             SWTBotTreeItem item = treePart.getTreeItemWithRegexNodes(tree,
                 BUDDIES + ".*", buddyNickName + ".*");
             item.contextMenu(CM_DELETE).click();
-            windowPart.confirmDeleteWindow(YES);
+            shellC.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }
     }
 
     public void confirmRemovelOfSubscriptionWindow() throws RemoteException {
-        if (!windowPart.activateShellWithText(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            windowPart.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        windowPart.confirmWindow(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
+        if (!shellC.activateShellWithText(SHELL_REMOVAL_OF_SUBSCRIPTION))
+            shellC.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        shellC.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
     }
 
     /**********************************************
@@ -461,8 +460,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
         SWTBotTreeItem item = treePart.getTreeItemWithRegexNodes(tree, BUDDIES
             + ".*", buddyNickName + ".*");
         item.contextMenu(CM_RENAME).click();
-        if (!windowPart.activateShellWithText("Set new nickname")) {
-            windowPart.waitUntilShellActive("Set new nickname");
+        if (!shellC.activateShellWithText("Set new nickname")) {
+            shellC.waitUntilShellActive("Set new nickname");
         }
         bot.text(buddyNickName).setText(newBuddyName);
         bot.button(OK).click();
@@ -559,7 +558,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
     }
 
     private boolean isWizardCreateXMPPAccountActive() throws RemoteException {
-        return basicC.isShellActive(SHELL_CREATE_XMPP_ACCOUNT);
+        return shellC.isShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
     @SuppressWarnings("static-access")

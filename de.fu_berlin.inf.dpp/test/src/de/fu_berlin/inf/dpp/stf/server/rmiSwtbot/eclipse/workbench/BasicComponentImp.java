@@ -2,8 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
@@ -62,27 +61,34 @@ public class BasicComponentImp extends EclipseComponent implements
         bot.button(mnemonicText).click();
     }
 
-    public boolean isShellOpen(String title) throws RemoteException {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells)
-            if (shell.getText().equals(title))
-                return true;
-        return false;
+    public void waitUntilButtonEnabled(String mnemonicText)
+        throws RemoteException {
+        waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
     }
 
-    public boolean isShellActive(String title) throws RemoteException {
-        if (!isShellOpen(title))
-            return false;
-        try {
-            SWTBotShell activeShell = bot.activeShell();
-            String shellTitle = activeShell.getText();
-            return shellTitle.equals(title);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+    /**
+     * Waits until the button is enabled.
+     * 
+     * @param tooltipText
+     *            the tooltip on the widget.
+     */
+    public void waitUnitButtonWithTooltipIsEnabled(String tooltipText)
+        throws RemoteException {
+        waitUntil(Conditions
+            .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
     }
 
-    public void closeShell(String title) throws RemoteException {
-        bot.shell(title).close();
+    public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
+        return bot.button(mnemonicText).isEnabled();
     }
+
+    public void setTextInTextWithLabel(String text, String label)
+        throws RemoteException {
+        bot.textWithLabel(label).setText(text);
+    }
+
+    public String getLabelText() throws RemoteException {
+        return bot.label().getText();
+    }
+
 }

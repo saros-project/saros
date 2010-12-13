@@ -76,7 +76,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
                 bob);
         assertTrue(bob.pEV.isWIndowSessionInvitationActive());
         bob.pEV
-            .confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
+            .confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
 
         assertTrue(bob.pEV.isProjectExist(PROJECT1));
         assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));

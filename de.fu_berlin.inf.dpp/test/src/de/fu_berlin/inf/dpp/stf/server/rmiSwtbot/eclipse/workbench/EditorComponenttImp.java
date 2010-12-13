@@ -121,7 +121,7 @@ public class EditorComponenttImp extends EclipseComponent implements
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).close();
-            if (basicC.isShellActive("Save Resource"))
+            if (shellC.isShellActive("Save Resource"))
                 confirmWindowSaveSource(YES);
         }
     }
@@ -160,8 +160,8 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
-        windowPart.waitUntilShellActive("Save Resource");
-        windowPart.confirmWindow("Save Resource", buttonType);
+        shellC.waitUntilShellActive("Save Resource");
+        shellC.confirmShell("Save Resource", buttonType);
     }
 
     // public void closeAllOpenedEditors() throws RemoteException {

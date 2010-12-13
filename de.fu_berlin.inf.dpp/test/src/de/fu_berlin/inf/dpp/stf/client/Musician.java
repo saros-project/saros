@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.Session
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
 
 /**
  * Musician encapsulates a test instance of Saros. It takes use of all RMI
@@ -35,16 +36,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewC
 public class Musician extends STFTest {
     private static final Logger log = Logger.getLogger(Musician.class);
 
-    public EditorComponent editor;
     public SarosPEViewComponent pEV;
-    public SarosMainMenuComponent mainMenu;
     public ProgressViewComponent progressV;
-    public BasicComponent basic;
-    public SarosState state;
     public RosterViewComponent rosterV;
     public SessionViewComponent sessionV;
     public RSViewComponent rSV;
     public ChatViewComponent chatV;
+    public BasicComponent basic;
+    public SarosState state;
+    public EditorComponent editor;
+    public ShellComponent shell;
+    public SarosMainMenuComponent mainMenu;
     public SarosWorkbenchComponent workbench;
 
     public JID jid;
@@ -72,10 +74,7 @@ public class Musician extends STFTest {
         AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
-            // bot = (ISarosRmiSWTWorkbenchBot) registry.lookup("Bot");
-            state = (SarosState) registry.lookup("state");
 
-            workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
             chatV = (ChatViewComponent) registry.lookup("chatView");
             rosterV = (RosterViewComponent) registry.lookup("rosterView");
             sessionV = (SessionViewComponent) registry.lookup("sessionView");
@@ -84,16 +83,16 @@ public class Musician extends STFTest {
              * object. It worked for the local tests, but i don't know if it
              * work for the remote tests too.
              */
-
             sessionV.setJID(jid);
             rSV = (RSViewComponent) registry.lookup("remoteScreenView");
-            // popupWindow = (ExWindowObject) registry.lookup("popUpWindow");
-
-            editor = (EditorComponent) registry.lookup("eclipseEditor");
             pEV = (SarosPEViewComponent) registry.lookup("packageExplorerView");
+            progressV = (ProgressViewComponent) registry.lookup("progressView");
+            state = (SarosState) registry.lookup("state");
+            workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
+            shell = (ShellComponent) registry.lookup("shell");
+            editor = (EditorComponent) registry.lookup("eclipseEditor");
             mainMenu = (SarosMainMenuComponent) registry
                 .lookup("sarosMainMenu");
-            progressV = (ProgressViewComponent) registry.lookup("progressView");
             basic = (BasicComponent) registry.lookup("basicObject");
 
         } catch (java.rmi.ConnectException e) {

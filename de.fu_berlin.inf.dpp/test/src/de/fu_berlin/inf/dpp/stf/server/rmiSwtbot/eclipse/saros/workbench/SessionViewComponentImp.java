@@ -624,14 +624,14 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public void confirmIncomingScreensharingSesionWindow()
         throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
-        windowPart.confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
+        shellC.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
+        shellC.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
     }
 
     public void confirmWindowScreensharingAErrorOccured()
         throws RemoteException {
-        windowPart.waitUntilShellActive(SHELL_SCREENSHARING_ERROR_OCCURED);
-        windowPart.confirmWindow(SHELL_SCREENSHARING_ERROR_OCCURED, OK);
+        shellC.waitUntilShellActive(SHELL_SCREENSHARING_ERROR_OCCURED);
+        shellC.confirmShell(SHELL_SCREENSHARING_ERROR_OCCURED, OK);
     }
 
     /**********************************************
@@ -657,13 +657,13 @@ public class SessionViewComponentImp extends EclipseComponent implements
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (basicC.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
+        if (shellC.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
             confirmErrorInSarosPluginWindow();
         }
     }
 
     public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        windowPart.confirmWindow(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
+        shellC.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
     }
 
     /**********************************************
@@ -674,7 +674,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void inconsistencyDetectedGUI() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        windowPart.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
+        shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     public boolean isInconsistencyDetectedEnabled() throws RemoteException {
@@ -705,7 +705,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         if (isRemoveAllRiverEnabled()) {
             clickToolbarButtonWithTooltip(TB_REMOVE_ALL_DRIVER_ROLES);
-            windowPart.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
+            shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
         }
     }
 
@@ -759,9 +759,9 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickTBleaveTheSession();
-        if (!windowPart.activateShellWithText(CONFIRM_LEAVING_SESSION))
-            windowPart.waitUntilShellActive(CONFIRM_LEAVING_SESSION);
-        windowPart.confirmWindow(CONFIRM_LEAVING_SESSION, YES);
+        if (!shellC.activateShellWithText(CONFIRM_LEAVING_SESSION))
+            shellC.waitUntilShellActive(CONFIRM_LEAVING_SESSION);
+        shellC.confirmShell(CONFIRM_LEAVING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
@@ -778,16 +778,16 @@ public class SessionViewComponentImp extends EclipseComponent implements
         // }
         // }
         // });
-        if (!windowPart.activateShellWithText(SHELL_CONFIRM_CLOSING_SESSION))
-            windowPart.waitUntilShellActive(SHELL_CONFIRM_CLOSING_SESSION);
-        windowPart.confirmWindow(SHELL_CONFIRM_CLOSING_SESSION, YES);
+        if (!shellC.activateShellWithText(SHELL_CONFIRM_CLOSING_SESSION))
+            shellC.waitUntilShellActive(SHELL_CONFIRM_CLOSING_SESSION);
+        shellC.confirmShell(SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
     public void confirmClosingTheSessionWindow() throws RemoteException {
-        windowPart.waitUntilShellActive(CLOSING_THE_SESSION);
-        windowPart.confirmWindow(CLOSING_THE_SESSION, OK);
-        windowPart.waitUntilShellClosed(CLOSING_THE_SESSION);
+        shellC.waitUntilShellActive(CLOSING_THE_SESSION);
+        shellC.confirmShell(CLOSING_THE_SESSION, OK);
+        shellC.waitUntilShellClosed(CLOSING_THE_SESSION);
     }
 
     /**********************************************

@@ -23,13 +23,6 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     /* title of shells which are pop up by clicking the main menus */
     private static final String SHELL_PREFERNCES = "Preferences";
 
-    /* All infos about the shell "Create XMPP account" */
-    private static final String SHELL_CREATE_XMPP_ACCOUNT = "Create XMPP account";
-    private static final String LABEL_SERVER = "Server";
-    private static final String LABEL_USERNAME = "Username:";
-    private static final String LABEL_PASSWORD = "Password:";
-    private static final String LABEL_CONFIRM = "Confirm:";
-
     /**
      * {@link SarosMainMenuComponentImp} is a singleton, but inheritance is
      * possible.
@@ -57,11 +50,11 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         xmppAccountStore.createNewAccount(username, password, server);
     }
 
-    public void creatAccountGUI(JID jid, String password)
-        throws RemoteException {
-        mainMenuC.clickMenuWithTexts("Saros", "Create Account");
+    public void creatAccountGUI(JID jid, String password,
+        boolean usesThisAccountNow) throws RemoteException {
+        mainMenuC.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         rosterVC.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
-            password);
+            password, usesThisAccountNow);
     }
 
     public boolean isAccountExist(JID jid, String password)
@@ -150,7 +143,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         bot.ccomboBox(1).setSelection(videoResolution);
         bot.button("Apply").click();
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
     /**********************************************
@@ -181,7 +174,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
                 Messages.getString("feedback.page.group.interval")).click();
             bot.button("Apply").click();
             bot.button(OK).click();
-            windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+            shellC.waitUntilShellClosed(SHELL_PREFERNCES);
         }
     }
 

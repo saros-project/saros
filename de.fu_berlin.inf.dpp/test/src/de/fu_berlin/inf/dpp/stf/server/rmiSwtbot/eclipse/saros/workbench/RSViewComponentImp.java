@@ -94,8 +94,8 @@ public class RSViewComponentImp extends EclipseComponent implements
 
     public void IncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        windowPart
-            .confirmWindow(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+        shellC
+            .confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
 }

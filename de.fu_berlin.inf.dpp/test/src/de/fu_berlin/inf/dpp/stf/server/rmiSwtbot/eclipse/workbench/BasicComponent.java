@@ -14,11 +14,28 @@ public interface BasicComponent extends Remote {
 
     public void clickButton(String mnemonicText) throws RemoteException;
 
-    public boolean isShellOpen(String title) throws RemoteException;
+    /**
+     * Waits until the button is enabled.
+     * 
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     */
+    public void waitUntilButtonEnabled(String mnemonicText)
+        throws RemoteException;
 
-    public boolean isShellActive(String title) throws RemoteException;
+    /**
+     * Waits until the button is enabled.
+     * 
+     * @param tooltipText
+     *            the tooltip on the widget.
+     */
+    public void waitUnitButtonWithTooltipIsEnabled(String tooltipText)
+        throws RemoteException;
 
-    public void closeShell(String title) throws RemoteException;
+    public void setTextInTextWithLabel(String text, String label)
+        throws RemoteException;
+
+    public String getLabelText() throws RemoteException;
 
     /**
      * TODO don't work now
@@ -27,4 +44,6 @@ public interface BasicComponent extends Remote {
      * @throws RemoteException
      */
     public String getPathToScreenShot() throws RemoteException;
+
+    public boolean isButtonEnabled(String mnemonicText) throws RemoteException;
 }

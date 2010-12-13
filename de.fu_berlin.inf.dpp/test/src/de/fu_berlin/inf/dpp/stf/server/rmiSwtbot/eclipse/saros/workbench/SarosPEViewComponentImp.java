@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -90,17 +89,17 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
 
     public void confirmWindowInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        windowPart.activateShellWithText(INVITATION);
-        windowPart.confirmWindowWithCheckBox(INVITATION, FINISH,
-            baseJIDOfinvitees);
+        shellC.activateShellWithText(INVITATION);
+        shellC.confirmWindowWithCheckBox(INVITATION, FINISH, baseJIDOfinvitees);
     }
 
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
         throws RemoteException {
-        if (!windowPart.activateShellWithText(SESSION_INVITATION))
-            windowPart.waitUntilShellActive(SESSION_INVITATION);
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
         confirmFirstPageOfWizardSessionInvitation();
         confirmSecondPageOfWizardSessionInvitationUsingNewproject();
+
     }
 
     public void confirmWizardSessionInvitationUsingExistProject(
@@ -118,37 +117,37 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWizardSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
         confirmFirstPageOfWizardSessionInvitation();
-        confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(projectName);
+        confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(projectName);
     }
 
     public void confirmFirstPageOfWizardSessionInvitation()
         throws RemoteException {
         bot.button(NEXT).click();
-        basicPart.waitUntilButtonIsEnabled(FINISH);
+        basicC.waitUntilButtonEnabled(FINISH);
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()
         throws RemoteException {
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
-        try {
-            windowPart.waitLongUntilShellCloses(bot.shell(SESSION_INVITATION));
-        } catch (TimeoutException e) {
-            /*
-             * sometimes session can not be completely builded because of
-             * unclear reason, so after timeout STF try to close
-             * "the sesion invitation" window, but it can't close the window
-             * before stopping the invitation process. In this case a Special
-             * treatment should be done, so that the following tests still will
-             * be run.
-             */
-            basicC.captureScreenshot(basicC.getPathToScreenShot()
-                + "/sessionInvitationFailedUsingNewProject.png");
-            if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
-                bot.activeShell().bot().toggleButton().click();
-            }
-            throw new RuntimeException("session invitation is failed!");
-        }
+        shellC.waitUntilShellClosed(SESSION_INVITATION);
+        // try {
+        // shellC.waitLongUntilShellClosed(bot.shell(SESSION_INVITATION));
+        // } catch (TimeoutException e) {
+        /*
+         * sometimes session can not be completely builded because of unclear
+         * reason, so after timeout STF try to close "the sesion invitation"
+         * window, but it can't close the window before stopping the invitation
+         * process. In this case a Special treatment should be done, so that the
+         * following tests still will be run.
+         */
+        // basicC.captureScreenshot(basicC.getPathToScreenShot()
+        // + "/sessionInvitationFailedUsingNewProject.png");
+        // if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+        // bot.activeShell().bot().toggleButton().click();
+        // }
+        // throw new RuntimeException("session invitation is failed!");
+        // }
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingExistProject(
@@ -176,11 +175,11 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          */
         // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
         // }
-        if (basicC.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
-            windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
+        if (shellC.isShellOpen(WARNING_LOCAL_CHANGES_DELETED))
+            shellC.confirmShell(WARNING_LOCAL_CHANGES_DELETED, YES);
 
-        if (basicC.isShellActive("Save Resource")) {
-            windowPart.confirmWindow("Save Resource", YES);
+        if (shellC.isShellActive("Save Resource")) {
+            shellC.confirmShell("Save Resource", YES);
         }
 
         // windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
@@ -194,17 +193,17 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (basicC.isShellActive(SESSION_INVITATION)) {
-            try {
-                windowPart.waitLongUntilShellCloses(bot
-                    .shell(SESSION_INVITATION));
-            } catch (TimeoutException e) {
-                basicC.captureScreenshot(basicC.getPathToScreenShot()
-                    + "/sessionInvitationFailedUsingExistProject.png");
-                if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
-                    bot.activeShell().bot().toggleButton().click();
-                }
-            }
+        if (shellC.isShellActive(SESSION_INVITATION)) {
+            shellC.waitUntilShellClosed(SESSION_INVITATION);
+            // try {
+            // shellC.waitLongUntilShellClosed(bot.shell(SESSION_INVITATION));
+            // } catch (TimeoutException e) {
+            // basicC.captureScreenshot(basicC.getPathToScreenShot()
+            // + "/sessionInvitationFailedUsingExistProject.png");
+            // if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+            // bot.activeShell().bot().toggleButton().click();
+            // }
+            // }
         }
     }
 
@@ -213,16 +212,16 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         bot.radio("Use existing project").click();
         bot.textWithLabel("Project name", 1).setText(projectName);
         bot.button(FINISH).click();
-        windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, NO);
+        shellC.confirmShell(WARNING_LOCAL_CHANGES_DELETED, NO);
     }
 
-    public void confirmPageTwoOfWizardSessionInvitationUsingExistProjectWithCopy(
+    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
         bot.radio("Use existing project").click();
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        windowPart.waitUntilShellClosed(SESSION_INVITATION);
+        shellC.waitUntilShellClosed(SESSION_INVITATION);
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
@@ -235,7 +234,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWizardSessionInvitationUsingWhichProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
-        windowPart.waitUntilShellActive(SESSION_INVITATION);
+        shellC.waitUntilShellActive(SESSION_INVITATION);
         switch (usingWhichProject) {
         case NEW_PROJECT:
             confirmWirzardSessionInvitationWithNewProject(projectName);
@@ -255,32 +254,32 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     }
 
     public boolean isWindowInvitationCancelledActive() throws RemoteException {
-        return basicC.isShellActive(INVITATIONCANCELLED);
+        return shellC.isShellActive(INVITATIONCANCELLED);
     }
 
     public void closeWindowInvitationCancelled() throws RemoteException {
-        basicC.closeShell(INVITATIONCANCELLED);
+        shellC.closeShell(INVITATIONCANCELLED);
     }
 
     public void waitUntilWindowInvitationCnacelledActive()
         throws RemoteException {
-        windowPart.waitUntilShellActive(INVITATIONCANCELLED);
+        shellC.waitUntilShellActive(INVITATIONCANCELLED);
     }
 
     public boolean isWIndowSessionInvitationActive() throws RemoteException {
-        return basicC.isShellActive(SESSION_INVITATION);
+        return shellC.isShellActive(SESSION_INVITATION);
     }
 
     public void closeWIndowSessionInvitation() throws RemoteException {
-        basicC.closeShell(SESSION_INVITATION);
+        shellC.closeShell(SESSION_INVITATION);
     }
 
     public void waitUntilWindowSessionInvitationActive() throws RemoteException {
-        windowPart.waitUntilShellActive(SESSION_INVITATION);
+        shellC.waitUntilShellActive(SESSION_INVITATION);
     }
 
     public void waitUntilWindowProblemOccurredActive() throws RemoteException {
-        basicC.isShellActive(PROBLEMOCCURRED);
+        shellC.isShellActive(PROBLEMOCCURRED);
     }
 
     public String getSecondLabelOfWindowProblemOccurred()

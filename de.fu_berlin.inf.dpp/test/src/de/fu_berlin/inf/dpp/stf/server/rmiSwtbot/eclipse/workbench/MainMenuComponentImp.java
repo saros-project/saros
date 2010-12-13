@@ -57,7 +57,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
         }
         bot.button("Apply").click();
         bot.button(OK).click();
-        windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
     public String getTextFileLineDelimiter() throws RemoteException {
@@ -66,17 +66,17 @@ public class MainMenuComponentImp extends EclipseComponent implements
         tree.expandNode("General").select("Workspace");
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            basicC.closeShell(SHELL_PREFERNCES);
+            shellC.closeShell(SHELL_PREFERNCES);
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            basicC.closeShell(SHELL_PREFERNCES);
+            shellC.closeShell(SHELL_PREFERNCES);
             return itemName;
         }
-        basicC.closeShell(SHELL_PREFERNCES);
+        shellC.closeShell(SHELL_PREFERNCES);
         return "";
     }
 
@@ -164,7 +164,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
         workbenchC.activateEclipseShell();
         clickMenuWithTexts(MENU_TITLE_WINDOW, MENU_TITLE_SHOW_VIEW,
             MENU_TITLE_OTHER);
-        windowPart.confirmWindowWithTreeWithFilterText(MENU_TITLE_SHOW_VIEW,
+        shellC.confirmShellWithTreeWithFilterText(MENU_TITLE_SHOW_VIEW,
             category, nodeName, OK);
 
     }

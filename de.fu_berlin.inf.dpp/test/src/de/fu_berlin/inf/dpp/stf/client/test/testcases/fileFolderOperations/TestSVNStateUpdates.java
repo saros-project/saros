@@ -97,11 +97,12 @@ public class TestSVNStateUpdates extends STFTest {
 
     @Override
     @After
-    public void after() throws RemoteException, InterruptedException {
+    public void after() throws Exception {
+        super.after();
         alice.leaveSessionHostFirstDone(bob);
         if (bob.pEV.isProjectExist(SVN_PROJECT))
             bob.pEV.deleteProject(SVN_PROJECT);
-        
+
         if (alice.pEV.isProjectExist(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
     }
