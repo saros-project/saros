@@ -8,7 +8,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
@@ -102,7 +101,7 @@ public abstract class EclipseComponent {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
 
-    protected void waitLongUntil(ICondition condition) throws TimeoutException {
+    protected void waitLongUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 

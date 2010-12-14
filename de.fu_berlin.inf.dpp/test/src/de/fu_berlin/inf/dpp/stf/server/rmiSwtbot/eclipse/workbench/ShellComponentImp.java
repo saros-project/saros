@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -172,9 +171,9 @@ public class ShellComponentImp extends EclipseComponent implements
         bot.sleep(10);
     }
 
-    public void waitLongUntilShellClosed(SWTBotShell shell)
-        throws RemoteException, TimeoutException {
-        waitLongUntil(shellCloses(shell));
+    public void waitLongUntilShellClosed(String shellText)
+        throws RemoteException {
+        waitLongUntil(SarosConditions.isShellClosed(bot, shellText));
     }
 
     /**********************************************

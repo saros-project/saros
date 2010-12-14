@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.concurrent.TimeoutException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
@@ -114,13 +113,11 @@ public interface ShellComponent extends Remote {
     /**
      * waits until the given Shell is closed.
      * 
-     * @param shell
-     *            the sell,which you want to close.
+     * @param title
+     *            the title of the shell.
      * @throws RemoteException
-     * @throws TimeoutException
      */
-    public void waitLongUntilShellClosed(SWTBotShell shell)
-        throws RemoteException, TimeoutException;
+    public void waitLongUntilShellClosed(String title) throws RemoteException;
 
     /**********************************************
      * 

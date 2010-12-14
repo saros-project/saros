@@ -178,6 +178,8 @@ public class TestSessionViewComponent extends STFTest {
     }
 
     @Test
+    @Ignore
+    // FIXME dialog with error message "Xuggler not installed"
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         alice.shareYourScreenWithSelectedUserDone(bob);

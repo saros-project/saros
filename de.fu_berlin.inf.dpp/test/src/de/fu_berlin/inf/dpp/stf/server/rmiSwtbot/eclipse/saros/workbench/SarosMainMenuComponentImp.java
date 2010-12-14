@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
@@ -59,8 +58,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public boolean isAccountExist(JID jid, String password)
         throws RemoteException {
-        ArrayList<XMPPAccount> allAccounts = xmppAccountStore.getAllAccounts();
-        for (XMPPAccount account : allAccounts) {
+        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
             log.debug("account id: " + account.getId());
             log.debug("account username: " + account.getUsername());
             log.debug("account password: " + account.getPassword());
@@ -185,8 +183,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
      **************************************************************/
 
     private XMPPAccount getXMPPAccount(JID id) {
-        ArrayList<XMPPAccount> allAccounts = xmppAccountStore.getAllAccounts();
-        for (XMPPAccount account : allAccounts) {
+        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
             if (localJID.getName().equals(account.getUsername())
                 && localJID.getDomain().equals(account.getServer())) {
                 return account;

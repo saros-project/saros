@@ -138,24 +138,24 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         throws RemoteException {
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
-        shellC.waitUntilShellClosed(SESSION_INVITATION);
-        // try {
-        // shellC.waitLongUntilShellClosed(bot.shell(SESSION_INVITATION));
-        // } catch (TimeoutException e) {
-        /*
-         * sometimes session can not be completely builded because of unclear
-         * reason, so after timeout STF try to close "the sesion invitation"
-         * window, but it can't close the window before stopping the invitation
-         * process. In this case a Special treatment should be done, so that the
-         * following tests still will be run.
-         */
-        // basicC.captureScreenshot(basicC.getPathToScreenShot()
-        // + "/sessionInvitationFailedUsingNewProject.png");
-        // if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
-        // bot.activeShell().bot().toggleButton().click();
-        // }
-        // throw new RuntimeException("session invitation is failed!");
-        // }
+        try {
+            shellC.waitLongUntilShellClosed(SESSION_INVITATION);
+        } catch (Exception e) {
+            /*
+             * sometimes session can not be completely builded because of
+             * unclear reason, so after timeout STF try to close
+             * "the sesion invitation" window, but it can't close the window
+             * before stopping the invitation process. In this case a Special
+             * treatment should be done, so that the following tests still will
+             * be run.
+             */
+            workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
+                + "/sessionInvitationFailedUsingNewProject.png");
+            if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+                bot.activeShell().bot().toggleButton().click();
+            }
+            throw new RuntimeException("session invitation is failed!");
+        }
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingExistProject(
@@ -202,16 +202,15 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
          * window "Session Invitation" is still open at all.
          */
         if (shellC.isShellActive(SESSION_INVITATION)) {
-            shellC.waitUntilShellClosed(SESSION_INVITATION);
-            // try {
-            // shellC.waitLongUntilShellClosed(bot.shell(SESSION_INVITATION));
-            // } catch (TimeoutException e) {
-            // basicC.captureScreenshot(basicC.getPathToScreenShot()
-            // + "/sessionInvitationFailedUsingExistProject.png");
-            // if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
-            // bot.activeShell().bot().toggleButton().click();
-            // }
-            // }
+            try {
+                shellC.waitLongUntilShellClosed(SESSION_INVITATION);
+            } catch (Exception e) {
+                workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
+                    + "/sessionInvitationFailedUsingExistProject.png");
+                if (bot.activeShell().getText().equals(SESSION_INVITATION)) {
+                    bot.activeShell().bot().toggleButton().click();
+                }
+            }
         }
     }
 
@@ -229,7 +228,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        shellC.waitUntilShellClosed(SESSION_INVITATION);
+        shellC.waitLongUntilShellClosed(SESSION_INVITATION);
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
