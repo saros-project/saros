@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.accountManagement;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -112,12 +114,8 @@ public class XMPPAccountStore {
                 "XMPPAccountManager has invalid state!");
     }
 
-    public ArrayList<XMPPAccount> getAllAccounts() {
-        return this.accounts;
-    }
-
-    public boolean isJabberAccountActive(XMPPAccount account) {
-        return account.isActive();
+    public List<XMPPAccount> getAllAccounts() {
+        return Collections.unmodifiableList(this.accounts);
     }
 
     /**

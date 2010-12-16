@@ -92,8 +92,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     public Menu getMenu(Control parent) {
         accountMenu = new Menu(parent);
-        List<XMPPAccount> accounts = accountService.getAllAccounts();
-        for (XMPPAccount account : accounts) {
+        for (XMPPAccount account : accountService.getAllAccounts()) {
             this.currentAccountId = account.getId();
             addMenuItem(account.toString());
         }

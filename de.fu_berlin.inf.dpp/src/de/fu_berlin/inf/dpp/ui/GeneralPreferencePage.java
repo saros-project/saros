@@ -19,8 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
-import java.util.ArrayList;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -160,11 +158,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
             | SWT.V_SCROLL);
         GridData data = new GridData(GridData.FILL_BOTH);
         accountList.setLayoutData(data);
-        ArrayList<XMPPAccount> accounts = accountStore.getAllAccounts();
-        if (accounts.size() == 0) {
-            accountStore.loadAccounts();
-        }
-        for (XMPPAccount account : accounts) {
+        for (XMPPAccount account : accountStore.getAllAccounts()) {
             accountList.add(account.toString());
         }
         accountList.addSelectionListener(new SelectionListener() {
@@ -370,8 +364,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     public void updateList() {
         accountList.removeAll();
-        ArrayList<XMPPAccount> accounts = accountStore.getAllAccounts();
-        for (XMPPAccount account : accounts) {
+        for (XMPPAccount account : accountStore.getAllAccounts()) {
             accountList.add(account.toString());
         }
     }
