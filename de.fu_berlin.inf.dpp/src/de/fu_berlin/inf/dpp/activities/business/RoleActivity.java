@@ -91,16 +91,12 @@ public class RoleActivity extends AbstractActivity {
             + this.getRole() + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new RoleActivityDataObject(source.getJID(), affectedUser
-            .getJID(), role);
+        return new RoleActivityDataObject(source.getJID(),
+            affectedUser.getJID(), role);
     }
 }

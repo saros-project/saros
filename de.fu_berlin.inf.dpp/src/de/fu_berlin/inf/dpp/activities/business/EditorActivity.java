@@ -118,10 +118,6 @@ public class EditorActivity extends AbstractActivity {
             + (this.path != null ? this.path : "no path") + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

@@ -23,22 +23,19 @@ public class ChangeColorActivity extends AbstractActivity {
         this.color = color;
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new ChangeColorActivityDataObject(source.getJID(), target
-            .getJID(), this.color);
+        return new ChangeColorActivityDataObject(source.getJID(),
+            target.getJID(), this.color);
     }
 
     @Override
     public String toString() {
-        return "ChangeColorActivity(" + source + " " + target + " " + color + ")";
+        return "ChangeColorActivity(" + source + " " + target + " " + color
+            + ")";
     }
 
     public User getTarget() {

@@ -103,10 +103,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             param1);
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

@@ -89,10 +89,6 @@ public class ChecksumActivity extends AbstractActivity {
             + length + ",vectorTime:" + jupiterTimestamp + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
@@ -145,7 +141,7 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new ChecksumActivityDataObject(source.getJID(), path
-            .toSPathDataObject(sarosSession), hash, length);
+        return new ChecksumActivityDataObject(source.getJID(),
+            path.toSPathDataObject(sarosSession), hash, length);
     }
 }

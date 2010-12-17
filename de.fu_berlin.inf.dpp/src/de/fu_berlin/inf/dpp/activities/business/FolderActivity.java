@@ -66,10 +66,6 @@ public class FolderActivity extends AbstractActivity implements
         return "FolderActivity(type: " + type + ", path: " + path + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

@@ -38,8 +38,8 @@ public class PingPongActivity extends AbstractActivity {
     }
 
     public IActivity createPong(User localUser) {
-        return new PingPongActivity(localUser, getInitiator(), this
-            .getDepartureTime());
+        return new PingPongActivity(localUser, getInitiator(),
+            this.getDepartureTime());
     }
 
     @Override
@@ -49,16 +49,12 @@ public class PingPongActivity extends AbstractActivity {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new PingPongActivityDataObject(source.getJID(), initiator
-            .getJID(), departureTime);
+        return new PingPongActivityDataObject(source.getJID(),
+            initiator.getJID(), departureTime);
     }
 }

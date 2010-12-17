@@ -62,10 +62,6 @@ public class ChecksumErrorActivity extends AbstractActivity {
         this.recoveryID = recoveryID;
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

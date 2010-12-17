@@ -97,16 +97,12 @@ public class JupiterActivity extends AbstractActivity {
         return this.editor;
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new JupiterActivityDataObject(timestamp, operation, source
-            .getJID(), editor.toSPathDataObject(sarosSession));
+        return new JupiterActivityDataObject(timestamp, operation,
+            source.getJID(), editor.toSPathDataObject(sarosSession));
     }
 }

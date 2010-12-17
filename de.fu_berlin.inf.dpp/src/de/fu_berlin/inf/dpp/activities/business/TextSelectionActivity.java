@@ -93,10 +93,6 @@ public class TextSelectionActivity extends AbstractActivity {
             + this.length + ",src:" + getSource() + ",path:" + this.path + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
-    }
-
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

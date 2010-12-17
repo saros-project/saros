@@ -34,8 +34,8 @@ public class ViewportActivity extends AbstractActivity {
 
     public ViewportActivity(User source, ILineRange viewport, SPath editor) {
 
-        this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
-            .getStartLine())
+        this(source, Math.max(0, viewport.getStartLine()), Math.max(0,
+            viewport.getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
     }
 
@@ -90,10 +90,6 @@ public class ViewportActivity extends AbstractActivity {
     public String toString() {
         return "ViewportActivity(path:" + this.path + ",range:("
             + this.topIndex + "," + this.bottomIndex + "))";
-    }
-
-    public boolean dispatch(IActivityConsumer consumer) {
-        return consumer.consume(this);
     }
 
     public void dispatch(IActivityReceiver receiver) {
