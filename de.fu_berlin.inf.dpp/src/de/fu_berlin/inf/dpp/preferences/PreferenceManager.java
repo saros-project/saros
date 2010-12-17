@@ -38,7 +38,8 @@ public class PreferenceManager extends AbstractSarosSessionListener {
 
     protected List<IRestorePoint> restorePoints = new ArrayList<IRestorePoint>();
 
-    public PreferenceManager(JDTFacade jdtFacade, SarosSessionManager sessionManager) {
+    public PreferenceManager(JDTFacade jdtFacade,
+        SarosSessionManager sessionManager) {
 
         // collect PreferenceManipulators
         if (jdtFacade.isJDTAvailable()) {
@@ -50,6 +51,7 @@ public class PreferenceManager extends AbstractSarosSessionListener {
         sessionManager.addSarosSessionListener(this);
     }
 
+    @Override
     public void sessionStarted(ISarosSession newSarosSession) {
 
         // TODO The user should be told that we are changing options...
@@ -72,11 +74,13 @@ public class PreferenceManager extends AbstractSarosSessionListener {
         }
     }
 
+    @Override
     public void sessionEnded(ISarosSession oldSarosSession) {
         // TODO we should monitor the preferences for changes during the
         // session
         for (IRestorePoint restorePoint : restorePoints) {
             restorePoint.restore();
         }
+        restorePoints.clear();
     }
 }

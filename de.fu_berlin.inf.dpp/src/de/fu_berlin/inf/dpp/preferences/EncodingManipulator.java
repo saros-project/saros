@@ -63,6 +63,8 @@ public class EncodingManipulator implements IPreferenceManipulator {
      * be <code>null</code> to set <em>no</em> encoding on project level.
      */
     protected void setEncoding(IProject project, @Nullable String encoding) {
+        if (!project.exists())
+            return;
         BlockingProgressMonitor monitor = new BlockingProgressMonitor();
         try {
             project.setDefaultCharset(encoding, monitor);
