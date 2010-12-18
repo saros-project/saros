@@ -8,6 +8,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
@@ -19,32 +20,31 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.ui.ChangeColorDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This action opens a color dialog and checks whether the chosen color
- * is different enough from other colors.
- * If yes, the new color will be sent to the sessionmembers
- * If no, you can change a new color or abort the process
+ * This action opens a color dialog and checks whether the chosen color is
+ * different enough from other colors. If yes, the new color will be sent to the
+ * sessionmembers If no, you can change a new color or abort the process
  * 
  * @author cnk and tobi
  */
 @Component(module = "action")
-public class ChangeColorAction extends SelectionProviderAction implements Disposable {
+public class ChangeColorAction extends SelectionProviderAction implements
+    Disposable {
 
-    private static final Logger log = Logger
-    .getLogger(ChangeColorAction.class.getName());
+    private static final Logger log = Logger.getLogger(ChangeColorAction.class);
 
     @Inject
     protected ISarosSessionManager sessionManager;
 
     @Inject
     protected Saros saros;
-    
+
     @Inject
     protected EditorManager editorManager;
 
@@ -54,7 +54,7 @@ public class ChangeColorAction extends SelectionProviderAction implements Dispos
 
         setToolTipText("changes your session colour");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
-        
+
         selectionChanged(getStructuredSelection());
     }
 
@@ -63,7 +63,7 @@ public class ChangeColorAction extends SelectionProviderAction implements Dispos
         setEnabled(sessionManager.getSarosSession() != null
             && getSelectedUser() != null);
     }
-    
+
     /**
      * @review runSafe OK
      */
@@ -72,36 +72,42 @@ public class ChangeColorAction extends SelectionProviderAction implements Dispos
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 boolean done = false;
-                ChangeColorDialog changeColor = new ChangeColorDialog(EditorAPI.getShell(), sessionManager.getSarosSession(), "Please choose your color");
+                ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());
+                changeColor.setText("Please choose your color");
                 while (!done) {
                     RGB selectedColor = changeColor.open();
-                    if(selectedColor==null){
+                    if (selectedColor == null) {
                         break;
                     }
-                    User localUser = sessionManager.getSarosSession().getLocalUser();
-                    
+                    ISarosSession sarosSession = sessionManager
+                        .getSarosSession();
+                    User localUser = sarosSession.getLocalUser();
+
                     Collection<User> listOfUsers = new Vector<User>();
-                    listOfUsers.addAll(sessionManager.getSarosSession().getParticipants());
+                    listOfUsers.addAll(sarosSession.getParticipants());
                     listOfUsers.remove(localUser);
 
-                    if (ChangeColorManager.checkColor(selectedColor, listOfUsers)) {
+                    if (ChangeColorManager.checkColor(selectedColor,
+                        listOfUsers)) {
                         log.info(selectedColor + " was selected.");
                         SarosAnnotation.setUserColor(localUser, selectedColor);
                         for (User user : listOfUsers) {
-                            sessionManager.getSarosSession().sendActivity(user, new ChangeColorActivity(
-                                localUser, user, selectedColor));
+                            sarosSession.sendActivity(user,
+                                new ChangeColorActivity(localUser, user, 
+                                    selectedColor));
                         }
-                        editorManager.colorChangend();
+                        editorManager.colorChanged();
                         editorManager.refreshAnnotations();
                         done = true;
                     } else {
-                        MessageDialog.openInformation(EditorAPI.getShell(), "Color Information", "Please choose another color");
+                        MessageDialog.openInformation(EditorAPI.getShell(),
+                            "Color Information", "Please choose another color");
                     }
                 }
             }
         });
     }
-    
+
     public User getSelectedUser() {
         Object selected = getStructuredSelection().getFirstElement();
 

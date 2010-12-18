@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -27,7 +28,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.ChangeColorDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -38,8 +38,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "core")
 public class ChangeColorManager implements IActivityProvider {
 
-    private static final Logger log = Logger.getLogger(ChangeColorManager.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(ChangeColorManager.class);
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
     protected SarosSessionManager sessionManager;
@@ -72,7 +72,7 @@ public class ChangeColorManager implements IActivityProvider {
                 + " from user: " + user);
             SarosAnnotation.setUserColor(user, changeColorActivity.getColor());
 
-            editorManager.colorChangend();
+            editorManager.colorChanged();
             editorManager.refreshAnnotations();
         }
     }
@@ -123,10 +123,10 @@ public class ChangeColorManager implements IActivityProvider {
                     userList)) {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            ChangeColorDialog changeColor = new ChangeColorDialog(
-                                EditorAPI.getShell(), sessionManager
-                                    .getSarosSession(),
-                                "Color Conflict! Please choose a new color for "
+                            ColorDialog changeColor = new ColorDialog(EditorAPI
+                                .getShell());
+                            changeColor
+                                .setText("Color Conflict! Please choose a new color for "
                                     + newUser.getHumanReadableName());
                             rgbOfNewParticipant = changeColor.open();
                         }

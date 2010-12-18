@@ -66,6 +66,6 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "FollowActivityDataObject(" + source + " " + target + ")";
+        return "ChangeColorActivityDataObject(" + source + " " + target + ")";
     }
 }

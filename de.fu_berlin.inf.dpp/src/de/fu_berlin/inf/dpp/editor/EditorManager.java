@@ -1766,7 +1766,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         return remoteEditorManager.getRemoteOpenEditors();
     }
 
-    public void colorChangend() {
+    public void colorChanged() {
         this.execColorChanged();
     }
 
