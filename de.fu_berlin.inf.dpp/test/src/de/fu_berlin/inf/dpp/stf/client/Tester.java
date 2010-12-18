@@ -157,18 +157,19 @@ public class Tester extends STFTest {
      */
     public void leaveSessionHostFirstDone(Tester... peers)
         throws RemoteException, InterruptedException {
-        sessionV.leaveTheSessionByHost();
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < peers.length; i++) {
-            final Tester tester = peers[i];
-            closeSessionTasks.add(new Callable<Void>() {
-                public Void call() throws Exception {
-                    // Need to check for isDriver before leaving.
-                    tester.sessionV.confirmClosingTheSessionWindow();
-                    return null;
-                }
-            });
+        for (final Tester tester : peers) {
+            if (tester.sessionV.isInSession()) {
+                closeSessionTasks.add(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        // Need to check for isDriver before leaving.
+                        tester.sessionV.confirmClosingTheSessionWindow();
+                        return null;
+                    }
+                });
+            }
         }
+        sessionV.leaveTheSessionByHost();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 

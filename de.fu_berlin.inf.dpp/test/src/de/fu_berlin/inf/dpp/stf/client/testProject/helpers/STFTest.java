@@ -192,6 +192,14 @@ public class STFTest {
             tester.workbench.openSarosViews();
             tester.rosterV.connect(tester.jid, tester.password);
         }
+        // Now that everyone is connected, check buddy lists.
+        for (Tester tester : activeTesters) {
+            for (Tester otherTester : activeTesters) {
+                if (tester != otherTester) {
+                    tester.addBuddyGUIDone(otherTester);
+                }
+            }
+        }
     }
 
     public static void setUpSession(Tester host, Tester... invitees)
@@ -267,8 +275,7 @@ public class STFTest {
 
     public static void resetWorkbenches() throws RemoteException {
         for (Tester tester : activeTesters) {
-            if (tester != null)
-                tester.workbench.resetWorkbench();
+            tester.workbench.resetWorkbench();
         }
     }
 
