@@ -131,8 +131,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
             if (!mainMenuC.isAccountExist(jid, password)) {
-                mainMenuC.createAccount(jid.getName(), password,
-                    jid.getDomain());
+                mainMenuC.createAccount(jid.getDomain(), jid.getName(),
+                    password);
             }
             if (!mainMenuC.isAccountActive(jid))
                 mainMenuC.activateAccount(jid);
@@ -498,6 +498,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
         item.contextMenu(CM_INVITE_USER).click();
     }
 
+    public void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException {
+        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
+    }
+
     /**************************************************************
      * 
      * Inner functions
@@ -535,17 +540,6 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     protected boolean isToolbarButtonEnabled(String tooltip) {
         return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
-    }
-
-    /**
-     * click the toolbar button specified with the given tooltip.
-     * 
-     * @param tooltipText
-     *            the tooltip text of the toolbar button which you want to
-     *            click.
-     */
-    protected void clickToolbarButtonWithTooltip(String tooltipText) {
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
     }
 
     /**

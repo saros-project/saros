@@ -22,6 +22,17 @@ public interface ShellComponent extends Remote {
     public boolean activateShellWithText(String title) throws RemoteException;
 
     /**
+     * This method first check, if the given shell is already open, if not, then
+     * waits until the shell is open before activating the shell.
+     * 
+     * @param title
+     *            the title of the shell.
+     * @throws RemoteException
+     */
+    public void activateShellWaitingUntilOpened(String title)
+        throws RemoteException;
+
+    /**
      * activate the shell specified with the given regex.
      * 
      * @param regex

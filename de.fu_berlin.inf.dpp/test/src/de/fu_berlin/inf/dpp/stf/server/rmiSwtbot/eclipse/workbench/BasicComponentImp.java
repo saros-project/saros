@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
@@ -75,7 +76,14 @@ public class BasicComponentImp extends EclipseComponent implements
      **********************************************/
     public String geFirsttLabelText() throws RemoteException {
         return bot.label().getText();
-
     }
 
+    public boolean existsLabel(String label) throws RemoteException {
+        try {
+            bot.label(label);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
 }

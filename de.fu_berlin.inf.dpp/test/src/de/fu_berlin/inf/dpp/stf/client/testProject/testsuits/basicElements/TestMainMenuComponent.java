@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
 
 public class TestMainMenuComponent extends STFTest {
@@ -28,14 +30,22 @@ public class TestMainMenuComponent extends STFTest {
 
     /* All infos about the shell "Create New User Account" */
     private final static String SHELL_CREATE_NEW_USER_ACCOUNT = "Create New User Account";
-    private final static String JABBER_SERVER = "Jabber Server";
-    private final static String USER_NAME = "Username";
-    private final static String PASSWORD = "Password";
-    private final static String REPEAT_PASSWORD = "Repeat Password";
+    private final static String LABEL_JABBER_SERVER = "Jabber Server";
+    private final static String LABEL_USER_NAME = "Username";
+    private final static String LABEL_PASSWORD = "Password";
+    private final static String LABEL_REPEAT_PASSWORD = "Repeat Password";
 
+    /* Error massage */
     private final static String ERROR_MESSAGE_PASSWORDS_NOT_MATCH = "Passwords don't match.";
     private final static String ERROR_MESSAGE_COULD_NOT_CONNECT = "Could not connect.*";
     private final static String ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS = "conflict(409): Account already exists";
+
+    /* infos about the added account */
+    private final static String SERVER = "saros-con.imp.fu-berlin.de";
+    private final static String USERNAME = "lin";
+    private final static String PASSWORD = "lin";
+    private final static String JID_ANOTHER_ACCOUNT = ("lin@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+    private final static JID ANOTHER_JID = new JID(JID_ANOTHER_ACCOUNT);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
@@ -50,13 +60,19 @@ public class TestMainMenuComponent extends STFTest {
     }
 
     @Before
-    public void runBeforeEveryTest() {
+    public void runBeforeEveryTest() throws RemoteException {
         //
     }
 
     @After
-    public void runAfterEveryTest() {
-        //
+    public void runAfterEveryTest() throws RemoteException {
+        if (!alice.mainMenu.isAccountExist(alice.jid, alice.password))
+            alice.mainMenu.createAccount(alice.jid.getDomain(),
+                alice.jid.getName(), alice.password);
+        if (!alice.mainMenu.isAccountActive(alice.jid))
+            alice.mainMenu.activateAccount(alice.jid);
+        if (alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD))
+            alice.mainMenu.deleteAccount(ANOTHER_JID);
     }
 
     /**********************************************
@@ -69,10 +85,11 @@ public class TestMainMenuComponent extends STFTest {
         alice.mainMenu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel(bob.getXmppServer(), JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel(bob.getName(), USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password, REPEAT_PASSWORD);
+        alice.basic.setTextInTextWithLabel(bob.getXmppServer(),
+            LABEL_JABBER_SERVER);
+        alice.basic.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basic.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
         assertTrue(alice.basic.isButtonEnabled(FINISH));
         alice.basic.clickButton(FINISH);
         // wait a minute,so that bot can get the error message.
@@ -92,10 +109,12 @@ public class TestMainMenuComponent extends STFTest {
         alice.mainMenu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel(bob.getXmppServer(), JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel(bob.getName(), USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password + "d", REPEAT_PASSWORD);
+        alice.basic.setTextInTextWithLabel(bob.getXmppServer(),
+            LABEL_JABBER_SERVER);
+        alice.basic.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basic.setTextInTextWithLabel(bob.password + "d",
+            LABEL_REPEAT_PASSWORD);
         assertFalse(alice.basic.isButtonEnabled(FINISH));
         String errorMessage = alice.shell
             .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
@@ -109,10 +128,11 @@ public class TestMainMenuComponent extends STFTest {
         alice.mainMenu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel("invalid server", JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel("invalid name", USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password, REPEAT_PASSWORD);
+        alice.basic.setTextInTextWithLabel("invalid server",
+            LABEL_JABBER_SERVER);
+        alice.basic.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
+        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basic.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
         assertTrue(alice.basic.isButtonEnabled(FINISH));
         alice.basic.clickButton(FINISH);
         alice.basic.waitUntilButtonEnabled(FINISH);
@@ -121,5 +141,76 @@ public class TestMainMenuComponent extends STFTest {
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
         alice.shell.confirmShell(SHELL_CREATE_NEW_USER_ACCOUNT, CANCEL);
         assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_USER_ACCOUNT));
+    }
+
+    @Test
+    public void addAndActivateAccount() throws RemoteException {
+        assertFalse(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        alice.mainMenu.createAccount(SERVER, USERNAME, PASSWORD);
+        assertTrue(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        assertTrue(alice.mainMenu.isAccountActive(alice.jid));
+        assertFalse(alice.mainMenu.isAccountActive(ANOTHER_JID));
+        alice.mainMenu.activateAccount(ANOTHER_JID);
+        assertTrue(alice.mainMenu.isAccountActive(ANOTHER_JID));
+        assertFalse(alice.mainMenu.isAccountActive(alice.jid));
+    }
+
+    @Test
+    public void addAndActivateAcountGUI() throws RemoteException {
+        assertFalse(alice.mainMenu.isAccountExistGUI(ANOTHER_JID, PASSWORD));
+        alice.mainMenu.addAccountGUI(ANOTHER_JID, PASSWORD);
+        assertTrue(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        assertTrue(alice.mainMenu.isAccountActive(alice.jid));
+        assertFalse(alice.mainMenu.isAccountActive(ANOTHER_JID));
+        alice.mainMenu.activateAccountGUI(ANOTHER_JID, PASSWORD);
+        assertTrue(alice.mainMenu.isAccountActive(ANOTHER_JID));
+        assertFalse(alice.mainMenu.isAccountActive(alice.jid));
+    }
+
+    @Test
+    public void changeAccount() throws RemoteException {
+        assertTrue(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        assertTrue(alice.mainMenu.isAccountActive(alice.jid));
+        alice.mainMenu.changeAccount(alice.jid, USERNAME, PASSWORD, SERVER);
+        assertFalse(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        assertFalse(alice.mainMenu.isAccountActive(alice.jid));
+        assertTrue(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        assertTrue(alice.mainMenu.isAccountActive(ANOTHER_JID));
+
+    }
+
+    @Test
+    public void changeAccountGUI() throws RemoteException {
+        assertTrue(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        assertTrue(alice.mainMenu.isAccountActive(alice.jid));
+        alice.mainMenu.changeAccountGUI(alice.jid, USERNAME, PASSWORD, SERVER);
+        assertFalse(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        assertFalse(alice.mainMenu.isAccountActive(alice.jid));
+        assertTrue(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        assertTrue(alice.mainMenu.isAccountActive(ANOTHER_JID));
+    }
+
+    @Test
+    public void deleteActiveAccount() throws RemoteException {
+        assertTrue(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        alice.mainMenu.deleteAccount(alice.jid);
+        assertFalse(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+    }
+
+    @Test
+    public void deleteActiveAccountGUI() throws RemoteException {
+        assertTrue(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+        alice.mainMenu.deleteAccountGUI(alice.jid, alice.password);
+        assertTrue(alice.mainMenu.isAccountActive(alice.jid));
+        assertTrue(alice.mainMenu.isAccountExist(alice.jid, alice.password));
+    }
+
+    @Test
+    public void deleteInactiveAccountGUI() throws RemoteException {
+        assertFalse(alice.mainMenu.isAccountExistGUI(ANOTHER_JID, PASSWORD));
+        alice.mainMenu.addAccountGUI(ANOTHER_JID, PASSWORD);
+        assertTrue(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
+        alice.mainMenu.deleteAccountGUI(ANOTHER_JID, PASSWORD);
+        assertFalse(alice.mainMenu.isAccountExist(ANOTHER_JID, PASSWORD));
     }
 }

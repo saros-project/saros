@@ -111,4 +111,12 @@ public interface BasicComponent extends Remote {
      */
     public String geFirsttLabelText() throws RemoteException;
 
+    /**
+     * 
+     * @param label
+     *            the text of the label
+     * @return<tt>true</tt>, if the given label exists.
+     * @throws RemoteException
+     */
+    public boolean existsLabel(String label) throws RemoteException;
 }

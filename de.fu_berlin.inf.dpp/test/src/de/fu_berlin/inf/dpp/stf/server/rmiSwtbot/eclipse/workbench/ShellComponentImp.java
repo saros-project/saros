@@ -64,6 +64,14 @@ public class ShellComponentImp extends EclipseComponent implements
         return false;
     }
 
+    public void activateShellWaitingUntilOpened(String title)
+        throws RemoteException {
+        if (!isShellOpen(title)) {
+            waitUntilShellOpen(title);
+        }
+        activateShellWithText(title);
+    }
+
     public boolean isShellActive(String title) throws RemoteException {
         if (!isShellOpen(title))
             return false;

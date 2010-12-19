@@ -10,8 +10,18 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuCompo
 
 public interface SarosMainMenuComponent extends MainMenuComponent {
 
-    public void creatAccountGUI(JID jid, String password,
+    public void creatAccountWithMenuGUI(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException;
+
+    /**
+     * 
+     * @param server
+     * @param username
+     * @param password
+     * @throws RemoteException
+     */
+    public void createAccountInPeferencesGUI(String server, String username,
+        String password) throws RemoteException;
 
     /**
      * @param jid
@@ -27,6 +37,19 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
 
     /**
      * 
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the account specified by the given parameters
+     *         exists in preference store
+     * @throws RemoteException
+     */
+    public boolean isAccountExistGUI(JID jid, String password)
+        throws RemoteException;
+
+    /**
+     * 
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
@@ -35,6 +58,16 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      * @see XMPPAccount#isActive()
      */
     public boolean isAccountActive(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the acount specified by the given jid is active
+     * @throws RemoteException
+     */
+    public boolean isAccountActiveGUI(JID jid) throws RemoteException;
 
     /**
      * activate the account specified by the given jid
@@ -48,18 +81,31 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
     public void activateAccount(JID jid) throws RemoteException;
 
     /**
+     * acti.vate the account specified by the given jid
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param password
+     * @throws RemoteException
+     */
+    public void activateAccountGUI(JID jid, String password)
+        throws RemoteException;
+
+    /**
      * Creates an account.
      * 
+     * @param server
+     *            the server of the new account.
      * @param username
      *            the username of the new account.
      * @param password
      *            the password of the new account.
-     * @param server
-     *            the server of the new account.
+     * 
      * 
      * @throws RemoteException
      */
-    public void createAccount(String username, String password, String server)
+    public void createAccount(String server, String username, String password)
         throws RemoteException;
 
     /**
@@ -81,6 +127,23 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
         String newServer) throws RemoteException;
 
     /**
+     * change the account specified by the given jid
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param newUserName
+     *            the new username
+     * @param newPassword
+     *            the new password
+     * @param newServer
+     *            the new server
+     * @throws RemoteException
+     */
+    public void changeAccountGUI(JID jid, String newUserName,
+        String newPassword, String newServer) throws RemoteException;
+
+    /**
      * delete the account specified by the given jid
      * 
      * @param jid
@@ -89,6 +152,11 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      * @throws RemoteException
      */
     public void deleteAccount(JID jid) throws RemoteException;
+
+    public void addAccountGUI(JID jid, String password) throws RemoteException;
+
+    public void deleteAccountGUI(JID jid, String password)
+        throws RemoteException;
 
     /**********************************************
      * 

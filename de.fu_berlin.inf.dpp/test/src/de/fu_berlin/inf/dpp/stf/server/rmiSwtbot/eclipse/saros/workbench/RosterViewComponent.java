@@ -12,16 +12,15 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
  * the roster view. then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test.
- * (How to do it please look at the javadoc in class {@link TestPattern} or read
- * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link Tester} object in your junit-test. (How
+ * to do it please look at the javadoc in class {@link TestPattern} or read the
+ * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
  * after then you can use the object rosterV initialized in {@link Tester} to
  * access the API :), e.g.
@@ -63,9 +62,10 @@ public interface RosterViewComponent extends Remote {
      * <ol>
      * <li>Make sure, the roster view is open and active.</li>
      * <li>if the test account specified by the given jid doesn't exists, create
-     * it using {@link SarosState#createAccount(String, String, String)}</li>
+     * it using
+     * {@link SarosMainMenuComponent#createAccount(String, String, String)}</li>
      * <li>if the test account isn't active, then activate it using
-     * {@link SarosState#activateAccount(JID)}</li>
+     * {@link SarosMainMenuComponent#activateAccount(JID)}</li>
      * <li>Waits until the connection is really done. It guarantee that the
      * following action is running successfully.</li>
      * </ol>
@@ -386,8 +386,7 @@ public interface RosterViewComponent extends Remote {
      * This popup window should be appeared by you, after someone else deleted
      * your contact from his buddies.
      * 
-     * This method should be called by
-     * {@link Tester#deleteBuddyGUIDone(Tester)}
+     * This method should be called by {@link Tester#deleteBuddyGUIDone(Tester)}
      * 
      * @throws RemoteException
      */
@@ -450,4 +449,14 @@ public interface RosterViewComponent extends Remote {
      * 
      **********************************************/
     public void inviteUserGUI(JID buddyJID) throws RemoteException;
+
+    /**
+     * click the toolbar button specified with the given tooltip.
+     * 
+     * @param tooltipText
+     *            the tooltip text of the toolbar button which you want to
+     *            click.
+     */
+    public void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException;
 }

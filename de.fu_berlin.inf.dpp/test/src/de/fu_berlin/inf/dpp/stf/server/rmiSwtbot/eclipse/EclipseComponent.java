@@ -49,6 +49,7 @@ public abstract class EclipseComponent {
     protected final static String NO = "No";
     protected final static String CANCEL = "Cancel";
     protected final static String FINISH = "Finish";
+    protected final static String APPLY = "Apply";
     protected final static String NEXT = "Next >";
 
     public static final String SRC = "src";
@@ -229,6 +230,20 @@ public abstract class EclipseComponent {
                     throw e;
             }
         }
+    }
+
+    public enum TypeOfOS {
+        MAC, WINDOW
+    }
+
+    public TypeOfOS getOS() {
+        String osName = System.getProperty("os.name");
+        if (osName.matches("Windows.*"))
+            return TypeOfOS.WINDOW;
+        else if (osName.matches("Mac OS X.*")) {
+            return TypeOfOS.MAC;
+        }
+        return TypeOfOS.WINDOW;
     }
 
 }

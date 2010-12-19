@@ -49,11 +49,9 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
         Bundle bundle = saros.getBundle();
         log.debug("screenshot's directory: "
             + bundle.getLocation().substring(16) + SCREENSHOTDIR);
-        String osName = System.getProperty("os.name");
-        log.debug("Name of the OS: " + osName);
-        if (osName.matches("Windows.*"))
+        if (getOS() == TypeOfOS.WINDOW)
             return bundle.getLocation().substring(16) + SCREENSHOTDIR;
-        else if (osName.matches("Mac OS X.*")) {
+        else if (getOS() == TypeOfOS.MAC) {
             return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
         }
         return bundle.getLocation().substring(16) + SCREENSHOTDIR;

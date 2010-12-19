@@ -353,10 +353,10 @@ public class Tester extends STFTest {
 
     /**
      * This method is same as
-     * {@link Tester#buildSessionDoneConcurrently(String, String, Tester...)} .
-     * The difference to buildSessionConcurrently is that the invitation process
-     * is activated by clicking the toolbarbutton "open invitation interface" in
-     * the roster view.
+     * {@link Tester#buildSessionDoneConcurrently(String, TypeOfShareProject, TypeOfCreateProject, Tester...)}
+     * . The difference to buildSessionConcurrently is that the invitation
+     * process is activated by clicking the toolbarbutton
+     * "open invitation interface" in the roster view.
      * 
      * @param projectName
      *            the name of the project which is in a session now.

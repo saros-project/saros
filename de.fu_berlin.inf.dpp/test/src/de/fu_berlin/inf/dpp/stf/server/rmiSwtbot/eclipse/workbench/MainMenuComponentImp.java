@@ -31,13 +31,20 @@ public class MainMenuComponentImp extends EclipseComponent implements
     private static final String MENU_PREFERENCES = "Preferences";
     private static final String MENU_FILE = "File";
     private static final String MENU_IMPORT = "Import...";
+    public final static String MENU_OTHER = "Other...";
+    public final static String MENU_SHOW_VIEW = "Show View";
 
     /* title of shells which are pop up by clicking the main menus */
     private static final String SHELL_PREFERNCES = "Preferences";
 
-    public final static String MENU_TITLE_OTHER = "Other...";
-    public final static String MENU_TITLE_SHOW_VIEW = "Show View";
-    public final static String MENU_TITLE_WINDOW = "Window";
+    /* treeItems in Preferences dialog */
+    private static final String GENERAL = "General";
+    private static final String WORKSPACE = "Workspace";
+
+    /* treeItems in Show View dialog */
+    private static final String V_GENERAL = "General";
+    private static final String V_PROBLEM = "Problems";
+    private static final String V_PROJECT_EXPLORER = "Project Explorer";
 
     /***********************************************************************
      * 
@@ -47,14 +54,14 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * all related actions with preferences
+     * TreeItem: General->Workspaces in preferences dialog
      * 
      **********************************************/
 
     public void newTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode("General").select("Workspace");
+        tree.expandNode(GENERAL).select(WORKSPACE);
 
         if (OS.equals("Default")) {
             bot.radioInGroup("Default", "New text file line delimiter").click();
@@ -63,7 +70,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
             bot.comboBoxInGroup("New text file line delimiter")
                 .setSelection(OS);
         }
-        bot.button("Apply").click();
+        bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
@@ -71,7 +78,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode("General").select("Workspace");
+        tree.expandNode(GENERAL).select(WORKSPACE);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
             shellC.closeShell(SHELL_PREFERNCES);
@@ -94,11 +101,11 @@ public class MainMenuComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void showViewProblems() throws RemoteException {
-        openViewWithName("General", "Problems");
+        openViewWithName(V_GENERAL, V_PROBLEM);
     }
 
     public void showViewProjectExplorer() throws RemoteException {
-        openViewWithName("General", "Project Explorer");
+        openViewWithName(V_GENERAL, V_PROJECT_EXPLORER);
     }
 
     /**********************************************
@@ -206,7 +213,10 @@ public class MainMenuComponentImp extends EclipseComponent implements
     }
 
     public void clickMenuPreferences() throws RemoteException {
-        clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
+        if (getOS() == TypeOfOS.MAC)
+            clickMenuWithTexts("Eclipse", "Preferences...");
+        else
+            clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
     }
 
     /**
@@ -234,10 +244,9 @@ public class MainMenuComponentImp extends EclipseComponent implements
     public void openViewWithName(String category, String nodeName)
         throws RemoteException {
         workbenchC.activateEclipseShell();
-        clickMenuWithTexts(MENU_TITLE_WINDOW, MENU_TITLE_SHOW_VIEW,
-            MENU_TITLE_OTHER);
-        shellC.confirmShellWithTreeWithFilterText(MENU_TITLE_SHOW_VIEW,
-            category, nodeName, OK);
+        clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
+            nodeName, OK);
 
     }
 
