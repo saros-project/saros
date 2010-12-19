@@ -47,7 +47,6 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -61,9 +60,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -100,36 +97,32 @@ public class SarosSessionManager implements IConnectionListener,
     protected DiscoveryManager discoveryManager;
 
     @Inject
-    protected XMPPReceiver xmppReceiver;
-
-    @Inject
     protected XMPPTransmitter transmitter;
-
-    @Inject
-    protected DataTransferManager transferManager;
 
     @Inject
     protected SessionIDObservable sessionID;
 
     @Inject
+    // FIXME dependency of OIP
     protected StopManager stopManager;
 
     @Inject
+    // FIXME dependency of other classes
     protected InvitationProcessObservable invitationProcesses;
 
     @Inject
+    // FIXME dependency of other classes
     protected VersionManager versionManager;
-
-    @Inject
-    protected MUCManager mucManager;
 
     @Inject
     protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
 
     @Inject
+    // FIXME dependency of other class
     protected RosterTracker rosterTracker;
 
     @Inject
+    // FIXME dependency of other class
     protected DispatchThreadContext dispatchThreadContext;
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
@@ -165,8 +158,8 @@ public class SarosSessionManager implements IConnectionListener,
         this.doStreamingInvitation = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
 
-        SarosSession sarosSession = new SarosSession(this.transmitter, dispatchThreadContext,
-            new DateTime());
+        SarosSession sarosSession = new SarosSession(this.transmitter,
+            dispatchThreadContext, new DateTime());
         // TODO Add project after starting the session.
         sarosSession.addSharedProject(project, project.getName());
 
@@ -184,8 +177,8 @@ public class SarosSessionManager implements IConnectionListener,
     public ISarosSession joinSession(String projectID, IProject project,
         JID host, int colorID, DateTime sessionStart) {
 
-        SarosSession sarosSession = new SarosSession(this.transmitter, dispatchThreadContext,
-            host, colorID, sessionStart);
+        SarosSession sarosSession = new SarosSession(this.transmitter,
+            dispatchThreadContext, host, colorID, sessionStart);
         sarosSession.addSharedProject(project, projectID);
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -266,8 +259,9 @@ public class SarosSessionManager implements IConnectionListener,
         this.sessionID.setValue(sessionID);
 
         final IncomingInvitationProcess process = new IncomingInvitationProcess(
-            this.transmitter, from, projectName, description, colorID, invitationProcesses,
-            versionInfo, sessionStart, invitationID, doStream);
+            this.transmitter, from, projectName, description, colorID,
+            invitationProcesses, versionInfo, sessionStart, invitationID,
+            doStream);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Util.runSafeSWTAsync(log, new Runnable() {
@@ -351,7 +345,7 @@ public class SarosSessionManager implements IConnectionListener,
             transmitter, toInvite, sarosSession, partialProjectResources,
             toInviteTo, description, sarosSession.getFreeColor(),
             invitationProcesses, versionManager, stopManager, discoveryManager,
-            mucManager, comNegotiatingManager, doStreamingInvitation);
+            comNegotiatingManager, doStreamingInvitation);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);

@@ -46,7 +46,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -105,7 +104,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
     protected SubMonitor monitor;
     protected VersionManager versionManager;
-    protected MUCManager mucManager;
     protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
     protected StopManager stopManager;
     protected DiscoveryManager discoveryManager;
@@ -124,8 +122,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
-        DiscoveryManager discoveryManager, MUCManager mucManager,
-        MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
+        DiscoveryManager discoveryManager, MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
         boolean doStream) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
@@ -135,7 +132,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         this.versionManager = versionManager;
         this.stopManager = stopManager;
         this.discoveryManager = discoveryManager;
-        this.mucManager = mucManager;
         this.comNegotiatingManager = comNegotiatingManager;
         this.project = project;
         this.doStream = doStream;
@@ -442,6 +438,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // they have changed. How to ask Eclipse whether there are resource
             // changes?
             // if (outInvitationUI.confirmProjectSave(peer))
+            // TODO What if we're not a driver right now?
             EditorAPI.saveProject(this.project, false);
             // else
             // throw new LocalCancellationException();
@@ -494,6 +491,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
+    // FIXME duplicate code from createArchive()/sendArchive().
     protected void streamArchive(SubMonitor subMonitor)
         throws SarosCancellationException {
 
