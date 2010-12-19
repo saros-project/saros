@@ -58,7 +58,6 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
-import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -86,8 +85,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
     @Inject
     protected StopManager stopManager;
-
-    protected ITransmitter transmitter;
 
     protected ActivitySequencer activitySequencer;
 
@@ -157,17 +154,6 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     };
 
-    protected Blockable stopManagerListener = new Blockable() {
-
-        public void unblock() {
-            // TODO see #block()
-        }
-
-        public void block() {
-            // TODO find a way to effectively block the user from doing anything
-        }
-    };
-
     public static class QueueItem {
 
         public final List<User> recipients;
@@ -189,6 +175,10 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Common constructor code for host and client side.
      */
+    /*
+     * FIXME ITransmitter, DataTransferManager, and DispatchThreadContext are
+     * dependencies of ActivitySequencer, not SarosSession.
+     */
     protected SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, int myColorID,
         DateTime sessionStart) {
@@ -198,14 +188,12 @@ public class SarosSession implements ISarosSession, Disposable {
         assert transmitter != null;
         assert saros.getMyJID() != null;
 
-        this.transmitter = transmitter;
         this.sessionStart = sessionStart;
 
         this.localUser = new User(this, saros.getMyJID(), myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager, threadContext);
 
-        stopManager.addBlockable(stopManagerListener);
         activityDispatcher.setDaemon(true);
         activityDispatcher.start();
     }
@@ -214,8 +202,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * Constructor called for SarosSession of the host
      */
     public SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext,
-        DateTime sessionStart) {
+        DispatchThreadContext threadContext, DateTime sessionStart) {
 
         this(transmitter, threadContext, 0, sessionStart);
 
@@ -538,8 +525,6 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void dispose() {
-        stopManager.removeBlockable(stopManagerListener);
-
         if (concurrentDocumentServer != null) {
             concurrentDocumentServer.dispose();
         }
@@ -598,10 +583,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public ConcurrentDocumentServer getConcurrentDocumentServer() {
         return concurrentDocumentServer;
-    }
-
-    public ITransmitter getTransmitter() {
-        return transmitter;
     }
 
     public Saros getSaros() {

@@ -35,7 +35,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 
@@ -226,12 +225,6 @@ public interface ISarosSession extends IActivityListener {
      * @return the concurrent document manager
      */
     public ConcurrentDocumentClient getConcurrentDocumentClient();
-
-    /**
-     * The ITransmitter is the network component and responsible for
-     * transmitting changes to the other participants
-     */
-    public ITransmitter getTransmitter();
 
     /**
      * The Saros Plugin this SarosSession is running in.
