@@ -54,7 +54,7 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testNewTextFileLineDelimiter() throws RemoteException {
-        alice.mainMenu.newTextFileLineDelimiter("Unix");
+        alice.mainMenu.setNewTextFileLineDelimiter("Unix");
         System.out.println(alice.mainMenu.getTextFileLineDelimiter());
         assertTrue(alice.mainMenu.getTextFileLineDelimiter().equals("Unix"));
     }

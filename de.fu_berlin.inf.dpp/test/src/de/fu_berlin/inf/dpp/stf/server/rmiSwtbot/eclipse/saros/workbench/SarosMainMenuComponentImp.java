@@ -19,13 +19,12 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     /* name of the main menus */
     private static final String MENU_SAROS = "Saros";
     private static final String MENU_CREATE_ACCOUNT = "Create Account";
-    private static final String MENU_PREFERENCES = "Preferences";
 
-    /* title of shells which are pop up by clicking the main menus */
+    /* title of shells which may pop up by clicking the main menus */
     private static final String SHELL_PREFERNCES = "Preferences";
     private static final String SHELL_SAROS_CONFIGURATION = "Saros Configuration";
 
-    /* title of treeItem Saros and all sub treeItems in the preferences dialog */
+    /* title of treeItem Saros and it's sub treeItems in the preferences dialog */
     private static final String P_SAROS = "Saros";
 
     /**
@@ -46,8 +45,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
      ***********************************************************************/
 
     /**********************************************
-     * 
-     * actions about Account.
+     * create and add an Account.
      * 
      **********************************************/
     public void createAccount(String server, String username, String password)
@@ -64,9 +62,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public void createAccountInPeferencesGUI(String server, String username,
         String password) throws RemoteException {
-        clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
+        selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
@@ -87,9 +83,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     }
 
     public void addAccountGUI(JID jid, String password) throws RemoteException {
-        clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
+        selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
@@ -123,9 +117,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public boolean isAccountExistGUI(JID jid, String password)
         throws RemoteException {
-        clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
+        selectSarosPageInPreferences();
         SWTBotList list = bot
             .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
         String[] items = list.getItems();
@@ -141,6 +133,10 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         return false;
     }
 
+    /**********************************************
+     * activate an Account.
+     * 
+     **********************************************/
     public void activateAccount(JID jid) throws RemoteException {
         XMPPAccount account = getXMPPAccount(jid);
         xmppAccountStore.setAccountActive(account);
@@ -159,7 +155,6 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         bot.buttonInGroup(GeneralPreferencePage.ACTIVATE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         assert basicC.existsLabel("Active: " + jid.getBase());
-
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -180,6 +175,10 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         return existLabel;
     }
 
+    /**********************************************
+     * change an Account.
+     * 
+     **********************************************/
     public void changeAccount(JID jid, String newUserName, String newPassword,
         String newServer) throws RemoteException {
         xmppAccountStore.changeAccountData(getXMPPAccount(jid).getId(),
@@ -188,9 +187,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public void changeAccountGUI(JID jid, String newUserName,
         String newPassword, String newServer) throws RemoteException {
-        clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
+        selectSarosPageInPreferences();
         SWTBotList list = bot
             .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
         list.select(jid.getBase());
@@ -207,17 +204,20 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
+    /**********************************************
+     * delete an Account.
+     * 
+     **********************************************/
+
     public void deleteAccount(JID jid) throws RemoteException {
         xmppAccountStore.deleteAccount(getXMPPAccount(jid));
     }
 
     public void deleteAccountGUI(JID jid, String password)
         throws RemoteException {
-        assert isAccountExist(jid, password) : "the account (" + jid.getBase()
-            + ") doesn't exists yet!";
-        clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
+        if (!isAccountExist(jid, password))
+            return;
+        selectSarosPageInPreferences();
         SWTBotList list = bot
             .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
         String[] items = list.getItems();
@@ -238,44 +238,38 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     /**********************************************
      * 
-     * setting for screensharing
+     * setting screensharing
      * 
      **********************************************/
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
+        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
         SWTBotTree tree = bot.tree();
-        tree.expandNode("Saros").select("Screensharing");
+        tree.expandNode(P_SAROS).select("Screensharing");
         bot.ccomboBox(0).setSelection(encoder);
         bot.ccomboBox(1).setSelection(videoResolution);
-        bot.button("Apply").click();
+        bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
     /**********************************************
      * 
-     * setting for Feedback
+     * setting Feedback
      * 
      **********************************************/
     public void disableAutomaticReminder() throws RemoteException {
         if (!feedbackManager.isFeedbackDisabled()) {
             feedbackManager.setFeedbackDisabled(true);
-            // clickMenuSarosPreferences();
-            // SWTBotTree tree = bot.tree();
-            // tree.expandNode("Saros").select("Feedback");
-            // bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
-            // Messages.getString("feedback.page.group.interval")).click();
-            // bot.button("Apply").click();
-            // bot.button(OK).click();
-            // windowPart.waitUntilShellClosed(SHELL_PREFERNCES);
         }
     }
 
     public void disableAutomaticReminderGUI() throws RemoteException {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
+            shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
             SWTBotTree tree = bot.tree();
             tree.expandNode("Saros").select("Feedback");
             bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
@@ -293,18 +287,24 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
      * @throws RemoteException
      * 
      *************************************************************/
-
+    /**
+     * This is a convenient function to show the right setting-page of saros
+     * item in the preferences dialog.
+     */
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
         shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        selectTreeItemSarosInShellPreferences();
-    }
-
-    private void selectTreeItemSarosInShellPreferences() {
         SWTBotTree tree = bot.tree();
         tree.expandNode(P_SAROS).select();
     }
 
+    /**
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return {@link XMPPAccount} of the given jid.
+     */
     private XMPPAccount getXMPPAccount(JID jid) {
         for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
             if (jid.getName().equals(account.getUsername())
@@ -315,21 +315,14 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         return null;
     }
 
+    /**
+     * click the main menu Saros-> Preferences
+     * 
+     * @throws RemoteException
+     */
     private void clickMenuSarosPreferences() throws RemoteException {
         precondition();
         mainMenuC.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
-    }
-
-    public void addAccountGUI(String server, String username, String password)
-        throws RemoteException {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void deleteAccountGUI(String server, String username, String password)
-        throws RemoteException {
-        // TODO Auto-generated method stub
-
     }
 
 }

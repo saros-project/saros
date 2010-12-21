@@ -17,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 
 public class MainMenuComponentImp extends EclipseComponent implements
     MainMenuComponent {
@@ -28,18 +27,18 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     /* name of all the main menus */
     private static final String MENU_WINDOW = "Window";
-    private static final String MENU_PREFERENCES = "Preferences";
+    protected static final String MENU_PREFERENCES = "Preferences";
     private static final String MENU_FILE = "File";
     private static final String MENU_IMPORT = "Import...";
     public final static String MENU_OTHER = "Other...";
     public final static String MENU_SHOW_VIEW = "Show View";
 
-    /* title of shells which are pop up by clicking the main menus */
+    /* title of shells which should pop up by clicking the main menus */
     private static final String SHELL_PREFERNCES = "Preferences";
 
     /* treeItems in Preferences dialog */
-    private static final String GENERAL = "General";
-    private static final String WORKSPACE = "Workspace";
+    private static final String P_GENERAL = "General";
+    private static final String P_WORKSPACE = "Workspace";
 
     /* treeItems in Show View dialog */
     private static final String V_GENERAL = "General";
@@ -54,14 +53,14 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * TreeItem: General->Workspaces in preferences dialog
+     * change setting with preferences dialog
      * 
      **********************************************/
 
-    public void newTextFileLineDelimiter(String OS) throws RemoteException {
+    public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(GENERAL).select(WORKSPACE);
+        tree.expandNode(P_GENERAL).select(P_WORKSPACE);
 
         if (OS.equals("Default")) {
             bot.radioInGroup("Default", "New text file line delimiter").click();
@@ -78,7 +77,7 @@ public class MainMenuComponentImp extends EclipseComponent implements
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(GENERAL).select(WORKSPACE);
+        tree.expandNode(P_GENERAL).select(P_WORKSPACE);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
             shellC.closeShell(SHELL_PREFERNCES);
@@ -95,17 +94,32 @@ public class MainMenuComponentImp extends EclipseComponent implements
         return "";
     }
 
+    public void clickMenuPreferences() throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            clickMenuWithTexts("Eclipse", "Preferences...");
+        else
+            clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
+    }
+
     /**********************************************
      * 
      * show view with main menu
      * 
      **********************************************/
     public void showViewProblems() throws RemoteException {
-        openViewWithName(V_GENERAL, V_PROBLEM);
+        showViewWithName(V_GENERAL, V_PROBLEM);
     }
 
     public void showViewProjectExplorer() throws RemoteException {
-        openViewWithName(V_GENERAL, V_PROJECT_EXPLORER);
+        showViewWithName(V_GENERAL, V_PROJECT_EXPLORER);
+    }
+
+    public void showViewWithName(String category, String nodeName)
+        throws RemoteException {
+        workbenchC.activateEclipseShell();
+        clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
+            nodeName, OK);
     }
 
     /**********************************************
@@ -127,6 +141,41 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
         return isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
+    }
+
+    /**************************************************************
+     * 
+     * Basic actions for main menu
+     * 
+     **************************************************************/
+
+    public void clickMenuWithTexts(String... texts) throws RemoteException {
+        precondition();
+        SWTBotMenu selectedmenu = null;
+        for (String text : texts) {
+            try {
+                if (selectedmenu == null) {
+                    selectedmenu = bot.menu(text);
+                } else {
+                    selectedmenu = selectedmenu.menu(text);
+                }
+            } catch (WidgetNotFoundException e) {
+                log.error("menu \"" + text + "\" not found!");
+                throw e;
+            }
+        }
+        if (selectedmenu != null)
+            selectedmenu.click();
+    }
+
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
+
+    protected void precondition() throws RemoteException {
+        workbenchC.activateEclipseShell();
     }
 
     /**
@@ -178,86 +227,37 @@ public class MainMenuComponentImp extends EclipseComponent implements
 
     }
 
+    /**
+     * 
+     * @param id
+     *            id which identify a perspective
+     * @return<tt>true</tt>, if the perspective specified with the given id is
+     *                       active.
+     */
     public boolean isPerspectiveActive(String id) {
         return bot.perspectiveById(id).isActive();
     }
 
+    /**
+     * 
+     * @param title
+     *            the title of a perspective.
+     * @return<tt>true</tt>, if the perspective specified with the given title
+     *                       is open.
+     */
     public boolean isPerspectiveOpen(String title) {
         return getPerspectiveTitles().contains(title);
     }
 
+    /**
+     * 
+     * @return titles of all available perspectives.
+     */
     protected List<String> getPerspectiveTitles() {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotPerspective perspective : bot.perspectives())
             list.add(perspective.getLabel());
         return list;
-    }
-
-    public void clickMenuWithTexts(String... texts) throws RemoteException {
-        precondition();
-        SWTBotMenu selectedmenu = null;
-        for (String text : texts) {
-            try {
-                if (selectedmenu == null) {
-                    selectedmenu = bot.menu(text);
-                } else {
-                    selectedmenu = selectedmenu.menu(text);
-                }
-            } catch (WidgetNotFoundException e) {
-                log.error("menu \"" + text + "\" not found!");
-                throw e;
-            }
-        }
-        if (selectedmenu != null)
-            selectedmenu.click();
-    }
-
-    public void clickMenuPreferences() throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
-            clickMenuWithTexts("Eclipse", "Preferences...");
-        else
-            clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
-    }
-
-    /**
-     * Open a view using menus Window->Show View->Other... The method is defined
-     * as helper method and should not be exported by rmi. <br/>
-     * Operational steps:
-     * <ol>
-     * <li>If the view is already open, return.</li>
-     * <li>Activate the saros-instance workbench(alice / bob / carl). If the
-     * workbench isn't active, bot can't find the main menus.</li>
-     * <li>Click main menus Window -> Show View -> Other....</li>
-     * <li>Confirm the pop-up window "Show View".</li>
-     * </ol>
-     * 
-     * @param title
-     *            the title on the view tab.
-     * @param category
-     *            example: "General"
-     * @param nodeName
-     *            example: "Console"
-     * @see SarosWorkbenchComponentImp#activateEclipseShell()
-     * @see MenuPart#clickMenuWithTexts(String...)
-     * 
-     */
-    public void openViewWithName(String category, String nodeName)
-        throws RemoteException {
-        workbenchC.activateEclipseShell();
-        clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
-            nodeName, OK);
-
-    }
-
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
-    protected void precondition() throws RemoteException {
-        workbenchC.activateEclipseShell();
     }
 
 }

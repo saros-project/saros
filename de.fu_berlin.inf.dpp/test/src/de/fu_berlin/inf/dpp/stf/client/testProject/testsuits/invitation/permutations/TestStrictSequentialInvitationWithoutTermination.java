@@ -50,9 +50,9 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        carl.mainMenu.newTextFileLineDelimiter("Default");
-        bob.mainMenu.newTextFileLineDelimiter("Default");
-        alice.mainMenu.newTextFileLineDelimiter("Default");
+        carl.mainMenu.setNewTextFileLineDelimiter("Default");
+        bob.mainMenu.setNewTextFileLineDelimiter("Default");
+        alice.mainMenu.setNewTextFileLineDelimiter("Default");
     }
 
     /**
@@ -83,7 +83,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
-        alice.mainMenu.newTextFileLineDelimiter("Unix");
+        alice.mainMenu.setNewTextFileLineDelimiter("Unix");
 
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,

@@ -10,25 +10,93 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuCompo
 
 public interface SarosMainMenuComponent extends MainMenuComponent {
 
+    /**********************************************
+     * setting for Account.
+     * 
+     **********************************************/
+
+    /**
+     * Creates an account with
+     * {@link XMPPAccountStore#createNewAccount(String, String, String)}.
+     * 
+     * @param server
+     *            the server of the new account.
+     * @param username
+     *            the username of the new account.
+     * @param password
+     *            the password of the new account.
+     * 
+     * 
+     * @throws RemoteException
+     */
+    public void createAccount(String server, String username, String password)
+        throws RemoteException;
+
+    /**
+     * Creates an account with GUI, which should be done with the following
+     * steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Create Account"</li>
+     * <li>confirm the popup window "Create New User Account" with the given
+     * parameters</li>
+     * </ol>
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param password
+     *            the password of the new account.
+     * @param usesThisAccountNow
+     *            TODO not implement yet.
+     * @throws RemoteException
+     */
     public void creatAccountWithMenuGUI(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException;
 
     /**
+     * Creates an account with GUI, which should be done with the following
+     * steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right saros-page click Button "Add Account"</li>
+     * <li>in the popup window click button "Create New Account"</li>
+     * </ol>
      * 
      * @param server
+     *            the server of the new account.
      * @param username
+     *            the username of the new account.
      * @param password
+     *            the password of the new account.
      * @throws RemoteException
      */
     public void createAccountInPeferencesGUI(String server, String username,
         String password) throws RemoteException;
 
     /**
+     * add an account in the XMPP-Accounts list with GUI, which should be done
+     * with the following steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right saros-page click Button "Add Account"</li>
+     * <li>Confirm the popup window with the given parameters</li>
+     * </ol>
+     * 
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the account specified by the given jid exists in
-     *         preference store
+     * @param password
+     *            the password of the added account.
+     * @throws RemoteException
+     */
+    public void addAccountGUI(JID jid, String password) throws RemoteException;
+
+    /**
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the account specified by the given jid and
+     *         password exists in preference store
      * @throws RemoteException
      * @see XMPPAccountStore#getAllAccounts()
      */
@@ -42,10 +110,40 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      *            a Jabber ID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt> if the account specified by the given parameters
-     *         exists in preference store
+     *         exists in the XMPP-Accounts list on the right
+     *         saros-preferences-page.
      * @throws RemoteException
      */
     public boolean isAccountExistGUI(JID jid, String password)
+        throws RemoteException;
+
+    /**
+     * activate the account specified by the given jid with
+     * XMPPAccountStore#setAccountActive(XMPPAccount)
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @throws RemoteException
+     */
+    public void activateAccount(JID jid) throws RemoteException;
+
+    /**
+     * activate the account specified by the given jid using GUI,which should be
+     * done with the following steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right saros-page click Button "Activate Account"</li>
+     * </ol>
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param password
+     *            password of the given jid
+     * @throws RemoteException
+     */
+    public void activateAccountGUI(JID jid, String password)
         throws RemoteException;
 
     /**
@@ -64,53 +162,16 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the acount specified by the given jid is active
+     * @return <tt>true</tt> if the red label with the text
+     *         "active: jid.getBase()" is visible in the saros-preferences-page.
      * @throws RemoteException
      */
     public boolean isAccountActiveGUI(JID jid) throws RemoteException;
 
     /**
-     * activate the account specified by the given jid
      * 
-     * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @throws RemoteException
-     * @see XMPPAccountStore#setAccountActive(XMPPAccount)
-     */
-    public void activateAccount(JID jid) throws RemoteException;
-
-    /**
-     * acti.vate the account specified by the given jid
-     * 
-     * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @param password
-     * @throws RemoteException
-     */
-    public void activateAccountGUI(JID jid, String password)
-        throws RemoteException;
-
-    /**
-     * Creates an account.
-     * 
-     * @param server
-     *            the server of the new account.
-     * @param username
-     *            the username of the new account.
-     * @param password
-     *            the password of the new account.
-     * 
-     * 
-     * @throws RemoteException
-     */
-    public void createAccount(String server, String username, String password)
-        throws RemoteException;
-
-    /**
-     * 
-     * change the account specified by the given jid
+     * change the account specified by the given jid with
+     * {@link XMPPAccountStore#changeAccountData(int, String, String, String)}
      * 
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
@@ -127,7 +188,13 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
         String newServer) throws RemoteException;
 
     /**
-     * change the account specified by the given jid
+     * change the account specified by the given jid with GUI, which should be
+     * done with the following steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right saros-page click Button "Edit Account"</li>
+     * <li>confirm the popupwindow with the passed parameters</li>
+     * </ol>
      * 
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
@@ -144,7 +211,8 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
         String newPassword, String newServer) throws RemoteException;
 
     /**
-     * delete the account specified by the given jid
+     * delete the account specified by the given jid with
+     * {@link XMPPAccountStore#deleteAccount(XMPPAccount)}
      * 
      * @param jid
      *            a Jabber ID which is used to identify the users of the Jabber
@@ -153,8 +221,21 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      */
     public void deleteAccount(JID jid) throws RemoteException;
 
-    public void addAccountGUI(JID jid, String password) throws RemoteException;
-
+    /**
+     * delete the account specified by the given jid with GUI, which should be
+     * done with the following steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right saros-page click Button "Delete Account"</li>
+     * </ol>
+     * 
+     * @param jid
+     *            a Jabber ID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @param password
+     *            password of the given jid.
+     * @throws RemoteException
+     */
     public void deleteAccountGUI(JID jid, String password)
         throws RemoteException;
 
@@ -164,6 +245,13 @@ public interface SarosMainMenuComponent extends MainMenuComponent {
      * 
      **********************************************/
     /**
+     * modify the setting for screensharing with GUI, which should be done with
+     * the following steps:
+     * <ol>
+     * <li>Click menu "Saros" -> "Preferences"</li>
+     * <li>In the right Saros-Screensharing-page modifiy the encoder and
+     * videoResolution with the given parameters.</li>
+     * </ol>
      * 
      * @throws RemoteException
      */
