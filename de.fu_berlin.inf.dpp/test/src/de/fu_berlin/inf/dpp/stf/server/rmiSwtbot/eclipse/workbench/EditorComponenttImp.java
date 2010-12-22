@@ -10,6 +10,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -385,7 +387,10 @@ public class EditorComponenttImp extends EclipseComponent implements
         throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
-        getEditor(fileName).typeText(text);
+        workbenchC.activateEclipseShell();
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.setFocus();
+        editor.typeText(text);
         // e.navigateTo(3, 0);
         // e.autoCompleteProposal("main", "main - main method");
         // e.autoCompleteProposal("sys", "sysout - print to standard out");
@@ -480,10 +485,12 @@ public class EditorComponenttImp extends EclipseComponent implements
 
     private void precondition(String... fileNodes) throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
-        if (!isEditorOpen(fileName))
+        if (!isEditorOpen(fileName)) {
             peVC.openFile(fileNodes);
-        if (!isEditorActive(fileName))
+        }
+        if (!isEditorActive(fileName)) {
             activateEditor(fileName);
+        }
     }
 
     /**
@@ -494,5 +501,25 @@ public class EditorComponenttImp extends EclipseComponent implements
         for (SWTBotEditor editor : bot.editors())
             list.add(editor.getTitle());
         return list;
+    }
+
+    public void navigateInEditor(String fileName, int line, int column)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.setFocus();
+        editor.navigateTo(line, column);
+    }
+
+    public void pressShortcutInEditor(String fileName, String... keys)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.setFocus();
+        for (String key : keys) {
+            try {
+                editor.pressShortcut(KeyStroke.getInstance(key));
+            } catch (ParseException e) {
+                throw new RemoteException("Could not parse \"" + key + "\"", e);
+            }
+        }
     }
 }

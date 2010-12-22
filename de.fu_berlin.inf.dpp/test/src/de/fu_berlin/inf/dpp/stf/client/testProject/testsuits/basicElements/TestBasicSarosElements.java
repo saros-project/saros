@@ -99,4 +99,31 @@ public class TestBasicSarosElements extends STFTest {
             .getPathToScreenShot() + "/xmpp_disconnected.png"));
         assertEquals(false, alice.rosterV.isConnected());
     }
+
+    @Test
+    public void testTypeInEditor() throws RemoteException {
+        alice.pEV.newProject(PROJECT1);
+        String fileName = "test.txt";
+        String[] path = { PROJECT1, fileName };
+        alice.pEV.newFile(path);
+        alice.editor.waitUntilEditorActive(fileName);
+
+        String expected = "Hello World";
+        alice.editor.typeTextInEditor(expected, path);
+        assertEquals(expected, alice.editor.getTextOfEditor(path));
+    }
+
+    @Test
+    public void testDeleteInEditor() throws RemoteException {
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.editor.waitUntilJavaEditorActive(CLS1);
+        String fileName = CLS1 + ".java";
+        alice.editor.navigateInEditor(fileName, 3, 0);
+        alice.editor.typeTextInJavaEditor("testtext", PROJECT1, PKG1, CLS1);
+        alice.editor.navigateInEditor(fileName, 3, 3);
+        alice.editor.pressShortcutInEditor(fileName, "DELETE", "DELETE");
+        assertEquals("tesext",
+            alice.editor.getJavaTextOnLine(PROJECT1, PKG1, CLS1, 3));
+    }
 }

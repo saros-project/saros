@@ -68,7 +68,6 @@ public class TestShare2UsersSequentially extends STFTest {
     @Test
     public void aliceShareProjectWithBobSequentially() throws RemoteException,
         InterruptedException {
-        log.trace("testShareProject enter");
         alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,

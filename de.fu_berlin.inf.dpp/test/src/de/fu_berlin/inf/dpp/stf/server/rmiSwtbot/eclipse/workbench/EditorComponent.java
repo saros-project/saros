@@ -612,4 +612,17 @@ public interface EditorComponent extends Remote {
     public void setBreakPoint(int line, String projectName, String pkg,
         String className) throws RemoteException;
 
+    /**
+     * Changes the cursor position in editor.
+     * 
+     * @param className
+     * @param line
+     * @param column
+     * @throws RemoteException
+     */
+    public void navigateInEditor(String className, int line, int column)
+        throws RemoteException;
+
+    public void pressShortcutInEditor(String className, String... keys)
+        throws RemoteException;
 }
