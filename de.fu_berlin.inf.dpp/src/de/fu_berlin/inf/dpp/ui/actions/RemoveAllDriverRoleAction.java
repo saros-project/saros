@@ -65,6 +65,7 @@ public class RemoveAllDriverRoleAction extends Action {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
+            log.debug("RemoveAllDriverRoleAction: SessionStarted");
             newSarosSession.addListener(sharedProjectListener);
             updateEnablement();
         }
@@ -85,6 +86,17 @@ public class RemoveAllDriverRoleAction extends Action {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
+
+        /*
+         * if SessionView is not "visible" on session start up this constructor
+         * will be called after session started (and the user uses this view)
+         * That's why the method sessionListener.sessionStarted has to be called
+         * manually. If not the sharedProjectListener is not added to the
+         * session and the action enablement cannot be updated.
+         */
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
+        }
 
         sessionManager.addSarosSessionListener(sessionListener);
         updateEnablement();
@@ -115,6 +127,7 @@ public class RemoveAllDriverRoleAction extends Action {
 
     protected void updateEnablement() {
         ISarosSession sarosSession = sessionManager.getSarosSession();
-        setEnabled((sarosSession != null && sarosSession.isHost()));
+        setEnabled((sarosSession != null && sarosSession.isHost() && (sarosSession
+            .getDrivers().size() > 0)));
     }
 }

@@ -62,6 +62,17 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the exclusive driver role to this user");
 
+        /*
+         * if SessionView is not "visible" on session start up this constructor
+         * will be called after session started (and the user uses this view)
+         * That's why the method sessionListener.sessionStarted has to be called
+         * manually. If not the sharedProjectListener is not added to the
+         * session and the action enablement cannot be updated.
+         */
+        if (sessionManager.getSarosSession() != null) {
+            sessionListener.sessionStarted(sessionManager.getSarosSession());
+        }
+
         sessionManager.addSarosSessionListener(sessionListener);
 
         updateEnablement();
