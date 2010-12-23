@@ -19,9 +19,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TablePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
@@ -79,14 +76,7 @@ public class STFController {
         sarosSWTBot = bot;
         EclipseComponent.bot = sarosSWTBot;
         EclipseComponent.sleepTime = sleepTime;
-        initNoExportedObects();
-    }
 
-    private void initNoExportedObects() {
-        EclipseComponent.tablePart = new TablePart();
-        EclipseComponent.treePart = new TreePart();
-        EclipseComponent.viewPart = new ViewPart();
-        EclipseComponent.shellC = new ShellComponentImp();
     }
 
     /*

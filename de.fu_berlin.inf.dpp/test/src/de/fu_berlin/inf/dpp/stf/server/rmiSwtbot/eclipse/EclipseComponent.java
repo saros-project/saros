@@ -23,9 +23,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TablePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.TreePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponentImp;
@@ -83,11 +80,6 @@ public abstract class EclipseComponent {
     public static ProgressViewComponentImp progressC = ProgressViewComponentImp
         .getInstance();
     public static ShellComponent shellC = ShellComponentImp.getInstance();
-
-    // No exported objects
-    public static TablePart tablePart;
-    public static TreePart treePart;
-    public static ViewPart viewPart;
 
     // Picocontainer
     public static Saros saros;

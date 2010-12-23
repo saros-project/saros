@@ -3,9 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.eclipse.ui.part.ViewPart;
+
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.noExportedObjects.ViewPart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
 
 /**
@@ -15,9 +16,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPE
  * ) , then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test.
- * (How to do it please look at the javadoc in class {@link TestPattern} or read
- * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link Tester} object in your junit-test. (How
+ * to do it please look at the javadoc in class {@link TestPattern} or read the
+ * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
  * then you can use the object pEV initialized in {@link Tester} to access the
  * API :), e.g.
@@ -624,7 +625,8 @@ public interface PEViewComponent extends Remote {
      *            path specified by the node array parameter.e.g. {"Foo-saros",
      *            "myFolder", "myFile.xml"}
      */
-    public void waitUntilFileExisted(String... fileNodes) throws RemoteException;
+    public void waitUntilFileExisted(String... fileNodes)
+        throws RemoteException;
 
     /**
      * Performs the action "move class to another package" which should be done
