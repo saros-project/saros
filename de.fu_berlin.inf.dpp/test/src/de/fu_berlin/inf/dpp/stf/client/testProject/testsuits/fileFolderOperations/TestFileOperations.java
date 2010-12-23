@@ -47,12 +47,12 @@ public class TestFileOperations extends STFTest {
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         // Make sure CLS1 always has the same content
-        if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
+        if (alice.pEV.existsClass(PROJECT1, PKG1, CLS1))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
         alice.pEV.newClass(PROJECT1, PKG1, CLS1);
-        if (alice.pEV.isClassExist(PROJECT1, PKG1, CLS2))
+        if (alice.pEV.existsClass(PROJECT1, PKG1, CLS2))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
-        if (alice.pEV.isPkgExist(PROJECT1, PKG2))
+        if (alice.pEV.existsPkg(PROJECT1, PKG2))
             alice.pEV.deletePkg(PROJECT1, PKG2);
         // FIXME This method assumes that all the file operations (like
         // deleteClass) work...
@@ -80,16 +80,22 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testRenameFile() throws RemoteException {
-        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        /*
+         * TODO, sometimes i get the assertError exception by performing the
+         * following assertTrue, it seems that the building-session isn't
+         * finished yet.
+         */
+        bob.workbench.sleep(1000);
+        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
         alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
 
-        bob.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
+        bob.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
 
-        carl.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG1, CLS1));
-        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG1, CLS2));
+        carl.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertFalse(carl.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(carl.pEV.existsClass(PROJECT1, PKG1, CLS2));
     }
 
     /**
@@ -109,9 +115,9 @@ public class TestFileOperations extends STFTest {
     public void testDeleteFile() throws RemoteException {
         alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
         bob.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
         carl.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertFalse(carl.pEV.existsClass(PROJECT1, PKG1, CLS1));
     }
 
     /**
@@ -136,14 +142,14 @@ public class TestFileOperations extends STFTest {
         alice.pEV.newPackage(PROJECT1, PKG2);
         bob.pEV.waitUntilPkgExist(PROJECT1, PKG2);
         carl.pEV.waitUntilPkgExist(PROJECT1, PKG2);
-        assertTrue(bob.pEV.isPkgExist(PROJECT1, PKG2));
-        assertTrue(carl.pEV.isPkgExist(PROJECT1, PKG2));
+        assertTrue(bob.pEV.existsPkg(PROJECT1, PKG2));
+        assertTrue(carl.pEV.existsPkg(PROJECT1, PKG2));
 
         alice.pEV.newClass(PROJECT1, PKG2, CLS1);
-        bob.pEV.waitUntilClassExist(PROJECT1, PKG2, CLS1);
-        carl.pEV.waitUntilClassExist(PROJECT1, PKG2, CLS1);
-        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG2, CLS1));
-        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG2, CLS1));
+        bob.pEV.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
+        carl.pEV.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
+        assertTrue(bob.pEV.existsClass(PROJECT1, PKG2, CLS1));
+        assertTrue(carl.pEV.existsClass(PROJECT1, PKG2, CLS1));
 
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG2, CLS1);
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG2,
@@ -182,12 +188,12 @@ public class TestFileOperations extends STFTest {
         alice.pEV.newPackage(PROJECT1, PKG2);
         alice.pEV.newClass(PROJECT1, PKG2, CLS2);
         alice.pEV.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
-        bob.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        carl.pEV.waitUntilClassExist(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.pEV.isClassExist(PROJECT1, PKG1, CLS2));
-        assertFalse(bob.pEV.isClassExist(PROJECT1, PKG2, CLS2));
-        assertTrue(carl.pEV.isClassExist(PROJECT1, PKG1, CLS2));
-        assertFalse(carl.pEV.isClassExist(PROJECT1, PKG2, CLS2));
+        bob.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        carl.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.pEV.existsClass(PROJECT1, PKG2, CLS2));
+        assertTrue(carl.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(carl.pEV.existsClass(PROJECT1, PKG2, CLS2));
     }
 
     /**
@@ -209,13 +215,13 @@ public class TestFileOperations extends STFTest {
 
         bob.pEV.waitUntilPkgExist(PROJECT1, PKG2);
         bob.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(bob.pEV.isPkgExist(PROJECT1, PKG1));
-        assertTrue(bob.pEV.isPkgExist(PROJECT1, PKG2));
+        assertFalse(bob.pEV.existsPkg(PROJECT1, PKG1));
+        assertTrue(bob.pEV.existsPkg(PROJECT1, PKG2));
 
         carl.pEV.waitUntilPkgExist(PROJECT1, PKG2);
         carl.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(carl.pEV.isPkgExist(PROJECT1, PKG1));
-        assertTrue(carl.pEV.isPkgExist(PROJECT1, PKG2));
+        assertFalse(carl.pEV.existsPkg(PROJECT1, PKG1));
+        assertTrue(carl.pEV.existsPkg(PROJECT1, PKG2));
     }
 
     /**
@@ -236,7 +242,7 @@ public class TestFileOperations extends STFTest {
         alice.pEV.deletePkg(PROJECT1, PKG1);
         bob.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
         carl.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(bob.pEV.isPkgExist(PROJECT1, PKG1));
-        assertFalse(carl.pEV.isPkgExist(PROJECT1, PKG1));
+        assertFalse(bob.pEV.existsPkg(PROJECT1, PKG1));
+        assertFalse(carl.pEV.existsPkg(PROJECT1, PKG1));
     }
 }

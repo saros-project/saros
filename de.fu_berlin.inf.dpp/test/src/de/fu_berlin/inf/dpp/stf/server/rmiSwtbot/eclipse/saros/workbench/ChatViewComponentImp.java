@@ -33,20 +33,20 @@ public class ChatViewComponentImp extends EclipseComponent implements
     }
 
     public void activateChatView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            viewPart.openViewById(VIEWID);
+            basicC.openViewById(VIEWID);
     }
 
     public void closeChatView() throws RemoteException {
-        viewPart.closeViewById(VIEWID);
+        basicC.closeViewById(VIEWID);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return viewPart.isViewOpen(VIEWNAME);
+        return basicC.isViewOpen(VIEWNAME);
     }
 
     public void sendChatMessage(String message) throws RemoteException {
@@ -140,5 +140,4 @@ public class ChatViewComponentImp extends EclipseComponent implements
         return text.equals(message);
     }
 
-   
 }

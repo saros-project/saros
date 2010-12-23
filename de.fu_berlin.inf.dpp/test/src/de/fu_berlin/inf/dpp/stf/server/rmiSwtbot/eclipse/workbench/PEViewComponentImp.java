@@ -124,23 +124,23 @@ public class PEViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void openPEView() throws RemoteException {
         if (!isPEViewOpen())
-            viewPart.openViewById(VIEWID);
+            basicC.openViewById(VIEWID);
     }
 
     public boolean isPEViewOpen() throws RemoteException {
-        return viewPart.isViewOpen(VIEWNAME);
+        return basicC.isViewOpen(VIEWNAME);
     }
 
     public void closePEView() throws RemoteException {
-        viewPart.closeViewByTitle(VIEWNAME);
+        basicC.closeViewByTitle(VIEWNAME);
     }
 
     public void setFocusOnPEView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isPEViewActive() throws RemoteException {
-        return viewPart.isViewActive(VIEWNAME);
+        return basicC.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -149,7 +149,7 @@ public class PEViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void newProject(String projectName) throws RemoteException {
-        if (!isProjectExist(projectName)) {
+        if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
             mainMenuC.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
@@ -157,14 +157,14 @@ public class PEViewComponentImp extends EclipseComponent implements
     }
 
     public void newJavaProject(String projectName) throws RemoteException {
-        if (!isProjectExist(projectName)) {
+        if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
             mainMenuC.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
     }
 
-    public boolean isProjectExist(String projectName) throws RemoteException {
+    public boolean existsProject(String projectName) throws RemoteException {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
         return project.exists();
@@ -178,9 +178,9 @@ public class PEViewComponentImp extends EclipseComponent implements
             folderNodes[i] = parentNodes[i];
         }
         folderNodes[folderNodes.length - 1] = newFolderName;
-        if (!isFolderExist(folderNodes)) {
+        if (!existsFolder(folderNodes)) {
             try {
-                viewPart.selectTreeItemWithLabelsInView(VIEWNAME, parentNodes);
+                basicC.getTreeItemWithLabelsInView(VIEWNAME, parentNodes);
                 mainMenuC.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
@@ -191,7 +191,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean isFolderExist(String... folderNodes) throws RemoteException {
+    public boolean existsFolder(String... folderNodes) throws RemoteException {
         IPath path = new Path(getPath(folderNodes));
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
@@ -200,7 +200,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         return true;
     }
 
-    public void waitUntilFolderExist(String... folderNodes)
+    public void waitUntilFolderExisted(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
         waitUntil(SarosConditions.isResourceExist(fullPath));
@@ -209,7 +209,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void newPackage(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches("[\\w\\.]*\\w+")) {
-            if (!isPkgExist(projectName, pkg))
+            if (!existsPkg(projectName, pkg))
                 try {
                     workbenchC.activateEclipseShell();
                     mainMenuC.clickMenuWithTexts(FILE, NEW, PACKAGE);
@@ -225,7 +225,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean isPkgExist(String projectName, String pkg)
+    public boolean existsPkg(String projectName, String pkg)
         throws RemoteException {
         IPath path = new Path(getPkgPath(projectName, pkg));
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
@@ -258,7 +258,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     }
 
     public void newFile(String... fileNodes) throws RemoteException {
-        if (!isFileExist(getPath(fileNodes)))
+        if (!existsFile(getPath(fileNodes)))
             try {
                 precondition();
                 String[] parentNodes = new String[fileNodes.length - 1];
@@ -269,7 +269,7 @@ public class PEViewComponentImp extends EclipseComponent implements
                     else
                         parentNodes[i] = fileNodes[i];
                 }
-                viewPart.selectTreeItemWithLabelsInView(VIEWNAME, parentNodes);
+                basicC.getTreeItemWithLabelsInView(VIEWNAME, parentNodes);
                 mainMenuC.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {
@@ -279,7 +279,7 @@ public class PEViewComponentImp extends EclipseComponent implements
             }
     }
 
-    public boolean isFileExist(String filePath) throws RemoteException {
+    public boolean existsFile(String filePath) throws RemoteException {
         IPath path = new Path(filePath);
         log.info("Checking existence of file \"" + path + "\"");
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
@@ -287,30 +287,31 @@ public class PEViewComponentImp extends EclipseComponent implements
         return file.exists();
     }
 
-    public boolean isFileExist(String... nodes) throws RemoteException {
-        return isFileExist(getPath(nodes));
+    public boolean existsFile(String... nodes) throws RemoteException {
+        return existsFile(getPath(nodes));
     }
 
-    public boolean isClassExist(String projectName, String pkg, String className)
+    public boolean existsClass(String projectName, String pkg, String className)
         throws RemoteException {
-        return isFileExist(getClassPath(projectName, pkg, className));
+        return existsFile(getClassPath(projectName, pkg, className));
     }
 
-    public boolean isFileExistWithGUI(String... nodes) throws RemoteException {
+    public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
         workbenchC.activateEclipseShell();
         precondition();
-        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
-        return treePart.isTreeItemWithMatchTextExist(tree, nodes);
+        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
+        return basicC.existsTreeItemWithRegexs(tree, nodes);
     }
 
-    public void waitUntilFileExist(String... fileNodes) throws RemoteException {
+    public void waitUntilFileExisted(String... fileNodes)
+        throws RemoteException {
         String fullPath = getPath(fileNodes);
         waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
-        if (!isFileExist(getClassPath(projectName, pkg, className))) {
+        if (!existsFile(getClassPath(projectName, pkg, className))) {
             try {
                 workbenchC.activateEclipseShell();
                 mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
@@ -323,7 +324,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void waitUntilClassExist(String projectName, String pkg,
+    public void waitUntilClassExisted(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
         waitUntil(SarosConditions.isResourceExist(path));
@@ -337,7 +338,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void newClassImplementsRunnable(String projectName, String pkg,
         String className) throws RemoteException {
-        if (!isFileExist(getClassPath(projectName, pkg, className))) {
+        if (!existsFile(getClassPath(projectName, pkg, className))) {
             precondition();
             mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
         }
@@ -352,7 +353,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
         text.setText("java.lang.Runnable");
-        tablePart.waitUntilTableHasRows(1);
+        basicC.waitUntilTableHasRows(1);
         bot.button(OK).click();
         bot.shell(SHELL_NEW_JAVA_CLASS).activate();
         bot.checkBox("Inherited abstract methods").click();
@@ -374,7 +375,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
-        viewPart.clickContextMenuOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
+        basicC.clickContextsOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
     }
 
     public void openClass(String projectName, String pkg, String className)
@@ -391,7 +392,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void openFileWith(String whichEditor, String... fileNodes)
         throws RemoteException {
         precondition();
-        SWTBotTree tree = viewPart.getTreeInView(VIEWNAME);
+        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
         tree.expandNode(fileNodes).select();
         ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
         shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
@@ -435,7 +436,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void deleteAllProjectsWithGUI() throws RemoteException {
         precondition();
-        SWTBotTreeItem[] allTreeItems = viewPart.getView(VIEWNAME).bot().tree()
+        SWTBotTreeItem[] allTreeItems = basicC.getTreeInView(VIEWNAME)
             .getAllItems();
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
@@ -449,8 +450,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void deleteProjectWithGUI(String projectName) throws RemoteException {
         precondition();
-        viewPart
-            .clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, projectName);
+        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
         shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
@@ -493,7 +493,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void deleteFile(String... nodes) throws RemoteException {
         precondition();
-        viewPart.clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, nodes);
+        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
         shellC.confirmShellDelete(OK);
     }
 
@@ -523,9 +523,11 @@ public class PEViewComponentImp extends EclipseComponent implements
         String className, String targetProject, String targetPkg)
         throws RemoteException {
         precondition();
+
         String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            changeToRegex(nodes), REFACTOR, MOVE);
+        String[] contexts = { REFACTOR, MOVE };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(nodes));
         shellC.waitUntilShellActive(SHELL_MOVE);
         shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
             targetPkg);
@@ -535,8 +537,10 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void rename(String shellTitle, String confirmLabel, String newName,
         String[] nodes) throws RemoteException {
         precondition();
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            changeToRegex(nodes), REFACTOR, RENAME);
+
+        String[] contexts = { REFACTOR, RENAME };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(nodes));
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         basicC.waitUntilButtonEnabled(confirmLabel);
@@ -547,8 +551,10 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void renameClass(String newName, String projectName, String pkg,
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            changeToRegex(nodes), REFACTOR, RENAME);
+        String[] contexts = { REFACTOR, RENAME };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(nodes));
+
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
@@ -558,11 +564,16 @@ public class PEViewComponentImp extends EclipseComponent implements
          * TODO Sometimes the window doesn't close when clicking on Finish, but
          * stays open with the warning 'class contains a main method blabla'. In
          * this case just click Finish again.
+         * 
+         * @Andreas, this problem dones't exist by me, so i get still the
+         * exception: "button isn't enabled" by performing the following code. I
+         * comment it out first, if my change doesn't work by you, please tell
+         * me.
          */
-        bot.sleep(50);
-        if (shellC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
-            bot.button(FINISH).click();
-        }
+        // bot.sleep(50);
+        // if (shellC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
+        // bot.button(FINISH).click();
+        // }
         shellC.waitUntilShellClosed(shellTitle);
     }
 
@@ -594,9 +605,11 @@ public class PEViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void shareProjectWithSVN(String projectName, String repositoryURL)
         throws RemoteException {
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, SHARE_PROJECT);
+
+        String[] contexts = { TEAM, SHARE_PROJECT };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
+
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
@@ -615,9 +628,11 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
         String projectName, String repositoryURL) throws RemoteException {
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, SHARE_PROJECT);
+
+        String[] contexts = { TEAM, SHARE_PROJECT };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
+
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
@@ -630,9 +645,10 @@ public class PEViewComponentImp extends EclipseComponent implements
         String repositoryURL, String specifiedFolderName)
         throws RemoteException {
         precondition();
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, SHARE_PROJECT);
+
+        String[] contexts = { TEAM, SHARE_PROJECT };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
             NEXT);
@@ -649,11 +665,11 @@ public class PEViewComponentImp extends EclipseComponent implements
             // close window
             shareProjectShell.close();
             // in svn repos view: enter url
-            viewPart
+            basicC
                 .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
-            viewPart.setFocusOnViewByTitle("SVN Repositories");
-            final boolean viewWasOpen = viewPart.isViewOpen("SVN Repositories");
-            final SWTBotView repoView = viewPart.getView("SVN Repositories");
+            basicC.setFocusOnViewByTitle("SVN Repositories");
+            final boolean viewWasOpen = basicC.isViewOpen("SVN Repositories");
+            final SWTBotView repoView = basicC.getView("SVN Repositories");
             repoView.toolbarButton("Add SVN Repository").click();
             if (!shellC.activateShellWithText("Add SVN Repository")) {
                 shellC.waitUntilShellActive("Add SVN Repository");
@@ -708,17 +724,21 @@ public class PEViewComponentImp extends EclipseComponent implements
     }
 
     public void disConnect(String projectName) throws RemoteException {
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, DISCONNECT);
+
+        String[] contexts = { TEAM, DISCONNECT };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
+
         shellC.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
     }
 
     public void revertProject(String projectName) throws RemoteException {
         precondition();
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, REVERT);
+
+        String[] contexts = { TEAM, REVERT };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
+
         shellC.confirmShell(SHELL_REVERT, OK);
         shellC.waitUntilShellClosed(SHELL_REVERT);
     }
@@ -739,9 +759,11 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void switchProjectWithGui(String projectName, String url)
         throws RemoteException {
         precondition();
-        String[] matchTexts = { projectName + ".*" };
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+
+        String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            changeToRegex(projectName));
+
         shellC.waitUntilShellActive(SHELL_SWITCH);
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
         bot.button(OK).click();
@@ -914,8 +936,9 @@ public class PEViewComponentImp extends EclipseComponent implements
     private void switchToAnotherRevision(String[] matchTexts, String versionID)
         throws RemoteException {
         precondition();
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
+        String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
+        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+            matchTexts);
         shellC.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
@@ -928,16 +951,17 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void copyProject(String target, String source)
         throws RemoteException {
 
-        if (isProjectExist(target)) {
+        if (existsProject(target)) {
             throw new RemoteException("Can't copy project from " + source
                 + " to " + target + " , the target already exists.");
         }
         precondition();
-        String[] matchTexts = changeToRegex(source);
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, "Copy");
-        viewPart.clickSubmenusOfContextMenuOfTreeItemInView(VIEWNAME,
-            matchTexts, "Paste");
+
+        basicC.clickContextsOfTreeItemInView(VIEWNAME, "Copy",
+            changeToRegex(source));
+        basicC.clickContextsOfTreeItemInView(VIEWNAME, "Paste",
+            changeToRegex(source));
+
         shellC.activateShellWithText("Copy Project");
         bot.textWithLabel("Project name:").setText(target);
         bot.button(OK).click();

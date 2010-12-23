@@ -49,13 +49,13 @@ public class TestPackageExplorerViewComponent extends STFTest {
     @Test
     public void testNewProject() throws RemoteException {
         alice.pEV.newProject(PROJECT1);
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
     }
 
     @Test
     public void testNewJavaProject() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
     }
 
     @Test
@@ -63,12 +63,12 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFolder(FOLDER2, PROJECT1, FOLDER1);
-        assertTrue(alice.pEV.isFolderExist(PROJECT1, FOLDER1));
-        assertTrue(alice.pEV.isFolderExist(PROJECT1, FOLDER1, FOLDER2));
+        assertTrue(alice.pEV.existsFolder(PROJECT1, FOLDER1));
+        assertTrue(alice.pEV.existsFolder(PROJECT1, FOLDER1, FOLDER2));
         alice.pEV.deleteFolder(PROJECT1, FOLDER1, FOLDER2);
-        assertFalse(alice.pEV.isFolderExist(PROJECT1, FOLDER1, FOLDER2));
+        assertFalse(alice.pEV.existsFolder(PROJECT1, FOLDER1, FOLDER2));
         alice.pEV.deleteFolder(PROJECT1, FOLDER1);
-        assertFalse(alice.pEV.isFolderExist(PROJECT1, FOLDER1));
+        assertFalse(alice.pEV.existsFolder(PROJECT1, FOLDER1));
     }
 
     @Test
@@ -76,12 +76,12 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newPackage(PROJECT1, PKG1);
         alice.pEV.newPackage(PROJECT1, PKG1 + ".subpkg");
-        assertTrue(alice.pEV.isPkgExist(PROJECT1, PKG1));
-        assertTrue(alice.pEV.isPkgExist(PROJECT1, PKG1 + ".subpkg"));
+        assertTrue(alice.pEV.existsPkg(PROJECT1, PKG1));
+        assertTrue(alice.pEV.existsPkg(PROJECT1, PKG1 + ".subpkg"));
         alice.pEV.deletePkg(PROJECT1, PKG1 + ".subpkg");
-        assertFalse(alice.pEV.isPkgExist(PROJECT1, PKG1 + ".subpkg"));
+        assertFalse(alice.pEV.existsPkg(PROJECT1, PKG1 + ".subpkg"));
         alice.pEV.deletePkg(PROJECT1, PKG1);
-        assertFalse(alice.pEV.isPkgExist(PROJECT1, PKG1));
+        assertFalse(alice.pEV.existsPkg(PROJECT1, PKG1));
     }
 
     @Test
@@ -89,14 +89,14 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
     }
 
     @Test
     public void testNewClass() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.pEV.isClassExist(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, PKG1, CLS1));
     }
 
     /**********************************************
@@ -141,8 +141,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         alice.pEV.newPackage(PROJECT1, PKG2);
         alice.pEV.moveClassTo(PROJECT1, PKG1, CLS1, PROJECT1, PKG2);
-        assertFalse(alice.pEV.isClassExist(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.pEV.isClassExist(PROJECT1, PKG2, CLS1));
+        assertFalse(alice.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, PKG2, CLS1));
     }
 
     @Test
@@ -150,8 +150,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, PKG1, CLS1);
         alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
-        assertFalse(alice.pEV.isClassExist(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.pEV.isClassExist(PROJECT1, PKG1, CLS2));
+        assertFalse(alice.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, PKG1, CLS2));
     }
 
     @Test
@@ -160,8 +160,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.newFile(PROJECT1, FOLDER1, FILE1);
         alice.pEV.renameFile(FILE2, PROJECT1, FOLDER1, FILE1);
-        assertFalse(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE1));
-        assertTrue(alice.pEV.isFileExist(PROJECT1, FOLDER1, FILE2));
+        assertFalse(alice.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.pEV.existsFile(PROJECT1, FOLDER1, FILE2));
     }
 
     @Test
@@ -169,8 +169,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
         alice.pEV.renameFolder(FOLDER2, PROJECT1, FOLDER1);
-        assertFalse(alice.pEV.isFolderExist(PROJECT1, FOLDER1));
-        assertTrue(alice.pEV.isFolderExist(PROJECT1, FOLDER2));
+        assertFalse(alice.pEV.existsFolder(PROJECT1, FOLDER1));
+        assertTrue(alice.pEV.existsFolder(PROJECT1, FOLDER2));
     }
 
     @Test
@@ -178,8 +178,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newPackage(PROJECT1, PKG1);
         alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
-        assertFalse(alice.pEV.isPkgExist(PROJECT1, PKG1));
-        assertTrue(alice.pEV.isPkgExist(PROJECT1, PKG2));
+        assertFalse(alice.pEV.existsPkg(PROJECT1, PKG1));
+        assertTrue(alice.pEV.existsPkg(PROJECT1, PKG2));
     }
 
     @Test
@@ -198,13 +198,13 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testRenameProject() throws Exception {
         alice.pEV.newJavaProject(PROJECT1);
 
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
-        assertFalse(alice.pEV.isProjectExist(PROJECT2));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT2));
 
         alice.pEV.renameJavaProject(PROJECT2, PROJECT1);
 
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
-        assertTrue(alice.pEV.isProjectExist(PROJECT2));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT2));
     }
 
     /***********************************************************/
@@ -213,9 +213,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
     @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
         alice.pEV.deleteProject(PROJECT1);
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
     }
 
     @Test
@@ -223,9 +223,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testDeleteFileUsingGUI() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
         alice.pEV.deleteFile(PROJECT1, "src", "pkg", "Cls.java");
-        assertFalse(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
@@ -233,36 +233,36 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testIsFileExist() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
         alice.pEV.deleteClass(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass() throws RemoteException {
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
         alice.pEV.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
-        assertTrue(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_2() throws RemoteException {
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
         alice.pEV.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
-        assertTrue(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_3() throws RemoteException {
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
         alice.pEV.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
-        assertTrue(alice.pEV.isClassExist(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.pEV.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
@@ -272,29 +272,29 @@ public class TestPackageExplorerViewComponent extends STFTest {
         final String className = "Cls";
 
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
         log.trace("alice.newProjectWithClass()");
 
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, pkg, className);
         log.trace("alice.isJavaProjectExist()");
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.pEV.isClassExist(PROJECT1, pkg, className));
+        assertTrue(alice.pEV.existsClass(PROJECT1, pkg, className));
 
         log.trace("alice.isJavaClassExist()");
         final String className2 = "Cls2";
-        assertFalse(alice.pEV.isClassExist(PROJECT1, pkg, className2));
+        assertFalse(alice.pEV.existsClass(PROJECT1, pkg, className2));
         log.trace("alice.newJavaClassInProject()");
         alice.pEV.newClass(PROJECT1, pkg, className2);
 
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.pEV.isClassExist(PROJECT1, pkg, className2));
+        assertTrue(alice.pEV.existsClass(PROJECT1, pkg, className2));
 
         log.trace("deleteResource()");
         alice.pEV.deleteProject(PROJECT1);
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.pEV.isProjectExist(PROJECT1));
+        assertFalse(alice.pEV.existsProject(PROJECT1));
     }
 
     @Test
@@ -303,10 +303,10 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testIsFileExistWithGUI() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.pEV.isFileExistWithGUI(PROJECT1, "src", "pkg",
+        assertTrue(alice.pEV.existsFiletWithGUI(PROJECT1, "src", "pkg",
             "Cls.java"));
         alice.pEV.deleteClass(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.pEV.isFileExistWithGUI(PROJECT1, "src", "pkg",
+        assertFalse(alice.pEV.existsFiletWithGUI(PROJECT1, "src", "pkg",
             "Cls.java"));
     }
 
@@ -325,7 +325,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
     @Ignore
     public void testNewFileNewFolderInEmptyProject() throws RemoteException {
         alice.pEV.newProject(PROJECT1);
-        assertTrue(alice.pEV.isProjectExist(PROJECT1));
+        assertTrue(alice.pEV.existsProject(PROJECT1));
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
@@ -340,9 +340,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testDeleteFolder() throws RemoteException {
         alice.pEV.newJavaProject(PROJECT1);
         alice.pEV.newFolder(FOLDER1, PROJECT1);
-        assertTrue(alice.pEV.isFolderExist(PROJECT1, FOLDER1));
+        assertTrue(alice.pEV.existsFolder(PROJECT1, FOLDER1));
         alice.pEV.deleteFolder(PROJECT1, FOLDER1);
-        assertFalse(alice.pEV.isFolderExist(PROJECT1, FOLDER1));
+        assertFalse(alice.pEV.existsFolder(PROJECT1, FOLDER1));
     }
 
     @Test
@@ -358,8 +358,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
     @Test
     public void testCopyProject() throws RemoteException {
         alice.pEV.newProject(PROJECT1);
-        assertFalse(alice.pEV.isProjectExist(PROJECT2));
+        assertFalse(alice.pEV.existsProject(PROJECT2));
         alice.pEV.copyProject(PROJECT2, PROJECT1);
-        assertTrue(alice.pEV.isProjectExist(PROJECT2));
+        assertTrue(alice.pEV.existsProject(PROJECT2));
     }
 }

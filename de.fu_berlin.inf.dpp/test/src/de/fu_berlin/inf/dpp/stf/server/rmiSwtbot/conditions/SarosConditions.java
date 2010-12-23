@@ -5,16 +5,16 @@ import java.util.List;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.sarosSWTBot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 
+/**
+ * This is a factory class to create some conditions provided with STF.
+ */
 public class SarosConditions extends Conditions {
 
     public static ICondition isConnect(List<SWTBotToolbarButton> buttons,
@@ -27,15 +27,6 @@ public class SarosConditions extends Conditions {
         return new isDisConnected(buttons, tooltipText);
     }
 
-    public static ICondition existTreeItem(SWTBotTreeItem treeItem,
-        String nodeName) {
-        return new ExistTreeItem(treeItem, nodeName);
-    }
-
-    public static ICondition existTree(SWTBotTree tree, String... nodeNames) {
-        return new ExistTree(tree, nodeNames);
-    }
-
     public static ICondition ShellActive(SWTWorkbenchBot bot, String title) {
         return new ShellActive(bot, title);
     }
@@ -44,14 +35,14 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(SWTBotTable table,
+    public static ICondition existTableItem(BasicComponent basic,
         String tableItemName) {
-        return new ExistTableItem(table, tableItemName);
+        return new ExistTableItem(basic, tableItemName);
     }
 
-    public static ICondition ExistContextMenuOfTableItem(
-        SWTBotTableItem tableItem, String text) {
-        return new ExistContextMenuOfTableItem(tableItem, text);
+    public static ICondition ExistContextMenuOfTableItem(BasicComponent basic,
+        String itemName, String contextName) {
+        return new ExistContextMenuOfTableItem(basic, itemName, contextName);
     }
 
     /**********************************************

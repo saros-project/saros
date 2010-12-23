@@ -29,7 +29,7 @@ public interface ShellComponent extends Remote {
      *            the title of the shell.
      * @throws RemoteException
      */
-    public void activateShellWaitingUntilOpened(String title)
+    public boolean activateShellWaitingUntilOpened(String title)
         throws RemoteException;
 
     /**

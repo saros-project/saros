@@ -294,8 +294,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
         shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        SWTBotTree tree = bot.tree();
-        tree.expandNode(P_SAROS).select();
+        basicC.selectTreeItem(P_SAROS);
     }
 
     /**

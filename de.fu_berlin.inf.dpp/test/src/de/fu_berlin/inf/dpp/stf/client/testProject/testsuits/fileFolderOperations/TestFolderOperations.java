@@ -43,9 +43,9 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.pEV.isClassExist(PROJECT1, PKG1, CLS1))
+        if (!alice.pEV.existsClass(PROJECT1, PKG1, CLS1))
             alice.pEV.newClass(PROJECT1, PKG1, CLS1);
-        if (!alice.pEV.isFolderExist(PROJECT1, FOLDER1))
+        if (!alice.pEV.existsFolder(PROJECT1, FOLDER1))
             alice.pEV.newFolder(FOLDER1, PROJECT1);
     }
 
@@ -73,8 +73,8 @@ public class TestFolderOperations extends STFTest {
         final String newFolderName = FOLDER1 + "New";
 
         alice.pEV.renameFolder(newFolderName, PROJECT1, FOLDER1);
-        bob.pEV.waitUntilFolderExist(PROJECT1, newFolderName);
-        assertTrue(bob.pEV.isFolderExist(PROJECT1, newFolderName));
-        assertFalse(bob.pEV.isFolderExist(PROJECT1, FOLDER1));
+        bob.pEV.waitUntilFolderExisted(PROJECT1, newFolderName);
+        assertTrue(bob.pEV.existsFolder(PROJECT1, newFolderName));
+        assertFalse(bob.pEV.existsFolder(PROJECT1, FOLDER1));
     }
 }

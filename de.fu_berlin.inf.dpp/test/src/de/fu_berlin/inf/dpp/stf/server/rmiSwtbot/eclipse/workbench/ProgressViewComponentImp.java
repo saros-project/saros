@@ -29,11 +29,11 @@ public class ProgressViewComponentImp extends EclipseComponent implements
     }
 
     public void openProgressView() throws RemoteException {
-        viewPart.openViewById("org.eclipse.ui.views.ProgressView");
+        basicC.openViewById("org.eclipse.ui.views.ProgressView");
     }
 
     public void activateProgressView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean existPorgress() throws RemoteException {
@@ -65,7 +65,7 @@ public class ProgressViewComponentImp extends EclipseComponent implements
     }
 
     public boolean isProgressViewOpen() throws RemoteException {
-        return viewPart.isViewOpen("Progress");
+        return basicC.isViewOpen("Progress");
     }
 
     // /**

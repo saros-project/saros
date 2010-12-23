@@ -1,17 +1,17 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 
 public class ExistTableItem extends DefaultCondition {
 
-    private SWTBotTable table;
-    private String tableItemName;
+    private BasicComponent basic;
+    private String itemText;
 
-    ExistTableItem(SWTBotTable table, String tableItemName) {
-        this.table = table;
-        this.tableItemName = tableItemName;
+    ExistTableItem(BasicComponent basic, String itemText) {
+        this.basic = basic;
+        this.itemText = itemText;
     }
 
     public String getFailureMessage() {
@@ -20,11 +20,6 @@ public class ExistTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        try {
-            table.getTableItem(tableItemName);
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+        return basic.existsTableItem(itemText);
     }
 }

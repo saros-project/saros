@@ -22,10 +22,10 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
-public class EditorComponenttImp extends EclipseComponent implements
+public class EditorComponentImp extends EclipseComponent implements
     EditorComponent {
 
-    private static transient EditorComponenttImp self;
+    private static transient EditorComponentImp self;
 
     /* error messages */
     private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
@@ -35,12 +35,12 @@ public class EditorComponenttImp extends EclipseComponent implements
     private static String SHELL_SAVE_RESOURCE = "Save Resource";
 
     /**
-     * {@link EditorComponenttImp} is a singleton, but inheritance is possible.
+     * {@link EditorComponentImp} is a singleton, but inheritance is possible.
      */
-    public static EditorComponenttImp getInstance() {
+    public static EditorComponentImp getInstance() {
         if (self != null)
             return self;
-        self = new EditorComponenttImp();
+        self = new EditorComponentImp();
         return self;
     }
 
@@ -391,6 +391,7 @@ public class EditorComponenttImp extends EclipseComponent implements
         SWTBotEclipseEditor editor = getEditor(fileName);
         editor.setFocus();
         editor.typeText(text);
+
         // e.navigateTo(3, 0);
         // e.autoCompleteProposal("main", "main - main method");
         // e.autoCompleteProposal("sys", "sysout - print to standard out");

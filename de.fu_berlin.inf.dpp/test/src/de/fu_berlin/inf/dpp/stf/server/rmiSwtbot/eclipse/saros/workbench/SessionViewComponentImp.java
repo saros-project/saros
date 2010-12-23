@@ -87,27 +87,27 @@ public class SessionViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void openSessionView() throws RemoteException {
         if (!isSessionViewOpen())
-            viewPart.openViewById(VIEWID);
+            basicC.openViewById(VIEWID);
     }
 
     public boolean isSessionViewOpen() throws RemoteException {
-        return viewPart.isViewOpen(VIEWNAME);
+        return basicC.isViewOpen(VIEWNAME);
     }
 
     public void closeSessionView() throws RemoteException {
         if (isSessionViewOpen())
-            viewPart.closeViewById(VIEWID);
+            basicC.closeViewById(VIEWID);
     }
 
     public void setFocusOnSessionView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.setFocusOnViewByTitle(VIEWNAME);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/focusOnsessionView.png");
-        viewPart.waitUntilViewActive(VIEWNAME);
+        basicC.waitUntilViewActive(VIEWNAME);
     }
 
     public boolean isSessionViewActive() throws RemoteException {
-        return viewPart.isViewActive(VIEWNAME);
+        return basicC.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -168,7 +168,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         precondition();
         String contactLabel = getContactStatusInSessionView(contactJID);
-        SWTBotTable table = viewPart.getTableInView(VIEWNAME);
+        SWTBotTable table = basicC.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().equals(contactLabel))
                 return true;
@@ -181,7 +181,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         precondition();
         if (isContactInSessionViewGUI(contactJID)) {
             String contactLabel = getContactStatusInSessionView(contactJID);
-            SWTBotTable table = viewPart.getTableInView(VIEWNAME);
+            SWTBotTable table = basicC.getTableInView(VIEWNAME);
             table.getTableItem(contactLabel).select();
         }
     }
@@ -212,12 +212,12 @@ public class SessionViewComponentImp extends EclipseComponent implements
 
     public boolean existsLabelTextInSessionView() throws RemoteException {
         precondition();
-        return viewPart.existsLabelTextInView(VIEWNAME);
+        return basicC.existsLabelInView(VIEWNAME);
     }
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelTextInSessionView())
-            return viewPart.getView(VIEWNAME).bot().label().getText();
+            return basicC.getView(VIEWNAME).bot().label().getText();
         return null;
     }
 
@@ -241,7 +241,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        basicC.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -262,7 +262,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        basicC.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -283,7 +283,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        basicC.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_REMOVE_DRIVER_ROLE);
         sessionV.waitUntilIsNoDriver();
     }
@@ -492,7 +492,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public boolean isInFollowModeGUI() throws RemoteException {
         try {
             precondition();
-            SWTBotTable table = viewPart.getTableInView(VIEWNAME);
+            SWTBotTable table = basicC.getTableInView(VIEWNAME);
             for (int i = 0; i < table.rowCount(); i++) {
                 try {
                     return table.getTableItem(i)
@@ -549,7 +549,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getContactStatusInSessionView(followedUserJID);
-        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        basicC.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_STOP_FOLLOWING_THIS_USER);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -578,14 +578,14 @@ public class SessionViewComponentImp extends EclipseComponent implements
     public boolean isCMStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
         precondition();
-        return tablePart.isContextMenuOfTableVisible(contactName,
+        return basicC.isContextMenuOfTableVisibleInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public boolean isCMStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
         precondition();
-        return tablePart.isContextMenuOfTableEnabled(contactName,
+        return basicC.isContextMenuOfTableEnabledInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
@@ -846,7 +846,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
     private List<String> getAllContactsInSessionView() throws RemoteException {
         precondition();
         List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = viewPart.getTableInView(VIEWNAME);
+        SWTBotTable table = basicC.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
             allContactsName.add(table.getTableItem(i).getText());
         }
@@ -863,7 +863,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        viewPart.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
+        basicC.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
 
     }
 
@@ -874,19 +874,22 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        viewPart.selectTableItemWithLabelInView(VIEWNAME, contactLabel);
+        basicC.selectTableItemWithLabelInView(VIEWNAME, contactLabel);
     }
 
-    private boolean isToolbarButtonEnabled(String tooltip) {
-        return viewPart.isToolbarInViewEnabled(VIEWNAME, tooltip);
+    private boolean isToolbarButtonEnabled(String tooltip)
+        throws RemoteException {
+        return basicC.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
     }
 
-    private void clickToolbarButtonWithTooltip(String tooltipText) {
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, tooltipText);
+    private void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException {
+        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, tooltipText);
     }
 
-    private List<SWTBotToolbarButton> getToolbarButtons() {
-        return viewPart.getAllToolbarButtonsOnView(VIEWNAME);
+    private List<SWTBotToolbarButton> getToolbarButtons()
+        throws RemoteException {
+        return basicC.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
 }

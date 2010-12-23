@@ -45,7 +45,7 @@ public class TestSVNStateUpdates extends STFTest {
         for (final Tester musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    if (!musician.pEV.isProjectExist(SVN_PROJECT_COPY)) {
+                    if (!musician.pEV.existsProject(SVN_PROJECT_COPY)) {
                         musician.pEV.newJavaProject(SVN_PROJECT_COPY);
                         musician.pEV
                             .shareProjectWithSVNUsingSpecifiedFolderName(
@@ -79,9 +79,9 @@ public class TestSVNStateUpdates extends STFTest {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
-                    assertTrue(musician.pEV.isProjectExist(SVN_PROJECT));
+                    assertTrue(musician.pEV.existsProject(SVN_PROJECT));
                     assertTrue(musician.pEV.isProjectManagedBySVN(SVN_PROJECT));
-                    assertTrue(musician.pEV.isFileExist(SVN_CLS1_FULL_PATH));
+                    assertTrue(musician.pEV.existsFile(SVN_CLS1_FULL_PATH));
                     return null;
                 }
             });
@@ -101,10 +101,10 @@ public class TestSVNStateUpdates extends STFTest {
     public void after() throws Exception {
         super.after();
         alice.leaveSessionHostFirstDone(bob);
-        if (bob.pEV.isProjectExist(SVN_PROJECT))
+        if (bob.pEV.existsProject(SVN_PROJECT))
             bob.pEV.deleteProject(SVN_PROJECT);
 
-        if (alice.pEV.isProjectExist(SVN_PROJECT))
+        if (alice.pEV.existsProject(SVN_PROJECT))
             alice.pEV.deleteProject(SVN_PROJECT);
     }
 
@@ -145,8 +145,8 @@ public class TestSVNStateUpdates extends STFTest {
         assertTrue(bob.sessionV.isDriver());
         bob.pEV.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
-        alice.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, "Asdf");
-        assertTrue(alice.pEV.isClassExist(SVN_PROJECT, SVN_PKG, "Asdf"));
+        alice.pEV.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
+        assertTrue(alice.pEV.existsClass(SVN_PROJECT, SVN_PKG, "Asdf"));
     }
 
     /**
@@ -176,8 +176,8 @@ public class TestSVNStateUpdates extends STFTest {
         bob.pEV.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
             "new_package");
 
-        alice.pEV.waitUntilClassExist(SVN_PROJECT, "new_package", SVN_CLS1);
-        assertTrue(alice.pEV.isClassExist(SVN_PROJECT, "new_package", SVN_CLS1));
+        alice.pEV.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
+        assertTrue(alice.pEV.existsClass(SVN_PROJECT, "new_package", SVN_CLS1));
     }
 
     /**
@@ -300,10 +300,10 @@ public class TestSVNStateUpdates extends STFTest {
     public void testRevert() throws RemoteException {
         alice.pEV.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
         bob.pEV.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertFalse(bob.pEV.isFileExist(STFTest.SVN_CLS1_FULL_PATH));
+        assertFalse(bob.pEV.existsFile(STFTest.SVN_CLS1_FULL_PATH));
         alice.pEV.revertProject(SVN_PROJECT);
-        bob.pEV.waitUntilClassExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertTrue(bob.pEV.isFileExist(STFTest.SVN_CLS1_FULL_PATH));
+        bob.pEV.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        assertTrue(bob.pEV.existsFile(STFTest.SVN_CLS1_FULL_PATH));
     }
 
 }

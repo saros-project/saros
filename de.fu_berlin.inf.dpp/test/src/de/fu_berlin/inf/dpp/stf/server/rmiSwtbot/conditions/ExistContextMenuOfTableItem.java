@@ -1,17 +1,20 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
 
 public class ExistContextMenuOfTableItem extends DefaultCondition {
 
-    private SWTBotTableItem tableItem;
-    private String text;
+    private BasicComponent basic;
+    private String itemText;
+    private String contextName;
 
-    ExistContextMenuOfTableItem(SWTBotTableItem tableItem, String text) {
-        this.tableItem = tableItem;
-        this.text = text;
+    ExistContextMenuOfTableItem(BasicComponent basic, String itemText,
+        String contextName) {
+        this.basic = basic;
+        this.itemText = itemText;
+        this.contextName = contextName;
     }
 
     public String getFailureMessage() {
@@ -20,11 +23,6 @@ public class ExistContextMenuOfTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        try {
-            tableItem.contextMenu(text);
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+        return basic.isContextMenuOfTableEnabled(itemText, contextName);
     }
 }

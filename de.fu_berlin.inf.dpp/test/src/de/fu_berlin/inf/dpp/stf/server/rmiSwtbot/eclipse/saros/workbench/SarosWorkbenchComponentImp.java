@@ -65,16 +65,16 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void closeUnnecessaryViews() throws RemoteException {
-        if (viewPart.isViewOpen("Problems"))
-            viewPart.closeViewByTitle("Problems");
-        if (viewPart.isViewOpen("Javadoc"))
-            viewPart.closeViewByTitle("Javadoc");
-        if (viewPart.isViewOpen("Declaration"))
-            viewPart.closeViewByTitle("Declaration");
-        if (viewPart.isViewOpen("Task List"))
-            viewPart.closeViewByTitle("Task List");
-        if (viewPart.isViewOpen("Outline"))
-            viewPart.closeViewByTitle("Outline");
+        if (basicC.isViewOpen("Problems"))
+            basicC.closeViewByTitle("Problems");
+        if (basicC.isViewOpen("Javadoc"))
+            basicC.closeViewByTitle("Javadoc");
+        if (basicC.isViewOpen("Declaration"))
+            basicC.closeViewByTitle("Declaration");
+        if (basicC.isViewOpen("Task List"))
+            basicC.closeViewByTitle("Task List");
+        if (basicC.isViewOpen("Outline"))
+            basicC.closeViewByTitle("Outline");
     }
 
     public void resetSaros() throws RemoteException {
@@ -137,7 +137,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void closeWelcomeView() throws RemoteException {
-        viewPart.closeViewByTitle(VIEW_TITLE_WELCOME);
+        basicC.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
     public void deleteAllProjects() throws RemoteException {

@@ -5,13 +5,13 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 public class isViewActive extends DefaultCondition {
 
-    private SWTWorkbenchBot bot1;
+    private SWTWorkbenchBot bot;
     private String name;
 
     isViewActive(SWTWorkbenchBot bot, String name) {
 
         this.name = name;
-        this.bot1 = bot;
+        this.bot = bot;
     }
 
     public String getFailureMessage() {
@@ -20,14 +20,7 @@ public class isViewActive extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return bot1.activeView().getTitle().equals(name);
-        // try {
-        // return bot1.viewByTitle(name).isActive();
-        //
-        // } catch (WidgetNotFoundException e) {
-        // return false;
-        // }
-
+        return bot.activeView().getTitle().equals(name);
     }
 
 }

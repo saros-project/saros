@@ -71,6 +71,7 @@ public class STFTest {
     public static final String PKG1 = "my.pkg";
     public static final String PKG2 = "my.pkg2";
     public static final String PKG3 = "my.pkg3";
+    public static final String SRC = "src";
 
     /* class name */
     public static final String CLS1 = "MyClass";
@@ -282,7 +283,7 @@ public class STFTest {
     public static void deleteFolders(String... folders) throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.pEV.isFolderExist(PROJECT1, folder))
+                if (tester.pEV.existsFolder(PROJECT1, folder))
                     tester.pEV.deleteFolder(PROJECT1, folder);
             }
         }

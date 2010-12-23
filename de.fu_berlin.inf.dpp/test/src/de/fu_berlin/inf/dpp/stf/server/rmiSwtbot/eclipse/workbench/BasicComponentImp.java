@@ -1,13 +1,36 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
-import java.rmi.RemoteException;
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.tableHasRows;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
+import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.ContextMenuHelper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
 public class BasicComponentImp extends EclipseComponent implements
@@ -33,15 +56,34 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * basic widget: {@link SWTBotButton}.
+     * actions with basic widget: {@link SWTBotButton}.
      * 
      **********************************************/
     public void clickButton(String mnemonicText) throws RemoteException {
         bot.button(mnemonicText).click();
     }
 
+    public void clickButtonWithTooltip(String tooltip) throws RemoteException {
+        bot.buttonWithTooltip(tooltip).click();
+    }
+
     public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
         return bot.button(mnemonicText).isEnabled();
+    }
+
+    public boolean existsButtonInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        try {
+            bot.buttonInGroup(mnemonicText, inGroup);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean isButtonWithTooltipEnabled(String tooltip)
+        throws RemoteException {
+        return bot.buttonWithTooltip(tooltip).isEnabled();
     }
 
     public void waitUntilButtonEnabled(String mnemonicText)
@@ -49,15 +91,14 @@ public class BasicComponentImp extends EclipseComponent implements
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
     }
 
-    public void waitUnitButtonWithTooltipIsEnabled(String tooltipText)
+    public void waitUnitButtonWithTooltipIsEnabled(String tooltip)
         throws RemoteException {
-        waitUntil(Conditions
-            .widgetIsEnabled(bot.buttonWithTooltip(tooltipText)));
+        waitUntil(Conditions.widgetIsEnabled(bot.buttonWithTooltip(tooltip)));
     }
 
     /**********************************************
      * 
-     * basic widget: {@link SWTBotText}.
+     * actions with basic widget: {@link SWTBotText}.
      * 
      **********************************************/
     public void setTextInTextWithLabel(String text, String label)
@@ -71,19 +112,833 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * basic widget: {@link SWTBotLabel}.
+     * actions with basic widget: {@link SWTBotLabel}.
      * 
      **********************************************/
-    public String geFirsttLabelText() throws RemoteException {
+    public String geFirstLabelText() throws RemoteException {
         return bot.label().getText();
     }
 
-    public boolean existsLabel(String label) throws RemoteException {
+    public boolean existsLabel(String mnemonicText) throws RemoteException {
         try {
-            bot.label(label);
+            bot.label(mnemonicText);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
         }
+    }
+
+    /**********************************************
+     * 
+     * actions with basic widget: {@link SWTBotTable}.
+     * 
+     **********************************************/
+
+    /***************** exist table item ****************** */
+    public boolean existsTableItem(String itemText) throws RemoteException {
+        return existsTableItem(bot.table(), itemText);
+    }
+
+    public boolean existsTableItemInView(String viewTitle, String itemText)
+        throws RemoteException {
+        return existsTableItem(getTableInView(viewTitle), itemText);
+    }
+
+    /***************** select table item ****************** */
+    public void selectTableItem(String itemText) throws RemoteException {
+        selectTableItem(bot.table(), itemText);
+    }
+
+    public void selectTableItemInView(String viewTitle, String itemText)
+        throws RemoteException {
+        selectTableItem(getTableInView(viewTitle), itemText);
+    }
+
+    /***************** exists context of tree item ****************** */
+    public boolean existsContextMenuOfTableItem(String itemName,
+        String contextName) throws RemoteException {
+        return existsContextMenuOfTableItem(bot.table(), itemName, contextName);
+    }
+
+    public boolean existsContextMenuOfTableItemInView(String viewName,
+        String itemName, String contextName) throws RemoteException {
+        return existsContextMenuOfTableItem(getTableInView(viewName), itemName,
+            contextName);
+    }
+
+    /***************** click context of tree item ****************** */
+    public void clickContextMenuOfTable(String itemText, String contextName)
+        throws RemoteException {
+        clickContextMenuOfTable(bot.table(), itemText, contextName);
+    }
+
+    public void clickContextMenuOfTableInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        clickContextMenuOfTable(getTableInView(viewTitle), itemText,
+            contextName);
+    }
+
+    /***************** is context of tree item visible ****************** */
+    public boolean isContextMenuOfTableVisible(String itemText,
+        String contextName) throws RemoteException {
+        return isContextMenuOfTableVisible(bot.table(), itemText, contextName);
+    }
+
+    public boolean isContextMenuOfTableVisibleInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        return isContextMenuOfTableVisible(getTableInView(viewTitle), itemText,
+            contextName);
+    }
+
+    /***************** is context of tree item enabled ****************** */
+    public boolean isContextMenuOfTableEnabled(String itemText,
+        String contextName) throws RemoteException {
+        return isContextMenuOfTableEnabled(bot.table(), itemText, contextName);
+    }
+
+    public boolean isContextMenuOfTableEnabledInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        return isContextMenuOfTableEnabled(getTableInView(viewTitle), itemText,
+            contextName);
+    }
+
+    /***************** checkbox of tree item enabled ****************** */
+    public void selectCheckBoxInTable(String itemText) throws RemoteException {
+        for (int i = 0; i < bot.table().rowCount(); i++) {
+            if (bot.table().getTableItem(i).getText(0).equals(itemText)) {
+                bot.table().getTableItem(i).check();
+                log.debug("Found checkbox item \"" + itemText + "\".");
+                return;
+            }
+        }
+        throw new WidgetNotFoundException("No checkbox item found with text \""
+            + itemText + "\".");
+    }
+
+    public void selectCheckBoxsInTable(List<String> itemTexts)
+        throws RemoteException {
+        for (int i = 0; i < bot.table().rowCount(); i++) {
+            String next = bot.table().getTableItem(i).getText(0);
+            if (itemTexts.contains(next)) {
+                bot.table().getTableItem(i).check();
+            }
+        }
+    }
+
+    public List<String> getTableColumns() throws RemoteException {
+        return bot.table().columns();
+    }
+
+    /***************** waits until ****************** */
+    public void waitUntilTableItemExisted(BasicComponent basic, String itemText)
+        throws RemoteException {
+        waitUntil(SarosConditions.existTableItem(basic, itemText));
+    }
+
+    public void waitUntilTableHasRows(int row) throws RemoteException {
+        waitUntil(tableHasRows(bot.table(), row));
+    }
+
+    public void waitUntilContextMenuOfTableItemEnabled(BasicComponent basic,
+        String itemText, String contextName) throws RemoteException {
+        waitUntil(SarosConditions.ExistContextMenuOfTableItem(basic, itemText,
+            contextName));
+    }
+
+    /**********************************************
+     * 
+     * actions with basic widget: {@link SWTBotTree}.
+     * 
+     **********************************************/
+
+    /***************** select tree item ****************** */
+    public void selectTreeItem(String... nodes) throws RemoteException {
+        selectTreeItem(bot.tree(), nodes);
+    }
+
+    public void selectTreeItemInView(String viewTitle, String... nodes)
+        throws RemoteException {
+        selectTreeItem(getTreeInView(viewTitle), nodes);
+    }
+
+    /***************** select tree item with regexs****************** */
+
+    public void selectTreeItemWithRegexs(String... regexNodes)
+        throws RemoteException {
+        selectTreeItemWithRegexs(bot.tree(), regexNodes);
+    }
+
+    public void selectTreeItemWithRegexsInView(String viewTitle,
+        String... regexNodes) throws RemoteException {
+        selectTreeItemWithRegexs(getTreeInView(viewTitle), regexNodes);
+    }
+
+    /***************** select tree item with waiting expand ****************** */
+    public void selectTreeItemWithWaitingExpand(String... nodes)
+        throws RemoteException {
+        selectTreeItemWithWaitingExpand(bot.tree(), nodes);
+    }
+
+    public void selectTreeItemWithWaitingExpandInView(String viewTitle,
+        String... nodes) throws RemoteException {
+        selectTreeItemWithWaitingExpand(getTreeInView(viewTitle), nodes);
+    }
+
+    /***************** exist tree item with regexs ****************** */
+
+    public boolean existsTreeItemWithRegexs(String... regexs)
+        throws RemoteException {
+        return existsTreeItemWithRegexs(bot.tree(), regexs);
+    }
+
+    public boolean existsTreeItemWithRegexsInView(String viewTitle,
+        String... regexs) throws RemoteException {
+        return existsTreeItemWithRegexs(getTreeInView(viewTitle), regexs);
+    }
+
+    /***************** exist tree item ****************** */
+    public boolean existsTreeItemInTree(String itemText) throws RemoteException {
+        return existsTreeItemInTree(bot.tree(), itemText);
+    }
+
+    public boolean existsTreeItemInTreeInView(String viewTitle, String itemText)
+        throws RemoteException {
+        return existsTreeItemInTree(getTreeInView(viewTitle), itemText);
+    }
+
+    public boolean existsTreeItemInTreeNode(String itemText, String... nodes)
+        throws RemoteException {
+        return getAllItemsInTreeNode(nodes).contains(itemText);
+    }
+
+    public boolean existsTreeItemInTreeNodeInView(String viewTitle,
+        String itemText, String... nodes) throws RemoteException {
+        return getAllItemsInTreeNodeInView(viewTitle, nodes).contains(itemText);
+    }
+
+    /***************** exist context of tree item ****************** */
+    public boolean existsContextOfTreeItem(String contextName, String... nodes)
+        throws RemoteException {
+        return existsContextOfTreeItem(bot.tree(), contextName, nodes);
+    }
+
+    public boolean existsContextOfTreeItemInView(String viewTitle,
+        String contextName, String... nodes) throws RemoteException {
+        return existsContextOfTreeItem(getTreeInView(viewTitle), contextName,
+            nodes);
+    }
+
+    public boolean existsSuMenuOfContextOfTreeItem(String[] contextNames,
+        String... nodes) throws RemoteException {
+        return existsSubMenuOfContextOfTreeItem(bot.tree(), contextNames, nodes);
+    }
+
+    public boolean existsSubmenuOfContextOfTreeItemInView(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException {
+        return existsSubMenuOfContextOfTreeItem(getTreeInView(viewTitle),
+            contextNames, nodes);
+    }
+
+    /***************** is context of tree item enabled****************** */
+    public boolean isContextOfTreeItemEnabled(String contextName,
+        String... nodes) throws RemoteException {
+        return isContextOfTreeItemEnabled(bot.tree(), contextName, nodes);
+    }
+
+    public boolean isContextOfTreeItemInViewEnabled(String viewTitle,
+        String contextName, String... nodes) throws RemoteException {
+        return isContextOfTreeItemEnabled(getTreeInView(viewTitle),
+            contextName, nodes);
+    }
+
+    public boolean isSuMenuOfContextOfTreeItemEnabled(String[] contextNames,
+        String... nodes) throws RemoteException {
+        return isSubMenuOfContextOfTreeItemEnabled(bot.tree(), contextNames,
+            nodes);
+    }
+
+    public boolean isSubmenuOfContextOfTreeItemInViewEnabled(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException {
+        return isSubMenuOfContextOfTreeItemEnabled(getTreeInView(viewTitle),
+            contextNames, nodes);
+    }
+
+    /***************** click context of tree item ****************** */
+
+    public void clickContextsOfTreeItem(String contextName, String... nodes)
+        throws RemoteException {
+        clickContextsOfTreeItem(bot.tree(), contextName, nodes);
+    }
+
+    public void clickContextsOfTreeItemInView(String viewTitle,
+        String contextName, String... nodes) throws RemoteException {
+        clickContextsOfTreeItem(getTreeInView(viewTitle), contextName, nodes);
+    }
+
+    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
+        String... nodes) throws RemoteException {
+        clickSubMenuOfContextsOfTreeItem(bot.tree(), contextNames, nodes);
+    }
+
+    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException {
+        clickSubMenuOfContextsOfTreeItem(getTreeInView(viewTitle),
+            contextNames, nodes);
+    }
+
+    /***************** get allItems in treeNode ****************** */
+
+    public List<String> getAllItemsInTreeNode(String... nodes)
+        throws RemoteException {
+        SWTBotTree tree = bot.tree();
+        SWTBotTreeItem treeNode = tree.expandNode(nodes);
+        return getAllItemsInTreeNode(treeNode);
+    }
+
+    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
+        String... nodes) throws RemoteException {
+        SWTBotTreeItem treeNode = getTreeInView(viewTitle).expandNode(nodes);
+        return getAllItemsInTreeNode(treeNode);
+    }
+
+    /***************** get allItems in tree ****************** */
+    public List<String> getAllItemsIntree() throws RemoteException {
+        return getAllItemsIntree(bot.tree());
+    }
+
+    public List<String> getAllItemsIntreeInView(String viewTitle)
+        throws RemoteException {
+        return getAllItemsIntree(getTreeInView(viewTitle));
+    }
+
+    public List<String> getAllItemsIntree(SWTBotTree tree)
+        throws RemoteException {
+        List<String> allItemTexts = new ArrayList<String>();
+        for (SWTBotTreeItem item : tree.getAllItems()) {
+            allItemTexts.add(item.getText());
+            log.info("existed treeItem of the tree: " + item.getText());
+        }
+        return allItemTexts;
+    }
+
+    /***************** waits until treeItem existed ****************** */
+    public void waitUntilTreeItemInTreeExisted(final String itemText)
+        throws RemoteException {
+        waitUntilTreeItemInTreeExisted(bot.tree(), itemText);
+    }
+
+    public void waitUntilTreeItemInTreeExisted(final SWTBotTree tree,
+        final String itemText) throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return existsTreeItemInTree(tree, itemText);
+            }
+
+            public String getFailureMessage() {
+                return "Tree " + "doesn't contain the treeItem" + itemText;
+            }
+        });
+    }
+
+    public void waitUntilTreeItemInTreeNodeExisted(final String itemText,
+        final String... nodes) throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return existsTreeItemInTreeNode(itemText, nodes);
+            }
+
+            public String getFailureMessage() {
+                return "The tree node" + "doesn't contain the treeItem"
+                    + itemText;
+            }
+        });
+    }
+
+    public void waitUntilTreeItemInTreeNodeExisted(
+        final SWTBotTreeItem treeNode, final String itemText)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return existsTreeItemInTreeNode(treeNode, itemText);
+            }
+
+            public String getFailureMessage() {
+                return "TreeNode " + treeNode.getText()
+                    + "doesn't contain the treeItem" + itemText;
+            }
+        });
+    }
+
+    public void openViewById(final String viewId) throws RemoteException {
+        try {
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    final IWorkbench wb = PlatformUI.getWorkbench();
+                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+
+                    IWorkbenchPage page = win.getActivePage();
+                    try {
+                        IViewReference[] registeredViews = page
+                            .getViewReferences();
+                        for (IViewReference registeredView : registeredViews) {
+                            log.debug("registered view ID: "
+                                + registeredView.getId());
+                        }
+
+                        page.showView(viewId);
+                    } catch (PartInitException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            log.debug("Couldn't initialize " + viewId, e.getCause());
+        }
+    }
+
+    public boolean isViewOpen(String title) throws RemoteException {
+        return getTitlesOfOpenedViews().contains(title);
+    }
+
+    public void setFocusOnViewByTitle(String title) throws RemoteException {
+        try {
+            bot.viewByTitle(title).setFocus();
+        } catch (WidgetNotFoundException e) {
+            log.warn("view not found '" + title + "'", e);
+        }
+    }
+
+    public boolean isViewActive(String title) throws RemoteException {
+        if (!isViewOpen(title))
+            return false;
+        try {
+            return bot.activeView().getTitle().equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public void closeViewByTitle(String title) throws RemoteException {
+        if (isViewOpen(title)) {
+            bot.viewByTitle(title).close();
+        }
+    }
+
+    public void closeViewById(final String viewId) throws RemoteException {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                IWorkbenchPage page = win.getActivePage();
+                final IViewPart view = page.findView(viewId);
+                if (view != null) {
+                    page.hideView(view);
+                }
+            }
+        });
+    }
+
+    public List<String> getTitlesOfOpenedViews() throws RemoteException {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotView view : bot.views())
+            list.add(view.getTitle());
+        return list;
+    }
+
+    public void clickToolbarButtonWithRegexTooltipInView(String viewName,
+        String tooltipText) throws RemoteException {
+        // bot.viewByTitle(viewName).toolbarPushButton(buttonTooltip).click();
+        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(
+                ".*" + tooltipText + ".*")) {
+                toolbarButton.click();
+                return;
+            }
+        }
+        throw new WidgetNotFoundException(
+            "The toolbarbutton with the tooltipText "
+                + tooltipText
+                + " doesn't exist. Are you sure that the passed tooltip text is correct?");
+    }
+
+    public void clickToolbarPushButtonWithTooltipInView(String viewName,
+        String tooltip) throws RemoteException {
+        bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
+    }
+
+    public boolean existsContextMenuOfTreeItemInView(String viewName,
+        String contextName, String... nodes) throws RemoteException {
+        setFocusOnViewByTitle(viewName);
+
+        SWTBotTreeItem item = getTreeItemWithLabelsInView(viewName, nodes);
+        try {
+            item.contextMenu(contextName);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
+    public boolean existsSubMenuOfContextMenuOfTreeItemInView(String viewTitle,
+        String[] nodes, String... contextNames) throws RemoteException {
+        try {
+            SWTBotTree tree = getTreeInView(viewTitle);
+            // you should first select the project,whose context you want to
+            // click.
+            selectTreeItemWithRegexs(tree, nodes);
+            ContextMenuHelper.clickContextMenu(tree, contextNames);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean existsLabelInView(String viewTitle) throws RemoteException {
+        try {
+            getView(viewTitle).bot().label();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean isToolbarButtonInViewEnabled(String viewTitle,
+        String tooltipText) throws RemoteException {
+        SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
+            viewTitle, tooltipText);
+        if (button == null)
+            return false;
+        return button.isEnabled();
+    }
+
+    public void waitUntilViewActive(String viewName) throws RemoteException {
+        waitUntil(SarosConditions.isViewActive(bot, viewName));
+    }
+
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
+
+    /**
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @return a {@link SWTBotTree} with the specified <code>none</code> in
+     *         specified view.
+     */
+    public SWTBotTree getTreeInView(String viewName) {
+        return bot.viewByTitle(viewName).bot().tree();
+    }
+
+    /**
+     * @param viewName
+     *            the title on the view tab.
+     * @param labels
+     *            all labels on the treeitem widget
+     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
+     */
+    public SWTBotTreeItem getTreeItemWithLabelsInView(String viewName,
+        String... labels) {
+        try {
+            return getTreeInView(viewName).expandNode(labels).select();
+        } catch (WidgetNotFoundException e) {
+            return null;
+        }
+    }
+
+    public SWTBotTreeItem getTreeItem(String... nodes) {
+        return bot.tree().expandNode(nodes);
+    }
+
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @return all {@link SWTBotToolbarButton} located in the given view.
+     */
+    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String title) {
+        return getView(title).getToolbarButtons();
+    }
+
+    /**
+     * 
+     * @param title
+     *            the title on the view tab.
+     * @return {@link SWTBotTable} with the specified <code>none</code> in
+     *         specified view.
+     */
+    public SWTBotTable getTableInView(String title) {
+        return bot.viewByTitle(title).bot().table();
+    }
+
+    /**
+     * Select a table item specified with the given label in the given view.
+     * 
+     * @param viewName
+     *            the title on the view tab.
+     * @param label
+     *            the table item' name, which you want to select.
+     */
+    public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
+        String label) {
+        try {
+            SWTBotTable table = getTableInView(viewName);
+            return table.getTableItem(label).select();
+        } catch (WidgetNotFoundException e) {
+            log.warn(" table item " + label + " on View " + viewName
+                + " not found.", e);
+        }
+        return null;
+    }
+
+    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String title,
+        String tooltipText) {
+        for (SWTBotToolbarButton toolbarButton : getView(title)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(
+                ".*" + tooltipText + ".*")) {
+                return toolbarButton;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param title
+     *            the title on the view tab.
+     * @return the {@link SWTBotView} specified with the given title.
+     */
+    public SWTBotView getView(String title) {
+        return bot.viewByTitle(title);
+    }
+
+    public SWTBotTreeItem getTreeItemWithRegexs(SWTBotTree tree,
+        String... regexNodes) {
+        SWTBotTreeItem currentItem = null;
+        SWTBotTreeItem[] allChildrenOfCurrentItem;
+        for (String regex : regexNodes) {
+            if (currentItem == null) {
+                allChildrenOfCurrentItem = tree.getAllItems();
+            } else {
+                allChildrenOfCurrentItem = currentItem.getItems();
+            }
+            boolean itemFound = false;
+            for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
+                log.info("treeItem name: " + child.getText());
+                if (child.getText().matches(regex)) {
+                    currentItem = child;
+                    if (!child.isExpanded())
+                        child.expand();
+                    itemFound = true;
+                    continue;
+                }
+            }
+            if (!itemFound) {
+                throw new WidgetNotFoundException("Tree item \"" + regex
+                    + "\" not found. Nodes: " + Arrays.asList(regexNodes));
+            }
+        }
+        return currentItem;
+    }
+
+    public boolean existsTableItem(SWTBotTable table, String itemText) {
+        return table.containsItem(itemText);
+    }
+
+    public void selectTableItem(SWTBotTable table, String itemText) {
+        try {
+            table.getTableItem(itemText).select();
+        } catch (WidgetNotFoundException e) {
+            log.warn("tableItem matching the itemText " + itemText
+                + " doesn't exist.", e);
+        }
+    }
+
+    /***************** get table item ****************** */
+    public SWTBotTableItem getTableItem(String itemText) {
+        return getTableItem(bot.table(), itemText);
+    }
+
+    public SWTBotTableItem getTableItemInView(String viewTitle, String itemText) {
+        return getTableItem(getTableInView(viewTitle), itemText);
+    }
+
+    public SWTBotTableItem getTableItem(SWTBotTable table, String itemText) {
+        try {
+            return table.getTableItem(itemText);
+        } catch (WidgetNotFoundException e) {
+            log.warn("tableItem matching the itemText " + itemText
+                + " doesn't exist.", e);
+        }
+        return null;
+    }
+
+    public boolean existsContextMenuOfTableItem(SWTBotTable table,
+        String itemText, String contextName) {
+        selectTableItem(table, itemText);
+        return ContextMenuHelper.existsContextMenu(table, contextName);
+    }
+
+    public void clickContextMenuOfTable(SWTBotTable table, String itemText,
+        String contextName) {
+        selectTableItem(table, itemText);
+        ContextMenuHelper.clickContextMenu(table, contextName);
+    }
+
+    public boolean isContextMenuOfTableVisible(SWTBotTable table,
+        String itemText, String contextName) {
+        return getTableItem(table, itemText).contextMenu(contextName)
+            .isVisible();
+    }
+
+    public boolean isContextMenuOfTableEnabled(SWTBotTable table,
+        String itemText, String contextName) {
+        selectTableItem(table, itemText);
+        return ContextMenuHelper.isContextMenuEnabled(table, contextName);
+    }
+
+    /**
+     * This method ist very helpful, if you are not sure, how exactly is the
+     * tree item's name.
+     * 
+     * @param tree
+     *            a {@link SWTBotTree} with the specified <code>none</code>
+     * @param regexs
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array parameter.e.g.
+     *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
+     * @return <tt>true</tt>, if the three item specified with the given regexs
+     *         exists
+     */
+
+    public void selectTreeItem(SWTBotTree tree, String... nodes) {
+        try {
+            tree.expandNode(nodes).select();
+        } catch (WidgetNotFoundException e) {
+            log.warn("tree item can't be found.", e);
+        }
+    }
+
+    public void selectTreeItemWithRegexs(SWTBotTree tree, String... regexNodes) {
+        // assert tree != null : "the passed tree is null.";
+        SWTBotTreeItem currentItem = null;
+        SWTBotTreeItem[] allChildrenOfCurrentItem;
+        for (String regex : regexNodes) {
+            if (currentItem == null) {
+                allChildrenOfCurrentItem = tree.getAllItems();
+            } else {
+                allChildrenOfCurrentItem = currentItem.getItems();
+            }
+            boolean itemWithRegexFound = false;
+            for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
+                log.info("treeItem name: " + child.getText());
+                if (child.getText().matches(regex)) {
+                    currentItem = child;
+                    if (!child.isExpanded())
+                        child.expand();
+                    itemWithRegexFound = true;
+                    break;
+                }
+            }
+            if (!itemWithRegexFound) {
+                throw new WidgetNotFoundException("Tree item matching the \""
+                    + regex + "\" can't be found. Nodes: "
+                    + Arrays.asList(regexNodes));
+            }
+        }
+        if (currentItem != null)
+            currentItem.select();
+    }
+
+    public void selectTreeItemWithWaitingExpand(SWTBotTree tree,
+        String... nodes) throws RemoteException {
+        SWTBotTreeItem selectedTreeItem = null;
+        for (String node : nodes) {
+            try {
+                if (selectedTreeItem == null) {
+                    waitUntilTreeItemInTreeExisted(tree, node);
+                    selectedTreeItem = tree.expandNode(node);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                } else {
+                    waitUntilTreeItemInTreeNodeExisted(selectedTreeItem, node);
+                    selectedTreeItem = selectedTreeItem.expandNode(node);
+                    log.info("treeItem name: " + selectedTreeItem.getText());
+                }
+            } catch (WidgetNotFoundException e) {
+                log.error("treeitem \"" + node + "\" not found");
+            }
+        }
+        if (selectedTreeItem != null) {
+            log.info("treeItem name: " + selectedTreeItem.getText());
+            selectedTreeItem.select();
+
+        }
+    }
+
+    public boolean existsTreeItemWithRegexs(SWTBotTree tree, String... regexs) {
+        try {
+            selectTreeItemWithRegexs(tree, regexs);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean existsTreeItemInTree(SWTBotTree tree, String itemText)
+        throws RemoteException {
+        return getAllItemsIntree(tree).contains(itemText);
+    }
+
+    public boolean existsTreeItemInTreeNode(SWTBotTreeItem treeNode,
+        String itemText) {
+        return getAllItemsInTreeNode(treeNode).contains(itemText);
+    }
+
+    public boolean existsContextOfTreeItem(SWTBotTree tree, String contextName,
+        String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        return ContextMenuHelper.existsContextMenu(tree, contextName);
+    }
+
+    public boolean existsSubMenuOfContextOfTreeItem(SWTBotTree tree,
+        String[] contextNames, String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        return ContextMenuHelper.existsContextMenu(tree, contextNames);
+    }
+
+    public boolean isContextOfTreeItemEnabled(SWTBotTree tree,
+        String contextName, String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        return ContextMenuHelper.isContextMenuEnabled(tree, contextName);
+    }
+
+    public boolean isSubMenuOfContextOfTreeItemEnabled(SWTBotTree tree,
+        String[] contextNames, String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        return ContextMenuHelper.isContextMenuEnabled(tree, contextNames);
+    }
+
+    public void clickContextsOfTreeItem(SWTBotTree tree, String contextName,
+        String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        ContextMenuHelper.clickContextMenu(tree, contextName);
+    }
+
+    public void clickSubMenuOfContextsOfTreeItem(SWTBotTree tree,
+        String[] contextNames, String... nodes) {
+        selectTreeItemWithRegexs(tree, nodes);
+        ContextMenuHelper.clickContextMenu(tree, contextNames);
+    }
+
+    public List<String> getAllItemsInTreeNode(SWTBotTreeItem treeNode) {
+        List<String> allItemTexts = new ArrayList<String>();
+        for (SWTBotTreeItem item : treeNode.getItems()) {
+            allItemTexts.add(item.getText());
+            log.info("existed subTreeItem of the TreeNode "
+                + treeNode.getText() + ": " + item.getText());
+        }
+        return allItemTexts;
     }
 }

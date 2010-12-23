@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
@@ -68,6 +69,80 @@ public class ContextMenuHelper {
                 hide(menuItem.getParent());
             }
         });
+    }
+
+    /**
+     * Exists the context menu matching the texts.
+     * 
+     * @param texts
+     *            the text on the context menus.
+     * @throws WidgetNotFoundException
+     *             if the widget is not found.
+     */
+    public static boolean existsContextMenu(
+        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+
+        final boolean existContext = UIThreadRunnable
+            .syncExec(new BoolResult() {
+                MenuItem menuItem = null;
+
+                public Boolean run() {
+                    Control control = bot.widget;
+                    Menu menu = control.getMenu();
+
+                    for (String text : texts) {
+                        @SuppressWarnings("unchecked")
+                        Matcher<?> matcher = allOf(instanceOf(MenuItem.class),
+                            withMnemonic(text));
+                        menuItem = show(menu, matcher);
+                        if (menuItem != null) {
+                            menu = menuItem.getMenu();
+                        } else {
+                            hide(menu);
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+            });
+        return existContext;
+
+    }
+
+    public static boolean isContextMenuEnabled(
+        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+
+        final boolean istContextEnabled = UIThreadRunnable
+            .syncExec(new BoolResult() {
+                MenuItem menuItem = null;
+
+                public Boolean run() {
+                    Control control = bot.widget;
+                    Menu menu = control.getMenu();
+
+                    for (String text : texts) {
+                        @SuppressWarnings("unchecked")
+                        Matcher<?> matcher = allOf(instanceOf(MenuItem.class),
+                            withMnemonic(text));
+                        menuItem = show(menu, matcher);
+                        if (menuItem != null) {
+                            if (!menuItem.isEnabled()) {
+                                hide(menu);
+                                return false;
+                            } else
+                                menu = menuItem.getMenu();
+                        } else {
+                            hide(menu);
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+            });
+        return istContextEnabled;
+
     }
 
     public static MenuItem show(final Menu menu, final Matcher<?> matcher) {

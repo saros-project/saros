@@ -137,7 +137,7 @@ public interface PEViewComponent extends Remote {
      *            name of the project, e.g. Foo_Saros.
      * @return <tt>true</tt>, if the given project is exist
      */
-    public boolean isProjectExist(String projectName) throws RemoteException;
+    public boolean existsProject(String projectName) throws RemoteException;
 
     /**
      * Performs the action "create a new folder" which should be done with the
@@ -174,7 +174,7 @@ public interface PEViewComponent extends Remote {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}
      */
-    public boolean isFolderExist(String... folderNodes) throws RemoteException;
+    public boolean existsFolder(String... folderNodes) throws RemoteException;
 
     /**
      * waits until the specified folder is exist
@@ -184,7 +184,7 @@ public interface PEViewComponent extends Remote {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}
      */
-    public void waitUntilFolderExist(String... folderNodes)
+    public void waitUntilFolderExisted(String... folderNodes)
         throws RemoteException;
 
     /**
@@ -221,7 +221,7 @@ public interface PEViewComponent extends Remote {
      *            name of the package, e.g. my.pkg.
      * @throws RemoteException
      */
-    public boolean isPkgExist(String projectName, String pkg)
+    public boolean existsPkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -281,7 +281,7 @@ public interface PEViewComponent extends Remote {
      *            of a class file, e.g. "Foo_Saros/src/my/pkg/myClass.java
      * 
      */
-    public boolean isFileExist(String filePath) throws RemoteException;
+    public boolean existsFile(String filePath) throws RemoteException;
 
     /**
      * 
@@ -293,7 +293,7 @@ public interface PEViewComponent extends Remote {
      *                       exists.
      * @throws RemoteException
      */
-    public boolean isFileExist(String... nodes) throws RemoteException;
+    public boolean existsFile(String... nodes) throws RemoteException;
 
     /**
      * 
@@ -307,7 +307,7 @@ public interface PEViewComponent extends Remote {
      *         parameters exists.
      * @throws RemoteException
      */
-    public boolean isClassExist(String projectName, String pkg, String className)
+    public boolean existsClass(String projectName, String pkg, String className)
         throws RemoteException;
 
     /**
@@ -350,7 +350,7 @@ public interface PEViewComponent extends Remote {
      *            name of the class, e.g. myClass.
      * @throws RemoteException
      */
-    public void waitUntilClassExist(String projectName, String pkg,
+    public void waitUntilClassExisted(String projectName, String pkg,
         String className) throws RemoteException;
 
     /**
@@ -616,7 +616,7 @@ public interface PEViewComponent extends Remote {
      *         exists
      * @throws RemoteException
      */
-    public boolean isFileExistWithGUI(String... nodes) throws RemoteException;
+    public boolean existsFiletWithGUI(String... nodes) throws RemoteException;
 
     /**
      * @param fileNodes
@@ -624,7 +624,7 @@ public interface PEViewComponent extends Remote {
      *            path specified by the node array parameter.e.g. {"Foo-saros",
      *            "myFolder", "myFile.xml"}
      */
-    public void waitUntilFileExist(String... fileNodes) throws RemoteException;
+    public void waitUntilFileExisted(String... fileNodes) throws RemoteException;
 
     /**
      * Performs the action "move class to another package" which should be done

@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 
@@ -293,10 +292,9 @@ public interface RosterViewComponent extends Remote {
      * @param baseJID
      *            the base JID of the contact showed under Buddies which you
      *            want to select
-     * @return
      * @throws RemoteException
      */
-    public SWTBotTreeItem selectBuddyGUI(String baseJID) throws RemoteException;
+    public void selectBuddyGUI(String baseJID) throws RemoteException;
 
     /**
      * 

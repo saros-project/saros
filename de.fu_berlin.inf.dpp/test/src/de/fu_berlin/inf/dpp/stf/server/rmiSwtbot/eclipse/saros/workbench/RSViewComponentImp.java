@@ -42,60 +42,59 @@ public class RSViewComponentImp extends EclipseComponent implements
      */
 
     public void activateRemoteScreenView() throws RemoteException {
-        viewPart.setFocusOnViewByTitle(VIEWNAME);
+        basicC.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return viewPart.isViewOpen(VIEWNAME);
+        return basicC.isViewOpen(VIEWNAME);
     }
 
     public boolean isRemoteScreenViewActive() throws RemoteException {
-        return viewPart.isViewActive(VIEWNAME);
+        return basicC.isViewActive(VIEWNAME);
     }
 
     public void openRemoteScreenView() throws RemoteException {
         if (!isRemoteScreenViewOpen())
-            viewPart.openViewById(VIEWID);
+            basicC.openViewById(VIEWID);
     }
 
     public void closeRemoteScreenView() throws RemoteException {
-        viewPart.closeViewById(VIEWID);
+        basicC.closeViewById(VIEWID);
     }
 
     public void changeModeOfImageSource() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME,
+        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
     public void stopRunningSession() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME,
+        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_STOP_RUNNING_SESSION);
     }
 
     public void resume() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, TB_RESUME);
+        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_RESUME);
     }
 
     public void pause() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        viewPart.clickToolbarButtonWithTooltipInView(VIEWNAME, TB_PAUSE);
+        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_PAUSE);
     }
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        viewPart.waitUntilViewActive(VIEWNAME);
+        basicC.waitUntilViewActive(VIEWNAME);
     }
 
     public void IncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        shellC
-            .confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+        shellC.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
 }
