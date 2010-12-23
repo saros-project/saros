@@ -12,6 +12,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
@@ -159,23 +160,95 @@ public interface BasicComponent extends Remote {
      * 
      **********************************************/
 
+    /***************** exists table item ****************** */
     /**
-     * Selects the tableItem matching the given itemText.
+     * this method is suitable for Shell widget
      * 
      * @param itemText
-     *            text of the selected table item.
-     * @return the object {@link SWTBotTableItem} specified with the given
-     *         itemText.
+     *            text of a table item.
+     * @return<tt>true</tt>, if the tableItem specified with the given itemText
+     *                       exists in the table: bot.table().
+     * 
      * @throws RemoteException
      */
-    ;
+    public boolean existsTableItem(String itemText) throws RemoteException;
 
-    public void selectTableItem(String itemText) throws RemoteException;
-
-    public void selectTableItemInView(String viewTitle, String itemText)
+    /**
+     * this method is suitable for view widget
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            text of a table item.
+     * @return<tt>true</tt>, if the tableItem specified with the given itemText
+     *                       in the view specified with the given viewTitle
+     *                       exists in the table:
+     *                       bot.getViewTitle(viewTitle).bot().table().
+     * @throws RemoteException
+     */
+    public boolean existsTableItemInView(String viewTitle, String itemText)
         throws RemoteException;
 
     /**
+     * 
+     * 
+     * Selects the tableItem matching the given itemText. This method is
+     * suitable for Shell widget.
+     * 
+     * @param itemText
+     *            text of the selected table item.
+     * 
+     * @throws RemoteException
+     */
+    public void selectTableItem(String itemText) throws RemoteException;
+
+    /**
+     * Selects the tableItem matching the given itemText in the given view. This
+     * method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            text of the selected table item.
+     * @throws RemoteException
+     */
+    public void selectTableItemInView(String viewTitle, String itemText)
+        throws RemoteException;
+
+    /***************** exists context of table item ****************** */
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param itemText
+     *            text of the selected table item.
+     * @param contextName
+     *            the name of the context of the selected tableItem.
+     * @return<tt></tt>, if the specified contextMenu exists.
+     * @throws RemoteException
+     */
+    public boolean existsContextMenuOfTableItem(String itemText,
+        String contextName) throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            the name of the table item.
+     * @param contextName
+     *            the name of the context menu of the given tableItem specified
+     *            with the given itemText
+     * @return <tt>true</tt> if the specified context menu of the select table
+     *         item exists.
+     */
+    public boolean existsContextMenuOfTableItemInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException;
+
+    /***************** click context of table item ****************** */
+    /**
+     * This method is suitable for shell widget.
+     * 
      * Click the context menu matching the given contextName of the selected
      * table item matching the given itemText.<br/>
      * Operational steps:
@@ -195,6 +268,29 @@ public interface BasicComponent extends Remote {
         throws RemoteException;
 
     /**
+     * This method is suitable for view widget.
+     * 
+     * Click a context menu of the selected table item in the given view.
+     * <p>
+     * Operational steps:
+     * <ol>
+     * <li>select a table item</li>
+     * <li>then click the specified context menu on it</li>
+     * </ol>
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemName
+     *            the table item' name, whose context menu you want to click.
+     * 
+     */
+    public void clickContextMenuOfTableInView(String viewTitle,
+        String itemName, String contextName) throws RemoteException;
+
+    /***************** is context of table item visible ****************** */
+
+    /**
+     * This method is suitable for shell widget.
      * 
      * @param itemText
      *            text of the selected table item.
@@ -207,10 +303,25 @@ public interface BasicComponent extends Remote {
     public boolean isContextMenuOfTableVisible(String itemText,
         String contextName) throws RemoteException;
 
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            text of the selected table item.
+     * @param contextName
+     *            the text on the context menu.
+     * @return<tt>true</tt>, if the specified contextMenu of the selected
+     *                       tableItem is visible.
+     * @throws RemoteException
+     */
     public boolean isContextMenuOfTableVisibleInView(String viewTitle,
         String itemText, String contextName) throws RemoteException;
 
+    /***************** is context of tree item enabled ****************** */
     /**
+     * This method is suitable for shell widget.
      * 
      * @param itemText
      *            text of the selected table item.
@@ -223,9 +334,23 @@ public interface BasicComponent extends Remote {
     public boolean isContextMenuOfTableEnabled(String itemText,
         String contextName) throws RemoteException;
 
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            text of the selected table item.
+     * @param contextName
+     *            the text on the context menu
+     * @return<tt>true</tt>, if the specified contextMenu of the selected
+     *                       tableItem is enabled.
+     * @throws RemoteException
+     */
     public boolean isContextMenuOfTableEnabledInView(String viewTitle,
         String itemText, String contextName) throws RemoteException;
 
+    /***************** checkbox of tree item ****************** */
     /**
      * checks the checkBox of the tableItem specified with the given itemText.
      * 
@@ -254,53 +379,9 @@ public interface BasicComponent extends Remote {
      */
     public List<String> getTableColumns() throws RemoteException;
 
+    /***************** waits until ****************** */
     /**
-     * 
-     * @param itemText
-     *            text of a table item.
-     * @return<tt>true</tt>, if the table contains the specified tableItem.
-     * @throws RemoteException
-     */
-    public boolean existsTableItem(String itemText) throws RemoteException;
-
-    public boolean existsTableItemInView(String viewTitle, String itemText)
-        throws RemoteException;
-
-    /**
-     * 
-     * TODO optimize this function, it takes too long to identify whether a
-     * context exist because of waiting until timeout.
-     * 
-     * @param itemText
-     *            name of the table item, whose context menu you want to
-     *            check,if it exists.
-     * @param contextName
-     *            name of the context menu you want to check,if it exists.
-     * @return <tt>true</tt>, if the context menu of the specified table item
-     *         exists.
-     */
-    // public boolean existsContextOfTableItem(String itemText, String
-    // contextName)
-    // throws RemoteException;
-
-    /**
-     * 
-     * TODO it don't work yet, need to be fixed.
-     * 
-     * @param itemText
-     *            name of the table item, whose context menu you want to
-     *            check,if it exists.
-     * @param contextName
-     *            name of the context menu you want to check,if it exists.
-     * @return <tt>true</tt>, if the context menu of the specified table item
-     *         exists.
-     */
-    // public boolean existContextOfTableItem(
-    // final AbstractSWTBot<? extends Control> bot, final String itemText,
-    // final String contextName) throws RemoteException;
-
-    /**
-     * waits until if the specified tableItem exists.
+     * waits until the specified tableItem existed.
      * 
      * @param basic
      *            the object {@link BasicComponent}
@@ -319,6 +400,7 @@ public interface BasicComponent extends Remote {
     public void waitUntilTableHasRows(int row) throws RemoteException;
 
     /**
+     * waits until the specified contextMenu of the selected tableItem enabled.
      * 
      * @param basic
      *            the object {@link BasicComponent}
@@ -326,7 +408,7 @@ public interface BasicComponent extends Remote {
      *            name of the table item, whose context menu you want to
      *            check,if it is enabled.
      * @param contextName
-     *            , the name on the context menu.
+     *            the name on the context menu.
      * @throws RemoteException
      */
     public void waitUntilContextMenuOfTableItemEnabled(BasicComponent basic,
@@ -338,66 +420,434 @@ public interface BasicComponent extends Remote {
      * 
      **********************************************/
 
-    public boolean existsTreeItemWithRegexs(String... regexs)
-        throws RemoteException;
-
-    public boolean existsTreeItemWithRegexsInView(String viewTitle,
-        String... regexs) throws RemoteException;
+    /***************** select tree item ****************** */
 
     /**
+     * Selects the treeItem matching the given nodes in the tree: bot.tree().
+     * This method is suitable for Shell widget.
      * 
-     * @param tree
-     *            a {@link SWTBotTree} with the specified <code>none</code>
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void selectTreeItem(String... nodes) throws RemoteException;
+
+    /**
+     * Selects the treeItem matching the given nodes in the tree:
+     * bot.getViewTitle(viewTitle).bot().tree(). This method is suitable for
+     * view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void selectTreeItemInView(String viewTitle, String... nodes)
+        throws RemoteException;
+
+    /***************** select tree item with regexs ******************/
+
+    /**
+     * Selects the treeItem matching the given Regexnodes in the tree:
+     * bot.tree(). This method is suitable for shell widget.
+     * 
      * @param regexNodes
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the regex array
      *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
-     * @return the {@link SWTBotTree} with the given regexNodes
+     * 
      * @throws WidgetNotFoundException
      *             If the item wasn't found.
      */
-
     public void selectTreeItemWithRegexs(String... regexNodes)
         throws RemoteException;
 
+    /**
+     * Selects the treeItem matching the given Regexnodes in the tree:
+     * bot.getViewTitle(viewTitle).bot().tree(). This method is suitable for
+     * view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param regexNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array
+     *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
+     * @throws RemoteException
+     */
     public void selectTreeItemWithRegexsInView(String viewTitle,
         String... regexNodes) throws RemoteException;
 
-    // public void selectTreeItemWithWaitingExpand(SWTBotTree tree,
-    // String... labels) throws RemoteException;
-
+    /***************** select tree item with waiting expand ****************** */
+    /**
+     * Selects the treeItem matching the given nodes in the tree: bot.tree()
+     * with waiting until the parentTreeItem is expanded. This method is
+     * suitable for shell widget.
+     * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
     public void selectTreeItemWithWaitingExpand(String... nodes)
-        throws RemoteException;
+        throws RemoteException;;
 
+    /**
+     * Selects the treeItem matching the given nodes in the tree:
+     * bot.getViewTitle(viewTitle).bot().tree() with waiting until the
+     * parentTreeItem is expanded. This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
     public void selectTreeItemWithWaitingExpandInView(String viewTitle,
         String... nodes) throws RemoteException;
 
-    public void selectTreeItem(String... nodes) throws RemoteException;
+    /***************** exist tree item with regexs ****************** */
 
-    public void selectTreeItemInView(String viewTitle, String... nodes)
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param regexNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array
+     *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
+     * @return<tt>true</tt>, if the treeItem specified with the given regexNodes
+     *                       exists.
+     * @throws RemoteException
+     */
+    public boolean existsTreeItemWithRegexs(String... regexNodes)
         throws RemoteException;
 
-    public List<String> getAllItemsInTreeNode(String... paths)
-        throws RemoteException;
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param regexNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array
+     *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
+     * @return<tt>true</tt>, if the treeItem specified with the given regexNodes
+     *                       exists.
+     * @throws RemoteException
+     */
+    public boolean existsTreeItemWithRegexsInView(String viewTitle,
+        String... regexNodes) throws RemoteException;
 
-    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
-        String... nodes) throws RemoteException;
-
-    public List<String> getAllItemsIntree() throws RemoteException;
-
-    public List<String> getAllItemsIntree(SWTBotTree tree)
-        throws RemoteException;
-
+    /***************** exists tree item ****************** */
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param itemText
+     *            name of the tree item.
+     * @return<tt>true</tt>, if the treeItem in the bot.tree() exists.
+     * @throws RemoteException
+     */
     public boolean existsTreeItemInTree(String itemText) throws RemoteException;
 
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            name of the tree item.
+     * @return<tt>true</tt>, if the treeItem in the
+     *                       bot.viewByTitle(viewTitle).bot().tree() exists.
+     * @throws RemoteException
+     */
     public boolean existsTreeItemInTreeInView(String viewTitle, String itemText)
         throws RemoteException;
 
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param itemText
+     *            name of the tree item.
+     * @param nodes
+     *            parent node path of the treeItem to expand. Attempts to expand
+     *            all nodes along the path specified by the node array
+     *            parameter.
+     * @return<tt>true</tt>, if the treeItem in the treeNode specified with the
+     *                       given nodes exists.
+     * @throws RemoteException
+     */
     public boolean existsTreeItemInTreeNode(String itemText, String... nodes)
         throws RemoteException;
 
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            name of the tree item.
+     * @param nodes
+     *            parent node path of the treeItem to expand. Attempts to expand
+     *            all nodes along the path specified by the node array
+     *            parameter.
+     * @return<tt>true</tt>, if the treeItem in the treeNode specified with the
+     *                       given nodes exists.
+     * @throws RemoteException
+     */
     public boolean existsTreeItemInTreeNodeInView(String viewTitle,
         String itemText, String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the contextMenu of the selected TreeItem exists.
+     * @throws RemoteException
+     */
+    public boolean existsContextOfTreeItem(String contextName, String... nodes)
+        throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the contextMenu of the selected TreeItem exists.
+     * @throws RemoteException
+     */
+    public boolean existsContextOfTreeItemInView(String viewTitle,
+        String contextName, String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the subMenu of the selected TreeItem exists.
+     * @throws RemoteException
+     */
+    public boolean existsSuMenuOfContextOfTreeItem(String[] contextNames,
+        String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the subMenu of the selected TreeItem exists.
+     * @throws RemoteException
+     */
+    public boolean existsSubmenuOfContextOfTreeItemInView(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException;
+
+    /***************** is context of tree item enabled****************** */
+    /**
+     * This method is suitable for sehll widget.
+     * 
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the contextMenu of the selected TreeItem is
+     *                       enabled.
+     * @throws RemoteException
+     */
+    public boolean isContextOfTreeItemEnabled(String contextName,
+        String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the contextMenu of the selected TreeItem is
+     *                       enabled.
+     * @throws RemoteException
+     */
+    public boolean isContextOfTreeItemInViewEnabled(String viewTitle,
+        String contextName, String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the subMenu of the selected TreeItem is enabled.
+     * @throws RemoteException
+     */
+    public boolean isSuMenuOfContextOfTreeItemEnabled(String[] contextNames,
+        String... nodes) throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return<tt>true</tt>, if the subMenu of the selected TreeItem is enabled.
+     * @throws RemoteException
+     */
+    public boolean isSubmenuOfContextOfTreeItemInViewEnabled(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException;
+
+    /***************** click context of tree item ****************** */
+    /**
+     * 
+     * This method is suitable for shell widget.
+     * 
+     * Clicks the contextMenu of the selected TreeItem.
+     * 
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void clickContextsOfTreeItem(String contextName, String... nodes)
+        throws RemoteException;
+
+    /**
+     * 
+     * This method is suitable for view widget.
+     * 
+     * Clicks the contextMenu of the selected TreeItem.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextName
+     *            the name on the context menu.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void clickContextsOfTreeItemInView(String viewTitle,
+        String contextName, String... nodes) throws RemoteException;
+
+    /**
+     * 
+     * This method is suitable for shell widget.
+     * 
+     * Clicks the subMenu of the selected TreeItem.
+     * 
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
+        String... nodes) throws RemoteException;
+
+    /**
+     * 
+     * This method is suitable for view widget.
+     * 
+     * Clicks the subMenu of the selected TreeItem.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param contextNames
+     *            all menus'name along the path specified by the contentNames
+     *            array parameter.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @throws RemoteException
+     */
+    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException;
+
+    /***************** get allItems in treeNode ****************** */
+
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return all the treeItem'name of the given TreeNode.
+     * @throws RemoteException
+     */
+    public List<String> getAllItemsInTreeNode(String... nodes)
+        throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return all the treeItem'name of the given TreeNode.
+     * @throws RemoteException
+     */
+    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
+        String... nodes) throws RemoteException;
+
+    /***************** get allItems in tree ****************** */
+
+    /**
+     * This method is suitable for shell widget.
+     * 
+     * @return all the treeItem'name of the bot.tree().
+     * @throws RemoteException
+     */
+    public List<String> getAllItemsIntree() throws RemoteException;
+
+    /**
+     * This method is suitable for view widget.
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @return all the treeItem'name of the
+     *         bot.getViewByTitle(viewTitle).bot().tree().
+     * @throws RemoteException
+     */
+    public List<String> getAllItemsIntreeInView(String viewTitle)
+        throws RemoteException;
 
     public void waitUntilTreeItemInTreeExisted(String nodeName)
         throws RemoteException;
@@ -410,57 +860,6 @@ public interface BasicComponent extends Remote {
 
     public void waitUntilTreeItemInTreeNodeExisted(SWTBotTreeItem treeItem,
         String nodeName) throws RemoteException;
-
-    // public SWTBotTree getTreeInView(String viewName) throws RemoteException;
-
-    // /**
-    // * This method is a helper method and should not be exported by rmi. it is
-    // * very helpful, when you want to click a context menu of a tree node in a
-    // * view.e.g.
-    // *
-    // * in Package Explorer View: click context menu "open" of the class file
-    // * "MyClass", in this case, you should pass the
-    // * parameters("Package Explorer", "open", "Foo_Saros","src", "my.pkg",
-    // * "MyClass.java".
-    // *
-    // * in Roster View: click context menu "rename.." of a user
-    // * "lin@saros-con.imp.fu-berlin.de" in buddies. In this case, you shuld
-    // pass
-    // * the parameter ("Roster", "rename...", "Buddies",
-    // * "lin@saros-con.imp.fu-berlin.de").
-    // *
-    // * 1. select the tree node that context menu you want to click.
-    // *
-    // * 2. then click the context menu.
-    // *
-    // * @param viewName
-    // * the title on the view tab. e.g. Package Explorer view or
-    // * Resource Explorer view
-    // * @param nodes
-    // * node path to expand. Attempts to expand all nodes along the
-    // * path specified by the node array parameter.
-    // * @throws RemoteException
-    // */
-    // public void clickContextMenuOfTreeItemInView(String viewName,
-    // String context, String... nodes) throws RemoteException;
-
-    /**
-     * Click a context menu of the selected table item in the given view..
-     * <p>
-     * Operational steps:
-     * <ol>
-     * <li>select a table item</li>
-     * <li>then click the specified context menu on it</li>
-     * </ol>
-     * 
-     * @param viewName
-     *            the title on the view tab.
-     * @param itemName
-     *            the table item' name, whose context menu you want to click.
-     * @see #selectTableItemWithLabelInView(String, String)
-     */
-    public void clickContextMenuOfTableInView(String viewName, String itemName,
-        String contextName) throws RemoteException;
 
     /**
      * click the toolbar button specified with the given buttonTooltip in the
@@ -489,33 +888,6 @@ public interface BasicComponent extends Remote {
      */
     public void clickToolbarPushButtonWithTooltipInView(String viewName,
         String tooltip) throws RemoteException;
-
-    /**
-     * @param viewName
-     *            the title on the view tab.
-     * @return <tt>true</tt> if the specified table item exists.
-     * 
-     */
-    // public boolean existsTableItemInView(String viewName, String itemName)
-    // throws RemoteException;
-
-    public boolean existsContextMenuOfTableItem(String itemName,
-        String contextName) throws RemoteException;
-
-    /**
-     * 
-     * @param viewName
-     *            the title on the view tab.
-     * @param itemName
-     *            the name of the table item.
-     * @param contextName
-     *            the name of the context menu of the given tableItem specified
-     *            with the given itemName
-     * @return <tt>true</tt> if the specified context menu of the select table
-     *         item exists.
-     */
-    public boolean existsContextMenuOfTableItemInView(String viewName,
-        String itemName, String contextName) throws RemoteException;
 
     /**
      * 
@@ -561,26 +933,6 @@ public interface BasicComponent extends Remote {
      *            the title on the view tab.
      */
     public boolean existsLabelInView(String viewName) throws RemoteException;
-
-    // /**
-    // * This method is very useful, if you want to click a sub menu of a
-    // context
-    // * menu of the treeitem specified with the given nodes. e.g. the sub menu
-    // * "Team->Commit...".
-    // *
-    // * @param viewTitle
-    // * the title on the view tab.
-    // * @param nodes
-    // * node path to expand. Attempts to expand all nodes along the
-    // * path specified by the node array parameter.e.g.{"Foo-saros",
-    // * "my.pkg", "myClass.java"}
-    // * @param contexts
-    // * context menu of the given treeitem and his sub menus. e.g.
-    // * {"Team", "Commit..."}
-    // * @throws RemoteException
-    // */
-    // public void clickSubmenusOfContextMenuOfTreeItemInView(String viewTitle,
-    // String[] nodes, String... contexts) throws RemoteException;
 
     /**
      * 
@@ -658,41 +1010,5 @@ public interface BasicComponent extends Remote {
      * @see SWTWorkbenchBot#views()
      */
     public List<String> getTitlesOfOpenedViews() throws RemoteException;
-
-    public boolean existsContextOfTreeItem(String contextName, String... nodes)
-        throws RemoteException;
-
-    public boolean existsContextOfTreeItemInView(String viewTitle,
-        String contextName, String... nodes) throws RemoteException;
-
-    public boolean existsSuMenuOfContextOfTreeItem(String[] contextNames,
-        String... nodes) throws RemoteException;
-
-    public boolean existsSubmenuOfContextOfTreeItemInView(String viewTitle,
-        String[] contextNames, String... nodes) throws RemoteException;
-
-    public boolean isContextOfTreeItemEnabled(String contextName,
-        String... nodes) throws RemoteException;
-
-    public boolean isContextOfTreeItemInViewEnabled(String viewTitle,
-        String contextName, String... nodes) throws RemoteException;
-
-    public boolean isSuMenuOfContextOfTreeItemEnabled(String[] contextNames,
-        String... nodes) throws RemoteException;
-
-    public boolean isSubmenuOfContextOfTreeItemInViewEnabled(String viewTitle,
-        String[] contextNames, String... nodes) throws RemoteException;
-
-    public void clickContextsOfTreeItem(String contextName, String... nodes)
-        throws RemoteException;
-
-    public void clickContextsOfTreeItemInView(String viewTitle,
-        String contextName, String... nodes) throws RemoteException;
-
-    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
-        String... nodes) throws RemoteException;
-
-    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
-        String[] contextNames, String... nodes) throws RemoteException;
 
 }

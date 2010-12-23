@@ -134,7 +134,7 @@ public class BasicComponentImp extends EclipseComponent implements
      * 
      **********************************************/
 
-    /***************** exist table item ****************** */
+    /***************** exists table item ****************** */
     public boolean existsTableItem(String itemText) throws RemoteException {
         return existsTableItem(bot.table(), itemText);
     }
@@ -154,7 +154,7 @@ public class BasicComponentImp extends EclipseComponent implements
         selectTableItem(getTableInView(viewTitle), itemText);
     }
 
-    /***************** exists context of tree item ****************** */
+    /***************** exists context of table item ****************** */
     public boolean existsContextMenuOfTableItem(String itemName,
         String contextName) throws RemoteException {
         return existsContextMenuOfTableItem(bot.table(), itemName, contextName);
@@ -166,7 +166,7 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** click context of tree item ****************** */
+    /***************** click context of table item ****************** */
     public void clickContextMenuOfTable(String itemText, String contextName)
         throws RemoteException {
         clickContextMenuOfTable(bot.table(), itemText, contextName);
@@ -178,7 +178,7 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** is context of tree item visible ****************** */
+    /***************** is context of table item visible ****************** */
     public boolean isContextMenuOfTableVisible(String itemText,
         String contextName) throws RemoteException {
         return isContextMenuOfTableVisible(bot.table(), itemText, contextName);
@@ -202,7 +202,7 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** checkbox of tree item enabled ****************** */
+    /***************** checkbox of tree item *******************/
     public void selectCheckBoxInTable(String itemText) throws RemoteException {
         for (int i = 0; i < bot.table().rowCount(); i++) {
             if (bot.table().getTableItem(i).getText(0).equals(itemText)) {
@@ -296,7 +296,7 @@ public class BasicComponentImp extends EclipseComponent implements
         return existsTreeItemWithRegexs(getTreeInView(viewTitle), regexs);
     }
 
-    /***************** exist tree item ****************** */
+    /***************** exists tree item ****************** */
     public boolean existsTreeItemInTree(String itemText) throws RemoteException {
         return existsTreeItemInTree(bot.tree(), itemText);
     }
@@ -409,16 +409,6 @@ public class BasicComponentImp extends EclipseComponent implements
     public List<String> getAllItemsIntreeInView(String viewTitle)
         throws RemoteException {
         return getAllItemsIntree(getTreeInView(viewTitle));
-    }
-
-    public List<String> getAllItemsIntree(SWTBotTree tree)
-        throws RemoteException {
-        List<String> allItemTexts = new ArrayList<String>();
-        for (SWTBotTreeItem item : tree.getAllItems()) {
-            allItemTexts.add(item.getText());
-            log.info("existed treeItem of the tree: " + item.getText());
-        }
-        return allItemTexts;
     }
 
     /***************** waits until treeItem existed ****************** */
@@ -938,6 +928,15 @@ public class BasicComponentImp extends EclipseComponent implements
             allItemTexts.add(item.getText());
             log.info("existed subTreeItem of the TreeNode "
                 + treeNode.getText() + ": " + item.getText());
+        }
+        return allItemTexts;
+    }
+
+    public List<String> getAllItemsIntree(SWTBotTree tree) {
+        List<String> allItemTexts = new ArrayList<String>();
+        for (SWTBotTreeItem item : tree.getAllItems()) {
+            allItemTexts.add(item.getText());
+            log.info("existed treeItem of the tree: " + item.getText());
         }
         return allItemTexts;
     }

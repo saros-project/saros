@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfShareProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
 
@@ -16,9 +16,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponen
  * as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test.
- * (How to do it please look at the javadoc in class {@link TestPattern} or read
- * the user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link Tester} object in your junit-test. (How
+ * to do it please look at the javadoc in class {@link TestPattern} or read the
+ * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
  * then you can use the object pEV initialized in {@link Tester} to access the
  * API :), e.g.
@@ -94,9 +94,8 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * then the invited users confirm the popup window
      * {@link SarosPEViewComponent#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
      * . Since the share session process is very often used, so a convenient
-     * method
-     * {@link Tester#buildSessionSequentially(String, String, Tester...)} is
-     * defined, which build the sharing session completely.</li>
+     * method {@link Tester#buildSessionSequentially(String, String, Tester...)}
+     * is defined, which build the sharing session completely.</li>
      * </ol>
      * 
      * @param projectName
@@ -327,5 +326,17 @@ public interface SarosPEViewComponent extends PEViewComponent {
      * @throws RemoteException
      */
     public String getSecondLabelOfWindowProblemOccurred()
+        throws RemoteException;
+
+    /**
+     * Clicks the sub menu "Share project" of the context menu "Saros" of the
+     * given project in the package explorer view.
+     * 
+     * @param projectName
+     *            the name of the project, which you want to share with other
+     *            peoples.
+     * @throws RemoteException
+     */
+    public void clickContextMenushareProject(String projectName)
         throws RemoteException;
 }

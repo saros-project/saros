@@ -297,22 +297,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         return bot.shell(PROBLEMOCCURRED).bot().label(2).getText();
     }
 
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
-    /**
-     * Clicks the sub menu "Share project" of the context menu "Saros" of the
-     * given project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     * @throws RemoteException
-     */
-    private void clickContextMenushareProject(String projectName)
+    public void clickContextMenushareProject(String projectName)
         throws RemoteException {
         precondition();
         String[] matchTexts = changeToRegex(projectName);
@@ -320,6 +305,12 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
+
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
 
     /**
      * Clicks the sub menu "Share project partically" of the context menu
