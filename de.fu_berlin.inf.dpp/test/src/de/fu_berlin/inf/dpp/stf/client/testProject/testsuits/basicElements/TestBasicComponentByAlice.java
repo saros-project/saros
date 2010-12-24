@@ -16,9 +16,9 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
-public class TestBasicComponent extends STFTest {
+public class TestBasicComponentByAlice extends STFTest {
     private static final Logger log = Logger
-        .getLogger(TestBasicComponent.class);
+        .getLogger(TestBasicComponentByAlice.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {

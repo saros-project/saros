@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.multiDriver;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -86,5 +88,40 @@ public class TestConcurrentEditing extends STFTest {
         String aliceText = alice.editor.getTextOfEditor(path);
         String bobText = bob.editor.getTextOfEditor(path);
         assertEquals(aliceText, bobText);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void AliceAndBobeditInSameLine() throws RemoteException,
+        InterruptedException {
+        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.buildSessionDoneConcurrently(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            bob);
+        bob.pEV.openClass(PROJECT1, PKG1, CLS1);
+        bob.editor.waitUntilJavaEditorActive(CLS1);
+        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+
+        String fileName = CLS1 + ".java";
+        alice.editor.navigateInEditor(fileName, 3, 0);
+        bob.editor.navigateInEditor(fileName, 3, 0);
+        char[] content = "Merry Christmas and Happy New Year!".toCharArray();
+        for (int i = 0; i < content.length; i++) {
+            alice.editor.typeTextInJavaEditor(content[i] + "", PROJECT1, PKG1,
+                CLS1);
+            Thread.sleep(100);
+            if (i != 0 && i % 2 == 0) {
+                bob.editor.navigateInEditor(fileName, 3, i);
+                bob.editor.pressShortcutInEditor(fileName,
+                    IKeyLookup.DELETE_NAME, IKeyLookup.DELETE_NAME);
+            }
+        }
+
+        String aliceText = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
+            CLS1);
+        String bobText = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1);
+        System.out.println(aliceText);
+        System.out.println(bobText);
+        assertEquals(aliceText, bobText);
+        assertTrue(bob.sessionV.isInconsistencyDetectedEnabled());
     }
 }

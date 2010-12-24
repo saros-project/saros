@@ -180,7 +180,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         folderNodes[folderNodes.length - 1] = newFolderName;
         if (!existsFolder(folderNodes)) {
             try {
-                basicC.getTreeItemWithLabelsInView(VIEWNAME, parentNodes);
+                basicC.getTreeItemInView(VIEWNAME, parentNodes);
                 mainMenuC.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
@@ -269,7 +269,7 @@ public class PEViewComponentImp extends EclipseComponent implements
                     else
                         parentNodes[i] = fileNodes[i];
                 }
-                basicC.getTreeItemWithLabelsInView(VIEWNAME, parentNodes);
+                basicC.getTreeItemInView(VIEWNAME, parentNodes);
                 mainMenuC.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {

@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
@@ -302,28 +301,6 @@ public interface EditorComponent extends Remote {
      * @throws RemoteException
      */
     public RGB getJavaLineBackground(String className, int line)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param fileName
-     *            the filename on the editor tab
-     * @return an editor specified by the given fileName which provides methods
-     *         for text editors.
-     * @throws RemoteException
-     */
-    public SWTBotEclipseEditor getEditor(String fileName)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @return an editor specified by the given className which provides methods
-     *         for text editors.
-     * @throws RemoteException
-     */
-    public SWTBotEclipseEditor getJavaEditor(String className)
         throws RemoteException;
 
     /**

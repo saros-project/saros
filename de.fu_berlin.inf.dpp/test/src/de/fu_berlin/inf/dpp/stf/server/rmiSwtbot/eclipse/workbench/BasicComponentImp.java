@@ -20,7 +20,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
@@ -98,6 +97,41 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
+     * actions with basic widget: {@link SWTBotToolbarButton}.
+     * 
+     **********************************************/
+    public void clickToolbarButtonWithRegexTooltipInView(String viewTitle,
+        String tooltipText) throws RemoteException {
+        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
+            .getToolbarButtons()) {
+            if (toolbarButton.getToolTipText().matches(
+                ".*" + tooltipText + ".*")) {
+                toolbarButton.click();
+                return;
+            }
+        }
+        throw new WidgetNotFoundException(
+            "The toolbarbutton with the tooltipText "
+                + tooltipText
+                + " doesn't exist. Are you sure that the passed tooltip text is correct?");
+    }
+
+    public void clickToolbarPushButtonWithTooltipInView(String viewTitle,
+        String tooltip) throws RemoteException {
+        bot.viewByTitle(viewTitle).toolbarPushButton(tooltip).click();
+    }
+
+    public boolean isToolbarButtonInViewEnabled(String viewTitle,
+        String tooltipText) throws RemoteException {
+        SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
+            viewTitle, tooltipText);
+        if (button == null)
+            return false;
+        return button.isEnabled();
+    }
+
+    /**********************************************
+     * 
      * actions with basic widget: {@link SWTBotText}.
      * 
      **********************************************/
@@ -122,6 +156,15 @@ public class BasicComponentImp extends EclipseComponent implements
     public boolean existsLabel(String mnemonicText) throws RemoteException {
         try {
             bot.label(mnemonicText);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean existsLabelInView(String viewTitle) throws RemoteException {
+        try {
+            getView(viewTitle).bot().label();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
@@ -459,6 +502,11 @@ public class BasicComponentImp extends EclipseComponent implements
         });
     }
 
+    /**********************************************
+     * 
+     * actions with basic widget: {@link SWTBotView}.
+     * 
+     **********************************************/
     public void openViewById(final String viewId) throws RemoteException {
         try {
             Display.getDefault().syncExec(new Runnable() {
@@ -535,73 +583,6 @@ public class BasicComponentImp extends EclipseComponent implements
         return list;
     }
 
-    public void clickToolbarButtonWithRegexTooltipInView(String viewName,
-        String tooltipText) throws RemoteException {
-        // bot.viewByTitle(viewName).toolbarPushButton(buttonTooltip).click();
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewName)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(
-                ".*" + tooltipText + ".*")) {
-                toolbarButton.click();
-                return;
-            }
-        }
-        throw new WidgetNotFoundException(
-            "The toolbarbutton with the tooltipText "
-                + tooltipText
-                + " doesn't exist. Are you sure that the passed tooltip text is correct?");
-    }
-
-    public void clickToolbarPushButtonWithTooltipInView(String viewName,
-        String tooltip) throws RemoteException {
-        bot.viewByTitle(viewName).toolbarPushButton(tooltip).click();
-    }
-
-    public boolean existsContextMenuOfTreeItemInView(String viewName,
-        String contextName, String... nodes) throws RemoteException {
-        setFocusOnViewByTitle(viewName);
-
-        SWTBotTreeItem item = getTreeItemWithLabelsInView(viewName, nodes);
-        try {
-            item.contextMenu(contextName);
-            return true;
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-    public boolean existsSubMenuOfContextMenuOfTreeItemInView(String viewTitle,
-        String[] nodes, String... contextNames) throws RemoteException {
-        try {
-            SWTBotTree tree = getTreeInView(viewTitle);
-            // you should first select the project,whose context you want to
-            // click.
-            selectTreeItemWithRegexs(tree, nodes);
-            ContextMenuHelper.clickContextMenu(tree, contextNames);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean existsLabelInView(String viewTitle) throws RemoteException {
-        try {
-            getView(viewTitle).bot().label();
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    public boolean isToolbarButtonInViewEnabled(String viewTitle,
-        String tooltipText) throws RemoteException {
-        SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
-            viewTitle, tooltipText);
-        if (button == null)
-            return false;
-        return button.isEnabled();
-    }
-
     public void waitUntilViewActive(String viewName) throws RemoteException {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
     }
@@ -614,78 +595,67 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**
      * 
-     * @param viewName
+     * @param viewTitle
      *            the title on the view tab.
      * @return a {@link SWTBotTree} with the specified <code>none</code> in
      *         specified view.
      */
-    public SWTBotTree getTreeInView(String viewName) {
-        return bot.viewByTitle(viewName).bot().tree();
+    public SWTBotTree getTreeInView(String viewTitle) {
+        return bot.viewByTitle(viewTitle).bot().tree();
     }
 
     /**
-     * @param viewName
-     *            the title on the view tab.
-     * @param labels
-     *            all labels on the treeitem widget
-     * @return a {@link SWTBotTreeItem} with the specified <code>label</code>.
+     * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return a {@link SWTBotTreeItem} specified with the given
+     *         <code>nodes</code>.
      */
-    public SWTBotTreeItem getTreeItemWithLabelsInView(String viewName,
-        String... labels) {
-        try {
-            return getTreeInView(viewName).expandNode(labels).select();
-        } catch (WidgetNotFoundException e) {
-            return null;
-        }
-    }
-
     public SWTBotTreeItem getTreeItem(String... nodes) {
         return bot.tree().expandNode(nodes);
     }
 
     /**
-     * @param title
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.
+     * @return a {@link SWTBotTreeItem} specified with the given
+     *         <code>nodes</code> in the given view.
+     */
+    public SWTBotTreeItem getTreeItemInView(String viewTitle, String... nodes) {
+        try {
+            return getTreeInView(viewTitle).expandNode(nodes).select();
+        } catch (WidgetNotFoundException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param viewTitle
      *            the title on the view tab.
      * @return all {@link SWTBotToolbarButton} located in the given view.
      */
-    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String title) {
-        return getView(title).getToolbarButtons();
+    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String viewTitle) {
+        return getView(viewTitle).getToolbarButtons();
     }
 
     /**
      * 
-     * @param title
+     * @param viewTitle
      *            the title on the view tab.
-     * @return {@link SWTBotTable} with the specified <code>none</code> in
-     *         specified view.
+     * @return a {@link SWTBotTable} with the specified <code>none</code> in the
+     *         given view.
      */
-    public SWTBotTable getTableInView(String title) {
-        return bot.viewByTitle(title).bot().table();
+    public SWTBotTable getTableInView(String viewTitle) {
+        return bot.viewByTitle(viewTitle).bot().table();
     }
 
-    /**
-     * Select a table item specified with the given label in the given view.
-     * 
-     * @param viewName
-     *            the title on the view tab.
-     * @param label
-     *            the table item' name, which you want to select.
-     */
-    public SWTBotTableItem selectTableItemWithLabelInView(String viewName,
-        String label) {
-        try {
-            SWTBotTable table = getTableInView(viewName);
-            return table.getTableItem(label).select();
-        } catch (WidgetNotFoundException e) {
-            log.warn(" table item " + label + " on View " + viewName
-                + " not found.", e);
-        }
-        return null;
-    }
-
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(String title,
-        String tooltipText) {
-        for (SWTBotToolbarButton toolbarButton : getView(title)
+    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
+        String viewTitle, String tooltipText) {
+        for (SWTBotToolbarButton toolbarButton : getView(viewTitle)
             .getToolbarButtons()) {
             if (toolbarButton.getToolTipText().matches(
                 ".*" + tooltipText + ".*")) {
@@ -696,12 +666,12 @@ public class BasicComponentImp extends EclipseComponent implements
     }
 
     /**
-     * @param title
+     * @param viewTitle
      *            the title on the view tab.
      * @return the {@link SWTBotView} specified with the given title.
      */
-    public SWTBotView getView(String title) {
-        return bot.viewByTitle(title);
+    public SWTBotView getView(String viewTitle) {
+        return bot.viewByTitle(viewTitle);
     }
 
     public SWTBotTreeItem getTreeItemWithRegexs(SWTBotTree tree,
@@ -746,15 +716,38 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
-    /***************** get table item ****************** */
+    /**
+     * 
+     * @param itemText
+     *            the table item' name, which you want to select.
+     * @return a {@link SWTBotTableItem} specified with the given label.
+     */
     public SWTBotTableItem getTableItem(String itemText) {
         return getTableItem(bot.table(), itemText);
     }
 
+    /**
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param itemText
+     *            the table item' name
+     * @return a {@link SWTBotTableItem} specified with the given label in the
+     *         given view.
+     */
     public SWTBotTableItem getTableItemInView(String viewTitle, String itemText) {
         return getTableItem(getTableInView(viewTitle), itemText);
     }
 
+    /**
+     * 
+     * @param table
+     *            the parent widget of the found tableItem.
+     * @param itemText
+     *            the table item' name
+     * @return a {@link SWTBotTableItem} in the given table specified with the
+     *         given itemText.
+     */
     public SWTBotTableItem getTableItem(SWTBotTable table, String itemText) {
         try {
             return table.getTableItem(itemText);
@@ -789,20 +782,6 @@ public class BasicComponentImp extends EclipseComponent implements
         return ContextMenuHelper.isContextMenuEnabled(table, contextName);
     }
 
-    /**
-     * This method ist very helpful, if you are not sure, how exactly is the
-     * tree item's name.
-     * 
-     * @param tree
-     *            a {@link SWTBotTree} with the specified <code>none</code>
-     * @param regexs
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the regex array parameter.e.g.
-     *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
-     * @return <tt>true</tt>, if the three item specified with the given regexs
-     *         exists
-     */
-
     public void selectTreeItem(SWTBotTree tree, String... nodes) {
         try {
             tree.expandNode(nodes).select();
@@ -811,8 +790,20 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
+    /**
+     * select a treeItem specified with the given regexs. This method ist very
+     * helpful, if you are not sure, how exactly is the tree item's name.
+     * 
+     * @param tree
+     *            a {@link SWTBotTree} with the specified <code>none</code>
+     * @param regexNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array parameter.e.g.
+     *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
+     * 
+     */
     public void selectTreeItemWithRegexs(SWTBotTree tree, String... regexNodes) {
-        // assert tree != null : "the passed tree is null.";
+        assert tree != null : "the passed tree is null.";
         SWTBotTreeItem currentItem = null;
         SWTBotTreeItem[] allChildrenOfCurrentItem;
         for (String regex : regexNodes) {
@@ -867,6 +858,19 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
+    /**
+     * This method ist very helpful, if you are not sure, how exactly is the
+     * tree item's name.
+     * 
+     * @param tree
+     *            a {@link SWTBotTree} with the specified <code>none</code>
+     * @param regexs
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the regex array parameter.e.g.
+     *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
+     * @return <tt>true</tt>, if the three item specified with the given regexs
+     *         exists
+     */
     public boolean existsTreeItemWithRegexs(SWTBotTree tree, String... regexs) {
         try {
             selectTreeItemWithRegexs(tree, regexs);
@@ -876,8 +880,7 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean existsTreeItemInTree(SWTBotTree tree, String itemText)
-        throws RemoteException {
+    public boolean existsTreeItemInTree(SWTBotTree tree, String itemText) {
         return getAllItemsIntree(tree).contains(itemText);
     }
 

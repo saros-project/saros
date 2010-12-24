@@ -890,41 +890,6 @@ public interface BasicComponent extends Remote {
         String tooltip) throws RemoteException;
 
     /**
-     * 
-     * @param viewName
-     *            the title on the view tab.
-     * @param contextName
-     *            then name of the context menu of the selected treeitem
-     *            specified with the given nodes.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "my.pkg", "myClass.java"}
-     * @return <tt>true</tt> if the specified context menu of the select tree
-     *         item exists.
-     * @throws RemoteException
-     */
-    public boolean existsContextMenuOfTreeItemInView(String viewName,
-        String contextName, String... nodes) throws RemoteException;
-
-    /**
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "my.pkg", "myClass.java"}.
-     * @param contexts
-     *            context menu of the given treeitem and his sub menus. e.g.
-     *            {"Team", "Commit..."}
-     * @return <tt>true</tt>, if the submenus of the selected treeitem's context
-     *         exists.
-     * @throws RemoteException
-     */
-    public boolean existsSubMenuOfContextMenuOfTreeItemInView(String viewTitle,
-        String[] nodes, String... contexts) throws RemoteException;
-
-    /**
      * @return<tt>true</tt>, if there are some label texts existed in the given
      *                       view. You can only see the label texts when you are
      *                       not in a session.

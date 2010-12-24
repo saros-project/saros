@@ -14,7 +14,8 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.ChatViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.RSViewComponent;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponen
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Tester extends STFTest {
+public class Tester {
     private static final Logger log = Logger.getLogger(Tester.class);
 
     public SarosPEViewComponent pEV;

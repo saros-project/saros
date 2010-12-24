@@ -21,12 +21,12 @@ public class TestEditorComponent2 extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        alice.pEV.newProject(PROJECT1);
-        alice.pEV.newFile(path);
-        alice.editor.waitUntilEditorOpen(FILE3);
-        bob.pEV.newProject(PROJECT1);
-        bob.pEV.newFile(path);
-        bob.editor.waitUntilEditorOpen(FILE3);
+        // alice.pEV.newProject(PROJECT1);
+        // alice.pEV.newFile(path);
+        // alice.editor.waitUntilEditorOpen(FILE3);
+        // bob.pEV.newProject(PROJECT1);
+        // bob.pEV.newFile(path);
+        // bob.editor.waitUntilEditorOpen(FILE3);
     }
 
     @Test
@@ -41,4 +41,5 @@ public class TestEditorComponent2 extends STFTest {
         assertEquals(aliceText, alice.editor.getTextOfEditor(path));
         assertEquals(bobText, bob.editor.getTextOfEditor(path));
     }
+
 }

@@ -141,7 +141,7 @@ public class EditorComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * operations about deleting a editor
+     * operations about closing a editor
      * 
      **********************************************/
     public void closeEditorWithSave(String fileName) throws RemoteException {
@@ -212,7 +212,7 @@ public class EditorComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * get contents infos of a editor
+     * get contents of a editor
      * 
      **********************************************/
 
@@ -222,12 +222,9 @@ public class EditorComponentImp extends EclipseComponent implements
         return getEditor(fileName).getText();
     }
 
-    public String getTextOfJavaEditor(String projectName, String packageName,
+    public String getTextOfJavaEditor(String projectName, String pkg,
         String className) throws RemoteException {
-        if (!isJavaEditorOpen(className))
-            peVC.openClass(projectName, packageName, className);
-        if (!isJavaEditorActive(className))
-            activateJavaEditor(className);
+        precondition(getClassNodes(projectName, pkg, className));
         return getJavaEditor(className).getText();
     }
 
@@ -256,17 +253,6 @@ public class EditorComponentImp extends EclipseComponent implements
     public RGB getJavaLineBackground(String className, int line)
         throws RemoteException {
         return getJavaEditor(className).getLineBackground(line);
-    }
-
-    public SWTBotEclipseEditor getEditor(String fileName)
-        throws RemoteException {
-        SWTBotEditor editor = bot.editorByTitle(fileName);
-        return editor.toTextEditor();
-    }
-
-    public SWTBotEclipseEditor getJavaEditor(String className)
-        throws RemoteException {
-        return getEditor(className + SUFIX_JAVA);
     }
 
     public void waitUntilFileContentSame(String otherClassContent,
@@ -301,9 +287,9 @@ public class EditorComponentImp extends EclipseComponent implements
         return ConvertStreamToString(file.getContents());
     }
 
-    public String getFileContent(String... fileNodes) throws RemoteException,
+    public String getFileContent(String... nodes) throws RemoteException,
         IOException, CoreException {
-        IPath path = new Path(getPath(fileNodes));
+        IPath path = new Path(getPath(nodes));
         log.info("Checking existence of file \"" + path + "\"");
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
@@ -494,6 +480,14 @@ public class EditorComponentImp extends EclipseComponent implements
         }
     }
 
+    private void precondition(String projectName, String pkg, String className)
+        throws RemoteException {
+        if (!isJavaEditorOpen(className))
+            peVC.openClass(projectName, pkg, className);
+        if (!isJavaEditorActive(className))
+            activateJavaEditor(className);
+    }
+
     /**
      * @return all filenames on the editors which are opened currently
      */
@@ -523,4 +517,30 @@ public class EditorComponentImp extends EclipseComponent implements
             }
         }
     }
+
+    /**
+     * 
+     * @param fileName
+     *            the filename on the editor tab
+     * @return an editor specified by the given fileName which provides methods
+     *         for text editors.
+     * 
+     */
+    public SWTBotEclipseEditor getEditor(String fileName) {
+        SWTBotEditor editor = bot.editorByTitle(fileName);
+        return editor.toTextEditor();
+    }
+
+    /**
+     * 
+     * @param className
+     *            the name of the java file without the suffix ".java".
+     * @return an editor specified by the given className which provides methods
+     *         for text editors.
+     * 
+     */
+    public SWTBotEclipseEditor getJavaEditor(String className) {
+        return getEditor(className + SUFIX_JAVA);
+    }
+
 }

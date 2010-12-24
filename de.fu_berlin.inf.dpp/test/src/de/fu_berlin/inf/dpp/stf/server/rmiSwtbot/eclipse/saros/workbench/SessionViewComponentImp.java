@@ -874,7 +874,7 @@ public class SessionViewComponentImp extends EclipseComponent implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        basicC.selectTableItemWithLabelInView(VIEWNAME, contactLabel);
+        basicC.getTableItemInView(VIEWNAME, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)

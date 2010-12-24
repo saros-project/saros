@@ -330,7 +330,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void selectBuddyGUI(String baseJID) throws RemoteException {
-        basicC.getTreeItemWithLabelsInView(VIEWNAME, BUDDIES, baseJID);
+        basicC.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
