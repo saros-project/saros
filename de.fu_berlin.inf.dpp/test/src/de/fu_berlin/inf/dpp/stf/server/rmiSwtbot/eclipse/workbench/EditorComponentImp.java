@@ -10,8 +10,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -228,20 +230,27 @@ public class EditorComponentImp extends EclipseComponent implements
         return getJavaEditor(className).getText();
     }
 
+    public String getTextOnCurrentLine(String fileName) throws RemoteException {
+        return getEditor(fileName).getTextOnCurrentLine();
+    }
+
+    public String getTextOnLine(String fileName, int line)
+        throws RemoteException {
+        return getEditor(fileName).getTextOnLine(line);
+    }
+
     public String getJavaTextOnLine(String projectName, String pkg,
         String className, int line) throws RemoteException {
         precondition(getClassNodes(projectName, pkg, className));
         return getJavaEditor(className).getTextOnLine(line);
     }
 
-    public void selectLineInEditor(int line, String fileName)
-        throws RemoteException {
-        getEditor(fileName).selectLine(line);
+    public int getCursorLine(String fileName) throws RemoteException {
+        return getEditor(fileName).cursorPosition().line;
     }
 
-    public void selectLineInJavaEditor(int line, String className)
-        throws RemoteException {
-        selectLineInEditor(line, className + SUFIX_JAVA);
+    public int getCursorColumn(String fileName) throws RemoteException {
+        return getEditor(fileName).cursorPosition().column;
     }
 
     public int getJavaCursorLinePosition(String className)
@@ -301,7 +310,7 @@ public class EditorComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * set contents of a editor
+     * modify contents of a editor
      * 
      **********************************************/
     public void setTextInEditorWithSave(String contentPath, String... fileNodes)
@@ -409,7 +418,7 @@ public class EditorComponentImp extends EclipseComponent implements
 
     public void typeTextInJavaEditor(String text, String projectName,
         String packageName, String className) throws RemoteException {
-        typeTextInEditor(text,
+        typeTextInEditor(checkInputText(text),
             getClassNodes(projectName, packageName, className));
     }
 
@@ -452,6 +461,145 @@ public class EditorComponentImp extends EclipseComponent implements
         // return results.get(0);
     }
 
+    public void navigateInEditor(String fileName, int line, int column)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.setFocus();
+        editor.navigateTo(line, column);
+    }
+
+    public void selectCurrentLine(String fileName) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.selectCurrentLine();
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        workbenchC.sleep(500);
+    }
+
+    public void selectLine(String fileName, int line) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.selectLine(line);
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        workbenchC.sleep(1000);
+
+    }
+
+    public void selectRange(String fileName, int line, int column, int length)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.selectRange(line, column, length);
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        workbenchC.sleep(800);
+    }
+
+    public String getSelection(String fileName) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        return editor.getSelection();
+    }
+
+    /**********************************************
+     * 
+     * modify contents of a editor with keyboard
+     * 
+     **********************************************/
+    public void pressShortcut(String fileName, String... keys)
+        throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.setFocus();
+        for (String key : keys) {
+            try {
+                editor.pressShortcut(KeyStroke.getInstance(key));
+            } catch (ParseException e) {
+                throw new RemoteException("Could not parse \"" + key + "\"", e);
+            }
+        }
+    }
+
+    public void pressShortCut(String fileName, int modificationKeys, char c)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.pressShortcut(modificationKeys, c);
+    }
+
+    public void pressShortCutDelete(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        pressShortcut(fileName, IKeyLookup.DELETE_NAME);
+    }
+
+    public void pressShortCutEnter(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        pressShortcut(fileName, IKeyLookup.LF_NAME);
+    }
+
+    public void pressShortCutSave(String fileName) throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        if (getOS() == TypeOfOS.MAC)
+            editor.pressShortcut(SWT.COMMAND, 's');
+        else
+            editor.pressShortcut(SWT.CTRL, 's');
+    }
+
+    public void pressShortRunAsJavaApplication(String fileName)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        if (getOS() == TypeOfOS.MAC)
+            editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
+        else
+            editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
+        workbenchC.sleep(1000);
+        editor.pressShortcut(SWT.NONE, 'j');
+    }
+
+    public void pressShortCutNextAnnotation(String fileName)
+        throws RemoteException {
+        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        if (getOS() == TypeOfOS.MAC)
+            editor.pressShortcut(SWT.COMMAND, '.');
+        else
+            editor.pressShortcut(SWT.CTRL, '.');
+        workbenchC.sleep(20);
+    }
+
+    public void pressShortCutQuickAssignToLocalVariable(String fileName)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        if (getOS() == TypeOfOS.MAC)
+            editor.pressShortcut(SWT.COMMAND, '2');
+        else
+            editor.pressShortcut(SWT.CTRL, '2');
+        workbenchC.sleep(1000);
+        editor.pressShortcut(SWT.NONE, 'l');
+
+    }
+
+    public void autoCompleteProposal(String fileName, String insertText,
+        String proposalText) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.autoCompleteProposal(checkInputText(insertText), proposalText);
+    }
+
+    public List<String> getAutoCompleteProposals(String fileName,
+        String insertText) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        return editor.getAutoCompleteProposals(insertText);
+    }
+
+    public void quickfix(String fileName, String quickFixName)
+        throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.quickfix(quickFixName);
+    }
+
+    public void quickfix(String fileName, int index) throws RemoteException {
+        SWTBotEclipseEditor editor = getEditor(fileName);
+        editor.quickfix(index);
+    }
+
     /**********************************************
      * 
      * infos about debug
@@ -460,7 +608,7 @@ public class EditorComponentImp extends EclipseComponent implements
     public void setBreakPoint(int line, String projectName, String packageName,
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
-        selectLineInJavaEditor(line, className);
+        selectLine(className + SUFIX_JAVA, line);
         mainMenuC.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
@@ -480,14 +628,6 @@ public class EditorComponentImp extends EclipseComponent implements
         }
     }
 
-    private void precondition(String projectName, String pkg, String className)
-        throws RemoteException {
-        if (!isJavaEditorOpen(className))
-            peVC.openClass(projectName, pkg, className);
-        if (!isJavaEditorActive(className))
-            activateJavaEditor(className);
-    }
-
     /**
      * @return all filenames on the editors which are opened currently
      */
@@ -496,26 +636,6 @@ public class EditorComponentImp extends EclipseComponent implements
         for (SWTBotEditor editor : bot.editors())
             list.add(editor.getTitle());
         return list;
-    }
-
-    public void navigateInEditor(String fileName, int line, int column)
-        throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
-        editor.setFocus();
-        editor.navigateTo(line, column);
-    }
-
-    public void pressShortcutInEditor(String fileName, String... keys)
-        throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
-        editor.setFocus();
-        for (String key : keys) {
-            try {
-                editor.pressShortcut(KeyStroke.getInstance(key));
-            } catch (ParseException e) {
-                throw new RemoteException("Could not parse \"" + key + "\"", e);
-            }
-        }
     }
 
     /**

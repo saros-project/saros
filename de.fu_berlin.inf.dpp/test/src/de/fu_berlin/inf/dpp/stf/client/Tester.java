@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPE
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SessionViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
@@ -49,6 +50,7 @@ public class Tester {
     public ShellComponent shell;
     public SarosMainMenuComponent mainMenu;
     public SarosWorkbenchComponent workbench;
+    public ConsoleViewComponent consoleV;
 
     public JID jid;
     public String password;
@@ -88,6 +90,7 @@ public class Tester {
             rSV = (RSViewComponent) registry.lookup("remoteScreenView");
             pEV = (SarosPEViewComponent) registry.lookup("packageExplorerView");
             progressV = (ProgressViewComponent) registry.lookup("progressView");
+            consoleV = (ConsoleViewComponent) registry.lookup("consoleView");
             state = (SarosState) registry.lookup("state");
             workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
             shell = (ShellComponent) registry.lookup("shell");

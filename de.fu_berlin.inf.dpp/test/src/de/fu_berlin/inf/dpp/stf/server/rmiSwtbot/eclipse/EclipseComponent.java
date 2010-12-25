@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.osgi.framework.Bundle;
 
@@ -246,4 +247,16 @@ public abstract class EclipseComponent {
         return TypeOfOS.WINDOW;
     }
 
+    public String checkInputText(String inputText) {
+        char[] chars = inputText.toCharArray();
+        String newInputText = "";
+        log.debug("keyboard layout: " + SWTBotPreferences.KEYBOARD_LAYOUT);
+        for (char c : chars) {
+            if (c == 'y' && SWTBotPreferences.KEYBOARD_LAYOUT.equals("MAC_DE")) {
+                newInputText += 'z';
+            } else
+                newInputText += c;
+        }
+        return newInputText;
+    }
 }

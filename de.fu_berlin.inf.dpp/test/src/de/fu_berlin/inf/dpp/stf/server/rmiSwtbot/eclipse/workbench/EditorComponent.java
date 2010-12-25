@@ -3,9 +3,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
@@ -243,6 +246,11 @@ public interface EditorComponent extends Remote {
     public String getTextOfJavaEditor(String projectName, String packageName,
         String className) throws RemoteException;
 
+    public String getTextOnCurrentLine(String fileName) throws RemoteException;
+
+    public String getTextOnLine(String fileName, int line)
+        throws RemoteException;
+
     /**
      * @param projectName
      *            name of the java project, e.g. Foo_Saros.
@@ -258,28 +266,9 @@ public interface EditorComponent extends Remote {
     public String getJavaTextOnLine(String projectName, String packageName,
         String className, int line) throws RemoteException;
 
-    /**
-     * 
-     * @param line
-     *            the line number, 0 based.
-     * @param fileName
-     *            the filename on the editor tab
-     * @throws RemoteException
-     * @see SWTBotStyledText#selectLine(int)
-     */
-    public void selectLineInEditor(int line, String fileName)
-        throws RemoteException;
+    public int getCursorLine(String fileName) throws RemoteException;
 
-    /**
-     * 
-     * @param line
-     *            the line number, 0 based.
-     * @param className
-     *            the filename on the editor tab
-     * @throws RemoteException
-     */
-    public void selectLineInJavaEditor(int line, String className)
-        throws RemoteException;
+    public int getCursorColumn(String fileName) throws RemoteException;
 
     /**
      * 
@@ -592,14 +581,80 @@ public interface EditorComponent extends Remote {
     /**
      * Changes the cursor position in editor.
      * 
-     * @param className
+     * @param fileName
+     *            name of the file with suffix, e.g. myFile.xml
      * @param line
+     *            the line number, 0 based.
      * @param column
+     *            the column number, 0 based.
+     * @see SWTBotStyledText#navigateTo(int, int)
      * @throws RemoteException
      */
-    public void navigateInEditor(String className, int line, int column)
+    public void navigateInEditor(String fileName, int line, int column)
         throws RemoteException;
 
-    public void pressShortcutInEditor(String className, String... keys)
+    /**
+     * Presses the shortcut specified by the given keys.
+     * 
+     * @param fileName
+     *            name of the file with suffix, e.g. myFile.xml
+     * @param keys
+     *            the formal representation for key strokes
+     * @throws RemoteException
+     * @see IKeyLookup
+     * @see SWTBotEclipseEditor#pressShortcut(org.eclipse.jface.bindings.keys.KeyStroke...)
+     */
+    public void pressShortcut(String fileName, String... keys)
+        throws RemoteException;
+
+    /**
+     * 
+     * @param fileName
+     * @param insertText
+     * @param proposalText
+     * @throws RemoteException
+     * @see SWTBotEclipseEditor#autoCompleteProposal(String, String)
+     */
+    public void autoCompleteProposal(String fileName, String insertText,
+        String proposalText) throws RemoteException;
+
+    public List<String> getAutoCompleteProposals(String fileName,
+        String insertText) throws RemoteException;
+
+    public void quickfix(String fileName, String quickFixName)
+        throws RemoteException;
+
+    public void quickfix(String fileName, int index) throws RemoteException;
+
+    public void selectCurrentLine(String fileName) throws RemoteException;
+
+    public void selectLine(String fileName, int line) throws RemoteException;
+
+    public void selectRange(String fileName, int line, int column, int length)
+        throws RemoteException;
+
+    public String getSelection(String fileName) throws RemoteException;
+
+    /**
+     * 
+     * @param fileName
+     * @throws RemoteException
+     */
+    public void pressShortCutDelete(String fileName) throws RemoteException;
+
+    public void pressShortCutEnter(String fileName) throws RemoteException;
+
+    public void pressShortCutSave(String fileName) throws RemoteException;
+
+    public void pressShortRunAsJavaApplication(String fileName)
+        throws RemoteException;
+
+    public void pressShortCutNextAnnotation(String fileName)
+        throws RemoteException;
+
+    public void pressShortCutQuickAssignToLocalVariable(String fileName)
+        throws RemoteException;
+
+    public void pressShortCut(String fileName, int modificationKeys, char c)
         throws RemoteException;
 }
