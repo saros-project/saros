@@ -153,6 +153,17 @@ public class WhiteboardEditor extends GraphicalEditorWithPalette {
 					getCurrentEvent().detail = DND.DROP_NONE;
 			}
 		});
+
+		// TODO rolechange
+		// WhiteboardManager.getInstance().addRoleChangeListener(
+		// new RoleChangeListener() {
+		//
+		// @Override
+		// public void roleChanged(UserRole role) {
+		// WhiteboardEditor.this
+		// .setEnabled(role == UserRole.DRIVER);
+		// }
+		// });
 	}
 
 	protected void updateViewerContents(ElementRecord root) {

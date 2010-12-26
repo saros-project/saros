@@ -57,14 +57,14 @@ public class ElementRecordChangeLayoutCommand extends SXECommand {
 	protected boolean canExecuteSXECommand() {
 		if (record == null || layout == null)
 			return false;
-		return record.isCommitted();
+		return record.isCommitted() && record.isVisible();
 	}
 
 	@Override
 	protected boolean canUndoSXECommand() {
 		if (record == null || oldLayout == null)
 			return false;
-		return record.isCommitted();
+		return record.isCommitted() && record.isVisible();
 	}
 
 	@Override

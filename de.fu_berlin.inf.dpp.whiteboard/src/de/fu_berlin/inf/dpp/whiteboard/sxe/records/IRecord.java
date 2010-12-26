@@ -16,6 +16,10 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  */
 public interface IRecord {
 
+	/* existence */
+
+	public boolean isVisible();
+
 	/* applying */
 
 	/**

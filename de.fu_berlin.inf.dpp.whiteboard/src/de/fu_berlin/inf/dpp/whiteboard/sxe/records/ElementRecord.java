@@ -45,11 +45,20 @@ public class ElementRecord extends NodeRecord {
 		super(documentRecord, NodeType.ELEMENT);
 	}
 
-	public NodeSet<ElementRecord> getChildElements() {
+	protected NodeSet<ElementRecord> getChildElements() {
 		return children;
 	}
 
-	public TreeSet<ElementRecord> getAllDescendantElements() {
+	public List<ElementRecord> getVisibleChildElements() {
+		LinkedList<ElementRecord> visibleChildren = new LinkedList<ElementRecord>();
+		for (ElementRecord e : children) {
+			if (e.isVisible())
+				visibleChildren.add(e);
+		}
+		return visibleChildren;
+	}
+
+	protected TreeSet<ElementRecord> getAllDescendantElements() {
 		TreeSet<ElementRecord> descendants = new TreeSet<ElementRecord>();
 
 		descendants.addAll(getChildElements());
@@ -61,7 +70,19 @@ public class ElementRecord extends NodeRecord {
 		return descendants;
 	}
 
-	public List<NodeRecord> getAllDescendantNodes() {
+	public List<ElementRecord> getAllVisibleDescendantElements() {
+		LinkedList<ElementRecord> descendants = new LinkedList<ElementRecord>();
+
+		descendants.addAll(getVisibleChildElements());
+
+		for (ElementRecord er : getVisibleChildElements()) {
+			descendants.addAll(er.getAllVisibleDescendantElements());
+		}
+
+		return descendants;
+	}
+
+	protected List<NodeRecord> getAllDescendantNodes() {
 		List<NodeRecord> records = new LinkedList<NodeRecord>();
 
 		records.addAll(getAttributes());
@@ -73,8 +94,17 @@ public class ElementRecord extends NodeRecord {
 		return records;
 	}
 
-	public AttributeSet getAttributes() {
+	protected AttributeSet getAttributes() {
 		return attributes;
+	}
+
+	public List<AttributeRecord> getVisibleAttributes() {
+		LinkedList<AttributeRecord> visibleAttributes = new LinkedList<AttributeRecord>();
+		for (AttributeRecord e : attributes) {
+			if (e.isVisible())
+				visibleAttributes.add(e);
+		}
+		return visibleAttributes;
 	}
 
 	/* Helpers */
@@ -309,33 +339,6 @@ public class ElementRecord extends NodeRecord {
 
 	}
 
-	/**
-	 * Recreates this record, adds it to the passed parent and clears references
-	 * to child nodes.
-	 * 
-	 * @param parent
-	 *            where to recreate the record to
-	 * @param recursive
-	 *            whether to include child nodes
-	 * @return if recursive==false same as
-	 *         {@link Record#recreate(ElementRecord)} else the child nodes are
-	 *         recreated, too.
-	 */
-	public void recreate(ElementRecord parent, boolean recursive) {
-		recreate(parent);
-		if (!recursive)
-			return;
-		for (AttributeRecord a : this.getAttributes()) {
-			a.recreate(this);
-		}
-
-		for (ElementRecord r : this.getChildElements()) {
-			r.recreate(this, recursive);
-		}
-		this.getAttributes().clear();
-		this.getChildElements().clear();
-	}
-
 	protected void add(ElementRecord r) {
 		children.add(r);
 	}
@@ -351,21 +354,6 @@ public class ElementRecord extends NodeRecord {
 		} else {
 			this.children.remove(r);
 		}
-	}
-
-	@Override
-	public boolean applyRemoveRecord(RemoveRecord removeRecord) {
-
-		if (super.applyRemoveRecord(removeRecord)) {
-			/*
-			 * Note: the subtree of the removed record remain in order. This is
-			 * useful for un/redo.
-			 */
-			getDocumentRecord().remove(getAllDescendantNodes());
-			return true;
-
-		}
-		return false;
 	}
 
 	/* notification */

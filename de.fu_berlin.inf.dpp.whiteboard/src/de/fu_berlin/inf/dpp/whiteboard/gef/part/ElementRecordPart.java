@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.part;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,8 +55,7 @@ public abstract class ElementRecordPart extends AbstractGraphicalEditPart
 
 	@Override
 	public List<ElementRecord> getModelChildren() {
-		return new LinkedList<ElementRecord>(getElementRecord()
-				.getChildElements());
+		return getElementRecord().getVisibleChildElements();
 	}
 
 	@Override

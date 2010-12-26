@@ -62,6 +62,8 @@ public class WhiteboardManager {
 				controller.startSession();
 			} else {
 				sxeTransmitter.enableInvitation(controller);
+				// WhiteboardManager.this.roleChanged(session.getLocalUser()
+				// .getUserRole());
 			}
 
 		}
@@ -95,6 +97,13 @@ public class WhiteboardManager {
 				inv.start(SubMonitor.convert(new NullProgressMonitor()));
 			}
 		}
+
+		// TODO rolechange
+		// @Override
+		// public void roleChanged(User user) {
+		// if (user.isLocal())
+		// WhiteboardManager.this.roleChanged(user.getUserRole());
+		// }
 	};
 
 	@Inject

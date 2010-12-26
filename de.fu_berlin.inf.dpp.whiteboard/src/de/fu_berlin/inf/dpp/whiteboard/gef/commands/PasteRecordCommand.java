@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.util.AttributeSet;
 
 /**
  * <p>
@@ -151,8 +150,8 @@ public class PasteRecordCommand extends SXECommand {
 	 * Returns the layout records plus all the records of the AttributeSet that
 	 * are no layout records.
 	 */
-	protected List<IRecord> getMergedAttributes(AttributeSet attributes,
-			List<IRecord> layout) {
+	protected List<IRecord> getMergedAttributes(
+			List<AttributeRecord> attributes, List<IRecord> layout) {
 		List<IRecord> records = new LinkedList<IRecord>();
 		for (AttributeRecord attr : attributes) {
 			records.add(mergeAttribute(attr, layout));
@@ -195,12 +194,12 @@ public class PasteRecordCommand extends SXECommand {
 
 		// add all attributes from the copy but the layout ones
 		records.add(copy);
-		records.addAll(getMergedAttributes(toCopy.getAttributes(),
+		records.addAll(getMergedAttributes(toCopy.getVisibleAttributes(),
 				layoutAttributes));
 
 		// add all other sub nodes
 		ElementRecord childCopy;
-		for (ElementRecord er : toCopy.getChildElements()) {
+		for (ElementRecord er : toCopy.getVisibleChildElements()) {
 			childCopy = er.getCopy();
 			childCopy.setParent(copy);
 			records.add(childCopy);

@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.NewRecordDataObject;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RemoveRecordDataObject;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObject;
 
 /**
@@ -53,8 +52,6 @@ public class SXEExtensionProvider implements PacketExtensionProvider {
 		switch (t) {
 		case NEW:
 			return new NewRecordDataObject();
-		case REMOVE:
-			return new RemoveRecordDataObject();
 		case SET:
 			return new SetRecordDataObject();
 		}

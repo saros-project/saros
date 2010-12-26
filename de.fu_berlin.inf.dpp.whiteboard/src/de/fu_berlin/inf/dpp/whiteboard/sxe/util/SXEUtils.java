@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -100,7 +99,7 @@ public class SXEUtils {
 	 * @param element
 	 *            to add the attributes to
 	 */
-	protected static void addAttributes(Set<AttributeRecord> attributes,
+	protected static void addAttributes(List<AttributeRecord> attributes,
 			Element parent) {
 		for (AttributeRecord record : attributes) {
 			parent.setAttributeNS(record.getNs(), record.getName(),
@@ -115,7 +114,7 @@ public class SXEUtils {
 	 * @param element
 	 *            to add the elements to
 	 */
-	protected static void addElements(Set<ElementRecord> elements,
+	protected static void addElements(List<ElementRecord> elements,
 			Element parent) {
 		Element e;
 		for (ElementRecord record : elements) {
@@ -136,8 +135,8 @@ public class SXEUtils {
 	 *            to add the nodes to
 	 */
 	protected static void addChildNodes(ElementRecord record, Element element) {
-		addElements(record.getChildElements(), element);
-		addAttributes(record.getAttributes(), element);
+		addElements(record.getVisibleChildElements(), element);
+		addAttributes(record.getVisibleAttributes(), element);
 	}
 
 	/**

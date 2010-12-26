@@ -29,6 +29,7 @@ public class SetRecord implements IRecord {
 	private String chdata;
 	private ElementRecord parentToChange;
 	private Float primaryWeight;
+	private Boolean setVisible;
 
 	private String lastModifiedBy;
 
@@ -88,6 +89,8 @@ public class SetRecord implements IRecord {
 			sb.append(" primary-weight=" + getPrimaryWeight());
 		if (getChdata() != null)
 			sb.append(" chdata=" + getChdata());
+		if (setVisible != null)
+			sb.append(" visible=" + setVisible);
 		if (version != -1)
 			sb.append(" version=" + version);
 		else
@@ -107,6 +110,7 @@ public class SetRecord implements IRecord {
 		RecordDataObject rdo = new SetRecordDataObject();
 		rdo.putValue(RecordEntry.TARGET, getTarget().getRid());
 		rdo.putValue(RecordEntry.VERSION, getVersion());
+		rdo.putValue(RecordEntry.VISIBLE, getSetVisibilityTo());
 		rdo.putValue(RecordEntry.CHDATA, getChdata());
 		rdo.putValue(RecordEntry.PRIMARY_WEIGHT, getPrimaryWeight());
 		if (getParentToChange() != null)
@@ -174,6 +178,8 @@ public class SetRecord implements IRecord {
 			return true;
 		if (primaryWeight != null
 				&& !primaryWeight.equals(target.getPrimaryWeight()))
+			return true;
+		if (setVisible != null && !setVisible.equals(target.isVisible()))
 			return true;
 		/*
 		 * Remote records always must change something if not contained, even if
@@ -261,6 +267,19 @@ public class SetRecord implements IRecord {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public Boolean getSetVisibilityTo() {
+		return setVisible;
+	}
+
+	public void setSetVisibilityTo(boolean setVisible) {
+		this.setVisible = setVisible;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return target.isVisible();
 	}
 
 }

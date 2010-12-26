@@ -1,17 +1,13 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.RemoveRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.util.HierarchicalRecordSet;
 
 /**
@@ -34,8 +30,6 @@ public class DeleteRecordsCommand extends SXECommand {
 
 	/** all records to delete */
 	private HierarchicalRecordSet recordSet = new HierarchicalRecordSet();
-	/** Maps records to their previous parents */
-	private LinkedHashMap<ElementRecord, ElementRecord> recordMap = new LinkedHashMap<ElementRecord, ElementRecord>();
 	private DocumentRecord documentRecord;
 
 	public void addRecordToDelete(ElementRecord record) {
@@ -50,26 +44,20 @@ public class DeleteRecordsCommand extends SXECommand {
 	protected boolean canExecuteSXECommand() {
 		if (recordSet.getRootRecords().isEmpty())
 			return false;
-		Iterator<ElementRecord> it = recordSet.getRootRecords().iterator();
 
-		// remove records that are already removed
-		while (it.hasNext()) {
-			if (!it.next().isCommitted())
-				it.remove();
+		for (ElementRecord er : recordSet.getRootRecords()) {
+			if (er.isVisible())
+				return true;
 		}
-
-		return !recordSet.getRootRecords().isEmpty();
+		return false;
 	}
 
 	@Override
 	public List<IRecord> getRecords() {
 		List<IRecord> records = new LinkedList<IRecord>();
 
-		recordMap.clear();
-
 		for (ElementRecord er : recordSet.getRootRecords()) {
-			recordMap.put(er, er.getParent());
-			records.add(new RemoveRecord(er));
+			records.add(er.getRemoveRecord());
 		}
 
 		return records;
@@ -80,15 +68,8 @@ public class DeleteRecordsCommand extends SXECommand {
 
 		List<IRecord> records = new ArrayList<IRecord>();
 
-		for (Entry<ElementRecord, ElementRecord> e : recordMap.entrySet()) {
-			// first achieve the records from the tree in the command stack
-			records.add(e.getKey());
-			records.addAll(e.getKey().getAllDescendantNodes());
-			/*
-			 * then recreate - clears the child references to ensure proper
-			 * applying.
-			 */
-			e.getKey().recreate(e.getValue(), true);
+		for (ElementRecord e : recordSet.getRootRecords()) {
+			records.add(e.getRecreateRecord());
 		}
 
 		return records;
@@ -103,16 +84,20 @@ public class DeleteRecordsCommand extends SXECommand {
 	protected boolean canUndoSXECommand() {
 		LayoutElementRecord parent;
 
-		if (recordMap.isEmpty())
+		if (recordSet.getRootRecords().isEmpty())
 			return false;
 
 		try {
-			for (Entry<ElementRecord, ElementRecord> e : recordMap.entrySet()) {
-				parent = (LayoutElementRecord) e.getValue();
+			for (ElementRecord e : recordSet.getRootRecords()) {
+				parent = (LayoutElementRecord) e.getParent();
 				if (!parent.isCommitted())
 					return false;
 				if (!parent.isComposite())
 					return false;
+				/*
+				 * also if existent, let's just set it visible again. Will be
+				 * ignored by the controller then.
+				 */
 			}
 		} catch (ClassCastException e) {
 			return false;
@@ -126,8 +111,6 @@ public class DeleteRecordsCommand extends SXECommand {
 		super.dispose();
 		recordSet.clear();
 		recordSet = null;
-		recordMap.clear();
-		recordMap = null;
 		documentRecord = null;
 	}
 

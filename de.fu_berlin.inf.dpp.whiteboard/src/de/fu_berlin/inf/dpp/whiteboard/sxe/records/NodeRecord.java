@@ -58,6 +58,7 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	protected String creator;
 
 	/* mutable fields */
+	protected boolean visible = true;
 	protected ElementRecord currentParent;
 	protected Float currentPrimaryWeight;
 
@@ -114,6 +115,23 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 			return true;
 
 		return false;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return visible;
+	}
+
+	public SetRecord getRemoveRecord() {
+		SetRecord remove = new SetRecord(this);
+		remove.setSetVisibilityTo(false);
+		return remove;
+	}
+
+	public SetRecord getRecreateRecord() {
+		SetRecord recreate = new SetRecord(this);
+		recreate.setSetVisibilityTo(true);
+		return recreate;
 	}
 
 	/**
@@ -300,24 +318,6 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	}
 
 	/**
-	 * Removes this record and its children from the document and its parent.
-	 * 
-	 * @param removeRecord
-	 * @return if the record and its children are removed from the document
-	 */
-	public boolean applyRemoveRecord(RemoveRecord removeRecord) {
-
-		if (!getDocumentRecord().remove(this))
-			return false;
-
-		getParent().removeChild(this);
-
-		getParent().notifyChildChange(removeRecord);
-
-		return true;
-	}
-
-	/**
 	 * If successful, this method sets the mutable fields to these defined in
 	 * the provided SetRecord and increments the version attribute.
 	 * 
@@ -434,6 +434,11 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 			parentOrChildOrderChange = true;
 		}
 
+		if (setRecord.getSetVisibilityTo() != null
+				&& !setRecord.getSetVisibilityTo().equals(visible)) {
+			visible = setRecord.getSetVisibilityTo();
+		}
+
 		// Because of SortedSet functionality we have to re-attach a child on
 		// primaryWeight change
 		if (parentOrChildOrderChange)
@@ -505,33 +510,6 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	 */
 	public abstract NodeRecord getCopy();
 
-	/**
-	 * <p>
-	 * This method helps to create new New-Records but maintaining the
-	 * references in a local command stack. </br>
-	 * 
-	 * Therefore the rid is changed and the history cleared but mutable fields
-	 * maintain.
-	 * </p>
-	 * <p>
-	 * Does not notify and must not be called when connected to the DOM tree!
-	 * </p>
-	 * 
-	 * @param parent
-	 *            where to recreate the record to
-	 */
-	public void recreate(ElementRecord parent) {
-		if (isCommitted())
-			throw new CommittedRecordException();
-		setRecords.clear();
-		currentParent = parent;
-
-		this.rid = String.valueOf(RANDOM.nextLong());
-		initialSet = new SetRecord(this, version);
-		initialSet.setParentToChange(currentParent);
-		initialSet.setPrimaryWeight(currentPrimaryWeight);
-	}
-
 	/* notification */
 
 	/**
@@ -540,22 +518,29 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	protected void fireRecordChanged(SetRecord oldState, SetRecord newState) {
 
 		if (newState.getParentToChange() != null
-				&& !oldState.getParentToChange().equals(
-						newState.getParentToChange())) {
+				&& !newState.getParentToChange().equals(
+						oldState.getParentToChange())) {
 			// notify old parent
 			oldState.getParentToChange().notifyChildChange(this);
 			getParent().notifyChildChange(newState);
 			return;
 		}
 		if (newState.getPrimaryWeight() != null
-				&& !oldState.getPrimaryWeight().equals(
-						newState.getPrimaryWeight())) {
+				&& !newState.getPrimaryWeight().equals(
+						oldState.getPrimaryWeight())) {
 			getParent().notifyChildChange(newState);
 			return;
 		}
 
 		if (newState.getChdata() != null
-				&& !oldState.getChdata().equals(newState.getChdata())) {
+				&& !newState.getChdata().equals(oldState.getChdata())) {
+			getParent().notifyChildChange(newState);
+			return;
+		}
+
+		if (newState.getSetVisibilityTo() != null
+				&& !newState.getSetVisibilityTo().equals(
+						oldState.getSetVisibilityTo())) {
 			getParent().notifyChildChange(newState);
 			return;
 		}
@@ -573,4 +558,8 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "attr(" + rid + ") name=" + name;
+	}
 }

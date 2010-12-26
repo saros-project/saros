@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.RemoveRecord;
 
 /**
  * <p>
@@ -55,6 +53,7 @@ public abstract class AbstractElementRecordCreateCommand extends SXECommand {
 
 		child = (LayoutElementRecord) parent.createNewElementRecord(null,
 				newChildName);
+
 		records.add(child);
 		records.addAll(getAttributeRecords(child));
 
@@ -67,21 +66,15 @@ public abstract class AbstractElementRecordCreateCommand extends SXECommand {
 	@Override
 	public List<IRecord> getUndoRecords() {
 		List<IRecord> records = new LinkedList<IRecord>();
-		RemoveRecord rr = new RemoveRecord(child);
-		records.add(rr);
+		records.add(child.getRemoveRecord());
 
 		return records;
 	}
 
 	@Override
 	public List<IRecord> getRedoRecords() {
-
-		List<IRecord> records = new ArrayList<IRecord>();
-		records.add(child);
-		records.addAll(child.getAllDescendantNodes());
-
-		child.recreate(parent, true);
-
+		List<IRecord> records = new LinkedList<IRecord>();
+		records.add(child.getRecreateRecord());
 		return records;
 	}
 
@@ -95,12 +88,12 @@ public abstract class AbstractElementRecordCreateCommand extends SXECommand {
 		if (newChildName == null || parent == null || !parent.isComposite())
 			return false;
 
-		return parent.isCommitted();
+		return parent.isVisible() && parent.isCommitted();
 	}
 
 	@Override
 	protected boolean canUndoSXECommand() {
-		return child.isCommitted();
+		return child.isVisible() && child.isCommitted();
 	}
 
 	@Override

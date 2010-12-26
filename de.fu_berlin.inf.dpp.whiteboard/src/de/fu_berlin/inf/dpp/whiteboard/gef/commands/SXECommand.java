@@ -83,8 +83,9 @@ public abstract class SXECommand extends Command {
 	@Override
 	public final boolean canUndo() {
 		if (getDocumentRecord() == null
-				|| getDocumentRecord().getController() == null)
+				|| getDocumentRecord().getController() == null) {
 			return false;
+		}
 		return canUndoSXECommand();
 	}
 
@@ -103,5 +104,4 @@ public abstract class SXECommand extends Command {
 		} else
 			return super.chain(command);
 	}
-
 }

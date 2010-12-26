@@ -1,11 +1,8 @@
 package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -38,15 +35,12 @@ public class DocumentRecord {
 
 	/** linked map if NodeRecords contained in this document */
 	protected LinkedHashMap<String, NodeRecord> newRecords;
-	/** RIDs of removed records */
-	protected Set<String> removedRecords;
 
 	// TODO install document prolog etc
 
 	public DocumentRecord(SXEController controller) {
 		this.controller = controller;
 		newRecords = new LinkedHashMap<String, NodeRecord>();
-		removedRecords = new HashSet<String>();
 	}
 
 	public SXEController getController() {
@@ -101,39 +95,6 @@ public class DocumentRecord {
 	}
 
 	/**
-	 * <p>
-	 * Removes a NodeRecord from the document.
-	 * </p>
-	 * 
-	 * <p>
-	 * To be called during applying of a RemoveRecord after removing the target
-	 * or any of its parents from the tree.
-	 * </p>
-	 * 
-	 * @param target
-	 */
-	boolean remove(NodeRecord target) {
-		if (newRecords.remove(target.getRid()) != null) {
-			removedRecords.add(target.getRid());
-			return true;
-		} else {
-			log.warn("Try to remove non existent " + target.getNodeType()
-					+ " record: " + target.getName() + " " + target.getRid());
-			return false;
-		}
-	}
-
-	/**
-	 * @param records
-	 *            to remove from the document
-	 * @see #remove(NodeRecord)
-	 */
-	void remove(Collection<NodeRecord> records) {
-		for (NodeRecord r : records)
-			remove(r);
-	}
-
-	/**
 	 * Method to use when trying to create IRecords from the serializable
 	 * RecordDataObject.
 	 * 
@@ -176,7 +137,6 @@ public class DocumentRecord {
 	 */
 	public void clear() {
 		newRecords.clear();
-		removedRecords.clear();
 	}
 
 	/**
@@ -205,10 +165,6 @@ public class DocumentRecord {
 
 	public boolean isEmpty() {
 		return newRecords.isEmpty();
-	}
-
-	public boolean isRemoved(String rid) {
-		return removedRecords.contains(rid);
 	}
 
 	/**

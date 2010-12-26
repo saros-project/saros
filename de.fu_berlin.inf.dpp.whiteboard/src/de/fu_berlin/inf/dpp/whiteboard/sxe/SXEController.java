@@ -225,19 +225,13 @@ public class SXEController extends AbstractSXEMessageHandler {
 
 			return applied;
 		} catch (MissingRecordException e) {
-			if (document.isRemoved(e.getMissingRid())) {
-				log.debug("Received " + rdo.getRecordType()
-						+ " record for deleted target: " + e.getMissingRid());
-			} else {
-				log.debug("Missing record: " + e.getMissingRid() + " for "
-						+ rdo + ". Queued for the moment.");
-				/*
-				 * this record is not casual ready yet but will be or it's an
-				 * error
-				 */
-				// TODO request record after time or delete and inform peers
-				unappliedMissingTargetRecords.put(e.getMissingRid(), rdo);
-			}
+			log.debug("Missing record: " + e.getMissingRid() + " for " + rdo
+					+ ". Queued for the moment.");
+			/*
+			 * this record is not casual ready yet but will be or it's an error
+			 */
+			// TODO request record after time or delete and inform peers
+			unappliedMissingTargetRecords.put(e.getMissingRid(), rdo);
 			return false;
 		} catch (Exception e) {
 			// TODO delete on peers

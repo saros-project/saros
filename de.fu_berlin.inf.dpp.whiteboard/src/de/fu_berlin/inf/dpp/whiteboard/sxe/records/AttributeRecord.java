@@ -104,10 +104,4 @@ public class AttributeRecord extends NodeRecord {
 		return currentState;
 	}
 
-	@Override
-	public void recreate(ElementRecord parent) {
-		super.recreate(parent);
-		initialSet.setChdata(currentChdata);
-	}
-
 }

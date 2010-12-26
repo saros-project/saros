@@ -68,12 +68,24 @@ public abstract class RecordDataObject implements Serializable {
 			valuePairs.put(entry, String.valueOf(value));
 	}
 
+	public void putValue(RecordEntry entry, Boolean value) {
+		if (value != null)
+			valuePairs.put(entry, String.valueOf(value));
+	}
+
 	public void putValue(RecordEntry entry, int value) {
 		putValue(entry, String.valueOf(value));
 	}
 
 	public String getString(RecordEntry name) {
 		return valuePairs.get(name);
+	}
+
+	public Boolean getBoolean(RecordEntry name) {
+		String value = getString(name);
+		if (value == null)
+			return null;
+		return Boolean.valueOf(value);
 	}
 
 	public Integer getInt(RecordEntry name) {

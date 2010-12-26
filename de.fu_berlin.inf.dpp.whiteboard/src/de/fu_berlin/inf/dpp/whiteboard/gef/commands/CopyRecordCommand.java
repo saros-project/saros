@@ -49,6 +49,8 @@ public class CopyRecordCommand extends Command {
 				return false;
 			if (!er.getParent().isCommitted())
 				return false;
+			if (!er.getParent().isVisible())
+				return false;
 		}
 		return true;
 	}

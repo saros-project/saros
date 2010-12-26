@@ -58,7 +58,8 @@ public class HierarchicalRecordSet {
 			return;
 		} else {
 			ElementRecord tmp;
-			TreeSet<ElementRecord> children = record.getAllDescendantElements();
+			Collection<ElementRecord> children = record
+					.getAllVisibleDescendantElements();
 
 			Iterator<ElementRecord> it = rootRecords.iterator();
 			while (it.hasNext()) {

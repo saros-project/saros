@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.records.RemoveRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
 
 public class SetRecordDataObject extends RecordDataObject {
@@ -56,18 +55,14 @@ public class SetRecordDataObject extends RecordDataObject {
 		tmp = getString(RecordEntry.PARENT);
 
 		if (tmp != null) {
-			try {
-				parent = document.getElementRecordById(tmp);
-			} catch (MissingRecordException e) {
-				if (document.isRemoved(tmp)) {
-					log.debug("Concurrently the new parent for a record was removed locally. Converting the set record to a local remove");
-					return new RemoveRecord(target);
-				} else
-					throw e;
-			}
+			parent = document.getElementRecordById(tmp);
 		}
 
 		SetRecord record = new SetRecord(target, version);
+
+		Boolean visible = getBoolean(RecordEntry.VISIBLE);
+		if (visible != null)
+			record.setSetVisibilityTo(visible);
 
 		tmp = getString(RecordEntry.CHDATA);
 		if (tmp != null)

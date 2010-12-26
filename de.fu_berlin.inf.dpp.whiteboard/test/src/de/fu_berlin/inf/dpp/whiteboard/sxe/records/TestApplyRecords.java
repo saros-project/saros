@@ -27,12 +27,12 @@ public class TestApplyRecords {
 
 		assertTrue(document.contains(r));
 
-		RemoveRecord rr = new RemoveRecord(r);
+		// RemoveRecord rr = new RemoveRecord(r);
 
-		rr.apply(document);
+		// rr.apply(document);
 
 		assertFalse(document.contains(r));
-		assertTrue(document.isRemoved(r.getRid()));
+		// assertTrue(document.isRemoved(r.getRid()));
 
 	}
 
