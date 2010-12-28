@@ -75,6 +75,8 @@ public class SetRecordDataObject extends RecordDataObject {
 		if (pw != null)
 			record.setPrimaryWeight(pw);
 
+		record.setSender(getSender());
+
 		return record;
 	}
 

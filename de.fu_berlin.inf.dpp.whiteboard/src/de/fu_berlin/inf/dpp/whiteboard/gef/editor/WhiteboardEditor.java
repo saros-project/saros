@@ -35,7 +35,6 @@ import org.eclipse.gef.ui.actions.SelectAllAction;
 import org.eclipse.gef.ui.actions.UndoAction;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
-import org.eclipse.gef.ui.parts.GraphicalEditorWithPalette;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -45,6 +44,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.actions.ActionFactory;
 
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.CopyRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.PasteRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.SXEDeleteAction;
@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.tools.CreationToolWithoutSelection;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool.PanningToolEntry;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PointlistCreationTool;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
+import de.fu_berlin.inf.dpp.whiteboard.net.RoleChangeManager.RoleChangeListener;
 import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
 import de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardContextMenuProvider;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.MessageAdapter;
@@ -69,7 +70,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
  * @author jurke
  * 
  */
-public class WhiteboardEditor extends GraphicalEditorWithPalette {
+public class WhiteboardEditor extends LockableGraphicalEditor {
 
 	public static final String ID = "de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor";
 
@@ -155,15 +156,16 @@ public class WhiteboardEditor extends GraphicalEditorWithPalette {
 		});
 
 		// TODO rolechange
-		// WhiteboardManager.getInstance().addRoleChangeListener(
-		// new RoleChangeListener() {
-		//
-		// @Override
-		// public void roleChanged(UserRole role) {
-		// WhiteboardEditor.this
-		// .setEnabled(role == UserRole.DRIVER);
-		// }
-		// });
+		WhiteboardManager.getInstance().addRoleChangeListener(
+				new RoleChangeListener() {
+
+					@Override
+					public void roleChanged(UserRole role) {
+						WhiteboardEditor.this
+								.setEnabled(role == UserRole.DRIVER);
+						updateActions();
+					}
+				});
 	}
 
 	protected void updateViewerContents(ElementRecord root) {

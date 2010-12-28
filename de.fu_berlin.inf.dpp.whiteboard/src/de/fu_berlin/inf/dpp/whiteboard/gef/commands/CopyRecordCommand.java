@@ -47,9 +47,7 @@ public class CopyRecordCommand extends Command {
 			er = it.next();
 			if (!isCopyableNode(er))
 				return false;
-			if (!er.getParent().isCommitted())
-				return false;
-			if (!er.getParent().isVisible())
+			if (!er.getParent().isPartOfVisibleDocument())
 				return false;
 		}
 		return true;

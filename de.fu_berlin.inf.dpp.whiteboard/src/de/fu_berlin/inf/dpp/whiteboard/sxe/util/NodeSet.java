@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.sxe.util;
 
+import java.util.Collection;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -75,6 +76,15 @@ public class NodeSet<T extends NodeRecord> extends TreeSet<T> {
 		else
 			return last().getPrimaryWeight() + STEP_TO_NEXT_PRIMARY_WEIGHT
 					+ random2Decimals();
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends T> c) {
+		boolean changed = false;
+		for (T t : c) {
+			changed |= add(t);
+		}
+		return changed;
 	}
 
 }

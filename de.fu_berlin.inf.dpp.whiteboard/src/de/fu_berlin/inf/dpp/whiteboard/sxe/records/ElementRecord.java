@@ -2,12 +2,12 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache.ChildRecordChangeListener;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.util.AttributeSet;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.util.NodeSet;
@@ -58,8 +58,8 @@ public class ElementRecord extends NodeRecord {
 		return visibleChildren;
 	}
 
-	protected TreeSet<ElementRecord> getAllDescendantElements() {
-		TreeSet<ElementRecord> descendants = new TreeSet<ElementRecord>();
+	protected List<ElementRecord> getAllDescendantElements() {
+		LinkedList<ElementRecord> descendants = new LinkedList<ElementRecord>();
 
 		descendants.addAll(getChildElements());
 
@@ -395,6 +395,27 @@ public class ElementRecord extends NodeRecord {
 	@Override
 	protected Float nextPrimaryWeight(ElementRecord newParent) {
 		return newParent.getChildElements().nextPrimaryWeight();
+	}
+
+	@Override
+	protected void setValuesTo(SetRecord setRecord) {
+		if (isCircularRelationship(setRecord.getParentToChange())) {
+			throw new XMLNotWellFormedException(setRecord,
+					version != setRecord.getVersion());
+		}
+		super.setValuesTo(setRecord);
+	}
+
+	public boolean isCircularRelationship(ElementRecord newParent) {
+		if (newParent == null)
+			return false;
+		if (currentParent == newParent)
+			return false;
+
+		if (this == newParent || getAllDescendantElements().contains(newParent))
+			return true;
+
+		return false;
 	}
 
 }

@@ -46,7 +46,7 @@ public class DeleteRecordsCommand extends SXECommand {
 			return false;
 
 		for (ElementRecord er : recordSet.getRootRecords()) {
-			if (er.isVisible())
+			if (er.isPartOfVisibleDocument())
 				return true;
 		}
 		return false;
@@ -90,7 +90,7 @@ public class DeleteRecordsCommand extends SXECommand {
 		try {
 			for (ElementRecord e : recordSet.getRootRecords()) {
 				parent = (LayoutElementRecord) e.getParent();
-				if (!parent.isCommitted())
+				if (!parent.isPartOfVisibleDocument())
 					return false;
 				if (!parent.isComposite())
 					return false;

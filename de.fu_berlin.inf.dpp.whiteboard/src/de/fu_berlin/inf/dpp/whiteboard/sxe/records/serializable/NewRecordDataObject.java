@@ -85,6 +85,7 @@ public class NewRecordDataObject extends RecordDataObject {
 			record.setNs(tmp);
 
 		// if no creator specified set sender as creator
+		// TODO maybe creator tag is obsolete
 		tmp = getString(RecordEntry.CREATOR);
 		if (tmp != null)
 			record.setCreator(tmp);
@@ -94,6 +95,9 @@ public class NewRecordDataObject extends RecordDataObject {
 		tmp = getString(RecordEntry.LAST_MODIFIED_BY);
 		if (tmp != null)
 			record.setLastModifiedBy(tmp);
+
+		record.setSender(getSender());
+
 		return record;
 	}
 

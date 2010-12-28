@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
@@ -32,7 +33,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
  * <li>applying a local list of records</li>
  * <li>applying a remote SXE message</li>
  * <li>queue incoming messages while synchronizing and apply them on finish</li>
- * <li>queue out-of-order (non-casual-ready) records to apply them when possible
+ * <li>queue out-of-order (non-causal-ready) records to apply them when possible
  * </li>
  * </ul>
  * </p>
@@ -203,6 +204,7 @@ public class SXEController extends AbstractSXEMessageHandler {
 			 * version difference is unequal 1
 			 */
 			if (r.getRecordType() == RecordType.SET) {
+
 				int versionDiff = ((SetRecord) r).getVersionDifference();
 
 				if (versionDiff != 1)
@@ -230,14 +232,45 @@ public class SXEController extends AbstractSXEMessageHandler {
 			/*
 			 * this record is not casual ready yet but will be or it's an error
 			 */
-			// TODO request record after time or delete and inform peers
+			// TODO request record after time or re-synchronize
 			unappliedMissingTargetRecords.put(e.getMissingRid(), rdo);
 			return false;
+		} catch (XMLNotWellFormedException xmlE) {
+			// TODO investigate how to solve this
+			log.warn("Received record that caused a non well-formed XML due to a conflict!");
+
+			applyNullRecord(xmlE.getCausingSetRecord());
+			return false;
 		} catch (Exception e) {
-			// TODO delete on peers
+			// TODO delete on peers or re-synchronize
 			log.error("Unexpected exception when applying record: " + rdo, e);
 			return false;
 		}
+	}
+
+	protected void applyNullRecord(SetRecord toConflict) {
+		SetRecord setRecord = new SetRecord(toConflict.getTarget(),
+				toConflict.getVersion());
+		// let's apply the conflict locally, too, to ensure a same version
+		setRecord.apply(document);
+	}
+
+	/**
+	 * This method sends a SetRecord to all peers that conflicts with the
+	 * provided one so that this will be reverted to a previous version. This
+	 * may be necessary, if due to concurrent SetRecords the XML document would
+	 * not be well-formed anymore due to a circular relationship.
+	 * 
+	 * @param toConflict
+	 */
+	protected void applyLocallyAndsentConflictingSetRecord(SetRecord toConflict) {
+		LinkedList<IRecord> records = new LinkedList<IRecord>();
+		SetRecord setRecord = new SetRecord(toConflict.getTarget(),
+				toConflict.getVersion());
+		// let's apply the conflict locally, too, to ensure a same version
+		setRecord.apply(document);
+		records.add(setRecord);
+		commitRecords(records);
 	}
 
 	/**
@@ -332,9 +365,6 @@ public class SXEController extends AbstractSXEMessageHandler {
 
 		} else if (cause.getRecordType() == RecordType.SET) {
 
-			// if (!unappliedBigVersionSetRecords.isEmpty())
-			// log.debug("New SetRecord added: " + cause.getTarget().getRid());
-
 			List<SetRecord> setRecords = unappliedBigVersionSetRecords
 					.remove(cause.getTarget().getRid());
 			if (setRecords != null)
@@ -406,15 +436,25 @@ public class SXEController extends AbstractSXEMessageHandler {
 			while (it.hasNext()) {
 				current = it.next();
 				// and don't commit if not executed
-				if (!apply(current)) {
+				boolean applied = false;
+				try {
+					applied = apply(current);
 					/*
-					 * i.e. may happen on undo a creation (==delete) where one
-					 * record of the selection got deleted by a peer.
+					 * i.e. may happen on undo a creation where one record of
+					 * the selection got deleted by a peer.
 					 * 
 					 * Or if a record is trivial - does not change anything.
 					 */
 					// may be switched to trace level
-					log.debug("Did not apply local record: " + current);
+					if (!applied)
+						log.debug("Did not apply local record: " + current);
+				} catch (XMLNotWellFormedException e) {
+					log.debug("Could not apply local record because would result in a non well-formed XML: "
+							+ current);
+				}
+
+				if (!applied) {
+					// if not applied, don't send to peers
 					it.remove();
 				}
 			}

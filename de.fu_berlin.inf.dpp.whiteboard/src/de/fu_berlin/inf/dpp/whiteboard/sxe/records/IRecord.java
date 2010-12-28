@@ -18,7 +18,7 @@ public interface IRecord {
 
 	/* existence */
 
-	public boolean isVisible();
+	public boolean isPartOfVisibleDocument();
 
 	/* applying */
 
@@ -62,13 +62,6 @@ public interface IRecord {
 	 */
 	public String getLastModifiedBy();
 
-	/**
-	 * 
-	 * @return if this method is committed and part of the current document
-	 *         state
-	 */
-	public boolean isCommitted();
-
 	/* serialization */
 
 	/**
@@ -76,5 +69,19 @@ public interface IRecord {
 	 * @return the serializable record data object
 	 */
 	public RecordDataObject getRecordDataObject();
+
+	/**
+	 * 
+	 * @return the sender of this record
+	 */
+	public String getSender();
+
+	/**
+	 * Sets the sender of this record
+	 * 
+	 * @param sender
+	 * @throws de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException
+	 */
+	public void setSender(String sender);
 
 }

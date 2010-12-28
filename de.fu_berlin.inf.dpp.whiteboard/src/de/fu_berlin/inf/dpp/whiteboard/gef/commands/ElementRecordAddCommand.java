@@ -82,14 +82,22 @@ public class ElementRecordAddCommand extends SXECommand {
 	protected boolean canExecuteSXECommand() {
 		if (record == null || parent == null || layout == null)
 			return false;
-		return record.isCommitted() && parent.isCommitted();
+		// this is important: don't allow a non well-formed XML document
+		if (record.isCircularRelationship(parent))
+			return false;
+
+		return record.isVisible() && parent.isPartOfVisibleDocument();
 	}
 
 	@Override
 	protected boolean canUndoSXECommand() {
 		if (record == null || oldParent == null || oldLayout == null)
 			return false;
-		return record.isCommitted() && oldParent.isCommitted();
+		// this is important: don't allow a non well-formed XML document
+		if (record.isCircularRelationship(oldParent))
+			return false;
+
+		return record.isVisible() && oldParent.isPartOfVisibleDocument();
 	}
 
 	@Override

@@ -40,7 +40,8 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SetRecordList;
  * @author jurke
  * 
  */
-public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
+public abstract class NodeRecord extends AbstractRecord implements
+		Comparable<NodeRecord> {
 
 	private static final Logger log = Logger.getLogger(NodeRecord.class);
 
@@ -95,6 +96,7 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 		this.documentRecord = documentRecord;
 		this.version = version;
 		initialSet = new SetRecord(this, version);
+		initialSet.setSetVisibilityTo(true);
 	}
 
 	public DocumentRecord getDocumentRecord() {
@@ -117,9 +119,25 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 		return false;
 	}
 
-	@Override
 	public boolean isVisible() {
 		return visible;
+	}
+
+	@Override
+	public boolean isPartOfVisibleDocument() {
+		if (!isCommitted())
+			return false;
+
+		if (!visible)
+			return false;
+
+		if (this == documentRecord.getRoot())
+			return true;
+
+		if (currentParent == null)
+			return false;
+
+		return currentParent.isPartOfVisibleDocument();
 	}
 
 	public SetRecord getRemoveRecord() {
@@ -263,6 +281,8 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	public void setPrimaryWeight(Float primaryWeight) {
 		if (isCommitted())
 			throw new CommittedRecordException();
+		if (primaryWeight == null)
+			throw new NullPointerException();
 		currentPrimaryWeight = primaryWeight;
 		initialSet.setPrimaryWeight(primaryWeight);
 	}
@@ -339,21 +359,22 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 		SetRecord oldState = getCurrentMutableFields();
 		SetRecord newState;
 
-		version++;
-
 		// conflict
-		if (version != setRecord.getVersion()) {
-			newState = getMutableFieldsBefore(setRecord.getVersion() - 1);
+		if (version + 1 != setRecord.getVersion()) {
+			newState = getNewStateAndRevertHistory(setRecord.getVersion());
 			getParent().notifyChildConflict(this, oldState, setRecord);
-			log.debug("reverting record from " + (getVersion() - 1)
-					+ " version to " + (setRecord.getVersion() - 1) + ": "
+			log.debug("reverting record from version " + (getVersion() - 1)
+					+ " to " + (setRecord.getVersion() - 1) + ": "
 					+ newState.toString());
+			setValuesTo(newState);
 		} else {
-			setRecords.add(setRecord);
 			newState = setRecord;
+			setValuesTo(newState);
+			setRecords.add(setRecord);
 		}
 
-		setValuesTo(newState);
+		version++;
+
 		fireRecordChanged(oldState, newState);
 		return true;
 	}
@@ -374,7 +395,7 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 	 * @param version
 	 * @return the mutable fields before the version as SetRecord
 	 */
-	protected SetRecord getMutableFieldsBefore(int version) {
+	protected SetRecord getNewStateAndRevertHistory(int version) {
 		if (setRecords.isEmpty())
 			return initialSet;
 		ListIterator<SetRecord> it = setRecords.listIterator(setRecords.size());
@@ -389,7 +410,7 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 
 		while (it.hasPrevious()) {
 			previous = it.previous();
-			if (previous.getVersion() < version) {
+			if (previous.getVersion() >= version) {
 				it.remove();
 			} else {
 				setTo.fillEmptyMutableFieldsFrom(previous);
@@ -495,6 +516,7 @@ public abstract class NodeRecord implements IRecord, Comparable<NodeRecord> {
 		rdo.putValue(RecordEntry.VERSION, initialSet.getVersion());
 		if (getParent() != null)
 			rdo.putValue(RecordEntry.PARENT, getParent().getRid());
+		rdo.putValue(RecordEntry.VISIBLE, isVisible());
 		rdo.putValue(RecordEntry.PRIMARY_WEIGHT, initialSet.getPrimaryWeight());
 		rdo.putValue(RecordEntry.NAME, getName());
 		rdo.putValue(RecordEntry.NS, getNs());

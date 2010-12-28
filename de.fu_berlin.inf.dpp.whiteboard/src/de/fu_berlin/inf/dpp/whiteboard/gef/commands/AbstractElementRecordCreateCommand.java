@@ -88,12 +88,12 @@ public abstract class AbstractElementRecordCreateCommand extends SXECommand {
 		if (newChildName == null || parent == null || !parent.isComposite())
 			return false;
 
-		return parent.isVisible() && parent.isCommitted();
+		return parent.isPartOfVisibleDocument();
 	}
 
 	@Override
 	protected boolean canUndoSXECommand() {
-		return child.isVisible() && child.isCommitted();
+		return child.isPartOfVisibleDocument();
 	}
 
 	@Override

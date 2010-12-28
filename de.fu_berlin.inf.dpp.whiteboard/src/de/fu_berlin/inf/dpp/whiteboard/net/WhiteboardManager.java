@@ -7,6 +7,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess
  * Note: this class is not yet final because a lot of changes are about to
  * happen respective the Saros invitation or network layer
  */
-public class WhiteboardManager {
+public class WhiteboardManager extends RoleChangeManager {
 
 	private static Logger log = Logger.getLogger(WhiteboardManager.class);
 
@@ -62,8 +63,8 @@ public class WhiteboardManager {
 				controller.startSession();
 			} else {
 				sxeTransmitter.enableInvitation(controller);
-				// WhiteboardManager.this.roleChanged(session.getLocalUser()
-				// .getUserRole());
+				WhiteboardManager.this.roleChanged(session.getLocalUser()
+						.getUserRole());
 			}
 
 		}
@@ -73,6 +74,8 @@ public class WhiteboardManager {
 			sarosSession.removeListener(sharedProjectListener);
 			controller.setDisconnected();
 
+			// set driver role to enable editor
+			roleChanged(UserRole.DRIVER);
 			/*
 			 * dispose because we do not want to be invited when not in a Saros
 			 * session and the transmitter will be recreated on start
@@ -99,11 +102,11 @@ public class WhiteboardManager {
 		}
 
 		// TODO rolechange
-		// @Override
-		// public void roleChanged(User user) {
-		// if (user.isLocal())
-		// WhiteboardManager.this.roleChanged(user.getUserRole());
-		// }
+		@Override
+		public void roleChanged(User user) {
+			if (user.isLocal())
+				WhiteboardManager.this.roleChanged(user.getUserRole());
+		}
 	};
 
 	@Inject

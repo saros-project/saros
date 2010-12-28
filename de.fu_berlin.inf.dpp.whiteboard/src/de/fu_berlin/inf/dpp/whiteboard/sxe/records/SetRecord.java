@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObj
  * @author jurke
  * 
  */
-public class SetRecord implements IRecord {
+public class SetRecord extends AbstractRecord {
 
 	protected NodeRecord target;
 	protected int version = -1;
@@ -170,7 +170,7 @@ public class SetRecord implements IRecord {
 	 * @return whether the target changes applying this set record
 	 */
 	public boolean changesTargetState() {
-		if (chdata != null
+		if (chdata != null && target instanceof AttributeRecord
 				&& !chdata.equals(((AttributeRecord) target).getChdata()))
 			return true;
 		if (parentToChange != null
@@ -201,6 +201,8 @@ public class SetRecord implements IRecord {
 			return false;
 		if (primaryWeight == null)
 			return false;
+		if (setVisible == null)
+			return false;
 		return true;
 	}
 
@@ -218,6 +220,9 @@ public class SetRecord implements IRecord {
 		if (primaryWeight == null && previous.getChdata() != null) {
 			setChdata(previous.getChdata());
 		}
+		if (setVisible == null && previous.getSetVisibilityTo() != null) {
+			setSetVisibilityTo(previous.getSetVisibilityTo());
+		}
 		if (version == -1)
 			version = previous.getVersion();
 	}
@@ -233,6 +238,13 @@ public class SetRecord implements IRecord {
 		if (r.getVersion() != version)
 			return false;
 
+		if (sender == null && r.getSender() != null)
+			return false;
+
+		if (sender != null)
+			if (!(sender.equals(r.getSender())))
+				return false;
+
 		if (!target.equals(r.getTarget()))
 			return false;
 
@@ -246,6 +258,9 @@ public class SetRecord implements IRecord {
 
 		if (primaryWeight != null)
 			if (!(primaryWeight.equals(r.getPrimaryWeight())))
+				return false;
+		if (setVisible != null)
+			if (!(setVisible.equals(r.getSetVisibilityTo())))
 				return false;
 
 		return true;
@@ -278,8 +293,8 @@ public class SetRecord implements IRecord {
 	}
 
 	@Override
-	public boolean isVisible() {
-		return target.isVisible();
+	public boolean isPartOfVisibleDocument() {
+		return target.isPartOfVisibleDocument();
 	}
 
 }

@@ -33,7 +33,7 @@ public class SVGPolylinePart extends ElementRecordPart {
 
 		// hack because selection handle does not update
 		if (getViewer().getSelectedEditParts().contains(this)
-				&& getElementRecord().isCommitted())
+				&& getElementRecord().isPartOfVisibleDocument())
 			getViewer().appendSelection(this);
 	}
 

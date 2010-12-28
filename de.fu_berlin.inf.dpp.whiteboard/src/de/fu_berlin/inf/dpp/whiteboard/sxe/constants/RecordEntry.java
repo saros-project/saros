@@ -21,7 +21,8 @@ public enum RecordEntry {
 	RID("rid"), TARGET("target"), TYPE("type"), VERSION("version"), RECORD_TYPE(
 			"record-type"), TARGET_VERSION("target-version"), PARENT("parent"), VISIBLE(
 			"visible"), PRIMARY_WEIGHT("primary-weight"), NS("ns"), NAME("name"), CHDATA(
-			"chdata"), CREATOR("creator"), LAST_MODIFIED_BY("last-modified-by");
+			"chdata"), CREATOR("creator"), LAST_MODIFIED_BY("last-modified-by"), SENDER(
+			"sender");
 
 	private String type;
 

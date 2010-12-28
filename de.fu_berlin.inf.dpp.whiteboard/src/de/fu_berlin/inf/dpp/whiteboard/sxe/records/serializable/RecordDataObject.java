@@ -46,6 +46,11 @@ public abstract class RecordDataObject implements Serializable {
 		return type;
 	}
 
+	public void setSenderIfAbsent(String sender) {
+		if (getString(RecordEntry.SENDER) == null)
+			putValue(RecordEntry.SENDER, sender);
+	}
+
 	/**
 	 * Returns the target RID entry or the RID of the new-record. Like this it
 	 * works as complement to Record.getTarget() and clients can assume that it
@@ -103,11 +108,7 @@ public abstract class RecordDataObject implements Serializable {
 	}
 
 	public String getSender() {
-		return sender;
-	}
-
-	public void setSender(String sender) {
-		this.sender = sender;
+		return getString(RecordEntry.SENDER);
 	}
 
 	@Override

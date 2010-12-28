@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.whiteboard.net;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +29,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEIncomingSynchronizationProcess;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
  * Uses Smack and Saros to establish the SXE communication.</br>
@@ -83,6 +85,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 				 * sender on every RecordDataObject where it is null
 				 */
 				extension.getMessage().setFrom(packet.getFrom());
+				setSender(extension.getMessage().getRecords(), packet.getFrom());
 				Util.runSafeSWTAsync(log, new Runnable() {
 
 					@Override
@@ -203,6 +206,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 		receiver.addPacketListener(invitationListener,
 				provider.getInvitationPacketFilter());
+	}
+
+	protected void setSender(List<RecordDataObject> rdos, String sender) {
+		for (RecordDataObject rdo : rdos)
+			rdo.setSenderIfAbsent(sender);
 	}
 
 	/**
