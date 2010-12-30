@@ -111,7 +111,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected boolean useVersionControl = true;
 
-    private BlockingQueue<IActivity> pendingActivities = new LinkedBlockingQueue<IActivity>();
+    protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
 
     protected SharedProject sharedProject;
 
@@ -133,16 +133,32 @@ public class SarosSession implements ISarosSession, Disposable {
      * @see Util#runSafeSWTAsync(Logger, Runnable)
      * @see Display#asyncExec(Runnable)
      */
+    /*
+     * Note: transformation and executing has to be performed together in the
+     * SWT thread. Else, it would be possible that local activities are executed
+     * between transformation and application of remote operations. In other
+     * words, the transformation would be applied to an out-dated state.
+     */
     private Thread activityDispatcher = new Thread("Saros Activity Dispatcher") {
         @Override
         public void run() {
             try {
                 while (!cancelActivityDispatcher) {
-                    final IActivity activity = pendingActivities.take();
+                    final List<IActivity> activities = pendingActivityLists
+                        .take();
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            for (IActivityProvider executor : activityProviders) {
-                                executor.exec(activity);
+                            TransformationResult transformed = concurrentDocumentClient
+                                .transformIncoming(activities);
+
+                            for (QueueItem item : transformed.getSendToPeers()) {
+                                sendActivity(item.recipients, item.activity);
+                            }
+
+                            for (IActivity activity : transformed.executeLocally) {
+                                for (IActivityProvider executor : activityProviders) {
+                                    executor.exec(activity);
+                                }
                             }
                         }
                     });
@@ -439,7 +455,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         listenerDispatch.userJoined(user);
 
-        log.info("User " + Util.prefix(jid) + " joined session");
+        log.info("User " + Util.prefix(jid) + " joined session.");
     }
 
     public void removeUser(User user) {
@@ -611,23 +627,7 @@ public class SarosSession implements ISarosSession, Disposable {
             }
         }
 
-        final List<IActivity> stillToExecute = activities;
-
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-
-                TransformationResult transformed = concurrentDocumentClient
-                    .transformIncoming(stillToExecute);
-
-                for (QueueItem item : transformed.getSendToPeers()) {
-                    sendActivity(item.recipients, item.activity);
-                }
-
-                for (IActivity activityDataObject : transformed.executeLocally) {
-                    pendingActivities.add(activityDataObject);
-                }
-            }
-        });
+        pendingActivityLists.add(activities);
     }
 
     private List<IActivity> convert(
@@ -656,8 +656,7 @@ public class SarosSession implements ISarosSession, Disposable {
             throw new IllegalArgumentException("Activity cannot be null");
 
         /*
-         * Let ConcurrentDocumentManager have a look at the activityDataObjects
-         * first
+         * Let ConcurrentDocumentManager have a look at the activities first
          */
         List<QueueItem> toSend = concurrentDocumentClient
             .transformOutgoing(activity);
@@ -672,8 +671,8 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see #sendActivity(List, IActivity)
      */
-    public void sendActivity(User recipient, IActivity activityDataObject) {
-        sendActivity(Collections.singletonList(recipient), activityDataObject);
+    public void sendActivity(User recipient, IActivity activity) {
+        sendActivity(Collections.singletonList(recipient), activity);
     }
 
     public void sendActivity(List<User> toWhom, final IActivity activity) {
