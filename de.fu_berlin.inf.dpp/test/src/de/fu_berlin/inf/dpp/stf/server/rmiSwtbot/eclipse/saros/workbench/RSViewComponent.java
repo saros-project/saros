@@ -15,13 +15,13 @@ public interface RSViewComponent extends Remote {
 
     public void closeRemoteScreenView() throws RemoteException;
 
-    public void changeModeOfImageSource() throws RemoteException;
+    public void clickTBChangeModeOfImageSource() throws RemoteException;
 
-    public void stopRunningSession() throws RemoteException;
+    public void clickTBStopRunningSession() throws RemoteException;
 
-    public void resume() throws RemoteException;
+    public void clickTBResume() throws RemoteException;
 
-    public void pause() throws RemoteException;
+    public void clickTBPause() throws RemoteException;
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException;
 }

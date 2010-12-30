@@ -277,7 +277,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         }
     }
 
-    public void confirmRequestOfSubscriptionReceivedWindow()
+    public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException {
         if (!shellC
             .activateShellWithText(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED))

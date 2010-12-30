@@ -137,23 +137,23 @@ public class STFTest {
         for (TypeOfTester t : testers) {
             switch (t) {
             case ALICE:
-                alice = InitMusician.newAlice();
+                alice = InitTester.newAlice();
                 result.add(alice);
                 break;
             case BOB:
-                bob = InitMusician.newBob();
+                bob = InitTester.newBob();
                 result.add(bob);
                 break;
             case CARL:
-                carl = InitMusician.newCarl();
+                carl = InitTester.newCarl();
                 result.add(carl);
                 break;
             case DAVE:
-                dave = InitMusician.newDave();
+                dave = InitTester.newDave();
                 result.add(dave);
                 break;
             case EDNA:
-                edna = InitMusician.newEdna();
+                edna = InitTester.newEdna();
                 result.add(edna);
                 break;
             default:

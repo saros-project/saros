@@ -19,5 +19,11 @@ public interface ProgressViewComponent extends Remote {
 
     public void removeProcess(int index) throws RemoteException;
 
+    /**
+     * For some tests a host need to invite many peers concurrently and some
+     * operations should not be performed if the invitation processes aren't
+     * finished yet. In this case, you can use this method to guarantee, that
+     * host wait so long until all the invitation Processes are finished.
+     */
     public void waitUntilNoInvitationProgress() throws RemoteException;
 }

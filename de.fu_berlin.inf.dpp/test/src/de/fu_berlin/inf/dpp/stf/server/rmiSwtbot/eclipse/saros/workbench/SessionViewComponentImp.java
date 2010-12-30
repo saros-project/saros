@@ -817,12 +817,6 @@ public class SessionViewComponentImp extends EclipseComponent implements
         return localJID;
     }
 
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
     /**
      * 
      * Define the precondition which should be guaranteed when you want to

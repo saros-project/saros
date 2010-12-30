@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
-
 import java.rmi.RemoteException;
 
 import org.eclipse.jface.wizard.WizardDialog;
@@ -64,6 +62,23 @@ public class ShellComponentImp extends EclipseComponent implements
         return false;
     }
 
+    public boolean activateShellWithRegexText(String matchText)
+        throws RemoteException {
+        SWTBotShell[] shells = bot.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(matchText)) {
+                log.debug("shell found matching \"" + matchText + "\"");
+                if (!shell.isActive()) {
+                    shell.activate();
+                }
+                return shell.isActive();
+            }
+        }
+        final String message = "No shell found matching \"" + matchText + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
+
     public boolean activateShellWaitingUntilOpened(String title)
         throws RemoteException {
         if (!isShellOpen(title)) {
@@ -84,23 +99,6 @@ public class ShellComponentImp extends EclipseComponent implements
         } catch (WidgetNotFoundException e) {
             return false;
         }
-    }
-
-    public boolean activateShellWithMatchText(String matchText)
-        throws RemoteException {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(matchText)) {
-                log.debug("shell found matching \"" + matchText + "\"");
-                if (!shell.isActive()) {
-                    shell.activate();
-                }
-                return shell.isActive();
-            }
-        }
-        final String message = "No shell found matching \"" + matchText + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
     }
 
     public boolean isShellOpen(String title) throws RemoteException {
@@ -169,19 +167,14 @@ public class ShellComponentImp extends EclipseComponent implements
         // + "\"");
     }
 
-    public void waitUntilShellClosed(SWTBotShell shell) throws RemoteException {
-        waitUntil(shellCloses(shell));
+    public void waitUntilShellClosed(String title) throws RemoteException {
+        waitUntil(SarosConditions.isShellClosed(bot, title));
         bot.sleep(10);
     }
 
-    public void waitUntilShellClosed(String shellText) throws RemoteException {
-        waitUntil(SarosConditions.isShellClosed(bot, shellText));
-        bot.sleep(10);
-    }
-
-    public void waitLongUntilShellClosed(String shellText)
+    public void waitLongUntilShellClosed(String title)
         throws RemoteException {
-        waitLongUntil(SarosConditions.isShellClosed(bot, shellText));
+        waitLongUntil(SarosConditions.isShellClosed(bot, title));
     }
 
     /**********************************************
@@ -231,7 +224,7 @@ public class ShellComponentImp extends EclipseComponent implements
         bot.sleep(sleepTime);
     }
 
-    public void confirmWindowWithCheckBox(String title, String buttonText,
+    public void confirmWindowWithCheckBoxs(String title, String buttonText,
         String... itemNames) throws RemoteException {
         waitUntilShellActive(title);
         for (String itemName : itemNames) {

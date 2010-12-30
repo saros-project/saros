@@ -234,7 +234,7 @@ public interface PEViewComponent extends Remote {
      *            name of the package, e.g. my.pkg.
      * @throws RemoteException
      */
-    public void waitUntilPkgExist(String projectName, String pkg)
+    public void waitUntilPkgExisted(String projectName, String pkg)
         throws RemoteException;
 
     /**

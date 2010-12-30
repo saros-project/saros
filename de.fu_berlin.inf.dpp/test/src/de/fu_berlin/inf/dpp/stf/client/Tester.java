@@ -70,11 +70,11 @@ public class Tester {
     public void initBot() throws AccessException, RemoteException,
         NotBoundException {
         log.trace("initBot enter, initRmi");
-        initRmi();
+        getRegistriedRmiObject();
     }
 
-    private void initRmi() throws RemoteException, NotBoundException,
-        AccessException {
+    private void getRegistriedRmiObject() throws RemoteException,
+        NotBoundException, AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
 
@@ -306,8 +306,8 @@ public class Tester {
     public void addBuddyDone(Tester peer) throws RemoteException, XMPPException {
         if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContact(peer.jid);
-            peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
-            rosterV.confirmRequestOfSubscriptionReceivedWindow();
+            peer.rosterV.confirmShellRequestOfSubscriptionReceived();
+            rosterV.confirmShellRequestOfSubscriptionReceived();
         }
     }
 
@@ -321,8 +321,8 @@ public class Tester {
     public void addBuddyGUIDone(Tester peer) throws RemoteException {
         if (!rosterV.hasBuddy(peer.jid)) {
             rosterV.addANewContactGUI(peer.jid);
-            peer.rosterV.confirmRequestOfSubscriptionReceivedWindow();
-            rosterV.confirmRequestOfSubscriptionReceivedWindow();
+            peer.rosterV.confirmShellRequestOfSubscriptionReceived();
+            rosterV.confirmShellRequestOfSubscriptionReceived();
         }
     }
 

@@ -28,6 +28,12 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         return self;
     }
 
+    /**********************************************
+     * 
+     * open/close/activate the progress view
+     * 
+     **********************************************/
+
     public void openProgressView() throws RemoteException {
         basicC.openViewById("org.eclipse.ui.views.ProgressView");
     }
@@ -36,6 +42,15 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         basicC.setFocusOnViewByTitle(VIEWNAME);
     }
 
+    public boolean isProgressViewOpen() throws RemoteException {
+        return basicC.isViewOpen("Progress");
+    }
+
+    /**********************************************
+     * 
+     * remove progress
+     * 
+     **********************************************/
     public boolean existPorgress() throws RemoteException {
         openProgressView();
         activateProgressView();
@@ -64,24 +79,6 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         b.click();
     }
 
-    public boolean isProgressViewOpen() throws RemoteException {
-        return basicC.isViewOpen("Progress");
-    }
-
-    // /**
-    // * end the invitation process. ie. Click the red stop icon in Progress
-    // view.
-    // */
-    // public void cancelInvitation() throws RemoteException {
-    // openProgressView();
-    // activateProgressView();
-    // SWTBotView view = bot.viewByTitle(VIEWNAME);
-    // view.setFocus();
-    // SWTBot bot = view.bot();
-    // SWTBotToolbarButton b = bot.toolbarButton();
-    // b.click();
-    // }
-
     public void removeProcess(int index) throws RemoteException {
         preCondition();
         SWTBotView view = bot.viewByTitle(VIEWNAME);
@@ -92,17 +89,17 @@ public class ProgressViewComponentImp extends EclipseComponent implements
         b.click();
     }
 
-    /**
-     * For some tests a host need to invite many peers concurrently and some
-     * operations should not be performed if the invitation processes aren't
-     * finished yet. In this case, you can use this method to guarantee, that
-     * host wait so long until all the invitation Processes are finished.
-     */
     public void waitUntilNoInvitationProgress() throws RemoteException {
         openProgressView();
         activateProgressView();
         bot.waitUntil(SarosConditions.existNoInvitationProgress(bot), 100000);
     }
+
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
 
     private void preCondition() throws RemoteException {
         openProgressView();

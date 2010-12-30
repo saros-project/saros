@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-
 public interface ShellComponent extends Remote {
 
     /**********************************************
@@ -39,7 +37,7 @@ public interface ShellComponent extends Remote {
      * @return <tt>true</tt>, it the given shell is open and can be activated.
      * @throws RemoteException
      */
-    public boolean activateShellWithMatchText(String regex)
+    public boolean activateShellWithRegexText(String regex)
         throws RemoteException;
 
     public boolean isShellOpen(String title) throws RemoteException;
@@ -102,15 +100,6 @@ public interface ShellComponent extends Remote {
      * @throws RemoteException
      */
     public void waitUntilShellActive(String title) throws RemoteException;
-
-    /**
-     * waits until the given Shell is closed.
-     * 
-     * @param shell
-     *            the sell,which you want to close.
-     * @throws RemoteException
-     */
-    public void waitUntilShellClosed(SWTBotShell shell) throws RemoteException;
 
     /**
      * waits until the given Shell is closed.
@@ -191,7 +180,7 @@ public interface ShellComponent extends Remote {
      *            the labels of the checkboxs, which you want to select.
      * 
      */
-    public void confirmWindowWithCheckBox(String title, String buttonText,
+    public void confirmWindowWithCheckBoxs(String title, String buttonText,
         String... itemNames) throws RemoteException;
 
     /**

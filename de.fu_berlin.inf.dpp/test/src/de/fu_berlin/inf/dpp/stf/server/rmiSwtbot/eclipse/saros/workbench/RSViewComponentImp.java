@@ -62,27 +62,27 @@ public class RSViewComponentImp extends EclipseComponent implements
         basicC.closeViewById(VIEWID);
     }
 
-    public void changeModeOfImageSource() throws RemoteException {
+    public void clickTBChangeModeOfImageSource() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
         basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
-    public void stopRunningSession() throws RemoteException {
+    public void clickTBStopRunningSession() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
         basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_STOP_RUNNING_SESSION);
     }
 
-    public void resume() throws RemoteException {
+    public void clickTBResume() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
         basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_RESUME);
     }
 
-    public void pause() throws RemoteException {
+    public void clickTBPause() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
         basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_PAUSE);
@@ -92,7 +92,7 @@ public class RSViewComponentImp extends EclipseComponent implements
         basicC.waitUntilViewActive(VIEWNAME);
     }
 
-    public void IncomingScreensharingSession(String YesOrNot)
+    public void confirmShellIncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
         shellC.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }

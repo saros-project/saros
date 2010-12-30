@@ -199,7 +199,7 @@ public interface RosterViewComponent extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmRequestOfSubscriptionReceivedWindow()
+    public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException;
 
     /**

@@ -235,7 +235,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         return false;
     }
 
-    public void waitUntilPkgExist(String projectName, String pkg)
+    public void waitUntilPkgExisted(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches("[\\w\\.]*\\w+")) {
             waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
@@ -718,9 +718,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         shellC.confirmShellWithTreeWithWaitingExpand("Checkout from SVN",
             FINISH, repositoryURL, "trunk", "examples");
         shellC.waitUntilShellActive("SVN Checkout");
-
-        SWTBotShell shell2 = bot.shell("SVN Checkout");
-        shellC.waitUntilShellClosed(shell2);
+        shellC.waitUntilShellClosed("SVN Checkout");
     }
 
     public void disConnect(String projectName) throws RemoteException {

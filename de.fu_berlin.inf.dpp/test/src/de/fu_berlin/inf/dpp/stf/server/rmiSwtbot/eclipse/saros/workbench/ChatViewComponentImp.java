@@ -27,11 +27,6 @@ public class ChatViewComponentImp extends EclipseComponent implements
         return self;
     }
 
-    public void waitUntilGetChatMessage(String jid, String message)
-        throws RemoteException {
-        waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
-    }
-
     public void activateChatView() throws RemoteException {
         basicC.setFocusOnViewByTitle(VIEWNAME);
     }
@@ -47,6 +42,11 @@ public class ChatViewComponentImp extends EclipseComponent implements
 
     public boolean isChatViewOpen() throws RemoteException {
         return basicC.isViewOpen(VIEWNAME);
+    }
+
+    public void waitUntilGetChatMessage(String jid, String message)
+        throws RemoteException {
+        waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
     }
 
     public void sendChatMessage(String message) throws RemoteException {

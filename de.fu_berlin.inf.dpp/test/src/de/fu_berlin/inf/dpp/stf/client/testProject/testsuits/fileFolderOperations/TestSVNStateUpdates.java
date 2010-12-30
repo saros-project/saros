@@ -171,7 +171,7 @@ public class TestSVNStateUpdates extends STFTest {
         assertTrue(bob.sessionV.isExclusiveDriver());
 
         bob.pEV.newPackage(SVN_PROJECT, "new_package");
-        alice.pEV.waitUntilPkgExist(SVN_PROJECT, "new_package");
+        alice.pEV.waitUntilPkgExisted(SVN_PROJECT, "new_package");
 
         bob.pEV.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
             "new_package");

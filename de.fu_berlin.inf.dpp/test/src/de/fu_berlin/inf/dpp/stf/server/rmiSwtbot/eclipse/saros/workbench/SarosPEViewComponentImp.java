@@ -90,7 +90,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
     public void confirmWindowInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
         shellC.activateShellWithText(INVITATION);
-        shellC.confirmWindowWithCheckBox(INVITATION, FINISH, baseJIDOfinvitees);
+        shellC.confirmWindowWithCheckBoxs(INVITATION, FINISH, baseJIDOfinvitees);
     }
 
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
