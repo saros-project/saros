@@ -118,13 +118,12 @@ public class StartupSaros implements IStartup {
         Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 log.debug("Util.isSWT(): " + Util.isSWT());
-                STFController bot = STFController.getInstance();
-                bot.sleepTime = time;
+                STFController.sleepTime = time;
                 try {
-                    bot.initExportedObjects(port, saros, sessionManager,
+                    STFController.exportedObjects(port, saros, sessionManager,
                         dataTransferManager, editorManager, xmppAccountStore,
                         feedbackManager);
-                    bot.listRmiObjects();
+                    STFController.listRmiObjects();
                 } catch (RemoteException e) {
                     log.error("remote:", e);
                 }

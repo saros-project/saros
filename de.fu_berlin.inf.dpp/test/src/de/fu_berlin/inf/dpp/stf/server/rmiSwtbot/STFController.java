@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -46,40 +45,10 @@ public class STFController {
     private static final transient Logger log = Logger
         .getLogger(STFController.class);
 
-    public static final transient String TEMPDIR = System
-        .getProperty("java.io.tmpdir");
-
-    private static transient STFController stfController;
-
-    public static transient SarosSWTBot sarosSWTBot;
-
-    public int sleepTime = 750;
+    public static int sleepTime = 750;
 
     /** The RMI registry used, is not exported */
     private static transient Registry registry;
-
-    /**
-     * {@link STFController} is a singleton, but inheritance is possible.
-     */
-    public static STFController getInstance() {
-        if (sarosSWTBot != null && stfController != null)
-            return stfController;
-        SarosSWTBot swtwbb = new SarosSWTBot();
-        stfController = new STFController(swtwbb);
-        return stfController;
-    }
-
-    /**
-     * Initiate {@link STFController} and all the no exported objects.
-     */
-    protected STFController(SarosSWTBot bot) {
-        super();
-        assert bot != null : "SarosSWTBot is null";
-        sarosSWTBot = bot;
-        EclipseComponent.bot = sarosSWTBot;
-        EclipseComponent.sleepTime = sleepTime;
-
-    }
 
     /*
      * sometimes when connecting to a server i'm getting error:
@@ -88,7 +57,7 @@ public class STFController {
      * solution is keeping a static references "classVariable" to the object in
      * the object in the server JVM.
      */
-    public void initExportedObjects(int port, Saros saros,
+    public static void exportedObjects(int port, Saros saros,
         SarosSessionManager sessionManager,
         DataTransferManager dataTransferManager, EditorManager editorManager,
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
@@ -124,7 +93,7 @@ public class STFController {
     /**
      * Add a shutdown hook to unbind exported Object from registry.
      */
-    private void addShutdownHook(final String name) {
+    private static void addShutdownHook(final String name) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -143,7 +112,7 @@ public class STFController {
     /**
      * Export object by given name on our local RMI Registry.
      */
-    private Remote exportObject(Remote exportedObject, String exportName) {
+    private static Remote exportObject(Remote exportedObject, String exportName) {
         try {
             Remote remoteObject = UnicastRemoteObject.exportObject(
                 exportedObject, 0);
@@ -159,7 +128,7 @@ public class STFController {
         return null;
     }
 
-    public void listRmiObjects() {
+    public static void listRmiObjects() {
         try {
             for (String s : registry.list())
                 log.debug("registered Object: " + s);

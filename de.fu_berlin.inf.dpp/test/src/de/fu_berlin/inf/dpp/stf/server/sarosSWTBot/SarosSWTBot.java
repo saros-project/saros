@@ -40,6 +40,18 @@ public class SarosSWTBot extends SWTWorkbenchBot {
     private static final transient Logger log = Logger
         .getLogger(SarosSWTBot.class);
 
+    private static transient SarosSWTBot self;
+
+    /**
+     * {@link SarosSWTBot} is a singleton
+     */
+    public static SarosSWTBot getInstance() {
+        if (self != null)
+            return self;
+        self = new SarosSWTBot();
+        return self;
+    }
+
     /**
      * @param mnemonicText
      *            the mnemonicText on the widget.

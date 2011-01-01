@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponentImp;
@@ -82,7 +83,7 @@ public abstract class EclipseComponent {
         .getInstance();
     public static ShellComponent shellC = ShellComponentImp.getInstance();
 
-    // Picocontainer
+    // Picocontainer initiated by STFController.
     public static Saros saros;
     public static SarosSessionManager sessionManager;
     public static DataTransferManager dataTransferManager;
@@ -94,8 +95,8 @@ public abstract class EclipseComponent {
     public static JID localJID;
 
     // SWTBot framework
-    public static SarosSWTBot bot;
-    public static int sleepTime = 750;
+    public static SarosSWTBot bot = SarosSWTBot.getInstance();
+    public static int sleepTime = STFController.sleepTime;
 
     public final static String SCREENSHOTDIR = "test/STF/screenshot";
 
