@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.sarosSWTBot;
+package de.fu_berlin.inf.dpp.stf.server.sarosSWTBot;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
@@ -13,7 +13,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.swtbot.eclipse.finder.SWTEclipseBot;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -21,10 +20,10 @@ import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.hamcrest.Matcher;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatLine;
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotRadio;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatLine;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotRadio;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;
@@ -214,8 +213,8 @@ public class SarosSWTBot extends SWTWorkbenchBot {
     }
 
     /**
-     * This method does the same as {@link SWTEclipseBot#shells()}, but doesn't
-     * throw an exception if a shell was already disposed.
+     * This method does the same as {@link SWTWorkbenchBot#shells()}, but
+     * doesn't throw an exception if a shell was already disposed.
      */
     @Override
     public SWTBotShell[] shells() {

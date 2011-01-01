@@ -9,7 +9,7 @@ import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestConcurrentEditing extends STFTest {
     @BeforeClass

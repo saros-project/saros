@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.helpers;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits;
 
 import static org.junit.Assert.assertTrue;
 
@@ -137,23 +137,23 @@ public class STFTest {
         for (TypeOfTester t : testers) {
             switch (t) {
             case ALICE:
-                alice = InitTester.newAlice();
+                alice = ConfigTester.newAlice();
                 result.add(alice);
                 break;
             case BOB:
-                bob = InitTester.newBob();
+                bob = ConfigTester.newBob();
                 result.add(bob);
                 break;
             case CARL:
-                carl = InitTester.newCarl();
+                carl = ConfigTester.newCarl();
                 result.add(carl);
                 break;
             case DAVE:
-                dave = InitTester.newDave();
+                dave = ConfigTester.newDave();
                 result.add(dave);
                 break;
             case EDNA:
-                edna = InitTester.newEdna();
+                edna = ConfigTester.newEdna();
                 result.add(edna);
                 break;
             default:

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets;
+package de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
 import static org.hamcrest.Matchers.allOf;

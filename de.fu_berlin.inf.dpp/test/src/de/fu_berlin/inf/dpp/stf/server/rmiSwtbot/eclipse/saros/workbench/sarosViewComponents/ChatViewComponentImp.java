@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 
 public class ChatViewComponentImp extends EclipseComponent implements
     ChatViewComponent {

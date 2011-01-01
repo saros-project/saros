@@ -12,8 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.TesterConfigurationInfos;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.ConfigTester;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 /**
  * Tests for the initial synchronization of the SVN state during the invitation.<br>
@@ -68,7 +68,7 @@ public class TestSVNStateInitialization extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
-        if (TesterConfigurationInfos.DEVELOPMODE) {
+        if (ConfigTester.DEVELOPMODE) {
             if (alice.sessionV.isInSessionGUI())
                 alice.sessionV.leaveTheSessionByHost();
             // don't delete SVN_PROJECT_COPY

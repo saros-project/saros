@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestMainMenuComponent extends STFTest {
     private final static Logger log = Logger

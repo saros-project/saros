@@ -17,9 +17,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.client.TesterConfigurationInfos;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.ConfigTester;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestSVNStateUpdates extends STFTest {
     /**
@@ -110,7 +110,7 @@ public class TestSVNStateUpdates extends STFTest {
 
     @AfterClass
     public static void afterClass() throws RemoteException {
-        if (TesterConfigurationInfos.DEVELOPMODE) {
+        if (ConfigTester.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
             alice.rosterV.disconnectGUI();
             bob.rosterV.disconnectGUI();

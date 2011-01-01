@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class RmiTest extends STFTest {
     private final static Logger log = Logger.getLogger(RmiTest.class);

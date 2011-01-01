@@ -5,8 +5,8 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.STFTest.TypeOfShareProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.PEViewComponentImp;
 

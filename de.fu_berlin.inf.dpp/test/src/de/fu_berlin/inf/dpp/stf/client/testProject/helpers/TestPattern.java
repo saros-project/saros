@@ -8,6 +8,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+
 public class TestPattern extends STFTest {
 
     /**
