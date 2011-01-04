@@ -43,6 +43,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     }
 
     private Group ftGroup;
+    private Group inviteGroup;
     private Composite composite;
     private BooleanFieldEditor ftOverXMPP;
     private BooleanFieldEditor proxyDisabled;
@@ -73,12 +74,19 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         ftGroup = new Group(getFieldEditorParent(), SWT.NONE);
         ftGroup.setText("File transfer (changes require reconnection)"); //$NON-NLS-1$
 
-        GridLayout gridLayout = new GridLayout(2, false);
-        ftGroup.setLayout(gridLayout);
+        inviteGroup = new Group(getFieldEditorParent(), SWT.NONE);
+        inviteGroup.setText("Invitation");
 
-        GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-        gridData.horizontalSpan = 2;
-        ftGroup.setLayoutData(gridData);
+        ftGroup.setLayout(new GridLayout(2, false));
+        inviteGroup.setLayout(new GridLayout(2, false));
+
+        GridData ftGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        GridData inviteGridData = new GridData(SWT.FILL, SWT.CENTER, true,
+            false);
+        ftGridData.horizontalSpan = 2;
+        inviteGridData.horizontalSpan = 2;
+        ftGroup.setLayoutData(ftGridData);
+        inviteGroup.setLayoutData(inviteGridData);
 
         ftOverXMPP = new BooleanFieldEditor(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
@@ -91,8 +99,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         // note: fix to have two columns for the port field
         composite = new Composite(ftGroup, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
-        gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-        composite.setLayoutData(gridData);
+        ftGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        composite.setLayoutData(ftGridData);
 
         ftPort = new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
             "File transfer port:", composite);
@@ -121,15 +129,13 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
     @Override
     protected void createFieldEditors() {
-        addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
-            "Skype name:", getFieldEditorParent()));
 
         createPortFields();
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.SKIP_SYNC_SELECTABLE,
             "Offer possibility to skip synchronisation in Session Invitation dialog",
-            getFieldEditorParent()));
+            inviteGroup));
 
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
             "Show Jabber debug window (needs restart).", getFieldEditorParent()));
@@ -145,20 +151,34 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new IntegerFieldEditor(PreferenceConstants.STUN_PORT,
             "STUN server port (needs restart)", getFieldEditorParent()));
 
+        IntegerFieldEditor millisUpdateField = new IntegerFieldEditor(
+            PreferenceConstants.MILLIS_UPDATE,
+            "Frequency (in milliseconds) of outgoing updates to peers",
+            getFieldEditorParent());
+        millisUpdateField.setValidRange(100, 1000);
+        millisUpdateField.getLabelControl(getFieldEditorParent())
+            .setToolTipText(
+                "The rate at which your edits are sent to others in your session."
+                    + " If you find the rate of updates in the session is slow"
+                    + " you can reduce this number to increase the frequency."
+                    + "(Requires session restart.)");
+
+        addField(millisUpdateField);
+
         addField(new BooleanFieldEditor(
             PreferenceConstants.AUTO_ACCEPT_INVITATION,
             "Automatically accept incoming invitation (for debugging)",
-            getFieldEditorParent()));
+            inviteGroup));
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.AUTO_REUSE_PROJECT,
             "When automatically accepting invitation reuse existing project (for debugging)",
-            getFieldEditorParent()));
+            inviteGroup));
 
         addField(new StringFieldEditor(
             PreferenceConstants.AUTO_INVITE,
             "Automatically invite the following comma separated users (for debugging)",
-            getFieldEditorParent()));
+            inviteGroup));
 
         addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
             "Perform Latency Measurement using Ping Pong Activities",
@@ -167,7 +187,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new BooleanFieldEditor(
             PreferenceConstants.STREAM_PROJECT,
             "Stream invitation (recommended for large projects that experience errors during invitation)",
-            getFieldEditorParent()));
+            inviteGroup));
 
     }
 

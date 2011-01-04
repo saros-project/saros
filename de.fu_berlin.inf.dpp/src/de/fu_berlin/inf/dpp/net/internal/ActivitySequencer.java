@@ -74,7 +74,7 @@ public class ActivitySequencer {
      * activityDataObjects, and testing for too old queued incoming
      * activityDataObjects.
      */
-    protected static final int MILLIS_UPDATE = 1000;
+    protected int MILLIS_UPDATE;
 
     public static class DataObjectQueueItem {
 
@@ -99,8 +99,7 @@ public class ActivitySequencer {
     /**
      * A priority queue for timed activityDataObjects. Fore each remote user
      * there is one ActivityQueue, in which received events from those are
-     * stored.
-     * TODO "Timestamps" are treated more like consecutive sequence
+     * stored. TODO "Timestamps" are treated more like consecutive sequence
      * numbers, so may be all names and documentation should be changed to
      * reflect this.
      */
@@ -454,7 +453,7 @@ public class ActivitySequencer {
 
     public ActivitySequencer(ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
-        DispatchThreadContext threadContext) {
+        DispatchThreadContext threadContext, int updateFrequency) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
@@ -462,6 +461,7 @@ public class ActivitySequencer {
         this.transferManager = transferManager;
 
         this.localJID = sarosSession.getLocalUser().getJID();
+        this.MILLIS_UPDATE = updateFrequency;
     }
 
     /**

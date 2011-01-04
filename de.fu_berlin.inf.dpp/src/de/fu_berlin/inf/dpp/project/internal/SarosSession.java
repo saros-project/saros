@@ -34,6 +34,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
@@ -53,6 +54,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -116,6 +118,8 @@ public class SarosSession implements ISarosSession, Disposable {
     protected SharedProject sharedProject;
 
     public boolean cancelActivityDispatcher = false;
+
+    protected IPreferenceStore prefStore;
 
     /**
      * This thread executes pending activities in the SWT thread.<br>
@@ -207,8 +211,13 @@ public class SarosSession implements ISarosSession, Disposable {
         this.sessionStart = sessionStart;
 
         this.localUser = new User(this, saros.getMyJID(), myColorID);
+
+        this.prefStore = saros.getPreferenceStore();
+        int updateInterval = prefStore
+            .getInt(PreferenceConstants.MILLIS_UPDATE);
+
         this.activitySequencer = new ActivitySequencer(this, transmitter,
-            transferManager, threadContext);
+            transferManager, threadContext, updateInterval);
 
         activityDispatcher.setDaemon(true);
         activityDispatcher.start();

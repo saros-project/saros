@@ -60,6 +60,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.putInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
         prefs.put(PreferenceConstants.STUN, "stunserver.org");
         prefs.putInt(PreferenceConstants.STUN_PORT, 3478);
+        prefs.putInt(PreferenceConstants.MILLIS_UPDATE, 300);
         prefs.putBoolean(PreferenceConstants.MULTI_DRIVER, true);
         prefs.putBoolean(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
         prefs.putBoolean(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);

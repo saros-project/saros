@@ -52,6 +52,9 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         parent = getFieldEditorParent();
 
+        addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
+            "Skype name:", getFieldEditorParent()));
+
         chatserver = new StringFieldEditor(PreferenceConstants.CHATSERVER,
             "Chatserver (Example: conference.jabber.org)", parent);
 
