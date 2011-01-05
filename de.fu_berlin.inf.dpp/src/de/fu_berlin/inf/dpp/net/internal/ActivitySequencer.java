@@ -453,7 +453,7 @@ public class ActivitySequencer {
 
     public ActivitySequencer(ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
-        DispatchThreadContext threadContext, int updateFrequency) {
+        DispatchThreadContext threadContext, int updateInterval) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
@@ -461,7 +461,7 @@ public class ActivitySequencer {
         this.transferManager = transferManager;
 
         this.localJID = sarosSession.getLocalUser().getJID();
-        this.MILLIS_UPDATE = updateFrequency;
+        this.MILLIS_UPDATE = updateInterval;
     }
 
     /**
