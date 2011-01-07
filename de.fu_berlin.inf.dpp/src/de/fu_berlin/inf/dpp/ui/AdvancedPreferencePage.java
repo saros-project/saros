@@ -153,15 +153,16 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         IntegerFieldEditor millisUpdateField = new IntegerFieldEditor(
             PreferenceConstants.MILLIS_UPDATE,
-            "Frequency (in milliseconds) of outgoing updates to peers",
+            "Interval (in milliseconds) between outgoing updates to peers",
             getFieldEditorParent());
         millisUpdateField.setValidRange(100, 1000);
-        millisUpdateField.getLabelControl(getFieldEditorParent())
+        millisUpdateField
+            .getLabelControl(getFieldEditorParent())
             .setToolTipText(
-                "The rate at which your edits are sent to others in your session."
+                "The length of interval between your edits being sent to others in your session."
                     + " If you find the rate of updates in the session is slow"
-                    + " you can reduce this number to increase the frequency."
-                    + "(Requires session restart.)");
+                    + " you can reduce this number to increase the interval."
+                    + " (Requires session restart.)");
 
         addField(millisUpdateField);
 
