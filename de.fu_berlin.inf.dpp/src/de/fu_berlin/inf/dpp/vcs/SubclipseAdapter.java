@@ -33,6 +33,7 @@ import org.tigris.subversion.svnclientadapter.SVNRevision;
 import org.tigris.subversion.svnclientadapter.SVNUrl;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
@@ -78,6 +79,39 @@ class SubclipseAdapter extends VCSAdapter {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public VCSActivity getSwitchActivity(ISarosSession sarosSession,
+        IResource resource) {
+        VCSResourceInfo info = getResourceInfo(resource);
+        String url = info.url;
+        String revision = getCurrentRevisionString(resource);
+        return VCSActivity.switch_(sarosSession, resource, url, revision);
+    }
+
+    @Override
+    public VCSActivity getUpdateActivity(ISarosSession sarosSession,
+        IResource resource) {
+        String revision = getCurrentRevisionString(resource);
+        return VCSActivity.update(sarosSession, resource, revision);
+    }
+
+    public String getCurrentRevisionString(IResource resource) {
+        if (!isManaged(resource))
+            return null;
+        if (!resource.exists())
+            return null;
+        try {
+            ISVNLocalResource svnResourceFor = SVNWorkspaceRoot
+                .getSVNResourceFor(resource);
+            final SVNRevision revision = svnResourceFor.getRevision();
+            if (revision != null)
+                return revision.toString();
+        } catch (SVNException e) {
+            log.error("Error retrieving revision for " + resource, e);
+        }
+        return null;
     }
 
     @Override
@@ -237,7 +271,7 @@ class SubclipseAdapter extends VCSAdapter {
      * when it was merely added to version control.
      */
     private boolean isAddedToVersionControl(String revisionString) {
-        return revisionString.equals("0");
+        return revisionString == null || revisionString.equals("0");
     }
 
     @Override
@@ -245,6 +279,14 @@ class SubclipseAdapter extends VCSAdapter {
         VCSResourceInfo info = new VCSResourceInfo();
         info.url = getUrl(resource);
         info.revision = getRevisionString(resource);
+        return info;
+    }
+
+    @Override
+    public VCSResourceInfo getCurrentResourceInfo(IResource resource) {
+        VCSResourceInfo info = new VCSResourceInfo();
+        info.url = getUrl(resource);
+        info.revision = getCurrentRevisionString(resource);
         return info;
     }
 

@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
@@ -60,15 +59,13 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
                 sharedProject.updateRevision(resource, info.revision);
                 // Switch
                 if (info.revision != null && !ignoreChildren(resource)) {
-                    addActivity(VCSActivity.switch_(sarosSession, resource,
-                        info.url, info.revision));
+                    addActivity(vcs.getSwitchActivity(sarosSession, resource));
                     setIgnoreChildren(resource);
                 }
             } else if (sharedProject.updateRevision(resource, info.revision)) {
                 // Update
                 if (!ignoreChildren(resource)) {
-                    addActivity(VCSActivity.update(sarosSession, resource,
-                        info.revision));
+                    addActivity(vcs.getUpdateActivity(sarosSession, resource));
                     setIgnoreChildren(resource);
                 }
             }

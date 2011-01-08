@@ -368,7 +368,7 @@ public class FileList {
 
                 this.vcsProviderID = providerID;
                 this.vcsRepositoryRoot = vcs.getRepositoryString(project);
-                this.vcsProjectInfo = vcs.getResourceInfo(project);
+                this.vcsProjectInfo = vcs.getCurrentResourceInfo(project);
             }
         }
 
@@ -421,7 +421,7 @@ public class FileList {
 
     private boolean addVCSInfo(IResource resource, FileListData data,
         VCSAdapter vcs) {
-        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
         if (info == null)
             return false;
 

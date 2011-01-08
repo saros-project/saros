@@ -832,7 +832,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs == null)
             return null;
-        VCSResourceInfo info = vcs.getResourceInfo(resource);
+        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
         String result = info != null ? info.revision : null;
         return result;
     }

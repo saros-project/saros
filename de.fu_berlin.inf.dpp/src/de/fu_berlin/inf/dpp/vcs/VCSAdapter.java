@@ -12,6 +12,7 @@ import org.eclipse.team.core.subscribers.Subscriber;
 import org.eclipse.team.core.synchronize.SyncInfo;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
@@ -126,12 +127,31 @@ public abstract class VCSAdapter {
     public abstract void revert(IResource resource, SubMonitor monitor);
 
     /**
-     * Creates VCS specific information for the resource.
+     * Returns VCS specific information for the resource. For SVN, it returns
+     * the actual revision of the file (last changed revision), uniquely
+     * identifying the resource in the repository. E.g. if a file was last
+     * changed in revision 121, HEAD is 127, and we do an "svn update -r 124",
+     * then this method returns revision 121. We need this revision to detect
+     * changes: We get sync changed events only if the actual revision of a
+     * resource changes.
      * 
      * @param resource
      * @return
      */
     public abstract VCSResourceInfo getResourceInfo(IResource resource);
+
+    /**
+     * Returns VCS specific information for the resource. For SVN, it returns
+     * the revision that was used to get this file. E.g. if a file was last
+     * changed in revision 121, HEAD is 127, and we do an "svn update -r 124",
+     * then this method returns revision 124. We need this revision to replicate
+     * changes: If we used the actual revision in commands, it's possible that
+     * the URL changes.
+     * 
+     * @param resource
+     * @return
+     */
+    public abstract VCSResourceInfo getCurrentResourceInfo(IResource resource);
 
     /**
      * Connects the project to the directory in the repository.
@@ -187,10 +207,16 @@ public abstract class VCSAdapter {
             }
         } catch (NoClassDefFoundError e) {
             // TODO Should we inform the user?
-            log.warn("Could not find a VCSAdapter for " + identifier);
+            log.warn("Could not find a VCS adapter for \"" + identifier + "\".");
         }
         return null;
     }
+
+    public abstract VCSActivity getUpdateActivity(ISarosSession sarosSession,
+        IResource resource);
+
+    public abstract VCSActivity getSwitchActivity(ISarosSession sarosSession,
+        IResource resource);
 
     /**
      * Determine the repository provider of the project and return the
@@ -208,7 +234,8 @@ public abstract class VCSAdapter {
             return null;
 
         RepositoryProvider provider = RepositoryProvider.getProvider(project);
-        return getAdapter(provider.getID());
+        final VCSAdapter adapter = getAdapter(provider.getID());
+        return adapter;
     }
 
     public ProjectDeltaVisitor getProjectDeltaVisitor(

@@ -47,6 +47,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -338,7 +340,7 @@ public class IncomingInvitationProcess extends InvitationProcess {
         if (!vcs.isManaged(resource))
             return;
 
-        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
         final IPath path = resource.getProjectRelativePath();
         if (resource instanceof IProject) {
             /*
@@ -566,11 +568,26 @@ public class IncomingInvitationProcess extends InvitationProcess {
              * job, such that it is scheduled after the project is marked as
              * managed.
              */
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // do nothing
-            }
+            IJobManager m = Job.getJobManager();
+            int waited = 0;
+            do {
+                final int interval = 50;
+                waited += interval;
+                try {
+                    Thread.sleep(interval);
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
+                log.trace("Waited " + waited + "ms for jobs to finish");
+                Job[] jobs = m.find(null);
+                for (Job job : jobs) {
+                    if (job.getState() == Job.RUNNING)
+                        log.trace(" Job " + job.getName() + " running");
+                    if (job.getState() == Job.WAITING)
+                        log.trace(" Job " + job.getName() + " waiting");
+                }
+            } while (waited < 5000 && !m.isIdle());
+
             if (this.localProject != null)
                 return;
         }
