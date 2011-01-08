@@ -614,7 +614,7 @@ public class RosterView extends ViewPart {
         super();
 
         // Make sure that we get all dependencies injected
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
     }

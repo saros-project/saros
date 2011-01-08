@@ -66,7 +66,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
 
     public AddToSessionAction() {
         super();
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     public void selectionChanged(IAction action, ISelection selection) {

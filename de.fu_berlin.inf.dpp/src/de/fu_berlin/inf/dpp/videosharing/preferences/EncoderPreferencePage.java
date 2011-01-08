@@ -48,7 +48,7 @@ public class EncoderPreferencePage extends FieldEditorPreferencePage implements
 
     public EncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("General settings for encoding");

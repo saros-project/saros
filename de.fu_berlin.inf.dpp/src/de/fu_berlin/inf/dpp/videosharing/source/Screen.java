@@ -109,7 +109,7 @@ public class Screen implements ImageSource {
      */
     public Screen(VideoSharingSession videoSharingSession)
         throws InitializationException {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         preferences = saros.getPreferenceStore();
         mode = Enum.valueOf(Mode.class, preferences
             .getString(PreferenceConstants.SCREEN_INITIAL_MODE));

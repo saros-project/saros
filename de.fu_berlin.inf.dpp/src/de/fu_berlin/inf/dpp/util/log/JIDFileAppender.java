@@ -82,7 +82,7 @@ public class JIDFileAppender extends FileAppender {
     }
 
     protected void initialize() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         saros.addListener(new IConnectionListener() {
 

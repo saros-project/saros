@@ -64,7 +64,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
 
     public GeneralNewSessionAction() {
         super();
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     /**

@@ -83,7 +83,7 @@ public abstract class Encoder implements Runnable {
         this.videoSharingSession = videoSharingSession;
         assert videoSharingSession != null;
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         preferences = saros.getPreferenceStore();
         width = preferences.getInt(PreferenceConstants.ENCODING_VIDEO_WIDTH);

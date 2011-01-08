@@ -203,7 +203,7 @@ public class SarosSession implements ISarosSession, Disposable {
         DispatchThreadContext threadContext, int myColorID,
         DateTime sessionStart) {
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         assert transmitter != null;
         assert saros.getMyJID() != null;

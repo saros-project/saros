@@ -90,7 +90,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     public void createControl(Composite parent) {

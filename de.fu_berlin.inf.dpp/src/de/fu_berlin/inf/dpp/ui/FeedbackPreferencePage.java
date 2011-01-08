@@ -83,7 +83,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected boolean isPseudonymAllowed;
 
     public FeedbackPreferencePage() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         setPreferenceStore(saros.getPreferenceStore());
         setDescription(Messages.getString("feedback.page.description")); //$NON-NLS-1$
     }

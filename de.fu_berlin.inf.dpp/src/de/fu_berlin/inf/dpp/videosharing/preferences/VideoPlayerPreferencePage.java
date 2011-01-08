@@ -51,7 +51,7 @@ public class VideoPlayerPreferencePage extends FieldEditorPreferencePage
 
     public VideoPlayerPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for displaying the video in the view");

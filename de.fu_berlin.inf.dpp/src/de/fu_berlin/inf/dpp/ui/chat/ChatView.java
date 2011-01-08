@@ -219,7 +219,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
     };
 
     public ChatView() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         editorManager.addSharedEditorListener(sharedEditorListener);
         mucManager.addMUCManagerListener(mucManagerListener);
     }

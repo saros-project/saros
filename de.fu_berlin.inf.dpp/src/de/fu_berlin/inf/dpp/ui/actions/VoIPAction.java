@@ -64,7 +64,7 @@ public class VoIPAction extends Action {
 
     public VoIPAction(SessionViewTableViewer viewer) {
         super();
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         changeButton();
         setId(ACTION_ID);
         setEnabled(false);

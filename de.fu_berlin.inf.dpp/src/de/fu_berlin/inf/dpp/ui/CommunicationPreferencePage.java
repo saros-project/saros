@@ -41,7 +41,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     public CommunicationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for Chat and VoIP Functionality.");
         this.prefs = saros.getPreferenceStore();

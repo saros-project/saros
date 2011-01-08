@@ -51,7 +51,7 @@ public class ImageTileEncoderPreferencePage extends FieldEditorPreferencePage
 
     public ImageTileEncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Set up the image tile encoder.\nNote: Changing values here does not affect compression.");

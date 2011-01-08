@@ -78,7 +78,7 @@ public abstract class InvitationProcess {
         this.invitationProcesses = invitationProcesses;
         this.invitationProcesses.addInvitationProcess(this);
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     /**

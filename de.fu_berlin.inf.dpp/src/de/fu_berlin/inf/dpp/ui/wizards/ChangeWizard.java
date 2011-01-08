@@ -20,7 +20,7 @@ public class ChangeWizard extends Wizard {
     AccountPage accountPage;
 
     public ChangeWizard(XMPPAccount account) {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         this.accountToChange = account;
         addPageToWizard();
         setWindowTitle("Change XMPP Account");

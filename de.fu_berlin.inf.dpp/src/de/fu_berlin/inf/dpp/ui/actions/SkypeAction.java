@@ -35,7 +35,7 @@ public class SkypeAction extends SelectionProviderAction {
     public SkypeAction(ISelectionProvider provider) {
         super(provider, "Skype this user");
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setEnabled(false);
 

@@ -44,7 +44,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     };
 
     public ChangeXMPPAccountAction() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         this.setText("Connect");
         saros.addListener(connectionListener);
         setMenuCreator(this);

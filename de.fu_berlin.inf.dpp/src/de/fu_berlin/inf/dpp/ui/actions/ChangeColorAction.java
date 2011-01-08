@@ -50,7 +50,7 @@ public class ChangeColorAction extends SelectionProviderAction implements
 
     public ChangeColorAction(ISelectionProvider provider) {
         super(provider, "Change Color");
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setToolTipText("changes your session colour");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));

@@ -111,7 +111,7 @@ public class ResourceChangeValidator extends ModelProvider {
     @Override
     protected void initialize() {
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         sessionManager
             .addSarosSessionListener(new AbstractSarosSessionListener() {

@@ -61,7 +61,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the driver role to this user");
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         /*
          * if SessionView is not "visible" on session start up this constructor
          * will be called after session started (and the user uses this view)

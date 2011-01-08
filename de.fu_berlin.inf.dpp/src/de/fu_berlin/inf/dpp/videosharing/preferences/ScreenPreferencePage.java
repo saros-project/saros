@@ -48,7 +48,7 @@ public class ScreenPreferencePage extends FieldEditorPreferencePage implements
 
     public ScreenPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Set up how the desktop is captured in a session");

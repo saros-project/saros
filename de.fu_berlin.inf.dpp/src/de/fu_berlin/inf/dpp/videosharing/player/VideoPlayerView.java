@@ -135,7 +135,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected Rectangle clientArea;
 
     public VideoPlayerView() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         preferences = saros.getPreferenceStore();
         updateResample();

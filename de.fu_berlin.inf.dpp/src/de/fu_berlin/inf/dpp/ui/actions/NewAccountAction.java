@@ -57,7 +57,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
      * This class is created by Eclipse to hook it up in the Menu bar.
      */
     public NewAccountAction() {
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     /**

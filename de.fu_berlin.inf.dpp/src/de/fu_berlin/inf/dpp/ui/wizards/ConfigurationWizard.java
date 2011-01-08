@@ -69,7 +69,7 @@ public class ConfigurationWizard extends Wizard {
          * HACK Changing UI components like the configuration wizard should not
          * use PicoContainer directly.
          */
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         
         if (askForAccount) {
             this.pages.add(new RegisterAccountPage(saros, false, showUseNowButton, !showUseNowButton,

@@ -48,7 +48,7 @@ public class XugglerEncoderPreferencePage extends FieldEditorPreferencePage
 
     public XugglerEncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for the videostream Xuggler produces");

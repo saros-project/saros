@@ -66,6 +66,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Characteristics;
+import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
@@ -160,6 +161,7 @@ import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -213,7 +215,18 @@ public class Saros extends AbstractUIPlugin {
 
     protected SarosSessionManager sessionManager;
 
+    /**
+     * A caching container which holds all the singletons in Saros. This
+     * container has plug-in scope: The objects it manages are created when the
+     * plug-in is started, and disposed when the plug-in is stopped.
+     */
     protected MutablePicoContainer container;
+
+    /**
+     * The reinjector used to inject dependencies into those objects that are
+     * created by Eclipse and not by our PicoContainer.
+     */
+    protected Reinjector reinjector;
 
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle
@@ -222,12 +235,6 @@ public class Saros extends AbstractUIPlugin {
      * <code>dotMonitor= new DotGraphMonitor();</code>
      */
     protected DotGraphMonitor dotMonitor;
-
-    /**
-     * The reinjector used to inject dependencies for those objects that are
-     * created by Eclipse and not by our PicoContainer.
-     */
-    protected Reinjector reinjector;
 
     protected XMPPConnection connection;
 
@@ -314,7 +321,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(FeedbackManager.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(LocalPresenceTracker.class);
-        // this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MUCManager.class);
         this.container.addComponent(MUCManagerSingletonWrapperChatView.class);
         this.container.addComponent(PingPongCentral.class);
@@ -402,7 +408,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(AudioService.class);
         this.container.addComponent(VideoSharingService.class);
         this.container.addComponent(ArchiveStreamService.class);
-
         /*
          * The following classes are initialized by the re-injector because they
          * are created by Eclipse:
@@ -421,31 +426,55 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Injects dependencies into the annotated fields of the given object.
+     * Adds the object to Saros' container, and injects dependencies into the
+     * annotated fields of the given object. It should only be used for objects
+     * that were created by Eclipse, which have the same life cycle as the Saros
+     * plug-in, e.g. the popup menu actions.
      */
     public static synchronized void reinject(Object toInjectInto) {
-
-        if (plugin == null || !isInitialized()) {
-            LogLog.error("Saros not initialized", new StackTrace());
-            throw new IllegalStateException();
-        }
+        checkInitialized();
 
         try {
             // Remove the component if an instance of it was already registered
-            plugin.container.removeComponent(toInjectInto.getClass());
+            Class<? extends Object> clazz = toInjectInto.getClass();
+            ComponentAdapter<Object> removed = plugin.container
+                .removeComponent(clazz);
+            if (removed != null && clazz != Saros.class) {
+                LogLog.warn(clazz.toString() + " added more than once!",
+                    new StackTrace());
+            }
 
             // Add the given instance to the container
-            plugin.container
-                .addComponent(toInjectInto.getClass(), toInjectInto);
+            plugin.container.addComponent(clazz, toInjectInto);
 
             /*
              * Ask PicoContainer to inject into the component via fields
              * annotated with @Inject
              */
-            plugin.reinjector.reinject(toInjectInto.getClass(),
-                new AnnotatedFieldInjection());
+            plugin.reinjector.reinject(clazz, new AnnotatedFieldInjection());
         } catch (PicoCompositionException e) {
-            plugin.log.error("Internal error in reinjection:", e);
+            LogLog.error("Internal error in reinjection:", e);
+        }
+    }
+
+    /**
+     * Injects dependencies into the annotated fields of the given object. This
+     * method should be used for objects that were created by Eclipse, which
+     * have a different life cycle than the Saros plug-in.
+     */
+    public static synchronized void injectDependenciesOnly(Object toInjectInto) {
+        checkInitialized();
+
+        ChildContainer dummyContainer = plugin.container
+            .getComponent(ChildContainer.class);
+        dummyContainer.reinject(toInjectInto);
+        plugin.container.removeChildContainer(dummyContainer);
+    }
+
+    protected static void checkInitialized() {
+        if (plugin == null || !isInitialized()) {
+            LogLog.error("Saros not initialized", new StackTrace());
+            throw new IllegalStateException();
         }
     }
 
@@ -1393,6 +1422,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @return the state of the feature as <code> boolean</code>
      */
+    // TODO move to PreferenceUtils
     public boolean getMutliDriverEnabled() {
         return getPreferenceStore()
             .getBoolean(PreferenceConstants.MULTI_DRIVER);
@@ -1403,6 +1433,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @return the state of the feature as <code> boolean</code>
      */
+    // TODO move to PreferenceUtils
     public boolean getAutoFollowEnabled() {
         return getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_FOLLOW_MODE);
@@ -1413,6 +1444,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @return the state of the feature as <code> boolean</code>
      */
+    // TODO move to PreferenceUtils
     public boolean getFollowExclusiveDriverEnabled() {
         return getPreferenceStore().getBoolean(
             PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER);

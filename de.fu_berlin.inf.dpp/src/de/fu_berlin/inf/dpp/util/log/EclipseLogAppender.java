@@ -62,7 +62,7 @@ public class EclipseLogAppender extends AppenderSkeleton {
         if (saros == null && Saros.isInitialized()) {
 
             // Initialize
-            Saros.reinject(this);
+            Saros.injectDependenciesOnly(this);
 
             // Flush Cache
             for (LoggingEvent cached : cache) {

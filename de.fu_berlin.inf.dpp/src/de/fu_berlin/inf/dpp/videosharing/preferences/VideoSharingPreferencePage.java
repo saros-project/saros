@@ -47,7 +47,7 @@ public class VideoSharingPreferencePage extends FieldEditorPreferencePage
 
     public VideoSharingPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Here you can set up basic settings for screensharing. Check the sub-preference pages at the left side to configure advanced settings.");

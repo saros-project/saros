@@ -64,7 +64,7 @@ public class VideoSharingAction extends Action {
 
     public VideoSharingAction(SessionViewTableViewer viewer) {
         super();
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         setId(ACTION_ID);
         changeButton();
         setEnabled(false);

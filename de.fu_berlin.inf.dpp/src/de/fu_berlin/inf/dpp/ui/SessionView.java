@@ -414,7 +414,7 @@ public class SessionView extends ListExplanatoryViewPart {
 
     public SessionView() {
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         /*
          * Register with the Editors preference store, for getting notified when

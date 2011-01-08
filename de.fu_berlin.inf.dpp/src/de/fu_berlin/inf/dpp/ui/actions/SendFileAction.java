@@ -118,7 +118,7 @@ public class SendFileAction extends Action {
                 }
             }
         });
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
     }
 
     protected void updateEnablement() {

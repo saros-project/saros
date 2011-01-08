@@ -106,7 +106,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     public GeneralPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
         setPreferenceStore(saros.getPreferenceStore());
     }
 

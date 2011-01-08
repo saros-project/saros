@@ -36,7 +36,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     public AdvancedPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Advanced settings geared toward developers and power users.");

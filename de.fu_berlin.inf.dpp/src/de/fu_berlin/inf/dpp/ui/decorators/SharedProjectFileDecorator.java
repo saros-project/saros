@@ -195,7 +195,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     public SharedProjectFileDecorator() {
 
-        Saros.reinject(this);
+        Saros.injectDependenciesOnly(this);
 
         this.decoratedElements = new HashSet<Object>();
 
