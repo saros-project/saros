@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -55,8 +56,9 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The ActivitySequencer is responsible for making sure that activityDataObjects
- * are sent and received in the right order.
- * 
+ * are sent and received in the right order. There is one ActivitySequencer for
+ * each session participant.<br>
+ * <br>
  * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
  * push all responsibility up a layer into the SarosSession
  * 
@@ -97,11 +99,11 @@ public class ActivitySequencer {
     protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
     /**
-     * A priority queue for timed activityDataObjects. Fore each remote user
+     * A priority queue for timed activityDataObjects. For each remote user
      * there is one ActivityQueue, in which received events from those are
-     * stored. TODO "Timestamps" are treated more like consecutive sequence
-     * numbers, so may be all names and documentation should be changed to
-     * reflect this.
+     * stored.<br>
+     * TODO "Timestamps" are treated more like consecutive sequence numbers, so
+     * maybe all names and documentation should be changed to reflect this.
      */
     protected class ActivityQueue {
 
@@ -484,6 +486,10 @@ public class ActivitySequencer {
 
         started = true;
 
+        /*
+         * Since our task is waiting for the next item, we have to use
+         * schedule() here, not scheduleAtFixedRate().
+         */
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -502,6 +508,28 @@ public class ActivitySequencer {
                 List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
 
+                try {
+                    /*
+                     * Wait until the queue is not empty.
+                     * 
+                     * If the timer is cancelled, we don't want our TimerTask to
+                     * wait indefinitely. To get a chance to cancel the task, we
+                     * use poll with a timeout here instead of take.
+                     */
+                    DataObjectQueueItem item = outgoingQueue.poll(30,
+                        TimeUnit.SECONDS);
+                    if (item == null) {
+                        // poll() timed out, nothing to do.
+                        return;
+                    }
+                    activities.add(item);
+                } catch (InterruptedException e1) {
+                    if (!started)
+                        return;
+                    log.error("Interrupted while waiting for outgoing object",
+                        e1);
+                }
+                // If there was more than one ADO waiting, get the rest now.
                 outgoingQueue.drainTo(activities);
 
                 Map<User, List<IActivityDataObject>> toSend = AutoHashMap
