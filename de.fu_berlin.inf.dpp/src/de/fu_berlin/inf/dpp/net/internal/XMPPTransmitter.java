@@ -32,13 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
@@ -68,7 +64,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
@@ -644,36 +639,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         progress.done();
     }
 
-    public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, SubMonitor progress) throws IOException,
-        SarosCancellationException {
-
-        String user = connection.getUser();
-        if (user == null) {
-            log.warn("Local user is not logged in to the connection, yet.");
-            return;
-        }
-        progress.beginTask("Sending " + path.lastSegment(), 100);
-
-        TransferDescription transfer = TransferDescription
-            .createFileTransferDescription(to, new JID(user), path,
-                sessionID.getValue());
-
-        File f = new File(project.getFile(path).getLocation().toOSString());
-        if (!f.isFile())
-            throw new IOException("No file found for given path: " + path);
-
-        progress.subTask("Reading file " + path.lastSegment());
-
-        // TODO Use Eclipse to read file?
-        byte[] content = FileUtils.readFileToByteArray(f);
-        progress.worked(10);
-
-        progress.subTask("Sending file " + path.lastSegment());
-        dataManager.sendData(transfer, content, progress.newChild(90));
-        progress.done();
-    }
-
     public void sendProjectArchive(JID recipient, String invitationID,
         File archive, SubMonitor progress) throws SarosCancellationException,
         IOException {
@@ -903,51 +868,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    /**
-     * Executor service used by sendFileAsync to queue the sending of files.
-     */
-    protected ExecutorService sendAsyncExecutor;
-
-    /**
-     * Utility method for #sendFile() which makes a copy of the file and returns
-     * immediately while sending in the background.
-     */
-    public void sendFileAsync(JID recipient, IProject project,
-        final IPath path, int sequenceNumber,
-        final IFileTransferCallback callback, final SubMonitor progress)
-        throws IOException {
-
-        if (callback == null)
-            throw new IllegalArgumentException();
-
-        String user = connection.getUser();
-        if (user == null) {
-            log.warn("Local user is not logged in to the connection, yet.");
-            return;
-        }
-        final TransferDescription transfer = TransferDescription
-            .createFileTransferDescription(recipient, new JID(user), path,
-                sessionID.getValue());
-
-        File f = new File(project.getFile(path).getLocation().toOSString());
-
-        final byte[] content = FileUtils.readFileToByteArray(f);
-
-        sendAsyncExecutor.execute(new Runnable() {
-            public void run() {
-                try {
-                    // To test if asynchronously arriving file transfers work:
-                    // Thread.sleep(10000);
-                    dataManager.sendData(transfer, content,
-                        progress.newChild(100));
-                    callback.fileSent(path);
-                } catch (Exception e) {
-                    callback.fileTransferFailed(path, e);
-                }
-            }
-        });
-    }
-
     protected void prepareConnection(final XMPPConnection connection) {
 
         // Create Containers
@@ -956,9 +876,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .synchronizedMap(new HashMap<JID, InvitationProcess>());
         this.messageTransferQueue = Collections
             .synchronizedList(new LinkedList<MessageTransfer>());
-
-        this.sendAsyncExecutor = Executors
-            .newFixedThreadPool(MAX_PARALLEL_SENDS);
 
         this.connection = connection;
 
@@ -1000,7 +917,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             log.error("disposeConnection() called twice.");
             return;
         }
-        sendAsyncExecutor.shutdownNow();
         chats.clear();
         processes.clear();
         messageTransferQueue.clear();

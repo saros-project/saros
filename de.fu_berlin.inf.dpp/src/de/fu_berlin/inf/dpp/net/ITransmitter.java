@@ -25,8 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
 import org.joda.time.DateTime;
@@ -77,8 +75,7 @@ public interface ITransmitter {
      */
     public void sendInvitation(String projectID, JID jid, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream,
-        MUCSessionPreferences comPrefs);
+        DateTime sessionStart, boolean doStream, MUCSessionPreferences comPrefs);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -188,72 +185,6 @@ public interface ITransmitter {
      *            the Jabber ID of the recipient.
      */
     public void sendFileListRequest(JID recipient, String invitationID);
-
-    /**
-     * Sends given file to given recipient with given sequence number.
-     * 
-     * @param recipient
-     *            the Jabber ID of the recipient.
-     * @param project
-     *            the project of which the given path contains the file to be
-     *            sent.
-     * @param path
-     *            the project-relative path of the resource that is to be sent.
-     * @param sequenceNumber
-     *            the sequence number that will be associated with this
-     *            activityDataObject.
-     * @param callback
-     *            an call-back for the file transfer state. CANNOT be null.
-     * 
-     * @param monitor
-     *            a monitor to which progress will be reported and which is
-     *            queried for cancellation.
-     * 
-     * @throws IOException
-     *             If the file could not be read, other errors are reported to
-     *             the call-back.
-     */
-    public void sendFileAsync(JID recipient, IProject project, IPath path,
-        int sequenceNumber, IFileTransferCallback callback, SubMonitor monitor)
-        throws IOException;
-
-    /**
-     * Sends given file to given recipient with given sequence number
-     * SYNCHRONOUSLY.
-     * 
-     * This methods thus block until the file has been sent or it failed.
-     * 
-     * @param to
-     *            the Jabber ID of the recipient.
-     * @param project
-     *            the project of which the given path contains the file to be
-     *            sent.
-     * @param path
-     *            the project-relative path of the resource that is to be sent.
-     * @param sequenceNumber
-     *            the time that will be associated with this activityDataObject.
-     * 
-     * @param monitor
-     *            a monitor to which progress will be reported and which is
-     *            queried for cancellation.
-     * 
-     * @throws SarosCancellationException
-     *             if the operation was canceled via the given progress monitor
-     *             an LocalCancellationException is thrown. If the operation was
-     *             canceled via the monitor and the exception is not received,
-     *             the operation completed successfully, before noticing the
-     *             cancellation.
-     * 
-     *             if the operation was canceled by the recipient a
-     *             RemoteCancellationException is thrown
-     * 
-     * @throws IOException
-     *             If the given path identifies no file (but a directory), the
-     *             file could not be read or an error occurred while sending
-     */
-    public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, SubMonitor monitor) throws IOException,
-        SarosCancellationException;
 
     /**
      * Sends given archive file to given recipient.

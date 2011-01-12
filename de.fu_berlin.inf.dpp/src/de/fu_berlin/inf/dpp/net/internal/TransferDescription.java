@@ -14,7 +14,6 @@ import java.util.HashSet;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
@@ -63,10 +62,6 @@ public class TransferDescription implements Serializable {
          * Transfer of a FileList
          */
         FILELIST_TRANSFER,
-        /**
-         * Transfer of a single File/Resource
-         */
-        RESOURCE_TRANSFER,
         /**
          * Transfer of several resources in a ZIP-File
          */
@@ -148,9 +143,6 @@ public class TransferDescription implements Serializable {
         case FILELIST_TRANSFER:
             return "FileList from " + Util.prefix(getSender()) + " [SID="
                 + sessionID + "]";
-        case RESOURCE_TRANSFER:
-            return "Resource from " + Util.prefix(getSender()) + ": "
-                + file_project_path + " [SID=" + sessionID + "]";
         case ACTIVITY_TRANSFER:
             return "Activity from " + Util.prefix(getSender()) + ": [SID="
                 + sessionID + "]";
@@ -186,22 +178,6 @@ public class TransferDescription implements Serializable {
         result.sender = sender;
         result.testID = testID;
         result.type = FileTransferType.CONNECTION_TEST;
-        return result;
-    }
-
-    public static TransferDescription createFileTransferDescription(
-        JID recipient, JID sender, IPath path, String sessionID) {
-
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sender;
-        result.type = FileTransferType.RESOURCE_TRANSFER;
-        result.file_project_path = path.toPortableString();
-        result.sessionID = sessionID;
-
-        // Only compress if not a file-type which is already commonly compressed
-        result.compressed = compressedSet.contains(path.getFileExtension());
-
         return result;
     }
 

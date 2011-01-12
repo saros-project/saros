@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
@@ -43,6 +44,15 @@ public class BinaryChannelTest {
      * Field used exclusive by getTestArray to memoize the created TestArrays
      */
     private Map<Integer, WeakReference<byte[]>> memoMap = new HashMap<Integer, WeakReference<byte[]>>();
+
+    public static TransferDescription createArchiveTestTransferDescription(
+        JID to, JID from, IPath path, String sessionID) {
+        TransferDescription result = TransferDescription
+            .createArchiveTransferDescription(to, from, sessionID, null);
+        result.file_project_path = path.toPortableString();
+        result.compressed = true;
+        return result;
+    }
 
     /**
      * Construct a test array
@@ -157,8 +167,8 @@ public class BinaryChannelTest {
 
                 for (int i = 0; i < 128; i++) {
                     try {
-                        clientChannel.sendDirect(TransferDescription
-                            .createFileTransferDescription(new JID(
+                        clientChannel.sendDirect(
+                            createArchiveTestTransferDescription(new JID(
                                 "server@gmail.com"),
                                 new JID("client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
@@ -249,8 +259,8 @@ public class BinaryChannelTest {
 
                     // Send uneven arrays to client
                     for (int i = 1; i < 128; i += 2) {
-                        serverChannel.sendDirect(TransferDescription
-                            .createFileTransferDescription(new JID(
+                        serverChannel.sendDirect(
+                            createArchiveTestTransferDescription(new JID(
                                 "server@gmail.com"),
                                 new JID("client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
@@ -290,8 +300,8 @@ public class BinaryChannelTest {
                 // Send even arrays to server
                 for (int i = 0; i < 128; i += 2) {
                     try {
-                        clientChannel.sendDirect(TransferDescription
-                            .createFileTransferDescription(new JID(
+                        clientChannel.sendDirect(
+                            createArchiveTestTransferDescription(new JID(
                                 "server@gmail.com"),
                                 new JID("client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
@@ -422,8 +432,8 @@ public class BinaryChannelTest {
                     // Send even arrays to server
                     for (int i = 0; i < 512; i += 2) {
                         try {
-                            clientChannel.sendDirect(TransferDescription
-                                .createFileTransferDescription(new JID(
+                            clientChannel.sendDirect(
+                                createArchiveTestTransferDescription(new JID(
                                     "server@gmail.com"), new JID(
                                     "client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
@@ -445,8 +455,8 @@ public class BinaryChannelTest {
                     // Send even arrays to server
                     for (int i = 1; i < 512; i += 2) {
                         try {
-                            clientChannel.sendDirect(TransferDescription
-                                .createFileTransferDescription(new JID(
+                            clientChannel.sendDirect(
+                                createArchiveTestTransferDescription(new JID(
                                     "server@gmail.com"), new JID(
                                     "client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
@@ -685,8 +695,8 @@ public class BinaryChannelTest {
 
                 for (int i = 0; i < 128; i++) {
                     try {
-                        clientChannel.sendDirect(TransferDescription
-                            .createFileTransferDescription(new JID(
+                        clientChannel.sendDirect(
+                            createArchiveTestTransferDescription(new JID(
                                 "server@gmail.com"),
                                 new JID("client@gmail.com"), new Path(
                                     "/test/hello.jpg"), "" + 4722),
