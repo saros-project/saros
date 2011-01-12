@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
@@ -102,8 +103,7 @@ import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
  * provides convenience functions for sending messages.
  */
 @Component(module = "net")
-public class XMPPTransmitter implements ITransmitter, IConnectionListener,
-    IXMPPTransmitter {
+public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static Logger log = Logger.getLogger(XMPPTransmitter.class);
 
@@ -188,8 +188,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
 
     public void sendInvitation(String projectID, JID guest, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream,
-        MUCSessionPreferences comPrefs) {
+        DateTime sessionStart, boolean doStream, MUCSessionPreferences comPrefs) {
 
         log.trace("Sending invitation to " + Util.prefix(guest)
             + " with description " + description);
@@ -482,12 +481,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         sendMessageToAll(sarosSession, leaveExtension.create());
     }
 
-    /**
-     * Send the given list of timed activityDataObjects to the given recipient.
+    /*
+     * (non-Javadoc)
      * 
-     * If the total size in byte of the timedActivities exceeds
-     * MAX_XMPP_MESSAGE_SIZE, the message is not send using XMPP Chat Messages
-     * but rather using the DataTransferManager.
+     * @see de.fu_berlin.inf.dpp.ITransmitter
      * 
      * TODO: Add Progress
      */
@@ -506,44 +503,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
         String sID = sessionID.getValue();
         PacketExtension extensionToSend = activitiesProvider.create(sID,
             timedActivities);
-        byte[] data = null;
+
         try {
-            data = extensionToSend.toXML().getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            log.error("UTF-8 is unsupported", e);
+            TransferDescription transferDescription = TransferDescription
+                .createActivityTransferDescription(recipient, recipient,
+                    sessionID.getValue());
+
+            sendToProjectUser(recipient, extensionToSend, transferDescription);
+        } catch (IOException e) {
+            log.error("Failed to sent activityDataObjects: " + timedActivities,
+                e);
+            return;
         }
 
-        // if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
-        if (data == null
-            || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
-            // send as XMPP Message
-            sendMessageToProjectUser(recipient, extensionToSend);
-        } else {
-            // send using DataTransferManager
-            try {
-                String user = connection.getUser();
-                if (user == null) {
-                    log.warn("Local user is not logged in to the connection, yet.");
-                    return;
-                }
-                TransferDescription transferData = TransferDescription
-                    .createActivityTransferDescription(recipient,
-                        new JID(user), sID);
-
-                dataManager.sendData(transferData, data,
-                    SubMonitor.convert(new NullProgressMonitor()));
-            } catch (IOException e) {
-                log.error(
-                    "Failed to sent activityDataObjects ("
-                        + Util.formatByte(data.length) + "): "
-                        + timedActivities, e);
-                return;
-            } catch (SarosCancellationException e) {
-                log.error(
-                    "Cancellation cannot occur, because NullProgressMonitors"
-                        + " are used on both sides!", e);
-            }
-        }
         String msg = "Sent (" + String.format("%03d", timedActivities.size())
             + ") " + Util.prefix(recipient) + timedActivities;
 
@@ -552,6 +524,97 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener,
             log.trace(msg);
         else
             log.debug(msg);
+    }
+
+    /**
+     * <p>
+     * Sends the given {@link PacketExtension} to the given {@link JID}. The
+     * recipient has to be in the session or the extension will not be sent.
+     * </p>
+     * 
+     * <p>
+     * Callers may provide a {@link TransferDescription}.</br>
+     * 
+     * Then, if the extension's raw data (bytes) is longer than
+     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
+     * to the recipient the extension will be sent using this bytestream. Else
+     * it will be sent by chat.
+     * </p>
+     * 
+     * @param recipient
+     * @param extension
+     * @param transferDescription
+     *            if sent by bytestreams, this data is used to coordinate the
+     *            streaming. May be null.
+     * @throws IOException
+     *             if sending by bytestreams fails and the extension raw data is
+     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
+     */
+    public void sendToProjectUser(JID recipient, PacketExtension extension,
+        TransferDescription transferDescription) throws IOException {
+
+        byte[] data = null;
+
+        try {
+            data = extension.toXML().getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("UTF-8 is unsupported", e);
+        }
+
+        if (data == null
+            || transferDescription == null
+            || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
+
+            sendMessageToProjectUser(recipient, extension);
+
+        } else {
+            try {
+
+                sendByBytestreamToProjectUser(recipient, data,
+                    transferDescription);
+
+            } catch (IOException e) {
+                // else send by chat if applicable
+                if (data.length < MAX_XMPP_MESSAGE_SIZE)
+                    sendMessageToProjectUser(recipient, extension);
+                else {
+                    log.error("Failed to sent packet extension by bytestream ("
+                        + Util.formatByte(data.length) + " bytes)");
+                    throw e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Tries to send the passed byte array to the given {@link JID}.
+     * 
+     * @param recipient
+     * @param data
+     * @param transferDescription
+     *            to coordinate the the bytestream using XMPP packets
+     * @throws IOException
+     *             if sending by bytestream fails
+     */
+    protected void sendByBytestreamToProjectUser(JID recipient, byte[] data,
+        TransferDescription transferDescription) throws IOException {
+        String user = connection.getUser();
+
+        if (user == null) {
+            log.warn("Local user is not logged in to the connection, yet.");
+            return;
+        }
+
+        if (dataManager.getTransferMode(recipient) == NetTransferMode.NONE)
+            throw new IOException("No bytestream connection available");
+
+        try {
+            dataManager.sendData(transferDescription, data,
+                SubMonitor.convert(new NullProgressMonitor()));
+        } catch (SarosCancellationException e) {
+            log.error("Cancellation cannot occur, because NullProgressMonitors"
+                + " are used on both sides!", e);
+        }
     }
 
     /**

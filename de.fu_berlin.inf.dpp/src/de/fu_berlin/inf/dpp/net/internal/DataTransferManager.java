@@ -311,7 +311,7 @@ public class DataTransferManager implements IConnectionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
-        log.debug("sending data ... ");
+        log.trace("sending data ... ");
 
         JID recipient = transferData.recipient;
 
@@ -347,7 +347,7 @@ public class DataTransferManager implements IConnectionListener,
         IBytestreamConnection connection = connections.get(recipient);
 
         if (connection != null) {
-            log.debug("Reuse bytestream connection " + connection.getMode());
+            log.trace("Reuse bytestream connection " + connection.getMode());
             return connection;
         }
 
