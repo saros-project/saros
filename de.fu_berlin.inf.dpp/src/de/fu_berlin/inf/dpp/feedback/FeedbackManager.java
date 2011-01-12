@@ -168,6 +168,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
      * @param untilNext
      */
     public void setSessionsUntilNext(int untilNext) {
+        if (untilNext < 0)
+            untilNext = -1;
         saros.getConfigPrefs().putInt(PreferenceConstants.SESSIONS_UNTIL_NEXT,
             untilNext);
         saros.saveConfigPrefs();
