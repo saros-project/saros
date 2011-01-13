@@ -835,7 +835,8 @@ public class RosterView extends ViewPart {
         this.inviteAction = new InviteAction(sessionManager, saros,
             this.viewer, discoveryManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
-        this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
+        this.deleteContactAction = new DeleteContactAction(sessionManager,
+            saros, this.viewer);
         this.testAction = new ConnectionTestAction(saros,
             connectionTestManager, this.viewer);
     }

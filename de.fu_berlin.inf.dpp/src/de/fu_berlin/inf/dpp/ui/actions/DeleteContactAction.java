@@ -32,7 +32,10 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -45,7 +48,13 @@ public class DeleteContactAction extends SelectionProviderAction {
 
     protected Saros saros;
 
-    public DeleteContactAction(Saros saros, ISelectionProvider provider) {
+    protected SarosSessionManager sessionManager;
+
+    protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this user "
+        + "because they are currently in your Saros session.";
+
+    public DeleteContactAction(SarosSessionManager sessionManager, Saros saros,
+        ISelectionProvider provider) {
         super(provider, "Delete");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
@@ -55,6 +64,7 @@ public class DeleteContactAction extends SelectionProviderAction {
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
             ISharedImages.IMG_TOOL_DELETE));
 
+        this.sessionManager = sessionManager;
         this.saros = saros;
     }
 
@@ -88,6 +98,26 @@ public class DeleteContactAction extends SelectionProviderAction {
             return;
         }
 
+        if (rosterEntry != null && sessionManager != null) {
+            // Is the chosen user currently in the session?
+            ISarosSession sarosSession = sessionManager.getSarosSession();
+            String entryJid = rosterEntry.getUser();
+
+            if (sarosSession != null) {
+                for (User p : sarosSession.getParticipants()) {
+                    String pJid = p.getJID().getBase();
+
+                    // If so, stop the deletion from completing
+                    if (entryJid.equals(pJid)) {
+                        MessageDialog.openError(shell,
+                            "Cannot delete a user in the session",
+                            DELETE_ERROR_IN_SESSION);
+                        return;
+                    }
+                }
+            }
+        }
+
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
             "Are you sure you want to delete " + toString(entry)
                 + " from your roster?")) {
@@ -108,6 +138,8 @@ public class DeleteContactAction extends SelectionProviderAction {
             rosterEntry = ((TreeItem) selection.getFirstElement())
                 .getRosterEntry();
         }
-        setEnabled(rosterEntry != null);
+        boolean enabled = rosterEntry != null;
+
+        setEnabled(enabled);
     }
 }
