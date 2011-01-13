@@ -53,7 +53,8 @@ public class ChangeColorAction extends SelectionProviderAction implements
         Saros.injectDependenciesOnly(this);
 
         setToolTipText("changes your session colour");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/changecolor.png"));
 
         selectionChanged(getStructuredSelection());
     }
@@ -93,7 +94,7 @@ public class ChangeColorAction extends SelectionProviderAction implements
                         SarosAnnotation.setUserColor(localUser, selectedColor);
                         for (User user : listOfUsers) {
                             sarosSession.sendActivity(user,
-                                new ChangeColorActivity(localUser, user, 
+                                new ChangeColorActivity(localUser, user,
                                     selectedColor));
                         }
                         editorManager.colorChanged();

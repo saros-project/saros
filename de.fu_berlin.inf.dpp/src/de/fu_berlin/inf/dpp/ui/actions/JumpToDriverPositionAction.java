@@ -37,7 +37,8 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
         super(provider, "Jump to position of selected user");
 
         setToolTipText("Jump to position of selected user");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/jump.png"));
 
         this.saros = saros;
         this.editorManager = editorManager;

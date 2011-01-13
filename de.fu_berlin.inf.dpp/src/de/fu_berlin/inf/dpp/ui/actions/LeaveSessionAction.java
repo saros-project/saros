@@ -52,7 +52,8 @@ public class LeaveSessionAction extends Action {
         this.sessionManager = sessionManager;
 
         setToolTipText("Leave the session");
-        setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("/icons/elcl16/leavesession.png"));
 
         sessionManager
             .addSarosSessionListener(new AbstractSarosSessionListener() {

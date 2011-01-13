@@ -102,12 +102,14 @@ public class RosterView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(RosterView.class);
 
-    public static final Image groupImage = SarosUI.getImage("icons/group.png");
-    public static final Image personImage = SarosUI.getImage("icons/user.png");
+    public static final Image groupImage = SarosUI
+        .getImage("icons/obj16/group.png");
+    public static final Image personImage = SarosUI
+        .getImage("icons/obj16/user.png");
     public static final Image personImage_saros = SarosUI
-        .getImage("icons/user_saros.png");
+        .getImage("icons/obj16/sarosuser.png");
     public static final Image personAwayImage = SarosUI
-        .getImage("icons/clock.png");
+        .getImage("icons/elcl16/away.png");
     public static final Image personOfflineImage = new Image(
         Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
 

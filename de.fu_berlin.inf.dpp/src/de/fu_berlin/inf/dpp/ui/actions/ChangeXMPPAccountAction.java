@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -143,27 +142,27 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             case CONNECTED:
                 setText("Disconnect");
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/connect.png"));
+                    .getImageDescriptor("/icons/elcl16/connect.png"));
                 break;
             case CONNECTING:
                 setText("Connecting");
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/connect.png"));
+                    .getImageDescriptor("/icons/elcl16/connecting.png"));
                 break;
             case ERROR:
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/disconnect.png"));
+                    .getImageDescriptor("/icons/elcl16/conn_err.png"));
                 break;
             case NOT_CONNECTED:
                 setText("Connect");
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/disconnect.png"));
+                    .getImageDescriptor("/icons/elcl16/disconnected.png"));
                 break;
             case DISCONNECTING:
             default:
                 setText("Disconnecting");
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/disconnect.png"));
+                    .getImageDescriptor("/icons/elcl16/disconnecting.png"));
                 break;
             }
 

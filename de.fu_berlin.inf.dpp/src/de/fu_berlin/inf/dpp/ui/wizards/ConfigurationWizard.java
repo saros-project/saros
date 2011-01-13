@@ -63,17 +63,17 @@ public class ConfigurationWizard extends Wizard {
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
         setDefaultPageImageDescriptor(SarosUI
-            .getImageDescriptor("icons/saros-logo.png"));
+            .getImageDescriptor("icons/wizban/conf.png"));
 
         /*
          * HACK Changing UI components like the configuration wizard should not
          * use PicoContainer directly.
          */
         Saros.injectDependenciesOnly(this);
-        
+
         if (askForAccount) {
-            this.pages.add(new RegisterAccountPage(saros, false, showUseNowButton, !showUseNowButton,
-                preferenceUtils));
+            this.pages.add(new RegisterAccountPage(saros, false,
+                showUseNowButton, !showUseNowButton, preferenceUtils));
             this.pages.add(new GeneralSettingsPage(saros, preferenceUtils));
         }
         if (askAboutStatisticSubmission) {

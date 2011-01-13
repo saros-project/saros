@@ -83,7 +83,8 @@ public class RemoveAllDriverRoleAction extends Action {
         super("Remove driver roles");
         this.sessionManager = sessionManager;
 
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/removedrivers.png"));
         setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
 

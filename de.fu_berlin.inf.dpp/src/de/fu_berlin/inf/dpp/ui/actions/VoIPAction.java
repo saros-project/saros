@@ -125,8 +125,8 @@ public class VoIPAction extends Action {
                 protected IStatus run(IProgressMonitor monitor) {
                     log.info("Trying to invite " + selectedUser
                         + " to a new VoIP Session");
-                    return audioServiceManager.invite(selectedUser, SubMonitor
-                        .convert(monitor));
+                    return audioServiceManager.invite(selectedUser,
+                        SubMonitor.convert(monitor));
                 }
             };
             voipCreate.schedule();
@@ -151,22 +151,22 @@ public class VoIPAction extends Action {
         switch (audioServiceManager.getStatus()) {
         case RUNNING:
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/telephone_stop.png"));
+                .getImageDescriptor("icons/elcl16/stopvoip.png"));
             setToolTipText("Stop VoIP Session...");
             break;
         case STOPPED:
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/telephone.png"));
+                .getImageDescriptor("icons/elcl16/stoppedvoip.png"));
             setToolTipText("Start a VoIP Session...");
             break;
         case STOPPING:
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/telephone_stop.png"));
+                .getImageDescriptor("icons/elcl16/stoppingvoip.png"));
             setToolTipText("Stop VoIP Session...");
             break;
         default:
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/telephone.png"));
+                .getImageDescriptor("icons/elcl16/startvoip.png"));
             setToolTipText("Start a VoIP Session...");
             break;
         }

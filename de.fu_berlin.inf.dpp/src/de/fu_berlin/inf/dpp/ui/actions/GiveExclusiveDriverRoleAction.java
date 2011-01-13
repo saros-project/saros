@@ -59,7 +59,8 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         super(provider, "Give exclusive driver role");
 
         this.sessionManager = sessionManager;
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/giveexcldriver.png"));
         setToolTipText("Give the exclusive driver role to this user");
 
         /*

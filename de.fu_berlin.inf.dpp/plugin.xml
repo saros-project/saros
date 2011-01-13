@@ -9,7 +9,7 @@
       <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.RosterView"
-            icon="icons/group.png"
+            icon="icons/view16/rostr_misc.png"
             id="de.fu_berlin.inf.dpp.ui.RosterView"
             name="Roster"/>
       <view
@@ -21,13 +21,13 @@
       <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            icon="icons/comment.png"
+            icon="icons/view16/chat_misc.png"
             id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
             name="Chat View"/>
      <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
-            icon="icons/monitor_go.png"
+            icon="icons/view16/video_misc.png"
             id="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
             name="Remote Screen"
             restorable="true"/>
@@ -169,7 +169,7 @@
             objectClass="org.eclipse.core.resources.IResource"
             sibling_order="&lt;action&#x0A;               class=&quot;de.fu_berlin.inf.dpp.ui.actions.NewSessionAction&quot;&#x0A;               icon=&quot;icons/transmit.png&quot;&#x0A;               id=&quot;Saros.action1&quot;&#x0A;               label=&quot;Share project...&quot;&gt;&#x0A;         &lt;/action&gt;">
          <menu
-               icon="icons/saros-logo-16x16.png"
+               icon="icons/etool16/saros.png"
                id="sarosSubMenu"
                label="Saros">
                <separator name="Saros"/>
@@ -307,7 +307,7 @@
          </action>
          <action
                class="de.fu_berlin.inf.dpp.ui.actions.NewAccountAction"
-               icon="icons/vcard_add.png"
+               icon="icons/etool16/addaccount.png"
                id="de.fu_berlin.inf.dpp.ui.actions.createAccountAction"
                label="&amp;Create Account"
                menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group"

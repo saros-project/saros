@@ -58,13 +58,13 @@ public class ChatView extends SimpleExplanatoryViewPart {
      * Default image for ChatView.
      */
     public static final Image chatViewImage = SarosUI
-        .getImage("icons/comment.png");
+        .getImage("icons/view16/chat_misc.png");
 
     /**
      * Image while composing a message.
      */
     public static final Image composingImage = SarosUI
-        .getImage("icons/composing.png");
+        .getImage("icons/view16/cmpsg_misc.png");
 
     protected SimpleExplanation howtoExplanation = new SimpleExplanation(
         SWT.ICON_INFORMATION,

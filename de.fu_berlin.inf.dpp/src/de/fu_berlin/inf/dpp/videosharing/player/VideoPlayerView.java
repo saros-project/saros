@@ -343,7 +343,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         public ChangeSourceMode() {
             setToolTipText("Change mode of image source");
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/switch_mode.gif"));
+                .getImageDescriptor("icons/elcl16/chvdsrc.png"));
 
             videoSharingSessionObservable
                 .addAndNotify(new ValueChangeListener<VideoSharingSession>() {
@@ -444,16 +444,16 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             if (enabled && session != null) {
                 if (session.isPaused()) {
                     setImageDescriptor(SarosUI
-                        .getImageDescriptor("icons/resume_co.gif"));
+                        .getImageDescriptor("icons/elcl16/resumevideo.gif"));
                     setToolTipText("Resume");
                 } else {
                     setImageDescriptor(SarosUI
-                        .getImageDescriptor("icons/suspend_co.gif"));
+                        .getImageDescriptor("icons/elcl16/pausevideo.gif"));
                     setToolTipText("Pause");
                 }
             } else {
                 setImageDescriptor(SarosUI
-                    .getImageDescriptor("icons/suspend_co.gif"));
+                    .getImageDescriptor("icons/elcl16/pausevideo.gif"));
                 setToolTipText(null);
             }
         }

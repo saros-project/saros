@@ -386,7 +386,7 @@ public class SarosSessionManager implements IConnectionListener,
             this.peer = process.getPeer().getBase();
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
-                SarosUI.getImageDescriptor("/icons/invites.png"));
+                SarosUI.getImageDescriptor("/icons/elcl16/inv_wiz.png"));
         }
 
         @Override

@@ -43,7 +43,11 @@ public class MessagingAction extends SelectionProviderAction {
         selectionChanged((IStructuredSelection) provider.getSelection());
 
         setToolTipText("Start a IM session with this user");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
+        setImageDescriptor(SarosUI.getImageDescriptor("XXX")); // please read
+                                                               // http://wiki.eclipse.org/User_Interface_Guidelines#Naming_Conventions
+                                                               // for correct
+                                                               // naming of icon
+                                                               // file
     }
 
     @Override

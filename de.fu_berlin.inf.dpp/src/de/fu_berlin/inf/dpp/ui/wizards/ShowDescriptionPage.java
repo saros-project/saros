@@ -28,7 +28,7 @@ class ShowDescriptionPage extends WizardPage {
         setDescription("You have been invited to join a shared project session."
             + " Click next if you want to accept the invitation.");
         setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/start_invitation.png"));
+            .getImageDescriptor("icons/wizban/invitation.png"));
 
         /*
          * Show compatibility issues and inform the user what to do (but the

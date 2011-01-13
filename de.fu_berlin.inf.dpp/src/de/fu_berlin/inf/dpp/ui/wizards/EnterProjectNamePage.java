@@ -135,7 +135,7 @@ class EnterProjectNamePage extends WizardPage {
         case JINGLEUDP:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/jingle_connection.png"));
+                .getImageDescriptor("icons/wizban/jingle.png"));
             break;
         case SOCKS5_MEDIATED:
             if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
@@ -145,13 +145,13 @@ class EnterProjectNamePage extends WizardPage {
                 setDescription("Attention: direct file transfer connections with SOCKS5 protocol are deactivated.\n"
                     + "To activate uncheck 'Disable local file transfer proxy for direct connections'.");
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/ibb_connection.png"));
+                .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
         case SOCKS5:
         case SOCKS5_DIRECT:
             setDescription("Direct file transfer connection with SOCKS5 protocol available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/jingle_connection.png"));
+                .getImageDescriptor("icons/wizban/socks5.png"));
             break;
         case UNKNOWN:
         case HANDMADE:
@@ -167,7 +167,7 @@ class EnterProjectNamePage extends WizardPage {
                     + "Suggestions: Update an existing project or copy resources from another project.");
             }
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/ibb_connection.png"));
+                .getImageDescriptor("icons/wizban/ibb.png"));
         }
     }
 

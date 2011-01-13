@@ -70,10 +70,10 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         .getLogger(SharedProjectFileDecorator.class.getName());
 
     public final ImageDescriptor activeDescriptor = SarosUI
-        .getImageDescriptor("icons/bullet_green.png"); // NON-NLS-1
+        .getImageDescriptor("icons/ovr16/activeproject_obj.png"); // NON-NLS-1
 
     public final ImageDescriptor passiveDescriptor = SarosUI
-        .getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
+        .getImageDescriptor("icons/ovr16/passiveproject_obj.png"); // NON-NLS-1
 
     protected ISarosSession sarosSession;
 

@@ -134,11 +134,12 @@ public class VideoSharingAction extends Action {
     protected void changeButton() {
         if (sessionObservable.getValue() != null) {
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/monitor_stop.png"));
+                .getImageDescriptor("icons/elcl16/stopvideo.png"));
             setToolTipText(TOOLTIP_STOP_SESSION);
             return;
         }
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/monitor_go.png"));
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/startvideo.png"));
         setToolTipText(TOOLTIP_START_SESSION);
     }
 
