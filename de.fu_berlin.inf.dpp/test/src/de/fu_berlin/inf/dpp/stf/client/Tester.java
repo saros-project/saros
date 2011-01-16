@@ -16,23 +16,23 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.ChatViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.RSViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.RosterViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.SessionViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.BasicComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.SarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.WindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosState;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.RefactorM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.SarosM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.WindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.ConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.ProgressView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.SarosPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RSView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RosterView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionView;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
@@ -42,19 +42,19 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.Windo
 public class Tester {
     private static final Logger log = Logger.getLogger(Tester.class);
 
-    public SarosPEViewComponent pEV;
-    public ProgressViewComponent progressV;
-    public RosterViewComponent rosterV;
-    public SessionViewComponent sessionV;
-    public RSViewComponent rSV;
-    public ChatViewComponent chatV;
-    public BasicComponent basic;
+    public SarosPEView pEV;
+    public ProgressView progressV;
+    public RosterView rosterV;
+    public SessionView sessionV;
+    public RSView rSV;
+    public ChatView chatV;
+    public BasicWidgets basic;
     public SarosState state;
-    public EditorComponent editor;
-    public ShellComponent shell;
+    public Editor editor;
+    public Shell shell;
     public SarosM sarosM;
-    public SarosWorkbenchComponent workbench;
-    public ConsoleViewComponent consoleV;
+    public Workbench workbench;
+    public ConsoleView consoleV;
     public FileM fileM;
     public EditM editM;
     public RefactorM refactorM;
@@ -86,25 +86,25 @@ public class Tester {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
 
-            chatV = (ChatViewComponent) registry.lookup("chatView");
-            rosterV = (RosterViewComponent) registry.lookup("rosterView");
-            sessionV = (SessionViewComponent) registry.lookup("sessionView");
+            chatV = (ChatView) registry.lookup("chatView");
+            rosterV = (RosterView) registry.lookup("rosterView");
+            sessionV = (SessionView) registry.lookup("sessionView");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it
              * work for the remote tests too.
              */
             sessionV.setJID(jid);
-            rSV = (RSViewComponent) registry.lookup("remoteScreenView");
-            pEV = (SarosPEViewComponent) registry.lookup("packageExplorerView");
-            progressV = (ProgressViewComponent) registry.lookup("progressView");
-            consoleV = (ConsoleViewComponent) registry.lookup("consoleView");
+            rSV = (RSView) registry.lookup("remoteScreenView");
+            pEV = (SarosPEView) registry.lookup("packageExplorerView");
+            progressV = (ProgressView) registry.lookup("progressView");
+            consoleV = (ConsoleView) registry.lookup("consoleView");
             state = (SarosState) registry.lookup("state");
-            workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
-            shell = (ShellComponent) registry.lookup("shell");
-            editor = (EditorComponent) registry.lookup("eclipseEditor");
+            workbench = (Workbench) registry.lookup("workbench");
+            shell = (Shell) registry.lookup("shell");
+            editor = (Editor) registry.lookup("eclipseEditor");
 
-            basic = (BasicComponent) registry.lookup("basicObject");
+            basic = (BasicWidgets) registry.lookup("basicObject");
 
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");

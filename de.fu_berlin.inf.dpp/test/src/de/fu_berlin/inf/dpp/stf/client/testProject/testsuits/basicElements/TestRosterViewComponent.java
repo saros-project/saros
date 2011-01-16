@@ -16,7 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.RosterViewComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RosterView;
 
 public class TestRosterViewComponent extends STFTest {
     private static final Logger log = Logger
@@ -141,7 +141,7 @@ public class TestRosterViewComponent extends STFTest {
 
     /**
      * FIXME the method
-     * {@link RosterViewComponent#addANewContact(de.fu_berlin.inf.dpp.net.JID)}
+     * {@link RosterView#addANewContact(de.fu_berlin.inf.dpp.net.JID)}
      * 
      * @throws RemoteException
      * @throws XMPPException
