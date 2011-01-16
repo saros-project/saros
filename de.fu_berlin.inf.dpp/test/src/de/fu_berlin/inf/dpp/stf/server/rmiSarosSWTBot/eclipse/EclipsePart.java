@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
@@ -70,26 +69,17 @@ public abstract class EclipsePart {
     public static BasicWidgetsImp basic = BasicWidgetsImp.getInstance();
 
     public static EditorImp editor = EditorImp.getInstance();
-    public static WorkbenchImp workbenchC = WorkbenchImp
-        .getInstance();
+    public static WorkbenchImp workbenchC = WorkbenchImp.getInstance();
 
     public static Shell shellC = ShellImp.getInstance();
 
-    public static SarosStateImp state = SarosStateImp.getInstance();
-
     // Views
-    public static RosterViewImp rosterV = RosterViewImp
-        .getInstance();
-    public static SessionViewImp sessionV = SessionViewImp
-        .getInstance();
-    public static RSViewImp remoteScreenV = RSViewImp
-        .getInstance();
-    public static ChatViewImp chatV = ChatViewImp
-        .getInstance();
-    public static SarosPEViewImp pEV = SarosPEViewImp
-        .getInstance();
-    public static ProgressViewImp progressV = ProgressViewImp
-        .getInstance();
+    public static RosterViewImp rosterV = RosterViewImp.getInstance();
+    public static SessionViewImp sessionV = SessionViewImp.getInstance();
+    public static RSViewImp remoteScreenV = RSViewImp.getInstance();
+    public static ChatViewImp chatV = ChatViewImp.getInstance();
+    public static SarosPEViewImp pEV = SarosPEViewImp.getInstance();
+    public static ProgressViewImp progressV = ProgressViewImp.getInstance();
 
     // menus in menu bar
     public static FileMImp fileM = FileMImp.getInstance();

@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
@@ -54,7 +53,6 @@ public class Tester {
     public Shell shell;
 
     public Workbench workbench;
-    public SarosState state;
 
     public Editor editor;
 
@@ -103,7 +101,6 @@ public class Tester {
             pEV = (SarosPEView) registry.lookup("packageExplorerView");
             progressV = (ProgressView) registry.lookup("progressView");
             consoleV = (ConsoleView) registry.lookup("consoleView");
-            state = (SarosState) registry.lookup("state");
             workbench = (Workbench) registry.lookup("workbench");
             shell = (Shell) registry.lookup("shell");
             editor = (Editor) registry.lookup("eclipseEditor");

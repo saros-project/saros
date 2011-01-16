@@ -19,8 +19,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosStateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
@@ -80,8 +78,7 @@ public class STFController {
 
         exportObject(ShellImp.getInstance(), "shell");
         exportObject(BasicWidgetsImp.getInstance(), "basicObject");
-        exportObject(SarosPEViewImp.getInstance(),
-            "packageExplorerView");
+        exportObject(SarosPEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
 
         exportObject(EditorImp.getInstance(), "eclipseEditor");
@@ -90,7 +87,6 @@ public class STFController {
         exportObject(RSViewImp.getInstance(), "remoteScreenView");
         exportObject(ChatViewImp.getInstance(), "chatView");
         exportObject(WorkbenchImp.getInstance(), "workbench");
-        exportObject(SarosStateImp.getInstance(), "state");
         exportObject(ConsoleViewImp.getInstance(), "consoleView");
         exportObject(FileMImp.getInstance(), "fileM");
         exportObject(EditMImp.getInstance(), "editM");

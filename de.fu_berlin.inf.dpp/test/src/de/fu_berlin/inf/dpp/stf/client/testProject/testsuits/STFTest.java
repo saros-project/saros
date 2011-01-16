@@ -305,11 +305,11 @@ public class STFTest {
     public void before() throws Exception {
         //
         for (Tester m : activeTesters) {
-            m.state
-                .debug("\n---------------------------------------------------"
-                    + "\nExecuting @Test " + name.getMethodName() + " in "
-                    + getClass().getSimpleName()
-                    + "\n---------------------------------------------------");
+            // m.state
+            // .debug("\n---------------------------------------------------"
+            // + "\nExecuting @Test " + name.getMethodName() + " in "
+            // + getClass().getSimpleName()
+            // + "\n---------------------------------------------------");
         }
     }
 

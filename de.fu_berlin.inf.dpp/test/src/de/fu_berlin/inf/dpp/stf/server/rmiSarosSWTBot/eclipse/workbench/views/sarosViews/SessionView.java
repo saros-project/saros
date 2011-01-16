@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosState;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -38,9 +37,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.saros.noGUI.SarosS
 public interface SessionView extends Remote {
     /**
      * Test if you are now in a session. <br>
-     * You can also use another function
-     * {@link SessionView#isInSessionGUI()} , which test the session
-     * state with GUI.
+     * You can also use another function {@link SessionView#isInSessionGUI()} ,
+     * which test the session state with GUI.
      * 
      * <p>
      * <b>Attention:</b> <br>
@@ -139,12 +137,12 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g. alice.state.isInSession is
      * false after alice leave the session by running the
-     * {@link SessionViewImp#leaveTheSession()} and confirming the
-     * appeared pop up window without this waitUntil. In this case, you may get
-     * the AssertException, because alice should not really leave the session
-     * yet during asserting the condition or performing a following action. So
-     * it is recommended that you wait until the session is completely closed
-     * before you run the assertion or perform a following action.
+     * {@link SessionViewImp#leaveTheSession()} and confirming the appeared pop
+     * up window without this waitUntil. In this case, you may get the
+     * AssertException, because alice should not really leave the session yet
+     * during asserting the condition or performing a following action. So it is
+     * recommended that you wait until the session is completely closed before
+     * you run the assertion or perform a following action.
      * 
      * @throws RemoteException
      */
@@ -158,17 +156,17 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g.
      * assertFalse(alice.state.isDriver(bob.jid)) after bob leave the session by
-     * running the {@link SessionViewImp#leaveTheSession()} and
-     * confirming the appeared pop up window without this waitUntil. In this
-     * case, you may get the AssertException, because bob should not really
-     * leave the session yet during asserting a condition or performing a
-     * following action. So it is recommended that you wait until the session by
-     * the defined peer is completely closed before you run a assertion or
-     * perform a following action.
+     * running the {@link SessionViewImp#leaveTheSession()} and confirming the
+     * appeared pop up window without this waitUntil. In this case, you may get
+     * the AssertException, because bob should not really leave the session yet
+     * during asserting a condition or performing a following action. So it is
+     * recommended that you wait until the session by the defined peer is
+     * completely closed before you run a assertion or perform a following
+     * action.
      * 
      * @param sessionV
-     *            the {@link SessionView} of the user, whose session
-     *            should be closed.
+     *            the {@link SessionView} of the user, whose session should be
+     *            closed.
      * @throws RemoteException
      */
     public void waitUntilSessionClosedBy(final SessionView sessionV)
@@ -290,8 +288,8 @@ public interface SessionView extends Remote {
      * </ol>
      * 
      * @param sessionV
-     *            the {@link SessionView} of the user whom you want to
-     *            give drive role.
+     *            the {@link SessionView} of the user whom you want to give
+     *            drive role.
      * @throws RemoteException
      */
     public void giveDriverRoleGUI(final SessionView sessionV)
@@ -300,8 +298,8 @@ public interface SessionView extends Remote {
     /**
      * waits until the local user is driver after host give him the driver role.
      * This method should be used after performing the action
-     * {@link SessionView#giveDriverRoleGUI(SessionView)} to
-     * guarantee the invitee has really got the driver role.
+     * {@link SessionView#giveDriverRoleGUI(SessionView)} to guarantee the
+     * invitee has really got the driver role.
      * 
      * @throws RemoteException
      */
@@ -310,8 +308,8 @@ public interface SessionView extends Remote {
     /**
      * waits until the given user is driver after host give him the driver role.
      * This method should be used after performing the action
-     * {@link SessionView#giveDriverRoleGUI(SessionView)} to
-     * guarantee the invitee has really got the driver role.
+     * {@link SessionView#giveDriverRoleGUI(SessionView)} to guarantee the
+     * invitee has really got the driver role.
      * 
      * @throws RemoteException
      */
@@ -321,8 +319,8 @@ public interface SessionView extends Remote {
      * waits until the local user is no driver after host remove his driver
      * role. This method should be used after performing the action
      * {@link SessionView#removeDriverRoleGUI(SessionView)} or
-     * {@link SessionView#removeAllRriverRolesGUI()} to guarantee the
-     * invitee's driver role is really removed
+     * {@link SessionView#removeAllRriverRolesGUI()} to guarantee the invitee's
+     * driver role is really removed
      * 
      * @throws RemoteException
      */
@@ -342,8 +340,8 @@ public interface SessionView extends Remote {
      * </ol>
      * 
      * @param sessionV
-     *            the {@link SessionView} of the user whom you want to
-     *            give exclusive drive role.
+     *            the {@link SessionView} of the user whom you want to give
+     *            exclusive drive role.
      * @throws RemoteException
      */
     public void giveExclusiveDriverRoleGUI(final SessionView sessionV)
@@ -362,8 +360,8 @@ public interface SessionView extends Remote {
      * </ol>
      * 
      * @param sessionV
-     *            the {@link SessionView} of the user whom you want to
-     *            remove drive role.
+     *            the {@link SessionView} of the user whom you want to remove
+     *            drive role.
      * @throws RemoteException
      */
     public void removeDriverRoleGUI(final SessionView sessionV)
@@ -445,10 +443,10 @@ public interface SessionView extends Remote {
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use only the function
-     * {@link SessionView#isInSession()} for your junittests, because
-     * the method {@link TablePart#existsContextOfTableItem(String, String)}
-     * isn't really optimal implemented.</li>
+     * <li>Try to use only the function {@link SessionView#isInSession()} for
+     * your junittests, because the method
+     * {@link TablePart#existsContextOfTableItem(String, String)} isn't really
+     * optimal implemented.</li>
      * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
@@ -460,10 +458,10 @@ public interface SessionView extends Remote {
 
     /**
      * This function do same as the
-     * {@link SessionView#stopFollowingThisUserGUI(SarosState)} except
-     * you don't need to pass the {@link SarosState} of the followed user to the
-     * function. It is very useful, if you don't exactly know whom you are now
-     * following. Instead, we get the followed user JID from the method
+     * {@link SessionView#stopFollowingThisUserGUI(SarosState)} except you don't
+     * need to pass the {@link SarosState} of the followed user to the function.
+     * It is very useful, if you don't exactly know whom you are now following.
+     * Instead, we get the followed user JID from the method
      * {@link SarosState#getFollowedUserJID()}.
      * <p>
      * <b>Attention:</b>
@@ -831,8 +829,8 @@ public interface SessionView extends Remote {
 
     /**
      * After perform the
-     * {@link SessionView#shareYourScreenWithSelectedUserGUI(SarosState)}
-     * the selected user should get this popup window.
+     * {@link SessionView#shareYourScreenWithSelectedUserGUI(SarosState)} the
+     * selected user should get this popup window.
      * 
      * @throws RemoteException
      * @see Tester#shareYourScreenWithSelectedUserDone(Tester)

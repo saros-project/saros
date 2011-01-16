@@ -19,16 +19,14 @@ import org.osgi.framework.Bundle;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
-public class WorkbenchImp extends EclipsePart implements
-    Workbench {
+public class WorkbenchImp extends EclipsePart implements Workbench {
 
     private static transient WorkbenchImp self;
 
     private final static String VIEW_TITLE_WELCOME = "Welcome";
 
     /**
-     * {@link WorkbenchImp} is a singleton, but inheritance is
-     * possible.
+     * {@link WorkbenchImp} is a singleton, but inheritance is possible.
      */
     public static WorkbenchImp getInstance() {
         if (self != null)
