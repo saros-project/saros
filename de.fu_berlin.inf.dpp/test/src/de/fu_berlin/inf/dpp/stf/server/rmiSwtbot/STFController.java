@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.ChatViewComponentImp;
@@ -33,9 +32,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.SarosMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.WindowMImp;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -82,7 +83,7 @@ public class STFController {
         exportObject(SarosPEViewComponentImp.getInstance(),
             "packageExplorerView");
         exportObject(ProgressViewComponentImp.getInstance(), "progressView");
-        exportObject(SarosMainMenuComponentImp.getInstance(), "sarosMainMenu");
+
         exportObject(EditorComponentImp.getInstance(), "eclipseEditor");
         exportObject(RosterViewComponentImp.getInstance(), "rosterView");
         exportObject(SessionViewComponentImp.getInstance(), "sessionView");
@@ -91,9 +92,11 @@ public class STFController {
         exportObject(SarosWorkbenchComponentImp.getInstance(), "workbench");
         exportObject(SarosStateImp.getInstance(), "state");
         exportObject(ConsoleViewComponentImp.getInstance(), "consoleView");
-        exportObject(FileImp.getInstance(), "file");
-        exportObject(EditImp.getInstance(), "edit");
-        exportObject(RefactorImp.getInstance(), "refactor");
+        exportObject(FileMImp.getInstance(), "fileM");
+        exportObject(EditMImp.getInstance(), "editM");
+        exportObject(RefactorMImp.getInstance(), "refactorM");
+        exportObject(WindowMImp.getInstance(), "windowM");
+        exportObject(SarosMImp.getInstance(), "sarosM");
     }
 
     /**

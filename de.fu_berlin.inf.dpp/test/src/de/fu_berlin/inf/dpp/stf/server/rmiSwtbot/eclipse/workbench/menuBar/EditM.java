@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface Edit extends Remote {
+public interface EditM extends Remote {
 
     /**********************************************
      * 

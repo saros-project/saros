@@ -182,14 +182,14 @@ public class STFTest {
             tester.workbench.activateEclipseShell();
             tester.workbench.setUpWorkbench();
             tester.workbench.closeWelcomeView();
-            tester.mainMenu.openPerspectiveJava();
+            tester.windowM.openPerspectiveJava();
             tester.workbench.closeUnnecessaryViews();
         }
     }
 
     public static void setUpSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.mainMenu.disableAutomaticReminder();
+            tester.sarosM.disableAutomaticReminder();
             tester.workbench.openSarosViews();
             tester.rosterV.connect(tester.jid, tester.password);
         }
@@ -205,7 +205,7 @@ public class STFTest {
 
     public static void setUpSession(Tester host, Tester... invitees)
         throws RemoteException, InterruptedException {
-        host.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        host.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         host.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             invitees);
@@ -224,7 +224,7 @@ public class STFTest {
 
     public static void createProjectByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+            tester.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         }
     }
 
@@ -283,8 +283,8 @@ public class STFTest {
     public static void deleteFolders(String... folders) throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.file.existsFolder(PROJECT1, folder))
-                    tester.edit.deleteFolder(PROJECT1, folder);
+                if (tester.fileM.existsFolder(PROJECT1, folder))
+                    tester.editM.deleteFolder(PROJECT1, folder);
             }
         }
     }

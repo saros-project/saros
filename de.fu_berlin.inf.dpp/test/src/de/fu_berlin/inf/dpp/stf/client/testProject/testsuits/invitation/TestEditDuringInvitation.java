@@ -34,7 +34,7 @@ public class TestEditDuringInvitation extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass

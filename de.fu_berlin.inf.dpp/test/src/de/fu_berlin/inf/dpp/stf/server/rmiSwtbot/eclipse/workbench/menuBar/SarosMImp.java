@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar;
 
 import java.rmi.RemoteException;
 
@@ -8,13 +8,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
-public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
-    SarosMainMenuComponent {
+public class SarosMImp extends EclipseComponent implements
+    SarosM {
 
-    private static transient SarosMainMenuComponentImp self;
+    private static transient SarosMImp self;
 
     /* name of the main menus */
     private static final String MENU_SAROS = "Saros";
@@ -28,13 +28,13 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     private static final String P_SAROS = "Saros";
 
     /**
-     * {@link SarosMainMenuComponentImp} is a singleton, but inheritance is
+     * {@link SarosMImp} is a singleton, but inheritance is
      * possible.
      */
-    public static SarosMainMenuComponentImp getInstance() {
+    public static SarosMImp getInstance() {
         if (self != null)
             return self;
-        self = new SarosMainMenuComponentImp();
+        self = new SarosMImp();
         return self;
     }
 
@@ -55,8 +55,8 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public void creatAccountWithMenuGUI(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException {
-        mainMenuC.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        rosterVC.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
+        basic.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        rosterV.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
             password, usesThisAccountNow);
     }
 
@@ -68,15 +68,15 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
         bot.buttonInGroup("Create new Jabber-Account").click();
         shellC.activateShellWaitingUntilOpened("Create New User Account");
-        basicC.setTextInTextWithLabel(server, "Jabber Server");
-        basicC.setTextInTextWithLabel(username, "Username");
-        basicC.setTextInTextWithLabel(password, "Password");
-        basicC.setTextInTextWithLabel(password, "Repeat Password");
-        basicC.waitUntilButtonEnabled(FINISH);
-        basicC.clickButton(FINISH);
+        basic.setTextInTextWithLabel(server, "Jabber Server");
+        basic.setTextInTextWithLabel(username, "Username");
+        basic.setTextInTextWithLabel(password, "Password");
+        basic.setTextInTextWithLabel(password, "Repeat Password");
+        basic.waitUntilButtonEnabled(FINISH);
+        basic.clickButton(FINISH);
         shellC.waitUntilShellClosed("Create New User Account");
-        basicC.clickButton(NEXT);
-        basicC.clickButton(FINISH);
+        basic.clickButton(NEXT);
+        basic.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -87,13 +87,13 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
-        basicC.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
-        basicC.setTextInTextWithLabel(jid.getName(), "Username");
-        basicC.setTextInTextWithLabel(password, "Password");
-        basicC.waitUntilButtonEnabled(NEXT);
-        basicC.clickButton(NEXT);
-        basicC.waitUntilButtonEnabled(FINISH);
-        basicC.clickButton(FINISH);
+        basic.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
+        basic.setTextInTextWithLabel(jid.getName(), "Username");
+        basic.setTextInTextWithLabel(password, "Password");
+        basic.waitUntilButtonEnabled(NEXT);
+        basic.clickButton(NEXT);
+        basic.waitUntilButtonEnabled(FINISH);
+        basic.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -154,7 +154,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         list.select(jid.getBase());
         bot.buttonInGroup(GeneralPreferencePage.ACTIVATE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        assert basicC.existsLabel("Active: " + jid.getBase());
+        assert basic.existsLabel("Active: " + jid.getBase());
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -169,7 +169,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
 
     public boolean isAccountActiveGUI(JID jid) throws RemoteException {
         selectSarosPageInPreferences();
-        boolean existLabel = basicC.existsLabel("Active: " + jid.getBase());
+        boolean existLabel = basic.existsLabel("Active: " + jid.getBase());
         bot.button(CANCEL).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
         return existLabel;
@@ -194,11 +194,11 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
         bot.buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened("Change XMPP Account");
-        basicC.setTextInTextWithLabel(newServer, "Server");
-        basicC.setTextInTextWithLabel(newUserName, "Username:");
-        basicC.setTextInTextWithLabel(newPassword, "Password:");
-        basicC.setTextInTextWithLabel(newPassword, "Confirm:");
-        basicC.clickButton(FINISH);
+        basic.setTextInTextWithLabel(newServer, "Server");
+        basic.setTextInTextWithLabel(newUserName, "Username:");
+        basic.setTextInTextWithLabel(newPassword, "Password:");
+        basic.setTextInTextWithLabel(newPassword, "Confirm:");
+        basic.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -229,7 +229,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         if (isAccountActive(jid)) {
             shellC.activateShellWaitingUntilOpened("Deleting active account");
-            basicC.clickButton(OK);
+            basic.clickButton(OK);
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
@@ -294,7 +294,7 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
         shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        basicC.selectTreeItem(P_SAROS);
+        basic.selectTreeItem(P_SAROS);
     }
 
     /**
@@ -320,8 +320,8 @@ public class SarosMainMenuComponentImp extends MainMenuComponentImp implements
      * @throws RemoteException
      */
     private void clickMenuSarosPreferences() throws RemoteException {
-        precondition();
-        mainMenuC.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        workbenchC.activateEclipseShell();
+        basic.clickMenuWithTexts(MENU_SAROS, "Preferences");
     }
 
 }

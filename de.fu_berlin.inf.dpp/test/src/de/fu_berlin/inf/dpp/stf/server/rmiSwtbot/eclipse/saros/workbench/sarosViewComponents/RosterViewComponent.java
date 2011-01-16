@@ -11,7 +11,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.SarosM;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -63,9 +63,9 @@ public interface RosterViewComponent extends Remote {
      * <li>Make sure, the roster view is open and active.</li>
      * <li>if the test account specified by the given jid doesn't exists, create
      * it using
-     * {@link SarosMainMenuComponent#createAccount(String, String, String)}</li>
+     * {@link SarosM#createAccount(String, String, String)}</li>
      * <li>if the test account isn't active, then activate it using
-     * {@link SarosMainMenuComponent#activateAccount(JID)}</li>
+     * {@link SarosM#activateAccount(JID)}</li>
      * <li>Waits until the connection is really done. It guarantee that the
      * following action is running successfully.</li>
      * </ol>

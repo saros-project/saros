@@ -100,23 +100,23 @@ public class RosterViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void openRosterView() throws RemoteException {
         if (!isRosterViewOpen())
-            basicC.openViewById(VIEWID);
+            basic.openViewById(VIEWID);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
-        return basicC.isViewOpen(VIEWNAME);
+        return basic.isViewOpen(VIEWNAME);
     }
 
     public void closeRosterView() throws RemoteException {
-        basicC.closeViewById(VIEWID);
+        basic.closeViewById(VIEWID);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        basicC.setFocusOnViewByTitle(VIEWNAME);
+        basic.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isRosterViewActive() throws RemoteException {
-        return basicC.isViewActive(VIEWNAME);
+        return basic.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -130,12 +130,12 @@ public class RosterViewComponentImp extends EclipseComponent implements
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
-            if (!mainMenuC.isAccountExist(jid, password)) {
-                mainMenuC.createAccount(jid.getDomain(), jid.getName(),
+            if (!sarosM.isAccountExist(jid, password)) {
+                sarosM.createAccount(jid.getDomain(), jid.getName(),
                     password);
             }
-            if (!mainMenuC.isAccountActive(jid))
-                mainMenuC.activateAccount(jid);
+            if (!sarosM.isAccountActive(jid))
+                sarosM.activateAccount(jid);
             saros.connect(true);
             waitUntil(new DefaultCondition() {
                 public boolean test() throws Exception {
@@ -182,11 +182,11 @@ public class RosterViewComponentImp extends EclipseComponent implements
         String password, boolean usesThisAccountNow) throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             shellC.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        basicC.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
-        basicC.setTextInTextWithLabel(jid, USER_NAME);
-        basicC.setTextInTextWithLabel(password, PASSWORD);
-        basicC.setTextInTextWithLabel(password, REPEAT_PASSWORD);
-        basicC.clickButton(FINISH);
+        basic.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
+        basic.setTextInTextWithLabel(jid, USER_NAME);
+        basic.setTextInTextWithLabel(password, PASSWORD);
+        basic.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        basic.clickButton(FINISH);
         shellC.waitUntilShellClosed(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
@@ -288,9 +288,9 @@ public class RosterViewComponentImp extends EclipseComponent implements
     public void confirmNewContactWindow(String baseJID) throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_NEW_CONTACT))
             shellC.waitUntilShellActive(SHELL_NEW_CONTACT);
-        basicC.setTextInTextWithLabel(baseJID, JABBERID);
-        basicC.waitUntilButtonEnabled(FINISH);
-        basicC.clickButton(FINISH);
+        basic.setTextInTextWithLabel(baseJID, JABBERID);
+        basic.waitUntilButtonEnabled(FINISH);
+        basic.clickButton(FINISH);
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {
@@ -330,7 +330,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      * 
      **********************************************/
     public void selectBuddyGUI(String baseJID) throws RemoteException {
-        basicC.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
+        basic.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
@@ -362,8 +362,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public boolean hasBuddyGUI(String buddyNickName) throws RemoteException {
         precondition();
-        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
-        return basicC.existsTreeItemWithRegexs(tree, BUDDIES, buddyNickName
+        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
+        return basic.existsTreeItemWithRegexs(tree, BUDDIES, buddyNickName
             + ".*");
     }
 
@@ -408,7 +408,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (!hasBuddy(buddyJID))
             return;
         try {
-            basicC.clickContextsOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
+            basic.clickContextsOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
                 + ".*", buddyNickName + ".*");
             shellC.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
@@ -453,7 +453,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, CM_RENAME, BUDDIES
+        basic.clickContextsOfTreeItemInView(VIEWNAME, CM_RENAME, BUDDIES
             + ".*", buddyNickName + ".*");
         if (!shellC.activateShellWithText("Set new nickname")) {
             shellC.waitUntilShellActive("Set new nickname");
@@ -478,8 +478,8 @@ public class RosterViewComponentImp extends EclipseComponent implements
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
-        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = basicC.getTreeItemWithRegexs(tree,
+        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
+        SWTBotTreeItem item = basic.getTreeItemWithRegexs(tree,
             BUDDIES + ".*", buddyNickName + ".*");
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
@@ -495,7 +495,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        basicC.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, tooltipText);
+        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, tooltipText);
     }
 
     /**************************************************************
@@ -535,7 +535,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
      */
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return basicC.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
+        return basic.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
     }
 
     /**
@@ -545,7 +545,7 @@ public class RosterViewComponentImp extends EclipseComponent implements
 
     protected List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return basicC.getAllToolbarButtonsOnView(VIEWNAME);
+        return basic.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
     private boolean isWizardCreateXMPPAccountActive() throws RemoteException {

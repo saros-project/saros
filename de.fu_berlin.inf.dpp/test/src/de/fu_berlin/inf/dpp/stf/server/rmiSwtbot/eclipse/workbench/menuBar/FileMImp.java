@@ -17,17 +17,17 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
-public class FileImp extends EclipseComponent implements File {
+public class FileMImp extends EclipseComponent implements FileM {
 
-    private static transient FileImp fileImp;
+    private static transient FileMImp fileImp;
 
     /**
-     * {@link FileImp} is a singleton, but inheritance is possible.
+     * {@link FileMImp} is a singleton, but inheritance is possible.
      */
-    public static FileImp getInstance() {
+    public static FileMImp getInstance() {
         if (fileImp != null)
             return fileImp;
-        fileImp = new FileImp();
+        fileImp = new FileMImp();
         return fileImp;
     }
 
@@ -64,7 +64,7 @@ public class FileImp extends EclipseComponent implements File {
     public void newProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
-            mainMenuC.clickMenuWithTexts(FILE, NEW, PROJECT);
+            basic.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
     }
@@ -72,7 +72,7 @@ public class FileImp extends EclipseComponent implements File {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
-            mainMenuC.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
+            basic.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
     }
@@ -93,8 +93,8 @@ public class FileImp extends EclipseComponent implements File {
         folderNodes[folderNodes.length - 1] = newFolderName;
         if (!existsFolder(folderNodes)) {
             try {
-                basicC.getTreeItemInView(VIEWNAME, parentNodes);
-                mainMenuC.clickMenuWithTexts(FILE, NEW, FOLDER);
+                basic.getTreeItemInView(VIEWNAME, parentNodes);
+                basic.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -125,7 +125,7 @@ public class FileImp extends EclipseComponent implements File {
             if (!existsPkg(projectName, pkg))
                 try {
                     workbenchC.activateEclipseShell();
-                    mainMenuC.clickMenuWithTexts(FILE, NEW, PACKAGE);
+                    basic.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
                     final String cause = "error creating new package";
@@ -182,8 +182,8 @@ public class FileImp extends EclipseComponent implements File {
                     else
                         parentNodes[i] = fileNodes[i];
                 }
-                basicC.getTreeItemInView(VIEWNAME, parentNodes);
-                mainMenuC.clickMenuWithTexts(FILE, NEW, FILE);
+                basic.getTreeItemInView(VIEWNAME, parentNodes);
+                basic.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -212,8 +212,8 @@ public class FileImp extends EclipseComponent implements File {
     public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
         workbenchC.activateEclipseShell();
         precondition();
-        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
-        return basicC.existsTreeItemWithRegexs(tree, nodes);
+        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
+        return basic.existsTreeItemWithRegexs(tree, nodes);
     }
 
     public void waitUntilFileExisted(String... fileNodes)
@@ -227,7 +227,7 @@ public class FileImp extends EclipseComponent implements File {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             try {
                 workbenchC.activateEclipseShell();
-                mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
+                basic.clickMenuWithTexts(FILE, NEW, CLASS);
                 confirmWindowNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
@@ -253,7 +253,7 @@ public class FileImp extends EclipseComponent implements File {
         String className) throws RemoteException {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             precondition();
-            mainMenuC.clickMenuWithTexts(FILE, NEW, CLASS);
+            basic.clickMenuWithTexts(FILE, NEW, CLASS);
         }
         SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
@@ -266,7 +266,7 @@ public class FileImp extends EclipseComponent implements File {
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
         text.setText("java.lang.Runnable");
-        basicC.waitUntilTableHasRows(1);
+        basic.waitUntilTableHasRows(1);
         bot.button(OK).click();
         bot.shell(SHELL_NEW_JAVA_CLASS).activate();
         bot.checkBox("Inherited abstract methods").click();
@@ -281,8 +281,8 @@ public class FileImp extends EclipseComponent implements File {
     }
 
     protected void precondition() throws RemoteException {
-        peVC.openPEView();
-        peVC.setFocusOnPEView();
+        pEV.openPEView();
+        pEV.setFocusOnPEView();
     }
 
     private void confirmWindowNewJavaClass(String projectName, String pkg,
@@ -311,7 +311,7 @@ public class FileImp extends EclipseComponent implements File {
         SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
         shell.activate();
         bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
-        basicC.waitUntilButtonEnabled(FINISH);
+        basic.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
     }

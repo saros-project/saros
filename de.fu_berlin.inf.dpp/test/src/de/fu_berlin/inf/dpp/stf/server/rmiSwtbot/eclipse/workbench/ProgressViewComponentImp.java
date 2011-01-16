@@ -35,15 +35,15 @@ public class ProgressViewComponentImp extends EclipseComponent implements
      **********************************************/
 
     public void openProgressView() throws RemoteException {
-        basicC.openViewById("org.eclipse.ui.views.ProgressView");
+        basic.openViewById("org.eclipse.ui.views.ProgressView");
     }
 
     public void activateProgressView() throws RemoteException {
-        basicC.setFocusOnViewByTitle(VIEWNAME);
+        basic.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isProgressViewOpen() throws RemoteException {
-        return basicC.isViewOpen("Progress");
+        return basic.isViewOpen("Progress");
     }
 
     /**********************************************

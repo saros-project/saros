@@ -58,28 +58,28 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void openSarosViews() throws RemoteException {
-        rosterVC.openRosterView();
-        sessonVC.openSessionView();
-        chatVC.openChatView();
-        rsVC.openRemoteScreenView();
+        rosterV.openRosterView();
+        sessionV.openSessionView();
+        chatV.openChatView();
+        remoteScreenV.openRemoteScreenView();
     }
 
     public void closeUnnecessaryViews() throws RemoteException {
-        if (basicC.isViewOpen("Problems"))
-            basicC.closeViewByTitle("Problems");
-        if (basicC.isViewOpen("Javadoc"))
-            basicC.closeViewByTitle("Javadoc");
-        if (basicC.isViewOpen("Declaration"))
-            basicC.closeViewByTitle("Declaration");
-        if (basicC.isViewOpen("Task List"))
-            basicC.closeViewByTitle("Task List");
-        if (basicC.isViewOpen("Outline"))
-            basicC.closeViewByTitle("Outline");
+        if (basic.isViewOpen("Problems"))
+            basic.closeViewByTitle("Problems");
+        if (basic.isViewOpen("Javadoc"))
+            basic.closeViewByTitle("Javadoc");
+        if (basic.isViewOpen("Declaration"))
+            basic.closeViewByTitle("Declaration");
+        if (basic.isViewOpen("Task List"))
+            basic.closeViewByTitle("Task List");
+        if (basic.isViewOpen("Outline"))
+            basic.closeViewByTitle("Outline");
     }
 
     public void resetSaros() throws RemoteException {
-        rosterVC.resetAllBuddyName();
-        rosterVC.disconnectGUI();
+        rosterV.resetAllBuddyName();
+        rosterV.disconnectGUI();
         deleteAllProjects();
     }
 
@@ -110,7 +110,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     }
 
     public void resetWorkbench() throws RemoteException {
-        mainMenuC.openPerspectiveJava();
+        windowM.openPerspectiveJava();
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
@@ -132,12 +132,12 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
         deleteAllProjects();
-        edit.deleteAllProjectsWithGUI();
+        editM.deleteAllProjectsWithGUI();
 
     }
 
     public void closeWelcomeView() throws RemoteException {
-        basicC.closeViewByTitle(VIEW_TITLE_WELCOME);
+        basic.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
     public void deleteAllProjects() throws RemoteException {

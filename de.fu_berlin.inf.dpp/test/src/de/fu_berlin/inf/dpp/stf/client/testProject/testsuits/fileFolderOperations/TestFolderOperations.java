@@ -43,10 +43,10 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.file.existsClass(PROJECT1, PKG1, CLS1))
-            alice.file.newClass(PROJECT1, PKG1, CLS1);
-        if (!alice.file.existsFolder(PROJECT1, FOLDER1))
-            alice.file.newFolder(FOLDER1, PROJECT1);
+        if (!alice.fileM.existsClass(PROJECT1, PKG1, CLS1))
+            alice.fileM.newClass(PROJECT1, PKG1, CLS1);
+        if (!alice.fileM.existsFolder(PROJECT1, FOLDER1))
+            alice.fileM.newFolder(FOLDER1, PROJECT1);
     }
 
     @After
@@ -72,9 +72,9 @@ public class TestFolderOperations extends STFTest {
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
 
-        alice.refactor.renameFolder(newFolderName, PROJECT1, FOLDER1);
-        bob.file.waitUntilFolderExisted(PROJECT1, newFolderName);
-        assertTrue(bob.file.existsFolder(PROJECT1, newFolderName));
-        assertFalse(bob.file.existsFolder(PROJECT1, FOLDER1));
+        alice.refactorM.renameFolder(newFolderName, PROJECT1, FOLDER1);
+        bob.fileM.waitUntilFolderExisted(PROJECT1, newFolderName);
+        assertTrue(bob.fileM.existsFolder(PROJECT1, newFolderName));
+        assertFalse(bob.fileM.existsFolder(PROJECT1, FOLDER1));
     }
 }

@@ -54,9 +54,9 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testNewTextFileLineDelimiter() throws RemoteException {
-        alice.mainMenu.setNewTextFileLineDelimiter("Unix");
-        System.out.println(alice.mainMenu.getTextFileLineDelimiter());
-        assertTrue(alice.mainMenu.getTextFileLineDelimiter().equals("Unix"));
+        alice.windowM.setNewTextFileLineDelimiter("Unix");
+        System.out.println(alice.windowM.getTextFileLineDelimiter());
+        assertTrue(alice.windowM.getTextFileLineDelimiter().equals("Unix"));
     }
 
     // @Test
@@ -76,7 +76,7 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testCloseEditorWithSave() throws IOException, CoreException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
@@ -89,7 +89,7 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testCloseEditorWithoutSave() throws IOException, CoreException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
@@ -101,7 +101,7 @@ public class RmiTest extends STFTest {
 
     @Test
     public void testIsClassDirty() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         assertFalse(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
@@ -113,15 +113,15 @@ public class RmiTest extends STFTest {
     @Ignore
     public void testIsClassesSame() throws RemoteException, CoreException,
         IOException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.file.newClass(PROJECT1, PKG2, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newClass(PROJECT1, PKG2, CLS1);
         String clsOfPkgProject = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
         String clsOfpkg2Project = alice.editor.getClassContent(PROJECT1, PKG2,
             CLS1);
         assertFalse(clsOfPkgProject.equals(clsOfpkg2Project));
 
-        alice.file.newJavaProjectWithClass(PROJECT2, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT2, PKG1, CLS1);
         String clsOfPkgProject2 = alice.editor.getClassContent(PROJECT2, PKG1,
             CLS1);
         assertTrue(clsOfPkgProject.equals(clsOfPkgProject2));
@@ -130,19 +130,19 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testTypeTextInEditor() throws RemoteException {
-        alice.file.newJavaProject(PROJECT1);
-        alice.file.newClassImplementsRunnable(PROJECT1, "pkg", "Cls");
+        alice.fileM.newJavaProject(PROJECT1);
+        alice.fileM.newClassImplementsRunnable(PROJECT1, "pkg", "Cls");
         alice.editor.typeTextInJavaEditor(CP1, PROJECT1, "pkg", "Cls");
     }
 
     @Test
     @Ignore
     public void testPerspective() throws RemoteException {
-        assertTrue(alice.mainMenu.isJavaPerspectiveActive());
-        assertFalse(alice.mainMenu.isDebugPerspectiveActive());
-        alice.mainMenu.openPerspectiveDebug();
-        assertFalse(alice.mainMenu.isJavaPerspectiveActive());
-        assertTrue(alice.mainMenu.isDebugPerspectiveActive());
+        assertTrue(alice.windowM.isJavaPerspectiveActive());
+        assertFalse(alice.windowM.isDebugPerspectiveActive());
+        alice.windowM.openPerspectiveDebug();
+        assertFalse(alice.windowM.isJavaPerspectiveActive());
+        assertTrue(alice.windowM.isDebugPerspectiveActive());
     }
 
     @Test

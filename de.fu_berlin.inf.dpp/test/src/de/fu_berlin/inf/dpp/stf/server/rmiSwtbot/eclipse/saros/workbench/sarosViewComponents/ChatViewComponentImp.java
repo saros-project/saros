@@ -28,20 +28,20 @@ public class ChatViewComponentImp extends EclipseComponent implements
     }
 
     public void activateChatView() throws RemoteException {
-        basicC.setFocusOnViewByTitle(VIEWNAME);
+        basic.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            basicC.openViewById(VIEWID);
+            basic.openViewById(VIEWID);
     }
 
     public void closeChatView() throws RemoteException {
-        basicC.closeViewById(VIEWID);
+        basic.closeViewById(VIEWID);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return basicC.isViewOpen(VIEWNAME);
+        return basic.isViewOpen(VIEWNAME);
     }
 
     public void waitUntilGetChatMessage(String jid, String message)

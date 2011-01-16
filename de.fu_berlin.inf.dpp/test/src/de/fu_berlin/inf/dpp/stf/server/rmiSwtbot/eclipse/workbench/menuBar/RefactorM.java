@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface Refactor extends Remote {
+public interface RefactorM extends Remote {
 
     public void moveClassTo(String sourceProject, String sourcePkg,
         String className, String targetProject, String targetPkg)

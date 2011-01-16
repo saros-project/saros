@@ -35,7 +35,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass
@@ -50,9 +50,9 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        carl.mainMenu.setNewTextFileLineDelimiter("Default");
-        bob.mainMenu.setNewTextFileLineDelimiter("Default");
-        alice.mainMenu.setNewTextFileLineDelimiter("Default");
+        carl.windowM.setNewTextFileLineDelimiter("Default");
+        bob.windowM.setNewTextFileLineDelimiter("Default");
+        alice.windowM.setNewTextFileLineDelimiter("Default");
     }
 
     /**
@@ -83,15 +83,15 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
-        alice.mainMenu.setNewTextFileLineDelimiter("Unix");
+        alice.windowM.setNewTextFileLineDelimiter("Unix");
 
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl, bob);
 
-        String delimiterByAlice = alice.mainMenu.getTextFileLineDelimiter();
-        String delimiterByCarl = carl.mainMenu.getTextFileLineDelimiter();
-        String delimiterByBob = bob.mainMenu.getTextFileLineDelimiter();
+        String delimiterByAlice = alice.windowM.getTextFileLineDelimiter();
+        String delimiterByCarl = carl.windowM.getTextFileLineDelimiter();
+        String delimiterByBob = bob.windowM.getTextFileLineDelimiter();
 
         log.debug("delimiter by alice: " + delimiterByAlice
             + "delimiter by bob: " + delimiterByBob + "delimiter by carl: "

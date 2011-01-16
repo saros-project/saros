@@ -25,7 +25,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosStateImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.ChatViewComponentImp;
@@ -37,9 +36,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorCompone
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.SarosMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.WindowMImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public abstract class EclipseComponent {
@@ -66,28 +67,36 @@ public abstract class EclipseComponent {
     protected final static String ROLENAME = " (Driver)";
 
     // exported objects
-    public static BasicComponentImp basicC = BasicComponentImp.getInstance();
-    public static SarosMainMenuComponentImp mainMenuC = SarosMainMenuComponentImp
-        .getInstance();
-    public static EditorComponentImp editorC = EditorComponentImp.getInstance();
+    public static BasicComponentImp basic = BasicComponentImp.getInstance();
+
+    public static EditorComponentImp editor = EditorComponentImp.getInstance();
     public static SarosWorkbenchComponentImp workbenchC = SarosWorkbenchComponentImp
         .getInstance();
-    public static SarosStateImp state = SarosStateImp.getInstance();
-    public static RosterViewComponentImp rosterVC = RosterViewComponentImp
-        .getInstance();
-    public static SessionViewComponentImp sessonVC = SessionViewComponentImp
-        .getInstance();
-    public static RSViewComponentImp rsVC = RSViewComponentImp.getInstance();
-    public static ChatViewComponentImp chatVC = ChatViewComponentImp
-        .getInstance();
-    public static SarosPEViewComponentImp peVC = SarosPEViewComponentImp
-        .getInstance();
-    public static ProgressViewComponentImp progressC = ProgressViewComponentImp
-        .getInstance();
+
     public static ShellComponent shellC = ShellComponentImp.getInstance();
-    public static FileImp file = FileImp.getInstance();
-    public static EditImp edit = EditImp.getInstance();
-    public static RefactorImp refactor = RefactorImp.getInstance();
+
+    public static SarosStateImp state = SarosStateImp.getInstance();
+
+    // Views
+    public static RosterViewComponentImp rosterV = RosterViewComponentImp
+        .getInstance();
+    public static SessionViewComponentImp sessionV = SessionViewComponentImp
+        .getInstance();
+    public static RSViewComponentImp remoteScreenV = RSViewComponentImp
+        .getInstance();
+    public static ChatViewComponentImp chatV = ChatViewComponentImp
+        .getInstance();
+    public static SarosPEViewComponentImp pEV = SarosPEViewComponentImp
+        .getInstance();
+    public static ProgressViewComponentImp progressV = ProgressViewComponentImp
+        .getInstance();
+
+    // menus in menu bar
+    public static FileMImp fileM = FileMImp.getInstance();
+    public static EditMImp editM = EditMImp.getInstance();
+    public static RefactorMImp refactorM = RefactorMImp.getInstance();
+    public static SarosMImp sarosM = SarosMImp.getInstance();
+    public static WindowMImp windowM = WindowMImp.getInstance();
 
     // Picocontainer initiated by STFController.
     public static Saros saros;

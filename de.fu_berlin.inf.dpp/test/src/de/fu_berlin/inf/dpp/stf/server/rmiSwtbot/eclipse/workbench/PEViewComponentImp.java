@@ -86,23 +86,23 @@ public class PEViewComponentImp extends EclipseComponent implements
      **********************************************/
     public void openPEView() throws RemoteException {
         if (!isPEViewOpen())
-            basicC.openViewById(VIEWID);
+            basic.openViewById(VIEWID);
     }
 
     public boolean isPEViewOpen() throws RemoteException {
-        return basicC.isViewOpen(VIEWNAME);
+        return basic.isViewOpen(VIEWNAME);
     }
 
     public void closePEView() throws RemoteException {
-        basicC.closeViewByTitle(VIEWNAME);
+        basic.closeViewByTitle(VIEWNAME);
     }
 
     public void setFocusOnPEView() throws RemoteException {
-        basicC.setFocusOnViewByTitle(VIEWNAME);
+        basic.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isPEViewActive() throws RemoteException {
-        return basicC.isViewActive(VIEWNAME);
+        return basic.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -113,7 +113,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
+        basic.clickContextsOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
     }
 
     public void openClass(String projectName, String pkg, String className)
@@ -130,13 +130,13 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void openFileWith(String whichEditor, String... fileNodes)
         throws RemoteException {
         precondition();
-        SWTBotTree tree = basicC.getTreeInView(VIEWNAME);
+        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
         tree.expandNode(fileNodes).select();
         ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
         shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
-        basicC.waitUntilButtonEnabled(OK);
+        basic.waitUntilButtonEnabled(OK);
         shellC.confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
@@ -157,7 +157,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         throws RemoteException {
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
@@ -171,7 +171,7 @@ public class PEViewComponentImp extends EclipseComponent implements
             bot.button(NEXT).click();
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
         }
-        basicC.waitUntilButtonEnabled(FINISH);
+        basic.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
@@ -180,13 +180,13 @@ public class PEViewComponentImp extends EclipseComponent implements
         String projectName, String repositoryURL) throws RemoteException {
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
-        basicC.waitUntilButtonEnabled(FINISH);
+        basic.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
@@ -197,7 +197,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
@@ -215,11 +215,11 @@ public class PEViewComponentImp extends EclipseComponent implements
             // close window
             shareProjectShell.close();
             // in svn repos view: enter url
-            basicC
+            basic
                 .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
-            basicC.setFocusOnViewByTitle("SVN Repositories");
-            final boolean viewWasOpen = basicC.isViewOpen("SVN Repositories");
-            final SWTBotView repoView = basicC.getView("SVN Repositories");
+            basic.setFocusOnViewByTitle("SVN Repositories");
+            final boolean viewWasOpen = basic.isViewOpen("SVN Repositories");
+            final SWTBotView repoView = basic.getView("SVN Repositories");
             repoView.toolbarButton("Add SVN Repository").click();
             if (!shellC.activateShellWithText("Add SVN Repository")) {
                 shellC.waitUntilShellActive("Add SVN Repository");
@@ -252,7 +252,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         precondition();
-        mainMenuC.clickMenuWithTexts("File", "Import...");
+        basic.clickMenuWithTexts("File", "Import...");
         shellC.confirmShellWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {
@@ -274,7 +274,7 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void disConnect(String projectName) throws RemoteException {
 
         String[] contexts = { TEAM, DISCONNECT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
@@ -284,7 +284,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
 
         String[] contexts = { TEAM, REVERT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_REVERT, OK);
@@ -309,7 +309,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         precondition();
 
         String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.waitUntilShellActive(SHELL_SWITCH);
@@ -427,7 +427,7 @@ public class PEViewComponentImp extends EclipseComponent implements
         throws RemoteException {
         precondition();
         String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
         shellC.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
@@ -441,15 +441,15 @@ public class PEViewComponentImp extends EclipseComponent implements
     public void copyProject(String target, String source)
         throws RemoteException {
 
-        if (file.existsProject(target)) {
+        if (fileM.existsProject(target)) {
             throw new RemoteException("Can't copy project from " + source
                 + " to " + target + " , the target already exists.");
         }
         precondition();
 
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, "Copy",
+        basic.clickContextsOfTreeItemInView(VIEWNAME, "Copy",
             changeToRegex(source));
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, "Paste",
+        basic.clickContextsOfTreeItemInView(VIEWNAME, "Paste",
             changeToRegex(source));
 
         shellC.activateShellWithText("Copy Project");

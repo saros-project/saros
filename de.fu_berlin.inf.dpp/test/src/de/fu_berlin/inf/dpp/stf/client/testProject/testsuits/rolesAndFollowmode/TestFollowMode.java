@@ -65,7 +65,7 @@ public class TestFollowMode extends STFTest {
             CLS1);
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.file.newClass(PROJECT1, PKG1, CLS2);
+        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         bob.editor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
@@ -82,7 +82,7 @@ public class TestFollowMode extends STFTest {
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
 
         bob.sessionV.followThisUserGUI(alice.jid);
-        alice.file.newClass(PROJECT1, PKG1, CLS3);
+        alice.fileM.newClass(PROJECT1, PKG1, CLS3);
         alice.editor.waitUntilJavaEditorActive(CLS3);
         alice.editor.setTextInJavaEditorWithSave(CP3, PROJECT1, PKG1, CLS3);
         alice.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);

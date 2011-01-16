@@ -131,7 +131,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         if (!shellC.activateShellWithText(SESSION_INVITATION))
             shellC.waitUntilShellActive(SESSION_INVITATION);
         bot.button(NEXT).click();
-        basicC.waitUntilButtonEnabled(FINISH);
+        basic.waitUntilButtonEnabled(FINISH);
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()
@@ -302,7 +302,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         precondition();
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, SHARE_PROJECT };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 
@@ -354,7 +354,7 @@ public class SarosPEViewComponentImp extends PEViewComponentImp implements
         throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, contextName };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 }

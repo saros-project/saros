@@ -1,14 +1,14 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench;
+package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.MainMenuComponent;
 
-public interface SarosMainMenuComponent extends MainMenuComponent {
+public interface SarosM extends Remote {
 
     /**********************************************
      * setting for Account.

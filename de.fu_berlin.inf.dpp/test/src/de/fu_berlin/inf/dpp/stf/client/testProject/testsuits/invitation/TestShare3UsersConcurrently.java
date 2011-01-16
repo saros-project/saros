@@ -69,7 +69,7 @@ public class TestShare3UsersConcurrently extends STFTest {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, carl);

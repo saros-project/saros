@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 
-public class RefactorImp extends EclipseComponent implements Refactor {
+public class RefactorMImp extends EclipseComponent implements RefactorM {
 
-    private static transient RefactorImp refactorImp;
+    private static transient RefactorMImp refactorImp;
 
     /**
-     * {@link FileImp} is a singleton, but inheritance is possible.
+     * {@link FileMImp} is a singleton, but inheritance is possible.
      */
-    public static RefactorImp getInstance() {
+    public static RefactorMImp getInstance() {
         if (refactorImp != null)
             return refactorImp;
-        refactorImp = new RefactorImp();
+        refactorImp = new RefactorMImp();
         return refactorImp;
     }
 
@@ -45,7 +45,7 @@ public class RefactorImp extends EclipseComponent implements Refactor {
 
         String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
         String[] contexts = { REFACTOR, MOVE };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
         shellC.waitUntilShellActive(SHELL_MOVE);
         shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
@@ -58,11 +58,11 @@ public class RefactorImp extends EclipseComponent implements Refactor {
         precondition();
 
         String[] contexts = { REFACTOR, RENAME };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicC.waitUntilButtonEnabled(confirmLabel);
+        basic.waitUntilButtonEnabled(confirmLabel);
         bot.button(confirmLabel).click();
         shellC.waitUntilShellClosed(shellTitle);
     }
@@ -71,13 +71,13 @@ public class RefactorImp extends EclipseComponent implements Refactor {
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
         String[] contexts = { REFACTOR, RENAME };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
 
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicC.waitUntilButtonEnabled(FINISH);
+        basic.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         /*
          * TODO Sometimes the window doesn't close when clicking on Finish, but
@@ -118,8 +118,8 @@ public class RefactorImp extends EclipseComponent implements Refactor {
     }
 
     protected void precondition() throws RemoteException {
-        peVC.openPEView();
-        peVC.setFocusOnPEView();
+        pEV.openPEView();
+        pEV.setFocusOnPEView();
     }
 
 }

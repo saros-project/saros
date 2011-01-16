@@ -431,7 +431,7 @@ public class EditorComponentImp extends EclipseComponent implements
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException {
         if (!isJavaEditorOpen(className))
-            peVC.openClass(projectName, pkg, className);
+            pEV.openClass(projectName, pkg, className);
         if (!isJavaEditorActive(className))
             activateJavaEditor(className);
         return getJavaEditor(className).isDirty();
@@ -609,7 +609,7 @@ public class EditorComponentImp extends EclipseComponent implements
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
         selectLine(className + SUFIX_JAVA, line);
-        mainMenuC.clickMenuWithTexts("Run", "Toggle Breakpoint");
+        basic.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
     /**********************************************
@@ -621,7 +621,7 @@ public class EditorComponentImp extends EclipseComponent implements
     private void precondition(String... fileNodes) throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
         if (!isEditorOpen(fileName)) {
-            peVC.openFile(fileNodes);
+            pEV.openFile(fileNodes);
         }
         if (!isEditorActive(fileName)) {
             activateEditor(fileName);

@@ -39,7 +39,7 @@ public class ConsoleViewComponentImp extends EclipseComponent implements
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 try {
-                    SWTBotStyledText styledText = basicC.getView("Console")
+                    SWTBotStyledText styledText = basic.getView("Console")
                         .bot().styledText();
                     if (styledText != null && styledText.getText() != null
                         && !styledText.getText().equals(""))
@@ -58,6 +58,6 @@ public class ConsoleViewComponentImp extends EclipseComponent implements
     }
 
     public String getTextInConsole() throws RemoteException {
-        return basicC.getView("Console").bot().styledText().getText();
+        return basic.getView("Console").bot().styledText().getText();
     }
 }

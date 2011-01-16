@@ -148,7 +148,7 @@ public class ShellComponentImp extends EclipseComponent implements
     public boolean existsTableItemInShell(String title, String label)
         throws RemoteException {
         activateShellWithText(title);
-        return basicC.existsTableItem(label);
+        return basic.existsTableItem(label);
     }
 
     /**********************************************
@@ -202,8 +202,8 @@ public class ShellComponentImp extends EclipseComponent implements
     public void confirmShellWithTree(String title, String buttonText,
         String... nodes) throws RemoteException {
         bot.shell(title).activate();
-        basicC.selectTreeItem(nodes);
-        basicC.waitUntilButtonEnabled(buttonText);
+        basic.selectTreeItem(nodes);
+        basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
     }
 
@@ -211,7 +211,7 @@ public class ShellComponentImp extends EclipseComponent implements
         String buttonText, String... nodes) throws RemoteException {
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
-        basicC.selectTreeItemWithWaitingExpand(tree, nodes);
+        basic.selectTreeItemWithWaitingExpand(tree, nodes);
         bot.button(buttonText).click();
     }
 
@@ -228,9 +228,9 @@ public class ShellComponentImp extends EclipseComponent implements
         String... itemNames) throws RemoteException {
         waitUntilShellActive(title);
         for (String itemName : itemNames) {
-            basicC.selectCheckBoxInTable(itemName);
+            basic.selectCheckBoxInTable(itemName);
         }
-        basicC.waitUntilButtonEnabled(buttonText);
+        basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }
@@ -240,7 +240,7 @@ public class ShellComponentImp extends EclipseComponent implements
         // waitUntilShellActive(shellName);
         try {
             bot.shell(title).bot().table().select(itemName);
-            basicC.waitUntilButtonEnabled(buttonText);
+            basic.waitUntilButtonEnabled(buttonText);
             bot.button(buttonText).click();
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
@@ -253,11 +253,11 @@ public class ShellComponentImp extends EclipseComponent implements
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        basicC.waitUntilTreeItemInTreeExisted(rootOfTreeNode);
+        basic.waitUntilTreeItemInTreeExisted(rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        basicC.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
+        basic.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
-        basicC.waitUntilButtonEnabled(buttonText);
+        basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }

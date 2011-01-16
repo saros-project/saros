@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurre
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.noGUI.SarosState;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosMainMenuComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosPEViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.SarosWorkbenchComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.saros.workbench.sarosViewComponents.ChatViewComponent;
@@ -29,9 +28,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.Edit;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.File;
-import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.Refactor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.EditM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.RefactorM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.SarosM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.WindowM;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
@@ -51,12 +52,13 @@ public class Tester {
     public SarosState state;
     public EditorComponent editor;
     public ShellComponent shell;
-    public SarosMainMenuComponent mainMenu;
+    public SarosM sarosM;
     public SarosWorkbenchComponent workbench;
     public ConsoleViewComponent consoleV;
-    public File file;
-    public Edit edit;
-    public Refactor refactor;
+    public FileM fileM;
+    public EditM editM;
+    public RefactorM refactorM;
+    public WindowM windowM;
 
     public JID jid;
     public String password;
@@ -101,12 +103,15 @@ public class Tester {
             workbench = (SarosWorkbenchComponent) registry.lookup("workbench");
             shell = (ShellComponent) registry.lookup("shell");
             editor = (EditorComponent) registry.lookup("eclipseEditor");
-            mainMenu = (SarosMainMenuComponent) registry
-                .lookup("sarosMainMenu");
+
             basic = (BasicComponent) registry.lookup("basicObject");
-            file = (File) registry.lookup("file");
-            edit = (Edit) registry.lookup("edit");
-            refactor = (Refactor) registry.lookup("refactor");
+
+            // menus in menu bar
+            fileM = (FileM) registry.lookup("fileM");
+            editM = (EditM) registry.lookup("editM");
+            refactorM = (RefactorM) registry.lookup("refactorM");
+            windowM = (WindowM) registry.lookup("windowM");
+            sarosM = (SarosM) registry.lookup("sarosM");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid

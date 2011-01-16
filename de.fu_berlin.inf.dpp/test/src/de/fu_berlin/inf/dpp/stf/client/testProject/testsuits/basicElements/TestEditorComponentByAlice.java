@@ -48,10 +48,10 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void testTypeInEditor() throws RemoteException {
-        alice.file.newProject(PROJECT1);
+        alice.fileM.newProject(PROJECT1);
         String fileName = "test.txt";
         String[] path = { PROJECT1, fileName };
-        alice.file.newFile(path);
+        alice.fileM.newFile(path);
         alice.editor.waitUntilEditorActive(fileName);
 
         String expected = "Hello World";
@@ -61,7 +61,7 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void testDeleteInEditor() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
@@ -76,7 +76,7 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void testEnterInEditor() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
@@ -89,7 +89,7 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void autoComplateProposal() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -103,7 +103,7 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void getAutoComplateProposal() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -119,7 +119,7 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void pressShortCutSave() throws RemoteException {
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -134,8 +134,8 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void quickFix() throws RemoteException {
-        alice.file.newJavaProject(PROJECT1);
-        alice.file.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProject(PROJECT1);
+        alice.fileM.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
         alice.editor.pressShortCutNextAnnotation(CLS1 + ".java");
         alice.editor.quickfix(CLS1 + ".java", "Add unimplemented methods");
         assertContains("public void run()",
@@ -148,8 +148,8 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void getSelection() throws RemoteException {
-        alice.file.newProject(PROJECT1);
-        alice.file.newFile(PROJECT1, FILE1);
+        alice.fileM.newProject(PROJECT1);
+        alice.fileM.newFile(PROJECT1, FILE1);
         alice.editor.navigateInEditor(FILE1, 0, 0);
         alice.editor.typeTextInEditor("pleese", PROJECT1, FILE1);
         alice.editor.selectRange(FILE1, 0, 0, 6);
@@ -159,8 +159,8 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void quickFixWithSpellChecker() throws RemoteException {
-        alice.file.newProject(PROJECT1);
-        alice.file.newFile(PROJECT1, FILE1);
+        alice.fileM.newProject(PROJECT1);
+        alice.fileM.newFile(PROJECT1, FILE1);
         alice.editor
             .typeTextInEditor("pleese open the window", PROJECT1, FILE1);
         alice.editor.selectLine(FILE1, 0);
@@ -171,8 +171,8 @@ public class TestEditorComponentByAlice extends STFTest {
 
     @Test
     public void allTogether() throws RemoteException {
-        alice.file.newJavaProject(PROJECT1);
-        alice.file.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProject(PROJECT1);
+        alice.fileM.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
         alice.editor.pressShortCutNextAnnotation(CLS1 + ".java");
         alice.editor.quickfix(CLS1 + ".java", "Add unimplemented methods");
         assertContains("public void run()",

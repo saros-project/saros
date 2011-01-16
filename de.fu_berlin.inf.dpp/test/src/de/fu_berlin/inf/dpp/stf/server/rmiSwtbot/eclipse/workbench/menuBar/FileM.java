@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface File extends Remote {
+public interface FileM extends Remote {
     /**
      * Performs the action "create a project" which should be done with the
      * following steps:

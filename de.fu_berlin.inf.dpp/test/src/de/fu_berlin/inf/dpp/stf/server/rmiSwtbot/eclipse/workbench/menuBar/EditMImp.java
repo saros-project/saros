@@ -13,17 +13,17 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
-public class EditImp extends EclipseComponent implements Edit {
+public class EditMImp extends EclipseComponent implements EditM {
 
-    private static transient EditImp editImp;
+    private static transient EditMImp editImp;
 
     /**
-     * {@link FileImp} is a singleton, but inheritance is possible.
+     * {@link FileMImp} is a singleton, but inheritance is possible.
      */
-    public static EditImp getInstance() {
+    public static EditMImp getInstance() {
         if (editImp != null)
             return editImp;
-        editImp = new EditImp();
+        editImp = new EditMImp();
         return editImp;
     }
 
@@ -57,7 +57,7 @@ public class EditImp extends EclipseComponent implements Edit {
 
     public void deleteAllProjectsWithGUI() throws RemoteException {
         precondition();
-        SWTBotTreeItem[] allTreeItems = basicC.getTreeInView(VIEWNAME)
+        SWTBotTreeItem[] allTreeItems = basic.getTreeInView(VIEWNAME)
             .getAllItems();
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
@@ -71,7 +71,7 @@ public class EditImp extends EclipseComponent implements Edit {
 
     public void deleteProjectWithGUI(String projectName) throws RemoteException {
         precondition();
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
+        basic.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
         shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
@@ -114,7 +114,7 @@ public class EditImp extends EclipseComponent implements Edit {
 
     public void deleteFile(String... nodes) throws RemoteException {
         precondition();
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
+        basic.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
         shellC.confirmShellDelete(OK);
     }
 
@@ -135,8 +135,8 @@ public class EditImp extends EclipseComponent implements Edit {
     }
 
     protected void precondition() throws RemoteException {
-        peVC.openPEView();
-        peVC.setFocusOnPEView();
+        pEV.openPEView();
+        pEV.setFocusOnPEView();
     }
 
 }

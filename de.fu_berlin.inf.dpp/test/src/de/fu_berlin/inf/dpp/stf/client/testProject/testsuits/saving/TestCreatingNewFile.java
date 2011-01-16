@@ -23,7 +23,7 @@ public class TestCreatingNewFile extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        carl.file.newProject(PROJECT1);
+        carl.fileM.newProject(PROJECT1);
 
         /*
          * carl build session with bob, and alice simultaneously
@@ -66,12 +66,12 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.file.newFolder(FOLDER1, PROJECT1);
-        carl.file.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.file.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.file.existsFile(PROJECT1, FOLDER1, FILE1));
-        bob.file.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.file.existsFile(PROJECT1, FOLDER1, FILE1));
+        carl.fileM.newFolder(FOLDER1, PROJECT1);
+        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        assertTrue(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
     }
 
     /**
@@ -105,25 +105,25 @@ public class TestCreatingNewFile extends STFTest {
         assertFalse(carl.sessionV.isDriver());
         assertTrue(alice.sessionV.isDriver());
 
-        carl.file.newFolder(FOLDER1, PROJECT1);
-        carl.file.newFile(PROJECT1, FOLDER1, FILE1);
+        carl.fileM.newFolder(FOLDER1, PROJECT1);
+        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.workbench.sleep(500);
-        assertFalse(alice.file.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
         bob.workbench.sleep(500);
-        assertFalse(bob.file.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
 
         if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))
             carl.sessionV.followThisUserGUI(alice.jid);
         if (!bob.sessionV.isFollowingUser(alice.getBaseJid()))
             bob.sessionV.followThisUserGUI(alice.jid);
 
-        alice.file.newFolder(PROJECT1, FOLDER2);
-        alice.file.newFile(PROJECT1, FOLDER2, FILE2);
+        alice.fileM.newFolder(PROJECT1, FOLDER2);
+        alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.file.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.file.existsFile(PROJECT1, FOLDER2, FILE2));
-        bob.file.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.file.existsFile(PROJECT1, FOLDER2, FILE2));
+        carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        assertTrue(carl.fileM.existsFile(PROJECT1, FOLDER2, FILE2));
+        bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        assertTrue(bob.fileM.existsFile(PROJECT1, FOLDER2, FILE2));
 
         alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
 

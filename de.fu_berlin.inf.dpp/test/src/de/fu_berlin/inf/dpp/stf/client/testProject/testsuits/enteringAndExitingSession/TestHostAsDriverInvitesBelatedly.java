@@ -37,10 +37,10 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.file.newClass(PROJECT1, PKG1, CLS2);
-        bob.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        bob.file.newClass(PROJECT1, PKG1, CLS2);
+        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
+        bob.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        bob.fileM.newClass(PROJECT1, PKG1, CLS2);
 
         /*
          * alice build session with carl and is followed by carl.

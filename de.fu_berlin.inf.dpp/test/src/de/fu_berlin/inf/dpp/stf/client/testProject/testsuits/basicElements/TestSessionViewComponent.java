@@ -155,7 +155,7 @@ public class TestSessionViewComponent extends STFTest {
     @Test
     @Ignore
     public void jumpToSelectedUserGUI() throws RemoteException {
-        alice.file.newClass(PROJECT1, PKG1, CLS2);
+        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         alice.editor.waitUntilJavaEditorOpen(CLS2);
         assertTrue(alice.editor.isJavaEditorOpen(CLS2));
         assertFalse(bob.editor.isJavaEditorOpen(CLS2));
@@ -273,7 +273,7 @@ public class TestSessionViewComponent extends STFTest {
     public void inviteUsersInYourSession() throws RemoteException,
         InterruptedException {
         bob.sessionV.leaveTheSessionByPeer();
-        bob.edit.deleteProject(PROJECT1);
+        bob.editM.deleteProject(PROJECT1);
         assertFalse(bob.sessionV.isInSession());
         alice.inviteUsersInYourSessionDone(PROJECT1, bob, carl);
         assertTrue(carl.sessionV.isInSession());

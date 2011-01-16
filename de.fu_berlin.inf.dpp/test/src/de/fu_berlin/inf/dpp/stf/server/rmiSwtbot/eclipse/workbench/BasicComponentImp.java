@@ -14,6 +14,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -580,6 +581,30 @@ public class BasicComponentImp extends EclipseComponent implements
     // waits until
     public void waitUntilViewActive(String viewName) throws RemoteException {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
+    }
+
+    /**********************************************
+     * 
+     * actions on the widget: {@link SWTBotMenu}.
+     * 
+     **********************************************/
+    public void clickMenuWithTexts(String... texts) throws RemoteException {
+        workbenchC.activateEclipseShell();
+        SWTBotMenu selectedmenu = null;
+        for (String text : texts) {
+            try {
+                if (selectedmenu == null) {
+                    selectedmenu = bot.menu(text);
+                } else {
+                    selectedmenu = selectedmenu.menu(text);
+                }
+            } catch (WidgetNotFoundException e) {
+                log.error("menu \"" + text + "\" not found!");
+                throw e;
+            }
+        }
+        if (selectedmenu != null)
+            selectedmenu.click();
     }
 
     /**************************************************************
