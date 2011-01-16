@@ -39,8 +39,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        bob.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        bob.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
     }
 
     @After
@@ -53,20 +53,20 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void shareProjectUsingExistingProject() throws RemoteException {
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS2));
     }
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
         throws RemoteException {
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
 
         alice
             .buildSessionDoneSequentially(
@@ -78,10 +78,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         bob.pEV
             .confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.pEV.existsProject(PROJECT1));
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.pEV.existsProject(PROJECT1_NEXT));
-        assertTrue(bob.pEV.existsClass(PROJECT1_NEXT, PKG1, CLS1));
+        assertTrue(bob.file.existsProject(PROJECT1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.file.existsProject(PROJECT1_NEXT));
+        assertTrue(bob.file.existsClass(PROJECT1_NEXT, PKG1, CLS1));
         bob.pEV.deleteProject(PROJECT1_NEXT);
     }
 
@@ -91,10 +91,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, bob);
-        assertTrue(bob.pEV.existsProject(PROJECT1));
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.pEV.existsProject(PROJECT1_NEXT));
-        assertTrue(bob.pEV.existsClass(PROJECT1_NEXT, PKG1, CLS1));
+        assertTrue(bob.file.existsProject(PROJECT1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.file.existsProject(PROJECT1_NEXT));
+        assertTrue(bob.file.existsClass(PROJECT1_NEXT, PKG1, CLS1));
         bob.pEV.deleteProject(PROJECT1_NEXT);
 
     }

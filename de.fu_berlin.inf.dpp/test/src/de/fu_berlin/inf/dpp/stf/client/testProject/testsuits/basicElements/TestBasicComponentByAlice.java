@@ -66,33 +66,33 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsTreeItemInView() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.setFocusOnPEView();
         assertTrue(alice.basic.existsTreeItemInTreeInView("Package Explorer",
             PROJECT1));
-        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.file.existsProject(PROJECT1));
         assertTrue(alice.basic.existsTreeItemInTreeNodeInView(
             "Package Explorer", CLS1 + ".java", PROJECT1, SRC, PKG1));
-        alice.pEV.existsClass(PROJECT1, PKG1, CLS1);
+        alice.file.existsClass(PROJECT1, PKG1, CLS1);
     }
 
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.setFocusOnPEView();
         assertTrue(alice.basic.existsTreeItemWithRegexsInView(
             "Package Explorer", PROJECT1));
-        assertTrue(alice.pEV.existsProject(PROJECT1));
+        assertTrue(alice.file.existsProject(PROJECT1));
         assertTrue(alice.basic.existsTreeItemWithRegexsInView(
             "Package Explorer", PROJECT1, SRC, PKG1));
-        assertTrue(alice.pEV.existsPkg(PROJECT1, PKG1));
+        assertTrue(alice.file.existsPkg(PROJECT1, PKG1));
         assertTrue(alice.basic.existsTreeItemWithRegexsInView(
             "Package Explorer", PROJECT1, SRC, PKG1, CLS1 + ".*"));
-        assertTrue(alice.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
+        assertTrue(alice.file.existsClass(PROJECT1, PKG1, CLS1));
+        alice.file.newClass(PROJECT1, PKG1, CLS2);
         assertTrue(alice.basic.existsTreeItemWithRegexsInView(
             "Package Explorer", PROJECT1, SRC, PKG1, CLS2 + ".*"));
-        assertTrue(alice.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        assertTrue(alice.file.existsClass(PROJECT1, PKG1, CLS2));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void selectTreeItemInView() throws RemoteException {
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.setFocusOnPEView();
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.basic.clickToolbarButtonWithRegexTooltipInView(
@@ -137,7 +137,7 @@ public class TestBasicComponentByAlice extends STFTest {
      */
     @Test(expected = WidgetNotFoundException.class)
     public void selectTreeItemWithRegexs() throws RemoteException {
-        alice.pEV.newJavaProject(SVN_PROJECT_COPY);
+        alice.file.newJavaProject(SVN_PROJECT_COPY);
         alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
             SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.pEV.setFocusOnPEView();
@@ -147,7 +147,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void selectTreeItemWithRegexsInView() throws RemoteException {
-        alice.pEV.newJavaProject(SVN_PROJECT_COPY);
+        alice.file.newJavaProject(SVN_PROJECT_COPY);
         alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
             SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.pEV.setFocusOnPEView();
@@ -174,7 +174,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsSubmenuOfContextOfTreeItemInView() throws RemoteException {
-        alice.pEV.newJavaProject(PROJECT1);
+        alice.file.newJavaProject(PROJECT1);
         String[] contextNames = { "Saros", "Share project..." };
         assertTrue(alice.basic.existsSubmenuOfContextOfTreeItemInView(
             "Package Explorer", contextNames, PROJECT1));
@@ -192,7 +192,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void isSubmenuOfContextOfTreeItemInViewEnabled()
         throws RemoteException {
-        alice.pEV.newJavaProject(PROJECT1);
+        alice.file.newJavaProject(PROJECT1);
         String[] contextNames1 = { "Saros", "Share project..." };
         String[] contextNames2 = { "Saros", "Add to session (experimental)..." };
         assertTrue(alice.basic.isSubmenuOfContextOfTreeItemInViewEnabled(
@@ -211,7 +211,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void clickSubMenuOfContextsOfTreeItemInView() throws RemoteException {
-        alice.pEV.newJavaProject(PROJECT1);
+        alice.file.newJavaProject(PROJECT1);
         String[] contextNames1 = { "Saros", "Share project..." };
 
         alice.basic.clickSubMenuOfContextsOfTreeItemInView("Package Explorer",

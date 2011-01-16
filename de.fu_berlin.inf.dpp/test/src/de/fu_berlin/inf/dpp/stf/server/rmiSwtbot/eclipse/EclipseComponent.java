@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorCompone
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public abstract class EclipseComponent {
@@ -82,6 +83,7 @@ public abstract class EclipseComponent {
     public static ProgressViewComponentImp progressC = ProgressViewComponentImp
         .getInstance();
     public static ShellComponent shellC = ShellComponentImp.getInstance();
+    public static FileImp file = FileImp.getInstance();
 
     // Picocontainer initiated by STFController.
     public static Saros saros;

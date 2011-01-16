@@ -205,7 +205,7 @@ public class STFTest {
 
     public static void setUpSession(Tester host, Tester... invitees)
         throws RemoteException, InterruptedException {
-        host.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        host.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         host.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             invitees);
@@ -224,7 +224,7 @@ public class STFTest {
 
     public static void createProjectByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+            tester.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         }
     }
 
@@ -283,7 +283,7 @@ public class STFTest {
     public static void deleteFolders(String... folders) throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.pEV.existsFolder(PROJECT1, folder))
+                if (tester.file.existsFolder(PROJECT1, folder))
                     tester.pEV.deleteFolder(PROJECT1, folder);
             }
         }

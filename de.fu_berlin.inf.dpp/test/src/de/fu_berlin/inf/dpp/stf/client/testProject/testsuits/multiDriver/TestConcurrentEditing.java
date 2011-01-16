@@ -35,10 +35,10 @@ public class TestConcurrentEditing extends STFTest {
     @Test
     public void testBugInconsistencyConcurrentEditing() throws RemoteException,
         InterruptedException {
-        alice.pEV.newProject(PROJECT1);
+        alice.file.newProject(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
         String[] path = { PROJECT1, FILE };
-        alice.pEV.newFile(path);
+        alice.file.newFile(path);
         alice.editor.waitUntilEditorOpen(FILE);
         alice.editor.setTextInEditorWithSave("test/STF/lorem.txt", path);
         alice.editor.navigateInEditor(FILE, 0, 6);
@@ -93,7 +93,7 @@ public class TestConcurrentEditing extends STFTest {
     @Test(expected = AssertionError.class)
     public void AliceAndBobeditInSameLine() throws RemoteException,
         InterruptedException {
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
@@ -111,8 +111,8 @@ public class TestConcurrentEditing extends STFTest {
             Thread.sleep(100);
             if (i != 0 && i % 2 == 0) {
                 bob.editor.navigateInEditor(fileName, 3, i);
-                bob.editor.pressShortcut(fileName,
-                    IKeyLookup.DELETE_NAME, IKeyLookup.DELETE_NAME);
+                bob.editor.pressShortcut(fileName, IKeyLookup.DELETE_NAME,
+                    IKeyLookup.DELETE_NAME);
             }
         }
 

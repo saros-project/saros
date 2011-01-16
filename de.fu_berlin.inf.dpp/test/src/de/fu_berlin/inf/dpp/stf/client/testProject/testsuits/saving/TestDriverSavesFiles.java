@@ -39,9 +39,9 @@ public class TestDriverSavesFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbenchs();
         setUpSaros();
-        alice.pEV.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
-        alice.pEV.newClass(PROJECT1, PKG1, CLS3);
+        alice.file.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.file.newClass(PROJECT1, PKG1, CLS2);
+        alice.file.newClass(PROJECT1, PKG1, CLS3);
 
         /*
          * build session with bob, carl, dave and edna simultaneously

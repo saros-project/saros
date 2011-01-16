@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.File;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
@@ -51,6 +52,7 @@ public class Tester {
     public SarosMainMenuComponent mainMenu;
     public SarosWorkbenchComponent workbench;
     public ConsoleViewComponent consoleV;
+    public File file;
 
     public JID jid;
     public String password;
@@ -98,6 +100,7 @@ public class Tester {
             mainMenu = (SarosMainMenuComponent) registry
                 .lookup("sarosMainMenu");
             basic = (BasicComponent) registry.lookup("basicObject");
+            file = (File) registry.lookup("file");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid

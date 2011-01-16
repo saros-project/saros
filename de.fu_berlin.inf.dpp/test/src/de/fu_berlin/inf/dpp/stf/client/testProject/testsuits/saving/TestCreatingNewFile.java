@@ -23,7 +23,7 @@ public class TestCreatingNewFile extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        carl.pEV.newProject(PROJECT1);
+        carl.file.newProject(PROJECT1);
 
         /*
          * carl build session with bob, and alice simultaneously
@@ -66,12 +66,12 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.pEV.newFolder(FOLDER1, PROJECT1);
-        carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.pEV.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
-        bob.pEV.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
+        carl.file.newFolder(FOLDER1, PROJECT1);
+        carl.file.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.file.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.file.existsFile(PROJECT1, FOLDER1, FILE1));
+        bob.file.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        assertTrue(bob.file.existsFile(PROJECT1, FOLDER1, FILE1));
     }
 
     /**
@@ -105,25 +105,25 @@ public class TestCreatingNewFile extends STFTest {
         assertFalse(carl.sessionV.isDriver());
         assertTrue(alice.sessionV.isDriver());
 
-        carl.pEV.newFolder(FOLDER1, PROJECT1);
-        carl.pEV.newFile(PROJECT1, FOLDER1, FILE1);
+        carl.file.newFolder(FOLDER1, PROJECT1);
+        carl.file.newFile(PROJECT1, FOLDER1, FILE1);
         alice.workbench.sleep(500);
-        assertFalse(alice.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(alice.file.existsFile(PROJECT1, FOLDER1, FILE1));
         bob.workbench.sleep(500);
-        assertFalse(bob.pEV.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(bob.file.existsFile(PROJECT1, FOLDER1, FILE1));
 
         if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))
             carl.sessionV.followThisUserGUI(alice.jid);
         if (!bob.sessionV.isFollowingUser(alice.getBaseJid()))
             bob.sessionV.followThisUserGUI(alice.jid);
 
-        alice.pEV.newFolder(PROJECT1, FOLDER2);
-        alice.pEV.newFile(PROJECT1, FOLDER2, FILE2);
+        alice.file.newFolder(PROJECT1, FOLDER2);
+        alice.file.newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.pEV.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.pEV.existsFile(PROJECT1, FOLDER2, FILE2));
-        bob.pEV.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.pEV.existsFile(PROJECT1, FOLDER2, FILE2));
+        carl.file.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        assertTrue(carl.file.existsFile(PROJECT1, FOLDER2, FILE2));
+        bob.file.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        assertTrue(bob.file.existsFile(PROJECT1, FOLDER2, FILE2));
 
         alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
 

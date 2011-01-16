@@ -47,12 +47,12 @@ public class TestFileOperations extends STFTest {
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         // Make sure CLS1 always has the same content
-        if (alice.pEV.existsClass(PROJECT1, PKG1, CLS1))
+        if (alice.file.existsClass(PROJECT1, PKG1, CLS1))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.newClass(PROJECT1, PKG1, CLS1);
-        if (alice.pEV.existsClass(PROJECT1, PKG1, CLS2))
+        alice.file.newClass(PROJECT1, PKG1, CLS1);
+        if (alice.file.existsClass(PROJECT1, PKG1, CLS2))
             alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
-        if (alice.pEV.existsPkg(PROJECT1, PKG2))
+        if (alice.file.existsPkg(PROJECT1, PKG2))
             alice.pEV.deletePkg(PROJECT1, PKG2);
         // FIXME This method assumes that all the file operations (like
         // deleteClass) work...
@@ -86,16 +86,16 @@ public class TestFileOperations extends STFTest {
          * finished yet.
          */
         bob.workbench.sleep(1000);
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS1));
         alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
 
-        bob.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        bob.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
 
-        carl.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
-        assertFalse(carl.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(carl.pEV.existsClass(PROJECT1, PKG1, CLS2));
+        carl.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertFalse(carl.file.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(carl.file.existsClass(PROJECT1, PKG1, CLS2));
     }
 
     /**
@@ -114,10 +114,10 @@ public class TestFileOperations extends STFTest {
     @Test
     public void testDeleteFile() throws RemoteException {
         alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
-        bob.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG1, CLS1));
-        carl.pEV.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
-        assertFalse(carl.pEV.existsClass(PROJECT1, PKG1, CLS1));
+        bob.file.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
+        assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
+        carl.file.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
+        assertFalse(carl.file.existsClass(PROJECT1, PKG1, CLS1));
     }
 
     /**
@@ -139,17 +139,17 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
-        alice.pEV.newPackage(PROJECT1, PKG2);
-        bob.pEV.waitUntilPkgExisted(PROJECT1, PKG2);
-        carl.pEV.waitUntilPkgExisted(PROJECT1, PKG2);
-        assertTrue(bob.pEV.existsPkg(PROJECT1, PKG2));
-        assertTrue(carl.pEV.existsPkg(PROJECT1, PKG2));
+        alice.file.newPackage(PROJECT1, PKG2);
+        bob.file.waitUntilPkgExisted(PROJECT1, PKG2);
+        carl.file.waitUntilPkgExisted(PROJECT1, PKG2);
+        assertTrue(bob.file.existsPkg(PROJECT1, PKG2));
+        assertTrue(carl.file.existsPkg(PROJECT1, PKG2));
 
-        alice.pEV.newClass(PROJECT1, PKG2, CLS1);
-        bob.pEV.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
-        carl.pEV.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG2, CLS1));
-        assertTrue(carl.pEV.existsClass(PROJECT1, PKG2, CLS1));
+        alice.file.newClass(PROJECT1, PKG2, CLS1);
+        bob.file.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
+        carl.file.waitUntilClassExisted(PROJECT1, PKG2, CLS1);
+        assertTrue(bob.file.existsClass(PROJECT1, PKG2, CLS1));
+        assertTrue(carl.file.existsClass(PROJECT1, PKG2, CLS1));
 
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG2, CLS1);
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG2,
@@ -185,15 +185,15 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testMoveClass() throws RemoteException {
-        alice.pEV.newPackage(PROJECT1, PKG2);
-        alice.pEV.newClass(PROJECT1, PKG2, CLS2);
+        alice.file.newPackage(PROJECT1, PKG2);
+        alice.file.newClass(PROJECT1, PKG2, CLS2);
         alice.pEV.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
-        bob.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
-        carl.pEV.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.pEV.existsClass(PROJECT1, PKG1, CLS2));
-        assertFalse(bob.pEV.existsClass(PROJECT1, PKG2, CLS2));
-        assertTrue(carl.pEV.existsClass(PROJECT1, PKG1, CLS2));
-        assertFalse(carl.pEV.existsClass(PROJECT1, PKG2, CLS2));
+        bob.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        carl.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
+        assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.file.existsClass(PROJECT1, PKG2, CLS2));
+        assertTrue(carl.file.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(carl.file.existsClass(PROJECT1, PKG2, CLS2));
     }
 
     /**
@@ -213,15 +213,15 @@ public class TestFileOperations extends STFTest {
     public void testRenamePkg() throws RemoteException {
         alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
 
-        bob.pEV.waitUntilPkgExisted(PROJECT1, PKG2);
-        bob.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(bob.pEV.existsPkg(PROJECT1, PKG1));
-        assertTrue(bob.pEV.existsPkg(PROJECT1, PKG2));
+        bob.file.waitUntilPkgExisted(PROJECT1, PKG2);
+        bob.file.waitUntilPkgNotExist(PROJECT1, PKG1);
+        assertFalse(bob.file.existsPkg(PROJECT1, PKG1));
+        assertTrue(bob.file.existsPkg(PROJECT1, PKG2));
 
-        carl.pEV.waitUntilPkgExisted(PROJECT1, PKG2);
-        carl.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(carl.pEV.existsPkg(PROJECT1, PKG1));
-        assertTrue(carl.pEV.existsPkg(PROJECT1, PKG2));
+        carl.file.waitUntilPkgExisted(PROJECT1, PKG2);
+        carl.file.waitUntilPkgNotExist(PROJECT1, PKG1);
+        assertFalse(carl.file.existsPkg(PROJECT1, PKG1));
+        assertTrue(carl.file.existsPkg(PROJECT1, PKG2));
     }
 
     /**
@@ -240,9 +240,9 @@ public class TestFileOperations extends STFTest {
     @Test
     public void testDeletePkg() throws RemoteException {
         alice.pEV.deletePkg(PROJECT1, PKG1);
-        bob.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        carl.pEV.waitUntilPkgNotExist(PROJECT1, PKG1);
-        assertFalse(bob.pEV.existsPkg(PROJECT1, PKG1));
-        assertFalse(carl.pEV.existsPkg(PROJECT1, PKG1));
+        bob.file.waitUntilPkgNotExist(PROJECT1, PKG1);
+        carl.file.waitUntilPkgNotExist(PROJECT1, PKG1);
+        assertFalse(bob.file.existsPkg(PROJECT1, PKG1));
+        assertFalse(carl.file.existsPkg(PROJECT1, PKG1));
     }
 }

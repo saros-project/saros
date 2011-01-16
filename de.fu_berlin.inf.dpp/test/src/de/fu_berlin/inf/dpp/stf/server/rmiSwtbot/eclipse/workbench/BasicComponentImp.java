@@ -55,9 +55,11 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotButton}.
+     * actions on the basic widget: {@link SWTBotButton}.
      * 
      **********************************************/
+
+    // actions
     public void clickButton(String mnemonicText) throws RemoteException {
         bot.button(mnemonicText).click();
     }
@@ -66,8 +68,14 @@ public class BasicComponentImp extends EclipseComponent implements
         bot.buttonWithTooltip(tooltip).click();
     }
 
+    // states
     public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
         return bot.button(mnemonicText).isEnabled();
+    }
+
+    public boolean isButtonWithTooltipEnabled(String tooltip)
+        throws RemoteException {
+        return bot.buttonWithTooltip(tooltip).isEnabled();
     }
 
     public boolean existsButtonInGroup(String mnemonicText, String inGroup)
@@ -80,11 +88,7 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean isButtonWithTooltipEnabled(String tooltip)
-        throws RemoteException {
-        return bot.buttonWithTooltip(tooltip).isEnabled();
-    }
-
+    // waits until
     public void waitUntilButtonEnabled(String mnemonicText)
         throws RemoteException {
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
@@ -97,9 +101,10 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotToolbarButton}.
+     * actions on the basic widget: {@link SWTBotToolbarButton}.
      * 
      **********************************************/
+    // actions
     public void clickToolbarButtonWithRegexTooltipInView(String viewTitle,
         String tooltipText) throws RemoteException {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
@@ -121,6 +126,7 @@ public class BasicComponentImp extends EclipseComponent implements
         bot.viewByTitle(viewTitle).toolbarPushButton(tooltip).click();
     }
 
+    // states
     public boolean isToolbarButtonInViewEnabled(String viewTitle,
         String tooltipText) throws RemoteException {
         SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
@@ -132,24 +138,28 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotText}.
+     * actions on the widget: {@link SWTBotText}.
      * 
      **********************************************/
+
+    // actions
     public void setTextInTextWithLabel(String text, String label)
         throws RemoteException {
         bot.textWithLabel(label).setText(text);
     }
 
+    // states
     public String getTextInTextWithLabel(String label) throws RemoteException {
         return bot.textWithLabel(label).getText();
     }
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotLabel}.
+     * actions on the widget: {@link SWTBotLabel}.
      * 
      **********************************************/
-    public String geFirstLabelText() throws RemoteException {
+    // states
+    public String getTextOfLabel() throws RemoteException {
         return bot.label().getText();
     }
 
@@ -177,7 +187,7 @@ public class BasicComponentImp extends EclipseComponent implements
      * 
      **********************************************/
 
-    /***************** exists table item ****************** */
+    // states
     public boolean existsTableItem(String itemText) throws RemoteException {
         return existsTableItem(bot.table(), itemText);
     }
@@ -187,17 +197,6 @@ public class BasicComponentImp extends EclipseComponent implements
         return existsTableItem(getTableInView(viewTitle), itemText);
     }
 
-    /***************** select table item ****************** */
-    public void selectTableItem(String itemText) throws RemoteException {
-        selectTableItem(bot.table(), itemText);
-    }
-
-    public void selectTableItemInView(String viewTitle, String itemText)
-        throws RemoteException {
-        selectTableItem(getTableInView(viewTitle), itemText);
-    }
-
-    /***************** exists context of table item ****************** */
     public boolean existsContextMenuOfTableItem(String itemName,
         String contextName) throws RemoteException {
         return existsContextMenuOfTableItem(bot.table(), itemName, contextName);
@@ -209,19 +208,6 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** click context of table item ****************** */
-    public void clickContextMenuOfTable(String itemText, String contextName)
-        throws RemoteException {
-        clickContextMenuOfTable(bot.table(), itemText, contextName);
-    }
-
-    public void clickContextMenuOfTableInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        clickContextMenuOfTable(getTableInView(viewTitle), itemText,
-            contextName);
-    }
-
-    /***************** is context of table item visible ****************** */
     public boolean isContextMenuOfTableVisible(String itemText,
         String contextName) throws RemoteException {
         return isContextMenuOfTableVisible(bot.table(), itemText, contextName);
@@ -233,7 +219,6 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** is context of tree item enabled ****************** */
     public boolean isContextMenuOfTableEnabled(String itemText,
         String contextName) throws RemoteException {
         return isContextMenuOfTableEnabled(bot.table(), itemText, contextName);
@@ -245,7 +230,31 @@ public class BasicComponentImp extends EclipseComponent implements
             contextName);
     }
 
-    /***************** checkbox of tree item *******************/
+    public List<String> getTableColumns() throws RemoteException {
+        return bot.table().columns();
+    }
+
+    // actions
+    public void selectTableItem(String itemText) throws RemoteException {
+        selectTableItem(bot.table(), itemText);
+    }
+
+    public void selectTableItemInView(String viewTitle, String itemText)
+        throws RemoteException {
+        selectTableItem(getTableInView(viewTitle), itemText);
+    }
+
+    public void clickContextMenuOfTable(String itemText, String contextName)
+        throws RemoteException {
+        clickContextMenuOfTable(bot.table(), itemText, contextName);
+    }
+
+    public void clickContextMenuOfTableInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        clickContextMenuOfTable(getTableInView(viewTitle), itemText,
+            contextName);
+    }
+
     public void selectCheckBoxInTable(String itemText) throws RemoteException {
         for (int i = 0; i < bot.table().rowCount(); i++) {
             if (bot.table().getTableItem(i).getText(0).equals(itemText)) {
@@ -268,11 +277,7 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
-    public List<String> getTableColumns() throws RemoteException {
-        return bot.table().columns();
-    }
-
-    /***************** waits until ****************** */
+    // waits until
     public void waitUntilTableItemExisted(BasicComponent basic, String itemText)
         throws RemoteException {
         waitUntil(SarosConditions.existTableItem(basic, itemText));
@@ -290,11 +295,10 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotTree}.
+     * actions on the widget: {@link SWTBotTree}.
      * 
      **********************************************/
-
-    /***************** select tree item ****************** */
+    // actions
     public void selectTreeItem(String... nodes) throws RemoteException {
         selectTreeItem(bot.tree(), nodes);
     }
@@ -303,8 +307,6 @@ public class BasicComponentImp extends EclipseComponent implements
         throws RemoteException {
         selectTreeItem(getTreeInView(viewTitle), nodes);
     }
-
-    /***************** select tree item with regexs****************** */
 
     public void selectTreeItemWithRegexs(String... regexNodes)
         throws RemoteException {
@@ -316,7 +318,6 @@ public class BasicComponentImp extends EclipseComponent implements
         selectTreeItemWithRegexs(getTreeInView(viewTitle), regexNodes);
     }
 
-    /***************** select tree item with waiting expand ****************** */
     public void selectTreeItemWithWaitingExpand(String... nodes)
         throws RemoteException {
         selectTreeItemWithWaitingExpand(bot.tree(), nodes);
@@ -327,7 +328,49 @@ public class BasicComponentImp extends EclipseComponent implements
         selectTreeItemWithWaitingExpand(getTreeInView(viewTitle), nodes);
     }
 
-    /***************** exist tree item with regexs ****************** */
+    public void clickContextsOfTreeItem(String contextName, String... nodes)
+        throws RemoteException {
+        clickContextsOfTreeItem(bot.tree(), contextName, nodes);
+    }
+
+    public void clickContextsOfTreeItemInView(String viewTitle,
+        String contextName, String... nodes) throws RemoteException {
+        clickContextsOfTreeItem(getTreeInView(viewTitle), contextName, nodes);
+    }
+
+    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
+        String... nodes) throws RemoteException {
+        clickSubMenuOfContextsOfTreeItem(bot.tree(), contextNames, nodes);
+    }
+
+    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
+        String[] contextNames, String... nodes) throws RemoteException {
+        clickSubMenuOfContextsOfTreeItem(getTreeInView(viewTitle),
+            contextNames, nodes);
+    }
+
+    // states
+    public List<String> getAllItemsInTreeNode(String... nodes)
+        throws RemoteException {
+        SWTBotTree tree = bot.tree();
+        SWTBotTreeItem treeNode = tree.expandNode(nodes);
+        return getAllItemsInTreeNode(treeNode);
+    }
+
+    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
+        String... nodes) throws RemoteException {
+        SWTBotTreeItem treeNode = getTreeInView(viewTitle).expandNode(nodes);
+        return getAllItemsInTreeNode(treeNode);
+    }
+
+    public List<String> getAllItemsIntree() throws RemoteException {
+        return getAllItemsIntree(bot.tree());
+    }
+
+    public List<String> getAllItemsIntreeInView(String viewTitle)
+        throws RemoteException {
+        return getAllItemsIntree(getTreeInView(viewTitle));
+    }
 
     public boolean existsTreeItemWithRegexs(String... regexs)
         throws RemoteException {
@@ -339,7 +382,6 @@ public class BasicComponentImp extends EclipseComponent implements
         return existsTreeItemWithRegexs(getTreeInView(viewTitle), regexs);
     }
 
-    /***************** exists tree item ****************** */
     public boolean existsTreeItemInTree(String itemText) throws RemoteException {
         return existsTreeItemInTree(bot.tree(), itemText);
     }
@@ -359,7 +401,6 @@ public class BasicComponentImp extends EclipseComponent implements
         return getAllItemsInTreeNodeInView(viewTitle, nodes).contains(itemText);
     }
 
-    /***************** exist context of tree item ****************** */
     public boolean existsContextOfTreeItem(String contextName, String... nodes)
         throws RemoteException {
         return existsContextOfTreeItem(bot.tree(), contextName, nodes);
@@ -382,7 +423,6 @@ public class BasicComponentImp extends EclipseComponent implements
             contextNames, nodes);
     }
 
-    /***************** is context of tree item enabled****************** */
     public boolean isContextOfTreeItemEnabled(String contextName,
         String... nodes) throws RemoteException {
         return isContextOfTreeItemEnabled(bot.tree(), contextName, nodes);
@@ -406,55 +446,7 @@ public class BasicComponentImp extends EclipseComponent implements
             contextNames, nodes);
     }
 
-    /***************** click context of tree item ****************** */
-
-    public void clickContextsOfTreeItem(String contextName, String... nodes)
-        throws RemoteException {
-        clickContextsOfTreeItem(bot.tree(), contextName, nodes);
-    }
-
-    public void clickContextsOfTreeItemInView(String viewTitle,
-        String contextName, String... nodes) throws RemoteException {
-        clickContextsOfTreeItem(getTreeInView(viewTitle), contextName, nodes);
-    }
-
-    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
-        String... nodes) throws RemoteException {
-        clickSubMenuOfContextsOfTreeItem(bot.tree(), contextNames, nodes);
-    }
-
-    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
-        String[] contextNames, String... nodes) throws RemoteException {
-        clickSubMenuOfContextsOfTreeItem(getTreeInView(viewTitle),
-            contextNames, nodes);
-    }
-
-    /***************** get allItems in treeNode ****************** */
-
-    public List<String> getAllItemsInTreeNode(String... nodes)
-        throws RemoteException {
-        SWTBotTree tree = bot.tree();
-        SWTBotTreeItem treeNode = tree.expandNode(nodes);
-        return getAllItemsInTreeNode(treeNode);
-    }
-
-    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
-        String... nodes) throws RemoteException {
-        SWTBotTreeItem treeNode = getTreeInView(viewTitle).expandNode(nodes);
-        return getAllItemsInTreeNode(treeNode);
-    }
-
-    /***************** get allItems in tree ****************** */
-    public List<String> getAllItemsIntree() throws RemoteException {
-        return getAllItemsIntree(bot.tree());
-    }
-
-    public List<String> getAllItemsIntreeInView(String viewTitle)
-        throws RemoteException {
-        return getAllItemsIntree(getTreeInView(viewTitle));
-    }
-
-    /***************** waits until treeItem existed ****************** */
+    // waits until
     public void waitUntilTreeItemInTreeExisted(final String itemText)
         throws RemoteException {
         waitUntilTreeItemInTreeExisted(bot.tree(), itemText);
@@ -504,9 +496,10 @@ public class BasicComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotView}.
+     * actions on the widget: {@link SWTBotView}.
      * 
      **********************************************/
+    // actions
     public void openViewById(final String viewId) throws RemoteException {
         try {
             Display.getDefault().syncExec(new Runnable() {
@@ -534,28 +527,6 @@ public class BasicComponentImp extends EclipseComponent implements
         }
     }
 
-    public boolean isViewOpen(String title) throws RemoteException {
-        return getTitlesOfOpenedViews().contains(title);
-    }
-
-    public void setFocusOnViewByTitle(String title) throws RemoteException {
-        try {
-            bot.viewByTitle(title).setFocus();
-        } catch (WidgetNotFoundException e) {
-            log.warn("view not found '" + title + "'", e);
-        }
-    }
-
-    public boolean isViewActive(String title) throws RemoteException {
-        if (!isViewOpen(title))
-            return false;
-        try {
-            return bot.activeView().getTitle().equals(title);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
     public void closeViewByTitle(String title) throws RemoteException {
         if (isViewOpen(title)) {
             bot.viewByTitle(title).close();
@@ -576,6 +547,29 @@ public class BasicComponentImp extends EclipseComponent implements
         });
     }
 
+    public void setFocusOnViewByTitle(String title) throws RemoteException {
+        try {
+            bot.viewByTitle(title).setFocus();
+        } catch (WidgetNotFoundException e) {
+            log.warn("view not found '" + title + "'", e);
+        }
+    }
+
+    // states
+    public boolean isViewOpen(String title) throws RemoteException {
+        return getTitlesOfOpenedViews().contains(title);
+    }
+
+    public boolean isViewActive(String title) throws RemoteException {
+        if (!isViewOpen(title))
+            return false;
+        try {
+            return bot.activeView().getTitle().equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
     public List<String> getTitlesOfOpenedViews() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotView view : bot.views())
@@ -583,6 +577,7 @@ public class BasicComponentImp extends EclipseComponent implements
         return list;
     }
 
+    // waits until
     public void waitUntilViewActive(String viewName) throws RemoteException {
         waitUntil(SarosConditions.isViewActive(bot, viewName));
     }

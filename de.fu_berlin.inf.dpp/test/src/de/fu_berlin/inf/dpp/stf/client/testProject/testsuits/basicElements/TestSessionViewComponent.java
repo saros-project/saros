@@ -155,7 +155,7 @@ public class TestSessionViewComponent extends STFTest {
     @Test
     @Ignore
     public void jumpToSelectedUserGUI() throws RemoteException {
-        alice.pEV.newClass(PROJECT1, PKG1, CLS2);
+        alice.file.newClass(PROJECT1, PKG1, CLS2);
         alice.editor.waitUntilJavaEditorOpen(CLS2);
         assertTrue(alice.editor.isJavaEditorOpen(CLS2));
         assertFalse(bob.editor.isJavaEditorOpen(CLS2));

@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.FileImp;
 
 /**
  * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
@@ -88,6 +89,7 @@ public class STFController {
         exportObject(SarosWorkbenchComponentImp.getInstance(), "workbench");
         exportObject(SarosStateImp.getInstance(), "state");
         exportObject(ConsoleViewComponentImp.getInstance(), "consoleView");
+        exportObject(FileImp.getInstance(), "file");
     }
 
     /**

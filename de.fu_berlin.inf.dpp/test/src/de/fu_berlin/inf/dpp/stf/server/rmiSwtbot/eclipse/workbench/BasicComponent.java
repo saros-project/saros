@@ -143,7 +143,7 @@ public interface BasicComponent extends Remote {
      * @return the text of the first found {@link SWTBotLabel}
      * @throws RemoteException
      */
-    public String geFirstLabelText() throws RemoteException;
+    public String getTextOfLabel() throws RemoteException;
 
     /**
      * 
