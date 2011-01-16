@@ -48,17 +48,21 @@ public class Tester {
     public SessionView sessionV;
     public RSView rSV;
     public ChatView chatV;
-    public BasicWidgets basic;
-    public SarosState state;
-    public Editor editor;
-    public Shell shell;
-    public SarosM sarosM;
-    public Workbench workbench;
     public ConsoleView consoleV;
+
+    public BasicWidgets basicWidgets;
+    public Shell shell;
+
+    public Workbench workbench;
+    public SarosState state;
+
+    public Editor editor;
+
     public FileM fileM;
     public EditM editM;
     public RefactorM refactorM;
     public WindowM windowM;
+    public SarosM sarosM;
 
     public JID jid;
     public String password;
@@ -104,7 +108,7 @@ public class Tester {
             shell = (Shell) registry.lookup("shell");
             editor = (Editor) registry.lookup("eclipseEditor");
 
-            basic = (BasicWidgets) registry.lookup("basicObject");
+            basicWidgets = (BasicWidgets) registry.lookup("basicObject");
 
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");

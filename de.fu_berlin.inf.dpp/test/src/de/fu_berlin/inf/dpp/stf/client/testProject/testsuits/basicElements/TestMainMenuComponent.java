@@ -82,18 +82,18 @@ public class TestMainMenuComponent extends STFTest {
      **********************************************/
     @Test
     public void createAlreadyExistedAccount() throws RemoteException {
-        alice.basic.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel(bob.getXmppServer(),
+        alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
             LABEL_JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
-        assertTrue(alice.basic.isButtonEnabled(FINISH));
-        alice.basic.clickButton(FINISH);
+        alice.basicWidgets.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
+        assertTrue(alice.basicWidgets.isButtonEnabled(FINISH));
+        alice.basicWidgets.clickButton(FINISH);
         // wait a minute,so that bot can get the error message.
-        alice.basic.waitUntilButtonEnabled(FINISH);
+        alice.basicWidgets.waitUntilButtonEnabled(FINISH);
         assertTrue(alice.shell.isShellActive(SHELL_CREATE_NEW_USER_ACCOUNT));
         String errorMessage = alice.shell
             .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
@@ -106,16 +106,16 @@ public class TestMainMenuComponent extends STFTest {
 
     @Test
     public void createAccountWithDismatchedPassword() throws RemoteException {
-        alice.basic.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel(bob.getXmppServer(),
+        alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
             LABEL_JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password + "d",
+        alice.basicWidgets.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password + "d",
             LABEL_REPEAT_PASSWORD);
-        assertFalse(alice.basic.isButtonEnabled(FINISH));
+        assertFalse(alice.basicWidgets.isButtonEnabled(FINISH));
         String errorMessage = alice.shell
             .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
@@ -125,17 +125,17 @@ public class TestMainMenuComponent extends STFTest {
 
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
-        alice.basic.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basic.setTextInTextWithLabel("invalid server",
+        alice.basicWidgets.setTextInTextWithLabel("invalid server",
             LABEL_JABBER_SERVER);
-        alice.basic.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
-        alice.basic.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basic.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
-        assertTrue(alice.basic.isButtonEnabled(FINISH));
-        alice.basic.clickButton(FINISH);
-        alice.basic.waitUntilButtonEnabled(FINISH);
+        alice.basicWidgets.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
+        assertTrue(alice.basicWidgets.isButtonEnabled(FINISH));
+        alice.basicWidgets.clickButton(FINISH);
+        alice.basicWidgets.waitUntilButtonEnabled(FINISH);
         String errorMessage = alice.shell
             .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
