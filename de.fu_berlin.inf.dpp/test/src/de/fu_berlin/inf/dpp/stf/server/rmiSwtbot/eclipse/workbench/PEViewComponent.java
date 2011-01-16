@@ -186,277 +186,6 @@ public interface PEViewComponent extends Remote {
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException;
 
-    /**********************************************
-     * 
-     * all related actions with the sub menus of the context menu "Delete"
-     * 
-     **********************************************/
-
-    /**
-     * Delete the project using FileUntil.delete(resource). This delete-method
-     * costs less time than the method using GUI
-     * 
-     * @param projectName
-     *            name of the project, which you want to delete.
-     */
-    public void deleteProject(String projectName) throws RemoteException;
-
-    /**
-     * Delete all the projects existed in the package explorer view.
-     * 
-     * @throws RemoteException
-     */
-    public void deleteAllProjectsWithGUI() throws RemoteException;
-
-    /**
-     * Perform the action "delete project" which should be done with the
-     * following steps:
-     * <ol>
-     * <li>select the project,which you want to delete, and then click the
-     * context menu "Delete".</li>
-     * <li>confirm the popup-window "Delete Resources" and make sure the
-     * checkbox is clicked.</li>
-     * <li>wait until the popup-window is closed.</li>
-     * 
-     * @param projectName
-     *            the name of the project, which you want to delete.
-     */
-    public void deleteProjectWithGUI(String projectName) throws RemoteException;
-
-    /**
-     * Delete the specified folder using FileUntil.delete(resource).
-     * 
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}
-     */
-    public void deleteFolder(String... folderNodes) throws RemoteException;
-
-    /**
-     * Delete the specified package using FileUntil.delete(resource).
-     * 
-     * @param projectName
-     *            name of the project, which package you want to delete.
-     * @param pkg
-     *            name of the package, which you want to delete.
-     */
-    public void deletePkg(String projectName, String pkg)
-        throws RemoteException;
-
-    /**
-     * Performs the action "delete file" which should be done with the following
-     * steps:
-     * 
-     * <ol>
-     * <li>selects the file,which you want to delete, and then click the context
-     * menu Delete.</li>
-     * <li>confirms the popup-window "Confirm Delete".</li>
-     * <li>waits until the popup-window is closed.</li>
-     * </ol>
-     * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     */
-    public void deleteFile(String... nodes) throws RemoteException;
-
-    /**
-     * Delete a class of the specified java project using
-     * FileUntil.delete(resource).
-     * 
-     * @param projectName
-     *            name of the project, which class you want to delete.
-     * @param pkg
-     *            name of the package, which class you want to delete.
-     * @param className
-     *            name of the class, which you want to delete.
-     */
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException;
-
-    /**
-     * Performs the action "move class to another package" which should be done
-     * with the following steps:
-     * 
-     * <ol>
-     * <li>selects the class, which you want to move, and then click the context
-     * menu "Refactor -> Move..."</li>
-     * <li>choose the package specified by the passed parameter "targetPkg"</li>
-     * <li>click "OK" to confirm the move</li>
-     * </ol>
-     * 
-     * @param sourceProject
-     *            name of the project, e.g. Foo-Saros.
-     * @param sourcePkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @param targetProject
-     * @param targetPkg
-     * @throws RemoteException
-     */
-    public void moveClassTo(String sourceProject, String sourcePkg,
-        String className, String targetProject, String targetPkg)
-        throws RemoteException;
-
-    /**
-     * Perform the action "rename package" which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Select the given package with the given node path and click
-     * "Refactor" > "Rename..."</li>
-     * <li>Enter the given new name to the text field with the title "New name:"
-     * </li>
-     * <li>click "OK" to confirm the rename</li>
-     * <li>Waits until the shell "Rename package" is closed. It guarantee that
-     * the "rename package" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "rename..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * 
-     * @param newName
-     *            the new name of the given package.
-     * 
-     * @throws RemoteException
-     */
-    public void renamePkg(String newName, String projectName, String pkg)
-        throws RemoteException;
-
-    /**
-     * Perform the action "rename folder" which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Select the given folder with the given node path and click "Refactor"
-     * > "Rename..."</li>
-     * <li>Enter the given new name to the text field with the title "New name:"
-     * </li>
-     * <li>click "OK" to confirm the rename</li>
-     * <li>Waits until the shell "Rename resource" is closed. It guarantee that
-     * the "rename folder" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "rename..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * 
-     * @param newName
-     *            the new name of the given folder.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "myFolder"}
-     * @throws RemoteException
-     */
-    public void renameFolder(String newName, String... nodes)
-        throws RemoteException;
-
-    /**
-     * Perform the action "rename file" which should be done with the following
-     * steps:
-     * <ol>
-     * <li>Select the given file with the given node path and click "Refactor" >
-     * "Rename..."</li>
-     * <li>Enter the given new name to the text field with the title "New name:"
-     * </li>
-     * <li>click "OK" to confirm the rename</li>
-     * <li>Waits until the shell "Rename Compilation Unit" is closed. It
-     * guarantee that the "rename file" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "rename..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * 
-     * @param newName
-     *            the new name of the given file.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "myFolder", "myFile.xml"}
-     * @throws RemoteException
-     */
-    public void renameFile(String newName, String... nodes)
-        throws RemoteException;
-
-    /**
-     * Perform the action "rename class" which should be done with the following
-     * steps:
-     * <ol>
-     * <li>Select the given class with the given node path and click "Refactor"
-     * > "Rename..."</li>
-     * <li>Enter the given new name to the text field with the title "New name:"
-     * </li>
-     * <li>click "OK" to confirm the rename</li>
-     * <li>Waits until the shell "Rename Compilation Unit" is closed. It
-     * guarantee that the "rename file" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "rename..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * 
-     * @param newName
-     *            the new name of the given class.
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @throws RemoteException
-     */
-    public void renameClass(String newName, String projectName, String pkg,
-        String className) throws RemoteException;
-
-    public void renameJavaProject(String newName, String... nodes)
-        throws RemoteException;
-
-    /**
-     * Perform the action "revert" which should be done with the following
-     * steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Revert..."</li>
-     * <li>click "OK" to confirm the revert</li>
-     * <li>Waits until the shell "Revert" is closed. It guarantee that the
-     * "Revert" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "Revert..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * @throws RemoteException
-     */
-    public void revertProject(String projectName) throws RemoteException;
-
     /**
      * Perform the action "share project with SVN" which should be done with the
      * following steps:
@@ -612,6 +341,29 @@ public interface PEViewComponent extends Remote {
      * @throws RemoteException
      */
     public void disConnect(String projectName) throws RemoteException;
+
+    /**
+     * Perform the action "revert" which should be done with the following
+     * steps:
+     * 
+     * <ol>
+     * <li>Select the given project and click "Team" > "Revert..."</li>
+     * <li>click "OK" to confirm the revert</li>
+     * <li>Waits until the shell "Revert" is closed. It guarantee that the
+     * "Revert" action is completely done.</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "Revert..." . I mean, after clicking the sub menu you need to treat the
+     * following popup window too.</li>
+     * 
+     * @throws RemoteException
+     */
+    public void revertProject(String projectName) throws RemoteException;
 
     /**
      * Perform the action "switch to another revision" which should be done with

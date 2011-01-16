@@ -29,7 +29,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ConsoleViewCo
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.EditorComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ProgressViewComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.ShellComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.Edit;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.File;
+import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.workbench.menuBar.Refactor;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
@@ -53,6 +55,8 @@ public class Tester {
     public SarosWorkbenchComponent workbench;
     public ConsoleViewComponent consoleV;
     public File file;
+    public Edit edit;
+    public Refactor refactor;
 
     public JID jid;
     public String password;
@@ -101,6 +105,8 @@ public class Tester {
                 .lookup("sarosMainMenu");
             basic = (BasicComponent) registry.lookup("basicObject");
             file = (File) registry.lookup("file");
+            edit = (Edit) registry.lookup("edit");
+            refactor = (Refactor) registry.lookup("refactor");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid

@@ -132,7 +132,7 @@ public class SarosWorkbenchComponentImp extends EclipseComponent implements
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
         deleteAllProjects();
-        peVC.deleteAllProjectsWithGUI();
+        edit.deleteAllProjectsWithGUI();
 
     }
 

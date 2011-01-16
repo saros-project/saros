@@ -6,7 +6,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -16,12 +15,10 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSwtbot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -36,15 +33,13 @@ public class PEViewComponentImp extends EclipseComponent implements
      * title of shells which are pop up by performing the actions on the package
      * explorer view.
      */
-    private final static String SHELL_DELETE_RESOURCE = "Delete Resources";
+
     private final static String SHELL_EDITOR_SELECTION = "Editor Selection";
-    private final static String SHELL_MOVE = "Move";
+
     private final static String SHELL_REVERT = "Revert";
     private final static String SHELL_SHARE_PROJECT = "Share Project";
     private final static String SHELL_SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
-    private final static String SHELL_RENAME_PACKAGE = "Rename Package";
-    private final static String SHELL_RENAME_RESOURCE = "Rename Resource";
-    private final static String SHELL_RENAME_COMPiIATION_UNIT = "Rename Compilation Unit";
+
     private static final String SHELL_SWITCH = "Switch";
     private static final String SHELL_SVN_SWITCH = "SVN Switch";
     private final static String SHELL_CONFIRM_DISCONNECT_FROM_SVN = "Confirm Disconnect from SVN";
@@ -53,14 +48,10 @@ public class PEViewComponentImp extends EclipseComponent implements
     /* Label of pop up windows */
     private final static String LABEL_CREATE_A_NEW_REPOSITORY_LOCATION = "Create a new repository location";
     private final static String LABEL_URL = "Url:";
-    private final static String LABEL_NEW_NAME = "New name:";
+
     private final static String LABEL_TO_URL = "To URL:";
     private static final String LABEL_SWITCH_TOHEAD_REVISION = "Switch to HEAD revision";
     private static final String LABEL_REVISION = "Revision:";
-
-    /* Context menu of a selected tree item on the package explorer view */
-    private final static String DELETE = "Delete";
-    private final static String REFACTOR = "Refactor";
 
     /* Context menu of a selected file on the package explorer view */
     private final static String OPEN = "Open";
@@ -78,10 +69,6 @@ public class PEViewComponentImp extends EclipseComponent implements
     private final static String DISCONNECT = "Disconnect...";
     private final static String SHARE_PROJECT = "Share Project...";
     private final static String SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION = "Switch to another Branch/Tag/Revision...";
-
-    /* All the sub menus of the context menu "Refactor" */
-    private final static String RENAME = "Rename...";
-    private final static String MOVE = "Move...";
 
     /* table iems of the shell "Share project" of the conext menu "Team" */
     private final static String REPOSITORY_TYPE_SVN = "SVN";
@@ -163,195 +150,7 @@ public class PEViewComponentImp extends EclipseComponent implements
 
     /**********************************************
      * 
-     * all related actions with the sub menus of the context menu "Delete"
-     * 
-     **********************************************/
-
-    public void deleteProject(String projectName) throws RemoteException {
-        IPath path = new Path(projectName);
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource == null) {
-            log.debug("File " + projectName + " not found for deletion");
-            return;
-        }
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + projectName, e);
-            }
-        }
-    }
-
-    public void deleteAllProjectsWithGUI() throws RemoteException {
-        precondition();
-        SWTBotTreeItem[] allTreeItems = basicC.getTreeInView(VIEWNAME)
-            .getAllItems();
-        if (allTreeItems != null) {
-            for (SWTBotTreeItem item : allTreeItems) {
-                item.contextMenu(DELETE).click();
-                shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
-                    true);
-                shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
-            }
-        }
-    }
-
-    public void deleteProjectWithGUI(String projectName) throws RemoteException {
-        precondition();
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
-        shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
-    }
-
-    public void deleteFolder(String... folderNodes) throws RemoteException {
-        String folderpath = getPath(folderNodes);
-        IPath path = new Path(getPath(folderNodes));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete folder " + folderpath, e);
-            }
-        }
-    }
-
-    public void deletePkg(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
-            IPath path = new Path(getPkgPath(projectName, pkg));
-            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-                .getRoot();
-            IResource resource = root.findMember(path);
-            if (resource.isAccessible()) {
-                try {
-                    FileUtil.delete(resource);
-                    root.refreshLocal(IResource.DEPTH_INFINITE, null);
-                } catch (CoreException e) {
-                    log.debug("Couldn't delete file " + projectName, e);
-                }
-            }
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void deleteFile(String... nodes) throws RemoteException {
-        precondition();
-        basicC.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
-        shellC.confirmShellDelete(OK);
-    }
-
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + className + ".java", e);
-            }
-        }
-    }
-
-    /**********************************************
-     * 
-     * all related actions with the sub menus of the context menu "Refactor"
-     * 
-     **********************************************/
-
-    public void moveClassTo(String sourceProject, String sourcePkg,
-        String className, String targetProject, String targetPkg)
-        throws RemoteException {
-        precondition();
-
-        String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
-        String[] contexts = { REFACTOR, MOVE };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
-            changeToRegex(nodes));
-        shellC.waitUntilShellActive(SHELL_MOVE);
-        shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
-            targetPkg);
-        shellC.waitUntilShellClosed(SHELL_MOVE);
-    }
-
-    public void rename(String shellTitle, String confirmLabel, String newName,
-        String[] nodes) throws RemoteException {
-        precondition();
-
-        String[] contexts = { REFACTOR, RENAME };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
-            changeToRegex(nodes));
-        shellC.activateShellWithText(shellTitle);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicC.waitUntilButtonEnabled(confirmLabel);
-        bot.button(confirmLabel).click();
-        shellC.waitUntilShellClosed(shellTitle);
-    }
-
-    public void renameClass(String newName, String projectName, String pkg,
-        String className) throws RemoteException {
-        String[] nodes = getClassNodes(projectName, pkg, className);
-        String[] contexts = { REFACTOR, RENAME };
-        basicC.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
-            changeToRegex(nodes));
-
-        String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
-        shellC.activateShellWithText(shellTitle);
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basicC.waitUntilButtonEnabled(FINISH);
-        bot.button(FINISH).click();
-        /*
-         * TODO Sometimes the window doesn't close when clicking on Finish, but
-         * stays open with the warning 'class contains a main method blabla'. In
-         * this case just click Finish again.
-         * 
-         * @Andreas, this problem dones't exist by me, so i get still the
-         * exception: "button isn't enabled" by performing the following code. I
-         * comment it out first, if my change doesn't work by you, please tell
-         * me.
-         */
-        // bot.sleep(50);
-        // if (shellC.isShellOpen(SHELL_RENAME_COMPiIATION_UNIT)) {
-        // bot.button(FINISH).click();
-        // }
-        shellC.waitUntilShellClosed(shellTitle);
-    }
-
-    public void renameFile(String newName, String... nodes)
-        throws RemoteException {
-        rename(SHELL_RENAME_RESOURCE, OK, newName, nodes);
-    }
-
-    public void renameFolder(String newName, String... nodes)
-        throws RemoteException {
-        rename(SHELL_RENAME_RESOURCE, OK, newName, nodes);
-    }
-
-    public void renameJavaProject(String newName, String... nodes)
-        throws RemoteException {
-        rename("Rename Java Project", OK, newName, nodes);
-    }
-
-    public void renamePkg(String newName, String projectName, String pkg)
-        throws RemoteException {
-        String[] pkgNodes = getPkgNodes(projectName, pkg);
-        rename(SHELL_RENAME_PACKAGE, OK, newName, pkgNodes);
-    }
-
-    /**********************************************
-     * 
-     * all related actions with the sub menus of the context menu "SVN"
+     * all related actions with the sub menus of the context menu "Team"
      * 
      **********************************************/
     public void shareProjectWithSVN(String projectName, String repositoryURL)

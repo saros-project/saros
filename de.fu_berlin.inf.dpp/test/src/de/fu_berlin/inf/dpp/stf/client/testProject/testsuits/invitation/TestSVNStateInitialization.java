@@ -101,7 +101,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.leaveSessionHostFirstDone(bob);
 
         if (alice.file.existsProject(SVN_PROJECT))
-            alice.pEV.deleteProject(SVN_PROJECT);
+            alice.edit.deleteProject(SVN_PROJECT);
         bob.workbench.deleteAllProjects();
     }
 

@@ -72,7 +72,7 @@ public class TestFolderOperations extends STFTest {
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
 
-        alice.pEV.renameFolder(newFolderName, PROJECT1, FOLDER1);
+        alice.refactor.renameFolder(newFolderName, PROJECT1, FOLDER1);
         bob.file.waitUntilFolderExisted(PROJECT1, newFolderName);
         assertTrue(bob.file.existsFolder(PROJECT1, newFolderName));
         assertFalse(bob.file.existsFolder(PROJECT1, FOLDER1));

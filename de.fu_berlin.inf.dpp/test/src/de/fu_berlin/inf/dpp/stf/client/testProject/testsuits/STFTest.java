@@ -284,7 +284,7 @@ public class STFTest {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
                 if (tester.file.existsFolder(PROJECT1, folder))
-                    tester.pEV.deleteFolder(PROJECT1, folder);
+                    tester.edit.deleteFolder(PROJECT1, folder);
             }
         }
     }

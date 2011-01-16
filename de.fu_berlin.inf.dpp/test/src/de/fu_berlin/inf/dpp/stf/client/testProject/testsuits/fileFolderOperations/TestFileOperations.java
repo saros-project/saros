@@ -48,12 +48,12 @@ public class TestFileOperations extends STFTest {
     public void runBeforeEveryTest() throws RemoteException {
         // Make sure CLS1 always has the same content
         if (alice.file.existsClass(PROJECT1, PKG1, CLS1))
-            alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
+            alice.edit.deleteClass(PROJECT1, PKG1, CLS1);
         alice.file.newClass(PROJECT1, PKG1, CLS1);
         if (alice.file.existsClass(PROJECT1, PKG1, CLS2))
-            alice.pEV.deleteClass(PROJECT1, PKG1, CLS2);
+            alice.edit.deleteClass(PROJECT1, PKG1, CLS2);
         if (alice.file.existsPkg(PROJECT1, PKG2))
-            alice.pEV.deletePkg(PROJECT1, PKG2);
+            alice.edit.deletePkg(PROJECT1, PKG2);
         // FIXME This method assumes that all the file operations (like
         // deleteClass) work...
         // Need to make sure that the preconditions are met by bob and carl too.
@@ -87,7 +87,7 @@ public class TestFileOperations extends STFTest {
          */
         bob.workbench.sleep(1000);
         assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS1));
-        alice.pEV.renameClass(CLS2, PROJECT1, PKG1, CLS1);
+        alice.refactor.renameClass(CLS2, PROJECT1, PKG1, CLS1);
 
         bob.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
@@ -113,7 +113,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.pEV.deleteClass(PROJECT1, PKG1, CLS1);
+        alice.edit.deleteClass(PROJECT1, PKG1, CLS1);
         bob.file.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
         assertFalse(bob.file.existsClass(PROJECT1, PKG1, CLS1));
         carl.file.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
@@ -187,7 +187,7 @@ public class TestFileOperations extends STFTest {
     public void testMoveClass() throws RemoteException {
         alice.file.newPackage(PROJECT1, PKG2);
         alice.file.newClass(PROJECT1, PKG2, CLS2);
-        alice.pEV.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
+        alice.refactor.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
         bob.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         carl.file.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         assertTrue(bob.file.existsClass(PROJECT1, PKG1, CLS2));
@@ -211,7 +211,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.pEV.renamePkg(PKG2, PROJECT1, PKG1);
+        alice.refactor.renamePkg(PKG2, PROJECT1, PKG1);
 
         bob.file.waitUntilPkgExisted(PROJECT1, PKG2);
         bob.file.waitUntilPkgNotExist(PROJECT1, PKG1);
@@ -239,7 +239,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeletePkg() throws RemoteException {
-        alice.pEV.deletePkg(PROJECT1, PKG1);
+        alice.edit.deletePkg(PROJECT1, PKG1);
         bob.file.waitUntilPkgNotExist(PROJECT1, PKG1);
         carl.file.waitUntilPkgNotExist(PROJECT1, PKG1);
         assertFalse(bob.file.existsPkg(PROJECT1, PKG1));

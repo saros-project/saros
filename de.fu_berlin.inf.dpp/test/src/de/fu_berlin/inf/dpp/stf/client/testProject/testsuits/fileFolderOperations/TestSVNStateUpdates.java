@@ -102,10 +102,10 @@ public class TestSVNStateUpdates extends STFTest {
         super.after();
         alice.leaveSessionHostFirstDone(bob);
         if (bob.file.existsProject(SVN_PROJECT))
-            bob.pEV.deleteProject(SVN_PROJECT);
+            bob.edit.deleteProject(SVN_PROJECT);
 
         if (alice.file.existsProject(SVN_PROJECT))
-            alice.pEV.deleteProject(SVN_PROJECT);
+            alice.edit.deleteProject(SVN_PROJECT);
     }
 
     @AfterClass
@@ -143,7 +143,7 @@ public class TestSVNStateUpdates extends STFTest {
     public void testChangeDriverAndRenameClass() throws Exception {
         alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
         assertTrue(bob.sessionV.isDriver());
-        bob.pEV.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        bob.refactor.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
         alice.file.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
         assertTrue(alice.file.existsClass(SVN_PROJECT, SVN_PKG, "Asdf"));
@@ -173,7 +173,7 @@ public class TestSVNStateUpdates extends STFTest {
         bob.file.newPackage(SVN_PROJECT, "new_package");
         alice.file.waitUntilPkgExisted(SVN_PROJECT, "new_package");
 
-        bob.pEV.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
+        bob.refactor.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
             "new_package");
 
         alice.file.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
@@ -298,7 +298,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testRevert() throws RemoteException {
-        alice.pEV.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
+        alice.edit.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
         bob.file.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.file.existsFile(STFTest.SVN_CLS1_FULL_PATH));
         alice.pEV.revertProject(SVN_PROJECT);
