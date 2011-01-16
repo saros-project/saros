@@ -85,7 +85,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     // icons
     public static final Image ADD_IMAGE = SarosUI
-        .getImage("icons/addaccount.png");
+        .getImage("icons/btn/addaccount.png");
     public static final Image ACTIVATE_IMAGE = SarosUI
         .getImage("icons/btn/activateaccount.png");
     public static final Image DELETE_IMAGE = SarosUI
