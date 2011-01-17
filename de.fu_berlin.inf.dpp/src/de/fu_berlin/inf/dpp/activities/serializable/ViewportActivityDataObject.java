@@ -25,10 +25,10 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
     protected final SPathDataObject path;
 
     public ViewportActivityDataObject(JID source, int topIndex,
-        int bottomIndex, SPathDataObject sPathDataObject) {
+        int bottomIndex, SPathDataObject path) {
         super(source);
 
-        if (sPathDataObject == null) {
+        if (path == null) {
             throw new IllegalArgumentException("editor must not be null");
         }
 
@@ -37,14 +37,14 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
         this.topIndex = topIndex;
         this.bottomIndex = bottomIndex;
-        this.path = sPathDataObject;
+        this.path = path;
     }
 
     public ViewportActivityDataObject(JID source, ILineRange viewport,
         SPathDataObject editor) {
 
-        this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
-            .getStartLine())
+        this(source, Math.max(0, viewport.getStartLine()), Math.max(0,
+            viewport.getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
     }
 
@@ -60,7 +60,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         return this.topIndex;
     }
 
-    public SPathDataObject getEditor() {
+    public SPathDataObject getPath() {
         return this.path;
     }
 

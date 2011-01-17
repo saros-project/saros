@@ -196,7 +196,7 @@ public class RemoteEditorManager {
             @Override
             public void receive(ViewportActivity viewportActivityDataObject) {
 
-                setViewport(viewportActivityDataObject.getEditor(),
+                setViewport(viewportActivityDataObject.getPath(),
                     viewportActivityDataObject.getLineRange());
             }
 
@@ -204,7 +204,7 @@ public class RemoteEditorManager {
             public void receive(
                 TextSelectionActivity textSelectionActivityDataObject) {
 
-                setSelection(textSelectionActivityDataObject.getEditor(),
+                setSelection(textSelectionActivityDataObject.getPath(),
                     textSelectionActivityDataObject.getSelection());
             }
         };

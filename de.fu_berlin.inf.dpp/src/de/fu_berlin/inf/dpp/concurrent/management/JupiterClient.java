@@ -45,7 +45,7 @@ public class JupiterClient {
 
     public synchronized Operation receive(JupiterActivity jupiterActivity)
         throws TransformationException {
-        return get(jupiterActivity.getEditorPath()).receiveJupiterActivity(
+        return get(jupiterActivity.getPath()).receiveJupiterActivity(
             jupiterActivity);
     }
 
@@ -67,7 +67,7 @@ public class JupiterClient {
 
     public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
-        SPath path = textEdit.getEditor();
+        SPath path = textEdit.getPath();
         return get(path).generateJupiterActivity(textEdit.toOperation(),
             sarosSession.getLocalUser(), path);
     }

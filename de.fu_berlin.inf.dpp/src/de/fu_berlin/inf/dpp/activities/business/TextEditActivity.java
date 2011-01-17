@@ -43,7 +43,7 @@ public class TextEditActivity extends AbstractActivity {
     protected final int offset;
     protected final String text;
     protected final String replacedText;
-    protected final SPath editor;
+    protected final SPath path;
 
     /**
      * @param offset
@@ -53,26 +53,26 @@ public class TextEditActivity extends AbstractActivity {
      *            the text that was inserted.
      * @param replacedText
      *            the text that was replaced by this activityDataObject.
-     * @param editor
+     * @param path
      *            path of the editor where this activityDataObject happened.
      * @param source
      *            JID of the user that caused this activityDataObject
      */
     public TextEditActivity(User source, int offset, String text,
-        String replacedText, SPath editor) {
+        String replacedText, SPath path) {
 
         super(source);
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
             throw new IllegalArgumentException("ReplacedText cannot be null");
-        if (editor == null)
+        if (path == null)
             throw new IllegalArgumentException("Editor cannot be null");
 
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
-        this.editor = editor;
+        this.path = path;
     }
 
     public int getOffset() {
@@ -87,8 +87,8 @@ public class TextEditActivity extends AbstractActivity {
         return replacedText;
     }
 
-    public SPath getEditor() {
-        return this.editor;
+    public SPath getPath() {
+        return this.path;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class TextEditActivity extends AbstractActivity {
             + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
             + "',old:'"
             + Util.escapeForLogging(StringUtils.abbreviate(this.replacedText,
-                150)) + "',path:" + this.editor.toString() + ",src:"
+                150)) + "',path:" + this.path.toString() + ",src:"
             + this.source + ")";
     }
 
@@ -107,7 +107,7 @@ public class TextEditActivity extends AbstractActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + offset;
         result = prime * result
             + ((replacedText == null) ? 0 : replacedText.hashCode());
@@ -129,7 +129,7 @@ public class TextEditActivity extends AbstractActivity {
         if (offset != other.offset)
             return false;
 
-        if (!ObjectUtils.equals(this.editor, other.editor))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
 
         if (!ObjectUtils.equals(this.replacedText, other.replacedText))
@@ -151,8 +151,8 @@ public class TextEditActivity extends AbstractActivity {
     public boolean sameLike(Object obj) {
         if (obj instanceof TextEditActivity) {
             TextEditActivity other = (TextEditActivity) obj;
-            return (this.offset == other.offset) && (this.editor != null)
-                && (other.editor != null) && this.editor.equals(other.editor)
+            return (this.offset == other.offset) && (this.path != null)
+                && (other.path != null) && this.path.equals(other.path)
                 && this.text.equals(other.text)
                 && (this.replacedText.equals(other.replacedText));
         }
@@ -192,6 +192,6 @@ public class TextEditActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new TextEditActivityDataObject(source.getJID(), offset, text,
-            replacedText, editor.toSPathDataObject(sarosSession));
+            replacedText, path.toSPathDataObject(sarosSession));
     }
 }

@@ -16,11 +16,11 @@ public class ViewportActivity extends AbstractActivity {
     protected final SPath path;
 
     public ViewportActivity(User source, int topIndex, int bottomIndex,
-        SPath editor) {
+        SPath path) {
 
         super(source);
 
-        if (editor == null) {
+        if (path == null) {
             throw new IllegalArgumentException("editor must not be null");
         }
 
@@ -29,14 +29,14 @@ public class ViewportActivity extends AbstractActivity {
 
         this.topIndex = topIndex;
         this.bottomIndex = bottomIndex;
-        this.path = editor;
+        this.path = path;
     }
 
-    public ViewportActivity(User source, ILineRange viewport, SPath editor) {
+    public ViewportActivity(User source, ILineRange viewport, SPath path) {
 
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0,
             viewport.getStartLine())
-            + Math.max(0, viewport.getNumberOfLines()), editor);
+            + Math.max(0, viewport.getNumberOfLines()), path);
     }
 
     public ILineRange getLineRange() {
@@ -51,7 +51,7 @@ public class ViewportActivity extends AbstractActivity {
         return this.topIndex;
     }
 
-    public SPath getEditor() {
+    public SPath getPath() {
         return this.path;
     }
 

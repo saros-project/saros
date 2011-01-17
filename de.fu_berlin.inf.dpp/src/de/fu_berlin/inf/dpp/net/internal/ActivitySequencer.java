@@ -739,8 +739,8 @@ public class ActivitySequencer {
                 selection = (TextSelectionActivityDataObject) activityDataObject;
             } else if (activityDataObject instanceof ViewportActivityDataObject) {
                 ViewportActivityDataObject viewActivity = (ViewportActivityDataObject) activityDataObject;
-                viewport.remove(viewActivity.getEditor());
-                viewport.put(viewActivity.getEditor(), viewActivity);
+                viewport.remove(viewActivity.getPath());
+                viewport.put(viewActivity.getPath(), viewActivity);
             } else if (activityDataObject instanceof FolderActivityDataObject) {
                 FolderActivityDataObject folderEdit = (FolderActivityDataObject) activityDataObject;
                 foldRecursiveDelete(result, folderEdit);
@@ -820,7 +820,7 @@ public class ActivitySequencer {
                     lastTextEdit.getOffset(),
                     lastTextEdit.getText() + textEdit.getText(),
                     lastTextEdit.getReplacedText() + textEdit.getReplacedText(),
-                    lastTextEdit.getEditor());
+                    lastTextEdit.getPath());
             }
         }
 

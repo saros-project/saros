@@ -358,10 +358,10 @@ public class UndoManager implements Disposable, IActivityProvider {
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivityDataObject.getEditor(),
+                undoHistory.add(textEditActivityDataObject.getPath(),
                     Type.REMOTE, operation);
             } else {
-                if (!textEditActivityDataObject.getEditor().equals(
+                if (!textEditActivityDataObject.getPath().equals(
                     currentActiveEditor)) {
                     log.error("Editor of the local TextEditActivity is not the current "
                         + "active editor. Possibly the current active editor is not"

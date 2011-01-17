@@ -230,7 +230,7 @@ public class ConcurrentDocumentClient implements Disposable {
 
         // Transform to TextEdit so it can be executed locally
         for (TextEditActivity textEdit : op.toTextEdit(
-            jupiterActivity.getEditorPath(), jupiterActivity.getSource())) {
+            jupiterActivity.getPath(), jupiterActivity.getSource())) {
 
             result.executeLocally.add(textEdit);
         }

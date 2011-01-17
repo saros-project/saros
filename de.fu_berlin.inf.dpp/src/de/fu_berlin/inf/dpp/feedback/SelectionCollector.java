@@ -153,7 +153,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
         public void textSelectionMade(TextSelectionActivity selection) {
             // details of the occurred selection
             long time = System.currentTimeMillis();
-            SPath path = selection.getEditor();
+            SPath path = selection.getPath();
             int offset = selection.getOffset();
             int length = selection.getLength();
 

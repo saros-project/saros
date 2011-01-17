@@ -155,7 +155,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
         @Override
         public void receive(TextEditActivity text) {
-            latestChecksums.remove(text.getEditor());
+            latestChecksums.remove(text.getPath());
         }
 
         @Override

@@ -41,17 +41,17 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
     @XStreamAsAttribute
     private final int length;
 
-    private final SPathDataObject editor;
+    private final SPathDataObject path;
 
     public TextSelectionActivityDataObject(JID source, int offset, int length,
-        SPathDataObject sPathDataObject) {
+        SPathDataObject path) {
         super(source);
-        if (sPathDataObject == null) {
+        if (path == null) {
             throw new IllegalArgumentException("path must not be null");
         }
         this.offset = offset;
         this.length = length;
-        this.editor = sPathDataObject;
+        this.path = path;
     }
 
     public int getLength() {
@@ -62,8 +62,8 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
         return this.offset;
     }
 
-    public SPathDataObject getEditor() {
-        return this.editor;
+    public SPathDataObject getPath() {
+        return this.path;
     }
 
     public ITextSelection getSelection() {
@@ -74,7 +74,7 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + length;
         result = prime * result + offset;
         return result;
@@ -92,18 +92,18 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
         TextSelectionActivityDataObject activity = (TextSelectionActivityDataObject) obj;
         return (this.offset == activity.offset)
             && (this.length == activity.length)
-            && (ObjectUtils.equals(this.editor, activity.editor));
+            && (ObjectUtils.equals(this.path, activity.path));
     }
 
     @Override
     public String toString() {
         return "TextSelectionActivityDataObject(offset:" + this.offset
             + ",length:" + this.length + ",src:" + getSource() + ",path:"
-            + this.editor + ")";
+            + this.path + ")";
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
         return new TextSelectionActivity(sarosSession.getUser(source), offset,
-            length, editor.toSPath(sarosSession));
+            length, path.toSPath(sarosSession));
     }
 }

@@ -22,15 +22,15 @@ public class JupiterActivity extends AbstractActivity {
 
     private final Operation operation;
 
-    private final SPath editor;
+    private final SPath path;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
-        User source, SPath editor) {
+        User source, SPath path) {
 
         super(source);
         this.timestamp = timestamp;
         this.operation = operation;
-        this.editor = editor;
+        this.path = path;
     }
 
     public Operation getOperation() {
@@ -50,10 +50,10 @@ public class JupiterActivity extends AbstractActivity {
         if (getClass() != obj.getClass())
             return false;
         JupiterActivity other = (JupiterActivity) obj;
-        if (editor == null) {
-            if (other.editor != null)
+        if (path == null) {
+            if (other.path != null)
                 return false;
-        } else if (!editor.equals(other.editor))
+        } else if (!path.equals(other.path))
             return false;
         if (operation == null) {
             if (other.operation != null)
@@ -72,7 +72,7 @@ public class JupiterActivity extends AbstractActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result
             + ((operation == null) ? 0 : operation.hashCode());
         result = prime * result
@@ -93,8 +93,8 @@ public class JupiterActivity extends AbstractActivity {
         return buffer.toString();
     }
 
-    public SPath getEditorPath() {
-        return this.editor;
+    public SPath getPath() {
+        return this.path;
     }
 
     public void dispatch(IActivityReceiver receiver) {
@@ -103,6 +103,6 @@ public class JupiterActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new JupiterActivityDataObject(timestamp, operation,
-            source.getJID(), editor.toSPathDataObject(sarosSession));
+            source.getJID(), path.toSPathDataObject(sarosSession));
     }
 }

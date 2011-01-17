@@ -748,7 +748,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         log.trace("EditorManager.execTextEdit invoked");
 
-        SPath path = textEdit.getEditor();
+        SPath path = textEdit.getPath();
         IFile file = path.getFile();
 
         if (!file.exists()) {
@@ -803,7 +803,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         log.trace("EditorManager.execTextSelection invoked");
 
-        SPath path = selection.getEditor();
+        SPath path = selection.getPath();
 
         if (path == null) {
             EditorManager.log
@@ -862,7 +862,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         Set<IEditorPart> editors = this.editorPool.getEditors(viewport
-            .getEditor());
+            .getPath());
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
             if (following || user.isDriver())

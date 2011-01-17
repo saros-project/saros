@@ -83,7 +83,7 @@ public class JupiterServer {
         JupiterActivity jupiterActivity) throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(jupiterActivity
-            .getEditorPath());
+            .getPath());
 
         return docServer.transformJupiterActivity(jupiterActivity);
     }

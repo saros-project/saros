@@ -24,7 +24,7 @@ public class NetworkRequest implements Comparable<NetworkRequest> {
         if (jupiterActivity.getSource() == null) {
             this.jupiterActivity = new JupiterActivity(jupiterActivity
                 .getTimestamp(), jupiterActivity.getOperation(), from,
-                jupiterActivity.getEditorPath());
+                jupiterActivity.getPath());
         } else {
             this.jupiterActivity = jupiterActivity;
         }

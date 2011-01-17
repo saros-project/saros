@@ -54,7 +54,7 @@ public class TextSelectionActivity extends AbstractActivity {
         return this.offset;
     }
 
-    public SPath getEditor() {
+    public SPath getPath() {
         return this.path;
     }
 
