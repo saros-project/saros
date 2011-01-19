@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("vcsActivity")
-public class VCSActivityDataObject extends AbstractActivityDataObject implements
-    IResourceActivityDataObject {
+public class VCSActivityDataObject extends AbstractProjectActivityDataObject
+    implements IResourceActivityDataObject {
 
     protected String param1;
     protected String url;
@@ -26,10 +26,6 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
     @XStreamAsAttribute
     protected Type type;
     public Vector<IResourceActivityDataObject> containedActivity;
-
-    public VCSActivityDataObject(JID source) {
-        super(source);
-    }
 
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
         SPathDataObject path, String directory, String param1,
@@ -56,6 +52,7 @@ public class VCSActivityDataObject extends AbstractActivityDataObject implements
         return vcsActivity;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return path;
     }

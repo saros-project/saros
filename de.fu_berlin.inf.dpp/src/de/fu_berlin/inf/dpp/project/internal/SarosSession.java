@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
@@ -95,6 +96,8 @@ public class SarosSession implements ISarosSession, Disposable {
     protected ConcurrentDocumentServer concurrentDocumentServer;
 
     protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
+
+    private List<IActivityDataObject> queuedActivities = new ArrayList<IActivityDataObject>();
 
     /* Instance fields */
     protected User localUser;
@@ -624,7 +627,8 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void exec(List<IActivityDataObject> activityDataObjects) {
         // Convert me
-        List<IActivity> activities = convert(activityDataObjects);
+
+        List<IActivity> activities = convertAndQueueProjectActivities(activityDataObjects);
         if (isHost()) {
             TransformationResult transformed = concurrentDocumentServer
                 .transformIncoming(activities);
@@ -639,7 +643,7 @@ public class SarosSession implements ISarosSession, Disposable {
         pendingActivityLists.add(activities);
     }
 
-    private List<IActivity> convert(
+    private List<IActivity> convertAndQueueProjectActivities(
         List<IActivityDataObject> activityDataObjects) {
 
         List<IActivity> result = new ArrayList<IActivity>(
@@ -647,7 +651,10 @@ public class SarosSession implements ISarosSession, Disposable {
 
         for (IActivityDataObject dataObject : activityDataObjects) {
             try {
-                result.add(dataObject.getActivity(this));
+                if (!willBeQueued(dataObject)) {
+                    result.add(dataObject.getActivity(this));
+                }
+
             } catch (IllegalArgumentException e) {
                 log.warn("DataObject could not be attached to SarosSession: "
                     + dataObject, e);
@@ -655,6 +662,36 @@ public class SarosSession implements ISarosSession, Disposable {
         }
 
         return result;
+    }
+
+    /**
+     * 
+     * @param dataObject
+     * @return <code>true</code> if this activity can be executed now
+     */
+    private boolean willBeQueued(IActivityDataObject dataObject) {
+        if (dataObject instanceof IProjectActivityDataObject) {
+            IProjectActivityDataObject pado = (IProjectActivityDataObject) dataObject;
+            String projectID = pado.getProjectID();
+            /*
+             * some activities (e.g. EditorActivity) can return null for
+             * projectID
+             */
+            if (projectID != null) {
+                IProject project = getProject(projectID);
+                if (project == null) {
+                    if (!queuedActivities.contains(dataObject)) {
+                        queuedActivities.add(dataObject);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void execQueuedActivities() {
+        exec(queuedActivities);
     }
 
     public void activityCreated(IActivity activity) {

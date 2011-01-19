@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * @author rdjemili
  */
 @XStreamAlias("editorActivity")
-public class EditorActivityDataObject extends AbstractActivityDataObject {
+public class EditorActivityDataObject extends AbstractProjectActivityDataObject {
 
     @XStreamAsAttribute
     protected final Type type;
@@ -67,6 +67,7 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
      * @return the project-relative path to the resource that should be
      *         activated.
      */
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }

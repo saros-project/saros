@@ -28,7 +28,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * checksum.
  */
 @XStreamAlias("checksumActivity")
-public class ChecksumActivityDataObject extends AbstractActivityDataObject {
+public class ChecksumActivityDataObject extends
+    AbstractProjectActivityDataObject {
 
     /**
      * Constant used for representing a missing file
@@ -82,6 +83,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     /**
      * Returns the path this checksum is about
      */
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }
@@ -140,7 +142,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new ChecksumActivity(sarosSession.getUser(source), path
-            .toSPath(sarosSession), hash, length, jupiterTimestamp);
+        return new ChecksumActivity(sarosSession.getUser(source),
+            path.toSPath(sarosSession), hash, length, jupiterTimestamp);
     }
 }

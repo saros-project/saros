@@ -15,7 +15,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * Algorithm.
  */
 @XStreamAlias("jupiterActivity")
-public class JupiterActivityDataObject extends AbstractActivityDataObject {
+public class JupiterActivityDataObject extends
+    AbstractProjectActivityDataObject {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
@@ -53,6 +54,7 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
         return this.timestamp;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }
@@ -115,7 +117,7 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new JupiterActivity(timestamp, operation, sarosSession
-            .getUser(source), path.toSPath(sarosSession));
+        return new JupiterActivity(timestamp, operation,
+            sarosSession.getUser(source), path.toSPath(sarosSession));
     }
 }

@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("fileActivity")
-public class FileActivityDataObject extends AbstractActivityDataObject
+public class FileActivityDataObject extends AbstractProjectActivityDataObject
     implements IResourceActivityDataObject {
 
     @XStreamAsAttribute
@@ -75,6 +75,7 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         this.purpose = purpose;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return this.newPath;
     }
@@ -150,8 +151,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new FileActivity(sarosSession.getUser(source), type, newPath
-            .toSPath(sarosSession), (oldPath != null ? oldPath
-            .toSPath(sarosSession) : null), data, purpose);
+        return new FileActivity(sarosSession.getUser(source), type,
+            newPath.toSPath(sarosSession),
+            (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
+            purpose);
     }
 }

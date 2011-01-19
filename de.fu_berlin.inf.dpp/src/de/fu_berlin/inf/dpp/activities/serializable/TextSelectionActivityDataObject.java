@@ -33,7 +33,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("textSelectionActivity")
-public class TextSelectionActivityDataObject extends AbstractActivityDataObject {
+public class TextSelectionActivityDataObject extends
+    AbstractProjectActivityDataObject {
 
     @XStreamAsAttribute
     private final int offset;
@@ -62,6 +63,7 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
         return this.offset;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }

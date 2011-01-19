@@ -13,7 +13,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("viewportActivity")
-public class ViewportActivityDataObject extends AbstractActivityDataObject {
+public class ViewportActivityDataObject extends
+    AbstractProjectActivityDataObject {
     @XStreamAsAttribute
     @XStreamAlias("top")
     protected final int topIndex;
@@ -60,6 +61,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         return this.topIndex;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }

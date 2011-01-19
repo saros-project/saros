@@ -44,7 +44,8 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
  * @author rdjemili
  */
 @XStreamAlias("textEditActivity")
-public class TextEditActivityDataObject extends AbstractActivityDataObject {
+public class TextEditActivityDataObject extends
+    AbstractProjectActivityDataObject {
 
     @XStreamAsAttribute
     protected final int offset;
@@ -99,6 +100,7 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
         return replacedText;
     }
 
+    @Override
     public SPathDataObject getPath() {
         return this.path;
     }
@@ -197,7 +199,7 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new TextEditActivity(sarosSession.getUser(source), offset,
-            text, replacedText, path.toSPath(sarosSession));
+        return new TextEditActivity(sarosSession.getUser(source), offset, text,
+            replacedText, path.toSPath(sarosSession));
     }
 }
