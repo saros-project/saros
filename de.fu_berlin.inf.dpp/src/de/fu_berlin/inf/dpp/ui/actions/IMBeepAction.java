@@ -43,10 +43,10 @@ public class IMBeepAction extends Action {
     public void updateIcon() {
         if (this.isOn()) {
             this.setImageDescriptor(SarosUI
-                .getImageDescriptor("/icons/speakeron.png"));
+                .getImageDescriptor("/icons/elcl16/speakeron.png"));
         } else {
             this.setImageDescriptor(SarosUI
-                .getImageDescriptor("/icons/speakeroff.png"));
+                .getImageDescriptor("/icons/elcl16/speakeroff.png"));
         }
     }
 
