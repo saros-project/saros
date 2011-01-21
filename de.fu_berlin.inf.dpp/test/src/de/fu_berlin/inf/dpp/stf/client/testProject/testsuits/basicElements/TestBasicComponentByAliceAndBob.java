@@ -64,11 +64,11 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
         alice.sessionV.setFocusOnSessionView();
         alice.table.selectTableItemInView("Shared Project Session",
             bob.getBaseJid());
-        assertTrue(alice.basicWidgets.isToolbarButtonInViewEnabled(
+        assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
             "Shared Project Session", "Share your screen with selected user"));
         alice.table.selectTableItemInView("Shared Project Session",
             OWN_CONTACT_NAME + ROLE_NAME);
-        assertFalse(alice.basicWidgets.isToolbarButtonInViewEnabled(
+        assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
             "Shared Project Session", "Share your screen with selected user"));
     }
 

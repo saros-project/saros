@@ -10,16 +10,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 
-public class ProgressViewImp extends EclipsePart implements
-    ProgressView {
+public class ProgressViewImp extends EclipsePart implements ProgressView {
 
     private static transient ProgressViewImp self;
 
     protected final static String VIEWNAME = "Progress";
 
     /**
-     * {@link ProgressViewImp} is a singleton, but inheritance is
-     * possible.
+     * {@link ProgressViewImp} is a singleton, but inheritance is possible.
      */
     public static ProgressViewImp getInstance() {
         if (self != null)
@@ -35,15 +33,15 @@ public class ProgressViewImp extends EclipsePart implements
      **********************************************/
 
     public void openProgressView() throws RemoteException {
-        basic.openViewById("org.eclipse.ui.views.ProgressView");
+        viewW.openViewById("org.eclipse.ui.views.ProgressView");
     }
 
     public void activateProgressView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isProgressViewOpen() throws RemoteException {
-        return basic.isViewOpen("Progress");
+        return viewW.isViewOpen("Progress");
     }
 
     /**********************************************

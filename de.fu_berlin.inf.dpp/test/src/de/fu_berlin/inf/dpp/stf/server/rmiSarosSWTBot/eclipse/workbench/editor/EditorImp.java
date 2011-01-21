@@ -24,8 +24,7 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 
-public class EditorImp extends EclipsePart implements
-    Editor {
+public class EditorImp extends EclipsePart implements Editor {
 
     private static transient EditorImp self;
 
@@ -609,7 +608,7 @@ public class EditorImp extends EclipsePart implements
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
         selectLine(className + SUFIX_JAVA, line);
-        basic.clickMenuWithTexts("Run", "Toggle Breakpoint");
+        menuW.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
     /**********************************************

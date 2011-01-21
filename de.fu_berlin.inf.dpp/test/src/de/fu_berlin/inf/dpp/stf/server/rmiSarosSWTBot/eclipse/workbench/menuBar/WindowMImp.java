@@ -97,9 +97,9 @@ public class WindowMImp extends EclipsePart implements WindowM {
 
     public void clickMenuPreferences() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            basic.clickMenuWithTexts("Eclipse", "Preferences...");
+            menuW.clickMenuWithTexts("Eclipse", "Preferences...");
         else
-            basic.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
+            menuW.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
     }
 
     /**********************************************
@@ -118,7 +118,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     public void showViewWithName(String category, String nodeName)
         throws RemoteException {
         workbenchC.activateEclipseShell();
-        basic.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
         shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
             nodeName, OK);
     }

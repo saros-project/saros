@@ -98,23 +98,23 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      **********************************************/
     public void openRosterView() throws RemoteException {
         if (!isRosterViewOpen())
-            basic.openViewById(VIEWID);
+            viewW.openViewById(VIEWID);
     }
 
     public boolean isRosterViewOpen() throws RemoteException {
-        return basic.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEWNAME);
     }
 
     public void closeRosterView() throws RemoteException {
-        basic.closeViewById(VIEWID);
+        viewW.closeViewById(VIEWID);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isRosterViewActive() throws RemoteException {
-        return basic.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -492,7 +492,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, tooltipText);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+            tooltipText);
     }
 
     /**************************************************************
@@ -532,7 +533,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      */
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return basic.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
+        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
     }
 
     /**
@@ -542,7 +543,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     protected List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return basic.getAllToolbarButtonsOnView(VIEWNAME);
+        return toolbarButtonW.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
     private boolean isWizardCreateXMPPAccountActive() throws RemoteException {

@@ -5,8 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 
-public class RSViewImp extends EclipsePart implements
-    RSView {
+public class RSViewImp extends EclipsePart implements RSView {
     // public static RemoteScreenViewObjectImp classVariable;
 
     private static transient RSViewImp self;
@@ -42,54 +41,56 @@ public class RSViewImp extends EclipsePart implements
      */
 
     public void activateRemoteScreenView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return basic.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEWNAME);
     }
 
     public boolean isRemoteScreenViewActive() throws RemoteException {
-        return basic.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEWNAME);
     }
 
     public void openRemoteScreenView() throws RemoteException {
         if (!isRemoteScreenViewOpen())
-            basic.openViewById(VIEWID);
+            viewW.openViewById(VIEWID);
     }
 
     public void closeRemoteScreenView() throws RemoteException {
-        basic.closeViewById(VIEWID);
+        viewW.closeViewById(VIEWID);
     }
 
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
             TB_STOP_RUNNING_SESSION);
     }
 
     public void clickTBResume() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_RESUME);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+            TB_RESUME);
     }
 
     public void clickTBPause() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, TB_PAUSE);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+            TB_PAUSE);
     }
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        basic.waitUntilViewActive(VIEWNAME);
+        viewW.waitUntilViewActive(VIEWNAME);
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)

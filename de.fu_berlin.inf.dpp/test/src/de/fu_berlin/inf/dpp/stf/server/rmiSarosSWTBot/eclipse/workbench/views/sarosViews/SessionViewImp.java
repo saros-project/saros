@@ -85,27 +85,27 @@ public class SessionViewImp extends EclipsePart implements SessionView {
      **********************************************/
     public void openSessionView() throws RemoteException {
         if (!isSessionViewOpen())
-            basic.openViewById(VIEWID);
+            viewW.openViewById(VIEWID);
     }
 
     public boolean isSessionViewOpen() throws RemoteException {
-        return basic.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEWNAME);
     }
 
     public void closeSessionView() throws RemoteException {
         if (isSessionViewOpen())
-            basic.closeViewById(VIEWID);
+            viewW.closeViewById(VIEWID);
     }
 
     public void setFocusOnSessionView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/focusOnsessionView.png");
-        basic.waitUntilViewActive(VIEWNAME);
+        viewW.waitUntilViewActive(VIEWNAME);
     }
 
     public boolean isSessionViewActive() throws RemoteException {
-        return basic.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -215,7 +215,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelTextInSessionView())
-            return basic.getView(VIEWNAME).bot().label().getText();
+            return viewW.getView(VIEWNAME).bot().label().getText();
         return null;
     }
 
@@ -871,17 +871,18 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     private boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return basic.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
+        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        basic.clickToolbarButtonWithRegexTooltipInView(VIEWNAME, tooltipText);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+            tooltipText);
     }
 
     private List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return basic.getAllToolbarButtonsOnView(VIEWNAME);
+        return toolbarButtonW.getAllToolbarButtonsOnView(VIEWNAME);
     }
 
 }

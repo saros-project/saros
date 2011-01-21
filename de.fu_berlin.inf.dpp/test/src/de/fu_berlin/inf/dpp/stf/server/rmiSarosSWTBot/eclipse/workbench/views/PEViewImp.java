@@ -85,23 +85,23 @@ public class PEViewImp extends EclipsePart implements PEView {
      **********************************************/
     public void openPEView() throws RemoteException {
         if (!isPEViewOpen())
-            basic.openViewById(VIEWID);
+            viewW.openViewById(VIEWID);
     }
 
     public boolean isPEViewOpen() throws RemoteException {
-        return basic.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEWNAME);
     }
 
     public void closePEView() throws RemoteException {
-        basic.closeViewByTitle(VIEWNAME);
+        viewW.closeViewByTitle(VIEWNAME);
     }
 
     public void setFocusOnPEView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public boolean isPEViewActive() throws RemoteException {
-        return basic.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEWNAME);
     }
 
     /**********************************************
@@ -214,11 +214,11 @@ public class PEViewImp extends EclipsePart implements PEView {
             // close window
             shareProjectShell.close();
             // in svn repos view: enter url
-            basic
+            viewW
                 .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
-            basic.setFocusOnViewByTitle("SVN Repositories");
-            final boolean viewWasOpen = basic.isViewOpen("SVN Repositories");
-            final SWTBotView repoView = basic.getView("SVN Repositories");
+            viewW.setFocusOnViewByTitle("SVN Repositories");
+            final boolean viewWasOpen = viewW.isViewOpen("SVN Repositories");
+            final SWTBotView repoView = viewW.getView("SVN Repositories");
             repoView.toolbarButton("Add SVN Repository").click();
             if (!shellC.activateShellWithText("Add SVN Repository")) {
                 shellC.waitUntilShellActive("Add SVN Repository");
@@ -251,7 +251,7 @@ public class PEViewImp extends EclipsePart implements PEView {
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         precondition();
-        basic.clickMenuWithTexts("File", "Import...");
+        menuW.clickMenuWithTexts("File", "Import...");
         shellC.confirmShellWithTreeWithFilterText(SHELL_IMPORT,
             REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {

@@ -53,7 +53,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
 
     public void creatAccountWithMenuGUI(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException {
-        basic.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        menuW.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         rosterV.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
             password, usesThisAccountNow);
     }
@@ -319,7 +319,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
      */
     private void clickMenuSarosPreferences() throws RemoteException {
         workbenchC.activateEclipseShell();
-        basic.clickMenuWithTexts(MENU_SAROS, "Preferences");
+        menuW.clickMenuWithTexts(MENU_SAROS, "Preferences");
     }
 
 }

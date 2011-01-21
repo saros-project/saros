@@ -10,8 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
 
-public class ConsoleViewImp extends EclipsePart implements
-    ConsoleView {
+public class ConsoleViewImp extends EclipsePart implements ConsoleView {
 
     private static transient ConsoleViewImp consoleViewObject;
 
@@ -40,7 +39,7 @@ public class ConsoleViewImp extends EclipsePart implements
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 try {
-                    SWTBotStyledText styledText = basic.getView("Console")
+                    SWTBotStyledText styledText = viewW.getView("Console")
                         .bot().styledText();
                     if (styledText != null && styledText.getText() != null
                         && !styledText.getText().equals(""))
@@ -59,6 +58,6 @@ public class ConsoleViewImp extends EclipsePart implements
     }
 
     public String getTextInConsole() throws RemoteException {
-        return basic.getView("Console").bot().styledText().getText();
+        return viewW.getView("Console").bot().styledText().getText();
     }
 }

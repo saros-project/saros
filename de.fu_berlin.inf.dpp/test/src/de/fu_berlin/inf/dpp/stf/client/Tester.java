@@ -19,9 +19,12 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShare
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Button;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Menu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
@@ -56,7 +59,10 @@ public class Tester {
     public Table table;
     public Tree tree;
     public Button button;
+    public ToolbarButton toolbarButton;
     public Shell shell;
+    public View view;
+    public Menu menu;
 
     public Workbench workbench;
 
@@ -115,6 +121,9 @@ public class Tester {
             table = (Table) registry.lookup("table");
             tree = (Tree) registry.lookup("tree");
             button = (Button) registry.lookup("button");
+            toolbarButton = (ToolbarButton) registry.lookup("toolbarButton");
+            menu = (Menu) registry.lookup("menu");
+            view = (View) registry.lookup("view");
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");

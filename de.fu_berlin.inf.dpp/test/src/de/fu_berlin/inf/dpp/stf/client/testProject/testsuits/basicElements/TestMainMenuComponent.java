@@ -82,7 +82,7 @@ public class TestMainMenuComponent extends STFTest {
      **********************************************/
     @Test
     public void createAlreadyExistedAccount() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
         alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
@@ -108,7 +108,7 @@ public class TestMainMenuComponent extends STFTest {
 
     @Test
     public void createAccountWithDismatchedPassword() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
         alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
@@ -128,7 +128,7 @@ public class TestMainMenuComponent extends STFTest {
 
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
         alice.basicWidgets.setTextInTextWithLabel("invalid server",

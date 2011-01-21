@@ -63,16 +63,16 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
     }
 
     public void closeUnnecessaryViews() throws RemoteException {
-        if (basic.isViewOpen("Problems"))
-            basic.closeViewByTitle("Problems");
-        if (basic.isViewOpen("Javadoc"))
-            basic.closeViewByTitle("Javadoc");
-        if (basic.isViewOpen("Declaration"))
-            basic.closeViewByTitle("Declaration");
-        if (basic.isViewOpen("Task List"))
-            basic.closeViewByTitle("Task List");
-        if (basic.isViewOpen("Outline"))
-            basic.closeViewByTitle("Outline");
+        if (viewW.isViewOpen("Problems"))
+            viewW.closeViewByTitle("Problems");
+        if (viewW.isViewOpen("Javadoc"))
+            viewW.closeViewByTitle("Javadoc");
+        if (viewW.isViewOpen("Declaration"))
+            viewW.closeViewByTitle("Declaration");
+        if (viewW.isViewOpen("Task List"))
+            viewW.closeViewByTitle("Task List");
+        if (viewW.isViewOpen("Outline"))
+            viewW.closeViewByTitle("Outline");
     }
 
     public void resetSaros() throws RemoteException {
@@ -135,7 +135,7 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
     }
 
     public void closeWelcomeView() throws RemoteException {
-        basic.closeViewByTitle(VIEW_TITLE_WELCOME);
+        viewW.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
     public void deleteAllProjects() throws RemoteException {

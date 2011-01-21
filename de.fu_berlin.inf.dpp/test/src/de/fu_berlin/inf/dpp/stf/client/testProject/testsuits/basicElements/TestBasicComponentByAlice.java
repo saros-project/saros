@@ -43,15 +43,14 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsTreeItemInShell() throws RemoteException {
-        alice.basicWidgets
-            .clickMenuWithTexts("Window", "Show View", "Other...");
+        alice.menu.clickMenuWithTexts("Window", "Show View", "Other...");
         alice.shell.activateShellWaitingUntilOpened("Show View");
         assertTrue(alice.tree.existsTreeItemInTreeNode("Console", "General"));
     }
 
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts("Saros", "Preferences");
+        alice.menu.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
         assertTrue(alice.tree.existsTreeItemInTreeNode("Annotations",
             "General", "Editors", "Text Editors"));
@@ -59,7 +58,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts("Saros", "Preferences");
+        alice.menu.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
         assertTrue(alice.tree.existsTreeItemWithRegexs("General", "Editors",
             "Text Editors", "Annotations"));
@@ -110,17 +109,17 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.pEV.setFocusOnPEView();
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.basicWidgets.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
             "Package Explorer", "Collapse All");
         alice.tree.selectTreeItemInView("Package Explorer", PROJECT1, SRC,
             PKG1, CLS1 + ".java");
-        alice.basicWidgets.clickMenuWithTexts("File", "Close");
+        alice.menu.clickMenuWithTexts("File", "Close");
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
     }
 
     @Test
     public void selectTreeItemInShell() throws RemoteException {
-        alice.basicWidgets.clickMenuWithTexts("Saros", "Preferences");
+        alice.menu.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
         alice.tree.selectTreeItem("Saros");
         assertTrue(alice.button.existsButtonInGroup(
@@ -157,11 +156,11 @@ public class TestBasicComponentByAlice extends STFTest {
             "pkg", "Test");
         assertTrue(alice.editor.isClassDirty(SVN_PROJECT_COPY, "pkg", "Test",
             ID_JAVA_EDITOR));
-        alice.basicWidgets.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
             "Package Explorer", "Collapse All");
         alice.tree.selectTreeItemWithRegexsInView("Package Explorer",
             changeToRegex(getClassNodes(SVN_PROJECT_COPY, "pkg", "Test")));
-        alice.basicWidgets.clickMenuWithTexts("File", "Save");
+        alice.menu.clickMenuWithTexts("File", "Save");
         assertFalse(alice.editor.isClassDirty(SVN_PROJECT_COPY, "pkg", "Test",
             ID_JAVA_EDITOR));
     }

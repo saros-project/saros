@@ -6,8 +6,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 
-public class ChatViewImp extends EclipsePart implements
-    ChatView {
+public class ChatViewImp extends EclipsePart implements ChatView {
 
     private static transient ChatViewImp self;
 
@@ -28,20 +27,20 @@ public class ChatViewImp extends EclipsePart implements
     }
 
     public void activateChatView() throws RemoteException {
-        basic.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            basic.openViewById(VIEWID);
+            viewW.openViewById(VIEWID);
     }
 
     public void closeChatView() throws RemoteException {
-        basic.closeViewById(VIEWID);
+        viewW.closeViewById(VIEWID);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return basic.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEWNAME);
     }
 
     public void waitUntilGetChatMessage(String jid, String message)

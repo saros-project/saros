@@ -64,7 +64,7 @@ public class FileMImp extends EclipsePart implements FileM {
     public void newProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
-            basic.clickMenuWithTexts(FILE, NEW, PROJECT);
+            menuW.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
     }
@@ -72,7 +72,7 @@ public class FileMImp extends EclipsePart implements FileM {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
             workbenchC.activateEclipseShell();
-            basic.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
+            menuW.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
     }
@@ -94,7 +94,7 @@ public class FileMImp extends EclipsePart implements FileM {
         if (!existsFolder(folderNodes)) {
             try {
                 treeW.getTreeItemInView(VIEWNAME, parentNodes);
-                basic.clickMenuWithTexts(FILE, NEW, FOLDER);
+                menuW.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -125,7 +125,7 @@ public class FileMImp extends EclipsePart implements FileM {
             if (!existsPkg(projectName, pkg))
                 try {
                     workbenchC.activateEclipseShell();
-                    basic.clickMenuWithTexts(FILE, NEW, PACKAGE);
+                    menuW.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
                     final String cause = "error creating new package";
@@ -183,7 +183,7 @@ public class FileMImp extends EclipsePart implements FileM {
                         parentNodes[i] = fileNodes[i];
                 }
                 treeW.getTreeItemInView(VIEWNAME, parentNodes);
-                basic.clickMenuWithTexts(FILE, NEW, FILE);
+                menuW.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -227,7 +227,7 @@ public class FileMImp extends EclipsePart implements FileM {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             try {
                 workbenchC.activateEclipseShell();
-                basic.clickMenuWithTexts(FILE, NEW, CLASS);
+                menuW.clickMenuWithTexts(FILE, NEW, CLASS);
                 confirmWindowNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
@@ -253,7 +253,7 @@ public class FileMImp extends EclipsePart implements FileM {
         String className) throws RemoteException {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             precondition();
-            basic.clickMenuWithTexts(FILE, NEW, CLASS);
+            menuW.clickMenuWithTexts(FILE, NEW, CLASS);
         }
         SWTBotShell shell = bot.shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
