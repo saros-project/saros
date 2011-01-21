@@ -101,7 +101,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         viewW.setFocusOnViewByTitle(VIEWNAME);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/focusOnsessionView.png");
-        viewW.waitUntilViewActive(VIEWNAME);
+        viewW.waitUntilIsViewActive(VIEWNAME);
     }
 
     public boolean isSessionViewActive() throws RemoteException {
@@ -850,7 +850,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()

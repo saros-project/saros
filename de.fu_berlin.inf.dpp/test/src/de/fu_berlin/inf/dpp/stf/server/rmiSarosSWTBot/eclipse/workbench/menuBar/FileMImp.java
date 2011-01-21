@@ -63,7 +63,7 @@ public class FileMImp extends EclipsePart implements FileM {
      **************************************************************/
     public void newProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
-            workbenchC.activateEclipseShell();
+            workbenchC.activateWorkbench();
             menuW.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
@@ -71,7 +71,7 @@ public class FileMImp extends EclipsePart implements FileM {
 
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
-            workbenchC.activateEclipseShell();
+            workbenchC.activateWorkbench();
             menuW.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
@@ -124,7 +124,7 @@ public class FileMImp extends EclipsePart implements FileM {
         if (pkg.matches("[\\w\\.]*\\w+")) {
             if (!existsPkg(projectName, pkg))
                 try {
-                    workbenchC.activateEclipseShell();
+                    workbenchC.activateWorkbench();
                     menuW.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
@@ -210,7 +210,7 @@ public class FileMImp extends EclipsePart implements FileM {
     }
 
     public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         precondition();
         SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
         return treeW.existsTreeItemWithRegexs(tree, nodes);
@@ -226,7 +226,7 @@ public class FileMImp extends EclipsePart implements FileM {
         throws RemoteException {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             try {
-                workbenchC.activateEclipseShell();
+                workbenchC.activateWorkbench();
                 menuW.clickMenuWithTexts(FILE, NEW, CLASS);
                 confirmWindowNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {

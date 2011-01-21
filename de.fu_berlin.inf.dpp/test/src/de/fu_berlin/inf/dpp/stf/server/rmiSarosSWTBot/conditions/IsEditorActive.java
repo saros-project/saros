@@ -4,12 +4,12 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 
-public class isEditorActive extends DefaultCondition {
+public class IsEditorActive extends DefaultCondition {
 
     private Editor editorPart;
     private String fileName;
 
-    isEditorActive(Editor editor, String fileName) {
+    IsEditorActive(Editor editor, String fileName) {
         this.fileName = fileName;
         this.editorPart = editor;
     }

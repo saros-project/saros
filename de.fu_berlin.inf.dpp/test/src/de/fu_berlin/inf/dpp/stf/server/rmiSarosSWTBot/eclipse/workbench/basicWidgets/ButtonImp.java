@@ -21,7 +21,17 @@ public class ButtonImp extends EclipsePart implements Button {
         return buttonImp;
     }
 
-    // actions
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void clickButton(String mnemonicText) throws RemoteException {
         bot.button(mnemonicText).click();
     }
@@ -30,7 +40,11 @@ public class ButtonImp extends EclipsePart implements Button {
         bot.buttonWithTooltip(tooltip).click();
     }
 
-    // states
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
         return bot.button(mnemonicText).isEnabled();
     }
@@ -50,7 +64,11 @@ public class ButtonImp extends EclipsePart implements Button {
         }
     }
 
-    // waits until
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
     public void waitUntilButtonEnabled(String mnemonicText)
         throws RemoteException {
         waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));

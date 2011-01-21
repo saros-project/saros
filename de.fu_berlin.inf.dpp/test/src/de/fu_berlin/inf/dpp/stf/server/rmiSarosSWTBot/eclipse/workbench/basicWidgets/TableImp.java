@@ -28,7 +28,17 @@ public class TableImp extends EclipsePart implements Table {
         return tableImp;
     }
 
-    // states
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public boolean existsTableItem(String itemText) throws RemoteException {
         return existsTableItem(bot.table(), itemText);
     }
@@ -85,7 +95,11 @@ public class TableImp extends EclipsePart implements Table {
         return bot.table().columns();
     }
 
-    // actions
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void selectTableItem(String itemText) throws RemoteException {
         selectTableItem(bot.table(), itemText);
     }
@@ -128,7 +142,11 @@ public class TableImp extends EclipsePart implements Table {
         }
     }
 
-    // waits until
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
     public void waitUntilTableItemExisted(Table basic, String itemText)
         throws RemoteException {
         waitUntil(SarosConditions.existTableItem(this, itemText));
@@ -144,6 +162,11 @@ public class TableImp extends EclipsePart implements Table {
             contextName));
     }
 
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
     /**
      * 
      * @param viewTitle

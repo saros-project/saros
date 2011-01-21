@@ -165,8 +165,9 @@ public class STFTest {
     }
 
     /**
+     * bring workbench to a original state before beginning your tests
      * <ul>
-     * <li>activate saros-instance</li>
+     * <li>activate saros-instance workbench</li>
      * <li>close all opened popup windows</li>
      * <li>close all opened editors</li>
      * <li>delete all existed projects</li>
@@ -179,21 +180,32 @@ public class STFTest {
      */
     public static void setUpWorkbenchs() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.workbench.activateEclipseShell();
+            tester.workbench.activateWorkbench();
             tester.workbench.setUpWorkbench();
-            tester.workbench.closeWelcomeView();
+            tester.view.closeViewByTitle("Welcome");
             tester.windowM.openPerspectiveJava();
             tester.workbench.closeUnnecessaryViews();
         }
     }
 
+    /**
+     * bring Saros to a original state before beginning your tests
+     * <ul>
+     * <li>make automaticReminder disable</li>
+     * <li>open sarosViews</li>
+     * <li>connect</li>
+     * <li>check buddy lists, if all active testers are in contact</li>
+     * </ul>
+     * 
+     * @throws RemoteException
+     */
     public static void setUpSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.sarosM.disableAutomaticReminder();
             tester.workbench.openSarosViews();
             tester.rosterV.connect(tester.jid, tester.password);
         }
-        // Now that everyone is connected, check buddy lists.
+        // check buddy lists.
         for (Tester tester : activeTesters) {
             for (Tester otherTester : activeTesters) {
                 if (tester != otherTester) {
@@ -203,10 +215,18 @@ public class STFTest {
         }
     }
 
-    public static void setUpSession(Tester host, Tester... invitees)
+    /**
+     * A convenient function to quickly build a session with default value.
+     * 
+     * @param inviter
+     * @param invitees
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void setUpSessionByDefault(Tester inviter, Tester... invitees)
         throws RemoteException, InterruptedException {
-        host.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        host.buildSessionDoneConcurrently(PROJECT1,
+        inviter.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        inviter.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             invitees);
     }
@@ -294,12 +314,6 @@ public class STFTest {
         activeTesters.clear();
         assertTrue(activeTesters.isEmpty());
     }
-
-    // @BeforeClass
-    // public static void beforeClass() throws Exception {
-    // setUpWorkbenchs();
-    // setUpSaros();
-    // }
 
     @Before
     public void before() throws Exception {

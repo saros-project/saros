@@ -300,7 +300,7 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
         precondition();
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, SHARE_PROJECT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 
@@ -352,7 +352,7 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
         throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, contextName };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 }

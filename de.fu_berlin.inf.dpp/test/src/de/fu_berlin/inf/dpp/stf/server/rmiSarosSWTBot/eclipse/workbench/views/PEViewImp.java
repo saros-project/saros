@@ -112,7 +112,7 @@ public class PEViewImp extends EclipsePart implements PEView {
 
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
-        treeW.clickContextsOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
     }
 
     public void openClass(String projectName, String pkg, String className)
@@ -156,7 +156,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         throws RemoteException {
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
@@ -179,7 +179,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         String projectName, String repositoryURL) throws RemoteException {
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
@@ -196,7 +196,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         precondition();
 
         String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
@@ -273,7 +273,7 @@ public class PEViewImp extends EclipsePart implements PEView {
     public void disConnect(String projectName) throws RemoteException {
 
         String[] contexts = { TEAM, DISCONNECT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
@@ -283,7 +283,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         precondition();
 
         String[] contexts = { TEAM, REVERT };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_REVERT, OK);
@@ -308,7 +308,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         precondition();
 
         String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(projectName));
 
         shellC.waitUntilShellActive(SHELL_SWITCH);
@@ -426,7 +426,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         throws RemoteException {
         precondition();
         String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
         shellC.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
@@ -446,9 +446,9 @@ public class PEViewImp extends EclipsePart implements PEView {
         }
         precondition();
 
-        treeW.clickContextsOfTreeItemInView(VIEWNAME, "Copy",
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Copy",
             changeToRegex(source));
-        treeW.clickContextsOfTreeItemInView(VIEWNAME, "Paste",
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Paste",
             changeToRegex(source));
 
         shellC.activateShellWithText("Copy Project");

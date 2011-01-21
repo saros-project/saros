@@ -38,7 +38,7 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
             TypeOfTester.DAVE);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob, carl, dave);
+        setUpSessionByDefault(alice, bob, carl, dave);
         alice.followedBy(bob, carl, dave);
     }
 

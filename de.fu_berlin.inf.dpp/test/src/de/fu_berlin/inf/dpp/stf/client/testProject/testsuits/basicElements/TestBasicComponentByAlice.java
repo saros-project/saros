@@ -45,14 +45,14 @@ public class TestBasicComponentByAlice extends STFTest {
     public void existsTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts("Window", "Show View", "Other...");
         alice.shell.activateShellWaitingUntilOpened("Show View");
-        assertTrue(alice.tree.existsTreeItemInTreeNode("Console", "General"));
+        assertTrue(alice.tree.existsSubItemInTreeItem("Console", "General"));
     }
 
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
         alice.menu.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
-        assertTrue(alice.tree.existsTreeItemInTreeNode("Annotations",
+        assertTrue(alice.tree.existsSubItemInTreeItem("Annotations",
             "General", "Editors", "Text Editors"));
     }
 
@@ -71,7 +71,7 @@ public class TestBasicComponentByAlice extends STFTest {
         assertTrue(alice.tree.existsTreeItemInTreeInView("Package Explorer",
             PROJECT1));
         assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.tree.existsTreeItemInTreeNodeInView(
+        assertTrue(alice.tree.existsSubItemInTreeItemInView(
             "Package Explorer", CLS1 + ".java", PROJECT1, SRC, PKG1));
         alice.fileM.existsClass(PROJECT1, PKG1, CLS1);
     }
@@ -168,7 +168,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
         alice.rosterV.connect(alice.jid, alice.password);
-        assertTrue(alice.tree.existsContextOfTreeItemInView("Roster",
+        assertTrue(alice.tree.existsContextMenuOfTreeItemInView("Roster",
             "Rename...", "Buddies", "bob_stf.*"));
     }
 
@@ -176,16 +176,16 @@ public class TestBasicComponentByAlice extends STFTest {
     public void existsSubmenuOfContextOfTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         String[] contextNames = { "Saros", "Share project..." };
-        assertTrue(alice.tree.existsSubmenuOfContextOfTreeItemInView(
+        assertTrue(alice.tree.existsContextMenusOfTreeItemInView(
             "Package Explorer", contextNames, PROJECT1));
     }
 
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
         alice.rosterV.connect(alice.jid, alice.password);
-        assertTrue(alice.tree.isContextOfTreeItemInViewEnabled("Roster",
+        assertTrue(alice.tree.isContextMenuOfTreeItemInViewEnabled("Roster",
             "Rename...", "Buddies", "bob_stf.*"));
-        assertFalse(alice.tree.isContextOfTreeItemInViewEnabled("Roster",
+        assertFalse(alice.tree.isContextMenuOfTreeItemInViewEnabled("Roster",
             "Invite user...", "Buddies", "bob_stf.*"));
     }
 
@@ -195,16 +195,16 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         String[] contextNames1 = { "Saros", "Share project..." };
         String[] contextNames2 = { "Saros", "Add to session (experimental)..." };
-        assertTrue(alice.tree.isSubmenuOfContextOfTreeItemInViewEnabled(
+        assertTrue(alice.tree.isContextMenusOfTreeItemInViewEnabled(
             "Package Explorer", contextNames1, PROJECT1));
-        assertFalse(alice.tree.isSubmenuOfContextOfTreeItemInViewEnabled(
+        assertFalse(alice.tree.isContextMenusOfTreeItemInViewEnabled(
             "Package Explorer", contextNames2, PROJECT1));
     }
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
         alice.rosterV.connect(alice.jid, alice.password);
-        alice.tree.clickContextsOfTreeItemInView("Roster", "Rename...",
+        alice.tree.clickContextMenuOfTreeItemInView("Roster", "Rename...",
             "Buddies", "bob_stf.*");
         assertTrue(alice.shell.isShellOpen("Set new nickname"));
     }
@@ -214,7 +214,7 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         String[] contextNames1 = { "Saros", "Share project..." };
 
-        alice.tree.clickSubMenuOfContextsOfTreeItemInView("Package Explorer",
+        alice.tree.clickContextMenusOfTreeItemInView("Package Explorer",
             contextNames1, PROJECT1);
         assertTrue(alice.shell.activateShellWaitingUntilOpened("Invitation"));
     }

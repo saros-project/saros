@@ -381,7 +381,7 @@ public class EditorImp extends EclipsePart implements Editor {
         throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         SWTBotEclipseEditor editor = getEditor(fileName);
         editor.setFocus();
         editor.typeText(text);

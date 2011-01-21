@@ -32,7 +32,7 @@ public class TestFolderOperations extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob, carl);
+        setUpSessionByDefault(alice, bob, carl);
     }
 
     @AfterClass

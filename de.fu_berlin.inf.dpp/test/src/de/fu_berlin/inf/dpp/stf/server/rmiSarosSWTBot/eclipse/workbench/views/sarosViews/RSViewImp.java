@@ -90,7 +90,7 @@ public class RSViewImp extends EclipsePart implements RSView {
     }
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        viewW.waitUntilViewActive(VIEWNAME);
+        viewW.waitUntilIsViewActive(VIEWNAME);
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)

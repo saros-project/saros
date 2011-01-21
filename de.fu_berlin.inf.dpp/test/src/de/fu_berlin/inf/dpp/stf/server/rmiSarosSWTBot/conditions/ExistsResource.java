@@ -6,11 +6,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-public class ExistResource extends DefaultCondition {
+public class ExistsResource extends DefaultCondition {
 
     private String resourcePath;
 
-    ExistResource(String resourcePath) {
+    ExistsResource(String resourcePath) {
         this.resourcePath = resourcePath;
     }
 

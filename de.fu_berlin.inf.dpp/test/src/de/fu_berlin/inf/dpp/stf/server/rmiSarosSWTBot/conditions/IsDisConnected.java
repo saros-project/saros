@@ -5,12 +5,12 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-public class isDisConnected extends DefaultCondition {
+public class IsDisConnected extends DefaultCondition {
 
     private List<SWTBotToolbarButton> buttons;
     private String tooltipText;
 
-    isDisConnected(List<SWTBotToolbarButton> buttons, String tooltipText) {
+    IsDisConnected(List<SWTBotToolbarButton> buttons, String tooltipText) {
         this.buttons = buttons;
         this.tooltipText = tooltipText;
     }

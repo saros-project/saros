@@ -18,13 +18,28 @@ public class TextImp extends EclipsePart implements Text {
         return textImp;
     }
 
-    // actions
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
     public void setTextInTextWithLabel(String text, String label)
         throws RemoteException {
         bot.textWithLabel(label).setText(text);
     }
 
-    // states
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public String getTextInTextWithLabel(String label) throws RemoteException {
         return bot.textWithLabel(label).getText();
     }

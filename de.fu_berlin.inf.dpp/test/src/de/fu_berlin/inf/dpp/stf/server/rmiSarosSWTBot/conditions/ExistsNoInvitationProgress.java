@@ -7,11 +7,11 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class ExistNoInvitationProgress extends DefaultCondition {
+public class ExistsNoInvitationProgress extends DefaultCondition {
 
     private SarosSWTBot bot;
 
-    ExistNoInvitationProgress(SarosSWTBot bot) {
+    ExistsNoInvitationProgress(SarosSWTBot bot) {
         this.bot = bot;
     }
 

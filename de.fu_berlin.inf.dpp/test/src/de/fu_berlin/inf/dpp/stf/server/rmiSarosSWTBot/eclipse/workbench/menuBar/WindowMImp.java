@@ -117,7 +117,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
 
     public void showViewWithName(String category, String nodeName)
         throws RemoteException {
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
         shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
             nodeName, OK);
@@ -145,7 +145,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     }
 
     protected void precondition() throws RemoteException {
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
     }
 
     /**
@@ -168,7 +168,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            workbenchC.activateEclipseShell();
+            workbenchC.activateWorkbench();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {

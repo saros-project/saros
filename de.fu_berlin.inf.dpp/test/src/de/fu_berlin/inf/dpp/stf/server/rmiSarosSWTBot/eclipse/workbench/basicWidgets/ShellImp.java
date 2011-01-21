@@ -39,7 +39,7 @@ public class ShellImp extends EclipsePart implements Shell {
 
     /**********************************************
      * 
-     * open/close/activate the view
+     * actions
      * 
      **********************************************/
 
@@ -85,109 +85,10 @@ public class ShellImp extends EclipsePart implements Shell {
         return activateShellWithText(title);
     }
 
-    public boolean isShellActive(String title) throws RemoteException {
-        if (!isShellOpen(title))
-            return false;
-        try {
-
-            SWTBotShell activeShell = bot.activeShell();
-
-            String shellTitle = activeShell.getText();
-            return shellTitle.equals(title);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    public boolean isShellOpen(String title) throws RemoteException {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells)
-            if (shell.getText().equals(title))
-                return true;
-        return false;
-    }
-
     public void closeShell(String title) throws RemoteException {
         bot.shell(title).close();
     }
 
-    /**********************************************
-     * 
-     * get
-     * 
-     **********************************************/
-
-    public String getTextOfActiveShell() throws RemoteException {
-        final SWTBotShell activeShell = bot.activeShell();
-        return activeShell == null ? null : activeShell.getText();
-    }
-
-    public String getErrorMessageInShell(final String title)
-        throws RemoteException {
-        final SWTBotShell shell = bot.shell(title);
-        final String errorMessage = UIThreadRunnable
-            .syncExec(new StringResult() {
-                public String run() {
-                    WizardDialog dialog = (WizardDialog) shell.widget.getData();
-                    return dialog.getErrorMessage();
-                }
-            });
-        if (errorMessage == null) {
-            throw new WidgetNotFoundException("Could not find errorMessage!");
-        }
-        return errorMessage;
-    }
-
-    /**********************************************
-     * 
-     * exists the given widget in the shell
-     * 
-     **********************************************/
-    public boolean existsTableItemInShell(String title, String label)
-        throws RemoteException {
-        activateShellWithText(title);
-        return tableW.existsTableItem(label);
-    }
-
-    /**********************************************
-     * 
-     * waits until the widget...
-     * 
-     **********************************************/
-    public void waitUntilShellOpen(String title) throws RemoteException {
-        waitUntil(SarosConditions.isShellOpen(bot, title));
-    }
-
-    public void waitUntilShellActive(String title) throws RemoteException {
-        waitUntil(SarosConditions.ShellActive(bot, title));
-        // if (!isShellActive(title))
-        // throw new RemoteException("Couldn't activate shell \"" + title
-        // + "\"");
-    }
-
-    public void waitUntilShellClosed(String title) throws RemoteException {
-        waitUntil(SarosConditions.isShellClosed(bot, title));
-        bot.sleep(10);
-    }
-
-    public void waitLongUntilShellClosed(String title) throws RemoteException {
-        waitLongUntil(SarosConditions.isShellClosed(bot, title));
-    }
-
-    /**********************************************
-     * 
-     * confirm shell
-     * 
-     **********************************************/
-    /**
-     * confirm a pop-up window.
-     * 
-     * @param title
-     *            title of the window
-     * @param buttonText
-     *            text of the button
-     * 
-     */
     public void confirmShell(String title, String buttonText)
         throws RemoteException {
         if (activateShellWithText(title)) {
@@ -250,9 +151,9 @@ public class ShellImp extends EclipsePart implements Shell {
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        treeW.waitUntilTreeItemInTreeExisted(rootOfTreeNode);
+        treeW.waitUntilIsTreeItemInTreeExisted(rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        treeW.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
+        treeW.waitUntilIsSubItemInTreeItemExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
         buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
@@ -263,6 +164,85 @@ public class ShellImp extends EclipsePart implements Shell {
         if (!activateShellWithText(CONFIRM_DELETE))
             waitUntilShellActive(CONFIRM_DELETE);
         confirmShell(CONFIRM_DELETE, buttonName);
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean isShellActive(String title) throws RemoteException {
+        if (!isShellOpen(title))
+            return false;
+        try {
+
+            SWTBotShell activeShell = bot.activeShell();
+
+            String shellTitle = activeShell.getText();
+            return shellTitle.equals(title);
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean isShellOpen(String title) throws RemoteException {
+        SWTBotShell[] shells = bot.shells();
+        for (SWTBotShell shell : shells)
+            if (shell.getText().equals(title))
+                return true;
+        return false;
+    }
+
+    public String getTextOfActiveShell() throws RemoteException {
+        final SWTBotShell activeShell = bot.activeShell();
+        return activeShell == null ? null : activeShell.getText();
+    }
+
+    public String getErrorMessageInShell(final String title)
+        throws RemoteException {
+        final SWTBotShell shell = bot.shell(title);
+        final String errorMessage = UIThreadRunnable
+            .syncExec(new StringResult() {
+                public String run() {
+                    WizardDialog dialog = (WizardDialog) shell.widget.getData();
+                    return dialog.getErrorMessage();
+                }
+            });
+        if (errorMessage == null) {
+            throw new WidgetNotFoundException("Could not find errorMessage!");
+        }
+        return errorMessage;
+    }
+
+    public boolean existsTableItemInShell(String title, String label)
+        throws RemoteException {
+        activateShellWithText(title);
+        return tableW.existsTableItem(label);
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilShellOpen(String title) throws RemoteException {
+        waitUntil(SarosConditions.isShellOpen(bot, title));
+    }
+
+    public void waitUntilShellActive(String title) throws RemoteException {
+        waitUntil(SarosConditions.ShellActive(bot, title));
+        // if (!isShellActive(title))
+        // throw new RemoteException("Couldn't activate shell \"" + title
+        // + "\"");
+    }
+
+    public void waitUntilShellClosed(String title) throws RemoteException {
+        waitUntil(SarosConditions.isShellClosed(bot, title));
+        bot.sleep(10);
+    }
+
+    public void waitLongUntilShellClosed(String title) throws RemoteException {
+        waitLongUntil(SarosConditions.isShellClosed(bot, title));
     }
 
 }

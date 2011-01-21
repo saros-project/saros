@@ -176,7 +176,7 @@ public interface Tree extends Remote {
      *                       given nodes exists.
      * @throws RemoteException
      */
-    public boolean existsTreeItemInTreeNode(String itemText, String... nodes)
+    public boolean existsSubItemInTreeItem(String itemText, String... nodes)
         throws RemoteException;
 
     /**
@@ -194,7 +194,7 @@ public interface Tree extends Remote {
      *                       given nodes exists.
      * @throws RemoteException
      */
-    public boolean existsTreeItemInTreeNodeInView(String viewTitle,
+    public boolean existsSubItemInTreeItemInView(String viewTitle,
         String itemText, String... nodes) throws RemoteException;
 
     /**
@@ -208,7 +208,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the contextMenu of the selected TreeItem exists.
      * @throws RemoteException
      */
-    public boolean existsContextOfTreeItem(String contextName, String... nodes)
+    public boolean existsContextMenuOfTreeItem(String contextName, String... nodes)
         throws RemoteException;
 
     /**
@@ -224,7 +224,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the contextMenu of the selected TreeItem exists.
      * @throws RemoteException
      */
-    public boolean existsContextOfTreeItemInView(String viewTitle,
+    public boolean existsContextMenuOfTreeItemInView(String viewTitle,
         String contextName, String... nodes) throws RemoteException;
 
     /**
@@ -239,7 +239,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the subMenu of the selected TreeItem exists.
      * @throws RemoteException
      */
-    public boolean existsSuMenuOfContextOfTreeItem(String[] contextNames,
+    public boolean existsContextMenusOfTreeItem(String[] contextNames,
         String... nodes) throws RemoteException;
 
     /**
@@ -256,7 +256,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the subMenu of the selected TreeItem exists.
      * @throws RemoteException
      */
-    public boolean existsSubmenuOfContextOfTreeItemInView(String viewTitle,
+    public boolean existsContextMenusOfTreeItemInView(String viewTitle,
         String[] contextNames, String... nodes) throws RemoteException;
 
     /***************** is context of tree item enabled****************** */
@@ -272,7 +272,7 @@ public interface Tree extends Remote {
      *                       enabled.
      * @throws RemoteException
      */
-    public boolean isContextOfTreeItemEnabled(String contextName,
+    public boolean isContextMenuOfTreeItemEnabled(String contextName,
         String... nodes) throws RemoteException;
 
     /**
@@ -289,7 +289,7 @@ public interface Tree extends Remote {
      *                       enabled.
      * @throws RemoteException
      */
-    public boolean isContextOfTreeItemInViewEnabled(String viewTitle,
+    public boolean isContextMenuOfTreeItemInViewEnabled(String viewTitle,
         String contextName, String... nodes) throws RemoteException;
 
     /**
@@ -304,7 +304,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the subMenu of the selected TreeItem is enabled.
      * @throws RemoteException
      */
-    public boolean isSuMenuOfContextOfTreeItemEnabled(String[] contextNames,
+    public boolean isContextMenusOfTreeItemEnabled(String[] contextNames,
         String... nodes) throws RemoteException;
 
     /**
@@ -321,7 +321,7 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the subMenu of the selected TreeItem is enabled.
      * @throws RemoteException
      */
-    public boolean isSubmenuOfContextOfTreeItemInViewEnabled(String viewTitle,
+    public boolean isContextMenusOfTreeItemInViewEnabled(String viewTitle,
         String[] contextNames, String... nodes) throws RemoteException;
 
     /***************** click context of tree item ****************** */
@@ -338,7 +338,7 @@ public interface Tree extends Remote {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void clickContextsOfTreeItem(String contextName, String... nodes)
+    public void clickContextMenuOfTreeItem(String contextName, String... nodes)
         throws RemoteException;
 
     /**
@@ -356,7 +356,7 @@ public interface Tree extends Remote {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void clickContextsOfTreeItemInView(String viewTitle,
+    public void clickContextMenuOfTreeItemInView(String viewTitle,
         String contextName, String... nodes) throws RemoteException;
 
     /**
@@ -373,7 +373,7 @@ public interface Tree extends Remote {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void clickSubMenuOfContextsOfTreeItem(String[] contextNames,
+    public void clickContextMenusOfTreeItem(String[] contextNames,
         String... nodes) throws RemoteException;
 
     /**
@@ -392,7 +392,7 @@ public interface Tree extends Remote {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void clickSubMenuOfContextsOfTreeItemInView(String viewTitle,
+    public void clickContextMenusOfTreeItemInView(String viewTitle,
         String[] contextNames, String... nodes) throws RemoteException;
 
     /***************** get allItems in treeNode ****************** */
@@ -406,7 +406,7 @@ public interface Tree extends Remote {
      * @return all the treeItem'name of the given TreeNode.
      * @throws RemoteException
      */
-    public List<String> getAllItemsInTreeNode(String... nodes)
+    public List<String> getSubItemsInTreeItem(String... nodes)
         throws RemoteException;
 
     /**
@@ -420,7 +420,7 @@ public interface Tree extends Remote {
      * @return all the treeItem'name of the given TreeNode.
      * @throws RemoteException
      */
-    public List<String> getAllItemsInTreeNodeInView(String viewTitle,
+    public List<String> getSubItemsInTreeItemInView(String viewTitle,
         String... nodes) throws RemoteException;
 
     /***************** get allItems in tree ****************** */
@@ -431,7 +431,7 @@ public interface Tree extends Remote {
      * @return all the treeItem'name of the bot.tree().
      * @throws RemoteException
      */
-    public List<String> getAllItemsIntree() throws RemoteException;
+    public List<String> getSubtemsInTree() throws RemoteException;
 
     /**
      * This method is suitable for view widget.
@@ -442,19 +442,19 @@ public interface Tree extends Remote {
      *         bot.getViewByTitle(viewTitle).bot().tree().
      * @throws RemoteException
      */
-    public List<String> getAllItemsIntreeInView(String viewTitle)
+    public List<String> getSubItemsInTreeInView(String viewTitle)
         throws RemoteException;
 
-    public void waitUntilTreeItemInTreeExisted(String nodeName)
+    public void waitUntilIsTreeItemInTreeExisted(String nodeName)
         throws RemoteException;
 
-    public void waitUntilTreeItemInTreeExisted(final SWTBotTree tree,
+    public void waitUntilIsTreeItemInTreeExisted(final SWTBotTree tree,
         final String itemText) throws RemoteException;
 
-    public void waitUntilTreeItemInTreeNodeExisted(String itemText,
+    public void waitUntilIsSubItemInTreeItemExisted(String itemText,
         String... nodes) throws RemoteException;
 
-    public void waitUntilTreeItemInTreeNodeExisted(SWTBotTreeItem treeItem,
+    public void waitUntilIsSubItemInTreeItemExisted(SWTBotTreeItem treeItem,
         String nodeName) throws RemoteException;
 
 }

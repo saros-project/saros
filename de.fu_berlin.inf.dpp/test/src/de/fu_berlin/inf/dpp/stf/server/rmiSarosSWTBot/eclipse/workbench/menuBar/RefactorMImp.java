@@ -45,7 +45,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
 
         String[] nodes = getClassNodes(sourceProject, sourcePkg, className);
         String[] contexts = { REFACTOR, MOVE };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
         shellC.waitUntilShellActive(SHELL_MOVE);
         shellC.confirmShellWithTree(SHELL_MOVE, OK, targetProject, SRC,
@@ -58,7 +58,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
         precondition();
 
         String[] contexts = { REFACTOR, RENAME };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
@@ -71,7 +71,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
         String[] contexts = { REFACTOR, RENAME };
-        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
             changeToRegex(nodes));
 
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;

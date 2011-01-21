@@ -23,7 +23,7 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob);
+        setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass

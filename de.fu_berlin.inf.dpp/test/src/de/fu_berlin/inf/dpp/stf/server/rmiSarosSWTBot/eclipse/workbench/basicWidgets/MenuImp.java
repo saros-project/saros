@@ -21,8 +21,19 @@ public class MenuImp extends EclipsePart implements Menu {
         return menuImp;
     }
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void clickMenuWithTexts(String... texts) throws RemoteException {
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         SWTBotMenu selectedmenu = null;
         for (String text : texts) {
             try {

@@ -39,7 +39,7 @@ public class TestDriverResetsFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob, carl, dave, edna);
+        setUpSessionByDefault(alice, bob, carl, dave, edna);
     }
 
     @AfterClass

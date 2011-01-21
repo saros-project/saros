@@ -405,7 +405,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (!hasBuddy(buddyJID))
             return;
         try {
-            treeW.clickContextsOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
+            treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
                 + ".*", buddyNickName + ".*");
             shellC.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
@@ -450,7 +450,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        treeW.clickContextsOfTreeItemInView(VIEWNAME, CM_RENAME,
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_RENAME,
             BUDDIES + ".*", buddyNickName + ".*");
         if (!shellC.activateShellWithText("Set new nickname")) {
             shellC.waitUntilShellActive("Set new nickname");

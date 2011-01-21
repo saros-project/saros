@@ -31,9 +31,7 @@ public interface Workbench extends Remote {
      */
     public void resetWorkbench() throws RemoteException;
 
-    public void activateEclipseShell() throws RemoteException;
-
-    public void closeWelcomeView() throws RemoteException;
+    public void activateWorkbench() throws RemoteException;
 
     public void setUpWorkbench() throws RemoteException;
 

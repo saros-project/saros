@@ -19,7 +19,7 @@ public interface View extends Remote {
      * @param viewName
      *            name of the view, which should be active. //
      */
-    public void waitUntilViewActive(String viewName) throws RemoteException;
+    public void waitUntilIsViewActive(String viewName) throws RemoteException;
 
     /**
      * open the given view specified with the viewId.

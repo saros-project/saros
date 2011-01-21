@@ -32,7 +32,17 @@ public class ViewImp extends EclipsePart implements View {
         return viewImp;
     }
 
-    // actions
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void openViewById(final String viewId) throws RemoteException {
         try {
             Display.getDefault().syncExec(new Runnable() {
@@ -88,7 +98,11 @@ public class ViewImp extends EclipsePart implements View {
         }
     }
 
-    // states
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public boolean isViewOpen(String title) throws RemoteException {
         return getTitlesOfOpenedViews().contains(title);
     }
@@ -110,10 +124,20 @@ public class ViewImp extends EclipsePart implements View {
         return list;
     }
 
-    // waits until
-    public void waitUntilViewActive(String viewName) throws RemoteException {
-        waitUntil(SarosConditions.isViewActive(bot, viewName));
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilIsViewActive(String viewTitle) throws RemoteException {
+        waitUntil(SarosConditions.isViewActive(bot, viewTitle));
     }
+
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
 
     /**
      * @param viewTitle

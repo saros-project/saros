@@ -127,7 +127,7 @@ public interface WindowM extends Remote {
      *            example: "General"
      * @param nodeName
      *            example: "Console"
-     * @see WorkbenchImp#activateEclipseShell()
+     * @see WorkbenchImp#activateWorkbench()
      * @see MainMenuComponent#clickMenuWithTexts(String...)
      * 
      */

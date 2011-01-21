@@ -26,7 +26,7 @@ public class TestEditorComponentByAliceAndBob extends STFTest {
         setUpSaros();
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
-        setUpSession(alice, bob);
+        setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass

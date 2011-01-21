@@ -40,7 +40,7 @@ public class TestRosterViewComponent extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob);
+        setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass

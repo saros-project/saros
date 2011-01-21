@@ -20,7 +20,17 @@ public class LabelImp extends EclipsePart implements Label {
         return labelImp;
     }
 
-    // states
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public String getTextOfLabel() throws RemoteException {
         return bot.label().getText();
     }

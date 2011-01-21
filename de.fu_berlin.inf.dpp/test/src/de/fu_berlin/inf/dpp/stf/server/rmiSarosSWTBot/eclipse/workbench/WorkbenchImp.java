@@ -23,8 +23,6 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
 
     private static transient WorkbenchImp self;
 
-    private final static String VIEW_TITLE_WELCOME = "Welcome";
-
     /**
      * {@link WorkbenchImp} is a singleton, but inheritance is possible.
      */
@@ -95,7 +93,7 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
         throw new RemoteException(message);
     }
 
-    public void activateEclipseShell() throws RemoteException {
+    public void activateWorkbench() throws RemoteException {
         getEclipseShell().activate().setFocus();
         // return activateShellWithMatchText(".+? - .+");
         // Display.getDefault().syncExec(new Runnable() {
@@ -132,10 +130,6 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
         deleteAllProjects();
         editM.deleteAllProjectsWithGUI();
 
-    }
-
-    public void closeWelcomeView() throws RemoteException {
-        viewW.closeViewByTitle(VIEW_TITLE_WELCOME);
     }
 
     public void deleteAllProjects() throws RemoteException {

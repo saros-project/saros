@@ -4,14 +4,16 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 
-public class ExistTableItem extends DefaultCondition {
+public class ExistsContextMenuOfTableItem extends DefaultCondition {
 
     private Table table;
     private String itemText;
+    private String contextName;
 
-    ExistTableItem(Table table, String itemText) {
+    ExistsContextMenuOfTableItem(Table table, String itemText, String contextName) {
         this.table = table;
         this.itemText = itemText;
+        this.contextName = contextName;
     }
 
     public String getFailureMessage() {
@@ -20,6 +22,6 @@ public class ExistTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return table.existsTableItem(itemText);
+        return table.isContextMenuOfTableEnabled(itemText, contextName);
     }
 }

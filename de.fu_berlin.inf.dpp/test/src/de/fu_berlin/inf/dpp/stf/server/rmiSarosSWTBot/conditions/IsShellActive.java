@@ -3,24 +3,22 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-public class isViewActive extends DefaultCondition {
+public class IsShellActive extends DefaultCondition {
 
+    private String title;
     private SWTWorkbenchBot bot;
-    private String name;
 
-    isViewActive(SWTWorkbenchBot bot, String name) {
-
-        this.name = name;
+    IsShellActive(SWTWorkbenchBot bot, String title) {
+        this.title = title;
         this.bot = bot;
     }
 
     public String getFailureMessage() {
-
-        return null;
+        return "Shell " + title + " not found.";
     }
 
     public boolean test() throws Exception {
-        return bot.activeView().getTitle().equals(name);
+        // In conditions, only use methods that return immediately (no waiting)
+        return bot.activeShell().getText().equals(title);
     }
-
 }

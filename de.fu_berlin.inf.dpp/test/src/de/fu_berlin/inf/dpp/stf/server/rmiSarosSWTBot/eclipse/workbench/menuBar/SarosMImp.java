@@ -318,7 +318,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
      * @throws RemoteException
      */
     private void clickMenuSarosPreferences() throws RemoteException {
-        workbenchC.activateEclipseShell();
+        workbenchC.activateWorkbench();
         menuW.clickMenuWithTexts(MENU_SAROS, "Preferences");
     }
 

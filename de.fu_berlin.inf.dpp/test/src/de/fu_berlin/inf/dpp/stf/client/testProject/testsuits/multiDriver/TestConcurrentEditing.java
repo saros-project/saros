@@ -56,14 +56,14 @@ public class TestConcurrentEditing extends STFTest {
         bob.workbench.sleep(1000);
 
         // Alice goes to 0,6 and hits Delete
-        alice.workbench.activateEclipseShell();
+        alice.workbench.activateWorkbench();
         int waitActivate = 100;
         alice.workbench.sleep(waitActivate);
         alice.editor.activateEditor(FILE);
         alice.editor.waitUntilEditorActive(FILE);
         alice.editor.pressShortcut(FILE, "DELETE");
         // at the same time, Bob enters L at 0,30
-        bob.workbench.activateEclipseShell();
+        bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
         bob.editor.activateEditor(FILE);
         bob.editor.waitUntilEditorActive(FILE);
@@ -72,13 +72,13 @@ public class TestConcurrentEditing extends STFTest {
         alice.workbench.sleep(300);
 
         // Alice hits Delete again
-        alice.workbench.activateEclipseShell();
+        alice.workbench.activateWorkbench();
         alice.workbench.sleep(waitActivate);
         alice.editor.activateEditor(FILE);
         alice.editor.waitUntilEditorActive(FILE);
         alice.editor.pressShortcut(FILE, "DELETE");
         // Bob enters o
-        bob.workbench.activateEclipseShell();
+        bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
         bob.editor.activateEditor(FILE);
         bob.editor.waitUntilEditorActive(FILE);

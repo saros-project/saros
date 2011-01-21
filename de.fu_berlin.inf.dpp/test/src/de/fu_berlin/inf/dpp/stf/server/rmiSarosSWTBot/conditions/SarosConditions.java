@@ -24,11 +24,11 @@ public class SarosConditions extends Conditions {
 
     public static ICondition isDisConnected(List<SWTBotToolbarButton> buttons,
         String tooltipText) {
-        return new isDisConnected(buttons, tooltipText);
+        return new IsDisConnected(buttons, tooltipText);
     }
 
     public static ICondition ShellActive(SWTWorkbenchBot bot, String title) {
-        return new ShellActive(bot, title);
+        return new IsShellActive(bot, title);
     }
 
     public static ICondition isShellOpen(SWTWorkbenchBot bot, String title) {
@@ -36,12 +36,12 @@ public class SarosConditions extends Conditions {
     }
 
     public static ICondition existTableItem(Table table, String tableItemName) {
-        return new ExistTableItem(table, tableItemName);
+        return new ExistsTableItem(table, tableItemName);
     }
 
     public static ICondition ExistContextMenuOfTableItem(Table table,
         String itemName, String contextName) {
-        return new ExistContextMenuOfTableItem(table, itemName, contextName);
+        return new ExistsContextMenuOfTableItem(table, itemName, contextName);
     }
 
     /**********************************************
@@ -54,7 +54,7 @@ public class SarosConditions extends Conditions {
     }
 
     public static ICondition isEditorActive(Editor editor, String name) {
-        return new isEditorActive(editor, name);
+        return new IsEditorActive(editor, name);
     }
 
     public static ICondition isEditorClosed(Editor editor, String name) {
@@ -66,7 +66,7 @@ public class SarosConditions extends Conditions {
     }
 
     public static ICondition isViewActive(SWTWorkbenchBot bot, String name) {
-        return new isViewActive(bot, name);
+        return new IsViewActive(bot, name);
     }
 
     public static ICondition isFileContentsSame(Editor state,
@@ -83,20 +83,20 @@ public class SarosConditions extends Conditions {
     }
 
     public static ICondition isResourceExist(String resourcePath) {
-        return new ExistResource(resourcePath);
+        return new ExistsResource(resourcePath);
     }
 
     public static ICondition isResourceNotExist(String resourcePath) {
-        return new ExistNoResource(resourcePath);
+        return new ExistsNoResource(resourcePath);
     }
 
     public static ICondition isChatMessageExist(ChatViewImp chatV, String jid,
         String message) {
-        return new IsChatMessageExist(chatV, jid, message);
+        return new ExistsChatMessage(chatV, jid, message);
     }
 
     public static ICondition existNoInvitationProgress(SarosSWTBot bot) {
-        return new ExistNoInvitationProgress(bot);
+        return new ExistsNoInvitationProgress(bot);
     }
 
     public static ICondition isJavaEditorContentsSame(Editor editor,

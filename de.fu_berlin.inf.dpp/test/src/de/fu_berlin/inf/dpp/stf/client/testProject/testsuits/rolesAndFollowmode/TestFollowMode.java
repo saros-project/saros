@@ -22,7 +22,7 @@ public class TestFollowMode extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob);
+        setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass

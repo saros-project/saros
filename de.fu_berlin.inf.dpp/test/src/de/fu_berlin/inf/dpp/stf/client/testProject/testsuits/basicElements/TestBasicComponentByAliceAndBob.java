@@ -15,6 +15,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestBasicComponentByAliceAndBob extends STFTest {
+
+    public static String VIEW_SESSION = "Shared Project Session";
     private static final Logger log = Logger
         .getLogger(TestBasicComponentByAliceAndBob.class);
 
@@ -24,7 +26,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSession(alice, bob);
+        setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass
@@ -53,29 +55,28 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void existsTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.existsTableItemInView("Shared Project Session",
+        assertTrue(alice.table.existsTableItemInView(VIEW_SESSION,
             bob.getBaseJid()));
-        assertTrue(alice.table.existsTableItemInView("Shared Project Session",
+        assertTrue(alice.table.existsTableItemInView(VIEW_SESSION,
             OWN_CONTACT_NAME + ROLE_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.table.selectTableItemInView("Shared Project Session",
-            bob.getBaseJid());
+        alice.table.selectTableItemInView(VIEW_SESSION, bob.getBaseJid());
         assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            "Shared Project Session", "Share your screen with selected user"));
-        alice.table.selectTableItemInView("Shared Project Session",
-            OWN_CONTACT_NAME + ROLE_NAME);
+            VIEW_SESSION, "Share your screen with selected user"));
+        alice.table.selectTableItemInView(VIEW_SESSION, OWN_CONTACT_NAME
+            + ROLE_NAME);
         assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            "Shared Project Session", "Share your screen with selected user"));
+            VIEW_SESSION, "Share your screen with selected user"));
     }
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.table.clickContextMenuOfTableInView("Shared Project Session",
+        alice.table.clickContextMenuOfTableInView(VIEW_SESSION,
             bob.getBaseJid(), "Give driver role");
         alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.sessionV.waitUntilIsDriver();
@@ -85,18 +86,18 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableVisibleInView(
-            "Shared Project Session", bob.getBaseJid(), "Give driver role"));
-        assertTrue(alice.table.isContextMenuOfTableVisibleInView(
-            "Shared Project Session", bob.getBaseJid(), "Change Color"));
+        assertTrue(alice.table.isContextMenuOfTableVisibleInView(VIEW_SESSION,
+            bob.getBaseJid(), "Give driver role"));
+        assertTrue(alice.table.isContextMenuOfTableVisibleInView(VIEW_SESSION,
+            bob.getBaseJid(), "Change Color"));
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableEnabledInView(
-            "Shared Project Session", bob.getBaseJid(), "Give driver role"));
-        assertFalse(alice.table.isContextMenuOfTableEnabledInView(
-            "Shared Project Session", bob.getBaseJid(), "Change Color"));
+        assertTrue(alice.table.isContextMenuOfTableEnabledInView(VIEW_SESSION,
+            bob.getBaseJid(), "Give driver role"));
+        assertFalse(alice.table.isContextMenuOfTableEnabledInView(VIEW_SESSION,
+            bob.getBaseJid(), "Change Color"));
     }
 }

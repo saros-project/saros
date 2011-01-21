@@ -22,7 +22,18 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
         return ToolbarButtonImp;
     }
 
-    // actions
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
     public void clickToolbarButtonWithRegexTooltipInView(String viewTitle,
         String tooltipText) throws RemoteException {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
@@ -44,7 +55,11 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
         bot.viewByTitle(viewTitle).toolbarPushButton(tooltip).click();
     }
 
-    // states
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public boolean isToolbarButtonInViewEnabled(String viewTitle,
         String tooltipText) throws RemoteException {
         SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
@@ -53,6 +68,12 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
             return false;
         return button.isEnabled();
     }
+
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
 
     /**
      * @param viewTitle
