@@ -57,7 +57,7 @@ public class EditMImp extends EclipsePart implements EditM {
 
     public void deleteAllProjectsWithGUI() throws RemoteException {
         precondition();
-        SWTBotTreeItem[] allTreeItems = basic.getTreeInView(VIEWNAME)
+        SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(VIEWNAME)
             .getAllItems();
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
@@ -71,7 +71,7 @@ public class EditMImp extends EclipsePart implements EditM {
 
     public void deleteProjectWithGUI(String projectName) throws RemoteException {
         precondition();
-        basic.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
+        treeW.clickContextsOfTreeItemInView(VIEWNAME, DELETE, projectName);
         shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
@@ -114,7 +114,7 @@ public class EditMImp extends EclipsePart implements EditM {
 
     public void deleteFile(String... nodes) throws RemoteException {
         precondition();
-        basic.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
+        treeW.clickContextsOfTreeItemInView(VIEWNAME, DELETE, nodes);
         shellC.confirmShellDelete(OK);
     }
 

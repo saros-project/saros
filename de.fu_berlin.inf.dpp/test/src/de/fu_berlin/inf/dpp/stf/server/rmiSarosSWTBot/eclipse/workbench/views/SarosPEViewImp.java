@@ -9,8 +9,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreat
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
 
-public class SarosPEViewImp extends PEViewImp implements
-    SarosPEView {
+public class SarosPEViewImp extends PEViewImp implements SarosPEView {
 
     private static transient SarosPEViewImp self;
 
@@ -89,7 +88,8 @@ public class SarosPEViewImp extends PEViewImp implements
     public void confirmWindowInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
         shellC.activateShellWithText(INVITATION);
-        shellC.confirmWindowWithCheckBoxs(INVITATION, FINISH, baseJIDOfinvitees);
+        shellC
+            .confirmWindowWithCheckBoxs(INVITATION, FINISH, baseJIDOfinvitees);
     }
 
     public void confirmWirzardSessionInvitationWithNewProject(String projectname)
@@ -301,7 +301,7 @@ public class SarosPEViewImp extends PEViewImp implements
         precondition();
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, SHARE_PROJECT };
-        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 
@@ -353,7 +353,7 @@ public class SarosPEViewImp extends PEViewImp implements
         throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, contextName };
-        basic.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
+        treeW.clickSubMenuOfContextsOfTreeItemInView(VIEWNAME, contexts,
             matchTexts);
     }
 }

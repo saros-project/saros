@@ -166,7 +166,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         throws RemoteException {
         precondition();
         String contactLabel = getContactStatusInSessionView(contactJID);
-        SWTBotTable table = basic.getTableInView(VIEWNAME);
+        SWTBotTable table = tableW.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().equals(contactLabel))
                 return true;
@@ -179,7 +179,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         precondition();
         if (isContactInSessionViewGUI(contactJID)) {
             String contactLabel = getContactStatusInSessionView(contactJID);
-            SWTBotTable table = basic.getTableInView(VIEWNAME);
+            SWTBotTable table = tableW.getTableInView(VIEWNAME);
             table.getTableItem(contactLabel).select();
         }
     }
@@ -239,7 +239,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        tableW.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -260,7 +260,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        tableW.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -281,7 +281,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        tableW.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_REMOVE_DRIVER_ROLE);
         sessionV.waitUntilIsNoDriver();
     }
@@ -490,7 +490,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean isInFollowModeGUI() throws RemoteException {
         try {
             precondition();
-            SWTBotTable table = basic.getTableInView(VIEWNAME);
+            SWTBotTable table = tableW.getTableInView(VIEWNAME);
             for (int i = 0; i < table.rowCount(); i++) {
                 try {
                     return table.getTableItem(i)
@@ -547,7 +547,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getContactStatusInSessionView(followedUserJID);
-        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        tableW.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_STOP_FOLLOWING_THIS_USER);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -576,14 +576,14 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean isCMStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
         precondition();
-        return table.isContextMenuOfTableVisibleInView(VIEWNAME, contactName,
+        return tableW.isContextMenuOfTableVisibleInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public boolean isCMStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
         precondition();
-        return table.isContextMenuOfTableEnabledInView(VIEWNAME, contactName,
+        return tableW.isContextMenuOfTableEnabledInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
@@ -838,7 +838,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     private List<String> getAllContactsInSessionView() throws RemoteException {
         precondition();
         List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = basic.getTableInView(VIEWNAME);
+        SWTBotTable table = tableW.getTableInView(VIEWNAME);
         for (int i = 0; i < table.rowCount(); i++) {
             allContactsName.add(table.getTableItem(i).getText());
         }
@@ -855,7 +855,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
+        tableW.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
 
     }
 
@@ -866,7 +866,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        table.getTableItemInView(VIEWNAME, contactLabel);
+        tableW.getTableItemInView(VIEWNAME, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)

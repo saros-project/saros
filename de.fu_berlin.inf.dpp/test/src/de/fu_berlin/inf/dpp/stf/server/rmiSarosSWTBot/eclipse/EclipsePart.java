@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.EditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileMImp;
@@ -68,7 +69,8 @@ public abstract class EclipsePart {
 
     // exported objects
     public static BasicWidgetsImp basic = BasicWidgetsImp.getInstance();
-    public static TableImp table = TableImp.getInstance();
+    public static TableImp tableW = TableImp.getInstance();
+    public static TreeImp treeW = TreeImp.getInstance();
 
     public static EditorImp editor = EditorImp.getInstance();
     public static WorkbenchImp workbenchC = WorkbenchImp.getInstance();

@@ -93,7 +93,7 @@ public class FileMImp extends EclipsePart implements FileM {
         folderNodes[folderNodes.length - 1] = newFolderName;
         if (!existsFolder(folderNodes)) {
             try {
-                basic.getTreeItemInView(VIEWNAME, parentNodes);
+                treeW.getTreeItemInView(VIEWNAME, parentNodes);
                 basic.clickMenuWithTexts(FILE, NEW, FOLDER);
                 confirmWindowNewFolder(newFolderName);
             } catch (WidgetNotFoundException e) {
@@ -182,7 +182,7 @@ public class FileMImp extends EclipsePart implements FileM {
                     else
                         parentNodes[i] = fileNodes[i];
                 }
-                basic.getTreeItemInView(VIEWNAME, parentNodes);
+                treeW.getTreeItemInView(VIEWNAME, parentNodes);
                 basic.clickMenuWithTexts(FILE, NEW, FILE);
                 confirmWindowNewFile(newFileName);
             } catch (WidgetNotFoundException e) {
@@ -212,8 +212,8 @@ public class FileMImp extends EclipsePart implements FileM {
     public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
         workbenchC.activateEclipseShell();
         precondition();
-        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
-        return basic.existsTreeItemWithRegexs(tree, nodes);
+        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
+        return treeW.existsTreeItemWithRegexs(tree, nodes);
     }
 
     public void waitUntilFileExisted(String... fileNodes)
@@ -266,7 +266,7 @@ public class FileMImp extends EclipsePart implements FileM {
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
         text.setText("java.lang.Runnable");
-        table.waitUntilTableHasRows(1);
+        tableW.waitUntilTableHasRows(1);
         bot.button(OK).click();
         bot.shell(SHELL_NEW_JAVA_CLASS).activate();
         bot.checkBox("Inherited abstract methods").click();

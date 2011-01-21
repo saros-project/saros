@@ -36,8 +36,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
  * 
  * @author Lin
  */
-public class RosterViewImp extends EclipsePart implements
-    RosterView {
+public class RosterViewImp extends EclipsePart implements RosterView {
 
     private static transient RosterViewImp self;
 
@@ -77,8 +76,7 @@ public class RosterViewImp extends EclipsePart implements
     private final static String REPEAT_PASSWORD = "Repeat Password";
 
     /**
-     * {@link RosterViewImp} is a singleton, but inheritance is
-     * possible.
+     * {@link RosterViewImp} is a singleton, but inheritance is possible.
      */
     public static RosterViewImp getInstance() {
         if (self != null)
@@ -131,8 +129,7 @@ public class RosterViewImp extends EclipsePart implements
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
             if (!sarosM.isAccountExist(jid, password)) {
-                sarosM.createAccount(jid.getDomain(), jid.getName(),
-                    password);
+                sarosM.createAccount(jid.getDomain(), jid.getName(), password);
             }
             if (!sarosM.isAccountActive(jid))
                 sarosM.activateAccount(jid);
@@ -330,7 +327,7 @@ public class RosterViewImp extends EclipsePart implements
      * 
      **********************************************/
     public void selectBuddyGUI(String baseJID) throws RemoteException {
-        basic.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
+        treeW.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
@@ -362,8 +359,8 @@ public class RosterViewImp extends EclipsePart implements
 
     public boolean hasBuddyGUI(String buddyNickName) throws RemoteException {
         precondition();
-        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
-        return basic.existsTreeItemWithRegexs(tree, BUDDIES, buddyNickName
+        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
+        return treeW.existsTreeItemWithRegexs(tree, BUDDIES, buddyNickName
             + ".*");
     }
 
@@ -408,7 +405,7 @@ public class RosterViewImp extends EclipsePart implements
         if (!hasBuddy(buddyJID))
             return;
         try {
-            basic.clickContextsOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
+            treeW.clickContextsOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
                 + ".*", buddyNickName + ".*");
             shellC.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
@@ -453,8 +450,8 @@ public class RosterViewImp extends EclipsePart implements
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        basic.clickContextsOfTreeItemInView(VIEWNAME, CM_RENAME, BUDDIES
-            + ".*", buddyNickName + ".*");
+        treeW.clickContextsOfTreeItemInView(VIEWNAME, CM_RENAME,
+            BUDDIES + ".*", buddyNickName + ".*");
         if (!shellC.activateShellWithText("Set new nickname")) {
             shellC.waitUntilShellActive("Set new nickname");
         }
@@ -478,9 +475,9 @@ public class RosterViewImp extends EclipsePart implements
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
-        SWTBotTree tree = basic.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = basic.getTreeItemWithRegexs(tree,
-            BUDDIES + ".*", buddyNickName + ".*");
+        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
+        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, BUDDIES + ".*",
+            buddyNickName + ".*");
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
                 + buddyNickName + ", he isn't conntected yet");

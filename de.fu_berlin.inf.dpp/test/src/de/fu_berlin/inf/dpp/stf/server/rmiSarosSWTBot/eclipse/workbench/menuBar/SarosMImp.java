@@ -11,8 +11,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
-public class SarosMImp extends EclipsePart implements
-    SarosM {
+public class SarosMImp extends EclipsePart implements SarosM {
 
     private static transient SarosMImp self;
 
@@ -28,8 +27,7 @@ public class SarosMImp extends EclipsePart implements
     private static final String P_SAROS = "Saros";
 
     /**
-     * {@link SarosMImp} is a singleton, but inheritance is
-     * possible.
+     * {@link SarosMImp} is a singleton, but inheritance is possible.
      */
     public static SarosMImp getInstance() {
         if (self != null)
@@ -294,7 +292,7 @@ public class SarosMImp extends EclipsePart implements
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
         shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
-        basic.selectTreeItem(P_SAROS);
+        treeW.selectTreeItem(P_SAROS);
     }
 
     /**

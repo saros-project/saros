@@ -146,7 +146,7 @@ public class ShellImp extends EclipsePart implements Shell {
     public boolean existsTableItemInShell(String title, String label)
         throws RemoteException {
         activateShellWithText(title);
-        return table.existsTableItem(label);
+        return tableW.existsTableItem(label);
     }
 
     /**********************************************
@@ -199,7 +199,7 @@ public class ShellImp extends EclipsePart implements Shell {
     public void confirmShellWithTree(String title, String buttonText,
         String... nodes) throws RemoteException {
         bot.shell(title).activate();
-        basic.selectTreeItem(nodes);
+        treeW.selectTreeItem(nodes);
         basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
     }
@@ -208,7 +208,7 @@ public class ShellImp extends EclipsePart implements Shell {
         String buttonText, String... nodes) throws RemoteException {
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
-        basic.selectTreeItemWithWaitingExpand(tree, nodes);
+        treeW.selectTreeItemWithWaitingExpand(tree, nodes);
         bot.button(buttonText).click();
     }
 
@@ -225,7 +225,7 @@ public class ShellImp extends EclipsePart implements Shell {
         String... itemNames) throws RemoteException {
         waitUntilShellActive(title);
         for (String itemName : itemNames) {
-            table.selectCheckBoxInTable(itemName);
+            tableW.selectCheckBoxInTable(itemName);
         }
         basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
@@ -250,9 +250,9 @@ public class ShellImp extends EclipsePart implements Shell {
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        basic.waitUntilTreeItemInTreeExisted(rootOfTreeNode);
+        treeW.waitUntilTreeItemInTreeExisted(rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        basic.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
+        treeW.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
         basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();

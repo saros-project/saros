@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbenc
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
@@ -52,6 +53,7 @@ public class Tester {
 
     public BasicWidgets basicWidgets;
     public Table table;
+    public Tree tree;
     public Shell shell;
 
     public Workbench workbench;
@@ -109,6 +111,7 @@ public class Tester {
 
             basicWidgets = (BasicWidgets) registry.lookup("basicObject");
             table = (Table) registry.lookup("table");
+            tree = (Tree) registry.lookup("tree");
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");
