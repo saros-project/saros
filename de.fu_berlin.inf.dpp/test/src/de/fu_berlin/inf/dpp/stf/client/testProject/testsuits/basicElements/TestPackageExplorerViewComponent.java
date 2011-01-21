@@ -359,7 +359,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testCopyProject() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
         assertFalse(alice.fileM.existsProject(PROJECT2));
-        alice.pEV.copyProject(PROJECT2, PROJECT1);
+        alice.editM.copyProject(PROJECT2, PROJECT1);
         assertTrue(alice.fileM.existsProject(PROJECT2));
     }
 }

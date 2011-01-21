@@ -576,15 +576,15 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean isCMStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
         precondition();
-        return tableW.isContextMenuOfTableItemVisibleInView(VIEWNAME, contactName,
-            CM_STOP_FOLLOWING_THIS_USER);
+        return tableW.isContextMenuOfTableItemVisibleInView(VIEWNAME,
+            contactName, CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public boolean isCMStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
         precondition();
-        return tableW.isContextMenuOfTableItemEnabledInView(VIEWNAME, contactName,
-            CM_STOP_FOLLOWING_THIS_USER);
+        return tableW.isContextMenuOfTableItemEnabledInView(VIEWNAME,
+            contactName, CM_STOP_FOLLOWING_THIS_USER);
     }
 
     /**********************************************
@@ -798,7 +798,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        pEV.confirmWindowInvitation(jidOfInvitees);
+        sarosC.confirmWindowInvitation(jidOfInvitees);
     }
 
     /**************************************************************
@@ -855,7 +855,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel, context);
+        tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
+            context);
 
     }
 

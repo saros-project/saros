@@ -89,13 +89,13 @@ public class TestEditDuringInvitation extends STFTest {
         alice.sessionV.openInvitationInterface(carl.getBaseJid());
 
         log.trace("carl.confirmSessionInvitationWindowStep1");
-        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
+        carl.sarosC.confirmFirstPageOfWizardSessionInvitation();
 
         log.trace("bob.setTextInJavaEditor");
         bob.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
-        carl.pEV.confirmSecondPageOfWizardSessionInvitationUsingNewproject();
+        carl.sarosC.confirmSecondPageOfWizardSessionInvitationUsingNewproject();
 
         log.trace("getTextOfJavaEditor");
         String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,

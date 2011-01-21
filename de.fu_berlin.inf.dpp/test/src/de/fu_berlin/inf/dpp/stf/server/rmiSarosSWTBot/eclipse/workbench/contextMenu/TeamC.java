@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.PEView;
 
-public interface Team extends Remote {
+public interface TeamC extends Remote {
 
     /**
      * Perform the action "share project with SVN" which should be done with the

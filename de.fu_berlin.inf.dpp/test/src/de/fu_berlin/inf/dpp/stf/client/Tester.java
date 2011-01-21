@@ -26,7 +26,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.Team;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
@@ -34,8 +35,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.WindowM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.ConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.PEView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.ProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.SarosPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.ChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RosterView;
@@ -49,7 +50,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
 public class Tester {
     private static final Logger log = Logger.getLogger(Tester.class);
 
-    public SarosPEView pEV;
+    public PEView pEV;
     public ProgressView progressV;
     public RosterView rosterV;
     public SessionView sessionV;
@@ -79,7 +80,8 @@ public class Tester {
     public SarosM sarosM;
 
     // contextMenu
-    public Team team;
+    public TeamC team;
+    public SarosC sarosC;
 
     public JID jid;
     public String password;
@@ -117,7 +119,7 @@ public class Tester {
              */
             sessionV.setJID(jid);
             rSV = (RSView) registry.lookup("remoteScreenView");
-            pEV = (SarosPEView) registry.lookup("packageExplorerView");
+            pEV = (PEView) registry.lookup("packageExplorerView");
             progressV = (ProgressView) registry.lookup("progressView");
             consoleV = (ConsoleView) registry.lookup("consoleView");
             workbench = (Workbench) registry.lookup("workbench");
@@ -140,7 +142,8 @@ public class Tester {
             sarosM = (SarosM) registry.lookup("sarosM");
 
             // contextMenu
-            team = (Team) registry.lookup("team");
+            team = (TeamC) registry.lookup("team");
+            sarosC = (SarosC) registry.lookup("saros");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -157,9 +160,10 @@ public class Tester {
         throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-        pEV.shareProjectWith(projectName, howToShareProject, baseJIDOfInvitees);
+        sarosC.shareProjectWith(projectName, howToShareProject,
+            baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.pEV.confirmWizardSessionInvitationUsingWhichProject(
+            invitee.sarosC.confirmWizardSessionInvitationUsingWhichProject(
                 projectName, usingWhichProject);
         }
     }
@@ -170,14 +174,14 @@ public class Tester {
         throws RemoteException, InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        this.pEV.shareProjectWith(projectName, howToShareProject,
+        this.sarosC.shareProjectWith(projectName, howToShareProject,
             getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.pEV
+                    invitee.sarosC
                         .confirmWizardSessionInvitationUsingWhichProject(
                             projectName, usingWhichProject);
                     invitee.sessionV.waitUntilSessionOpen();
@@ -419,7 +423,7 @@ public class Tester {
         for (final Tester tester : peers) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.pEV
+                    tester.sarosC
                         .confirmWirzardSessionInvitationWithNewProject(projectName);
                     return null;
                 }

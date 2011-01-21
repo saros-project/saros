@@ -78,7 +78,7 @@ public class TestSVNStateUpdates extends STFTest {
         for (final Tester musician : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
+                    musician.editM.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
                     assertTrue(musician.fileM.existsProject(SVN_PROJECT));
                     assertTrue(musician.team.isProjectManagedBySVN(SVN_PROJECT));
                     assertTrue(musician.fileM.existsFile(SVN_CLS1_FULL_PATH));

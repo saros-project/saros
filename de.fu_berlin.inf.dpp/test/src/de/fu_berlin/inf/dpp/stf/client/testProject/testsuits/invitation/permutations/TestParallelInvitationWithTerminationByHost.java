@@ -88,37 +88,37 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
-            carl.getBaseJid());
+        alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
+            dave.getBaseJid(), carl.getBaseJid());
 
         bob.shell.waitUntilShellOpen(SESSION_INVITATION);
         bob.shell.activateShellWithText(SESSION_INVITATION);
         alice.progressV.removeProcess(0);
         bob.shell.waitUntilShellOpen(INVITATIONCANCELLED);
         bob.shell.activateShellWithText(INVITATIONCANCELLED);
-        bob.pEV.closeWindowInvitationCancelled();
+        bob.sarosC.closeWindowInvitationCancelled();
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
+        carl.sarosC.confirmFirstPageOfWizardSessionInvitation();
         alice.progressV.removeProcess(0);
-        carl.pEV.waitUntilWindowInvitationCnacelledActive();
-        assertTrue(carl.pEV.isWindowInvitationCancelledActive());
-        carl.pEV.closeWindowInvitationCancelled();
+        carl.sarosC.waitUntilWindowInvitationCnacelledActive();
+        assertTrue(carl.sarosC.isWindowInvitationCancelledActive());
+        carl.sarosC.closeWindowInvitationCancelled();
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.pEV.confirmFirstPageOfWizardSessionInvitation();
+        dave.sarosC.confirmFirstPageOfWizardSessionInvitation();
 
         dave.button.clickButton(FINISH);
         alice.progressV.removeProcess(0);
         // FIXME Timeout exception by MAC OS X, the building session under MAS
-        // is sofast that the session process is already done after canceling
+        // is so fast that the session process is already done after canceling
         // this process, so dave should never get the window
         // "Invitation canceled".
-        dave.pEV.waitUntilWindowInvitationCnacelledActive();
-        assertTrue(dave.pEV.isWindowInvitationCancelledActive());
-        dave.pEV.closeWindowInvitationCancelled();
+        dave.sarosC.waitUntilWindowInvitationCnacelledActive();
+        assertTrue(dave.sarosC.isWindowInvitationCancelledActive());
+        dave.sarosC.closeWindowInvitationCancelled();
 
     }
 }

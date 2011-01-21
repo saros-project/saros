@@ -134,6 +134,27 @@ public class EditMImp extends EclipsePart implements EditM {
         }
     }
 
+    public void copyProject(String target, String source)
+        throws RemoteException {
+
+        if (fileM.existsProject(target)) {
+            throw new RemoteException("Can't copy project from " + source
+                + " to " + target + " , the target already exists.");
+        }
+        precondition();
+
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Copy",
+            changeToRegex(source));
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Paste",
+            changeToRegex(source));
+
+        shellC.activateShellWithText("Copy Project");
+        bot.textWithLabel("Project name:").setText(target);
+        bot.button(OK).click();
+        shellC.waitUntilShellClosed("Copy Project");
+        bot.sleep(1000);
+    }
+
     protected void precondition() throws RemoteException {
         pEV.openPEView();
         pEV.setFocusOnPEView();

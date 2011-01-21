@@ -12,9 +12,22 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
 public class PEViewImp extends EclipsePart implements PEView {
+
+    private static transient PEViewImp pEViewImp;
+
+    /**
+     * {@link TableImp} is a singleton, but inheritance is possible.
+     */
+    public static PEViewImp getInstance() {
+        if (pEViewImp != null)
+            return pEViewImp;
+        pEViewImp = new PEViewImp();
+        return pEViewImp;
+    }
 
     /* View infos */
     protected final static String VIEWNAME = "Package Explorer";
@@ -112,12 +125,6 @@ public class PEViewImp extends EclipsePart implements PEView {
         Program.launch(resource.getLocation().toString());
     }
 
-    /**********************************************
-     * 
-     * all related actions with the sub menus of the context menu "Team"
-     * 
-     **********************************************/
-
     /**************************************************************
      * 
      * Inner functions
@@ -127,27 +134,6 @@ public class PEViewImp extends EclipsePart implements PEView {
     protected void precondition() throws RemoteException {
         openPEView();
         setFocusOnPEView();
-    }
-
-    public void copyProject(String target, String source)
-        throws RemoteException {
-
-        if (fileM.existsProject(target)) {
-            throw new RemoteException("Can't copy project from " + source
-                + " to " + target + " , the target already exists.");
-        }
-        precondition();
-
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Copy",
-            changeToRegex(source));
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Paste",
-            changeToRegex(source));
-
-        shellC.activateShellWithText("Copy Project");
-        bot.textWithLabel("Project name:").setText(target);
-        bot.button(OK).click();
-        shellC.waitUntilShellClosed("Copy Project");
-        bot.sleep(1000);
     }
 
 }

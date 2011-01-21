@@ -18,17 +18,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-public class TeamImp extends EclipsePart implements Team {
+public class TeamCImp extends EclipsePart implements TeamC {
 
-    private static transient TeamImp teamImp;
+    private static transient TeamCImp teamImp;
 
     /**
-     * {@link TeamImp} is a singleton, but inheritance is possible.
+     * {@link TeamCImp} is a singleton, but inheritance is possible.
      */
-    public static TeamImp getInstance() {
+    public static TeamCImp getInstance() {
         if (teamImp != null)
             return teamImp;
-        teamImp = new TeamImp();
+        teamImp = new TeamCImp();
         return teamImp;
     }
 

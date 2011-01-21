@@ -95,24 +95,16 @@ public interface EditM extends Remote {
         throws RemoteException;
 
     /**
-     * Performs the action "move class to another package" which should be done
-     * with the following steps:
+     * Uses Copy and Paste to create a copy of a project.<br>
+     * Warning: This method is not thread safe if the threads run on the same
+     * host because it uses the global clipboard to copy the project.
      * 
-     * <ol>
-     * <li>selects the class, which you want to move, and then click the context
-     * menu "Refactor -> Move..."</li>
-     * <li>choose the package specified by the passed parameter "targetPkg"</li>
-     * <li>click "OK" to confirm the move</li>
-     * </ol>
-     * 
-     * @param sourceProject
-     *            name of the project, e.g. Foo-Saros.
-     * @param sourcePkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @param targetProject
-     * @param targetPkg
+     * @param target
+     *            The name of the copy to be created.
+     * @param source
+     *            The project to create the copy from.
      * @throws RemoteException
      */
+    public void copyProject(String target, String source)
+        throws RemoteException;
 }

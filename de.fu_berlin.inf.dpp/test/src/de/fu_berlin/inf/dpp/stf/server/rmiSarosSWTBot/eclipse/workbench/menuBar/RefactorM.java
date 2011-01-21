@@ -5,6 +5,27 @@ import java.rmi.RemoteException;
 
 public interface RefactorM extends Remote {
 
+    /**
+     * Performs the action "move class to another package" which should be done
+     * with the following steps:
+     * 
+     * <ol>
+     * <li>selects the class, which you want to move, and then click the context
+     * menu "Refactor -> Move..."</li>
+     * <li>choose the package specified by the passed parameter "targetPkg"</li>
+     * <li>click "OK" to confirm the move</li>
+     * </ol>
+     * 
+     * @param sourceProject
+     *            name of the project, e.g. Foo-Saros.
+     * @param sourcePkg
+     *            name of the package, e.g. my.pkg.
+     * @param className
+     *            name of the class, e.g. myClass.
+     * @param targetProject
+     * @param targetPkg
+     * @throws RemoteException
+     */
     public void moveClassTo(String sourceProject, String sourcePkg,
         String className, String targetProject, String targetPkg)
         throws RemoteException;

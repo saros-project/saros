@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views;
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu;
 
 import java.rmi.RemoteException;
 
@@ -7,10 +7,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 
-public class SarosPEViewImp extends PEViewImp implements SarosPEView {
+public class SarosCImp extends EclipsePart implements SarosC {
 
-    private static transient SarosPEViewImp self;
+    private static transient SarosCImp self;
 
     public final static int CREATE_NEW_PROJECT = 1;
     public final static int USE_EXISTING_PROJECT = 2;
@@ -42,14 +43,15 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
      */
     private final static String RADIO_USING_EXISTING_PROJECT = "Use existing project";
     private final static String RADIO_CREATE_NEW_PROJECT = "Create new project";
+    protected final static String VIEWNAME = "Package Explorer";
 
     /**
      * {@link BasicWidgetsImp} is a singleton, but inheritance is possible.
      */
-    public static SarosPEViewImp getInstance() {
+    public static SarosCImp getInstance() {
         if (self != null)
             return self;
-        self = new SarosPEViewImp();
+        self = new SarosCImp();
         return self;
     }
 
@@ -300,8 +302,7 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
         precondition();
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, SHARE_PROJECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
-            matchTexts);
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts, matchTexts);
     }
 
     /**************************************************************
@@ -352,7 +353,12 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
         throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { SAROS, contextName };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
-            matchTexts);
+        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts, matchTexts);
     }
+
+    protected void precondition() throws RemoteException {
+        pEV.openPEView();
+        pEV.setFocusOnPEView();
+    }
+
 }

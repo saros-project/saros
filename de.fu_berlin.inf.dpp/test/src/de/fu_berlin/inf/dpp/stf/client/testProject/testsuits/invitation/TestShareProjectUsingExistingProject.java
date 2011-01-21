@@ -58,6 +58,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
+        bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS1);
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
         assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
     }
@@ -74,8 +75,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
                 TypeOfShareProject.SHARE_PROJECT,
                 TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
                 bob);
-        assertTrue(bob.pEV.isWIndowSessionInvitationActive());
-        bob.pEV
+        assertTrue(bob.sarosC.isWIndowSessionInvitationActive());
+        bob.sarosC
             .confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
 
         assertTrue(bob.fileM.existsProject(PROJECT1));

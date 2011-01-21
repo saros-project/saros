@@ -7,12 +7,13 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosC;
 
 /**
  * This interface contains convenience API to perform actions in the package
  * explorer view (API to perform the specifically defined actions for saros
- * would be separately located in the sub-interface {@link SarosPEView} ) , then
- * you can start off as follows:
+ * would be separately located in the sub-interface {@link SarosC} ) , then you
+ * can start off as follows:
  * <ol>
  * <li>
  * At first you need to create a {@link Tester} object in your junit-test. (How
@@ -185,17 +186,4 @@ public interface PEView extends Remote {
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException;
 
-    /**
-     * Uses Copy and Paste to create a copy of a project.<br>
-     * Warning: This method is not thread safe if the threads run on the same
-     * host because it uses the global clipboard to copy the project.
-     * 
-     * @param target
-     *            The name of the copy to be created.
-     * @param source
-     *            The project to create the copy from.
-     * @throws RemoteException
-     */
-    public void copyProject(String target, String source)
-        throws RemoteException;
 }

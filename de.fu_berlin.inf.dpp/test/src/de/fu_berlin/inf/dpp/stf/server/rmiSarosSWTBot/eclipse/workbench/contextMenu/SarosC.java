@@ -1,5 +1,6 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views;
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
  * 
  * @author Lin
  */
-public interface SarosPEView extends PEView {
+public interface SarosC extends Remote {
 
     /**
      * Perform one of the actions "Share project",
@@ -47,10 +48,9 @@ public interface SarosPEView extends PEView {
      * one of the sub menus . I mean, after clicking the sub menu e.g.
      * "Share project" you need to treat the following popup window too.</li>
      * <li>The share session process is only completely done after host first
-     * run
-     * {@link SarosPEView#shareProjectWith(String, TypeOfShareProject, String[])}
+     * run {@link SarosC#shareProjectWith(String, TypeOfShareProject, String[])}
      * , and then the invited users confirm the popup window
-     * {@link SarosPEView#confirmWizardSessionInvitationUsingWhichProject(String, TypeOfCreateProject)}
+     * {@link SarosC#confirmWizardSessionInvitationUsingWhichProject(String, TypeOfCreateProject)}
      * . Since the share session process is very often used, so a convenient
      * method
      * {@link Tester#buildSessionDoneSequentially(String, TypeOfShareProject, TypeOfCreateProject, Tester...)}
@@ -89,9 +89,9 @@ public interface SarosPEView extends PEView {
      * one of the sub menus . I mean, after clicking the sub menu
      * "Share project" you need to treat the following popup window too.</li>
      * <li>The share session process is only completely done after host first
-     * run {@link SarosPEView#shareProject(String, String...)}, and
-     * then the invited users confirm the popup window
-     * {@link SarosPEView#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
+     * run {@link SarosC#shareProject(String, String...)}, and then the invited
+     * users confirm the popup window
+     * {@link SarosC#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
      * . Since the share session process is very often used, so a convenient
      * method {@link Tester#buildSessionSequentially(String, String, Tester...)}
      * is defined, which build the sharing session completely.</li>
@@ -184,9 +184,9 @@ public interface SarosPEView extends PEView {
         throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the first page of the wizard.
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the first page of the wizard.
      * 
      * @throws RemoteException
      */
@@ -194,9 +194,9 @@ public interface SarosPEView extends PEView {
         throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the second page of the wizard,
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the second page of the wizard,
      * whereas check the radio button "Create new project".
      * 
      * 
@@ -206,9 +206,9 @@ public interface SarosPEView extends PEView {
         throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the second page of the wizard,
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the second page of the wizard,
      * whereas check the radio button "Use existing project".
      * 
      * @param projectName
@@ -220,9 +220,9 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the second page of the wizard,
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the second page of the wizard,
      * whereas check the radio button "Use existing project" and the checkbox
      * "Create copy for working distributed".
      * 
@@ -235,9 +235,9 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the second page of the wizard,
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the second page of the wizard,
      * whereas check the radio button "Use existing project".
      * 
      * TODO the method is not completely implemented yet. The invitation session
@@ -254,10 +254,10 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the wizard
-     * "Session Invitation" using a new project.
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the wizard "Session Invitation" using
+     * a new project.
      * 
      * @throws RemoteException
      */
@@ -265,10 +265,10 @@ public interface SarosPEView extends PEView {
         throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the wizard
-     * "Session Invitation" using a exist project.
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the wizard "Session Invitation" using
+     * a exist project.
      * 
      * @throws RemoteException
      */
@@ -276,12 +276,11 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the wizard
-     * "Session Invitation" using a exist project with clicking the button
-     * browser->confirming popup window -> clicking the button "finish" ->
-     * conforming the local change
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the wizard "Session Invitation" using
+     * a exist project with clicking the button browser->confirming popup window
+     * -> clicking the button "finish" -> conforming the local change
      * 
      * @throws RemoteException
      */
@@ -289,10 +288,10 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the wizard
-     * "Session Invitation" using a exist project with copy
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the wizard "Session Invitation" using
+     * a exist project with copy
      * 
      * @throws RemoteException
      */
@@ -300,11 +299,11 @@ public interface SarosPEView extends PEView {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosPEView#confirmWindowInvitation(String...)}
-     * the popup wizard with the title "Session Invitation" should be appeared
-     * by the invitees' side. This method confirm the wizard
-     * "Session Invitation" using a new project or a existed project according
-     * the passed parameter "usingWhichProject".
+     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * wizard with the title "Session Invitation" should be appeared by the
+     * invitees' side. This method confirm the wizard "Session Invitation" using
+     * a new project or a existed project according the passed parameter
+     * "usingWhichProject".
      * 
      * @throws RemoteException
      */

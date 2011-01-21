@@ -88,39 +88,39 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.pEV.shareProject(PROJECT1, bob.getBaseJid(), dave.getBaseJid(),
-            carl.getBaseJid(), edna.getBaseJid());
+        alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
+            dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
         bob.shell.waitUntilShellOpen(SESSION_INVITATION);
         bob.shell.activateShellWithText(SESSION_INVITATION);
         bob.button.clickButton(CANCEL);
-        alice.pEV.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
-            bob.getName() + ".*"));
+        alice.sarosC.waitUntilWindowProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+            .matches(bob.getName() + ".*"));
 
         alice.button.clickButton(OK);
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.pEV.confirmFirstPageOfWizardSessionInvitation();
+        carl.sarosC.confirmFirstPageOfWizardSessionInvitation();
         carl.button.clickButton(CANCEL);
-        alice.pEV.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
-            carl.getName() + ".*"));
+        alice.sarosC.waitUntilWindowProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+            .matches(carl.getName() + ".*"));
         alice.button.clickButton(OK);
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.pEV.confirmFirstPageOfWizardSessionInvitation();
+        dave.sarosC.confirmFirstPageOfWizardSessionInvitation();
         dave.button.clickButton(CANCEL);
-        alice.pEV.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
-            dave.getName() + ".*"));
+        alice.sarosC.waitUntilWindowProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+            .matches(dave.getName() + ".*"));
         alice.button.clickButton(OK);
 
         edna.shell.waitUntilShellOpen(SESSION_INVITATION);
         edna.shell.activateShellWithText(SESSION_INVITATION);
-        edna.pEV.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
+        edna.sarosC.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(edna.sessionV.isInSessionGUI());
         assertFalse(alice.sessionV.isObserver(edna.jid));

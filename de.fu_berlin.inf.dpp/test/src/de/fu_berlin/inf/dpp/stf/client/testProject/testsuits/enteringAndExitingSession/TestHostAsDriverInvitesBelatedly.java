@@ -106,8 +106,8 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
 
         alice.sessionV.openInvitationInterface(bob.getBaseJid());
 
-        bob.pEV.confirmFirstPageOfWizardSessionInvitation();
-        bob.pEV
+        bob.sarosC.confirmFirstPageOfWizardSessionInvitation();
+        bob.sarosC
             .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
 
         bob.workbench.sleep(500);
