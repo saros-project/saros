@@ -66,10 +66,10 @@ public class SarosMImp extends EclipsePart implements SarosM {
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
         bot.buttonInGroup("Create new Jabber-Account").click();
         shellC.activateShellWaitingUntilOpened("Create New User Account");
-        basic.setTextInTextWithLabel(server, "Jabber Server");
-        basic.setTextInTextWithLabel(username, "Username");
-        basic.setTextInTextWithLabel(password, "Password");
-        basic.setTextInTextWithLabel(password, "Repeat Password");
+        textW.setTextInTextWithLabel(server, "Jabber Server");
+        textW.setTextInTextWithLabel(username, "Username");
+        textW.setTextInTextWithLabel(password, "Password");
+        textW.setTextInTextWithLabel(password, "Repeat Password");
         buttonW.waitUntilButtonEnabled(FINISH);
         buttonW.clickButton(FINISH);
         shellC.waitUntilShellClosed("Create New User Account");
@@ -85,9 +85,9 @@ public class SarosMImp extends EclipsePart implements SarosM {
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
-        basic.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
-        basic.setTextInTextWithLabel(jid.getName(), "Username");
-        basic.setTextInTextWithLabel(password, "Password");
+        textW.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
+        textW.setTextInTextWithLabel(jid.getName(), "Username");
+        textW.setTextInTextWithLabel(password, "Password");
         buttonW.waitUntilButtonEnabled(NEXT);
         buttonW.clickButton(NEXT);
         buttonW.waitUntilButtonEnabled(FINISH);
@@ -152,7 +152,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         list.select(jid.getBase());
         bot.buttonInGroup(GeneralPreferencePage.ACTIVATE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        assert basic.existsLabel("Active: " + jid.getBase());
+        assert labelW.existsLabel("Active: " + jid.getBase());
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -167,7 +167,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
 
     public boolean isAccountActiveGUI(JID jid) throws RemoteException {
         selectSarosPageInPreferences();
-        boolean existLabel = basic.existsLabel("Active: " + jid.getBase());
+        boolean existLabel = labelW.existsLabel("Active: " + jid.getBase());
         bot.button(CANCEL).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
         return existLabel;
@@ -192,10 +192,10 @@ public class SarosMImp extends EclipsePart implements SarosM {
         bot.buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWaitingUntilOpened("Change XMPP Account");
-        basic.setTextInTextWithLabel(newServer, "Server");
-        basic.setTextInTextWithLabel(newUserName, "Username:");
-        basic.setTextInTextWithLabel(newPassword, "Password:");
-        basic.setTextInTextWithLabel(newPassword, "Confirm:");
+        textW.setTextInTextWithLabel(newServer, "Server");
+        textW.setTextInTextWithLabel(newUserName, "Username:");
+        textW.setTextInTextWithLabel(newPassword, "Password:");
+        textW.setTextInTextWithLabel(newPassword, "Confirm:");
         buttonW.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();

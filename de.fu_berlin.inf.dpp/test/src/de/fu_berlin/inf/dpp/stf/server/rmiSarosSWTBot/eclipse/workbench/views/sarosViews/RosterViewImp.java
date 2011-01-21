@@ -179,10 +179,10 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         String password, boolean usesThisAccountNow) throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             shellC.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        basic.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
-        basic.setTextInTextWithLabel(jid, USER_NAME);
-        basic.setTextInTextWithLabel(password, PASSWORD);
-        basic.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        textW.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
+        textW.setTextInTextWithLabel(jid, USER_NAME);
+        textW.setTextInTextWithLabel(password, PASSWORD);
+        textW.setTextInTextWithLabel(password, REPEAT_PASSWORD);
         buttonW.clickButton(FINISH);
         shellC.waitUntilShellClosed(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
@@ -285,7 +285,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
     public void confirmNewContactWindow(String baseJID) throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_NEW_CONTACT))
             shellC.waitUntilShellActive(SHELL_NEW_CONTACT);
-        basic.setTextInTextWithLabel(baseJID, JABBERID);
+        textW.setTextInTextWithLabel(baseJID, JABBERID);
         buttonW.waitUntilButtonEnabled(FINISH);
         buttonW.clickButton(FINISH);
     }

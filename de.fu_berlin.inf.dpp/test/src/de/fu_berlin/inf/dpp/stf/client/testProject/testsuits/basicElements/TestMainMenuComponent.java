@@ -85,13 +85,11 @@ public class TestMainMenuComponent extends STFTest {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
+        alice.text.setTextInTextWithLabel(bob.getXmppServer(),
             LABEL_JABBER_SERVER);
-        alice.basicWidgets.setTextInTextWithLabel(bob.getName(),
-            LABEL_USER_NAME);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password,
-            LABEL_REPEAT_PASSWORD);
+        alice.text.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.text.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
         assertTrue(alice.button.isButtonEnabled(FINISH));
         alice.button.clickButton(FINISH);
         // wait a minute,so that bot can get the error message.
@@ -111,12 +109,11 @@ public class TestMainMenuComponent extends STFTest {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basicWidgets.setTextInTextWithLabel(bob.getXmppServer(),
+        alice.text.setTextInTextWithLabel(bob.getXmppServer(),
             LABEL_JABBER_SERVER);
-        alice.basicWidgets.setTextInTextWithLabel(bob.getName(),
-            LABEL_USER_NAME);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password + "d",
+        alice.text.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
+        alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.text.setTextInTextWithLabel(bob.password + "d",
             LABEL_REPEAT_PASSWORD);
         assertFalse(alice.button.isButtonEnabled(FINISH));
         String errorMessage = alice.shell
@@ -131,13 +128,11 @@ public class TestMainMenuComponent extends STFTest {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        alice.basicWidgets.setTextInTextWithLabel("invalid server",
-            LABEL_JABBER_SERVER);
-        alice.basicWidgets.setTextInTextWithLabel("invalid name",
-            LABEL_USER_NAME);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
-        alice.basicWidgets.setTextInTextWithLabel(bob.password,
-            LABEL_REPEAT_PASSWORD);
+        alice.text
+            .setTextInTextWithLabel("invalid server", LABEL_JABBER_SERVER);
+        alice.text.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
+        alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
+        alice.text.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
         assertTrue(alice.button.isButtonEnabled(FINISH));
         alice.button.clickButton(FINISH);
         alice.button.waitUntilButtonEnabled(FINISH);

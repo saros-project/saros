@@ -129,7 +129,7 @@ public class TableImp extends EclipsePart implements Table {
     }
 
     // waits until
-    public void waitUntilTableItemExisted(BasicWidgets basic, String itemText)
+    public void waitUntilTableItemExisted(Table basic, String itemText)
         throws RemoteException {
         waitUntil(SarosConditions.existTableItem(this, itemText));
     }
@@ -138,7 +138,7 @@ public class TableImp extends EclipsePart implements Table {
         waitUntil(tableHasRows(bot.table(), row));
     }
 
-    public void waitUntilContextMenuOfTableItemEnabled(BasicWidgets basic,
+    public void waitUntilContextMenuOfTableItemEnabled(Table basic,
         String itemText, String contextName) throws RemoteException {
         waitUntil(SarosConditions.ExistContextMenuOfTableItem(this, itemText,
             contextName));

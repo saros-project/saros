@@ -1,0 +1,45 @@
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
+
+import java.rmi.RemoteException;
+
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+
+public class LabelImp extends EclipsePart implements Label {
+
+    private static transient LabelImp labelImp;
+
+    /**
+     * {@link TableImp} is a singleton, but inheritance is possible.
+     */
+    public static LabelImp getInstance() {
+        if (labelImp != null)
+            return labelImp;
+        labelImp = new LabelImp();
+        return labelImp;
+    }
+
+    // states
+    public String getTextOfLabel() throws RemoteException {
+        return bot.label().getText();
+    }
+
+    public boolean existsLabel(String mnemonicText) throws RemoteException {
+        try {
+            bot.label(mnemonicText);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean existsLabelInView(String viewTitle) throws RemoteException {
+        try {
+            viewW.getView(viewTitle).bot().label();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+}

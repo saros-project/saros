@@ -210,7 +210,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     public boolean existsLabelTextInSessionView() throws RemoteException {
         precondition();
-        return basic.existsLabelInView(VIEWNAME);
+        return labelW.existsLabelInView(VIEWNAME);
     }
 
     public String getFirstLabelTextInSessionview() throws RemoteException {

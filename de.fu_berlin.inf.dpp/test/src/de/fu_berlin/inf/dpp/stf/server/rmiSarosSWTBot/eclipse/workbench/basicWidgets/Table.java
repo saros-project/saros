@@ -243,7 +243,7 @@ public interface Table extends Remote {
      *            name of the table item, which you want to check,if it exists.
      * @throws RemoteException
      */
-    public void waitUntilTableItemExisted(BasicWidgets basic, String itemText)
+    public void waitUntilTableItemExisted(Table basic, String itemText)
         throws RemoteException;
 
     /**
@@ -265,6 +265,6 @@ public interface Table extends Remote {
      *            the name on the context menu.
      * @throws RemoteException
      */
-    public void waitUntilContextMenuOfTableItemEnabled(BasicWidgets basic,
+    public void waitUntilContextMenuOfTableItemEnabled(Table basic,
         String itemText, String contextName) throws RemoteException;
 }
