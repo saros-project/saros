@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.EditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileMImp;
@@ -106,6 +107,7 @@ public class STFController {
         exportObject(RefactorMImp.getInstance(), "refactorM");
         exportObject(WindowMImp.getInstance(), "windowM");
         exportObject(SarosMImp.getInstance(), "sarosM");
+        exportObject(TeamImp.getInstance(), "team");
     }
 
     /**

@@ -52,8 +52,8 @@ public class TestBasicComponentByAlice extends STFTest {
     public void existsTreeItemInShell2() throws RemoteException {
         alice.menu.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
-        assertTrue(alice.tree.existsSubItemInTreeItem("Annotations",
-            "General", "Editors", "Text Editors"));
+        assertTrue(alice.tree.existsSubItemInTreeItem("Annotations", "General",
+            "Editors", "Text Editors"));
     }
 
     @Test
@@ -71,8 +71,8 @@ public class TestBasicComponentByAlice extends STFTest {
         assertTrue(alice.tree.existsTreeItemInTreeInView("Package Explorer",
             PROJECT1));
         assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.tree.existsSubItemInTreeItemInView(
-            "Package Explorer", CLS1 + ".java", PROJECT1, SRC, PKG1));
+        assertTrue(alice.tree.existsSubItemInTreeItemInView("Package Explorer",
+            CLS1 + ".java", PROJECT1, SRC, PKG1));
         alice.fileM.existsClass(PROJECT1, PKG1, CLS1);
     }
 
@@ -138,8 +138,8 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test(expected = WidgetNotFoundException.class)
     public void selectTreeItemWithRegexs() throws RemoteException {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
-        alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
-            SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+        alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
+            SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.pEV.setFocusOnPEView();
         alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
             SVN_PROJECT_COPY, "pkg", "Test")));
@@ -148,8 +148,8 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void selectTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
-        alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
-            SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+        alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
+            SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.pEV.setFocusOnPEView();
         alice.pEV.openClass(SVN_PROJECT_COPY, "pkg", "Test");
         alice.editor.setTextInJavaEditorWithoutSave(CP1, SVN_PROJECT_COPY,

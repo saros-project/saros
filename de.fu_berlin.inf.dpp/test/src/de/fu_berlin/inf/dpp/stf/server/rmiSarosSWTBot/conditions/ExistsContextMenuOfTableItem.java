@@ -22,6 +22,6 @@ public class ExistsContextMenuOfTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return table.isContextMenuOfTableEnabled(itemText, contextName);
+        return table.isContextMenuOfTableItemEnabled(itemText, contextName);
     }
 }

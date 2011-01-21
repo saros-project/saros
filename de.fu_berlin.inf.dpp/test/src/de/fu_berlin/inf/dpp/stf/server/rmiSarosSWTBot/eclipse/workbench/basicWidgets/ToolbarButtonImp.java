@@ -34,6 +34,11 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
      * 
      **********************************************/
 
+    public void clickToolbarButtonWithTooltipInView(String viewTitle,
+        String tooltipText) throws RemoteException {
+        bot.viewByTitle(viewTitle).toolbarButton(tooltipText).click();
+    }
+
     public void clickToolbarButtonWithRegexTooltipInView(String viewTitle,
         String tooltipText) throws RemoteException {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
@@ -60,9 +65,18 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
      * states
      * 
      **********************************************/
+    public boolean existsToolbarButtonInview(String viewTitle,
+        String tooltipText) throws RemoteException {
+        for (SWTBotToolbarButton toolbarButton : getAllToolbarButtonsInView(viewTitle)) {
+            if (toolbarButton.getToolTipText().equals(tooltipText))
+                return true;
+        }
+        return false;
+    }
+
     public boolean isToolbarButtonInViewEnabled(String viewTitle,
         String tooltipText) throws RemoteException {
-        SWTBotToolbarButton button = getToolbarButtonWithTooltipInView(
+        SWTBotToolbarButton button = getToolbarButtonWithRegexTooltipInView(
             viewTitle, tooltipText);
         if (button == null)
             return false;
@@ -80,11 +94,11 @@ public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
      *            the title on the view tab.
      * @return all {@link SWTBotToolbarButton} located in the given view.
      */
-    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String viewTitle) {
+    public List<SWTBotToolbarButton> getAllToolbarButtonsInView(String viewTitle) {
         return bot.viewByTitle(viewTitle).getToolbarButtons();
     }
 
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
+    public SWTBotToolbarButton getToolbarButtonWithRegexTooltipInView(
         String viewTitle, String tooltipText) {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
             .getToolbarButtons()) {

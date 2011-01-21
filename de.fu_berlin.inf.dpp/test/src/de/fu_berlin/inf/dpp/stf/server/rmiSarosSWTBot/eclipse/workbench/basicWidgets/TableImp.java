@@ -8,7 +8,6 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
@@ -69,26 +68,28 @@ public class TableImp extends EclipsePart implements Table {
         return ContextMenuHelper.existsContextMenu(table, contextName);
     }
 
-    public boolean isContextMenuOfTableVisible(String itemText,
+    public boolean isContextMenuOfTableItemVisible(String itemText,
         String contextName) throws RemoteException {
-        return isContextMenuOfTableVisible(bot.table(), itemText, contextName);
-    }
-
-    public boolean isContextMenuOfTableVisibleInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        return isContextMenuOfTableVisible(getTableInView(viewTitle), itemText,
+        return isContextMenuOfTableItemVisible(bot.table(), itemText,
             contextName);
     }
 
-    public boolean isContextMenuOfTableEnabled(String itemText,
-        String contextName) throws RemoteException {
-        return isContextMenuOfTableEnabled(bot.table(), itemText, contextName);
+    public boolean isContextMenuOfTableItemVisibleInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        return isContextMenuOfTableItemVisible(getTableInView(viewTitle),
+            itemText, contextName);
     }
 
-    public boolean isContextMenuOfTableEnabledInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        return isContextMenuOfTableEnabled(getTableInView(viewTitle), itemText,
+    public boolean isContextMenuOfTableItemEnabled(String itemText,
+        String contextName) throws RemoteException {
+        return isContextMenuOfTableItemEnabled(bot.table(), itemText,
             contextName);
+    }
+
+    public boolean isContextMenuOfTableItemEnabledInView(String viewTitle,
+        String itemText, String contextName) throws RemoteException {
+        return isContextMenuOfTableItemEnabled(getTableInView(viewTitle),
+            itemText, contextName);
     }
 
     public List<String> getTableColumns() throws RemoteException {
@@ -109,14 +110,14 @@ public class TableImp extends EclipsePart implements Table {
         selectTableItem(getTableInView(viewTitle), itemText);
     }
 
-    public void clickContextMenuOfTable(String itemText, String contextName)
+    public void clickContextMenuOfTableItem(String itemText, String contextName)
         throws RemoteException {
-        clickContextMenuOfTable(bot.table(), itemText, contextName);
+        clickContextMenuOfTableItem(bot.table(), itemText, contextName);
     }
 
-    public void clickContextMenuOfTableInView(String viewTitle,
+    public void clickContextMenuOfTableItemInView(String viewTitle,
         String itemText, String contextName) throws RemoteException {
-        clickContextMenuOfTable(getTableInView(viewTitle), itemText,
+        clickContextMenuOfTableItem(getTableInView(viewTitle), itemText,
             contextName);
     }
 
@@ -156,7 +157,7 @@ public class TableImp extends EclipsePart implements Table {
         waitUntil(tableHasRows(bot.table(), row));
     }
 
-    public void waitUntilContextMenuOfTableItemEnabled(Table basic,
+    public void waitUntilIsContextMenuOfTableItemEnabled(Table basic,
         String itemText, String contextName) throws RemoteException {
         waitUntil(SarosConditions.ExistContextMenuOfTableItem(this, itemText,
             contextName));
@@ -178,19 +179,7 @@ public class TableImp extends EclipsePart implements Table {
         return bot.viewByTitle(viewTitle).bot().table();
     }
 
-    public SWTBotToolbarButton getToolbarButtonWithTooltipInView(
-        String viewTitle, String tooltipText) {
-        for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
-            .getToolbarButtons()) {
-            if (toolbarButton.getToolTipText().matches(
-                ".*" + tooltipText + ".*")) {
-                return toolbarButton;
-            }
-        }
-        return null;
-    }
-
-    public void clickContextMenuOfTable(SWTBotTable table, String itemText,
+    public void clickContextMenuOfTableItem(SWTBotTable table, String itemText,
         String contextName) {
         selectTableItem(table, itemText);
         ContextMenuHelper.clickContextMenu(table, contextName);
@@ -205,13 +194,13 @@ public class TableImp extends EclipsePart implements Table {
         }
     }
 
-    public boolean isContextMenuOfTableEnabled(SWTBotTable table,
+    public boolean isContextMenuOfTableItemEnabled(SWTBotTable table,
         String itemText, String contextName) {
         selectTableItem(table, itemText);
         return ContextMenuHelper.isContextMenuEnabled(table, contextName);
     }
 
-    public boolean isContextMenuOfTableVisible(SWTBotTable table,
+    public boolean isContextMenuOfTableItemVisible(SWTBotTable table,
         String itemText, String contextName) {
         return getTableItem(table, itemText).contextMenu(contextName)
             .isVisible();

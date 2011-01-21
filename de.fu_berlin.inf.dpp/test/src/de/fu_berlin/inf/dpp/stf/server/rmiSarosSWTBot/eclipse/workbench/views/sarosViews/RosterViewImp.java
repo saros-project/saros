@@ -543,7 +543,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     protected List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return toolbarButtonW.getAllToolbarButtonsOnView(VIEWNAME);
+        return toolbarButtonW.getAllToolbarButtonsInView(VIEWNAME);
     }
 
     private boolean isWizardCreateXMPPAccountActive() throws RemoteException {

@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.Team;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
@@ -70,11 +71,15 @@ public class Tester {
 
     public Editor editor;
 
+    // menuBar
     public FileM fileM;
     public EditM editM;
     public RefactorM refactorM;
     public WindowM windowM;
     public SarosM sarosM;
+
+    // contextMenu
+    public Team team;
 
     public JID jid;
     public String password;
@@ -133,6 +138,9 @@ public class Tester {
             refactorM = (RefactorM) registry.lookup("refactorM");
             windowM = (WindowM) registry.lookup("windowM");
             sarosM = (SarosM) registry.lookup("sarosM");
+
+            // contextMenu
+            team = (Team) registry.lookup("team");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid

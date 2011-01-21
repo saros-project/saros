@@ -60,7 +60,7 @@ public class TestSVNStateInitialization extends STFTest {
         setUpSaros();
         if (!alice.fileM.existsProject(SVN_PROJECT_COPY)) {
             alice.fileM.newJavaProject(SVN_PROJECT_COPY);
-            alice.pEV.shareProjectWithSVNUsingSpecifiedFolderName(
+            alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
                 SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         }
     }
@@ -92,7 +92,7 @@ public class TestSVNStateInitialization extends STFTest {
     public void setUp() throws RemoteException {
         alice.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
         assertTrue(alice.fileM.existsProject(SVN_PROJECT));
-        assertTrue(alice.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(alice.team.isProjectManagedBySVN(SVN_PROJECT));
         assertTrue(alice.fileM.existsFile(SVN_CLS1_FULL_PATH));
     }
 
@@ -125,7 +125,7 @@ public class TestSVNStateInitialization extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
 
         assertTrue(alice.sessionV.isDriver());
         assertTrue(alice.sessionV.isParticipant(bob.jid));
@@ -152,15 +152,15 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithUpdate() throws RemoteException {
-        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV1);
-        assertEquals(SVN_CLS1_REV1, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
+        alice.team.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_CLS1_REV1);
+        assertEquals(SVN_CLS1_REV1, alice.team.getRevision(SVN_CLS1_FULL_PATH));
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
 
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(SVN_CLS1_REV1, bob.pEV.getRevision(SVN_CLS1_FULL_PATH));
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(SVN_CLS1_REV1, bob.team.getRevision(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -183,18 +183,18 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithSwitch() throws RemoteException {
-        alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        alice.team.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+            alice.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+            bob.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -217,21 +217,21 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithSwitch2() throws RemoteException {
-        alice.pEV.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL,
+        alice.team.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL,
             SVN_CLS1_REV3);
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            alice.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        assertEquals(SVN_CLS1_REV3, alice.pEV.getRevision(SVN_CLS1_FULL_PATH));
+            alice.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, alice.team.getRevision(SVN_CLS1_FULL_PATH));
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        assertEquals(SVN_CLS1_REV3, bob.pEV.getRevision(SVN_CLS1_FULL_PATH));
+            bob.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, bob.team.getRevision(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -269,7 +269,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
         bob.sessionV.waitUntilSessionOpen();
 
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(cls1_content_after,
             bob.editor.getTextOfJavaEditor(SVN_PROJECT, SVN_PKG, SVN_CLS1));
     }

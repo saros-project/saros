@@ -118,7 +118,7 @@ public interface Table extends Remote {
      *            the text on the context menu
      * 
      */
-    public void clickContextMenuOfTable(String itemText, String contextName)
+    public void clickContextMenuOfTableItem(String itemText, String contextName)
         throws RemoteException;
 
     /**
@@ -138,7 +138,7 @@ public interface Table extends Remote {
      *            the table item' name, whose context menu you want to click.
      * 
      */
-    public void clickContextMenuOfTableInView(String viewTitle,
+    public void clickContextMenuOfTableItemInView(String viewTitle,
         String itemName, String contextName) throws RemoteException;
 
     /***************** is context of table item visible ****************** */
@@ -154,7 +154,7 @@ public interface Table extends Remote {
      *                       tableItem is visible.
      * @throws RemoteException
      */
-    public boolean isContextMenuOfTableVisible(String itemText,
+    public boolean isContextMenuOfTableItemVisible(String itemText,
         String contextName) throws RemoteException;
 
     /**
@@ -170,7 +170,7 @@ public interface Table extends Remote {
      *                       tableItem is visible.
      * @throws RemoteException
      */
-    public boolean isContextMenuOfTableVisibleInView(String viewTitle,
+    public boolean isContextMenuOfTableItemVisibleInView(String viewTitle,
         String itemText, String contextName) throws RemoteException;
 
     /***************** is context of tree item enabled ****************** */
@@ -185,7 +185,7 @@ public interface Table extends Remote {
      *                       tableItem is enabled.
      * @throws RemoteException
      */
-    public boolean isContextMenuOfTableEnabled(String itemText,
+    public boolean isContextMenuOfTableItemEnabled(String itemText,
         String contextName) throws RemoteException;
 
     /**
@@ -201,7 +201,7 @@ public interface Table extends Remote {
      *                       tableItem is enabled.
      * @throws RemoteException
      */
-    public boolean isContextMenuOfTableEnabledInView(String viewTitle,
+    public boolean isContextMenuOfTableItemEnabledInView(String viewTitle,
         String itemText, String contextName) throws RemoteException;
 
     /***************** checkbox of tree item ****************** */
@@ -265,6 +265,6 @@ public interface Table extends Remote {
      *            the name on the context menu.
      * @throws RemoteException
      */
-    public void waitUntilContextMenuOfTableItemEnabled(Table basic,
+    public void waitUntilIsContextMenuOfTableItemEnabled(Table basic,
         String itemText, String contextName) throws RemoteException;
 }

@@ -47,7 +47,7 @@ public class TestSVNStateUpdates extends STFTest {
                 public Void call() throws Exception {
                     if (!musician.fileM.existsProject(SVN_PROJECT_COPY)) {
                         musician.fileM.newJavaProject(SVN_PROJECT_COPY);
-                        musician.pEV
+                        musician.team
                             .shareProjectWithSVNUsingSpecifiedFolderName(
                                 SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
                                 SVN_PROJECT_PATH);
@@ -80,7 +80,7 @@ public class TestSVNStateUpdates extends STFTest {
                 public Void call() throws Exception {
                     musician.pEV.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
                     assertTrue(musician.fileM.existsProject(SVN_PROJECT));
-                    assertTrue(musician.pEV.isProjectManagedBySVN(SVN_PROJECT));
+                    assertTrue(musician.team.isProjectManagedBySVN(SVN_PROJECT));
                     assertTrue(musician.fileM.existsFile(SVN_CLS1_FULL_PATH));
                     return null;
                 }
@@ -177,7 +177,8 @@ public class TestSVNStateUpdates extends STFTest {
             "new_package");
 
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
-        assertTrue(alice.fileM.existsClass(SVN_PROJECT, "new_package", SVN_CLS1));
+        assertTrue(alice.fileM
+            .existsClass(SVN_PROJECT, "new_package", SVN_CLS1));
     }
 
     /**
@@ -194,14 +195,15 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testSwitch() throws Exception {
-        alice.pEV.switchProject(SVN_PROJECT, SVN_PROJECT_URL_SWITCHED);
-        alice.pEV.waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        alice.team.switchProject(SVN_PROJECT, SVN_PROJECT_URL_SWITCHED);
+        alice.team
+            .waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
 
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        bob.pEV.waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
+        bob.team.waitUntilUrlIsSame(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
 
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            bob.pEV.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+            bob.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -219,14 +221,14 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testDisconnectAndConnect() throws RemoteException {
-        alice.pEV.disConnect(SVN_PROJECT);
-        bob.pEV.waitUntilProjectNotInSVN(SVN_PROJECT);
-        assertFalse(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
-        alice.pEV.shareProjectWithSVNWhichIsConfiguredWithSVNInfos(SVN_PROJECT,
-            STFTest.SVN_REPOSITORY_URL);
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        bob.pEV.waitUntilProjectInSVN(SVN_PROJECT);
-        assertTrue(bob.pEV.isProjectManagedBySVN(SVN_PROJECT));
+        alice.team.disConnect(SVN_PROJECT);
+        bob.team.waitUntilProjectNotInSVN(SVN_PROJECT);
+        assertFalse(bob.team.isProjectManagedBySVN(SVN_PROJECT));
+        alice.team.shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
+            SVN_PROJECT, STFTest.SVN_REPOSITORY_URL);
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
+        bob.team.waitUntilProjectInSVN(SVN_PROJECT);
+        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
     }
 
     /**
@@ -244,12 +246,12 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testUpdate() throws RemoteException {
-        alice.pEV.updateProject(SVN_PROJECT, "115");
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        assertTrue(alice.pEV.getURLOfRemoteResource(SVN_PROJECT).equals(
-            bob.pEV.getURLOfRemoteResource(SVN_PROJECT)));
-        alice.pEV.updateProject(SVN_PROJECT, "116");
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
+        alice.team.updateProject(SVN_PROJECT, "115");
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
+        assertTrue(alice.team.getURLOfRemoteResource(SVN_PROJECT).equals(
+            bob.team.getURLOfRemoteResource(SVN_PROJECT)));
+        alice.team.updateProject(SVN_PROJECT, "116");
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
     }
 
     /**
@@ -268,17 +270,17 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testUpdateSingleFile() throws RemoteException {
-        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "102");
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
-        assertTrue(alice.pEV.getRevision(STFTest.SVN_CLS1_FULL_PATH).equals(
+        alice.team.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "102");
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
+        assertTrue(alice.team.getRevision(STFTest.SVN_CLS1_FULL_PATH).equals(
             "102"));
-        bob.pEV.waitUntilRevisionIsSame(STFTest.SVN_CLS1_FULL_PATH, "102");
-        assertTrue(bob.pEV.getRevision(STFTest.SVN_CLS1_FULL_PATH)
-            .equals("102"));
-        bob.pEV.waitUntilRevisionIsSame(SVN_PROJECT, "116");
-        assertTrue(bob.pEV.getRevision(SVN_PROJECT).equals("116"));
-        alice.pEV.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "116");
-        bob.pEV.waitUntilWindowSarosRunningVCSOperationClosed();
+        bob.team.waitUntilRevisionIsSame(STFTest.SVN_CLS1_FULL_PATH, "102");
+        assertTrue(bob.team.getRevision(STFTest.SVN_CLS1_FULL_PATH).equals(
+            "102"));
+        bob.team.waitUntilRevisionIsSame(SVN_PROJECT, "116");
+        assertTrue(bob.team.getRevision(SVN_PROJECT).equals("116"));
+        alice.team.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "116");
+        bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
     }
 
     /**
@@ -301,7 +303,7 @@ public class TestSVNStateUpdates extends STFTest {
         alice.editM.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
         bob.fileM.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
-        alice.pEV.revertProject(SVN_PROJECT);
+        alice.team.revertProject(SVN_PROJECT);
         bob.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertTrue(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
     }

@@ -76,7 +76,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.table.clickContextMenuOfTableInView(VIEW_SESSION,
+        alice.table.clickContextMenuOfTableItemInView(VIEW_SESSION,
             bob.getBaseJid(), "Give driver role");
         alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.sessionV.waitUntilIsDriver();
@@ -86,18 +86,18 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableVisibleInView(VIEW_SESSION,
+        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(VIEW_SESSION,
             bob.getBaseJid(), "Give driver role"));
-        assertTrue(alice.table.isContextMenuOfTableVisibleInView(VIEW_SESSION,
+        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(VIEW_SESSION,
             bob.getBaseJid(), "Change Color"));
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableEnabledInView(VIEW_SESSION,
+        assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(VIEW_SESSION,
             bob.getBaseJid(), "Give driver role"));
-        assertFalse(alice.table.isContextMenuOfTableEnabledInView(VIEW_SESSION,
+        assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(VIEW_SESSION,
             bob.getBaseJid(), "Change Color"));
     }
 }

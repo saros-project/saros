@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.EditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileMImp;
@@ -102,6 +103,9 @@ public abstract class EclipsePart {
     public static RefactorMImp refactorM = RefactorMImp.getInstance();
     public static SarosMImp sarosM = SarosMImp.getInstance();
     public static WindowMImp windowM = WindowMImp.getInstance();
+
+    // Context menu
+    public static TeamImp team = TeamImp.getInstance();
 
     // Picocontainer initiated by STFController.
     public static Saros saros;

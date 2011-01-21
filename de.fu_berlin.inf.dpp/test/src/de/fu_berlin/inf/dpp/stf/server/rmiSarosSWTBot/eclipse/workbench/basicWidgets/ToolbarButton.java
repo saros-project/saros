@@ -9,6 +9,21 @@ public interface ToolbarButton extends Remote {
      * click the toolbar button specified with the given buttonTooltip in the
      * passed view.<br/>
      * 
+     * 
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param tooltipText
+     *            the tooltip of the toolbar button which you want to click.
+     * 
+     */
+    public void clickToolbarButtonWithTooltipInView(String viewTitle,
+        String tooltipText) throws RemoteException;
+
+    /**
+     * click the toolbar button specified with the given buttonTooltip in the
+     * passed view.<br/>
+     * 
      * <b>NOTE</b>, when you are not sure about the full tooltipText of the
      * toolbarButton, please use this method.
      * 
@@ -16,7 +31,7 @@ public interface ToolbarButton extends Remote {
      *            the title on the view tab.
      * @param buttonTooltip
      *            the tooltip of the toolbar button which you want to click.
-     * @return
+     * 
      */
     public void clickToolbarButtonWithRegexTooltipInView(String viewName,
         String buttonTooltip) throws RemoteException;
@@ -32,6 +47,19 @@ public interface ToolbarButton extends Remote {
      */
     public void clickToolbarPushButtonWithTooltipInView(String viewName,
         String tooltip) throws RemoteException;
+
+    /**
+     * 
+     * @param viewTitle
+     *            the title on the view tab.
+     * @param tooltipText
+     *            the tooltip of the toolbar button which you want to know, if
+     *            it exists.
+     * @return<tt>true</tt>, if the given toolbar button exists.
+     * @throws RemoteException
+     */
+    public boolean existsToolbarButtonInview(String viewTitle,
+        String tooltipText) throws RemoteException;
 
     /**
      * 
