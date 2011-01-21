@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.MissingRecordException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.XMLNotWellFormedException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory;
@@ -445,9 +445,8 @@ public class SXEController extends AbstractSXEMessageHandler {
 					 * 
 					 * Or if a record is trivial - does not change anything.
 					 */
-					// may be switched to trace level
 					if (!applied)
-						log.debug("Did not apply local record: " + current);
+						log.trace("Did not apply local record: " + current);
 				} catch (XMLNotWellFormedException e) {
 					log.debug("Could not apply local record because would result in a non well-formed XML: "
 							+ current);

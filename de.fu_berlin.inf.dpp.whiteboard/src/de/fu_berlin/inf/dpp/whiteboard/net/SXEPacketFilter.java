@@ -8,8 +8,8 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 
 /**
  * A customizable filter for SXE that allows to filter for a certain peer within

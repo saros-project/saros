@@ -58,7 +58,7 @@ import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
 import de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardContextMenuProvider;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.MessageAdapter;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.NotificationListener;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 
 /**
@@ -70,7 +70,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
  * @author jurke
  * 
  */
-public class WhiteboardEditor extends LockableGraphicalEditor {
+public class WhiteboardEditor extends BlockableGraphicalEditor {
 
 	public static final String ID = "de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor";
 
@@ -155,7 +155,6 @@ public class WhiteboardEditor extends LockableGraphicalEditor {
 			}
 		});
 
-		// TODO rolechange
 		WhiteboardManager.getInstance().addRoleChangeListener(
 				new RoleChangeListener() {
 
@@ -166,6 +165,7 @@ public class WhiteboardEditor extends LockableGraphicalEditor {
 						updateActions();
 					}
 				});
+		setEnabled(WhiteboardManager.getInstance().getLocalUserRole() == UserRole.DRIVER);
 	}
 
 	protected void updateViewerContents(ElementRecord root) {

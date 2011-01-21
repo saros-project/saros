@@ -30,8 +30,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.LayoutUtils;
 
 /**
- * Whiteboard application specific edit policy that returns platform dependent
- * commands.
+ * Whiteboard application specific edit policy that returns adequate commands.
  * 
  * @author jurke
  * 
@@ -121,8 +120,8 @@ public class ElementModelLayoutEditPolicy extends
 
 			// TODO fix point list figure that is wrong positioned on non-root
 			/*
-			 * Note: the point list will be created here when using drag and
-			 * drop
+			 * Note, using drag and drop, the command may also create a
+			 * polyline. The pencil is always added to the root.
 			 */
 			if (((String) request.getNewObjectType())
 					.equals(SVGConstants.SVG_POLYLINE_TAG)) {
@@ -179,7 +178,6 @@ public class ElementModelLayoutEditPolicy extends
 
 				// pencil on root only
 				parent = LayoutUtils.translateToAndGetRoot(points, parent);
-				// parent = translateAndGetParent(points,parent);
 
 				PolylineRecordCreateCommand cmd = new PolylineRecordCreateCommand();
 

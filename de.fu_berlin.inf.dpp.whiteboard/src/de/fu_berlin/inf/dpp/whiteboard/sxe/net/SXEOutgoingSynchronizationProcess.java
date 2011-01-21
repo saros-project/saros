@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.util.SXEUtils;
 

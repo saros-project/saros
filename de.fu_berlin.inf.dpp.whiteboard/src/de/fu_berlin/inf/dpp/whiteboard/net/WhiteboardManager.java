@@ -101,13 +101,18 @@ public class WhiteboardManager extends RoleChangeManager {
 			}
 		}
 
-		// TODO rolechange
 		@Override
 		public void roleChanged(User user) {
 			if (user.isLocal())
 				WhiteboardManager.this.roleChanged(user.getUserRole());
 		}
 	};
+
+	public UserRole getLocalUserRole() {
+		if (sarosSession == null)
+			return UserRole.DRIVER;
+		return sarosSession.getLocalUser().getUserRole();
+	}
 
 	@Inject
 	private SarosSessionManager sessionManager;

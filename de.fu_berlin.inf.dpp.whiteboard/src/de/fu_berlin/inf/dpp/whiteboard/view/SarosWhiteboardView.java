@@ -83,21 +83,22 @@ public class SarosWhiteboardView extends ViewPart {
 		toolBarManager.add(getAction(GEFActionConstants.ZOOM_OUT));
 
 		ZoomComboContributionItem zoomItem = new ZoomComboContributionItem(
-				getViewSite().getPage()) {
-
-			/*
-			 * This method is overridden to ensure to only set the editor's
-			 * ZoomManager. Because of embedding the editor in a view only
-			 * another manager could be set if another page is selected.
-			 */
-			@Override
-			public void setZoomManager(ZoomManager zm) {
-				if (zm != gEditor.getAdapter(ZoomManager.class))
-					super.setZoomManager(null);
-				else
-					super.setZoomManager(zm);
-			}
-		};
+				getViewSite().getPage());
+		// {
+		//
+		// /*
+		// * This method is overridden to ensure to only set the editor's
+		// * ZoomManager. Another manager could be set if another part of the
+		// * workbench is selected.
+		// */
+		// @Override
+		// public void setZoomManager(ZoomManager zm) {
+		// if (zm != gEditor.getAdapter(ZoomManager.class))
+		// super.setZoomManager(null);
+		// else
+		// super.setZoomManager(zm);
+		// }
+		// };
 
 		toolBarManager.add(zoomItem);
 	}

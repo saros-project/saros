@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.sxe;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 

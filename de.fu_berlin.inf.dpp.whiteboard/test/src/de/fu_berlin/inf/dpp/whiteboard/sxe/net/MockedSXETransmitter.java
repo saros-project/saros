@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 
 public class MockedSXETransmitter implements ISXETransmitter {
 
@@ -19,7 +18,6 @@ public class MockedSXETransmitter implements ISXETransmitter {
 
 	@Override
 	public void sendAsync(SXEMessage msg) {
-		// TODO Auto-generated method stub
 
 	}
 

@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEIncomingSynchronizationProcess;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**

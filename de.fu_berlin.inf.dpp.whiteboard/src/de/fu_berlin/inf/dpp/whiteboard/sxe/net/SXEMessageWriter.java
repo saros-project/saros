@@ -21,23 +21,23 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 
 /**
- * Helper class to obtain well-formed XML-Strings from an SXEMessages
+ * Writer class for the SXE protocol (Shared XML Editing XEP-0284). Creates
+ * well-formed XML-Strings from a SXEMessages.
  * 
  * @author jurke
  * 
  */
-public class SXEMessageFactory {
+public class SXEMessageWriter {
 
-	private static final Logger log = Logger.getLogger(SXEMessageFactory.class);
+	private static final Logger log = Logger.getLogger(SXEMessageWriter.class);
 
-	private SXEWriter writer;
+	private SXEStreamWriter writer;
 	private ByteArrayOutputStream os;
 
-	public SXEMessageFactory(SXEWriter writer) {
+	public SXEMessageWriter(SXEStreamWriter writer) {
 		try {
 			this.writer = writer;
 			this.os = new ByteArrayOutputStream();
@@ -47,8 +47,8 @@ public class SXEMessageFactory {
 		}
 	}
 
-	public SXEMessageFactory() {
-		this(new SXEWriter());
+	public SXEMessageWriter() {
+		this(new SXEStreamWriter());
 	}
 
 	public String getSXEMessageAsString(SXEMessage msg) {
@@ -90,19 +90,18 @@ public class SXEMessageFactory {
 	}
 
 	/**
-	 * The writer uses a SAX writer to produce well-formed XML respective to
-	 * Shared XML Editing XEP-0284
+	 * The writer uses a SAX writer to produce well-formed XML respective to SXE
 	 * 
 	 * @author jurke
 	 * 
 	 */
-	public static class SXEWriter {
+	public static class SXEStreamWriter {
 
 		protected OutputStream stream;
 
 		protected TransformerHandler handler;
 
-		public SXEWriter() {
+		public SXEStreamWriter() {
 		}
 
 		public void initOutputStream(OutputStream os)

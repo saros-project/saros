@@ -19,10 +19,20 @@ import org.eclipse.swt.widgets.Event;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool;
 
-public abstract class LockableGraphicalEditor extends
+/**
+ * An extension of the GEF graphical editor with a locking feature using the
+ * setEnabled() method.
+ * 
+ * It uses a custom EditDomain and a custom ActionRegistry to block all
+ * currently possible edits. Zoom and panning tools will work though.
+ * 
+ * @author jurke
+ * 
+ */
+public abstract class BlockableGraphicalEditor extends
 		GraphicalEditorWithPalette {
 
-	private LockableActionRegistry actionRegistry;
+	private BlockableActionRegistry actionRegistry;
 	private boolean enabled = true;
 	private EditDomain previousEditDomain;
 	private final EditDomain lockedEditDomain = new LockedEditDomain();
@@ -30,7 +40,7 @@ public abstract class LockableGraphicalEditor extends
 	@Override
 	protected ActionRegistry getActionRegistry() {
 		if (actionRegistry == null)
-			actionRegistry = new LockableActionRegistry();
+			actionRegistry = new BlockableActionRegistry();
 		return actionRegistry;
 	}
 
@@ -40,6 +50,14 @@ public abstract class LockableGraphicalEditor extends
 				"Cannot change the action registry");
 	}
 
+	/**
+	 * Disables editing for this graphical editor.
+	 * 
+	 * If set to false, it will disable all registered actions and replace the
+	 * EditDomain with a blocked one.
+	 * 
+	 * @param enable
+	 */
 	public void setEnabled(boolean enable) {
 		if (enable == enabled)
 			return;
@@ -56,7 +74,7 @@ public abstract class LockableGraphicalEditor extends
 		} else
 			getGraphicalViewer().setEditDomain(previousEditDomain);
 
-		// actually just used for select all
+		// actually just used for select all, other actions auto-update
 		actionRegistry.setEnabled(enable);
 	}
 
@@ -64,7 +82,14 @@ public abstract class LockableGraphicalEditor extends
 		return enabled;
 	}
 
-	private class LockedEditDomain extends EditDomain {
+	/**
+	 * This custom EditDomain implementation does not return editing commands
+	 * and the only tools working are panning and the mouse wheel zoom.
+	 * 
+	 * @author jurke
+	 * 
+	 */
+	protected class LockedEditDomain extends EditDomain {
 		@Override
 		public Tool getActiveTool() {
 			if (previousEditDomain != null
@@ -93,11 +118,26 @@ public abstract class LockableGraphicalEditor extends
 		}
 	}
 
-	private class LockableActionRegistry extends ActionRegistry {
+	/**
+	 * <p>
+	 * This custom ActionRegistry can be disabled and by this it will block all
+	 * registered actions.
+	 * </p>
+	 * 
+	 * <p>
+	 * This is done using delegation. We can do this because in the whole GEF
+	 * API the only usage of instanceof or a cast with actions is the
+	 * {@link UpdateAction} that is incorporated here as well.
+	 * </p>
+	 * 
+	 * @author jurke
+	 * 
+	 */
+	protected class BlockableActionRegistry extends ActionRegistry {
 
 		@Override
 		public void registerAction(IAction action) {
-			super.registerAction(getLockable(action));
+			super.registerAction(getBlockable(action));
 		}
 
 		@SuppressWarnings("rawtypes")
@@ -114,22 +154,33 @@ public abstract class LockableGraphicalEditor extends
 		public void dispose() {
 			Iterator actions = getActions();
 			while (actions.hasNext()) {
-				LockableAction action = (LockableAction) actions.next();
+				BlockableAction action = (BlockableAction) actions.next();
 				if (action.getDelegate() instanceof Disposable)
 					((Disposable) action.getDelegate()).dispose();
 			}
 		}
 
-		protected IAction getLockable(IAction action) {
+		/**
+		 * @param action
+		 * @return the action encapsulated in a BlockableAction
+		 */
+		protected IAction getBlockable(IAction action) {
 			if (action instanceof UpdateAction)
-				return new LockableUpdateAction((UpdateAction) action);
-			return new LockableAction(action);
+				return new BlockableUpdateAction((UpdateAction) action);
+			return new BlockableAction(action);
 		}
 
-		protected class LockableUpdateAction extends LockableAction implements
+		/**
+		 * UpdateAction is the only interface in the GEF API where
+		 * instanceof/casting is used in context with an action.
+		 * 
+		 * @author jurke
+		 * 
+		 */
+		protected class BlockableUpdateAction extends BlockableAction implements
 				UpdateAction {
 
-			public LockableUpdateAction(UpdateAction action) {
+			public BlockableUpdateAction(UpdateAction action) {
 				super((IAction) action);
 			}
 
@@ -141,14 +192,28 @@ public abstract class LockableGraphicalEditor extends
 				}
 				((UpdateAction) getDelegate()).update();
 			}
-
 		}
 
-		protected class LockableAction implements IAction {
+		/**
+		 * Delegates an action to force a working blocking feature for
+		 * observers.
+		 * 
+		 * @author jurke
+		 * 
+		 */
+		/*
+		 * The alternative would be to extend every single action overriding the
+		 * isEnabled() method, checking for blocking and update on change. This
+		 * would require much more difficult code and cause a lot of
+		 * duplication. But the main drawback would be that if any subclass
+		 * omits the additional check the action would remain executable for a
+		 * blocked editor.
+		 */
+		protected class BlockableAction implements IAction {
 
 			private final IAction delegate;
 
-			public LockableAction(IAction action) {
+			public BlockableAction(IAction action) {
 				this.delegate = action;
 			}
 
@@ -321,9 +386,6 @@ public abstract class LockableGraphicalEditor extends
 			public void setAccelerator(int keycode) {
 				delegate.setAccelerator(keycode);
 			}
-
 		}
-
 	}
-
 }

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ChildRecordChangeCache;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 
 /**
  * Apart from maintaining the lists of listeners this class caches
- * ChildRecordChangeCache during record applying to notify listeners at once
+ * ChildRecordChangeCache during record applying to notify a list of listeners
+ * at once (i.e. only after handling one message or command)
  * 
  * @author jurke
  * 

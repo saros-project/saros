@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.whiteboard.net;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessageFactory;
-import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessage;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEMessageWriter;
 
 /**
  * Very simple extension embedding an SXEMessage using the SXEMessageFactory to
@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession.SXEMessage;
  */
 public class SXEExtension implements PacketExtension {
 
-	protected SXEMessageFactory msgFactory = new SXEMessageFactory();
+	protected SXEMessageWriter msgFactory = new SXEMessageWriter();
 
 	protected SXEMessage message;
 
