@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.EditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileMImp;
@@ -78,9 +79,9 @@ public class STFController {
 
         exportObject(ShellImp.getInstance(), "shell");
         exportObject(BasicWidgetsImp.getInstance(), "basicObject");
+        exportObject(TableImp.getInstance(), "table");
         exportObject(SarosPEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
-
         exportObject(EditorImp.getInstance(), "eclipseEditor");
         exportObject(RosterViewImp.getInstance(), "rosterView");
         exportObject(SessionViewImp.getInstance(), "sessionView");

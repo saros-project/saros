@@ -2,15 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 
 public class ExistTableItem extends DefaultCondition {
 
-    private BasicWidgets basic;
+    private Table table;
     private String itemText;
 
-    ExistTableItem(BasicWidgets basic, String itemText) {
-        this.basic = basic;
+    ExistTableItem(Table table, String itemText) {
+        this.table = table;
         this.itemText = itemText;
     }
 
@@ -20,6 +20,6 @@ public class ExistTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return basic.existsTableItem(itemText);
+        return table.existsTableItem(itemText);
     }
 }

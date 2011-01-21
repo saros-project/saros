@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShare
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.FileM;
@@ -50,6 +51,7 @@ public class Tester {
     public ConsoleView consoleV;
 
     public BasicWidgets basicWidgets;
+    public Table table;
     public Shell shell;
 
     public Workbench workbench;
@@ -106,7 +108,7 @@ public class Tester {
             editor = (Editor) registry.lookup("eclipseEditor");
 
             basicWidgets = (BasicWidgets) registry.lookup("basicObject");
-
+            table = (Table) registry.lookup("table");
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");

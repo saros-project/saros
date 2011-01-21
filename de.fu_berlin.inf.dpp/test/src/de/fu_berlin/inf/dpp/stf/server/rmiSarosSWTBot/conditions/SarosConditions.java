@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.ChatViewImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
@@ -35,14 +35,13 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(BasicWidgets basic,
-        String tableItemName) {
-        return new ExistTableItem(basic, tableItemName);
+    public static ICondition existTableItem(Table table, String tableItemName) {
+        return new ExistTableItem(table, tableItemName);
     }
 
-    public static ICondition ExistContextMenuOfTableItem(BasicWidgets basic,
+    public static ICondition ExistContextMenuOfTableItem(Table table,
         String itemName, String contextName) {
-        return new ExistContextMenuOfTableItem(basic, itemName, contextName);
+        return new ExistContextMenuOfTableItem(table, itemName, contextName);
     }
 
     /**********************************************
@@ -91,8 +90,8 @@ public class SarosConditions extends Conditions {
         return new ExistNoResource(resourcePath);
     }
 
-    public static ICondition isChatMessageExist(ChatViewImp chatV,
-        String jid, String message) {
+    public static ICondition isChatMessageExist(ChatViewImp chatV, String jid,
+        String message) {
         return new IsChatMessageExist(chatV, jid, message);
     }
 

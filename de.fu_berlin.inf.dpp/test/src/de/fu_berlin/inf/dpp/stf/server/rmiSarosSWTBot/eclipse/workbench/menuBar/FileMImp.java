@@ -266,7 +266,7 @@ public class FileMImp extends EclipsePart implements FileM {
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
         text.setText("java.lang.Runnable");
-        basic.waitUntilTableHasRows(1);
+        table.waitUntilTableHasRows(1);
         bot.button(OK).click();
         bot.shell(SHELL_NEW_JAVA_CLASS).activate();
         bot.checkBox("Inherited abstract methods").click();

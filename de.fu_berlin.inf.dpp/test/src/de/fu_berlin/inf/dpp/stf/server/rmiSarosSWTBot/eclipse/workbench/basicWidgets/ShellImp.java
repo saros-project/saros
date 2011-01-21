@@ -14,8 +14,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 
-public class ShellImp extends EclipsePart implements
-    Shell {
+public class ShellImp extends EclipsePart implements Shell {
     private static transient ShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
@@ -23,8 +22,7 @@ public class ShellImp extends EclipsePart implements
     protected final static String CONFIRM_DELETE = "Confirm Delete";
 
     /**
-     * {@link SessionViewImp} is a singleton, but inheritance is
-     * possible.
+     * {@link SessionViewImp} is a singleton, but inheritance is possible.
      */
     public static ShellImp getInstance() {
         if (self != null)
@@ -148,7 +146,7 @@ public class ShellImp extends EclipsePart implements
     public boolean existsTableItemInShell(String title, String label)
         throws RemoteException {
         activateShellWithText(title);
-        return basic.existsTableItem(label);
+        return table.existsTableItem(label);
     }
 
     /**********************************************
@@ -172,8 +170,7 @@ public class ShellImp extends EclipsePart implements
         bot.sleep(10);
     }
 
-    public void waitLongUntilShellClosed(String title)
-        throws RemoteException {
+    public void waitLongUntilShellClosed(String title) throws RemoteException {
         waitLongUntil(SarosConditions.isShellClosed(bot, title));
     }
 
@@ -228,7 +225,7 @@ public class ShellImp extends EclipsePart implements
         String... itemNames) throws RemoteException {
         waitUntilShellActive(title);
         for (String itemName : itemNames) {
-            basic.selectCheckBoxInTable(itemName);
+            table.selectCheckBoxInTable(itemName);
         }
         basic.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();

@@ -53,20 +53,20 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void existsTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.basicWidgets.existsTableItemInView("Shared Project Session",
+        assertTrue(alice.table.existsTableItemInView("Shared Project Session",
             bob.getBaseJid()));
-        assertTrue(alice.basicWidgets.existsTableItemInView("Shared Project Session",
+        assertTrue(alice.table.existsTableItemInView("Shared Project Session",
             OWN_CONTACT_NAME + ROLE_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.basicWidgets.selectTableItemInView("Shared Project Session",
+        alice.table.selectTableItemInView("Shared Project Session",
             bob.getBaseJid());
         assertTrue(alice.basicWidgets.isToolbarButtonInViewEnabled(
             "Shared Project Session", "Share your screen with selected user"));
-        alice.basicWidgets.selectTableItemInView("Shared Project Session",
+        alice.table.selectTableItemInView("Shared Project Session",
             OWN_CONTACT_NAME + ROLE_NAME);
         assertFalse(alice.basicWidgets.isToolbarButtonInViewEnabled(
             "Shared Project Session", "Share your screen with selected user"));
@@ -75,7 +75,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.basicWidgets.clickContextMenuOfTableInView("Shared Project Session",
+        alice.table.clickContextMenuOfTableInView("Shared Project Session",
             bob.getBaseJid(), "Give driver role");
         alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.sessionV.waitUntilIsDriver();
@@ -85,18 +85,18 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.basicWidgets.isContextMenuOfTableVisibleInView(
+        assertTrue(alice.table.isContextMenuOfTableVisibleInView(
             "Shared Project Session", bob.getBaseJid(), "Give driver role"));
-        assertTrue(alice.basicWidgets.isContextMenuOfTableVisibleInView(
+        assertTrue(alice.table.isContextMenuOfTableVisibleInView(
             "Shared Project Session", bob.getBaseJid(), "Change Color"));
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.basicWidgets.isContextMenuOfTableEnabledInView(
+        assertTrue(alice.table.isContextMenuOfTableEnabledInView(
             "Shared Project Session", bob.getBaseJid(), "Give driver role"));
-        assertFalse(alice.basicWidgets.isContextMenuOfTableEnabledInView(
+        assertFalse(alice.table.isContextMenuOfTableEnabledInView(
             "Shared Project Session", bob.getBaseJid(), "Change Color"));
     }
 }

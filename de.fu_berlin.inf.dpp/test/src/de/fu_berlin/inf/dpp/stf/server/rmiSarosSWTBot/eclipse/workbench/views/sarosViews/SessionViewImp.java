@@ -19,8 +19,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
  * 
  * @author Lin
  */
-public class SessionViewImp extends EclipsePart implements
-    SessionView {
+public class SessionViewImp extends EclipsePart implements SessionView {
 
     private static transient SessionViewImp self;
 
@@ -64,8 +63,7 @@ public class SessionViewImp extends EclipsePart implements
     private final static String CM_CHANGE_COLOR = "Change Color";
 
     /**
-     * {@link SessionViewImp} is a singleton, but inheritance is
-     * possible.
+     * {@link SessionViewImp} is a singleton, but inheritance is possible.
      */
     public static SessionViewImp getInstance() {
         if (self != null)
@@ -241,7 +239,7 @@ public class SessionViewImp extends EclipsePart implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        basic.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -262,7 +260,7 @@ public class SessionViewImp extends EclipsePart implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        basic.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
         sessionV.waitUntilIsDriver();
     }
@@ -283,7 +281,7 @@ public class SessionViewImp extends EclipsePart implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
-        basic.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_REMOVE_DRIVER_ROLE);
         sessionV.waitUntilIsNoDriver();
     }
@@ -549,7 +547,7 @@ public class SessionViewImp extends EclipsePart implements
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getContactStatusInSessionView(followedUserJID);
-        basic.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
+        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel,
             CM_STOP_FOLLOWING_THIS_USER);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -578,14 +576,14 @@ public class SessionViewImp extends EclipsePart implements
     public boolean isCMStopFollowingThisUserVisible(String contactName)
         throws RemoteException {
         precondition();
-        return basic.isContextMenuOfTableVisibleInView(VIEWNAME, contactName,
+        return table.isContextMenuOfTableVisibleInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
     public boolean isCMStopFollowingThisUserEnabled(String contactName)
         throws RemoteException {
         precondition();
-        return basic.isContextMenuOfTableEnabledInView(VIEWNAME, contactName,
+        return table.isContextMenuOfTableEnabledInView(VIEWNAME, contactName,
             CM_STOP_FOLLOWING_THIS_USER);
     }
 
@@ -857,7 +855,7 @@ public class SessionViewImp extends EclipsePart implements
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        basic.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
+        table.clickContextMenuOfTableInView(VIEWNAME, contactLabel, context);
 
     }
 
@@ -868,7 +866,7 @@ public class SessionViewImp extends EclipsePart implements
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfSelectedUser);
-        basic.getTableItemInView(VIEWNAME, contactLabel);
+        table.getTableItemInView(VIEWNAME, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)
