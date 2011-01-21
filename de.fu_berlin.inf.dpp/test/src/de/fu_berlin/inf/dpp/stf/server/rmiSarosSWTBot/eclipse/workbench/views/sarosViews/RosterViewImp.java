@@ -183,7 +183,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         basic.setTextInTextWithLabel(jid, USER_NAME);
         basic.setTextInTextWithLabel(password, PASSWORD);
         basic.setTextInTextWithLabel(password, REPEAT_PASSWORD);
-        basic.clickButton(FINISH);
+        buttonW.clickButton(FINISH);
         shellC.waitUntilShellClosed(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
@@ -286,8 +286,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (!shellC.activateShellWithText(SHELL_NEW_CONTACT))
             shellC.waitUntilShellActive(SHELL_NEW_CONTACT);
         basic.setTextInTextWithLabel(baseJID, JABBERID);
-        basic.waitUntilButtonEnabled(FINISH);
-        basic.clickButton(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
+        buttonW.clickButton(FINISH);
     }
 
     public void clickAddANewContactToolbarButton() throws RemoteException {

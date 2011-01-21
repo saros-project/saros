@@ -311,7 +311,7 @@ public class FileMImp extends EclipsePart implements FileM {
         SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
         shell.activate();
         bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
-        basic.waitUntilButtonEnabled(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
     }

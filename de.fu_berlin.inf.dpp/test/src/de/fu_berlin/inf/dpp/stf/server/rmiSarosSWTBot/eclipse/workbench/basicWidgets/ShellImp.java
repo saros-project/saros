@@ -200,7 +200,7 @@ public class ShellImp extends EclipsePart implements Shell {
         String... nodes) throws RemoteException {
         bot.shell(title).activate();
         treeW.selectTreeItem(nodes);
-        basic.waitUntilButtonEnabled(buttonText);
+        buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
     }
 
@@ -227,7 +227,7 @@ public class ShellImp extends EclipsePart implements Shell {
         for (String itemName : itemNames) {
             tableW.selectCheckBoxInTable(itemName);
         }
-        basic.waitUntilButtonEnabled(buttonText);
+        buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }
@@ -237,7 +237,7 @@ public class ShellImp extends EclipsePart implements Shell {
         // waitUntilShellActive(shellName);
         try {
             bot.shell(title).bot().table().select(itemName);
-            basic.waitUntilButtonEnabled(buttonText);
+            buttonW.waitUntilButtonEnabled(buttonText);
             bot.button(buttonText).click();
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
@@ -254,7 +254,7 @@ public class ShellImp extends EclipsePart implements Shell {
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
         treeW.waitUntilTreeItemInTreeNodeExisted(treeItem, teeNode);
         treeItem.getNode(teeNode).select();
-        basic.waitUntilButtonEnabled(buttonText);
+        buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }

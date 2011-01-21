@@ -62,7 +62,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
             changeToRegex(nodes));
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basic.waitUntilButtonEnabled(confirmLabel);
+        buttonW.waitUntilButtonEnabled(confirmLabel);
         bot.button(confirmLabel).click();
         shellC.waitUntilShellClosed(shellTitle);
     }
@@ -77,7 +77,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
         String shellTitle = SHELL_RENAME_COMPiIATION_UNIT;
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        basic.waitUntilButtonEnabled(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         /*
          * TODO Sometimes the window doesn't close when clicking on Finish, but

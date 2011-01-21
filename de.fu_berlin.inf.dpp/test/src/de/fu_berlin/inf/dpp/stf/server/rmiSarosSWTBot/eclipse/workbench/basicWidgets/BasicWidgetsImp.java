@@ -7,8 +7,6 @@ import java.util.List;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.waits.Conditions;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -43,52 +41,6 @@ public class BasicWidgetsImp extends EclipsePart implements BasicWidgets {
      * exported functions
      * 
      **************************************************************/
-
-    /**********************************************
-     * 
-     * actions on the basic widget: {@link SWTBotButton}.
-     * 
-     **********************************************/
-
-    // actions
-    public void clickButton(String mnemonicText) throws RemoteException {
-        bot.button(mnemonicText).click();
-    }
-
-    public void clickButtonWithTooltip(String tooltip) throws RemoteException {
-        bot.buttonWithTooltip(tooltip).click();
-    }
-
-    // states
-    public boolean isButtonEnabled(String mnemonicText) throws RemoteException {
-        return bot.button(mnemonicText).isEnabled();
-    }
-
-    public boolean isButtonWithTooltipEnabled(String tooltip)
-        throws RemoteException {
-        return bot.buttonWithTooltip(tooltip).isEnabled();
-    }
-
-    public boolean existsButtonInGroup(String mnemonicText, String inGroup)
-        throws RemoteException {
-        try {
-            bot.buttonInGroup(mnemonicText, inGroup);
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    // waits until
-    public void waitUntilButtonEnabled(String mnemonicText)
-        throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(bot.button(mnemonicText)));
-    }
-
-    public void waitUnitButtonWithTooltipIsEnabled(String tooltip)
-        throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(bot.buttonWithTooltip(tooltip)));
-    }
 
     /**********************************************
      * 

@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
@@ -71,6 +72,7 @@ public abstract class EclipsePart {
     public static BasicWidgetsImp basic = BasicWidgetsImp.getInstance();
     public static TableImp tableW = TableImp.getInstance();
     public static TreeImp treeW = TreeImp.getInstance();
+    public static ButtonImp buttonW = ButtonImp.getInstance();
 
     public static EditorImp editor = EditorImp.getInstance();
     public static WorkbenchImp workbenchC = WorkbenchImp.getInstance();

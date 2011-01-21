@@ -135,7 +135,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
-        basic.waitUntilButtonEnabled(OK);
+        buttonW.waitUntilButtonEnabled(OK);
         shellC.confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
@@ -170,7 +170,7 @@ public class PEViewImp extends EclipsePart implements PEView {
             bot.button(NEXT).click();
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
         }
-        basic.waitUntilButtonEnabled(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
@@ -185,7 +185,7 @@ public class PEViewImp extends EclipsePart implements PEView {
         shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
-        basic.waitUntilButtonEnabled(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
         bot.button(FINISH).click();
         shellC.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }

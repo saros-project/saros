@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgetsImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
@@ -82,6 +83,7 @@ public class STFController {
         exportObject(BasicWidgetsImp.getInstance(), "basicObject");
         exportObject(TableImp.getInstance(), "table");
         exportObject(TreeImp.getInstance(), "tree");
+        exportObject(ButtonImp.getInstance(), "button");
         exportObject(SarosPEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
         exportObject(EditorImp.getInstance(), "eclipseEditor");

@@ -70,11 +70,11 @@ public class SarosMImp extends EclipsePart implements SarosM {
         basic.setTextInTextWithLabel(username, "Username");
         basic.setTextInTextWithLabel(password, "Password");
         basic.setTextInTextWithLabel(password, "Repeat Password");
-        basic.waitUntilButtonEnabled(FINISH);
-        basic.clickButton(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
+        buttonW.clickButton(FINISH);
         shellC.waitUntilShellClosed("Create New User Account");
-        basic.clickButton(NEXT);
-        basic.clickButton(FINISH);
+        buttonW.clickButton(NEXT);
+        buttonW.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -88,10 +88,10 @@ public class SarosMImp extends EclipsePart implements SarosM {
         basic.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
         basic.setTextInTextWithLabel(jid.getName(), "Username");
         basic.setTextInTextWithLabel(password, "Password");
-        basic.waitUntilButtonEnabled(NEXT);
-        basic.clickButton(NEXT);
-        basic.waitUntilButtonEnabled(FINISH);
-        basic.clickButton(FINISH);
+        buttonW.waitUntilButtonEnabled(NEXT);
+        buttonW.clickButton(NEXT);
+        buttonW.waitUntilButtonEnabled(FINISH);
+        buttonW.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -196,7 +196,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         basic.setTextInTextWithLabel(newUserName, "Username:");
         basic.setTextInTextWithLabel(newPassword, "Password:");
         basic.setTextInTextWithLabel(newPassword, "Confirm:");
-        basic.clickButton(FINISH);
+        buttonW.clickButton(FINISH);
         bot.button(APPLY).click();
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
@@ -227,7 +227,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         if (isAccountActive(jid)) {
             shellC.activateShellWaitingUntilOpened("Deleting active account");
-            basic.clickButton(OK);
+            buttonW.clickButton(OK);
         }
         bot.button(APPLY).click();
         bot.button(OK).click();

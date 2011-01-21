@@ -130,7 +130,7 @@ public class SarosPEViewImp extends PEViewImp implements SarosPEView {
         if (!shellC.activateShellWithText(SESSION_INVITATION))
             shellC.waitUntilShellActive(SESSION_INVITATION);
         bot.button(NEXT).click();
-        basic.waitUntilButtonEnabled(FINISH);
+        buttonW.waitUntilButtonEnabled(FINISH);
     }
 
     public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()

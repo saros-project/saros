@@ -93,30 +93,30 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         bob.shell.waitUntilShellOpen(SESSION_INVITATION);
         bob.shell.activateShellWithText(SESSION_INVITATION);
-        bob.basicWidgets.clickButton(CANCEL);
+        bob.button.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             bob.getName() + ".*"));
 
-        alice.basicWidgets.clickButton(OK);
+        alice.button.clickButton(OK);
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
         carl.pEV.confirmFirstPageOfWizardSessionInvitation();
-        carl.basicWidgets.clickButton(CANCEL);
+        carl.button.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             carl.getName() + ".*"));
-        alice.basicWidgets.clickButton(OK);
+        alice.button.clickButton(OK);
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
-        dave.basicWidgets.clickButton(CANCEL);
+        dave.button.clickButton(CANCEL);
         alice.pEV.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.pEV.getSecondLabelOfWindowProblemOccurred().matches(
             dave.getName() + ".*"));
-        alice.basicWidgets.clickButton(OK);
+        alice.button.clickButton(OK);
 
         edna.shell.waitUntilShellOpen(SESSION_INVITATION);
         edna.shell.activateShellWithText(SESSION_INVITATION);

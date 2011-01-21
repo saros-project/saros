@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreat
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BasicWidgets;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Button;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
@@ -54,6 +55,7 @@ public class Tester {
     public BasicWidgets basicWidgets;
     public Table table;
     public Tree tree;
+    public Button button;
     public Shell shell;
 
     public Workbench workbench;
@@ -112,6 +114,7 @@ public class Tester {
             basicWidgets = (BasicWidgets) registry.lookup("basicObject");
             table = (Table) registry.lookup("table");
             tree = (Tree) registry.lookup("tree");
+            button = (Button) registry.lookup("button");
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");

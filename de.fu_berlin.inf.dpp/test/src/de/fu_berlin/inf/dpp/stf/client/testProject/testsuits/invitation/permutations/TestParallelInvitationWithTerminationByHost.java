@@ -110,7 +110,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         dave.shell.activateShellWithText(SESSION_INVITATION);
         dave.pEV.confirmFirstPageOfWizardSessionInvitation();
 
-        dave.basicWidgets.clickButton(FINISH);
+        dave.button.clickButton(FINISH);
         alice.progressV.removeProcess(0);
         // FIXME Timeout exception by MAC OS X, the building session under MAS
         // is sofast that the session process is already done after canceling

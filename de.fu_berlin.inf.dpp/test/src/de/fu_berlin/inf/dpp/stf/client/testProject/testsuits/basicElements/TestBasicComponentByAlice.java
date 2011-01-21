@@ -123,7 +123,7 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.basicWidgets.clickMenuWithTexts("Saros", "Preferences");
         alice.shell.activateShellWaitingUntilOpened("Preferences");
         alice.tree.selectTreeItem("Saros");
-        assertTrue(alice.basicWidgets.existsButtonInGroup(
+        assertTrue(alice.button.existsButtonInGroup(
             GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE));
     }
