@@ -29,33 +29,53 @@ public class EditMImp extends EclipsePart implements EditM {
 
     protected final static String VIEWNAME = "Package Explorer";
     private final static String SHELL_DELETE_RESOURCE = "Delete Resources";
+
+    /* menu names */
     private final static String DELETE = "Delete";
+    private final static String EDIT = "Edit";
+    private final static String COPY = "Copy";
+    private final static String PASTE = "Paste";
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
-     * all related actions with the sub menus of the context menu "Delete"
+     * actions
      * 
      **********************************************/
 
-    public void deleteProject(String projectName) throws RemoteException {
+    public void deleteProjectNoGUI(String projectName) throws RemoteException {
         IPath path = new Path(projectName);
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource == null) {
-            log.debug("File " + projectName + " not found for deletion");
-            return;
-        }
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + projectName, e);
-            }
+        deleteNoGUI(path);
+    }
+
+    public void deleteFolderNoGUI(String... folderNodes) throws RemoteException {
+        IPath path = new Path(getPath(folderNodes));
+        deleteNoGUI(path);
+    }
+
+    public void deletePkgNoGUI(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            IPath path = new Path(getPkgPath(projectName, pkg));
+            deleteNoGUI(path);
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
         }
     }
 
-    public void deleteAllProjectsWithGUI() throws RemoteException {
+    public void deleteClassNoGUI(String projectName, String pkg,
+        String className) throws RemoteException {
+        IPath path = new Path(getClassPath(projectName, pkg, className));
+        deleteNoGUI(path);
+    }
+
+    public void deleteAllProjects() throws RemoteException {
         precondition();
         SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(VIEWNAME)
             .getAllItems();
@@ -69,95 +89,59 @@ public class EditMImp extends EclipsePart implements EditM {
         }
     }
 
-    public void deleteProjectWithGUI(String projectName) throws RemoteException {
+    public void deleteProject() throws RemoteException {
         precondition();
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, projectName);
+        menuW.clickMenuWithTexts(EDIT, DELETE);
         shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
-    public void deleteFolder(String... folderNodes) throws RemoteException {
-        String folderpath = getPath(folderNodes);
-        IPath path = new Path(getPath(folderNodes));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete folder " + folderpath, e);
-            }
-        }
-    }
-
-    public void deletePkg(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
-            IPath path = new Path(getPkgPath(projectName, pkg));
-            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-                .getRoot();
-            IResource resource = root.findMember(path);
-            if (resource.isAccessible()) {
-                try {
-                    FileUtil.delete(resource);
-                    root.refreshLocal(IResource.DEPTH_INFINITE, null);
-                } catch (CoreException e) {
-                    log.debug("Couldn't delete file " + projectName, e);
-                }
-            }
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void deleteFile(String... nodes) throws RemoteException {
+    public void deleteFile() throws RemoteException {
         precondition();
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, DELETE, nodes);
+        menuW.clickMenuWithTexts(EDIT, DELETE);
         shellC.confirmShellDelete(OK);
     }
 
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource.isAccessible()) {
-            try {
-                FileUtil.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-
-            } catch (CoreException e) {
-                log.debug("Couldn't delete file " + className + ".java", e);
-            }
-        }
-    }
-
-    public void copyProject(String target, String source)
-        throws RemoteException {
-
+    public void copyProject(String target) throws RemoteException {
         if (fileM.existsProject(target)) {
-            throw new RemoteException("Can't copy project from " + source
-                + " to " + target + " , the target already exists.");
+            throw new RemoteException("Can't copy project" + " to " + target
+                + " , the target already exists.");
         }
         precondition();
-
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Copy",
-            changeToRegex(source));
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, "Paste",
-            changeToRegex(source));
-
+        menuW.clickMenuWithTexts(EDIT, COPY);
+        menuW.clickMenuWithTexts(EDIT, PASTE);
         shellC.activateShellWithText("Copy Project");
-        bot.textWithLabel("Project name:").setText(target);
-        bot.button(OK).click();
+        textW.setTextInTextWithLabel(target, "Project name:");
+        buttonW.clickButton(OK);
         shellC.waitUntilShellClosed("Copy Project");
         bot.sleep(1000);
     }
 
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
+
     protected void precondition() throws RemoteException {
-        pEV.openPEView();
-        pEV.setFocusOnPEView();
+        workbenchC.activateWorkbench();
+    }
+
+    private void deleteNoGUI(IPath path) {
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IResource resource = root.findMember(path);
+        if (resource == null) {
+            log.debug(" Can't find resource");
+            return;
+        }
+        if (resource.isAccessible()) {
+            try {
+                FileUtil.delete(resource);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete the resource", e);
+            }
+        }
     }
 
 }

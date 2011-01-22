@@ -29,7 +29,7 @@ public interface SarosM extends Remote {
      * 
      * @throws RemoteException
      */
-    public void createAccount(String server, String username, String password)
+    public void createAccountNoGUI(String server, String username, String password)
         throws RemoteException;
 
     /**
@@ -50,7 +50,7 @@ public interface SarosM extends Remote {
      *            TODO not implement yet.
      * @throws RemoteException
      */
-    public void creatAccountWithMenuGUI(JID jid, String password,
+    public void creatAccount(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException;
 
     /**
@@ -70,7 +70,7 @@ public interface SarosM extends Remote {
      *            the password of the new account.
      * @throws RemoteException
      */
-    public void createAccountInPeferencesGUI(String server, String username,
+    public void createAccountInPeferences(String server, String username,
         String password) throws RemoteException;
 
     /**
@@ -89,7 +89,7 @@ public interface SarosM extends Remote {
      *            the password of the added account.
      * @throws RemoteException
      */
-    public void addAccountGUI(JID jid, String password) throws RemoteException;
+    public void addAccount(JID jid, String password) throws RemoteException;
 
     /**
      * @param jid
@@ -126,7 +126,7 @@ public interface SarosM extends Remote {
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
-    public void activateAccount(JID jid) throws RemoteException;
+    public void activateAccountNoGUI(JID jid) throws RemoteException;
 
     /**
      * activate the account specified by the given jid using GUI,which should be
@@ -143,7 +143,7 @@ public interface SarosM extends Remote {
      *            password of the given jid
      * @throws RemoteException
      */
-    public void activateAccountGUI(JID jid, String password)
+    public void activateAccount(JID jid, String password)
         throws RemoteException;
 
     /**

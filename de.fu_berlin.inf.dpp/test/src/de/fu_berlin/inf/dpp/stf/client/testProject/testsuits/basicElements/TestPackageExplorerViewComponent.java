@@ -65,9 +65,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newFolder(FOLDER2, PROJECT1, FOLDER1);
         assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1));
         assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1, FOLDER2));
-        alice.editM.deleteFolder(PROJECT1, FOLDER1, FOLDER2);
+        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
         assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1, FOLDER2));
-        alice.editM.deleteFolder(PROJECT1, FOLDER1);
+        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
         assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
     }
 
@@ -78,9 +78,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newPackage(PROJECT1, PKG1 + ".subpkg");
         assertTrue(alice.fileM.existsPkg(PROJECT1, PKG1));
         assertTrue(alice.fileM.existsPkg(PROJECT1, PKG1 + ".subpkg"));
-        alice.editM.deletePkg(PROJECT1, PKG1 + ".subpkg");
+        alice.editM.deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
         assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1 + ".subpkg"));
-        alice.editM.deletePkg(PROJECT1, PKG1);
+        alice.editM.deletePkgNoGUI(PROJECT1, PKG1);
         assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1));
     }
 
@@ -114,7 +114,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         assertFalse(alice.editor.isEditorOpen(FILE1));
         alice.pEV.openFile(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
-        alice.editM.deleteFile(PROJECT1, FOLDER1, FILE1);
+        alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
+        alice.editM.deleteFile();
         assertFalse(alice.editor.isEditorOpen(FILE1));
     }
 
@@ -126,7 +127,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.editor.closeEditorWithSave(FILE1);
         alice.pEV.openFileWith("Text Editor", PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
-        alice.editM.deleteFile(PROJECT1, FOLDER1, FILE1);
+        alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
+        alice.editM.deleteFile();
         assertFalse(alice.editor.isEditorOpen(FILE1));
     }
 
@@ -219,17 +221,17 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         assertTrue(alice.fileM.existsProject(PROJECT1));
-        alice.editM.deleteProject(PROJECT1);
+        alice.editM.deleteProjectNoGUI(PROJECT1);
         assertFalse(alice.fileM.existsProject(PROJECT1));
     }
 
     @Test
-    @Ignore
     public void testDeleteFileUsingGUI() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
-        alice.editM.deleteFile(PROJECT1, "src", "pkg", "Cls.java");
+        alice.pEV.selectClass(PROJECT1, "pkg", "Cls");
+        alice.editM.deleteFile();
         assertFalse(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
@@ -239,7 +241,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
-        alice.editM.deleteClass(PROJECT1, "pkg", "Cls");
+        alice.editM.deleteClassNoGUI(PROJECT1, "pkg", "Cls");
         assertFalse(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
     }
 
@@ -297,7 +299,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         assertTrue(alice.fileM.existsClass(PROJECT1, pkg, className2));
 
         log.trace("deleteResource()");
-        alice.editM.deleteProject(PROJECT1);
+        alice.editM.deleteProjectNoGUI(PROJECT1);
         log.trace("alice.isJavaProjectExist()");
         assertFalse(alice.fileM.existsProject(PROJECT1));
     }
@@ -310,7 +312,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.fileM.existsFiletWithGUI(PROJECT1, "src", "pkg",
             "Cls.java"));
-        alice.editM.deleteClass(PROJECT1, "pkg", "Cls");
+        alice.editM.deleteClassNoGUI(PROJECT1, "pkg", "Cls");
         assertFalse(alice.fileM.existsFiletWithGUI(PROJECT1, "src", "pkg",
             "Cls.java"));
     }
@@ -346,7 +348,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1));
-        alice.editM.deleteFolder(PROJECT1, FOLDER1);
+        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
         assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
     }
 
@@ -364,7 +366,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testCopyProject() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
         assertFalse(alice.fileM.existsProject(PROJECT2));
-        alice.editM.copyProject(PROJECT2, PROJECT1);
+        alice.pEV.selectProject(PROJECT1);
+        alice.editM.copyProject(PROJECT2);
         assertTrue(alice.fileM.existsProject(PROJECT2));
     }
 }

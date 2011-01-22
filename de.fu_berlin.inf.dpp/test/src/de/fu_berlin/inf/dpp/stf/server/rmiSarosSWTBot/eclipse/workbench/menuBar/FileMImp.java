@@ -61,9 +61,15 @@ public class FileMImp extends EclipsePart implements FileM {
      * exported functions
      * 
      **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void newProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
-            workbenchC.activateWorkbench();
+            precondition();
             menuW.clickMenuWithTexts(FILE, NEW, PROJECT);
             confirmWizardNewProject(projectName);
         }
@@ -71,16 +77,10 @@ public class FileMImp extends EclipsePart implements FileM {
 
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProject(projectName)) {
-            workbenchC.activateWorkbench();
+            precondition();
             menuW.clickMenuWithTexts(FILE, NEW, JAVA_PROJECT);
             confirmWindowNewJavaProject(projectName);
         }
-    }
-
-    public boolean existsProject(String projectName) throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
-        return project.exists();
     }
 
     public void newFolder(String newFolderName, String... parentNodes)
@@ -104,27 +104,12 @@ public class FileMImp extends EclipsePart implements FileM {
         }
     }
 
-    public boolean existsFolder(String... folderNodes) throws RemoteException {
-        IPath path = new Path(getPath(folderNodes));
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            return false;
-        return true;
-    }
-
-    public void waitUntilFolderExisted(String... folderNodes)
-        throws RemoteException {
-        String fullPath = getPath(folderNodes);
-        waitUntil(SarosConditions.isResourceExist(fullPath));
-    }
-
     public void newPackage(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches("[\\w\\.]*\\w+")) {
             if (!existsPkg(projectName, pkg))
                 try {
-                    workbenchC.activateWorkbench();
+                    precondition();
                     menuW.clickMenuWithTexts(FILE, NEW, PACKAGE);
                     confirmWindowNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
@@ -132,38 +117,6 @@ public class FileMImp extends EclipsePart implements FileM {
                     log.error(cause, e);
                     throw new RemoteException(cause, e);
                 }
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public boolean existsPkg(String projectName, String pkg)
-        throws RemoteException {
-        IPath path = new Path(getPkgPath(projectName, pkg));
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource != null)
-            return true;
-        return false;
-    }
-
-    public void waitUntilPkgExisted(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
-            waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
-                pkg)));
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void waitUntilPkgNotExist(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
-            waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
-                projectName, pkg)));
         } else {
             throw new RuntimeException(
                 "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
@@ -192,41 +145,11 @@ public class FileMImp extends EclipsePart implements FileM {
             }
     }
 
-    public boolean existsFile(String filePath) throws RemoteException {
-        IPath path = new Path(filePath);
-        log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
-        return file.exists();
-    }
-
-    public boolean existsFile(String... nodes) throws RemoteException {
-        return existsFile(getPath(nodes));
-    }
-
-    public boolean existsClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        return existsFile(getClassPath(projectName, pkg, className));
-    }
-
-    public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
-        workbenchC.activateWorkbench();
-        precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
-        return treeW.existsTreeItemWithRegexs(tree, nodes);
-    }
-
-    public void waitUntilFileExisted(String... fileNodes)
-        throws RemoteException {
-        String fullPath = getPath(fileNodes);
-        waitUntil(SarosConditions.isResourceExist(fullPath));
-    }
-
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
         if (!existsFile(getClassPath(projectName, pkg, className))) {
             try {
-                workbenchC.activateWorkbench();
+                precondition();
                 menuW.clickMenuWithTexts(FILE, NEW, CLASS);
                 confirmWindowNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
@@ -235,18 +158,6 @@ public class FileMImp extends EclipsePart implements FileM {
                 throw new RemoteException(cause, e);
             }
         }
-    }
-
-    public void waitUntilClassExisted(String projectName, String pkg,
-        String className) throws RemoteException {
-        String path = getClassPath(projectName, pkg, className);
-        waitUntil(SarosConditions.isResourceExist(path));
-    }
-
-    public void waitUntilClassNotExist(String projectName, String pkg,
-        String className) throws RemoteException {
-        String path = getClassPath(projectName, pkg, className);
-        waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
     public void newClassImplementsRunnable(String projectName, String pkg,
@@ -280,7 +191,118 @@ public class FileMImp extends EclipsePart implements FileM {
         newClass(projectName, pkg, className);
     }
 
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean existsProject(String projectName) throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        return project.exists();
+    }
+
+    public boolean existsFolder(String... folderNodes) throws RemoteException {
+        IPath path = new Path(getPath(folderNodes));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            return false;
+        return true;
+    }
+
+    public boolean existsPkg(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(getPkgPath(projectName, pkg));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource != null)
+            return true;
+        return false;
+    }
+
+    public boolean existsFile(String filePath) throws RemoteException {
+        IPath path = new Path(filePath);
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        return file.exists();
+    }
+
+    public boolean existsFile(String... nodes) throws RemoteException {
+        return existsFile(getPath(nodes));
+    }
+
+    public boolean existsClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        return existsFile(getClassPath(projectName, pkg, className));
+    }
+
+    public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
+        workbenchC.activateWorkbench();
+        precondition();
+        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
+        return treeW.existsTreeItemWithRegexs(tree, nodes);
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilFolderExisted(String... folderNodes)
+        throws RemoteException {
+        String fullPath = getPath(folderNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void waitUntilPkgExisted(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
+                pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void waitUntilPkgNotExist(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
+                projectName, pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void waitUntilFileExisted(String... fileNodes)
+        throws RemoteException {
+        String fullPath = getPath(fileNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void waitUntilClassExisted(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceExist(path));
+    }
+
+    public void waitUntilClassNotExist(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceNotExist(path));
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
     protected void precondition() throws RemoteException {
+        workbenchC.activateWorkbench();
         pEV.openPEView();
         pEV.setFocusOnPEView();
     }

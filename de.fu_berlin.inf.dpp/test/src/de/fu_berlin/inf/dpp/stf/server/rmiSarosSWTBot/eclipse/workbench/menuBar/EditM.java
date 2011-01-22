@@ -18,29 +18,27 @@ public interface EditM extends Remote {
      * @param projectName
      *            name of the project, which you want to delete.
      */
-    public void deleteProject(String projectName) throws RemoteException;
+    public void deleteProjectNoGUI(String projectName) throws RemoteException;
 
     /**
      * Delete all the projects existed in the package explorer view.
      * 
      * @throws RemoteException
      */
-    public void deleteAllProjectsWithGUI() throws RemoteException;
+    public void deleteAllProjects() throws RemoteException;
 
     /**
      * Perform the action "delete project" which should be done with the
      * following steps:
      * <ol>
-     * <li>select the project,which you want to delete, and then click the
-     * context menu "Delete".</li>
+     * <li>click the menu "Delete".</li>
      * <li>confirm the popup-window "Delete Resources" and make sure the
      * checkbox is clicked.</li>
      * <li>wait until the popup-window is closed.</li>
      * 
-     * @param projectName
-     *            the name of the project, which you want to delete.
+     * 
      */
-    public void deleteProjectWithGUI(String projectName) throws RemoteException;
+    public void deleteProject() throws RemoteException;
 
     /**
      * Delete the specified folder using FileUntil.delete(resource).
@@ -50,7 +48,7 @@ public interface EditM extends Remote {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}
      */
-    public void deleteFolder(String... folderNodes) throws RemoteException;
+    public void deleteFolderNoGUI(String... folderNodes) throws RemoteException;
 
     /**
      * Delete the specified package using FileUntil.delete(resource).
@@ -60,7 +58,7 @@ public interface EditM extends Remote {
      * @param pkg
      *            name of the package, which you want to delete.
      */
-    public void deletePkg(String projectName, String pkg)
+    public void deletePkgNoGUI(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -68,17 +66,14 @@ public interface EditM extends Remote {
      * steps:
      * 
      * <ol>
-     * <li>selects the file,which you want to delete, and then click the context
-     * menu Delete.</li>
+     * <li>click the menu Delete.</li>
      * <li>confirms the popup-window "Confirm Delete".</li>
      * <li>waits until the popup-window is closed.</li>
      * </ol>
      * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
+     * 
      */
-    public void deleteFile(String... nodes) throws RemoteException;
+    public void deleteFile() throws RemoteException;
 
     /**
      * Delete a class of the specified java project using
@@ -91,8 +86,8 @@ public interface EditM extends Remote {
      * @param className
      *            name of the class, which you want to delete.
      */
-    public void deleteClass(String projectName, String pkg, String className)
-        throws RemoteException;
+    public void deleteClassNoGUI(String projectName, String pkg,
+        String className) throws RemoteException;
 
     /**
      * Uses Copy and Paste to create a copy of a project.<br>
@@ -101,10 +96,8 @@ public interface EditM extends Remote {
      * 
      * @param target
      *            The name of the copy to be created.
-     * @param source
-     *            The project to create the copy from.
+     * 
      * @throws RemoteException
      */
-    public void copyProject(String target, String source)
-        throws RemoteException;
+    public void copyProject(String target) throws RemoteException;
 }

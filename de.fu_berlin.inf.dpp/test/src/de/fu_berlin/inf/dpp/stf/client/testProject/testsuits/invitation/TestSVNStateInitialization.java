@@ -90,7 +90,8 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Before
     public void setUp() throws RemoteException {
-        alice.editM.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
+        alice.pEV.selectProject(SVN_PROJECT_COPY);
+        alice.editM.copyProject(SVN_PROJECT);
         assertTrue(alice.fileM.existsProject(SVN_PROJECT));
         assertTrue(alice.team.isProjectManagedBySVN(SVN_PROJECT));
         assertTrue(alice.fileM.existsFile(SVN_CLS1_FULL_PATH));
@@ -101,7 +102,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.leaveSessionHostFirstDone(bob);
 
         if (alice.fileM.existsProject(SVN_PROJECT))
-            alice.editM.deleteProject(SVN_PROJECT);
+            alice.editM.deleteProjectNoGUI(SVN_PROJECT);
         bob.workbench.deleteAllProjects();
     }
 

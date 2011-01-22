@@ -67,10 +67,10 @@ public class TestMainMenuComponent extends STFTest {
     @After
     public void runAfterEveryTest() throws RemoteException {
         if (!alice.sarosM.isAccountExist(alice.jid, alice.password))
-            alice.sarosM.createAccount(alice.jid.getDomain(),
+            alice.sarosM.createAccountNoGUI(alice.jid.getDomain(),
                 alice.jid.getName(), alice.password);
         if (!alice.sarosM.isAccountActive(alice.jid))
-            alice.sarosM.activateAccount(alice.jid);
+            alice.sarosM.activateAccountNoGUI(alice.jid);
         if (alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD))
             alice.sarosM.deleteAccount(ANOTHER_JID);
     }
@@ -146,11 +146,11 @@ public class TestMainMenuComponent extends STFTest {
     @Test
     public void addAndActivateAccount() throws RemoteException {
         assertFalse(alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD));
-        alice.sarosM.createAccount(SERVER, USERNAME, PASSWORD);
+        alice.sarosM.createAccountNoGUI(SERVER, USERNAME, PASSWORD);
         assertTrue(alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD));
         assertTrue(alice.sarosM.isAccountActive(alice.jid));
         assertFalse(alice.sarosM.isAccountActive(ANOTHER_JID));
-        alice.sarosM.activateAccount(ANOTHER_JID);
+        alice.sarosM.activateAccountNoGUI(ANOTHER_JID);
         assertTrue(alice.sarosM.isAccountActive(ANOTHER_JID));
         assertFalse(alice.sarosM.isAccountActive(alice.jid));
     }
@@ -158,11 +158,11 @@ public class TestMainMenuComponent extends STFTest {
     @Test
     public void addAndActivateAcountGUI() throws RemoteException {
         assertFalse(alice.sarosM.isAccountExistGUI(ANOTHER_JID, PASSWORD));
-        alice.sarosM.addAccountGUI(ANOTHER_JID, PASSWORD);
+        alice.sarosM.addAccount(ANOTHER_JID, PASSWORD);
         assertTrue(alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD));
         assertTrue(alice.sarosM.isAccountActive(alice.jid));
         assertFalse(alice.sarosM.isAccountActive(ANOTHER_JID));
-        alice.sarosM.activateAccountGUI(ANOTHER_JID, PASSWORD);
+        alice.sarosM.activateAccount(ANOTHER_JID, PASSWORD);
         assertTrue(alice.sarosM.isAccountActive(ANOTHER_JID));
         assertFalse(alice.sarosM.isAccountActive(alice.jid));
     }
@@ -208,7 +208,7 @@ public class TestMainMenuComponent extends STFTest {
     @Test
     public void deleteInactiveAccountGUI() throws RemoteException {
         assertFalse(alice.sarosM.isAccountExistGUI(ANOTHER_JID, PASSWORD));
-        alice.sarosM.addAccountGUI(ANOTHER_JID, PASSWORD);
+        alice.sarosM.addAccount(ANOTHER_JID, PASSWORD);
         assertTrue(alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD));
         alice.sarosM.deleteAccountGUI(ANOTHER_JID, PASSWORD);
         assertFalse(alice.sarosM.isAccountExist(ANOTHER_JID, PASSWORD));

@@ -75,13 +75,14 @@ public class TestSVNStateUpdates extends STFTest {
     public void before() throws Exception {
         super.before();
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Tester musician : activeTesters) {
+        for (final Tester tester : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    musician.editM.copyProject(SVN_PROJECT, SVN_PROJECT_COPY);
-                    assertTrue(musician.fileM.existsProject(SVN_PROJECT));
-                    assertTrue(musician.team.isProjectManagedBySVN(SVN_PROJECT));
-                    assertTrue(musician.fileM.existsFile(SVN_CLS1_FULL_PATH));
+                    tester.pEV.selectProject(SVN_PROJECT_COPY);
+                    tester.editM.copyProject(SVN_PROJECT);
+                    assertTrue(tester.fileM.existsProject(SVN_PROJECT));
+                    assertTrue(tester.team.isProjectManagedBySVN(SVN_PROJECT));
+                    assertTrue(tester.fileM.existsFile(SVN_CLS1_FULL_PATH));
                     return null;
                 }
             });
@@ -102,10 +103,10 @@ public class TestSVNStateUpdates extends STFTest {
         super.after();
         alice.leaveSessionHostFirstDone(bob);
         if (bob.fileM.existsProject(SVN_PROJECT))
-            bob.editM.deleteProject(SVN_PROJECT);
+            bob.editM.deleteProjectNoGUI(SVN_PROJECT);
 
         if (alice.fileM.existsProject(SVN_PROJECT))
-            alice.editM.deleteProject(SVN_PROJECT);
+            alice.editM.deleteProjectNoGUI(SVN_PROJECT);
     }
 
     @AfterClass
@@ -300,7 +301,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testRevert() throws RemoteException {
-        alice.editM.deleteProject(STFTest.SVN_CLS1_FULL_PATH);
+        alice.editM.deleteProjectNoGUI(STFTest.SVN_CLS1_FULL_PATH);
         bob.fileM.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
         alice.team.revertProject(SVN_PROJECT);

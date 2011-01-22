@@ -129,10 +129,10 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
             if (!sarosM.isAccountExist(jid, password)) {
-                sarosM.createAccount(jid.getDomain(), jid.getName(), password);
+                sarosM.createAccountNoGUI(jid.getDomain(), jid.getName(), password);
             }
             if (!sarosM.isAccountActive(jid))
-                sarosM.activateAccount(jid);
+                sarosM.activateAccountNoGUI(jid);
             saros.connect(true);
             waitUntil(new DefaultCondition() {
                 public boolean test() throws Exception {

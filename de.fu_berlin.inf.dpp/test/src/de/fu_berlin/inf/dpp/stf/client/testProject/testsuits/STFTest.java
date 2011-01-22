@@ -304,7 +304,7 @@ public class STFTest {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
                 if (tester.fileM.existsFolder(PROJECT1, folder))
-                    tester.editM.deleteFolder(PROJECT1, folder);
+                    tester.editM.deleteFolderNoGUI(PROJECT1, folder);
             }
         }
     }

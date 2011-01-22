@@ -36,29 +36,30 @@ public class SarosMImp extends EclipsePart implements SarosM {
         return self;
     }
 
-    /***********************************************************************
+    /**************************************************************
      * 
      * exported functions
      * 
-     ***********************************************************************/
+     **************************************************************/
 
     /**********************************************
-     * create and add an Account.
+     * 
+     * actions
      * 
      **********************************************/
-    public void createAccount(String server, String username, String password)
-        throws RemoteException {
+    public void createAccountNoGUI(String server, String username,
+        String password) throws RemoteException {
         xmppAccountStore.createNewAccount(username, password, server);
     }
 
-    public void creatAccountWithMenuGUI(JID jid, String password,
+    public void creatAccount(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException {
         menuW.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         rosterV.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
             password, usesThisAccountNow);
     }
 
-    public void createAccountInPeferencesGUI(String server, String username,
+    public void createAccountInPeferences(String server, String username,
         String password) throws RemoteException {
         selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
@@ -80,7 +81,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
-    public void addAccountGUI(JID jid, String password) throws RemoteException {
+    public void addAccount(JID jid, String password) throws RemoteException {
         selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
@@ -113,34 +114,12 @@ public class SarosMImp extends EclipsePart implements SarosM {
         return false;
     }
 
-    public boolean isAccountExistGUI(JID jid, String password)
-        throws RemoteException {
-        selectSarosPageInPreferences();
-        SWTBotList list = bot
-            .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
-        String[] items = list.getItems();
-        for (String item : items) {
-            if ((jid.getBase()).equals(item)) {
-                bot.button(CANCEL).click();
-                shellC.waitUntilShellClosed(SHELL_PREFERNCES);
-                return true;
-            }
-        }
-        bot.button(CANCEL).click();
-        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
-        return false;
-    }
-
-    /**********************************************
-     * activate an Account.
-     * 
-     **********************************************/
-    public void activateAccount(JID jid) throws RemoteException {
+    public void activateAccountNoGUI(JID jid) throws RemoteException {
         XMPPAccount account = getXMPPAccount(jid);
         xmppAccountStore.setAccountActive(account);
     }
 
-    public void activateAccountGUI(JID jid, String password)
+    public void activateAccount(JID jid, String password)
         throws RemoteException {
         assert isAccountExist(jid, password) : "the account (" + jid.getBase()
             + ") doesn't exist yet!";
@@ -158,25 +137,6 @@ public class SarosMImp extends EclipsePart implements SarosM {
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
-    public boolean isAccountActive(JID jid) throws RemoteException {
-        XMPPAccount account = getXMPPAccount(jid);
-        if (account == null)
-            return false;
-        return account.isActive();
-    }
-
-    public boolean isAccountActiveGUI(JID jid) throws RemoteException {
-        selectSarosPageInPreferences();
-        boolean existLabel = labelW.existsLabel("Active: " + jid.getBase());
-        bot.button(CANCEL).click();
-        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
-        return existLabel;
-    }
-
-    /**********************************************
-     * change an Account.
-     * 
-     **********************************************/
     public void changeAccount(JID jid, String newUserName, String newPassword,
         String newServer) throws RemoteException {
         xmppAccountStore.changeAccountData(getXMPPAccount(jid).getId(),
@@ -201,11 +161,6 @@ public class SarosMImp extends EclipsePart implements SarosM {
         bot.button(OK).click();
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
-
-    /**********************************************
-     * delete an Account.
-     * 
-     **********************************************/
 
     public void deleteAccount(JID jid) throws RemoteException {
         xmppAccountStore.deleteAccount(getXMPPAccount(jid));
@@ -234,12 +189,6 @@ public class SarosMImp extends EclipsePart implements SarosM {
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
-    /**********************************************
-     * 
-     * setting screensharing
-     * 
-     **********************************************/
-
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
@@ -253,11 +202,6 @@ public class SarosMImp extends EclipsePart implements SarosM {
         shellC.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
-    /**********************************************
-     * 
-     * setting Feedback
-     * 
-     **********************************************/
     public void disableAutomaticReminder() throws RemoteException {
         if (!feedbackManager.isFeedbackDisabled()) {
             feedbackManager.setFeedbackDisabled(true);
@@ -278,11 +222,47 @@ public class SarosMImp extends EclipsePart implements SarosM {
         }
     }
 
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean isAccountExistGUI(JID jid, String password)
+        throws RemoteException {
+        selectSarosPageInPreferences();
+        SWTBotList list = bot
+            .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
+        String[] items = list.getItems();
+        for (String item : items) {
+            if ((jid.getBase()).equals(item)) {
+                bot.button(CANCEL).click();
+                shellC.waitUntilShellClosed(SHELL_PREFERNCES);
+                return true;
+            }
+        }
+        bot.button(CANCEL).click();
+        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
+        return false;
+    }
+
+    public boolean isAccountActive(JID jid) throws RemoteException {
+        XMPPAccount account = getXMPPAccount(jid);
+        if (account == null)
+            return false;
+        return account.isActive();
+    }
+
+    public boolean isAccountActiveGUI(JID jid) throws RemoteException {
+        selectSarosPageInPreferences();
+        boolean existLabel = labelW.existsLabel("Active: " + jid.getBase());
+        bot.button(CANCEL).click();
+        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
+        return existLabel;
+    }
+
     /**************************************************************
      * 
      * Inner functions
-     * 
-     * @throws RemoteException
      * 
      *************************************************************/
     /**

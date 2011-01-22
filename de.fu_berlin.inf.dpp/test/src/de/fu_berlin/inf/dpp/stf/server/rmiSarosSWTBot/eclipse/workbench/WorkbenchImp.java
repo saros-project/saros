@@ -128,7 +128,7 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
         deleteAllProjects();
-        editM.deleteAllProjectsWithGUI();
+        editM.deleteAllProjects();
 
     }
 

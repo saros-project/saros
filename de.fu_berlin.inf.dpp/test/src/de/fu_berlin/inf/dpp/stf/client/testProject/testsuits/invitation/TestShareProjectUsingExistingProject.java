@@ -83,7 +83,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
         assertTrue(bob.fileM.existsProject(PROJECT1_NEXT));
         assertTrue(bob.fileM.existsClass(PROJECT1_NEXT, PKG1, CLS1));
-        bob.editM.deleteProject(PROJECT1_NEXT);
+        bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
         assertTrue(bob.fileM.existsProject(PROJECT1_NEXT));
         assertTrue(bob.fileM.existsClass(PROJECT1_NEXT, PKG1, CLS1));
-        bob.editM.deleteProject(PROJECT1_NEXT);
+        bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
 
     }
 }

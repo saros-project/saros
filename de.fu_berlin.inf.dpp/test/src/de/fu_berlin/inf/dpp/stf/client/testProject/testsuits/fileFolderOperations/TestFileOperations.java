@@ -48,12 +48,12 @@ public class TestFileOperations extends STFTest {
     public void runBeforeEveryTest() throws RemoteException {
         // Make sure CLS1 always has the same content
         if (alice.fileM.existsClass(PROJECT1, PKG1, CLS1))
-            alice.editM.deleteClass(PROJECT1, PKG1, CLS1);
+            alice.editM.deleteClassNoGUI(PROJECT1, PKG1, CLS1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS1);
         if (alice.fileM.existsClass(PROJECT1, PKG1, CLS2))
-            alice.editM.deleteClass(PROJECT1, PKG1, CLS2);
+            alice.editM.deleteClassNoGUI(PROJECT1, PKG1, CLS2);
         if (alice.fileM.existsPkg(PROJECT1, PKG2))
-            alice.editM.deletePkg(PROJECT1, PKG2);
+            alice.editM.deletePkgNoGUI(PROJECT1, PKG2);
         // FIXME This method assumes that all the file operations (like
         // deleteClass) work...
         // Need to make sure that the preconditions are met by bob and carl too.
@@ -114,7 +114,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.editM.deleteClass(PROJECT1, PKG1, CLS1);
+        alice.editM.deleteClassNoGUI(PROJECT1, PKG1, CLS1);
         bob.fileM.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
         assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
         carl.fileM.waitUntilClassNotExist(PROJECT1, PKG1, CLS1);
@@ -241,7 +241,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeletePkg() throws RemoteException {
-        alice.editM.deletePkg(PROJECT1, PKG1);
+        alice.editM.deletePkgNoGUI(PROJECT1, PKG1);
         bob.fileM.waitUntilPkgNotExist(PROJECT1, PKG1);
         carl.fileM.waitUntilPkgNotExist(PROJECT1, PKG1);
         assertFalse(bob.fileM.existsPkg(PROJECT1, PKG1));

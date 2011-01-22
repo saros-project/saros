@@ -63,9 +63,9 @@ public interface RosterView extends Remote {
      * <li>Make sure, the roster view is open and active.</li>
      * <li>if the test account specified by the given jid doesn't exists, create
      * it using
-     * {@link SarosM#createAccount(String, String, String)}</li>
+     * {@link SarosM#createAccountNoGUI(String, String, String)}</li>
      * <li>if the test account isn't active, then activate it using
-     * {@link SarosM#activateAccount(JID)}</li>
+     * {@link SarosM#activateAccountNoGUI(JID)}</li>
      * <li>Waits until the connection is really done. It guarantee that the
      * following action is running successfully.</li>
      * </ol>
