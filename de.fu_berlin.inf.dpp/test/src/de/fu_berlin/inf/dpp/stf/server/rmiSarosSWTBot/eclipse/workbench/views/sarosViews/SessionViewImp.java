@@ -123,7 +123,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
     }
 
-    public void waitUntilSessionOpen() throws RemoteException {
+    public void waitUntilIsInSession() throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isInSession();
@@ -135,9 +135,9 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         });
     }
 
-    public void waitUntilSessionOpenBy(final SessionView sessionV)
+    public void waitUntilInviteeIsInSession(final SessionView sessionV)
         throws RemoteException {
-        sessionV.waitUntilSessionOpen();
+        sessionV.waitUntilIsInSession();
     }
 
     public void waitUntilSessionClosed() throws RemoteException {

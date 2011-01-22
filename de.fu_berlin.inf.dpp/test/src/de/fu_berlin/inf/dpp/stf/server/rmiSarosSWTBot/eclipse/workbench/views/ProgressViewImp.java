@@ -26,9 +26,15 @@ public class ProgressViewImp extends EclipsePart implements ProgressView {
         return self;
     }
 
+    /***********************************************************************
+     * 
+     * exported functions
+     * 
+     ***********************************************************************/
+
     /**********************************************
      * 
-     * open/close/activate the progress view
+     * actions
      * 
      **********************************************/
 
@@ -40,33 +46,6 @@ public class ProgressViewImp extends EclipsePart implements ProgressView {
         viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
-    public boolean isProgressViewOpen() throws RemoteException {
-        return viewW.isViewOpen("Progress");
-    }
-
-    /**********************************************
-     * 
-     * remove progress
-     * 
-     **********************************************/
-    public boolean existPorgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
-        SWTBotView view = bot.viewByTitle("Progress");
-        view.setFocus();
-        view.toolbarButton("Remove All Finished Operations").click();
-        SWTBot bot = view.bot();
-        try {
-            bot.toolbarButton();
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
-     * remove the progress. ie. Click the gray clubs delete icon.
-     */
     public void removeProgress() throws RemoteException {
         openProgressView();
         activateProgressView();
@@ -87,6 +66,35 @@ public class ProgressViewImp extends EclipsePart implements ProgressView {
         b.click();
     }
 
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean isProgressViewOpen() throws RemoteException {
+        return viewW.isViewOpen("Progress");
+    }
+
+    public boolean existPorgress() throws RemoteException {
+        openProgressView();
+        activateProgressView();
+        SWTBotView view = bot.viewByTitle("Progress");
+        view.setFocus();
+        view.toolbarButton("Remove All Finished Operations").click();
+        SWTBot bot = view.bot();
+        try {
+            bot.toolbarButton();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
     public void waitUntilNoInvitationProgress() throws RemoteException {
         openProgressView();
         activateProgressView();

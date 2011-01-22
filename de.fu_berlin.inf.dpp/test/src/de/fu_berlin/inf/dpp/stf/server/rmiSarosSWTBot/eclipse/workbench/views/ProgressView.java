@@ -11,6 +11,11 @@ public interface ProgressView extends Remote {
 
     public boolean existPorgress() throws RemoteException;
 
+    /**
+     * remove the progress. ie. Click the gray clubs delete icon.
+     * 
+     * @throws RemoteException
+     */
     public void removeProgress() throws RemoteException;
 
     public boolean isProgressViewOpen() throws RemoteException;

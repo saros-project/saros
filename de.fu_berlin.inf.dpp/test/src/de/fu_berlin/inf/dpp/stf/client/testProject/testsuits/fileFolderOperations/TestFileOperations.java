@@ -35,7 +35,7 @@ public class TestFileOperations extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         setUpSessionByDefault(alice, bob, carl);
-        carl.sessionV.followThisUserGUI(alice.jid);
+        alice.followedBy(carl);
     }
 
     @AfterClass

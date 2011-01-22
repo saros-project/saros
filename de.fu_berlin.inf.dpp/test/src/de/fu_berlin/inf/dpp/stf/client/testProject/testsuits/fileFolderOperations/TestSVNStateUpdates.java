@@ -93,7 +93,7 @@ public class TestSVNStateUpdates extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
     }
 
     @Override
@@ -175,7 +175,6 @@ public class TestSVNStateUpdates extends STFTest {
 
         bob.refactorM.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
             "new_package");
-
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
         assertTrue(alice.fileM
             .existsClass(SVN_PROJECT, "new_package", SVN_CLS1));

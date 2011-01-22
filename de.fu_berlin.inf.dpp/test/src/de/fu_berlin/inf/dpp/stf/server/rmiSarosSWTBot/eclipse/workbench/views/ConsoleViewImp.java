@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
@@ -14,7 +13,7 @@ public class ConsoleViewImp extends EclipsePart implements ConsoleView {
     private static transient ConsoleViewImp consoleViewObject;
 
     /**
-     * {@link BasicWidgetsImp} is a singleton, but inheritance is possible.
+     * {@link ConsoleViewImp} is a singleton, but inheritance is possible.
      */
     public static ConsoleViewImp getInstance() {
         if (consoleViewObject != null)
@@ -31,7 +30,16 @@ public class ConsoleViewImp extends EclipsePart implements ConsoleView {
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotButton}.
+     * states
+     * 
+     **********************************************/
+    public String getTextInConsole() throws RemoteException {
+        return viewW.getView("Console").bot().styledText().getText();
+    }
+
+    /**********************************************
+     * 
+     * waits until
      * 
      **********************************************/
     public void waitsUntilTextInConsoleExisted() throws RemoteException {
@@ -54,9 +62,5 @@ public class ConsoleViewImp extends EclipsePart implements ConsoleView {
                 return "in the console view contains no text.";
             }
         });
-    }
-
-    public String getTextInConsole() throws RemoteException {
-        return viewW.getView("Console").bot().styledText().getText();
     }
 }

@@ -125,6 +125,31 @@ public class PEViewImp extends EclipsePart implements PEView {
         Program.launch(resource.getLocation().toString());
     }
 
+    public void selectProject(String projectName) throws RemoteException {
+        treeW.selectTreeItemInView(VIEWNAME, projectName);
+    }
+
+    public void selectPkg(String projectName, String pkg)
+        throws RemoteException {
+        String[] nodes = { projectName, SRC, pkg };
+        treeW.selectTreeItemInView(VIEWNAME, nodes);
+    }
+
+    public void selectClass(String projectName, String pkg, String className)
+        throws RemoteException {
+        precondition();
+        String[] nodes = getClassNodes(projectName, pkg, className);
+        treeW.selectTreeItemInView(VIEWNAME, nodes);
+    }
+
+    public void selectFolder(String... pathToFolder) throws RemoteException {
+        treeW.selectTreeItemInView(VIEWNAME, pathToFolder);
+    }
+
+    public void selectFile(String... pathToFile) throws RemoteException {
+        treeW.selectTreeItemInView(VIEWNAME, pathToFile);
+    }
+
     /**************************************************************
      * 
      * Inner functions

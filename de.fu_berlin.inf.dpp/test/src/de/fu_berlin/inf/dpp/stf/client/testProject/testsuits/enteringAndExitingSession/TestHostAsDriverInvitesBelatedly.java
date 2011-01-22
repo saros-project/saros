@@ -41,7 +41,6 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         bob.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         bob.fileM.newClass(PROJECT1, PKG1, CLS2);
-
         /*
          * alice build session with carl and is followed by carl.
          */
@@ -90,12 +89,16 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
      * 
      * 7. bob has the same project like host.
      * 
+     * TODO: There are some bugs, if bob leave session and alice try it again,
+     * bob will not get the same project like alice.
+     * 
      * @throws CoreException
      * @throws IOException
+     * @throws InterruptedException
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
-        CoreException {
+        CoreException, InterruptedException {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.editor
             .setTextInJavaEditorWithSave(CP1_CHANGE, PROJECT1, PKG1, CLS1);
@@ -104,24 +107,21 @@ public class TestHostAsDriverInvitesBelatedly extends STFTest {
         bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT1, PKG1,
             CLS2);
 
-        alice.sessionV.openInvitationInterface(bob.getBaseJid());
+        alice.inviteUsersInSessionDone(PROJECT1,
+            TypeOfCreateProject.EXIST_PROJECT, bob);
 
-        bob.sarosC.confirmFirstPageOfWizardSessionInvitation();
-        bob.sarosC
-            .confirmSecondPageOfWizardSessionInvitationUsingExistProject(PROJECT1);
-
-        bob.workbench.sleep(500);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
-
-        String CLSContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
-        String CLS2ContentOfAlice = alice.editor.getClassContent(PROJECT1,
+        bob.editor.activateEditor(CLS1);
+        bob.editor.waitUntilJavaEditorContentSame(CP1, PROJECT1, PKG1, CLS1);
+        bob.editor.waitUntilJavaEditorContentSame(CP2, PROJECT1, PKG1, CLS2);
+        String CLSContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
+            PKG1, CLS1);
+        String CLS2ContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
             PKG1, CLS2);
 
-        String CLSContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
+        String CLSContentOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
             CLS1);
-        String CLS2ContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
-            CLS2);
+        String CLS2ContentOfBob = bob.editor.getTextOfJavaEditor(PROJECT1,
+            PKG1, CLS2);
 
         assertEquals(CLSContentOfAlice, CLSContentOfBob);
         assertEquals(CLS2ContentOfAlice, CLS2ContentOfBob);

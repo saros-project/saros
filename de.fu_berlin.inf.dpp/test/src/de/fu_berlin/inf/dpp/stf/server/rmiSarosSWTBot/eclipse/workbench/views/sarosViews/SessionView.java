@@ -97,7 +97,7 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      * @see SarosConditions#isInSession(SarosState)
      */
-    public void waitUntilSessionOpen() throws RemoteException;
+    public void waitUntilIsInSession() throws RemoteException;
 
     /**
      * waits until the session by the defined peer is open.
@@ -106,7 +106,7 @@ public interface SessionView extends Remote {
      *            the {@link SessionView} of the defined peer.
      * @throws RemoteException
      */
-    public void waitUntilSessionOpenBy(final SessionView sessionV)
+    public void waitUntilInviteeIsInSession(final SessionView sessionV)
         throws RemoteException;
 
     /**

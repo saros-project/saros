@@ -184,7 +184,7 @@ public class Tester {
                     invitee.sarosC
                         .confirmWizardSessionInvitationUsingWhichProject(
                             projectName, usingWhichProject);
-                    invitee.sessionV.waitUntilSessionOpen();
+                    invitee.sessionV.waitUntilIsInSession();
                     return null;
                 }
             });
@@ -416,21 +416,23 @@ public class Tester {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void inviteUsersInYourSessionDone(final String projectName,
-        Tester... peers) throws RemoteException, InterruptedException {
+    public void inviteUsersInSessionDone(final String projectName,
+        final TypeOfCreateProject usingWhichProject, Tester... peers)
+        throws RemoteException, InterruptedException {
         sessionV.openInvitationInterface(getPeersBaseJID(peers));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : peers) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.sarosC
-                        .confirmWirzardSessionInvitationWithNewProject(projectName);
+                        .confirmWizardSessionInvitationUsingWhichProject(
+                            projectName, usingWhichProject);
+
                     return null;
                 }
             });
         }
         log.trace("workAll(joinSessionTasks)");
         MakeOperationConcurrently.workAll(joinSessionTasks);
-
     }
 }

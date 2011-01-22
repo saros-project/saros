@@ -186,4 +186,16 @@ public interface PEView extends Remote {
     public void openClassWithSystemEditor(String projectName, String pkg,
         String className) throws RemoteException;
 
+    public void selectProject(String projectName) throws RemoteException;
+
+    public void selectPkg(String projectName, String pkg)
+        throws RemoteException;
+
+    public void selectClass(String projectName, String pkg, String className)
+        throws RemoteException;
+
+    public void selectFolder(String... pathToFolder) throws RemoteException;
+
+    public void selectFile(String... pathToFile) throws RemoteException;
+
 }

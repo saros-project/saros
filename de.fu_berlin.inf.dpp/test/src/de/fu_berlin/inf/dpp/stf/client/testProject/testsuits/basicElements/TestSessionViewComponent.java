@@ -270,12 +270,13 @@ public class TestSessionViewComponent extends STFTest {
     }
 
     @Test
-    public void inviteUsersInYourSession() throws RemoteException,
+    public void inviteUsersInSession() throws RemoteException,
         InterruptedException {
         bob.sessionV.leaveTheSessionByPeer();
         bob.editM.deleteProject(PROJECT1);
         assertFalse(bob.sessionV.isInSession());
-        alice.inviteUsersInYourSessionDone(PROJECT1, bob, carl);
+        alice.inviteUsersInSessionDone(PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, bob, carl);
         assertTrue(carl.sessionV.isInSession());
         assertTrue(bob.sessionV.isInSession());
     }

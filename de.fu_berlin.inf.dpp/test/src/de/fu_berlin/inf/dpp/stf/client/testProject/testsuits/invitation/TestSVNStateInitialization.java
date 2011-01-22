@@ -124,7 +124,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
 
         assertTrue(alice.sessionV.isDriver());
@@ -157,7 +157,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_REV1, bob.team.getRevision(SVN_CLS1_FULL_PATH));
@@ -189,8 +189,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
-        bob.sessionV.waitUntilSessionOpen();
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        bob.sessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
@@ -225,8 +225,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
-        bob.sessionV.waitUntilSessionOpen();
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        bob.sessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
@@ -266,8 +266,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilSessionOpenBy(bob.sessionV);
-        bob.sessionV.waitUntilSessionOpen();
+        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        bob.sessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(cls1_content_after,
