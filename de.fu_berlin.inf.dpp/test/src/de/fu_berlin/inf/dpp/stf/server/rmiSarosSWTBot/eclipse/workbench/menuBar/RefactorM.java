@@ -10,32 +10,25 @@ public interface RefactorM extends Remote {
      * with the following steps:
      * 
      * <ol>
-     * <li>selects the class, which you want to move, and then click the context
-     * menu "Refactor -> Move..."</li>
+     * <li>selects menu "Refactor -> Move..."</li>
      * <li>choose the package specified by the passed parameter "targetPkg"</li>
      * <li>click "OK" to confirm the move</li>
      * </ol>
      * 
-     * @param sourceProject
-     *            name of the project, e.g. Foo-Saros.
-     * @param sourcePkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
+     * 
+     * 
      * @param targetProject
      * @param targetPkg
      * @throws RemoteException
      */
-    public void moveClassTo(String sourceProject, String sourcePkg,
-        String className, String targetProject, String targetPkg)
+    public void moveClassTo(String targetProject, String targetPkg)
         throws RemoteException;
 
     /**
      * Perform the action "rename package" which should be done with the
      * following steps:
      * <ol>
-     * <li>Select the given package with the given node path and click
-     * "Refactor" > "Rename..."</li>
+     * <li>click menu "Refactor" > "Rename..."</li>
      * <li>Enter the given new name to the text field with the title "New name:"
      * </li>
      * <li>click "OK" to confirm the rename</li>
@@ -57,15 +50,13 @@ public interface RefactorM extends Remote {
      * 
      * @throws RemoteException
      */
-    public void renamePkg(String newName, String projectName, String pkg)
-        throws RemoteException;
+    public void renamePkg(String newName) throws RemoteException;
 
     /**
      * Perform the action "rename folder" which should be done with the
      * following steps:
      * <ol>
-     * <li>Select the given folder with the given node path and click "Refactor"
-     * > "Rename..."</li>
+     * <li>click menu "Refactor" > "Rename..."</li>
      * <li>Enter the given new name to the text field with the title "New name:"
      * </li>
      * <li>click "OK" to confirm the rename</li>
@@ -84,21 +75,15 @@ public interface RefactorM extends Remote {
      * 
      * @param newName
      *            the new name of the given folder.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "myFolder"}
      * @throws RemoteException
      */
-    public void renameFolder(String newName, String... nodes)
-        throws RemoteException;
+    public void renameFolder(String newName) throws RemoteException;
 
     /**
      * Perform the action "rename file" which should be done with the following
      * steps:
      * <ol>
-     * <li>Select the given file with the given node path and click "Refactor" >
-     * "Rename..."</li>
+     * <li>click menu "Refactor" > "Rename..."</li>
      * <li>Enter the given new name to the text field with the title "New name:"
      * </li>
      * <li>click "OK" to confirm the rename</li>
@@ -117,21 +102,16 @@ public interface RefactorM extends Remote {
      * 
      * @param newName
      *            the new name of the given file.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.{"Foo-saros",
-     *            "myFolder", "myFile.xml"}
+     * 
      * @throws RemoteException
      */
-    public void renameFile(String newName, String... nodes)
-        throws RemoteException;
+    public void renameFile(String newName) throws RemoteException;
 
     /**
      * Perform the action "rename class" which should be done with the following
      * steps:
      * <ol>
-     * <li>Select the given class with the given node path and click "Refactor"
-     * > "Rename..."</li>
+     * <li>click menu "Refactor" > "Rename..."</li>
      * <li>Enter the given new name to the text field with the title "New name:"
      * </li>
      * <li>click "OK" to confirm the rename</li>
@@ -150,18 +130,11 @@ public interface RefactorM extends Remote {
      * 
      * @param newName
      *            the new name of the given class.
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
+     * 
      * @throws RemoteException
      */
-    public void renameClass(String newName, String projectName, String pkg,
-        String className) throws RemoteException;
+    public void renameClass(String newName) throws RemoteException;
 
-    public void renameJavaProject(String newName, String... nodes)
-        throws RemoteException;
+    public void renameJavaProject(String newName) throws RemoteException;
 
 }

@@ -87,7 +87,8 @@ public class TestFileOperations extends STFTest {
          */
         bob.workbench.sleep(1000);
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        alice.refactorM.renameClass(CLS2, PROJECT1, PKG1, CLS1);
+        alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
+        alice.refactorM.renameClass(CLS2);
 
         bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
@@ -187,7 +188,8 @@ public class TestFileOperations extends STFTest {
     public void testMoveClass() throws RemoteException {
         alice.fileM.newPackage(PROJECT1, PKG2);
         alice.fileM.newClass(PROJECT1, PKG2, CLS2);
-        alice.refactorM.moveClassTo(PROJECT1, PKG2, CLS2, PROJECT1, PKG1);
+        alice.pEV.selectClass(PROJECT1, PKG2, CLS2);
+        alice.refactorM.moveClassTo(PROJECT1, PKG1);
         bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         carl.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS2);
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
@@ -211,8 +213,8 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.refactorM.renamePkg(PKG2, PROJECT1, PKG1);
-
+        alice.pEV.selectPkg(PROJECT1, PKG1);
+        alice.refactorM.renamePkg(PKG2);
         bob.fileM.waitUntilPkgExisted(PROJECT1, PKG2);
         bob.fileM.waitUntilPkgNotExist(PROJECT1, PKG1);
         assertFalse(bob.fileM.existsPkg(PROJECT1, PKG1));

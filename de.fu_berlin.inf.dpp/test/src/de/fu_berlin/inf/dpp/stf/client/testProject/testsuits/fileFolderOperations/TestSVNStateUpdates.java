@@ -143,8 +143,8 @@ public class TestSVNStateUpdates extends STFTest {
     public void testChangeDriverAndRenameClass() throws Exception {
         alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
         assertTrue(bob.sessionV.isDriver());
-        bob.refactorM.renameClass("Asdf", SVN_PROJECT, SVN_PKG, SVN_CLS1);
-
+        bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        bob.refactorM.renameClass("Asdf");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
         assertTrue(alice.fileM.existsClass(SVN_PROJECT, SVN_PKG, "Asdf"));
     }
@@ -172,9 +172,10 @@ public class TestSVNStateUpdates extends STFTest {
 
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");
+        bob.workbench.sleep(1000);
+        bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
-        bob.refactorM.moveClassTo(SVN_PROJECT, SVN_PKG, SVN_CLS1, SVN_PROJECT,
-            "new_package");
+        bob.refactorM.moveClassTo(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
         assertTrue(alice.fileM
             .existsClass(SVN_PROJECT, "new_package", SVN_CLS1));

@@ -126,28 +126,32 @@ public class PEViewImp extends EclipsePart implements PEView {
     }
 
     public void selectProject(String projectName) throws RemoteException {
-        treeW.selectTreeItemInView(VIEWNAME, projectName);
+        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+            changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        treeW.selectTreeItemInView(VIEWNAME, nodes);
+        treeW.selectTreeItemWithRegexsInView(VIEWNAME, changeToRegex(nodes));
     }
 
     public void selectClass(String projectName, String pkg, String className)
         throws RemoteException {
         precondition();
         String[] nodes = getClassNodes(projectName, pkg, className);
-        treeW.selectTreeItemInView(VIEWNAME, nodes);
+        treeW.selectTreeItemWithRegexsInView(VIEWNAME, changeToRegex(nodes));
+
     }
 
     public void selectFolder(String... pathToFolder) throws RemoteException {
-        treeW.selectTreeItemInView(VIEWNAME, pathToFolder);
+        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+            changeToRegex(pathToFolder));
     }
 
     public void selectFile(String... pathToFile) throws RemoteException {
-        treeW.selectTreeItemInView(VIEWNAME, pathToFile);
+        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+            changeToRegex(pathToFile));
     }
 
     /**************************************************************

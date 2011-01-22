@@ -71,8 +71,8 @@ public class TestFolderOperations extends STFTest {
     @Test
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
-
-        alice.refactorM.renameFolder(newFolderName, PROJECT1, FOLDER1);
+        alice.pEV.selectFolder(PROJECT1, FOLDER1);
+        alice.refactorM.renameFolder(newFolderName);
         bob.fileM.waitUntilFolderExisted(PROJECT1, newFolderName);
         assertTrue(bob.fileM.existsFolder(PROJECT1, newFolderName));
         assertFalse(bob.fileM.existsFolder(PROJECT1, FOLDER1));

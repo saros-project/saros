@@ -64,17 +64,19 @@ public class TreeImp extends EclipsePart implements Tree {
 
     public void selectTreeItemWithWaitingExpandInView(String viewTitle,
         String... pathToTreeItem) throws RemoteException {
-        selectTreeItemWithWaitingExpand(getTreeInView(viewTitle), pathToTreeItem);
+        selectTreeItemWithWaitingExpand(getTreeInView(viewTitle),
+            pathToTreeItem);
     }
 
-    public void clickContextMenuOfTreeItem(String contextName, String... pathToTreeItem)
-        throws RemoteException {
+    public void clickContextMenuOfTreeItem(String contextName,
+        String... pathToTreeItem) throws RemoteException {
         clickContextMenuOfTreeItem(bot.tree(), contextName, pathToTreeItem);
     }
 
     public void clickContextMenuOfTreeItemInView(String viewTitle,
         String contextName, String... pathToTreeItem) throws RemoteException {
-        clickContextMenuOfTreeItem(getTreeInView(viewTitle), contextName, pathToTreeItem);
+        clickContextMenuOfTreeItem(getTreeInView(viewTitle), contextName,
+            pathToTreeItem);
     }
 
     public void clickContextMenusOfTreeItem(String[] contextNames,
@@ -102,7 +104,8 @@ public class TreeImp extends EclipsePart implements Tree {
 
     public List<String> getSubItemsInTreeItemInView(String viewTitle,
         String... pathToTreeItem) throws RemoteException {
-        SWTBotTreeItem treeItem = getTreeInView(viewTitle).expandNode(pathToTreeItem);
+        SWTBotTreeItem treeItem = getTreeInView(viewTitle).expandNode(
+            pathToTreeItem);
         return getSubItemsInTreeItem(treeItem);
     }
 
@@ -122,20 +125,22 @@ public class TreeImp extends EclipsePart implements Tree {
 
     public boolean existsTreeItemWithRegexsInView(String viewTitle,
         String... regexPathToTreeItem) throws RemoteException {
-        return existsTreeItemWithRegexs(getTreeInView(viewTitle), regexPathToTreeItem);
+        return existsTreeItemWithRegexs(getTreeInView(viewTitle),
+            regexPathToTreeItem);
     }
 
-    public boolean existsTreeItemInTree(String treeItemText) throws RemoteException {
+    public boolean existsTreeItemInTree(String treeItemText)
+        throws RemoteException {
         return existsTreeItemInTree(bot.tree(), treeItemText);
     }
 
-    public boolean existsTreeItemInTreeInView(String viewTitle, String treeItemText)
-        throws RemoteException {
+    public boolean existsTreeItemInTreeInView(String viewTitle,
+        String treeItemText) throws RemoteException {
         return existsTreeItemInTree(getTreeInView(viewTitle), treeItemText);
     }
 
-    public boolean existsSubItemInTreeItem(String subItemText, String... pathToTreeItem)
-        throws RemoteException {
+    public boolean existsSubItemInTreeItem(String subItemText,
+        String... pathToTreeItem) throws RemoteException {
         return getSubItemsInTreeItem(pathToTreeItem).contains(subItemText);
     }
 
@@ -421,7 +426,8 @@ public class TreeImp extends EclipsePart implements Tree {
      * @return a {@link SWTBotTreeItem} specified with the given
      *         <code>nodes</code> in the given view.
      */
-    public SWTBotTreeItem getTreeItemInView(String viewTitle, String... pathToTreeItem) {
+    public SWTBotTreeItem getTreeItemInView(String viewTitle,
+        String... pathToTreeItem) {
         try {
             return getTreeInView(viewTitle).expandNode(pathToTreeItem).select();
         } catch (WidgetNotFoundException e) {
@@ -452,7 +458,8 @@ public class TreeImp extends EclipsePart implements Tree {
             }
             if (!itemFound) {
                 throw new WidgetNotFoundException("Tree item \"" + regex
-                    + "\" not found. Nodes: " + Arrays.asList(regexPathToTreeItem));
+                    + "\" not found. Nodes: "
+                    + Arrays.asList(regexPathToTreeItem));
             }
         }
         return currentItem;
@@ -470,8 +477,8 @@ public class TreeImp extends EclipsePart implements Tree {
         return bot.tree().expandNode(pathToTreeItem);
     }
 
-    public void clickContextMenuOfTreeItem(SWTBotTree tree, String contextMenuName,
-        String... pathToTreeItem) {
+    public void clickContextMenuOfTreeItem(SWTBotTree tree,
+        String contextMenuName, String... pathToTreeItem) {
         selectTreeItemWithRegexs(tree, pathToTreeItem);
         ContextMenuHelper.clickContextMenu(tree, contextMenuName);
     }

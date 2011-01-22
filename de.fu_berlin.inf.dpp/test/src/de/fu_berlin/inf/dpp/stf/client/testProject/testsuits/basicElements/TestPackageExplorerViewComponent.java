@@ -140,7 +140,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS1);
         alice.fileM.newPackage(PROJECT1, PKG2);
-        alice.refactorM.moveClassTo(PROJECT1, PKG1, CLS1, PROJECT1, PKG2);
+        alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
+        alice.refactorM.moveClassTo(PROJECT1, PKG2);
         assertFalse(alice.fileM.existsClass(PROJECT1, PKG1, CLS1));
         assertTrue(alice.fileM.existsClass(PROJECT1, PKG2, CLS1));
     }
@@ -149,7 +150,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testRenameClass() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS1);
-        alice.refactorM.renameClass(CLS2, PROJECT1, PKG1, CLS1);
+        alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
+        alice.refactorM.renameClass(CLS2);
         assertFalse(alice.fileM.existsClass(PROJECT1, PKG1, CLS1));
         assertTrue(alice.fileM.existsClass(PROJECT1, PKG1, CLS2));
     }
@@ -159,7 +161,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.refactorM.renameFile(FILE2, PROJECT1, FOLDER1, FILE1);
+        alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
+        alice.refactorM.renameFile(FILE2);
         assertFalse(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
         assertTrue(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE2));
     }
@@ -168,7 +171,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testRenameFolder() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
-        alice.refactorM.renameFolder(FOLDER2, PROJECT1, FOLDER1);
+        alice.pEV.selectFolder(PROJECT1, FOLDER1);
+        alice.refactorM.renameFolder(FOLDER2);
         assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
         assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER2));
     }
@@ -177,7 +181,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
     public void testRenamePackage() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newPackage(PROJECT1, PKG1);
-        alice.refactorM.renamePkg(PKG2, PROJECT1, PKG1);
+        alice.pEV.selectPkg(PROJECT1, PKG1);
+        alice.refactorM.renamePkg(PKG2);
         assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1));
         assertTrue(alice.fileM.existsPkg(PROJECT1, PKG2));
     }
@@ -200,8 +205,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
 
         assertTrue(alice.fileM.existsProject(PROJECT1));
         assertFalse(alice.fileM.existsProject(PROJECT2));
-
-        alice.refactorM.renameJavaProject(PROJECT2, PROJECT1);
+        alice.pEV.selectProject(PROJECT1);
+        alice.refactorM.renameJavaProject(PROJECT2);
 
         assertFalse(alice.fileM.existsProject(PROJECT1));
         assertTrue(alice.fileM.existsProject(PROJECT2));
