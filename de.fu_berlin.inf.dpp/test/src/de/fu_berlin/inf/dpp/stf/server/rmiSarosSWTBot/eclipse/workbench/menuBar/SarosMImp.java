@@ -64,9 +64,9 @@ public class SarosMImp extends EclipsePart implements SarosM {
         selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
+        shellC.activateShellWithWaitingOpen(SHELL_SAROS_CONFIGURATION);
         bot.buttonInGroup("Create new Jabber-Account").click();
-        shellC.activateShellWaitingUntilOpened("Create New User Account");
+        shellC.activateShellWithWaitingOpen("Create New User Account");
         textW.setTextInTextWithLabel(server, "Jabber Server");
         textW.setTextInTextWithLabel(username, "Username");
         textW.setTextInTextWithLabel(password, "Password");
@@ -85,7 +85,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         selectSarosPageInPreferences();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        shellC.activateShellWaitingUntilOpened(SHELL_SAROS_CONFIGURATION);
+        shellC.activateShellWithWaitingOpen(SHELL_SAROS_CONFIGURATION);
         textW.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
         textW.setTextInTextWithLabel(jid.getName(), "Username");
         textW.setTextInTextWithLabel(password, "Password");
@@ -151,7 +151,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         list.select(jid.getBase());
         bot.buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        shellC.activateShellWaitingUntilOpened("Change XMPP Account");
+        shellC.activateShellWithWaitingOpen("Change XMPP Account");
         textW.setTextInTextWithLabel(newServer, "Server");
         textW.setTextInTextWithLabel(newUserName, "Username:");
         textW.setTextInTextWithLabel(newPassword, "Password:");
@@ -181,7 +181,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         bot.buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         if (isAccountActive(jid)) {
-            shellC.activateShellWaitingUntilOpened("Deleting active account");
+            shellC.activateShellWithWaitingOpen("Deleting active account");
             buttonW.clickButton(OK);
         }
         bot.button(APPLY).click();
@@ -192,7 +192,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
+        shellC.activateShellWithWaitingOpen(SHELL_PREFERNCES);
         SWTBotTree tree = bot.tree();
         tree.expandNode(P_SAROS).select("Screensharing");
         bot.ccomboBox(0).setSelection(encoder);
@@ -211,7 +211,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
     public void disableAutomaticReminderGUI() throws RemoteException {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
-            shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
+            shellC.activateShellWithWaitingOpen(SHELL_PREFERNCES);
             SWTBotTree tree = bot.tree();
             tree.expandNode("Saros").select("Feedback");
             bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
@@ -271,7 +271,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
      */
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
-        shellC.activateShellWaitingUntilOpened(SHELL_PREFERNCES);
+        shellC.activateShellWithWaitingOpen(SHELL_PREFERNCES);
         treeW.selectTreeItem(P_SAROS);
     }
 

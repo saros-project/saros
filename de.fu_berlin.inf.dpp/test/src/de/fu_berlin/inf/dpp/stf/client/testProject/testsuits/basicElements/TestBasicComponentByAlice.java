@@ -44,14 +44,14 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void existsTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts("Window", "Show View", "Other...");
-        alice.shell.activateShellWaitingUntilOpened("Show View");
+        alice.shell.activateShellWithWaitingOpen("Show View");
         assertTrue(alice.tree.existsSubItemInTreeItem("Console", "General"));
     }
 
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
         alice.menu.clickMenuWithTexts("Saros", "Preferences");
-        alice.shell.activateShellWaitingUntilOpened("Preferences");
+        alice.shell.activateShellWithWaitingOpen("Preferences");
         assertTrue(alice.tree.existsSubItemInTreeItem("Annotations", "General",
             "Editors", "Text Editors"));
     }
@@ -59,7 +59,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts("Saros", "Preferences");
-        alice.shell.activateShellWaitingUntilOpened("Preferences");
+        alice.shell.activateShellWithWaitingOpen("Preferences");
         assertTrue(alice.tree.existsTreeItemWithRegexs("General", "Editors",
             "Text Editors", "Annotations"));
     }
@@ -120,7 +120,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void selectTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts("Saros", "Preferences");
-        alice.shell.activateShellWaitingUntilOpened("Preferences");
+        alice.shell.activateShellWithWaitingOpen("Preferences");
         alice.tree.selectTreeItem("Saros");
         assertTrue(alice.button.existsButtonInGroup(
             GeneralPreferencePage.CHANGE_BTN_TEXT,
@@ -216,20 +216,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
         alice.tree.clickContextMenusOfTreeItemInView("Package Explorer",
             contextNames1, PROJECT1);
-        assertTrue(alice.shell.activateShellWaitingUntilOpened("Invitation"));
+        assertTrue(alice.shell.activateShellWithWaitingOpen("Invitation"));
     }
 
-    public String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + ".java" };
-        return nodes;
-    }
-
-    public String[] changeToRegex(String... texts) {
-        String[] matchTexts = new String[texts.length];
-        for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + "( .*)?";
-        }
-        return matchTexts;
-    }
 }

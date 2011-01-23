@@ -38,10 +38,10 @@ public class STFTest {
     public static Tester edna;
 
     // views
-    protected final static String SESSION_VIEW = "Shared Project Session";
     protected final static String CHAT_VIEW = "Chat View";
     protected final static String ROSTER_VIEW = "Roster";
     protected final static String REMOTE_SCREEN_VIEW = "Remote Screen";
+    public static String SESSION_VIEW = "Shared Project Session";
 
     // Title of Buttons
     protected final static String YES = "Yes";
@@ -183,7 +183,7 @@ public class STFTest {
             tester.workbench.activateWorkbench();
             tester.workbench.setUpWorkbench();
             tester.view.closeViewByTitle("Welcome");
-            tester.windowM.openPerspectiveJava();
+            tester.windowM.openPerspective();
             tester.workbench.closeUnnecessaryViews();
         }
     }
@@ -335,6 +335,20 @@ public class STFTest {
     @AfterClass
     public static void afterClass() throws Exception {
         resetSaros();
+    }
+
+    public String[] getClassNodes(String projectName, String pkg,
+        String className) {
+        String[] nodes = { projectName, SRC, pkg, className + ".java" };
+        return nodes;
+    }
+
+    public String[] changeToRegex(String... texts) {
+        String[] matchTexts = new String[texts.length];
+        for (int i = 0; i < texts.length; i++) {
+            matchTexts[i] = texts[i] + "( .*)?";
+        }
+        return matchTexts;
     }
 
 }

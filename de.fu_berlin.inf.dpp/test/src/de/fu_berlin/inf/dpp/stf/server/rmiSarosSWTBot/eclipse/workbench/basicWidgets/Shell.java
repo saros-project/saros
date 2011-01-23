@@ -27,7 +27,7 @@ public interface Shell extends Remote {
      *            the title of the shell.
      * @throws RemoteException
      */
-    public boolean activateShellWaitingUntilOpened(String title)
+    public boolean activateShellWithWaitingOpen(String title)
         throws RemoteException;
 
     /**

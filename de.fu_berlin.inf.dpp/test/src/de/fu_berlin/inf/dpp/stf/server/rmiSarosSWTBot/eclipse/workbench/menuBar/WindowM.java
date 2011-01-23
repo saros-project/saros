@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Perspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 
 /**
@@ -139,18 +140,22 @@ public interface WindowM extends Remote {
      * open perspectives
      * 
      **********************************************/
+
     /**
-     * Open the perspective "Java" using GUI which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Click menu "Window" -> "Open Perspective" -> "other..."</li>
-     * <li>Select "Java (default)" and click "Finish" to confirm the action</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the saros-instance is active.</li>
-     * </ol>
+     * open the default perspective which is defined in
+     * {@link Perspective#WHICH_PERSPECTIVE}.
+     */
+    public void openPerspective() throws RemoteException;
+
+    /**
+     * Open the perspective "Resource" with id
+     * 
+     * @throws RemoteException
+     */
+    public void openPerspectiveResource() throws RemoteException;
+
+    /**
+     * Open the perspective "Java" with id
      * 
      * @throws RemoteException
      */
@@ -163,17 +168,7 @@ public interface WindowM extends Remote {
     public boolean isJavaPerspectiveActive() throws RemoteException;
 
     /**
-     * Open the perspective "Java" using GUI which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Click menu "Window" -> "Open Perspective" -> "other..."</li>
-     * <li>Select "Debug" and click "Finish" to confirm the action</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the saros-instance is active.</li>
-     * </ol>
+     * Open the perspective "Debug" with Id
      * 
      * @throws RemoteException
      */

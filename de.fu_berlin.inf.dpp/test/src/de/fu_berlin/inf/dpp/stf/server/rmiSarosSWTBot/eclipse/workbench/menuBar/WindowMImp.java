@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Perspective;
 
 public class WindowMImp extends EclipsePart implements WindowM {
 
@@ -52,6 +53,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     /* IDs of all the perspectives */
     public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
     public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
+    public final static String ID_RESOURCE_PERSPECTIVE = "eclipse.ui.resourcePerspective";
 
     /**********************************************
      * 
@@ -128,6 +130,27 @@ public class WindowMImp extends EclipsePart implements WindowM {
      * all related actions with perspective
      * 
      **********************************************/
+    public void openPerspective() throws RemoteException {
+        switch (Perspective.WHICH_PERSPECTIVE) {
+        case JAVA:
+            openPerspectiveJava();
+            break;
+        case DEBUG:
+            openPerspectiveDebug();
+            break;
+        case RESOURCE:
+            openPerspectiveResource();
+            break;
+        default:
+            openPerspectiveJava();
+            break;
+        }
+    }
+
+    public void openPerspectiveResource() throws RemoteException {
+        openPerspectiveWithId(ID_RESOURCE_PERSPECTIVE);
+    }
+
     public void openPerspectiveJava() throws RemoteException {
         openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
     }

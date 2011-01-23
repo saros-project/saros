@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestBasicComponentByAliceAndBob extends STFTest {
 
-    public static String VIEW_SESSION = "Shared Project Session";
     private static final Logger log = Logger
         .getLogger(TestBasicComponentByAliceAndBob.class);
 
@@ -55,28 +54,28 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void existsTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.existsTableItemInView(VIEW_SESSION,
+        assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
             bob.getBaseJid()));
-        assertTrue(alice.table.existsTableItemInView(VIEW_SESSION,
+        assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
             OWN_CONTACT_NAME + ROLE_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.table.selectTableItemInView(VIEW_SESSION, bob.getBaseJid());
+        alice.table.selectTableItemInView(SESSION_VIEW, bob.getBaseJid());
         assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            VIEW_SESSION, "Share your screen with selected user"));
-        alice.table.selectTableItemInView(VIEW_SESSION, OWN_CONTACT_NAME
+            SESSION_VIEW, "Share your screen with selected user"));
+        alice.table.selectTableItemInView(SESSION_VIEW, OWN_CONTACT_NAME
             + ROLE_NAME);
         assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            VIEW_SESSION, "Share your screen with selected user"));
+            SESSION_VIEW, "Share your screen with selected user"));
     }
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        alice.table.clickContextMenuOfTableItemInView(VIEW_SESSION,
+        alice.table.clickContextMenuOfTableItemInView(SESSION_VIEW,
             bob.getBaseJid(), "Give driver role");
         alice.sessionV.giveDriverRoleGUI(bob.sessionV);
         bob.sessionV.waitUntilIsDriver();
@@ -86,18 +85,18 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(VIEW_SESSION,
-            bob.getBaseJid(), "Give driver role"));
-        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(VIEW_SESSION,
-            bob.getBaseJid(), "Change Color"));
+        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
+            SESSION_VIEW, bob.getBaseJid(), "Give driver role"));
+        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
+            SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
-        assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(VIEW_SESSION,
-            bob.getBaseJid(), "Give driver role"));
-        assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(VIEW_SESSION,
-            bob.getBaseJid(), "Change Color"));
+        assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
+            SESSION_VIEW, bob.getBaseJid(), "Give driver role"));
+        assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(
+            SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }
 }

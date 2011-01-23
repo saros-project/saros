@@ -21,12 +21,12 @@ public class TestEditorComponent2 extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        // alice.pEV.newProject(PROJECT1);
-        // alice.pEV.newFile(path);
-        // alice.editor.waitUntilEditorOpen(FILE3);
-        // bob.pEV.newProject(PROJECT1);
-        // bob.pEV.newFile(path);
-        // bob.editor.waitUntilEditorOpen(FILE3);
+        alice.fileM.newProject(PROJECT1);
+        alice.fileM.newFile(path);
+        alice.editor.waitUntilEditorOpen(FILE3);
+        bob.fileM.newProject(PROJECT1);
+        bob.fileM.newFile(path);
+        bob.editor.waitUntilEditorOpen(FILE3);
     }
 
     @Test

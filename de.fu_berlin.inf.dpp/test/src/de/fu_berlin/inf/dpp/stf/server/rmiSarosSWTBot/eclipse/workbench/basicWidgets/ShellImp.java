@@ -77,7 +77,7 @@ public class ShellImp extends EclipsePart implements Shell {
         throw new RemoteException(message);
     }
 
-    public boolean activateShellWaitingUntilOpened(String title)
+    public boolean activateShellWithWaitingOpen(String title)
         throws RemoteException {
         if (!isShellOpen(title)) {
             waitUntilShellOpen(title);
