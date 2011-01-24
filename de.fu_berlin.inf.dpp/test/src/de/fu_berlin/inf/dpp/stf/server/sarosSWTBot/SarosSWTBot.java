@@ -24,10 +24,10 @@ import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotRadio;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 
 /**
  * SarosSWTBot is a {@link SWTWorkbenchBot} with capabilities for testing

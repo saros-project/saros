@@ -10,7 +10,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.hamcrest.SelfDescribing;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 
 /**
  * Represents a {@link ChatInput}widget in chat view. GUI peoples have changed

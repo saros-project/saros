@@ -278,7 +278,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
     /**
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return {@link XMPPAccount} of the given jid.
      */

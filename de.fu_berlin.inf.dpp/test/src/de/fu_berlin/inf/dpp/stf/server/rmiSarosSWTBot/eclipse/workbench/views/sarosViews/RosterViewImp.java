@@ -72,7 +72,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
     private final static String JABBER_SERVER = "Jabber Server";
     private final static String USER_NAME = "Username";
     private final static String PASSWORD = "Password";
-    private final static String JABBERID = "Jabber ID";
+    private final static String JABBERID = "JID";
     private final static String REPEAT_PASSWORD = "Repeat Password";
 
     /**
@@ -160,7 +160,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         precondition();
         log.trace("connectedByXMPP");
         if (!isConnectedGUI()) {
-            log.trace("click the toolbar button \"Connect\" in the rüoster view");
+            log.trace("click the toolbar button \"Connect\" in the rï¿½oster view");
             /*
              * TODO if the test-account doesn't exists, we need to first create
              * it.

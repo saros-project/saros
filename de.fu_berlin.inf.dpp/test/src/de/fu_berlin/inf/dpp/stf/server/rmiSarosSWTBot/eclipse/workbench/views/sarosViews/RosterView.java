@@ -71,7 +71,7 @@ public interface RosterView extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            the password of the given jid
@@ -89,7 +89,7 @@ public interface RosterView extends Remote {
      * @param xmppServer
      *            the xmpp server used by the given jid
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            the password of the given jid
@@ -187,7 +187,7 @@ public interface RosterView extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
@@ -355,7 +355,7 @@ public interface RosterView extends Remote {
      * performs the action "Delete contact" without GUI
      * 
      * @param buddyJID
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      */
     public void deleteBuddy(JID buddyJID) throws RemoteException, XMPPException;
@@ -375,7 +375,7 @@ public interface RosterView extends Remote {
      * </ol>
      * 
      * @param buddyJID
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */

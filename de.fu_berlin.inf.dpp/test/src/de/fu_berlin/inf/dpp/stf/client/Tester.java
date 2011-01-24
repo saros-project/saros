@@ -272,7 +272,7 @@ public class Tester {
      * the local user can be concurrently followed by many other users.
      * 
      * @param testers
-     *            the list of the remote Users who want to follow the local
+     *            the list of the buddies who want to follow the local
      *            user.
      * @throws RemoteException
      * @throws InterruptedException
@@ -293,11 +293,11 @@ public class Tester {
     }
 
     /**
-     * stop the follow-mode of the remote users who are following the local
+     * stop the follow-mode of the buddies who are following the local
      * user.
      * 
      * @param testers
-     *            the list of the remote Users who are following the local user.
+     *            the list of the buddies who are following the local user.
      * @throws RemoteException
      * @throws InterruptedException
      */
@@ -324,7 +324,7 @@ public class Tester {
     }
 
     /**
-     * @Return the Jabber ID without resource qualifier.
+     * @Return the JID without resource qualifier.
      */
     public String getBaseJid() {
         return jid.getBase();

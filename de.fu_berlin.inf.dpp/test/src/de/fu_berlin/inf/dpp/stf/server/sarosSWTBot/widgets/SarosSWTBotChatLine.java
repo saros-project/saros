@@ -6,7 +6,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.hamcrest.SelfDescribing;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
 
 /**
  * This represents a {@link ChatLine} widget in chat view. GUI peoples have

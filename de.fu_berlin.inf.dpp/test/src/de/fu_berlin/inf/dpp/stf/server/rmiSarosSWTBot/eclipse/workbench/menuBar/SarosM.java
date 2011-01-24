@@ -42,7 +42,7 @@ public interface SarosM extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            the password of the new account.
@@ -83,7 +83,7 @@ public interface SarosM extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            the password of the added account.
@@ -93,7 +93,7 @@ public interface SarosM extends Remote {
 
     /**
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt> if the account specified by the given jid and
      *         password exists in preference store
@@ -107,7 +107,7 @@ public interface SarosM extends Remote {
      * 
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt> if the account specified by the given parameters
      *         exists in the XMPP-Accounts list on the right
@@ -122,7 +122,7 @@ public interface SarosM extends Remote {
      * XMPPAccountStore#setAccountActive(XMPPAccount)
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
@@ -137,7 +137,7 @@ public interface SarosM extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            password of the given jid
@@ -149,7 +149,7 @@ public interface SarosM extends Remote {
     /**
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt> if the acount specified by the given jid is active
      * @throws RemoteException
@@ -160,7 +160,7 @@ public interface SarosM extends Remote {
     /**
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @return <tt>true</tt> if the red label with the text
      *         "active: jid.getBase()" is visible in the saros-preferences-page.
@@ -174,7 +174,7 @@ public interface SarosM extends Remote {
      * {@link XMPPAccountStore#changeAccountData(int, String, String, String)}
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param newUserName
      *            the new username
@@ -197,7 +197,7 @@ public interface SarosM extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param newUserName
      *            the new username
@@ -215,7 +215,7 @@ public interface SarosM extends Remote {
      * {@link XMPPAccountStore#deleteAccount(XMPPAccount)}
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
@@ -230,7 +230,7 @@ public interface SarosM extends Remote {
      * </ol>
      * 
      * @param jid
-     *            a Jabber ID which is used to identify the users of the Jabber
+     *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      * @param password
      *            password of the given jid.
