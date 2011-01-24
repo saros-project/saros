@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.ChatControl;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.util.ColorUtil;
 
 public class ChatRoomParticipant {

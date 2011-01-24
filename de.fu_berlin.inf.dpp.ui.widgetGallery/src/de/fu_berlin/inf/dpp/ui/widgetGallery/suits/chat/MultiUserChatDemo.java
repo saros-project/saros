@@ -15,13 +15,13 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.ChatControl;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatControlAdapter;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.chat.chatRoom.ChatRoomParticipant;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.DemoExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatControlAdapter;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 
 public class MultiUserChatDemo extends Demo {
 	public static final int NUM_PARTICIPANTS = 3;
