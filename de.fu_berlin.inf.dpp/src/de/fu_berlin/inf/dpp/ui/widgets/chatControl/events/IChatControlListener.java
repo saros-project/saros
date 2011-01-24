@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.chat.chatControl.events;
+package de.fu_berlin.inf.dpp.ui.widgets.chatControl.events;
 
 
 public interface IChatControlListener extends IChatDisplayListener {

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.chat.chatControl;
+package de.fu_berlin.inf.dpp.ui.widgets.chatControl;
 
 import java.util.Date;
 import java.util.Vector;
@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatControlListener;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatDisplay;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
 
 /**

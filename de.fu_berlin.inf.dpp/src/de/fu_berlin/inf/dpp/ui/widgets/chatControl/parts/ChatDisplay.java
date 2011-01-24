@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.chat.chatControl.parts;
+package de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts;
 
 import java.util.Date;
 import java.util.Vector;
@@ -17,11 +17,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.events.IChatDisplayListener;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.chat.chatControl.items.ChatLineSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLineSeparator;
 
 /**
  * This control displays a chat conversation between n users
