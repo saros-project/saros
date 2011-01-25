@@ -57,35 +57,32 @@ public class TransferDescription implements Serializable {
         compressedSet.add("7z");
     }
 
-    public static enum FileTransferType {
+    public static class FileTransferType {
         /**
          * Transfer of a FileList
          */
-        FILELIST_TRANSFER,
+        public static final String FILELIST_TRANSFER = "filelist-transfer";
         /**
          * Transfer of several resources in a ZIP-File
          */
-        ARCHIVE_TRANSFER,
-        /**
-         * Transfer of an ActivityExtension as XML that was serialized using
-         * UTF-8 and GZIPped
-         */
-        ACTIVITY_TRANSFER,
+        public static final String ARCHIVE_TRANSFER = "archive-transfer";
         /**
          * data in a stream
          */
-        STREAM_DATA,
+        public static final String STREAM_DATA = "stream-data";
         /**
          * meta data for a stream
          */
-        STREAM_META,
+        public static final String STREAM_META = "stream-meta";
         /**
          * test data for connection tests
          */
-        CONNECTION_TEST
+        public static final String CONNECTION_TEST = "connection-test";
     }
 
-    public FileTransferType type;
+    public String type;
+
+    public String namespace;
 
     public String sessionID;
 
@@ -113,6 +110,11 @@ public class TransferDescription implements Serializable {
     public boolean invitation;
 
     /**
+     * This field is set to true if we are in an invitation process
+     */
+    public boolean logToDebug = true;
+
+    /**
      * The invitationID of this TransferDescription or null if this
      * TransferDescription is not used during an invitation.
      */
@@ -136,26 +138,28 @@ public class TransferDescription implements Serializable {
     @Override
     public String toString() {
 
-        switch (type) {
-        case ARCHIVE_TRANSFER:
+        if (FileTransferType.ARCHIVE_TRANSFER.equals(type)) {
             return "Archive from " + Util.prefix(getSender()) + " [SID="
                 + sessionID + "]";
-        case FILELIST_TRANSFER:
+        } else if (FileTransferType.FILELIST_TRANSFER.equals(type)) {
             return "FileList from " + Util.prefix(getSender()) + " [SID="
                 + sessionID + "]";
-        case ACTIVITY_TRANSFER:
-            return "Activity from " + Util.prefix(getSender()) + ": [SID="
-                + sessionID + "]";
-        case STREAM_DATA:
+        } else if (FileTransferType.STREAM_DATA.equals(type)) {
             return "Stream data from " + Util.prefix(getSender())
                 + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
-        case STREAM_META:
+        } else if (FileTransferType.STREAM_META.equals(type)) {
             return "Stream metadata from " + Util.prefix(getSender())
                 + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
-        case CONNECTION_TEST:
+        } else if (FileTransferType.CONNECTION_TEST.equals(type)) {
             return "Connection test from " + Util.prefix(getSender());
-        default:
-            return "Not a valid FileTransferType";
+        } else {
+            StringBuilder sb = new StringBuilder("Bytestream transfer. type="
+                + type + " namespace=" + namespace);
+
+            if (sessionID != null)
+                sb.append(" [SID=" + sessionID + "]");
+
+            return sb.toString();
         }
     }
 
@@ -195,19 +199,6 @@ public class TransferDescription implements Serializable {
         return result;
     }
 
-    public static TransferDescription createActivityTransferDescription(
-        JID recipient, JID sender, String sessionID) {
-
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sender;
-        result.type = FileTransferType.ACTIVITY_TRANSFER;
-        result.sessionID = sessionID;
-        result.compressed = false;
-
-        return result;
-    }
-
     public static TransferDescription createStreamDataTransferDescription(
         JID recipient, JID sender, String sessionID, String streamPath) {
 
@@ -218,6 +209,7 @@ public class TransferDescription implements Serializable {
         result.sessionID = sessionID;
         result.file_project_path = streamPath;
         result.compressed = true;
+        result.logToDebug = false;
 
         return result;
     }

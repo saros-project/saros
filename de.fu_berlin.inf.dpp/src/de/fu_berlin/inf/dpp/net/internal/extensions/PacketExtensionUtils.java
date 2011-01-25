@@ -144,7 +144,7 @@ public class PacketExtensionUtils {
     public static PacketFilter getIncomingTransferObjectFilter(
         final IncomingTransferObjectExtensionProvider extProv,
         final SessionIDObservable sessionID, final String invitationID,
-        final TransferDescription.FileTransferType type) {
+        final String type) {
 
         return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
 

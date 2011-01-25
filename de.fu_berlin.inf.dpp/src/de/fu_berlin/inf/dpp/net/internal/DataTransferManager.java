@@ -32,11 +32,11 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * This class is responsible for handling all transfers of binary data. It
@@ -149,19 +149,12 @@ public class DataTransferManager implements IConnectionListener,
             try {
                 // TODO Put size in TransferDescription, so we can
                 // display it here
-                if (description.type == FileTransferType.ACTIVITY_TRANSFER
-                    || description.type == FileTransferType.STREAM_DATA
-                    || description.type == FileTransferType.STREAM_META) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("[" + getTransferMode().toString()
-                            + "] Starting incoming data transfer: "
-                            + description.toString());
-                    }
-                } else {
-                    log.debug("[" + getTransferMode().toString()
+
+                LoggingUtils.log(
+                    log,
+                    "[" + getTransferMode().toString()
                         + "] Starting incoming data transfer: "
-                        + description.toString());
-                }
+                        + description.toString(), description.logToDebug);
 
                 long startTime = System.nanoTime();
 
@@ -169,21 +162,13 @@ public class DataTransferManager implements IConnectionListener,
 
                 long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
-                if (description.type == FileTransferType.ACTIVITY_TRANSFER
-                    || description.type == FileTransferType.STREAM_DATA
-                    || description.type == FileTransferType.STREAM_META) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("[" + getTransferMode().toString()
-                            + "] Finished incoming data transfer: "
-                            + description.toString() + ", size: "
-                            + Util.throughput(content.length, duration));
-                    }
-                } else {
-                    log.debug("[" + getTransferMode().toString()
+                LoggingUtils.log(
+                    log,
+                    "[" + getTransferMode().toString()
                         + "] Finished incoming data transfer: "
                         + description.toString() + ", size: "
-                        + Util.throughput(content.length, duration));
-                }
+                        + Util.throughput(content.length, duration),
+                    description.logToDebug);
 
                 transferModeDispatch.transferFinished(description.getSender(),
                     getTransferMode(), true, content.length, duration);
@@ -311,7 +296,7 @@ public class DataTransferManager implements IConnectionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
-        log.trace("sending data ... ");
+        LoggingUtils.log(log, "sending data ... ", transferData.logToDebug);
 
         JID recipient = transferData.recipient;
 

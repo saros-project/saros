@@ -41,7 +41,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -311,7 +310,7 @@ public interface ITransmitter {
         T payload, long timeout);
 
     public SarosPacketCollector getInvitationCollector(String invitationID,
-        FileTransferType filelistTransfer);
+        String filelistTransfer);
 
     /**
      * @param to

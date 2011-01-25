@@ -75,7 +75,6 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestEx
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
@@ -268,7 +267,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     public SarosPacketCollector getInvitationCollector(String invitationID,
-        FileTransferType type) {
+        String type) {
 
         PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
@@ -501,11 +500,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             timedActivities);
 
         try {
-            TransferDescription transferDescription = TransferDescription
-                .createActivityTransferDescription(recipient, recipient,
-                    sessionID.getValue());
-
-            sendToProjectUser(recipient, extensionToSend, transferDescription);
+            sendToProjectUser(recipient, extensionToSend);
         } catch (IOException e) {
             log.error("Failed to sent activityDataObjects: " + timedActivities,
                 e);
@@ -520,6 +515,51 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             log.trace(msg);
         else
             log.debug(msg);
+    }
+
+    /**
+     * <p>
+     * Sends the given {@link PacketExtension} to the given {@link JID}. The
+     * recipient has to be in the session or the extension will not be sent.
+     * </p>
+     * 
+     * <p>
+     * If the extension's raw data (bytes) is longer than
+     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
+     * to the recipient the extension will be sent using the bytestream. Else it
+     * will be sent by chat.
+     * </p>
+     * 
+     * <p>
+     * Note: Does NOT ensure that peers receive messages in order because there
+     * may be two completely different communication ways. See
+     * {@link de.fu_berlin.inf.dpp.net.internal.ActivitySequencer} for details.
+     * </p>
+     * 
+     * @param recipient
+     * @param extension
+     * @throws IOException
+     *             if sending by bytestreams fails and the extension raw data is
+     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
+     */
+    public void sendToProjectUser(JID recipient, PacketExtension extension)
+        throws IOException {
+        /*
+         * The TransferDescription can be created out of the session, the name
+         * and namespace of the packet extension and standard values and thus
+         * transparent to users of this method.
+         */
+        TransferDescription result = new TransferDescription();
+        result.recipient = recipient;
+        result.sender = sarosSessionObservable.getValue().getLocalUser()
+            .getJID();
+        result.type = extension.getElementName();
+        result.namespace = extension.getNamespace();
+        result.sessionID = this.sessionID.getValue();
+        result.compressed = false;
+        result.logToDebug = false;
+
+        sendToProjectUser(recipient, extension, result);
     }
 
     /**

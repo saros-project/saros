@@ -1,36 +1,24 @@
 package de.fu_berlin.inf.dpp.net.business;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
@@ -48,10 +36,6 @@ public class ActivitiesHandler {
 
     @Inject
     protected DispatchThreadContext dispatchThread;
-
-    protected ExecutorService activityDownloadThreadPool = Executors
-        .newCachedThreadPool(new NamedThreadFactory(
-            "ActivitiesHandler-receiver-"));
 
     public ActivitiesHandler(XMPPReceiver receiver,
         final ActivitiesExtensionProvider provider,
@@ -92,64 +76,6 @@ public class ActivitiesHandler {
                 }
             }
         }, provider.getPacketFilter());
-
-        receiver.addPacketListener(
-            new PacketListener() {
-
-                public void processPacket(final Packet packet) {
-
-                    activityDownloadThreadPool.execute(Util.wrapSafe(log,
-                        new Runnable() {
-                            public void run() {
-                                receiveActivities(provider, incomingExtProv,
-                                    packet);
-                            }
-                        }));
-                }
-
-            }, PacketExtensionUtils.getIncomingTransferObjectFilter(
-                incomingExtProv, sessionID, null,
-                FileTransferType.ACTIVITY_TRANSFER));
-    }
-
-    private void receiveActivities(final ActivitiesExtensionProvider provider,
-        final IncomingTransferObjectExtensionProvider incomingExtProv,
-        final Packet packet) {
-
-        final IncomingTransferObject result = incomingExtProv
-            .getPayload(packet);
-
-        // TODO If long running show to user
-        SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
-
-        byte[] data;
-        try {
-            data = result.accept(monitor);
-        } catch (SarosCancellationException e) {
-            log.error("User canceled. This is unexpected", e);
-            return;
-        } catch (IOException e) {
-            log.error("Could not deserialize incoming "
-                + "activityDataObjects or an connection error occurred", e);
-            return;
-        }
-
-        final TimedActivities content;
-        try {
-            content = provider.parseString(IOUtils.toString(
-                new ByteArrayInputStream(data), "UTF-8"));
-        } catch (IOException e) {
-            log.error("Could not parse incoming activityDataObjects:", e);
-            return;
-        }
-
-        // When finished execute as dispatch
-        dispatchThread.executeAsDispatch(new Runnable() {
-            public void run() {
-                receiveActivities(result.getTransferDescription().getSender(),
-                    content.getTimedActivities());
-            }
-        });
     }
 
     /**

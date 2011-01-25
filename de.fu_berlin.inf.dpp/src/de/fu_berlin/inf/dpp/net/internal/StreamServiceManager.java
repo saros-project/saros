@@ -619,7 +619,7 @@ public class StreamServiceManager implements Startable {
          * Is always the base JID, initiator of session
          */
         public String jid;
-        public TransferDescription.FileTransferType type;
+        public String type;
 
         /**
          * @throws IllegalArgumentException
@@ -631,19 +631,17 @@ public class StreamServiceManager implements Startable {
 
             String[] tokens = path.split(String.valueOf(PATH_DELIMITER));
 
-            this.type = TransferDescription.FileTransferType.valueOf(tokens[0]);
+            this.type = tokens[0];
             if (this.type == null)
                 throw new IllegalArgumentException("Type not known!");
-            switch (this.type) {
-            case STREAM_META:
+            if (FileTransferType.STREAM_META.equals(this.type)) {
                 if (tokens.length != 4)
                     throw new IllegalArgumentException(
                         "Unexpected number of tokens for a meta-path.");
                 this.jid = tokens[1];
                 this.serviceName = tokens[3];
                 this.sessionID = Integer.valueOf(tokens[2]);
-                break;
-            case STREAM_DATA:
+            } else if (FileTransferType.STREAM_DATA.equals(this.type)) {
                 if (tokens.length != 5)
                     throw new IllegalArgumentException(
                         "Unexpected number of tokens for a data-path.");
@@ -651,8 +649,7 @@ public class StreamServiceManager implements Startable {
                 this.sessionID = Integer.valueOf(tokens[2]);
                 this.streamID = Integer.valueOf(tokens[3]);
                 this.size = Integer.valueOf(tokens[4]);
-                break;
-            default:
+            } else {
                 throw new IllegalArgumentException("Type not valid!");
             }
 
@@ -706,15 +703,13 @@ public class StreamServiceManager implements Startable {
          */
         @Override
         public String toString() {
-            switch (type) {
-            case STREAM_DATA:
-                return String
-                    .format("%6$s%5$c%1$s%5$c%2$d%5$c%3$d%5$c%4$d", jid,
-                        sessionID, streamID, size, PATH_DELIMITER, type.name());
-            case STREAM_META:
+            if (FileTransferType.STREAM_DATA.equals(type)) {
+                return String.format("%6$s%5$c%1$s%5$c%2$d%5$c%3$d%5$c%4$d",
+                    jid, sessionID, streamID, size, PATH_DELIMITER, type);
+            } else if (FileTransferType.STREAM_META.equals(type)) {
                 return String.format("%5$s%4$c%1$s%4$c%3$d%4$c%2$s", jid,
-                    serviceName, sessionID, PATH_DELIMITER, type.name());
-            default:
+                    serviceName, sessionID, PATH_DELIMITER, type);
+            } else {
                 throw new RuntimeException("Unknown type!");
             }
         }
@@ -1337,10 +1332,8 @@ public class StreamServiceManager implements Startable {
             TransferDescription description = packet.getTransferDescription();
 
             log.trace("Packet " + counter + " arrived");
-            switch (description.type) {
-            case STREAM_DATA:
+            if (FileTransferType.STREAM_DATA.equals(description.type)) {
                 StreamSession session = sessions.get(packet.getStreamPath());
-
                 if (session == null) {
                     log.error("Received packet for an unknown session. Path is "
                         + packet.getStreamPath());
@@ -1351,14 +1344,10 @@ public class StreamServiceManager implements Startable {
                     }
                     return;
                 }
-
                 session.addPacket(packet);
-
-                break;
-            case STREAM_META:
+            } else if (FileTransferType.STREAM_META.equals(description.type)) {
                 processMeta(packet);
-                break;
-            default:
+            } else {
                 log.error("Received unknown packet type: " + description.type);
             }
 

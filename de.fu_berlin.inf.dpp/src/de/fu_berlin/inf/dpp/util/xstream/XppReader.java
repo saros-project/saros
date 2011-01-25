@@ -27,6 +27,15 @@ public class XppReader extends AbstractPullReader {
     public XppReader(XmlPullParser parser) {
         super(new XmlFriendlyReplacer());
         this.parser = parser;
+
+        /*
+         * As addition to the "hack" beyond we have to ensure that the parser works,
+         * too, if XStream really pulls the very first
+         * element from the underlying parser. ;)
+         */
+        if (parser.getName() == null)
+            justStarted = false;
+
         moveDown();
     }
 
