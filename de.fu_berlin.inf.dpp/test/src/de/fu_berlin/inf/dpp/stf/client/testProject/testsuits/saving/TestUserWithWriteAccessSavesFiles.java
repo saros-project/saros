@@ -16,16 +16,16 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestDriverSavesFiles extends STFTest {
+public class TestUserWithWriteAccessSavesFiles extends STFTest {
 
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>Dave (Observer in Follow-Mode)</li>
-     * <li>Edna (Observer in Follow-Mode)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Dave (Read-Only in Follow-Mode)</li>
+     * <li>Edna (Read-Only in Follow-Mode)</li>
      * </ol>
      * 
      * @throws AccessException

@@ -41,9 +41,9 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         }
     }
 
-    public void driverEditorSaved(SPath path, boolean replicated) {
+    public void userWithWriteAccessEditorSaved(SPath path, boolean replicated) {
         for (ISharedEditorListener listener : editorListeners) {
-            listener.driverEditorSaved(path, replicated);
+            listener.userWithWriteAccessEditorSaved(path, replicated);
         }
     }
 

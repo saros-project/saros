@@ -24,28 +24,34 @@ import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * This class manages state of open editors of all drivers and connects
- * to/disconnects from the corresponding DocumentProviders to make sure that
- * TextEditActivities can be executed.
+ * This class manages state of open editors of all users with
+ * {@link User.Permission#WRITE_ACCESS} and connects to/disconnects from the
+ * corresponding DocumentProviders to make sure that TextEditActivities can be
+ * executed.
  * 
- * The main idea is to connect at observer site, when a driver activates his
- * editor with the document. Disconnect happens, when last driver closes the
- * editor.
+ * The main idea is to connect at the site of user with
+ * {@link User.Permission#READONLY_ACCESS}, when a user with
+ * {@link User.Permission#WRITE_ACCESS} activates his editor with the document.
+ * Disconnect happens, when last user with {@link User.Permission#WRITE_ACCESS}
+ * closes the editor.
  */
-public class RemoteDriverManager {
+public class RemoteWriteAccessManager {
 
     private static final Logger log = Logger
-        .getLogger(RemoteDriverManager.class);
+        .getLogger(RemoteWriteAccessManager.class);
 
-    // stores users and their opened files (identified by their path)
+    /** stores users and their opened files (identified by their path) */
     protected Map<SPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
 
-    // stores files (identified by their path) connected by at least one driver
-    protected Set<SPath> connectedDriverFiles = new HashSet<SPath>();
+    /**
+     * stores files (identified by their path) connected by at least user with
+     * {@link User.Permission#WRITE_ACCESS}
+     */
+    protected Set<SPath> connectedUserWithWriteAccessFiles = new HashSet<SPath>();
 
     protected ISarosSession sarosSession;
 
-    public RemoteDriverManager(final ISarosSession sarosSession) {
+    public RemoteWriteAccessManager(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
         this.sarosSession.addListener(sharedProjectListener);
     }
@@ -66,11 +72,11 @@ public class RemoteDriverManager {
 
         /**
          * This method takes care of maintaining correct state of class-internal
-         * tables with paths of connected documents, if the role of a user
+         * tables with paths of connected documents, if the permission of a user
          * changes.
          */
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
                 if (entry.getValue().contains(user))
                     updateConnectionState(entry.getKey());
@@ -127,20 +133,21 @@ public class RemoteDriverManager {
 
         editorStates.clear();
 
-        if (!connectedDriverFiles.isEmpty()) {
-            log.warn("RemoteDriverManager could not"
+        if (!connectedUserWithWriteAccessFiles.isEmpty()) {
+            log.warn("RemoteWriteAccessManager could not"
                 + " be dispose correctly. Still connect to: "
-                + connectedDriverFiles.toString());
+                + connectedUserWithWriteAccessFiles.toString());
         }
     }
 
     /**
      * Connects a document under the given path as a reaction on a remote
-     * activityDataObject of a driver (e.g. Activate Editor).
+     * activityDataObject of a user with {@link User.Permission#WRITE_ACCESS}
+     * (e.g. Activate Editor).
      */
     protected void connectDocumentProvider(SPath path) {
 
-        assert !connectedDriverFiles.contains(path);
+        assert !connectedUserWithWriteAccessFiles.contains(path);
 
         IFile file = path.getFile();
         if (!file.exists()) {
@@ -159,18 +166,19 @@ public class RemoteDriverManager {
             return;
         }
 
-        connectedDriverFiles.add(path);
+        connectedUserWithWriteAccessFiles.add(path);
     }
 
     /**
      * Disconnects a document under the given path as a reaction on a remote
-     * activityDataObject of a driver (e.g. Close Editor)
+     * activityDataObject of a user with {@link User.Permission#WRITE_ACCESS}
+     * (e.g. Close Editor)
      */
     protected void disconnectDocumentProvider(final SPath path) {
 
-        assert connectedDriverFiles.contains(path);
+        assert connectedUserWithWriteAccessFiles.contains(path);
 
-        connectedDriverFiles.remove(path);
+        connectedUserWithWriteAccessFiles.remove(path);
 
         IFile file = path.getFile();
         FileEditorInput input = new FileEditorInput(file);
@@ -187,23 +195,24 @@ public class RemoteDriverManager {
 
         log.trace(".updateConnectionState(" + path.toString() + ")");
 
-        boolean hadDriver = connectedDriverFiles.contains(path);
-        boolean hasDriver = false;
+        boolean hadUserWithWriteAccess = connectedUserWithWriteAccessFiles
+            .contains(path);
+        boolean hasUserWithWriteAccess = false;
 
         for (User user : editorStates.get(path)) {
-            if (user.isDriver()) {
-                hasDriver = true;
+            if (user.hasWriteAccess()) {
+                hasUserWithWriteAccess = true;
                 break;
             }
         }
 
-        if (!hadDriver && hasDriver) {
+        if (!hadUserWithWriteAccess && hasUserWithWriteAccess) {
             log.trace(".updateConnectionState File " + path.toString()
                 + " will be connected ");
             connectDocumentProvider(path);
         }
 
-        if (hadDriver && !hasDriver) {
+        if (hadUserWithWriteAccess && !hasUserWithWriteAccess) {
             log.trace(".updateConnectionState File " + path.toString()
                 + " will be disconnected ");
             disconnectDocumentProvider(path);

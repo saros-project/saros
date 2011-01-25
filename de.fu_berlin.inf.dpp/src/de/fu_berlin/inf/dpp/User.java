@@ -40,7 +40,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * There is one local user representing the person in front of the current
  * eclipse instance, all others are buddies.
  * 
- * The public and mutable properties are the role (Driver/Observer), time since
+ * The public and mutable properties are the {@link User.Permission}, time since
  * going off-line, connection state, away information and whether this user is
  * still joining or already part of the session.
  * 
@@ -54,8 +54,8 @@ public class User {
         UNKNOWN, ONLINE, OFFLINE
     }
 
-    public enum UserRole {
-        DRIVER, OBSERVER
+    public enum Permission {
+        WRITE_ACCESS, READONLY_ACCESS
     }
 
     protected final ISarosSession sarosSession;
@@ -82,7 +82,7 @@ public class User {
      */
     protected long offlineTime = 0;
 
-    protected UserRole role = UserRole.OBSERVER;
+    protected Permission permission = Permission.WRITE_ACCESS;
 
     public User(ISarosSession sarosSession, JID jid, int colorID) {
         if (sarosSession == null || jid == null)
@@ -97,46 +97,50 @@ public class User {
     }
 
     /**
-     * set the current user role of this user inside the current project.
+     * set the current user {@link User.Permission} of this user inside the
+     * current project.
      * 
-     * @param role
-     *            (Driver, Observer)
+     * @param permission
      */
-    public void setUserRole(UserRole role) {
-        this.role = role;
+    public void setPermission(Permission permission) {
+        this.permission = permission;
     }
 
     /**
-     * Gets current project role of this user.
+     * Gets current project {@link User.Permission} of this user.
      * 
-     * @return role (Driver, Observer)
+     * @return
      */
-    public UserRole getUserRole() {
-        return this.role;
+    public Permission getPermission() {
+        return this.permission;
     }
 
     /**
-     * Utility method to determine whether this user has the UserRole.DRIVER
+     * Utility method to determine whether this user has
+     * {@link User.Permission#WRITE_ACCESS}
      * 
-     * @return <code>true</code> if this User is driver, <code>false</code>
+     * @return <code>true</code> if this User has
+     *         {@link User.Permission#WRITE_ACCESS}, <code>false</code>
      *         otherwise.
      * 
-     *         This is always !isObserver()
+     *         This is always !{@link #hasReadOnlyAccess()}
      */
-    public boolean isDriver() {
-        return this.role == UserRole.DRIVER;
+    public boolean hasWriteAccess() {
+        return this.permission == Permission.WRITE_ACCESS;
     }
 
     /**
-     * Utility method to determine whether this user has the UserRole.OBSERVER
+     * Utility method to determine whether this user has
+     * {@link User.Permission#READONLY_ACCESS}
      * 
-     * @return <code>true</code> if this User is observer, <code>false</code>
+     * @return <code>true</code> if this User has
+     *         {@link User.Permission#READONLY_ACCESS}, <code>false</code>
      *         otherwise.
      * 
-     *         This is always !isDriver()
+     *         This is always !{@link #hasWriteAccess()}
      */
-    public boolean isObserver() {
-        return this.role == UserRole.OBSERVER;
+    public boolean hasReadOnlyAccess() {
+        return this.permission == Permission.READONLY_ACCESS;
     }
 
     public boolean isInSarosSession() {
@@ -256,7 +260,8 @@ public class User {
 
     /**
      * Returns true if this user is the one that initiated the SarosSession
-     * session and thus is responsible for synchronization, role management,
+     * session and thus is responsible for synchronization,
+     * {@link User.Permission} management,
      */
     public boolean isHost() {
         return this.equals(sarosSession.getHost());

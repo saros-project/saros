@@ -450,8 +450,8 @@ public class VideoSharing {
             screen = new Screen(this);
 
             try {
-                encoder = Encoder.getEncoder(getCodec(), connectionFactory
-                    .getVideoOutputStream(), screen, this);
+                encoder = Encoder.getEncoder(getCodec(),
+                    connectionFactory.getVideoOutputStream(), screen, this);
             } catch (EncoderInitializationException e) {
                 reportError(e);
                 throw e;
@@ -460,9 +460,9 @@ public class VideoSharing {
             activityManager = new ActivityManager(screen, this,
                 connectionFactory.getActivitiesInputStream());
 
-            connectionManager = new ConnectionManager(connectionFactory
-                .getVideoOutputStream(), encoder, connectionFactory
-                .getDecodingStatisticsInputStream(), this);
+            connectionManager = new ConnectionManager(
+                connectionFactory.getVideoOutputStream(), encoder,
+                connectionFactory.getDecodingStatisticsInputStream(), this);
 
             encoder.startEncoding();
         }
@@ -479,10 +479,10 @@ public class VideoSharing {
             if (isDisposing)
                 return;
             try {
-                decoder = Decoder.getDecoder(init.codec, connectionFactory
-                    .getVideoInputStream(), connectionFactory
-                    .getDecodeStaticticsOutputStream(), init.width,
-                    init.height, init.encoderFormatName, this);
+                decoder = Decoder.getDecoder(init.codec,
+                    connectionFactory.getVideoInputStream(),
+                    connectionFactory.getDecodeStaticticsOutputStream(),
+                    init.width, init.height, init.encoderFormatName, this);
             } catch (DecoderInitializationException e) {
                 reportError(e);
                 throw e;
@@ -513,9 +513,9 @@ public class VideoSharing {
                                 SessionErrorVideoActivity error = (SessionErrorVideoActivity) errorRaw;
                                 if (!(error.getException() instanceof IOException))
                                     // IOE are just confusing
-                                    VideoSharing.reportErrorToUser(error
-                                        .getException(),
-                                        "Screensharing: Host got an exception");
+                                    VideoSharing.reportErrorToUser(
+                                        error.getException(),
+                                        "Screensharing: Inviter got an exception");
                             }
                         } catch (IOException e) {
                             // ignore
@@ -540,7 +540,7 @@ public class VideoSharing {
 
         public Encoder getEncoder() throws IllegalStateException {
             if (mode != Mode.LOCAL && mode != Mode.HOST)
-                throw new IllegalStateException("Only host has an encoder.");
+                throw new IllegalStateException("Only inviter has an encoder.");
 
             return encoder;
         }
@@ -549,7 +549,7 @@ public class VideoSharing {
             throws IllegalStateException {
             if (mode != Mode.LOCAL && mode != Mode.HOST)
                 throw new IllegalStateException(
-                    "Only host has an ActivityManger.");
+                    "Only inviter has an ActivityManger.");
 
             return activityManager;
         }
@@ -558,14 +558,14 @@ public class VideoSharing {
             throws IllegalStateException {
             if (mode != Mode.LOCAL && mode != Mode.HOST)
                 throw new IllegalStateException(
-                    "Only host has a ConnectionManager.");
+                    "Only inviter has a ConnectionManager.");
 
             return connectionManager;
         }
 
         public Screen getScreen() throws IllegalStateException {
             if (mode != Mode.LOCAL && mode != Mode.HOST)
-                throw new IllegalStateException("Only host has a screen.");
+                throw new IllegalStateException("Only inviter has a screen.");
 
             return screen;
         }
@@ -797,8 +797,9 @@ public class VideoSharing {
             default:
                 encoderFormatName = "";
             }
-            return new VideoSharingInit(instance.getVideoWidth(), instance
-                .getVideoHeight(), instance.getCodec(), encoderFormatName);
+            return new VideoSharingInit(instance.getVideoWidth(),
+                instance.getVideoHeight(), instance.getCodec(),
+                encoderFormatName);
         }
 
     }

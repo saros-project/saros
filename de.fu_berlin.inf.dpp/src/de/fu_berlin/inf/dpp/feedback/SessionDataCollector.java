@@ -92,7 +92,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     /**
      * Stores some general platform information and settings, e.g. Saros
      * version, Java version, feedback settings, states of various settings
-     * (auto follow mode, mutli driver, follow exclusive driver)
+     * (auto follow mode)
      * 
      */
     protected void storeGeneralInfos() {
@@ -104,9 +104,6 @@ public class SessionDataCollector extends AbstractStatisticCollector {
         data.setFeedbackDisabled(feedbackManager.isFeedbackDisabled());
         data.setFeedbackInterval(feedbackManager.getSurveyInterval());
         data.setUserID(statisticManager.getUserID());
-        data.setMultiDriverEnabled(saros.getMutliDriverEnabled());
         data.setAutoFollowModeEnabled(saros.getAutoFollowEnabled());
-        data.setFollowExclusiveDriverEnabled(saros
-            .getFollowExclusiveDriverEnabled());
     }
 }

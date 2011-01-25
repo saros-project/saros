@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.ui.part.ViewPart;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -13,6 +14,8 @@ import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
+import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -155,14 +158,14 @@ public interface SessionView extends Remote {
      * After a action is performed, you immediately try to assert a condition is
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g.
-     * assertFalse(alice.state.isDriver(bob.jid)) after bob leave the session by
-     * running the {@link SessionViewImp#leaveTheSession()} and confirming the
-     * appeared pop up window without this waitUntil. In this case, you may get
-     * the AssertException, because bob should not really leave the session yet
-     * during asserting a condition or performing a following action. So it is
-     * recommended that you wait until the session by the defined peer is
-     * completely closed before you run a assertion or perform a following
-     * action.
+     * assertFalse(alice.state.hasWriteAccess(bob.jid)) after bob leave the
+     * session by running the {@link SessionViewImp#leaveTheSession()} and
+     * confirming the appeared pop up window without this waitUntil. In this
+     * case, you may get the AssertException, because bob should not really
+     * leave the session yet during asserting a condition or performing a
+     * following action. So it is recommended that you wait until the session by
+     * the defined peer is completely closed before you run a assertion or
+     * perform a following action.
      * 
      * @param sessionV
      *            the {@link SessionView} of the user, whose session should be
@@ -183,10 +186,9 @@ public interface SessionView extends Remote {
      * 
      * @param contactJID
      *            JID of a contact whose nick name listed in the session view.
-     *            e.g. "You" or "bob_stf@saros-con.imp.fu-berlin.de (Driver)" or
+     *            e.g. "You" or "bob_stf@saros-con.imp.fu-berlin.de" or
      *            "bob_stf@saros-con.imp.fu-berlin.de" or
-     *            "(nickNameOfBob (bob_stf@saros-con.imp.fu-berlin.de) (Driver)"
-     *            .
+     *            "(nickNameOfBob (bob_stf@saros-con.imp.fu-berlin.de)" .
      * @return <tt>true</tt> if the passed contactName is in the contact list in
      *         the session view.
      * @throws RemoteException
@@ -195,33 +197,37 @@ public interface SessionView extends Remote {
         throws RemoteException;
 
     /**
-     * @return <tt>true</tt> if the local client is a current driver of this
-     *         shared project. false otherwise.
+     * @return <tt>true</tt> if the local client has
+     *         {@link User.Permission#WRITE_ACCESS} of this shared project.
+     *         false otherwise.
      * @throws RemoteException
      */
-    public boolean isDriver() throws RemoteException;
+    public boolean hasWriteAccess() throws RemoteException;
 
     /**
-     * @return <tt>true</tt> if the given {@link JID} is a driver in this
+     * @return <tt>true</tt> if the given {@link JID} has
+     *         {@link User.Permission#WRITE_ACCESS} in this
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean isDriver(JID jid) throws RemoteException;
+    public boolean hasWriteAccess(JID jid) throws RemoteException;
 
     /**
      * 
-     * @return <tt>true</tt> if the given {@link JID} is a exclusive driver in
-     *         this {@link SharedProject}.
-     * @throws RemoteException
-     */
-    public boolean isExclusiveDriver() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if all given jids are drivers of this
+     * @return <tt>true</tt> if the given {@link JID} is the only one with
+     *         {@link User.Permission#WRITE_ACCESS} in this
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean areDrivers(List<JID> jids) throws RemoteException;
+    public boolean hasExclusiveWriteAccess() throws RemoteException;
+
+    /**
+     * @return <tt>true</tt>, if all given {@link JID}s have
+     *         {@link User.Permission#WRITE_ACCESS} for this
+     *         {@link SharedProject}.
+     * @throws RemoteException
+     */
+    public boolean haveWriteAccess(List<JID> jids) throws RemoteException;
 
     /**
      * 
@@ -240,21 +246,22 @@ public interface SessionView extends Remote {
     public boolean isHost(JID jid) throws RemoteException;
 
     /**
-     * @return <tt>true</tt>, if the local user is a observer in this
+     * @return <tt>true</tt>, if the local user has read-only access in this
      *         {@link SharedProject}.
      */
-    public boolean isObserver() throws RemoteException;
+    public boolean hasReadOnlyAccess() throws RemoteException;
 
     /**
-     * @return <tt>true</tt>, if the given {@link JID} is a observer in this
-     *         {@link SharedProject}.
+     * @return <tt>true</tt>, if the given {@link JID} has read-only access in
+     *         this {@link SharedProject}.
      */
-    public boolean isObserver(JID jid) throws RemoteException;
+    public boolean hasReadOnlyAccess(JID jid) throws RemoteException;
 
     /**
-     * @return <tt>true</tt>, if all given jids are observers of the project.
+     * @return <tt>true</tt>, if all given {@link JID} have read-only of the
+     *         project.
      */
-    public boolean areObservers(List<JID> jids) throws RemoteException;
+    public boolean haveReadOnlyAccess(List<JID> jids) throws RemoteException;
 
     /**
      * 
@@ -276,95 +283,79 @@ public interface SessionView extends Remote {
     public boolean areParticipants(List<JID> jids) throws RemoteException;
 
     /**
-     * Perform the action "Give driver Role" which should be activated by
-     * clicking the context menu "Give driver Role" of a tableItem with itemText
-     * e.g. "bob1_fu@jabber.ccc.de" in the session view.
+     * Perform the action "Grant write access" which should be activated by
+     * clicking the context menu "Grant write access" of a tableItem with
+     * itemText e.g. "bob1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Makes sure, the session view is open and active.</li>
      * <li>Waits until the shell "Progress Information" is closed. It guarantee
-     * that the "Give driver Role" action is completely done.</li>
+     * that the "Grant write access" action is completely done.</li>
      * </ol>
      * 
      * @param sessionV
-     *            the {@link SessionView} of the user whom you want to give
-     *            drive role.
+     *            the {@link SessionView} of the user whom you want to grant
+     *            {@link User.Permission#WRITE_ACCESS}.
      * @throws RemoteException
      */
-    public void giveDriverRoleGUI(final SessionView sessionV)
+    public void grantWriteAccessGUI(final SessionView sessionV)
         throws RemoteException;
 
     /**
-     * waits until the local user is driver after host give him the driver role.
-     * This method should be used after performing the action
-     * {@link SessionView#giveDriverRoleGUI(SessionView)} to guarantee the
-     * invitee has really got the driver role.
+     * waits until the local user has {@link User.Permission#WRITE_ACCESS} after
+     * host grants him {@link User.Permission#WRITE_ACCESS}. This method should
+     * be used after performing the action
+     * {@link SessionView#grantWriteAccessGUI(SessionView)} to guarantee the
+     * invitee has really got {@link User.Permission#WRITE_ACCESS}.
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsDriver() throws RemoteException;
+    public void waitUntilHasWriteAccess() throws RemoteException;
 
     /**
-     * waits until the given user is driver after host give him the driver role.
-     * This method should be used after performing the action
-     * {@link SessionView#giveDriverRoleGUI(SessionView)} to guarantee the
-     * invitee has really got the driver role.
+     * waits until the given user has {@link User.Permission#WRITE_ACCESS} after
+     * host grant him {@link User.Permission#WRITE_ACCESS}. This method should
+     * be used after performing the action
+     * {@link SessionView#grantWriteAccessGUI(SessionView)} to guarantee the
+     * invitee has really got the {@link User.Permission#WRITE_ACCESS}.
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsDriver(final JID jid) throws RemoteException;
+    public void waitUntilHasWriteAccess(final JID jid) throws RemoteException;
 
     /**
-     * waits until the local user is no driver after host remove his driver
-     * role. This method should be used after performing the action
-     * {@link SessionView#removeDriverRoleGUI(SessionView)} or
-     * {@link SessionView#removeAllRriverRolesGUI()} to guarantee the invitee's
-     * driver role is really removed
+     * waits until the local user has no more
+     * {@link User.Permission#WRITE_ACCESS} after host has
+     * {@link User.Permission#READONLY_ACCESS}. This method should be used after
+     * performing the action
+     * {@link SessionView#restrictToReadOnlyAccessGUI(SessionView)} or
+     * {@link SessionView#restrictInviteesToReadOnlyAccessGUI()} to guarantee
+     * the invitee's {@link User.Permission#WRITE_ACCESS} is really removed
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsNoDriver() throws RemoteException;
+    public void waitUntilHasReadOnlyAccess() throws RemoteException;
 
     /**
-     * Using this function host can perform the action
-     * "Give exclusive driver Role" which should be activated by clicking the
-     * context menu "Give exclusive driver Role" of the tableItem with itemText
+     * performs the {@link RestrictToReadOnlyAccessAction} which should be
+     * activated by clicking the context menu
+     * {@link RestrictToReadOnlyAccessAction} of the tableItem with itemText
      * e.g. "bob1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
      * <li>Waits until the shell "Progress Information" is closed. It guarantee
-     * that the "Give exclusive driver Role" action is completely done.</li>
-     * </ol>
-     * 
-     * @param sessionV
-     *            the {@link SessionView} of the user whom you want to give
-     *            exclusive drive role.
-     * @throws RemoteException
-     */
-    public void giveExclusiveDriverRoleGUI(final SessionView sessionV)
-        throws RemoteException;
-
-    /**
-     * performs the action "Remove driver Role" which should be activated by
-     * clicking the context menu "Remove driver Role" of the tableItem with
-     * itemText e.g. "bob1_fu@jabber.ccc.de (Driver)" in the session view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Make sure, the session view is open and active.</li>
-     * <li>Waits until the shell "Progress Information" is closed. It guarantee
-     * that the "Remove driver Role" action is completely done.</li>
+     * that the {@link RestrictToReadOnlyAccessAction} is completely done.</li>
      * </ol>
      * 
      * @param sessionV
      *            the {@link SessionView} of the user whom you want to remove
-     *            drive role.
+     *            drive {@link User.Permission}.
      * @throws RemoteException
      */
-    public void removeDriverRoleGUI(final SessionView sessionV)
+    public void restrictToReadOnlyAccessGUI(final SessionView sessionV)
         throws RemoteException;
 
     /**
@@ -396,7 +387,7 @@ public interface SessionView extends Remote {
     /**
      * Performs the action "Follow this user" which should be activated by
      * clicking the context menu "Follow this user" of the tableItem with
-     * itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
+     * itemText e.g. "alice1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -476,8 +467,7 @@ public interface SessionView extends Remote {
     /**
      * Performs the action "Stop following this user" which should be activated
      * by clicking the context menu "Stop following this user" of a tableItem
-     * with the itemText e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session
-     * view.
+     * with the itemText e.g. "alice1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -498,7 +488,8 @@ public interface SessionView extends Remote {
      * 
      * @param baseJIDOfFollowedUser
      *            the name, which listed in the session view. e.g. "You" or
-     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     *            "alice1_fu@jabber.ccc.de" or
+     *            "Bob1_fu@jabber.ccc.de (read-only)".
      * @return <tt>true</tt> if the context menu "Following this user" of the
      *         passed contactName listed in the session view is enabled.
      * @throws RemoteException
@@ -512,7 +503,8 @@ public interface SessionView extends Remote {
      * 
      * @param baseJIDOfFollowedUser
      *            the name, which listed in the session view. e.g. "You" or
-     *            "alice1_fu@jabber.ccc.de (Driver)" or "Bob1_fu@jabber.ccc.de".
+     *            "alice1_fu@jabber.ccc.de" or
+     *            "Bob1_fu@jabber.ccc.de (read-only)".
      * @return <tt>true</tt> if the context menu "Following this user" of the
      *         passed contactName listed in the session view is visible.
      * @throws RemoteException
@@ -648,10 +640,11 @@ public interface SessionView extends Remote {
     public void inconsistencyDetectedGUI() throws RemoteException;
 
     /**
-     * performs the action "Remove all river roles" which should be activated by
-     * clicking the tool bar button with the tooltip text
-     * "Remove all river roles" on the session view. The button is only enabled,
-     * if there are Driver existed in the session.
+     * performs the {@link RestrictInviteesToReadOnlyAccessAction} which should
+     * be activated by clicking the tool bar button with the tooltip text
+     * {@link RestrictInviteesToReadOnlyAccessAction} on the session view. The
+     * button is only enabled, if there users with
+     * {@link User.Permission#WRITE_ACCESS} existed in the session.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -663,15 +656,16 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void removeAllRriverRolesGUI() throws RemoteException;
+    public void restrictInviteesToReadOnlyAccessGUI() throws RemoteException;
 
     /**
      * 
-     * @return <tt>true</tt>, if the toolbar button "Remove all river roles" is
-     *         enabled
+     * @return <tt>true</tt>, if the toolbar button
+     *         {@link RestrictInviteesToReadOnlyAccessAction} is enabled
      * @throws RemoteException
      */
-    public boolean isRemoveAllRiverEnabled() throws RemoteException;
+    public boolean isRestrictInviteesToReadOnlyAccessEnabled()
+        throws RemoteException;
 
     /**
      * performs the action "Enable/disable follow mode" which should be
@@ -723,7 +717,7 @@ public interface SessionView extends Remote {
      * Performs the action "Jump to position of selected user" which should be
      * activated by clicking the context menu
      * "SJump to position of selected user" of a tableItem with the itemText
-     * e.g. "alice1_fu@jabber.ccc.de (Driver)" in the session view.
+     * e.g. "alice1_fu@jabber.ccc.de" in the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>

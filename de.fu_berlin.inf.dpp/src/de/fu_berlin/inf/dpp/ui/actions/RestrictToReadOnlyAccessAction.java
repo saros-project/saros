@@ -6,9 +6,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -20,10 +19,10 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 @Component(module = "action")
-public class GiveDriverRoleAction extends SelectionProviderAction {
+public class RestrictToReadOnlyAccessAction extends SelectionProviderAction {
 
     private static final Logger log = Logger
-        .getLogger(GiveDriverRoleAction.class.getName());
+        .getLogger(RestrictToReadOnlyAccessAction.class.getName());
 
     protected User selectedUser;
 
@@ -33,7 +32,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             updateEnablement();
         }
     };
@@ -48,21 +47,21 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             oldSarosSession.removeListener(projectListener);
-            updateEnablement();
         }
-
     };
 
-    @Inject
     protected SarosSessionManager sessionManager;
 
-    public GiveDriverRoleAction(ISelectionProvider provider) {
-        super(provider, "Give driver role");
-        setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/elcl16/givedriver.png"));
-        setToolTipText("Give the driver role to this buddy");
+    public RestrictToReadOnlyAccessAction(SarosSessionManager sessionManager,
+        ISelectionProvider provider) {
+        super(provider, "Restrict to read-only access");
+        this.sessionManager = sessionManager;
 
-        Saros.injectDependenciesOnly(this);
+        setImageDescriptor(SarosUI
+            .getImageDescriptor("icons/elcl16/restricttoreadonlyaccess.png"));
+
+        setToolTipText("Restrict To Read-Only Access");
+
         /*
          * if SessionView is not "visible" on session start up this constructor
          * will be called after session started (and the user uses this view)
@@ -73,6 +72,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
+
         sessionManager.addSarosSessionListener(sessionListener);
         updateEnablement();
     }
@@ -84,10 +84,19 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sarosUI.performRoleChange(
-                    GiveDriverRoleAction.this.selectedUser, UserRole.DRIVER);
+                runRestriction();
             }
         });
+    }
+
+    public void runRestriction() {
+        if (selectedUser.hasWriteAccess()) {
+            sarosUI.performPermissionChange(selectedUser,
+                Permission.READONLY_ACCESS);
+        } else {
+            log.warn("Buddy is has no write access: " + selectedUser);
+        }
+        updateEnablement();
     }
 
     @Override
@@ -98,10 +107,11 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     }
 
     protected void updateEnablement() {
-        ISarosSession project = sessionManager.getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        boolean enabled = ((project != null) && (this.selectedUser != null)
-            && project.isHost() && this.selectedUser.isObserver());
+        boolean enabled = ((sarosSession != null)
+            && (this.selectedUser != null) && sarosSession.isHost() && this.selectedUser
+            .hasWriteAccess());
         setEnabled(enabled);
     }
 }

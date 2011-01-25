@@ -30,19 +30,19 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * <br>
  * Saros replicates a shared project, i.e. keeps copies of the project on the
  * peers in sync with the local project. A SharedProject represents the state
- * that these remote copies are supposed to be in. Whenever a driver detects a
- * mismatch between the IProject and the corresponding SharedProject, we know
- * that we need to send activities.<br>
+ * that these remote copies are supposed to be in. Whenever a user with
+ * {@link User.Permission#WRITE_ACCESS} detects a mismatch between the IProject
+ * and the corresponding SharedProject, we know that we need to send activities.<br>
  * <br>
- * Currently, the SharedProject is only accessed (updated) when the client is a
- * driver.
+ * Currently, the SharedProject is only accessed (updated) when the client has
+ * {@link User.Permission#WRITE_ACCESS}.
  */
 /*
  * What if SharedProject became a little smarter, what if SharedProject actually
  * represented the shared project, not only its state? E.g. if
  * SharedResourceManager detects that a file was added to the local project, it
  * notifies the corresponding SharedProject, which then creates and sends a
- * FileActivity if we're a driver. On peers, the SharedProject would be
+ * FileActivity if we have write access. On peers, the SharedProject would be
  * responsible for updating the local project upon receiving resource
  * activities, possibly even reverting changes.
  */
@@ -142,7 +142,7 @@ public class SharedProject {
         }
     };
 
-    protected UpdatableValue<Boolean> isDriver = new UpdatableValue<Boolean>(
+    protected UpdatableValue<Boolean> hasWriteAccess = new UpdatableValue<Boolean>(
         false);
 
     /**
@@ -151,11 +151,11 @@ public class SharedProject {
      */
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user) {
-            boolean driver = sarosSession.isDriver();
-            if (!isDriver.update(driver))
+        public void permissionChanged(User user) {
+            boolean writeAccess = sarosSession.hasWriteAccess();
+            if (!hasWriteAccess.update(writeAccess))
                 return;
-            if (driver) {
+            if (writeAccess) {
                 resourceMap.clear();
                 initializeResources();
             }
@@ -205,13 +205,13 @@ public class SharedProject {
 
         projectIsOpen.update(project.isOpen());
 
-        boolean isDriver = sarosSession.isDriver();
-        this.isDriver.update(isDriver);
+        boolean hasWriteAccess = sarosSession.hasWriteAccess();
+        this.hasWriteAccess.update(hasWriteAccess);
 
         if (sarosSession.useVersionControl()) {
             sarosSession.addListener(sharedProjectListener);
         }
-        if (isDriver) {
+        if (hasWriteAccess) {
             initializeResources();
         }
     }

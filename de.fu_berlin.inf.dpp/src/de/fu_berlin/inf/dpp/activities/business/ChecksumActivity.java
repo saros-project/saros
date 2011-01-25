@@ -38,15 +38,16 @@ public class ChecksumActivity extends AbstractActivity {
 
     /**
      * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
-     * used when communicating with users which are observers)
+     * used when communicating with users who have
+     * {@link User.Permission#READONLY_ACCESS})
      */
     public ChecksumActivity(User source, SPath path, long hash, long length) {
         this(source, path, hash, length, null);
     }
 
     /**
-     * Constructor for checksum activities including a Timestamp (for users
-     * which are drivers)
+     * Constructor for checksum activities including a Timestamp (for users who
+     * have {@link User.Permission#WRITE_ACCESS});
      */
     public ChecksumActivity(User source, SPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {

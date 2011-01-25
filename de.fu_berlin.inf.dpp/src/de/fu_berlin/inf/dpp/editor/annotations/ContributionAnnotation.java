@@ -5,7 +5,8 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import de.fu_berlin.inf.dpp.User;
 
 /**
- * Marks text contributions done by a driver.
+ * Marks text contributions done by a user with
+ * {@link User.Permission#WRITE_ACCESS}.
  * 
  * Configuration of this annotation is done in the plugin-xml.
  * 

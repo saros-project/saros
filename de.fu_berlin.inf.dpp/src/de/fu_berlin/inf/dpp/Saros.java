@@ -99,7 +99,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
 import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
 import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
-import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
+import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
 import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -152,7 +152,7 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.project.internal.RoleManager;
+import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
@@ -326,7 +326,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(PingPongCentral.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(PreferenceUtils.class);
-        this.container.addComponent(RoleManager.class);
+        this.container.addComponent(PermissionManager.class);
         this.container.addComponent(RosterTracker.class);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
@@ -394,7 +394,7 @@ public class Saros extends AbstractUIPlugin {
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);
-        this.container.addComponent(RoleChangeCollector.class);
+        this.container.addComponent(PermissionChangeCollector.class);
         this.container.addComponent(ParticipantCollector.class);
         this.container.addComponent(SessionDataCollector.class);
         this.container.addComponent(TextEditCollector.class);
@@ -1417,17 +1417,6 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Returns the configuration setting for multi driver support
-     * 
-     * @return the state of the feature as <code> boolean</code>
-     */
-    // TODO move to PreferenceUtils
-    public boolean getMutliDriverEnabled() {
-        return getPreferenceStore()
-            .getBoolean(PreferenceConstants.MULTI_DRIVER);
-    }
-
-    /**
      * Returns the configuration setting for enabled auto follow mode
      * 
      * @return the state of the feature as <code> boolean</code>
@@ -1436,17 +1425,6 @@ public class Saros extends AbstractUIPlugin {
     public boolean getAutoFollowEnabled() {
         return getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_FOLLOW_MODE);
-    }
-
-    /**
-     * Returns the configuration setting for enabled follow exclusive driver
-     * 
-     * @return the state of the feature as <code> boolean</code>
-     */
-    // TODO move to PreferenceUtils
-    public boolean getFollowExclusiveDriverEnabled() {
-        return getPreferenceStore().getBoolean(
-            PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER);
     }
 
 }

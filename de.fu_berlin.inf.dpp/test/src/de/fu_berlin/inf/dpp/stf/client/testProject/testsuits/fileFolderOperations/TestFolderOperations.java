@@ -18,9 +18,9 @@ public class TestFolderOperations extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>alice (Host, Driver), aclice share a java project with bob and carl.</li>
-     * <li>bob (Observer)</li>
-     * <li>carl (Observer)</li>
+     * <li>alice (Host, Write Access), aclice share a java project with bob and carl.</li>
+     * <li>bob (Read-Only Access)</li>
+     * <li>carl (Read-Only Access)</li>
      * </ol>
      * 
      * @throws RemoteException

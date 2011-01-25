@@ -25,7 +25,7 @@ class ShowDescriptionPage extends WizardPage {
         this.joinSessionWizard = joinSessionWizard;
 
         setTitle("Session Invitation");
-        setDescription("You have been invited to join a shared project session."
+        setDescription("You have been invited to join a Saros session."
             + " Click next if you want to accept the invitation.");
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/wizban/invitation.png"));

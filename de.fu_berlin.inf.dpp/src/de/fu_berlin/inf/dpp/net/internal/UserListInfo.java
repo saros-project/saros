@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -20,7 +20,7 @@ public class UserListInfo extends DefaultInvitationInfo {
         super(sessionID, invitationID);
         for (User user : users) {
             UserListEntry newUser = new UserListEntry(user.getJID(), user
-                .getColorID(), user.getUserRole(), user.isInvitationComplete());
+                .getColorID(), user.getPermission(), user.isInvitationComplete());
             userList.add(newUser);
         }
     }
@@ -28,14 +28,14 @@ public class UserListInfo extends DefaultInvitationInfo {
     public static class UserListEntry {
         public JID jid;
         public int colorID;
-        public UserRole userRole;
+        public Permission permission;
         public boolean invitationComplete;
 
-        public UserListEntry(JID jid, int colorID, UserRole role,
+        public UserListEntry(JID jid, int colorID, Permission permission,
             boolean invitationComplete) {
             this.jid = jid;
             this.colorID = colorID;
-            this.userRole = role;
+            this.permission = permission;
             this.invitationComplete = invitationComplete;
         }
     }

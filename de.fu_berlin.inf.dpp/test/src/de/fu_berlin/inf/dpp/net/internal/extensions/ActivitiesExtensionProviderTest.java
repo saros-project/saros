@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
@@ -68,7 +68,8 @@ public class ActivitiesExtensionProviderTest {
         new FileActivityDataObject(jid, FileActivity.Type.Created, path, null,
             new byte[] { 34, 72 }, Purpose.ACTIVITY),
         new FolderActivityDataObject(jid, FolderActivity.Type.Created, path),
-        new RoleActivityDataObject(jid, new JID("user@server"), UserRole.DRIVER),
+        new PermissionActivityDataObject(jid, new JID("user@server"),
+            Permission.WRITE_ACCESS),
         new TextEditActivityDataObject(jid, 23, "foo\r\ntest\n\nbla", "bar",
             path), new TextSelectionActivityDataObject(jid, 1, 2, path),
         new ViewportActivityDataObject(jid, 5, 10, path) };
@@ -148,8 +149,8 @@ public class ActivitiesExtensionProviderTest {
     protected void assertRoundtrip(PacketExtension extension)
         throws XmlPullParserException, IOException {
         String xml = extension.toXML().replaceAll("\r", "");
-        assertEquals(aProvider.getPayload(extension), aProvider
-            .getPayload(parseExtension(xml)));
+        assertEquals(aProvider.getPayload(extension),
+            aProvider.getPayload(parseExtension(xml)));
     }
 
     protected PacketExtension createPacketExtension(

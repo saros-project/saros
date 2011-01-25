@@ -33,9 +33,9 @@ public class FollowModeAction extends Action implements Disposable {
     private static final Logger log = Logger.getLogger(FollowModeAction.class
         .getName());
 
-    protected ISharedProjectListener roleChangeListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener permissionChangeListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             updateEnablement();
         }
 
@@ -54,7 +54,7 @@ public class FollowModeAction extends Action implements Disposable {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
 
-            newSarosSession.addListener(roleChangeListener);
+            newSarosSession.addListener(permissionChangeListener);
             updateEnablement();
 
             /*
@@ -99,7 +99,7 @@ public class FollowModeAction extends Action implements Disposable {
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeListener(roleChangeListener);
+            oldSarosSession.removeListener(permissionChangeListener);
             updateEnablement();
         }
     };
@@ -161,7 +161,8 @@ public class FollowModeAction extends Action implements Disposable {
      * Returns the new user to follow.
      * 
      * If there is already a user followed <code>null</code> is returned, i.e.
-     * this is a toggeling method, otherwise a random driver is returned.
+     * this is a toggeling method, otherwise a random user with
+     * {@link User.Permission#WRITE_ACCESS} is returned.
      */
     protected User getNewToFollow() {
         ISarosSession sarosSession = sessionManager.getSarosSession();
@@ -171,11 +172,11 @@ public class FollowModeAction extends Action implements Disposable {
             return null;
         } else {
             for (User user : sarosSession.getParticipants()) {
-                if (user.isRemote() && user.isDriver()) {
+                if (user.isRemote() && user.hasWriteAccess()) {
                     return user;
                 }
             }
-            log.error("No driver to follow but action was enabled");
+            log.error("No user with write access to follow but action was enabled");
             return null;
         }
     }
@@ -196,12 +197,12 @@ public class FollowModeAction extends Action implements Disposable {
             return true;
         }
 
-        int driverCount = 0;
+        int usersWithWriteAccessCount = 0;
         for (User user : sarosSession.getParticipants()) {
-            if (user.isRemote() && user.isDriver())
-                driverCount++;
+            if (user.isRemote() && user.hasWriteAccess())
+                usersWithWriteAccessCount++;
         }
-        return driverCount == 1;
+        return usersWithWriteAccessCount == 1;
     }
 
     protected void updateEnablement() {

@@ -18,8 +18,8 @@ public class TestChatViewFunctions extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
      * </ol>
      * 
      * @throws AccessException

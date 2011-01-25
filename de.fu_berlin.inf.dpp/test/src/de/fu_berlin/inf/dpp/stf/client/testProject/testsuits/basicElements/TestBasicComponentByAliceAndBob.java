@@ -40,8 +40,8 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (bob.sessionV.isDriver())
-            alice.sessionV.removeDriverRoleGUI(bob.sessionV);
+        if (bob.sessionV.hasWriteAccess())
+            alice.sessionV.restrictToReadOnlyAccessGUI(bob.sessionV);
     }
 
     // @Test
@@ -57,7 +57,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
         assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
             bob.getBaseJid()));
         assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
-            OWN_CONTACT_NAME + ROLE_NAME));
+            OWN_CONTACT_NAME + PERMISSION_NAME));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
         assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
             SESSION_VIEW, "Share your screen with selected user"));
         alice.table.selectTableItemInView(SESSION_VIEW, OWN_CONTACT_NAME
-            + ROLE_NAME);
+            + PERMISSION_NAME);
         assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
             SESSION_VIEW, "Share your screen with selected user"));
     }
@@ -76,17 +76,17 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     public void clickContextMenuOfTableInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
         alice.table.clickContextMenuOfTableItemInView(SESSION_VIEW,
-            bob.getBaseJid(), "Give driver role");
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
-        bob.sessionV.waitUntilIsDriver();
-        assertTrue(bob.sessionV.isDriver());
+            bob.getBaseJid(), "Grant write access");
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        bob.sessionV.waitUntilHasWriteAccess();
+        assertTrue(bob.sessionV.hasWriteAccess());
     }
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
-            SESSION_VIEW, bob.getBaseJid(), "Give driver role"));
+            SESSION_VIEW, bob.getBaseJid(), "Grant write access"));
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
             SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }
@@ -95,7 +95,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         alice.sessionV.setFocusOnSessionView();
         assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
-            SESSION_VIEW, bob.getBaseJid(), "Give driver role"));
+            SESSION_VIEW, bob.getBaseJid(), "Grant write access"));
         assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(
             SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }

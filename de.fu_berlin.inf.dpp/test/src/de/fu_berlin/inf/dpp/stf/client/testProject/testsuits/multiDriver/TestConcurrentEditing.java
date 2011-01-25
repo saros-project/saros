@@ -48,7 +48,7 @@ public class TestConcurrentEditing extends STFTest {
             bob);
         bob.pEV.openFile(path);
 
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
 
         bob.editor.waitUntilEditorOpen(FILE);
         bob.editor.navigateInEditor(FILE, 0, 30);
@@ -99,7 +99,7 @@ public class TestConcurrentEditing extends STFTest {
             bob);
         bob.pEV.openClass(PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorActive(CLS1);
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
 
         String fileName = CLS1 + ".java";
         alice.editor.navigateInEditor(fileName, 3, 0);

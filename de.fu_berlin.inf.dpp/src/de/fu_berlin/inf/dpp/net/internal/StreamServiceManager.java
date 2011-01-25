@@ -1866,7 +1866,7 @@ public class StreamServiceManager implements Startable {
             // NOP
         }
 
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             // NOP
         }
 

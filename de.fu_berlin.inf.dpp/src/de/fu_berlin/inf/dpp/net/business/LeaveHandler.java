@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -74,8 +74,10 @@ public class LeaveHandler {
             if (user.isHost()) {
                 sessionManager.stopSarosSession();
 
-                WarningMessageDialog.showWarningMessage("Closing the Session",
-                    "Closing the session because the host left.");
+                SessionView.showNotification(
+                    "Closing the session",
+                    "Session was closed by inviter "
+                        + user.getHumanReadableName() + ".");
             } else {
                 // Client
                 Util.runSafeSWTSync(log, new Runnable() {

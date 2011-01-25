@@ -20,10 +20,10 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>Dave (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Dave (Read-Only Access)</li>
      * </ol>
      * 
      * @throws AccessException

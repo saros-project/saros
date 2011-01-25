@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.RevertBufferListener;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -97,7 +96,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
  * This includes the functionality of listening for user inputs in an editor,
- * locking the editors of the observer.
+ * locking the editors of the users with {@link User.Permission#READONLY_ACCESS}
+ * .
  * 
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in an class of the {@link IEditorAPI} type. (CO: This is the
@@ -105,9 +105,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  * 
- *         TODO CO Since it was forgotten to reset the DriverEditors after a
- *         session closed, it is highly likely that this whole class needs to be
- *         reviewed for restarting issues
+ *         TODO CO Since it was forgotten to reset the Editors of users with
+ *         {@link User.Permission#WRITE_ACCESS} after a session closed, it is
+ *         highly likely that this whole class needs to be reviewed for
+ *         restarting issues
  * 
  *         TODO CO This class contains too many different concerns: TextEdits,
  *         Editor opening and closing, Parsing of activityDataObjects, executing
@@ -125,7 +126,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected RemoteEditorManager remoteEditorManager;
 
-    protected RemoteDriverManager remoteDriverManager;
+    protected RemoteWriteAccessManager remoteWriteAccessManager;
 
     protected ISarosSession sarosSession;
 
@@ -136,7 +137,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     protected User userToFollow = null;
 
-    protected boolean isDriver;
+    protected boolean hasWriteAccess;
 
     protected final EditorPool editorPool = new EditorPool(this);
 
@@ -214,50 +215,14 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(final User user) {
+        public void permissionChanged(final User user) {
 
             // Make sure we have the up-to-date facts about ourself
-            isDriver = sarosSession.isDriver();
+            hasWriteAccess = sarosSession.hasWriteAccess();
 
             // Lock / unlock editors
             if (user.isLocal()) {
-                editorPool.setDriverEnabled(isDriver);
-            }
-
-            if (saros.getPreferenceStore().getBoolean(
-                PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
-
-                if (isDriver) {
-                    // If I became a driver, then I stop following
-                    if (user.isLocal() && userToFollow != null)
-                        setFollowing(null);
-
-                } else {
-                    // If I am not yet following anybody, or following an
-                    // observer
-                    if (userToFollow == null || userToFollow.isObserver()) {
-                        // If most recent change made somebody a driver
-                        if (user.isDriver() && user.isRemote()) {
-                            // start following...
-                            setFollowing(user);
-                        } else {
-                            // Find another driver to follow...
-                            boolean foundUser = false;
-                            for (User aUser : sarosSession.getParticipants()) {
-                                if (aUser.isDriver() && aUser.isRemote()) {
-                                    setFollowing(aUser);
-                                    foundUser = true;
-                                    break;
-                                }
-                            }
-                            // Did not find anybody, stopping to follow
-                            if (!foundUser) {
-                                if (userToFollow != null)
-                                    setFollowing(null);
-                            }
-                        }
-                    }
-                }
+                editorPool.setWriteAccessEnabled(hasWriteAccess);
             }
 
             // TODO [PERF] 1 Make this lazy triggered on activating a part?
@@ -330,14 +295,15 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
-            isDriver = sarosSession.isDriver();
+            hasWriteAccess = sarosSession.hasWriteAccess();
             sarosSession.addListener(sharedProjectListener);
 
             sarosSession.addActivityProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 newSarosSession);
             remoteEditorManager = new RemoteEditorManager(sarosSession);
-            remoteDriverManager = new RemoteDriverManager(sarosSession);
+            remoteWriteAccessManager = new RemoteWriteAccessManager(
+                sarosSession);
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -363,7 +329,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                         partActivated(activeEditor);
                     }
 
-                    // register bufferManager and initialize user's role in
+                    // register bufferManager and initialize user's permission
+                    // in
                     // session
                     buffListener = new RevertBufferListener(EditorManager.this,
                         sarosSession, fileReplacementInProgressObservable);
@@ -407,8 +374,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                     contributionAnnotationManager.dispose();
                     contributionAnnotationManager = null;
                     remoteEditorManager = null;
-                    remoteDriverManager.dispose();
-                    remoteDriverManager = null;
+                    remoteWriteAccessManager.dispose();
+                    remoteWriteAccessManager = null;
                     locallyActiveEditor = null;
                     locallyOpenEditors.clear();
                 }
@@ -680,15 +647,16 @@ public class EditorManager implements IActivityProvider, Disposable {
         TextEditActivity textEdit = new TextEditActivity(
             sarosSession.getLocalUser(), offset, text, replacedText, path);
 
-        if (!this.isDriver) {
+        if (!this.hasWriteAccess) {
             /**
-             * TODO If we are not a driver, then receiving this event might
-             * indicate that the user somehow achieved to change his document.
-             * We should run a consistency check.
+             * TODO If we don't have {@link User.Permission#WRITE_ACCESS}, then
+             * receiving this event might indicate that the user somehow
+             * achieved to change his document. We should run a consistency
+             * check.
              * 
              * But watch out for changes because of a consistency check!
              */
-            log.warn("Local buddy caused text changes as an observer: "
+            log.warn("Local buddy with read-only access caused text changes: "
                 + textEdit);
             return;
         }
@@ -739,7 +707,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         // First let the remote managers update itself based on the
         // activityDataObject
         remoteEditorManager.exec(activity);
-        remoteDriverManager.exec(activity);
+        remoteWriteAccessManager.exec(activity);
 
         activity.dispatch(activityDataObjectReceiver);
     }
@@ -807,7 +775,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         if (path == null) {
             EditorManager.log
-                .error("Received text selection but have no driver editor");
+                .error("Received text selection but have no writable editor");
             return;
         }
 
@@ -838,26 +806,30 @@ public class EditorManager implements IActivityProvider, Disposable {
         boolean following = user.equals(getFollowedUser());
 
         {
-            /*
-             * Check if source is an observed driver and his cursor is outside
+            /**
+             * Check if source is an observed user with
+             * {@link User.Permission#WRITE_ACCESS} and his cursor is outside
              * the viewport.
              */
-            ITextSelection driverSelection = remoteEditorManager
+            ITextSelection userWithWriteAccessSelection = remoteEditorManager
                 .getSelection(user);
-            /*
-             * driverSelection can be null if viewport activityDataObject came
-             * before the first text selection activityDataObject.
+            /**
+             * user with {@link User.Permission#WRITE_ACCESS} selection can be
+             * null if viewport activityDataObject came before the first text
+             * selection activityDataObject.
              */
-            if (driverSelection != null) {
-                /*
-                 * TODO MR Taking the last line of the driver's last selection
-                 * might be a bit inaccurate.
+            if (userWithWriteAccessSelection != null) {
+                /**
+                 * TODO MR Taking the last line of the last selection of the
+                 * user with {@link User.Permission#WRITE_ACCESS} might be a bit
+                 * inaccurate.
                  */
-                int driverCursor = driverSelection.getEndLine();
+                int userWithWriteAccessCursor = userWithWriteAccessSelection
+                    .getEndLine();
                 int top = viewport.getTopIndex();
                 int bottom = viewport.getBottomIndex();
                 following = following
-                    && (driverCursor < top || driverCursor > bottom);
+                    && (userWithWriteAccessCursor < top || userWithWriteAccessCursor > bottom);
             }
         }
 
@@ -865,7 +837,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             .getPath());
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
-            if (following || user.isDriver())
+            if (following || user.hasWriteAccess())
                 this.editorAPI.setViewportAnnotation(editorPart, lineRange,
                     user);
             if (following)
@@ -885,7 +857,10 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.activeEditorChanged(user, path);
 
-        // Path null means this driver has no active editor any more
+        /**
+         * Path null means this user with {@link User.Permission#WRITE_ACCESS}
+         * has no active editor any more
+         */
         if (user.equals(getFollowedUser()) && path != null) {
             editorAPI.openEditor(path);
         }
@@ -1310,7 +1285,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        editorListener.driverEditorSaved(path, true);
+        editorListener.userWithWriteAccessEditorSaved(path, true);
 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
@@ -1388,8 +1363,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Sends an activityDataObject for clients to save the editor of given path.
      * 
      * @param path
-     *            the project relative path to the resource that the driver was
-     *            editing.
+     *            the project relative path to the resource that the user with
+     *            {@link User.Permission#WRITE_ACCESS} was editing.
      */
     public void sendEditorActivitySaved(SPath path) {
 
@@ -1400,7 +1375,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         // editorPool, or?
         // What is the reason of this?
 
-        editorListener.driverEditorSaved(path, false);
+        editorListener.userWithWriteAccessEditorSaved(path, false);
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Saved, path));
     }
@@ -1597,7 +1572,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
-            if (user.isDriver() || user.equals(userToFollow)) {
+            if (user.hasWriteAccess() || user.equals(userToFollow)) {
                 ILineRange viewport = remoteEditor.getViewport();
                 if (viewport != null) {
                     editorAPI.setViewportAnnotation(editorPart, viewport, user);
@@ -1709,7 +1684,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
-        editorPool.setDriverEnabled(!lock && sarosSession.isDriver());
+        editorPool
+            .setWriteAccessEnabled(!lock && sarosSession.hasWriteAccess());
     }
 
     public void dispose() {
@@ -1718,10 +1694,11 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     /**
      * Triggers a "Document Revert" by other session participants. This happens
-     * when a driver rejected changes in file buffer (e.g. "Close editor"+
-     * "Do NOT save"). This method gets invoked, only when the user is a driver.
-     * It sends to other session participants two activityDataObjects which
-     * revert their documents:
+     * when a user with {@link User.Permission#WRITE_ACCESS} rejected changes in
+     * file buffer (e.g. "Close editor"+ "Do NOT save"). This method gets
+     * invoked, only when the user is a user with
+     * {@link User.Permission#WRITE_ACCESS}. It sends to other session
+     * participants two activityDataObjects which revert their documents:
      * <ul>
      * <li>TextEdit - replaces content of the document with new (reverted)
      * content</li>
@@ -1747,7 +1724,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         /**
          * TODO We should warn the user if he is reverting changes by other
-         * drivers
+         * users with {@link User.Permission#WRITE_ACCESS}
          * 
          * TODO If the UndoManager knows which changes were ours, we could
          * revert just those

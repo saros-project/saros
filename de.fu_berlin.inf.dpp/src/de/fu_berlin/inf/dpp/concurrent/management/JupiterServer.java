@@ -65,9 +65,9 @@ public class JupiterServer {
             // Create new local host document client
             docServer.addProxyClient(sarosSession.getHost().getJID());
 
-            // Add all drivers
-            for (User driver : sarosSession.getDrivers()) {
-                docServer.addProxyClient(driver.getJID());
+            /** Add all users with {@link User.Permission#WRITE_ACCESS} */
+            for (User userWithWriteAccess : sarosSession.getUsersWithWriteAccess()) {
+                docServer.addProxyClient(userWithWriteAccess.getJID());
             }
 
             this.concurrentDocuments.put(path, docServer);
@@ -82,8 +82,7 @@ public class JupiterServer {
     public synchronized Map<JID, JupiterActivity> transform(
         JupiterActivity jupiterActivity) throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(jupiterActivity
-            .getPath());
+        JupiterDocumentServer docServer = getServer(jupiterActivity.getPath());
 
         return docServer.transformJupiterActivity(jupiterActivity);
     }

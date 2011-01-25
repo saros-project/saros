@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -61,33 +61,33 @@ public interface ISarosSession extends IActivityListener {
     public List<User> getRemoteUsers();
 
     /**
-     * Initiates a role change. This method is called when the user wants to
-     * change user roles via the UI.
+     * Initiates a {@link User.Permission} change. This method is called when
+     * the user wants to change user {@link User.Permission}s via the UI.
      * 
      * @host This method may only called by the host.
      * @noSWT This method mustn't be called from the SWT UI thread
      * @param user
-     *            The user which role has to be changed.
-     * @blocking Returning after the role change is complete
+     *            The user which {@link User.Permission} has to be changed.
+     * @blocking Returning after the {@link User.Permission} change is complete
      * @cancelable
      * 
      * @Throws CancellationException
      * @Throws InterruptedException
      */
-    public void initiateRoleChange(User user, UserRole newRole,
+    public void initiatePermissionChange(User user, Permission newPermission,
         SubMonitor progress) throws CancellationException, InterruptedException;
 
     /**
-     * Set the role of the given user. This is called on incoming
-     * activityDataObjects from the network.
+     * Set the {@link User.Permission} of the given user. This is called on
+     * incoming activityDataObjects from the network.
      * 
      * @swt This method MUST to be called from the SWT UI thread
      * @param user
-     *            the user which role has to be set.
-     * @param role
-     *            The new role of the user.
+     *            the user which {@link User.Permission} has to be set.
+     * @param permission
+     *            The new {@link User.Permission} of the user.
      */
-    public void setUserRole(User user, UserRole role);
+    public void setPermission(User user, Permission permission);
 
     /**
      * Sets the {@link User#invitationComplete} flag to true;
@@ -98,10 +98,11 @@ public interface ISarosSession extends IActivityListener {
     public void userInvitationCompleted(final User user);
 
     /**
-     * @return <code>true</code> if the local client is a current driver of this
-     *         shared project. <code>false</code> otherwise.
+     * @return <code>true</code> if the local client is a user with
+     *         {@link User.Permission#WRITE_ACCESS} of this shared project.
+     *         <code>false</code> otherwise.
      */
-    public boolean isDriver();
+    public boolean hasWriteAccess();
 
     /**
      * The host is the person that initiated this SarosSession and holds all
@@ -206,9 +207,10 @@ public interface ISarosSession extends IActivityListener {
     public User getLocalUser();
 
     /**
-     * @return true, if there is exactly one driver, false otherwise.
+     * @return true, if there is exactly one user with
+     *         {@link User.Permission#WRITE_ACCESS}, false otherwise.
      */
-    public boolean isExclusiveDriver();
+    public boolean hasExclusiveWriteAccess();
 
     /**
      * the concurrent document manager is responsible for all jupiter controlled
@@ -294,39 +296,40 @@ public interface ISarosSession extends IActivityListener {
     public void removeActivityProvider(IActivityProvider provider);
 
     /**
-     * Returns a list of all users in this project which are drivers right now.
+     * Returns a list of all users in this project which have
+     * {@link User.Permission#WRITE_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           role change.
+     *           {@link User.Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
      */
-    public List<User> getDrivers();
+    public List<User> getUsersWithWriteAccess();
 
     /**
-     * Returns a list of all users in this project which are observers right
-     * now.
+     * Returns a list of all users in this project have
+     * {@link User.Permission#READONLY_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           role change.
+     *           {@link User.Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
      */
-    public List<User> getObservers();
+    public List<User> getUsersWithReadOnlyAccess();
 
     /**
-     * Returns all users in this project which are both remotely and observers
-     * right now.
+     * Returns all users in this project which are both remotely and have
+     * {@link User.Permission#READONLY_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           role change.
+     *           {@link User.Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
      */
-    public List<User> getRemoteObservers();
+    public List<User> getRemoteUsersWithReadOnlyAccess();
 
     /**
      * Returns the DateTime at which this SarosSession was started on the host.

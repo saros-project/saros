@@ -21,11 +21,11 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>Dave (Observer)</li>
-     * <li>Edna (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Dave (Read-Only Access)</li>
+     * <li>Edna (Read-Only Access)</li>
      * </ol>
      * 
      * @throws AccessException
@@ -123,6 +123,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.sarosC.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(edna.sessionV.isInSessionGUI());
-        assertFalse(alice.sessionV.isObserver(edna.jid));
+        assertFalse(alice.sessionV.hasReadOnlyAccess(edna.jid));
     }
 }

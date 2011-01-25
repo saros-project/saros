@@ -57,7 +57,10 @@ public class MakeOperationConcurrently {
             final Tester musician = peers.get(i);
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
-                    // Need to check for isDriver before leaving.
+                    /**
+                     * Need to check for {@link User.Permission#WRITE_ACCESS}
+                     * before leaving.
+                     */
                     musician.sessionV.leaveTheSessionByPeer();
                     return musician.sessionV.isParticipant(musician.jid);
                 }

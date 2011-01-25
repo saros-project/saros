@@ -6,8 +6,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -19,10 +20,10 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 @Component(module = "action")
-public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
+public class GiveWriteAccessAction extends SelectionProviderAction {
 
     private static final Logger log = Logger
-        .getLogger(GiveExclusiveDriverRoleAction.class.getName());
+        .getLogger(GiveWriteAccessAction.class.getName());
 
     protected User selectedUser;
 
@@ -32,12 +33,10 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             updateEnablement();
         }
     };
-
-    protected SarosSessionManager sessionManager;
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
@@ -54,15 +53,16 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
     };
 
-    public GiveExclusiveDriverRoleAction(SarosSessionManager sessionManager,
-        ISelectionProvider provider) {
-        super(provider, "Give exclusive driver role");
+    @Inject
+    protected SarosSessionManager sessionManager;
 
-        this.sessionManager = sessionManager;
+    public GiveWriteAccessAction(ISelectionProvider provider) {
+        super(provider, "Grant write access");
         setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/elcl16/giveexcldriver.png"));
-        setToolTipText("Give the exclusive driver role to this buddy");
+            .getImageDescriptor("icons/elcl16/grantwriteaccess.png"));
+        setToolTipText("Grant write access to this buddy");
 
+        Saros.injectDependenciesOnly(this);
         /*
          * if SessionView is not "visible" on session start up this constructor
          * will be called after session started (and the user uses this view)
@@ -73,9 +73,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
-
         sessionManager.addSarosSessionListener(sessionListener);
-
         updateEnablement();
     }
 
@@ -86,25 +84,11 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runGiveExclusiveDriver();
+                sarosUI.performPermissionChange(
+                    GiveWriteAccessAction.this.selectedUser,
+                    Permission.WRITE_ACCESS);
             }
         });
-    }
-
-    public void runGiveExclusiveDriver() {
-
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-
-        // set all participants other than the selected to observer
-        for (User user : sarosSession.getParticipants()) {
-            if ((user.isDriver() && !user.equals(this.selectedUser))) {
-                sarosUI.performRoleChange(user, UserRole.OBSERVER);
-            }
-        }
-
-        // if selected user is not already driver give him driver role
-        if (this.selectedUser.isObserver())
-            sarosUI.performRoleChange(this.selectedUser, UserRole.DRIVER);
     }
 
     @Override
@@ -115,26 +99,10 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     }
 
     protected void updateEnablement() {
-        setEnabled(shouldBeEnabled());
-    }
+        ISarosSession project = sessionManager.getSarosSession();
 
-    protected boolean shouldBeEnabled() {
-
-        // Nobody selected
-        if (this.selectedUser == null)
-            return false;
-
-        // Not in a shared project
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-
-        // Only the host can use this action
-        if (!sarosSession.isHost())
-            return false;
-
-        // Only enable if the user is observer or there is more than one driver
-        return this.selectedUser.isObserver()
-            || !sarosSession.isExclusiveDriver();
+        boolean enabled = ((project != null) && (this.selectedUser != null)
+            && project.isHost() && this.selectedUser.hasReadOnlyAccess());
+        setEnabled(enabled);
     }
 }

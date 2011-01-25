@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.rolesAndFollowmode;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode;
 
 import static org.junit.Assert.assertTrue;
 
@@ -15,16 +15,16 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestChangingDriverWhileOtherFollow extends STFTest {
+public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
 
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>Dave (Observer)</li>
-     * <li>All observers enable followmode</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Dave (Read-Only Access)</li>
+     * <li>All read-only users enable followmode</li>
      * </ol>
      * 
      * @throws AccessException
@@ -61,10 +61,10 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>alice makes carl exclusive driver.</li>
-     * <li>Observer are in follow mode.</li>
+     * <li>alice grants carl exclusive write access.</li>
+     * <li>read-only users are in follow mode.</li>
      * <li>carl opens a file and edit it.</li>
-     * <li>Observers leave follow mode after they saw the opened file.</li>
+     * <li>read-only users leave follow mode after they saw the opened file.</li>
      * <li>carl continue to edit the opened file, but doesn't save</li>
      * </ol>
      * 
@@ -72,14 +72,15 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
      * <ol>
      * <li></li>
      * <li></li>
-     * <li>Observers saw the opened file and the dirty flag of the file,</li>
+     * <li>read-only users saw the opened file and the dirty flag of the file,</li>
      * <li></li>
      * <li></li>
-     * <li>Edited file is opened and not saved at every observer</li>
+     * <li>Edited file is opened and not saved at every user with read-only
+     * access</li>
      * </ol>
      * 
-     * TODO: Tt exists still some bugs in saros by giving exclusive driver role,
-     * so you may get exception by perform this test.
+     * TODO: Tt exists still some bugs in saros by granding write access, so you
+     * may get exception by perform this test.
      * 
      * @throws CoreException
      * @throws IOException
@@ -89,14 +90,14 @@ public class TestChangingDriverWhileOtherFollow extends STFTest {
      */
 
     @Test
-    public void testChanginDriverWhileOtherFollow() throws IOException,
+    public void testChangingWriteAccessWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.sessionV.giveExclusiveDriverRoleGUI(carl.sessionV);
+        alice.sessionV.grantWriteAccessGUI(carl.sessionV);
         /*
-         * After new release 10.10.28 all of the observer is automatically in
-         * follow mode(are the observers really in follow mode???) when host
-         * give someone a exclusive driver role. So the following three line
-         * have to comment out, otherwise you should get timeoutException.
+         * After new release 10.10.28 all read-only users is automatically in
+         * follow mode(are the read-only users really in follow mode???) when
+         * host grants someone exclusive write access. So the following three
+         * line have to comment out, otherwise you should get timeoutException.
          */
         // alice.bot.waitUntilFollowed(carl.getBaseJid());
         // bob.bot.waitUntilFollowed(carl.getBaseJid());

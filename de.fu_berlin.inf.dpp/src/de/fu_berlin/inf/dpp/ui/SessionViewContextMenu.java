@@ -15,10 +15,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.JumpToDriverPositionAction;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
+import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
+import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 
 /**
  * This is the ContextMenu for the SessionView
@@ -28,10 +27,9 @@ public class SessionViewContextMenu {
 
     public SessionViewContextMenu(ViewPart sessionView, TableViewer viewer,
         final ChangeColorAction changedColourAction,
-        final JumpToDriverPositionAction jumpAction,
-        final RemoveDriverRoleAction removeDriverAction,
-        final GiveExclusiveDriverRoleAction exclusiveDriverAction,
-        final GiveDriverRoleAction giveDriverRoleAction,
+        final JumpToUserWithWriteAccessPositionAction jumpAction,
+        final RestrictToReadOnlyAccessAction restrictToReadOnlyAccessAction,
+        final GiveWriteAccessAction giveWriteAccessAction,
         final FollowThisPersonAction followAction,
         final PreferenceUtils preferences) {
 
@@ -39,18 +37,15 @@ public class SessionViewContextMenu {
         manager.setRemoveAllWhenShown(true);
         manager.addMenuListener(new IMenuListener() {
             public void menuAboutToShow(IMenuManager manager) {
-                manager.add(exclusiveDriverAction);
-                if (preferences.isMultiDriverEnabled()) {
-                    manager.add(giveDriverRoleAction);
-                    manager.add(removeDriverAction);
-                }
+                manager.add(giveWriteAccessAction);
+                manager.add(restrictToReadOnlyAccessAction);
                 manager.add(new Separator());
                 manager.add(followAction);
                 manager.add(jumpAction);
 
                 manager.add(new Separator());
                 manager.add(changedColourAction);
-                
+
                 // Other plug-ins can contribute their actions here
                 manager.add(new Separator(
                     IWorkbenchActionConstants.MB_ADDITIONS));

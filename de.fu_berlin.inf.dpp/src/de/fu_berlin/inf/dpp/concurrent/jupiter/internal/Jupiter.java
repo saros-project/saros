@@ -125,9 +125,9 @@ public class Jupiter implements Algorithm {
 
         int localOperationCount = this.vectorTime.getLocalOperationCount();
         if (timestamp == null) {
-            /*
+            /**
              * If this timestamp is null, this means it was sent to us while we
-             * were still an observer
+             * still had {@link User.Permission#READONLY_ACCESS}
              */
             return localOperationCount == 0;
         }

@@ -45,7 +45,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -276,7 +276,8 @@ public class SarosUI {
     /**
      * @swt
      */
-    public void performRoleChange(final User user, final UserRole newRole) {
+    public void performPermissionChange(final User user,
+        final Permission newPermission) {
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
             .getAWorkbenchWindow().getShell());
@@ -289,21 +290,22 @@ public class SarosUI {
 
                     try {
 
-                        progress.beginTask("Performing role change",
+                        progress.beginTask("Performing permission change",
                             IProgressMonitor.UNKNOWN);
 
-                        sessionManager.getSarosSession().initiateRoleChange(
-                            user, newRole, progress);
+                        sessionManager.getSarosSession()
+                            .initiatePermissionChange(user, newPermission,
+                                progress);
 
                     } catch (CancellationException e) {
-                        log.warn("Role change failed because buddy"
-                            + " canceled the role change");
+                        log.warn("Permission change failed because buddy"
+                            + " canceled the permission change");
                         Util.runSafeSWTSync(log, new Runnable() {
                             public void run() {
-                                MessageDialog.openInformation(
-                                    EditorAPI.getAWorkbenchWindow().getShell(),
-                                    "Role change failed",
-                                    "The role change was canceled. "
+                                MessageDialog.openInformation(EditorAPI
+                                    .getAWorkbenchWindow().getShell(),
+                                    "Permission change failed",
+                                    "The permission change was canceled. "
                                         + Util.getUserDescription(user));
                             }
                         });
@@ -316,10 +318,9 @@ public class SarosUI {
             });
         } catch (InvocationTargetException e) {
             log.error("Internal Error: ", e);
-            MessageDialog.openError(
-                EditorAPI.getAWorkbenchWindow().getShell(),
-                "Role change failed",
-                "Role change failed because of an internal error. "
+            MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
+                "Permission change failed",
+                "Permission change failed because of an internal error. "
                     + Util.getUserDescription(user) + " Please try again.");
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);

@@ -40,7 +40,7 @@ public class DirtyStateListener implements IElementStateListener {
         if (isDirty)
             return;
 
-        if (!this.editorManager.isDriver)
+        if (!this.editorManager.hasWriteAccess)
             return;
 
         if (!(element instanceof FileEditorInput))

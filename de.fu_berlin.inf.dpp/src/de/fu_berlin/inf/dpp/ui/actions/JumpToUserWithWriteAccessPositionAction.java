@@ -19,11 +19,11 @@ import de.fu_berlin.inf.dpp.util.Util;
  * user's one.
  */
 @Component(module = "action")
-public class JumpToDriverPositionAction extends SelectionProviderAction
+public class JumpToUserWithWriteAccessPositionAction extends SelectionProviderAction
     implements Disposable {
 
     private static final Logger log = Logger
-        .getLogger(JumpToDriverPositionAction.class.getName());
+        .getLogger(JumpToUserWithWriteAccessPositionAction.class.getName());
 
     protected SarosSessionManager sessionManager;
 
@@ -31,7 +31,7 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
 
     protected Saros saros;
 
-    public JumpToDriverPositionAction(Saros saros,
+    public JumpToUserWithWriteAccessPositionAction(Saros saros,
         SarosSessionManager sessionManager, EditorManager editorManager,
         ISelectionProvider provider) {
         super(provider, "Jump to position of selected buddy");

@@ -74,6 +74,7 @@ import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -594,14 +595,16 @@ public class Util {
     }
 
     /**
-     * @return a full sentence which describes the role of the given user, e.g.
-     *         "You are driver."
+     * @return a full sentence which describes the {@link User.Permission} of
+     *         the given user.
      */
     public static String getUserDescription(User user) {
-        if (user.isLocal())
-            return ("You are " + user.getUserRole().toString().toLowerCase() + ".");
-        return (user.getHumanReadableName() + " is "
-            + user.getUserRole().toString().toLowerCase() + ".");
+        String perm = ((user.getPermission() == Permission.WRITE_ACCESS) ? "write"
+            : "read-only")
+            + " access";
+
+        return user.isLocal() ? "You have " + perm + "." : user
+            .getHumanReadableName() + " has " + perm + ".";
     }
 
     /**

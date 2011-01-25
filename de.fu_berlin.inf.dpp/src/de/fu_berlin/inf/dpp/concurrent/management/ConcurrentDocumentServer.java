@@ -28,9 +28,9 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The ConcurrentDocumentServer is responsible for coordinating all
  * JupiterActivities.
  * 
- * All drivers (also the host!) will send their JupiterActivities to the
- * ConcurrentDocumentServer on the host, which transforms them (using Jupiter)
- * and then sends them to everybody else.
+ * All users with {@link User.Permission#WRITE_ACCESS} (also the host!) will
+ * send their JupiterActivities to the ConcurrentDocumentServer on the host,
+ * which transforms them (using Jupiter) and then sends them to everybody else.
  * 
  * A ConcurrentDocumentServer exists only on the host!
  */
@@ -75,16 +75,16 @@ public class ConcurrentDocumentServer implements Disposable {
     public class HostSideProjectListener extends AbstractSharedProjectListener {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
 
             if (user.isHost())
                 return;
 
-            if (user.isObserver()) {
-                // if driver changed to observer
+            if (user.hasReadOnlyAccess()) {
+                // if restricted to read-only
                 server.removeUser(user);
             } else {
-                // if user became a driver
+                // if user got write access
                 server.addUser(user);
             }
         }

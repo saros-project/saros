@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * ConcurrentDocumentClient is responsible for managing the Jupiter interaction
- * on the local side of drivers.
+ * on the local side of users with {@link User.Permission#WRITE_ACCESS}.
  * 
  * A client exists for every participant (also the host!) to take local
  * TextEdits and transforms them into JupiterActivities to send to the host.
@@ -62,13 +62,13 @@ public class ConcurrentDocumentClient implements Disposable {
 
     /**
      * ISharedProjectListener which is used to reset Jupiter on the client side,
-     * when the user is no longer a driver.
+     * when the user has no longer {@link User.Permission#WRITE_ACCESS}.
      */
     public class ClientSideProjectListener extends
         AbstractSharedProjectListener {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
 
             // Host always keeps his client docs
             if (sarosSession.isHost())
@@ -100,20 +100,23 @@ public class ConcurrentDocumentClient implements Disposable {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
-        final List<User> remObservers = sarosSession.getRemoteObservers();
+        final List<User> remoteUsersWithReadOnlyAccess = sarosSession
+            .getRemoteUsersWithReadOnlyAccess();
         final List<User> remoteUsers = sarosSession.getRemoteUsers();
         if (activity instanceof TextEditActivity) {
             TextEditActivity textEdit = (TextEditActivity) activity;
 
             result.add(new QueueItem(host, jupiterClient.generate(textEdit)));
 
-            /*
-             * This activityDataObject still needs to be sent to all observers,
-             * because they are not notified by
-             * receiveJupiterActivityHostSide(...).
+            /**
+             * This activityDataObject still needs to be sent to all users with
+             * {@link User.Permission#READONLY_ACCESS}, because they are not
+             * notified by receiveJupiterActivityHostSide(...).
              */
-            if (sarosSession.isHost() && remObservers.size() > 0) {
-                result.add(new QueueItem(remObservers, activity));
+            if (sarosSession.isHost()
+                && remoteUsersWithReadOnlyAccess.size() > 0) {
+                result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
+                    activity));
             }
         } else if (activity instanceof ChecksumActivity) {
             ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activity;
@@ -127,9 +130,12 @@ public class ConcurrentDocumentClient implements Disposable {
             result.add(new QueueItem(host, jupiterClient
                 .withTimestamp(checksumActivityDataObject)));
 
-            if (remObservers.size() > 0)
-                // Send general checksum to all observers
-                result.add(new QueueItem(remObservers,
+            if (remoteUsersWithReadOnlyAccess.size() > 0)
+                /**
+                 * Send general checksum to all users with
+                 * {@link User.Permission#READONLY_ACCESS}
+                 */
+                result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
                     checksumActivityDataObject));
         } else {
             if (remoteUsers.size() > 0)
@@ -167,7 +173,7 @@ public class ConcurrentDocumentClient implements Disposable {
                     result
                         .addAll(receiveActivity((JupiterActivity) activityDataObject));
                 } else if (activityDataObject instanceof ChecksumActivity
-                    && sarosSession.isDriver()) {
+                    && sarosSession.hasWriteAccess()) {
                     result
                         .addAll(receiveChecksum((ChecksumActivity) activityDataObject));
                 } else {
@@ -235,13 +241,16 @@ public class ConcurrentDocumentClient implements Disposable {
             result.executeLocally.add(textEdit);
         }
 
-        // Send text edits to all observers
+        /**
+         * Send text edits to all users with
+         * {@link User.Permission#READONLY_ACCESS}
+         */
         if (sarosSession.isHost()) {
-            List<User> observers = sarosSession.getObservers();
-            observers.remove(host);
-            if (!observers.isEmpty()) {
+            List<User> usersWithReadOnlyAccess = sarosSession.getUsersWithReadOnlyAccess();
+            usersWithReadOnlyAccess.remove(host);
+            if (!usersWithReadOnlyAccess.isEmpty()) {
                 for (IActivity activity : result.executeLocally) {
-                    result.add(new QueueItem(observers, activity));
+                    result.add(new QueueItem(usersWithReadOnlyAccess, activity));
                 }
             }
         }

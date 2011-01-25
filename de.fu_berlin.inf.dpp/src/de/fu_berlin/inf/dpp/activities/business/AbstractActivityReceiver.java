@@ -19,7 +19,7 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
-    public void receive(RoleActivity roleActivity) {
+    public void receive(PermissionActivity permissionActivity) {
         // do nothing
     }
 

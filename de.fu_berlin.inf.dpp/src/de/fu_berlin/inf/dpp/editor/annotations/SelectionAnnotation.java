@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 import de.fu_berlin.inf.dpp.User;
 
 /**
- * Marks text selected by both driver and observer.
+ * Marks text selected by both users with {@link User.Permission#WRITE_ACCESS}
+ * and {@link User.Permission#READONLY_ACCESS}.
  * 
  * Configuration of this annotation is done in the plugin-xml.
  * 
@@ -15,7 +16,6 @@ public class SelectionAnnotation extends SarosAnnotation {
 
     public SelectionAnnotation(User source, boolean isCursor) {
         super(SelectionAnnotation.TYPE, true, (isCursor ? "Cursor"
-            : "Selection")
-            + " of " + source.getHumanReadableName(), source);
+            : "Selection") + " of " + source.getHumanReadableName(), source);
     }
 }

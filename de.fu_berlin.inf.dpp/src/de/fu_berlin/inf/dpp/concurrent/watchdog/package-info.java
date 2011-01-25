@@ -13,7 +13,7 @@
  * 
  * <ol>
  * <li>Consistency is about files and folders, not about Editors, Viewports or
- * Roles</li>
+ * Permissions</li>
  * 
  * <li>The host is the reference point for consistency. The host himself thus
  * can never be in an inconsistent state.</li>

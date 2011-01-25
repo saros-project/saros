@@ -15,17 +15,17 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestDriverResetsFiles extends STFTest {
+public class TestUserWithWriteAccessResetsFiles extends STFTest {
 
     /**
      * Preconditions:
      * <ol>
      * 
-     * <li>alice (Host, Driver, all files are closed)</li>
-     * <li>bob (Observer)</li>
-     * <li>carl (Observer)</li>
-     * <li>dave (Observer in Follow-Mode)</li>
-     * <li>edna (Observer in Follow-Mode)</li>
+     * <li>alice (Host, Write Access, all files are closed)</li>
+     * <li>bob (Read-Only Access)</li>
+     * <li>carl (Read-Only Access)</li>
+     * <li>dave (Read-Only in Follow-Mode)</li>
+     * <li>edna (Read-Only in Follow-Mode)</li>
      * </ol>
      * 
      * @throws AccessException

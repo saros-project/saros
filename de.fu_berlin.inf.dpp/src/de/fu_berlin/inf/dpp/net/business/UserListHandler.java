@@ -86,7 +86,7 @@ public class UserListHandler {
                         // This user is not part of our project
                         newUser = new User(sarosSession, userEntry.jid,
                             userEntry.colorID);
-                        newUser.setUserRole(userEntry.userRole);
+                        newUser.setPermission(userEntry.permission);
                         if (userEntry.invitationComplete)
                             newUser.invitationCompleted();
 
@@ -103,8 +103,8 @@ public class UserListHandler {
                                 + " match known color id");
                         }
 
-                        // Update his role
-                        user.setUserRole(userEntry.userRole);
+                        // Update his permission
+                        user.setPermission(userEntry.permission);
 
                         // Update invitation status
                         if (userEntry.invitationComplete

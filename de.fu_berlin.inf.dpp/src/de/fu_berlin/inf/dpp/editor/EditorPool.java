@@ -17,6 +17,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
@@ -55,8 +56,8 @@ class EditorPool {
     /**
      * Tries to add an {@link IEditorPart} to the {@link EditorPool}. This
      * method also connects the editorPart with its data source (identified by
-     * associated {@link IFile}), makes it editable for driver, and registers
-     * listeners:
+     * associated {@link IFile}), makes it editable for user with
+     * {@link User.Permission#WRITE_ACCESS}, and registers listeners:
      * <ul>
      * <li>{@link IElementStateListener} on {@link IDocumentProvider} - listens
      * for the changes in the file connected with the editor (e.g. file gets
@@ -117,7 +118,7 @@ class EditorPool {
         this.editorManager.editorAPI.addSharedEditorListener(
             this.editorManager, editorPart);
         this.editorManager.editorAPI.setEditable(editorPart,
-            this.editorManager.isDriver);
+            this.editorManager.hasWriteAccess);
 
         IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
@@ -134,11 +135,12 @@ class EditorPool {
         editorInputMap.put(editorPart, input);
 
         this.editorManager.lastEditTimes.put(path, System.currentTimeMillis());
-        this.editorManager.lastRemoteEditTimes.put(path, System
-            .currentTimeMillis());
+        this.editorManager.lastRemoteEditTimes.put(path,
+            System.currentTimeMillis());
     }
 
-    public SPath getCurrentPath(IEditorPart editorPart, ISarosSession sarosSession) {
+    public SPath getCurrentPath(IEditorPart editorPart,
+        ISarosSession sarosSession) {
 
         IEditorInput input = editorInputMap.get(editorPart);
         if (input == null) {
@@ -298,15 +300,16 @@ class EditorPool {
 
     /**
      * Will set all IEditorParts in the EditorPool to be editable by the local
-     * user if isDriver == true. The editors will be locked if isDriver ==
-     * false.
+     * user if has {@link User.Permission#WRITE_ACCESS}. The editors will be
+     * locked otherwise.
      */
-    public void setDriverEnabled(boolean isDriver) {
+    public void setWriteAccessEnabled(boolean hasWriteAccess) {
 
-        log.trace("EditorPool.setDriverEnabled");
+        log.trace("EditorPool.setEditable");
 
         for (IEditorPart editorPart : getAllEditors()) {
-            this.editorManager.editorAPI.setEditable(editorPart, isDriver);
+            this.editorManager.editorAPI
+                .setEditable(editorPart, hasWriteAccess);
         }
     }
 

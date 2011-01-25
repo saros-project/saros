@@ -104,9 +104,8 @@ public class EditorAPI implements IEditorAPI {
                     IEditorStatusLine.class);
                 if (adapter != null) {
                     SessionView
-                        .showNotification(
-                            "Observer Notification",
-                            "You're not allowed to perform modifications while not being the driver of the session.");
+                        .showNotification("Read-Only Notification",
+                            "You have only read access and therefore can't perform modifications.");
                     Toolkit.getDefaultToolkit().beep();
                 }
             }
@@ -680,7 +679,10 @@ public class EditorAPI implements IEditorAPI {
         bottom = Math.max(0, Math.min(lines - 1, bottom));
 
         try {
-            // Show the middle of the driver's viewport.
+            /**
+             * Show the middle of the user's (with
+             * {@link User.Permission#WRITE_ACCESS}) viewport.
+             */
             viewer.revealRange(
                 document.getLineOffset(top + ((bottom - top) / 2)), 0);
         } catch (BadLocationException e) {

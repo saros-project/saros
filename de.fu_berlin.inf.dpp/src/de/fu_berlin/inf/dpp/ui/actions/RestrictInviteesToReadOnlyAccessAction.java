@@ -24,7 +24,7 @@ import org.eclipse.jface.action.Action;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -36,27 +36,25 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * this action remove all remote driver from project. Only the project host has
- * the driver role after this action is executed.
- * 
- * @author orieger
- * 
+ * this action remove all remote users with {@link User.Permission#WRITE_ACCESS}
+ * from project. Only the project host has {@link User.Permission#WRITE_ACCESS}
+ * after this action is executed.
  */
 @Component(module = "action")
-public class RemoveAllDriverRoleAction extends Action {
+public class RestrictInviteesToReadOnlyAccessAction extends Action {
 
-    public static final String ACTION_ID = RemoveAllDriverRoleAction.class
+    public static final String ACTION_ID = RestrictInviteesToReadOnlyAccessAction.class
         .getName();
 
     private static final Logger log = Logger
-        .getLogger(RemoveAllDriverRoleAction.class.getName());
+        .getLogger(RestrictInviteesToReadOnlyAccessAction.class.getName());
 
     @Inject
     protected SarosUI sarosUI;
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             updateEnablement();
         }
     };
@@ -65,7 +63,6 @@ public class RemoveAllDriverRoleAction extends Action {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            log.debug("RemoveAllDriverRoleAction: SessionStarted");
             newSarosSession.addListener(sharedProjectListener);
             updateEnablement();
         }
@@ -79,13 +76,14 @@ public class RemoveAllDriverRoleAction extends Action {
 
     protected SarosSessionManager sessionManager;
 
-    public RemoveAllDriverRoleAction(SarosSessionManager sessionManager) {
-        super("Remove driver roles");
+    public RestrictInviteesToReadOnlyAccessAction(
+        SarosSessionManager sessionManager) {
+        super("Restrict invitees to read-only access");
         this.sessionManager = sessionManager;
 
         setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/elcl16/removedrivers.png"));
-        setToolTipText("Remove all driver roles");
+            .getImageDescriptor("icons/elcl16/restrictinviteestoreadonlyaccess.png"));
+        setToolTipText("Restrict Invitees To Read-Only Access");
         setId(ACTION_ID);
 
         /*
@@ -110,17 +108,20 @@ public class RemoveAllDriverRoleAction extends Action {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runRemoveAllDrivers();
+                runRestriction();
             }
         });
     }
 
-    public void runRemoveAllDrivers() {
+    public void runRestriction() {
 
         ISarosSession sarosSession = sessionManager.getSarosSession();
         for (User user : sarosSession.getParticipants()) {
-            if (user.isDriver()) {
-                sarosUI.performRoleChange(user, UserRole.OBSERVER);
+            if (user.hasWriteAccess() && !user.isHost()) {
+                sarosUI.performPermissionChange(user,
+                    Permission.READONLY_ACCESS);
+            } else if (user.isHost() && !user.hasWriteAccess()) {
+                sarosUI.performPermissionChange(user, Permission.WRITE_ACCESS);
             }
         }
         updateEnablement();
@@ -129,6 +130,6 @@ public class RemoveAllDriverRoleAction extends Action {
     protected void updateEnablement() {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         setEnabled((sarosSession != null && sarosSession.isHost() && (sarosSession
-            .getDrivers().size() > 0)));
+            .getUsersWithWriteAccess().size() > 0)));
     }
 }

@@ -67,7 +67,7 @@ public class TestSharedProject {
 
     public @Test
     void createSharedProject() throws Exception {
-        session.setDriver(true);
+        session.setWriteAccess(true);
         session.setUseVersionControl(false);
 
         SharedProject sharedProject = new SharedProject(project, session);
@@ -78,7 +78,7 @@ public class TestSharedProject {
 
     public @Test
     void addFolder() throws Exception {
-        session.setDriver(true);
+        session.setWriteAccess(true);
         session.setUseVersionControl(false);
         SharedProject sharedProject = new SharedProject(project, session);
 
@@ -94,7 +94,7 @@ public class TestSharedProject {
 
     public @Test(expected = IllegalArgumentException.class)
     void checkUpdateFails() throws Exception {
-        session.setDriver(true);
+        session.setWriteAccess(true);
         session.setUseVersionControl(false);
         SharedProject sharedProject = new SharedProject(project, session);
         IFile kitty = project.getFile(new Path("kitty"));
@@ -103,7 +103,7 @@ public class TestSharedProject {
 
     public @Test
     void addFile() throws Exception {
-        session.setDriver(true);
+        session.setWriteAccess(true);
         session.setUseVersionControl(false);
         SharedProject sharedProject = new SharedProject(project, session);
 
@@ -123,7 +123,7 @@ public class TestSharedProject {
 
     public @Test
     void delete() throws Exception {
-        session.setDriver(true);
+        session.setWriteAccess(true);
         session.setUseVersionControl(false);
         SharedProject sharedProject = new SharedProject(project, session);
 

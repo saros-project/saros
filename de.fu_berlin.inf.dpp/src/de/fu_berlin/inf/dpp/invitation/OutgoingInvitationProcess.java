@@ -439,7 +439,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             // they have changed. How to ask Eclipse whether there are resource
             // changes?
             // if (outInvitationUI.confirmProjectSave(peer))
-            // TODO What if we're not a driver right now?
+            // TODO What if dont have write access right now?
             EditorAPI.saveProject(this.project, false);
             // else
             // throw new LocalCancellationException();
@@ -672,6 +672,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             synchronizeUserList();
         }
+
         subMonitor.setTaskName("Invitation has completed successfully.");
 
         invitationProcesses.removeInvitationProcess(this);

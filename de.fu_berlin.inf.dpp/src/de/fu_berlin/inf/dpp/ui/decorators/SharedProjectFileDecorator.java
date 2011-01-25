@@ -58,8 +58,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Decorates Shared Project files.
  * 
  * TODO CO SharedProjectFileDecorator does support multiple users but the
- * awareness shows all drivers and the person followed which is kind of
- * confusing.
+ * awareness shows all users with {@link User.Permission#WRITE_ACCESS} and the
+ * person followed which is kind of confusing.
  * 
  * @see ILightweightLabelDecorator *
  */
@@ -83,12 +83,12 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     /**
      * SharedProjectListener responsible for triggering an update on the
-     * decorations if there is a role change.
+     * decorations if there is a {@link User.Permission} change.
      */
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             updateDecorations(user);
         }
     };
@@ -272,7 +272,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     protected boolean containsUserToDisplay(List<User> activeUsers) {
 
         for (User user : activeUsers) {
-            if (user.isDriver() || user.equals(editorManager.getFollowedUser())) {
+            if (user.hasWriteAccess()
+                || user.equals(editorManager.getFollowedUser())) {
                 return true;
             }
         }

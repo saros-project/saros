@@ -55,8 +55,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     // Context menu's name of the table on the view
     private final static String CM_GIVE_EXCLUSIVE_DRIVER_ROLE = "Give exclusive driver role";
-    private final static String CM_GIVE_DRIVER_ROLE = "Give driver role";
-    private final static String CM_REMOVE_DRIVER_ROLE = "Remove driver role";
+    private final static String CM_GIVE_DRIVER_ROLE = "Grant write access";
+    private final static String CM_REMOVE_DRIVER_ROLE = "Restrict To Read-Only Access";
     private final static String CM_FOLLOW_THIS_USER = "Follow this user";
     private final static String CM_STOP_FOLLOWING_THIS_USER = "Stop following this user";
     private final static String CM_JUMP_TO_POSITION_SELECTED_USER = "Jump to position of selected user";
@@ -188,19 +188,19 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         throws RemoteException {
         String contactLabel;
         if (localJID.equals(contactJID)) {
-            if (isDriver())
+            if (hasWriteAccess())
                 contactLabel = OWN_CONTACT_NAME + ROLENAME;
             else
                 contactLabel = OWN_CONTACT_NAME;
         } else if (rosterV.hasBuddyNickName(contactJID)) {
-            if (isDriver(contactJID))
+            if (hasWriteAccess(contactJID))
                 contactLabel = rosterV.getBuddyNickName(contactJID) + " ("
                     + contactJID.getBase() + ")" + ROLENAME;
             else
                 contactLabel = rosterV.getBuddyNickName(contactJID) + " ("
                     + contactJID.getBase() + ")";
         } else {
-            if (isDriver(contactJID))
+            if (hasWriteAccess(contactJID))
                 contactLabel = contactJID.getBase() + ROLENAME;
             else
                 contactLabel = contactJID.getBase();
@@ -221,27 +221,27 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     /**********************************************
      * 
-     * context menu of a contact on the view: give/remove driver role
+     * context menu of a contact on the view: give/Restrict To Read-Only Access
      * 
      **********************************************/
     public void giveDriverRole(final JID jidOfPeer) throws RemoteException {
         // TODO add the correct implementation
     }
 
-    public void giveDriverRoleGUI(final SessionView sessionV)
+    public void grantWriteAccessGUI(final SessionView sessionV)
         throws RemoteException {
         final JID jidOfPeer = sessionV.getJID();
-        if (isDriver(jidOfPeer)) {
+        if (hasWriteAccess(jidOfPeer)) {
             throw new RuntimeException(
                 "User \""
                     + jidOfPeer.getBase()
-                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
+                    + "\" already has write access! Please pass a correct Musician Object to the method.");
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
         tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
             CM_GIVE_DRIVER_ROLE);
-        sessionV.waitUntilIsDriver();
+        sessionV.waitUntilHasWriteAccess();
     }
 
     public void giveExclusiveDriverRole(final JID jidOfPeer)
@@ -249,87 +249,87 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         // TODO add the correct implementation
     }
 
-    public void giveExclusiveDriverRoleGUI(final SessionView sessionV)
+    public void giveExclusiveWriteAccessGUI(final SessionView sessionV)
         throws RemoteException {
         final JID jidOfPeer = sessionV.getJID();
-        if (isDriver(jidOfPeer)) {
+        if (hasWriteAccess(jidOfPeer)) {
             throw new RuntimeException(
                 "User \""
                     + jidOfPeer.getBase()
-                    + "\" is already a driver! Please pass a correct Musician Object to the method.");
+                    + "\" already has write access! Please pass a correct Musician Object to the method.");
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
         tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
             CM_GIVE_EXCLUSIVE_DRIVER_ROLE);
-        sessionV.waitUntilIsDriver();
+        sessionV.waitUntilHasWriteAccess();
     }
 
-    public void removeDriverRole(final SessionView sessionV)
+    public void restrictToReadOnlyAccess(final SessionView sessionV)
         throws RemoteException {
         // TODO add the correct implementation
     }
 
-    public void removeDriverRoleGUI(final SessionView sessionV)
+    public void restrictToReadOnlyAccessGUI(final SessionView sessionV)
         throws RemoteException {
         final JID jidOfPeer = sessionV.getJID();
-        if (!sessionV.isDriver()) {
+        if (!sessionV.hasWriteAccess()) {
             throw new RuntimeException(
                 "User \""
                     + jidOfPeer.getBase()
-                    + "\" is  no driver! Please pass a correct Musician Object to the method.");
+                    + "\" has read-only access! Please pass a correct Musician Object to the method.");
         }
         precondition();
         String contactLabel = getContactStatusInSessionView(jidOfPeer);
         tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
             CM_REMOVE_DRIVER_ROLE);
-        sessionV.waitUntilIsNoDriver();
+        sessionV.waitUntilHasReadOnlyAccess();
     }
 
-    public void waitUntilIsDriver() throws RemoteException {
+    public void waitUntilHasWriteAccess() throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return isDriver();
+                return hasWriteAccess();
             }
 
             public String getFailureMessage() {
-                return localJID.getBase() + " is not a driver.";
+                return localJID.getBase() + " has read-only access.";
             }
         });
     }
 
-    public void waitUntilIsDriver(final JID jid) throws RemoteException {
+    public void waitUntilHasWriteAccess(final JID jid) throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return isDriver(jid);
+                return hasWriteAccess(jid);
             }
 
             public String getFailureMessage() {
-                return jid.getBase() + " is not a driver.";
+                return jid.getBase() + " has read-only access.";
             }
         });
     }
 
-    public void waitUntilIsNoDriver() throws RemoteException {
+    public void waitUntilHasReadOnlyAccess() throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !isDriver();
+                return !hasWriteAccess();
             }
 
             public String getFailureMessage() {
-                return localJID.getBase() + " is still a driver.";
+                return localJID.getBase() + " has read-only access";
             }
         });
     }
 
-    public boolean isDriver() throws RemoteException {
+    public boolean hasWriteAccess() throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
             return false;
-        return sarosSession.isDriver();
+        return sarosSession.hasWriteAccess();
     }
 
-    public boolean isDriver(JID jid) throws RemoteException {
+    public boolean hasWriteAccess(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
             return false;
@@ -337,11 +337,11 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         if (user == null)
             return false;
         log.debug("isDriver(" + jid.toString() + ") == "
-            + sarosSession.getDrivers().contains(user));
-        return sarosSession.getDrivers().contains(user);
+            + sarosSession.getUsersWithWriteAccess().contains(user));
+        return sarosSession.getUsersWithWriteAccess().contains(user);
     }
 
-    public boolean areDrivers(List<JID> jids) {
+    public boolean haveWriteAccess(List<JID> jids) {
         boolean result = true;
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
@@ -349,7 +349,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         for (JID jid : jids) {
             try {
                 User user = sarosSession.getUser(jid);
-                result &= sarosSession.getDrivers().contains(user);
+                result &= sarosSession.getUsersWithWriteAccess().contains(user);
             } catch (Exception e) {
                 return false;
             }
@@ -357,22 +357,23 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         return result;
     }
 
-    public boolean isExclusiveDriver() throws RemoteException {
+    public boolean hasExclusiveWriteAccess() throws RemoteException {
         try {
             ISarosSession sarosSession = sessionManager.getSarosSession();
             if (sarosSession == null)
                 return false;
-            return sarosSession.isExclusiveDriver();
+            return sarosSession.hasExclusiveWriteAccess();
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean isExclusiveDriver(JID jid) throws RemoteException {
+    public boolean hasExclusiveWriteAccess(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
             return false;
-        if (isDriver(jid) && sarosSession.getDrivers().size() == 1)
+        if (hasWriteAccess(jid)
+            && sarosSession.getUsersWithWriteAccess().size() == 1)
             return true;
         return false;
     }
@@ -393,23 +394,23 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         return result;
     }
 
-    public boolean isObserver() throws RemoteException {
-        return isObserver(getJID());
+    public boolean hasReadOnlyAccess() throws RemoteException {
+        return hasReadOnlyAccess(getJID());
     }
 
-    public boolean isObserver(JID jid) throws RemoteException {
+    public boolean hasReadOnlyAccess(JID jid) throws RemoteException {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
             return false;
         User user = sarosSession.getUser(jid);
         if (user == null)
             return false;
-        log.debug("isObserver(" + jid.toString() + ") == "
-            + sarosSession.getObservers().contains(user));
-        return sarosSession.getObservers().contains(user);
+        log.debug("hasReadOnlyAccess(" + jid.toString() + ") == "
+            + sarosSession.getUsersWithReadOnlyAccess().contains(user));
+        return sarosSession.getUsersWithReadOnlyAccess().contains(user);
     }
 
-    public boolean areObservers(List<JID> jids) {
+    public boolean haveReadOnlyAccess(List<JID> jids) {
         boolean result = true;
         ISarosSession sarosSession = sessionManager.getSarosSession();
         if (sarosSession == null)
@@ -417,7 +418,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         for (JID jid : jids) {
             try {
                 User user = sarosSession.getUser(jid);
-                result &= sarosSession.getObservers().contains(user);
+                result &= sarosSession.getUsersWithReadOnlyAccess().contains(
+                    user);
             } catch (Exception e) {
                 return false;
             }
@@ -699,15 +701,16 @@ public class SessionViewImp extends EclipsePart implements SessionView {
      * toolbar button on the view: remove all river role
      * 
      **********************************************/
-    public void removeAllRriverRolesGUI() throws RemoteException {
+    public void restrictInviteesToReadOnlyAccessGUI() throws RemoteException {
         precondition();
-        if (isRemoveAllRiverEnabled()) {
+        if (isRestrictInviteesToReadOnlyAccessEnabled()) {
             clickToolbarButtonWithTooltip(TB_REMOVE_ALL_DRIVER_ROLES);
             shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
         }
     }
 
-    public boolean isRemoveAllRiverEnabled() throws RemoteException {
+    public boolean isRestrictInviteesToReadOnlyAccessEnabled()
+        throws RemoteException {
         precondition();
         return isToolbarButtonEnabled(TB_REMOVE_ALL_DRIVER_ROLES);
     }

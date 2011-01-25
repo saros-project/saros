@@ -43,8 +43,8 @@ public class TestSVNStateInitialization extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
      * <li>Alice has the project {@link STFTest#SVN_PROJECT_COPY}, which is
      * checked out from SVN:<br>
      * repository: {@link STFTest#SVN_REPOSITORY_URL}<br>
@@ -128,9 +128,9 @@ public class TestSVNStateInitialization extends STFTest {
         alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.sessionV.isDriver());
+        assertTrue(alice.sessionV.hasWriteAccess());
         assertTrue(alice.sessionV.isParticipant(bob.jid));
-        assertTrue(bob.sessionV.isObserver(bob.jid));
+        assertTrue(bob.sessionV.hasReadOnlyAccess(bob.jid));
     }
 
     /**

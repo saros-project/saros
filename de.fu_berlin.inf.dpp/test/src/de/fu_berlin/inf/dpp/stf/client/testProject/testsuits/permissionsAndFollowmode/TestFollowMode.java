@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.rolesAndFollowmode;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode;
 
 import static org.junit.Assert.assertTrue;
 
@@ -42,8 +42,8 @@ public class TestFollowMode extends STFTest {
     }
 
     /**
-     * TODO: It exists still some bugs in saros by giving exclusive driver role,
-     * so you may get exception by perform this test.
+     * TODO: It exists still some bugs in saros by granting write access, so you
+     * may get exception by perform this test.
      * 
      * @throws IOException
      * @throws CoreException
@@ -70,10 +70,10 @@ public class TestFollowMode extends STFTest {
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
         /*
-         * After new release 10.10.28 all of the observer is automatically in
-         * follow mode(are the observers really in follow mode???) when host
-         * give someone a exclusive driver role. So the following line have to
-         * comment out, otherwise you should get WidgetNotFoundException.
+         * After new release 10.10.28 all read-only users are automatically in
+         * follow mode(are the read-only users really in follow mode???) when
+         * host give someone exclusive write access. So the following line have
+         * to comment out, otherwise you should get WidgetNotFoundException.
          */
         // alice.sessionV.followThisUser(bob.state);
         bob.editor.activateJavaEditor(CLS1);

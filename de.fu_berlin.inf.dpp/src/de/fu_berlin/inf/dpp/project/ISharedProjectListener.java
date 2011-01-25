@@ -23,23 +23,28 @@ import de.fu_berlin.inf.dpp.User;
 
 /**
  * Listens for events that can happen during a Saros session. For life-cycle
- * events like the start and end of sessions use the {@link ISarosSessionListener}.
+ * events like the start and end of sessions use the
+ * {@link ISarosSessionListener}.
  * 
  * TODO: Rename, it has nothing to do with projects.
  * 
  * @author rdjemili
  */
 public interface ISharedProjectListener {
-    // TODO add some easy way to check if given driver is the client (you)
+    /**
+     * TODO add some easy way to check if given user with
+     * {@link User.Permission#WRITE_ACCESS} is the client (you)
+     */
 
     /**
-     * The user role of the given participant has been changed. This is called
-     * after the role of the user has been updated to represent the new state.
+     * The user {@link User.Permission} of the given participant has been
+     * changed. This is called after the {@link User.Permission} of the user has
+     * been updated to represent the new state.
      * 
      * @param user
-     *            the user who's role changed.
+     *            the user who's {@link User.Permission} changed.
      */
-    public void roleChanged(User user);
+    public void permissionChanged(User user);
 
     /**
      * Is fired when an user joins the shared project.

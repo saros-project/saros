@@ -23,35 +23,37 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
- * A role activityDataObject indicates that a user has a new Role in the
- * Driver/Observer schemes of things.
+ * A {@link PermissionActivityDataObject} indicates that a user has a new
+ * {@link User.Permission}.
  */
-@XStreamAlias("roleActivity")
-public class RoleActivityDataObject extends AbstractActivityDataObject {
+@XStreamAlias("permissionActivity")
+public class PermissionActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    protected final UserRole role;
+    protected final Permission permission;
 
     @XStreamAsAttribute
     @XStreamConverter(JIDConverter.class)
     protected final JID affectedUser;
 
     /**
-     * Creates a new RoleActivityDataObject which indicates that the given user
-     * should change into the given role.
+     * Creates a new PermissionActivityDataObject which indicates that the given
+     * user should change into the given permission.
      */
-    public RoleActivityDataObject(JID source, JID affectedUser, UserRole role) {
+    public PermissionActivityDataObject(JID source, JID affectedUser,
+        Permission permission) {
         super(source);
         this.affectedUser = affectedUser;
-        this.role = role;
+        this.permission = permission;
     }
 
     @Override
@@ -60,7 +62,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
         int result = super.hashCode();
         result = prime * result
             + ((affectedUser == null) ? 0 : affectedUser.hashCode());
-        result = prime * result + ((role == null) ? 0 : role.hashCode());
+        result = prime * result
+            + ((permission == null) ? 0 : permission.hashCode());
         return result;
     }
 
@@ -70,18 +73,18 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof RoleActivityDataObject))
+        if (!(obj instanceof PermissionActivityDataObject))
             return false;
-        RoleActivityDataObject other = (RoleActivityDataObject) obj;
+        PermissionActivityDataObject other = (PermissionActivityDataObject) obj;
         if (affectedUser == null) {
             if (other.affectedUser != null)
                 return false;
         } else if (!affectedUser.equals(other.affectedUser))
             return false;
-        if (role == null) {
-            if (other.role != null)
+        if (permission == null) {
+            if (other.permission != null)
                 return false;
-        } else if (!role.equals(other.role))
+        } else if (!permission.equals(other.permission))
             return false;
         return true;
     }
@@ -90,18 +93,18 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
         return affectedUser;
     }
 
-    public UserRole getRole() {
-        return role;
+    public Permission getPermission() {
+        return permission;
     }
 
     @Override
     public String toString() {
-        return "RoleActivityDataObject(user:" + this.getAffectedUser()
-            + ",new role:" + this.getRole() + ")";
+        return "PermissionActivityDataObject(user:" + this.getAffectedUser()
+            + ",new permission:" + this.getPermission() + ")";
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new RoleActivity(sarosSession.getUser(source), sarosSession
-            .getUser(affectedUser), role);
+        return new PermissionActivity(sarosSession.getUser(source),
+            sarosSession.getUser(affectedUser), permission);
     }
 }

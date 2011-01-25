@@ -300,7 +300,7 @@ public class JoinSessionWizard extends Wizard {
                     String message = "The selected project '"
                         + projectName
                         + "' will be used as a target project to carry out the synchronization.\n\n"
-                        + "All local changes in the project will be overwritten using the host's project and additional files will be deleted!\n\n"
+                        + "All local changes in the project will be overwritten using the inviter's project and additional files will be deleted!\n\n"
                         + "Press No and select 'Create copy...' in the invitation dialog if you are unsure.\n\n"
                         + "Do you want to proceed?";
 

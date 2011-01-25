@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -26,15 +26,15 @@ import de.fu_berlin.inf.dpp.project.SharedProject;
 
 public class SarosSessionStub implements ISarosSession {
 
-    private boolean isDriver;
+    private boolean hasWriteAccess;
     private boolean useVersionControl;
 
     public void setUseVersionControl(boolean b) {
         useVersionControl = b;
     }
 
-    public void setDriver(boolean b) {
-        isDriver = b;
+    public void setWriteAccess(boolean b) {
+        hasWriteAccess = b;
     }
 
     public void userInvitationCompleted(User user) {
@@ -55,7 +55,7 @@ public class SarosSessionStub implements ISarosSession {
 
     }
 
-    public void setUserRole(User user, UserRole role) {
+    public void setPermission(User user, Permission permission) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
@@ -98,15 +98,15 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public boolean isExclusiveDriver() {
+    public boolean hasExclusiveWriteAccess() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public boolean isDriver() {
-        return isDriver;
+    public boolean hasWriteAccess() {
+        return hasWriteAccess;
     }
 
-    public void initiateRoleChange(User user, UserRole newRole,
+    public void initiatePermissionChange(User user, Permission newPermission,
         SubMonitor progress) throws CancellationException, InterruptedException {
         throw new RuntimeException("Unexpected call to Stub");
 
@@ -144,7 +144,7 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public List<User> getRemoteObservers() {
+    public List<User> getRemoteUsersWithReadOnlyAccess() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -164,7 +164,7 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public List<User> getObservers() {
+    public List<User> getUsersWithReadOnlyAccess() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -180,7 +180,7 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public List<User> getDrivers() {
+    public List<User> getUsersWithWriteAccess() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

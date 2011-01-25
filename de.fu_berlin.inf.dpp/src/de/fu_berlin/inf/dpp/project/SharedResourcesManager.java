@@ -222,7 +222,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected void handlePostChange(IResourceChangeEvent event) {
         assert sarosSession != null;
 
-        if (!sarosSession.isDriver()) {
+        if (!sarosSession.hasWriteAccess()) {
             return;
         }
 

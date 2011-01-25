@@ -106,7 +106,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected ListExplanation howTo = new ListExplanation(
         SWT.ICON_INFORMATION,
         "In order to share your screen with a session participant please do the following steps:",
-        "Open Shared Project Session",
+        "Open Saros session",
         "Select a participant with whom you want to share your screen",
         "Click on the \"" + VideoSharingAction.TOOLTIP_START_SESSION
             + "\" button in the view's toolbar");

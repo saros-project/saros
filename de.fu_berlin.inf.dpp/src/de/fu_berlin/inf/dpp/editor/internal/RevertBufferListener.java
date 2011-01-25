@@ -68,9 +68,9 @@ public class RevertBufferListener {
                 if (fileReplacementInProgress.isReplacementInProgress())
                     return;
 
-                if (!sarosSession.isDriver()) {
+                if (!sarosSession.hasWriteAccess()) {
                     // TODO Trigger consistency recovery/check
-                    log.warn("Observer reverted must cause inconsistencies");
+                    log.warn("User with read-only access reverted must cause inconsistencies");
                     return;
                 }
 
@@ -78,16 +78,14 @@ public class RevertBufferListener {
                 // ITextFileBuffer
                 // only editing (and reverting) of text files is supported
                 if (!(buffer instanceof ITextFileBuffer)) {
-                    log
-                        .error("Trying to dispose a buffer that is NOT ITextFileBuffer");
+                    log.error("Trying to dispose a buffer that is NOT ITextFileBuffer");
                     return;
                 }
                 ITextFileBuffer tfBuffer = (ITextFileBuffer) buffer;
 
                 // Get old content
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                IResource fileResource = root
-                    .findMember(tfBuffer.getLocation());
+                IResource fileResource = root.findMember(tfBuffer.getLocation());
 
                 if (fileResource == null)
                     return;
@@ -115,8 +113,7 @@ public class RevertBufferListener {
                 try {
                     newContent = IOUtils.toString(is, tfBuffer.getEncoding());
                 } catch (IOException e) {
-                    log
-                        .warn("Could not read from the InputStream of the document");
+                    log.warn("Could not read from the InputStream of the document");
                     return;
                 } finally {
                     IOUtils.closeQuietly(is);

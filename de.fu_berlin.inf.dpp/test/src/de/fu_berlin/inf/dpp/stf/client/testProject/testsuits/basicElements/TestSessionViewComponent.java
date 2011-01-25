@@ -42,7 +42,7 @@ public class TestSessionViewComponent extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetDriverRole(alice, bob);
+        resetWriteAccess(alice, bob);
         resetFollowModel(alice, bob);
     }
 
@@ -64,73 +64,47 @@ public class TestSessionViewComponent extends STFTest {
     }
 
     @Test
-    public void testGiveDriverRole() throws RemoteException {
+    public void testGrantWriteAccess() throws RemoteException {
         alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME);
+            OWN_CONTACT_NAME + PERMISSION_NAME);
         alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
             bob.getBaseJid());
         bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
             OWN_CONTACT_NAME);
         bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            alice.getBaseJid() + ROLE_NAME);
+            alice.getBaseJid() + PERMISSION_NAME);
 
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
-        assertTrue(alice.sessionV.isDriver());
-        assertTrue(alice.sessionV.isDriver(bob.jid));
-        assertTrue(bob.sessionV.isDriver());
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        assertTrue(alice.sessionV.hasWriteAccess());
+        assertTrue(alice.sessionV.hasWriteAccess(bob.jid));
+        assertTrue(bob.sessionV.hasWriteAccess());
 
         alice.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME);
+            OWN_CONTACT_NAME + PERMISSION_NAME);
         alice.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            bob.getBaseJid() + ROLE_NAME);
+            bob.getBaseJid() + PERMISSION_NAME);
         bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME);
+            OWN_CONTACT_NAME + PERMISSION_NAME);
         bob.sessionV.getContactStatusInSessionView(alice.jid).equals(
-            alice.getBaseJid() + ROLE_NAME);
+            alice.getBaseJid() + PERMISSION_NAME);
     }
 
     @Test
-    public void testGiveExclusiveDriverRole() throws RemoteException {
+    public void testRestrictToReadOnlyAccess() throws RemoteException {
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        assertTrue(alice.sessionV.hasWriteAccess());
+        assertTrue(bob.sessionV.hasWriteAccess());
+        alice.sessionV.restrictToReadOnlyAccessGUI(bob.sessionV);
+        assertTrue(alice.sessionV.hasWriteAccess());
+        assertFalse(bob.sessionV.hasWriteAccess());
         assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(OWN_CONTACT_NAME + ROLE_NAME));
-        assertTrue(alice.sessionV.getContactStatusInSessionView(bob.jid)
-            .equals(bob.getBaseJid()));
-        assertTrue(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME));
-        assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(alice.getBaseJid() + ROLE_NAME));
-
-        log.trace("alice give bob exclusive driver role.");
-        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
-        assertFalse(alice.sessionV.isDriver());
-        assertTrue(bob.sessionV.isDriver());
-
-        assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(OWN_CONTACT_NAME));
-        assertTrue(alice.sessionV.getContactStatusInSessionView(bob.jid)
-            .equals(bob.getBaseJid() + ROLE_NAME));
-        assertTrue(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME));
-        assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(alice.getBaseJid()));
-    }
-
-    @Test
-    public void removeDriverRole() throws RemoteException {
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
-        assertTrue(alice.sessionV.isDriver());
-        assertTrue(bob.sessionV.isDriver());
-        alice.sessionV.removeDriverRoleGUI(bob.sessionV);
-        assertTrue(alice.sessionV.isDriver());
-        assertFalse(bob.sessionV.isDriver());
-        assertTrue(alice.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(OWN_CONTACT_NAME + ROLE_NAME));
+            .equals(OWN_CONTACT_NAME + PERMISSION_NAME));
         assertFalse(alice.sessionV.getContactStatusInSessionView(bob.jid)
-            .equals(bob.getBaseJid() + ROLE_NAME));
+            .equals(bob.getBaseJid() + PERMISSION_NAME));
         assertFalse(bob.sessionV.getContactStatusInSessionView(bob.jid).equals(
-            OWN_CONTACT_NAME + ROLE_NAME));
+            OWN_CONTACT_NAME + PERMISSION_NAME));
         assertTrue(bob.sessionV.getContactStatusInSessionView(alice.jid)
-            .equals(alice.getBaseJid() + ROLE_NAME));
+            .equals(alice.getBaseJid() + PERMISSION_NAME));
     }
 
     @Test
@@ -205,18 +179,18 @@ public class TestSessionViewComponent extends STFTest {
     }
 
     @Test
-    public void removeAllDriverGUI() throws RemoteException {
+    public void testRestrictInviteesToReadOnlyAccessGUI() throws RemoteException {
         assertTrue(alice.sessionV.isHost());
-        assertTrue(alice.sessionV.isRemoveAllRiverEnabled());
-        assertFalse(bob.sessionV.isRemoveAllRiverEnabled());
-        assertTrue(alice.sessionV.isDriver());
-        assertFalse(bob.sessionV.isDriver());
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
-        assertTrue(bob.sessionV.isDriver());
-        alice.sessionV.removeAllRriverRolesGUI();
-        assertFalse(alice.sessionV.isDriver());
-        bob.sessionV.waitUntilIsNoDriver();
-        assertFalse(bob.sessionV.isDriver());
+        assertTrue(alice.sessionV.isRestrictInviteesToReadOnlyAccessEnabled());
+        assertFalse(bob.sessionV.isRestrictInviteesToReadOnlyAccessEnabled());
+        assertTrue(alice.sessionV.hasWriteAccess());
+        assertFalse(bob.sessionV.hasWriteAccess());
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        assertTrue(bob.sessionV.hasWriteAccess());
+        alice.sessionV.restrictInviteesToReadOnlyAccessGUI();
+        assertFalse(alice.sessionV.hasWriteAccess());
+        bob.sessionV.waitUntilHasReadOnlyAccess();
+        assertFalse(bob.sessionV.hasWriteAccess());
     }
 
     /**

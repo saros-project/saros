@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class ParticipantCollector extends AbstractStatisticCollector {
 
     protected static final Logger log = Logger
-        .getLogger(RoleChangeCollector.class.getName());
+        .getLogger(PermissionChangeCollector.class.getName());
 
     /** a map to contain the number of participants and the associated times */
     protected Map<Integer, Long> participantTimes = new HashMap<Integer, Long>();

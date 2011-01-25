@@ -20,29 +20,30 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A role activityDataObject indicates that a user has a new Role in the
- * Driver/Observer schemes of things.
+ * A {@link PermissionActivityDataObject} indicates that a user has a new
+ * {@link User.Permission}.
  */
-public class RoleActivity extends AbstractActivity {
+public class PermissionActivity extends AbstractActivity {
 
-    protected final UserRole role;
+    protected final Permission permission;
     protected final User affectedUser;
 
     /**
-     * Creates a new RoleActivity which indicates that the given user should
-     * change into the given role.
+     * Creates a new {@link PermissionActivity} which indicates that the given
+     * user should change into the given {@link User.Permission}.
      */
-    public RoleActivity(User source, User affectedUser, UserRole role) {
+    public PermissionActivity(User source, User affectedUser,
+        Permission permission) {
 
         super(source);
         this.affectedUser = affectedUser;
-        this.role = role;
+        this.permission = permission;
     }
 
     @Override
@@ -51,7 +52,8 @@ public class RoleActivity extends AbstractActivity {
         int result = super.hashCode();
         result = prime * result
             + ((affectedUser == null) ? 0 : affectedUser.hashCode());
-        result = prime * result + ((role == null) ? 0 : role.hashCode());
+        result = prime * result
+            + ((permission == null) ? 0 : permission.hashCode());
         return result;
     }
 
@@ -61,18 +63,18 @@ public class RoleActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof RoleActivity))
+        if (!(obj instanceof PermissionActivity))
             return false;
-        RoleActivity other = (RoleActivity) obj;
+        PermissionActivity other = (PermissionActivity) obj;
         if (affectedUser == null) {
             if (other.affectedUser != null)
                 return false;
         } else if (!affectedUser.equals(other.affectedUser))
             return false;
-        if (role == null) {
-            if (other.role != null)
+        if (permission == null) {
+            if (other.permission != null)
                 return false;
-        } else if (!role.equals(other.role))
+        } else if (!permission.equals(other.permission))
             return false;
         return true;
     }
@@ -81,14 +83,14 @@ public class RoleActivity extends AbstractActivity {
         return affectedUser;
     }
 
-    public UserRole getRole() {
-        return role;
+    public Permission getPermission() {
+        return permission;
     }
 
     @Override
     public String toString() {
-        return "RoleActivity(user:" + this.getAffectedUser() + ",new role:"
-            + this.getRole() + ")";
+        return getClass().getSimpleName() + "(user:" + this.getAffectedUser()
+            + ",new permission:" + this.getPermission() + ")";
     }
 
     public void dispatch(IActivityReceiver receiver) {
@@ -96,7 +98,7 @@ public class RoleActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new RoleActivityDataObject(source.getJID(),
-            affectedUser.getJID(), role);
+        return new PermissionActivityDataObject(source.getJID(),
+            affectedUser.getJID(), permission);
     }
 }

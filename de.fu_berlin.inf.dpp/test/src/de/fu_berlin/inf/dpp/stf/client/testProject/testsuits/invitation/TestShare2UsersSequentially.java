@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestShare2UsersSequentially extends STFTest {
@@ -21,8 +22,8 @@ public class TestShare2UsersSequentially extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -58,9 +59,10 @@ public class TestShare2UsersSequentially extends STFTest {
      * 
      * Result:
      * <ol>
-     * <li>Alice has the Role as participant and driver, bob has the role as
-     * participant and observer</li>
-     * <li>Alice and bob have no Role after leaving the session.</li>
+     * <li>Alice and Bob are participants and have both
+     * {@link User.Permission#WRITE_ACCESS}.</li>
+     * <li>Alice and bob have no {@link User.Permission}s after leaving the
+     * session.</li>
      * </ol>
      * 
      * @throws InterruptedException
@@ -80,22 +82,22 @@ public class TestShare2UsersSequentially extends STFTest {
         assertTrue(bob.sessionV.isParticipant());
         assertTrue(alice.sessionV.isParticipant());
 
-        assertTrue(bob.sessionV.isObserver());
-        assertFalse(alice.sessionV.isObserver());
+        assertFalse(bob.sessionV.hasReadOnlyAccess());
+        assertFalse(alice.sessionV.hasReadOnlyAccess());
 
-        assertTrue(alice.sessionV.isDriver());
-        assertFalse(bob.sessionV.isDriver());
+        assertTrue(alice.sessionV.hasWriteAccess());
+        assertTrue(bob.sessionV.hasWriteAccess());
 
         alice.leaveSessionPeersFirstDone(bob);
 
         assertFalse(bob.sessionV.isParticipant());
         assertFalse(alice.sessionV.isParticipant());
 
-        assertFalse(bob.sessionV.isObserver());
-        assertFalse(alice.sessionV.isObserver());
+        assertFalse(bob.sessionV.hasReadOnlyAccess());
+        assertFalse(alice.sessionV.hasReadOnlyAccess());
 
-        assertFalse(alice.sessionV.isDriver());
-        assertFalse(bob.sessionV.isDriver());
+        assertFalse(alice.sessionV.hasWriteAccess());
+        assertFalse(bob.sessionV.hasWriteAccess());
 
     }
 }

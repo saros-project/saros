@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.rolesAndFollowmode;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -16,16 +16,16 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestAllParticipantsFollowDriver extends STFTest {
+public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
 
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>Dave (Observer)</li>
-     * <li>All observers enable followmode</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Dave (Read-Only Access)</li>
+     * <li>All read-only users enable followmode</li>
      * </ol>
      * 
      * @throws AccessException

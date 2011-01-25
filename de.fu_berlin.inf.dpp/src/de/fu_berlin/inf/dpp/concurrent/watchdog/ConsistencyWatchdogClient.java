@@ -95,7 +95,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
             @Override
-            public void roleChanged(User user) {
+            public void permissionChanged(User user) {
 
                 if (user.isRemote())
                     return;
@@ -450,7 +450,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected synchronized void performCheck(ChecksumActivity checksumActivity) {
 
-        if (sarosSession.isDriver()
+        if (sarosSession.hasWriteAccess()
             && !sarosSession.getConcurrentDocumentClient().isCurrent(
                 checksumActivity))
             return;

@@ -40,16 +40,18 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * This collector collects information about selections made by observers that
- * are witnessed by the local user. The total selections are counted and it is
- * checked, if each selection was within the file the local user was viewing. He
- * might either see that selection directly within his viewport or through
- * viewport annotation.
+ * This collector collects information about selections made by users with
+ * {@link User.Permission#READONLY_ACCESS} that are witnessed by the local user.
+ * The total selections are counted and it is checked, if each selection was
+ * within the file the local user was viewing. He might either see that
+ * selection directly within his viewport or through viewport annotation.
  * 
- * Selection made by drivers are not analyzed as those will be misleading.
+ * Selection made by users with {@link User.Permission#WRITE_ACCESS} are not
+ * analyzed as those will be misleading.
  * 
- * Furthermore, if an observer selects some text and a change to that specific
- * text is done later on, this is stored as an (probable) successful gesture.
+ * Furthermore, if a user with {@link User.Permission#READONLY_ACCESS} selects
+ * some text and a change to that specific text is done later on, this is stored
+ * as an (probable) successful gesture.
  */
 @Component(module = "feedback")
 public class SelectionCollector extends AbstractStatisticCollector {
@@ -101,10 +103,10 @@ public class SelectionCollector extends AbstractStatisticCollector {
     protected Map<JID, SelectionEvent> activeSelections = new HashMap<JID, SelectionEvent>();
 
     /**
-     * A list where all selection events made by an remote observer are being
-     * stored<br>
+     * A list where all selection events made by an remote user with
+     * {@link User.Permission#READONLY_ACCESS} are being stored<br>
      */
-    protected List<SelectionEvent> observerSelectionEvents = new ArrayList<SelectionEvent>();
+    protected List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
@@ -176,13 +178,14 @@ public class SelectionCollector extends AbstractStatisticCollector {
             SelectionEvent currentSelection = new SelectionEvent(time, path,
                 offset, length, withinFile, gestured);
 
-            /*
-             * check if the selection was made by an observer and has a length
-             * of more than 0
+            /**
+             * check if the selection was made by a user with
+             * {@link User.Permission#READONLY_ACCESS} and has a length of more
+             * than 0
              */
-            if (length > 0 && source.isObserver()) {
+            if (length > 0 && source.hasReadOnlyAccess()) {
                 // store the selection event in the array list
-                observerSelectionEvents.add(currentSelection);
+                userWithReadOnlyAccessSelectionEvents.add(currentSelection);
                 /*
                  * check if there is already a selection stored for this user
                  * and replace it in case or just store the selection if not
@@ -207,26 +210,28 @@ public class SelectionCollector extends AbstractStatisticCollector {
     @Override
     protected void processGatheredData() {
         // count for selections witnessed by the local user
-        int numberOfWitnessedObserverSelections = 0;
+        int numberOfWitnessedUserWithReadOnlyAccessSelections = 0;
         int numberOfGestures = 0;
 
-        /*
-         * iterate through SelectionEvens caused by observers and check if they
-         * occurred within the file the local user was viewing and check if the
-         * gestured flag was set for this selection.
+        /**
+         * iterate through SelectionEvens caused by users with
+         * {@link User.Permission#READONLY_ACCESS} and check if they occurred
+         * within the file the local user was viewing and check if the gestured
+         * flag was set for this selection.
          */
-        for (SelectionEvent currentEntry : observerSelectionEvents) {
+        for (SelectionEvent currentEntry : userWithReadOnlyAccessSelectionEvents) {
             if (currentEntry.withinFile) {
-                numberOfWitnessedObserverSelections++;
+                numberOfWitnessedUserWithReadOnlyAccessSelections++;
             }
             if (currentEntry.gestured) {
                 numberOfGestures++;
             }
         }
 
-        data.setTotalOberserverSelectionCount((observerSelectionEvents.size()));
+        data.setTotalOberserverSelectionCount((userWithReadOnlyAccessSelectionEvents
+            .size()));
         data.setGestureCount(numberOfGestures);
-        data.setWitnessedObserverSelections(numberOfWitnessedObserverSelections);
+        data.setWitnessedUserWithReadOnlyAccessSelections(numberOfWitnessedUserWithReadOnlyAccessSelections);
 
     }
 
@@ -242,7 +247,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
 
     @Override
     protected synchronized void clearPreviousData() {
-        observerSelectionEvents.clear();
+        userWithReadOnlyAccessSelectionEvents.clear();
         localPath = null;
 
         super.clearPreviousData();

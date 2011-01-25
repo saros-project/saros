@@ -22,7 +22,7 @@ public abstract class AbstractSharedEditorListener implements
         // does nothing
     }
 
-    public void driverEditorSaved(SPath path, boolean replicated) {
+    public void userWithWriteAccessEditorSaved(SPath path, boolean replicated) {
         // does nothing
     }
 

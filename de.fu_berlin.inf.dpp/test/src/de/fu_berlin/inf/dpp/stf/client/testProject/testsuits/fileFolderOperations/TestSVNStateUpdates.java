@@ -25,8 +25,8 @@ public class TestSVNStateUpdates extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
      * <li>Alice and Bob both have the project {@link STFTest#SVN_PROJECT_COPY},
      * which is checked out from SVN:<br>
      * repository: {@link STFTest#SVN_REPOSITORY_URL}<br>
@@ -129,7 +129,7 @@ public class TestSVNStateUpdates extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>Alice makes Bob exclusive driver.</li>
+     * <li>Alice grants Bob write access.</li>
      * <li>Bob renames the file {@link STFTest#SVN_CLS1} to "Asdf".</li>
      * </ol>
      * Result:
@@ -141,9 +141,9 @@ public class TestSVNStateUpdates extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void testChangeDriverAndRenameClass() throws Exception {
-        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
-        assertTrue(bob.sessionV.isDriver());
+    public void testGrantWriteAccessAndRenameClass() throws Exception {
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        assertTrue(bob.sessionV.hasWriteAccess());
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
@@ -153,7 +153,7 @@ public class TestSVNStateUpdates extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>Alice makes Bob exclusive driver.</li>
+     * <li>Alice grants Bob write access.</li>
      * <li>Bob creates new package "new_package".</li>
      * <li>Bob moves the file {@link STFTest#SVN_CLS1} to "new_package".</li>
      * </ol>
@@ -167,9 +167,9 @@ public class TestSVNStateUpdates extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void testChangeDriverAndMoveClass() throws Exception {
-        alice.sessionV.giveExclusiveDriverRoleGUI(bob.sessionV);
-        assertTrue(bob.sessionV.isExclusiveDriver());
+    public void testGrantWriteAccessAndMoveClass() throws Exception {
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        assertTrue(bob.sessionV.hasExclusiveWriteAccess());
 
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");

@@ -94,14 +94,6 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns whether the (experimental) multi-driver mode is enabled.
-     */
-    public boolean isMultiDriverEnabled() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.MULTI_DRIVER);
-    }
-
-    /**
      * Returns the port for SOCKS5 file transfer. If
      * PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER is set, a negative
      * number is returned (smacks will try next free ports above this number)

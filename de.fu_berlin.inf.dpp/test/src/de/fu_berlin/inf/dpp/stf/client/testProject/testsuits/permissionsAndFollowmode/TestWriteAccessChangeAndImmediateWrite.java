@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.rolesAndFollowmode;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode;
 
 import static org.junit.Assert.assertFalse;
 
@@ -13,9 +13,9 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestDriverChangeAndImmediateWrite extends STFTest {
+public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
     private static final Logger log = Logger
-        .getLogger(TestDriverChangeAndImmediateWrite.class);
+        .getLogger(TestWriteAccessChangeAndImmediateWrite.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
@@ -45,7 +45,7 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
     /**
      * Steps:
      * 
-     * 1. alice passes driver role to bob
+     * 1. alice grants write access to bob
      * 
      * 2. bob immediately begins to write it.
      * 
@@ -56,7 +56,7 @@ public class TestDriverChangeAndImmediateWrite extends STFTest {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.workbench.sleep(5000);
         assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());

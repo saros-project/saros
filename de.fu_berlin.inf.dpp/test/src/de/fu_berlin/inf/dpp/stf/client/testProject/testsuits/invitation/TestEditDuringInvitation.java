@@ -21,9 +21,10 @@ public class TestEditDuringInvitation extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>alice (Host, Driver), alice share a java project with bob and carl.</li>
-     * <li>bob (Observer)</li>
-     * <li>carl (Observer)</li>
+     * <li>alice (Host, Write Access), alice share a java project with bob and
+     * carl.</li>
+     * <li>bob (Read-Only Access)</li>
+     * <li>carl (Read-Only Access)</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -59,7 +60,7 @@ public class TestEditDuringInvitation extends STFTest {
      * <ol>
      * <li>Alice invites Bob.</li>
      * <li>Bob accepts the invitation</li>
-     * <li>Alice gives Bob driver capability</li>
+     * <li>Alice grants Bob write access</li>
      * <li>Alice invites Carl</li>
      * <li>Bob changes data during the running invtiation of Carl.</li>
      * </ol>
@@ -80,10 +81,10 @@ public class TestEditDuringInvitation extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
 
-        log.trace("alice.giveDriverRole");
-        alice.sessionV.giveDriverRoleGUI(bob.sessionV);
+        log.trace("alice.grantWriteAccess");
+        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
 
-        assertTrue(bob.sessionV.isDriver());
+        assertTrue(bob.sessionV.hasWriteAccess());
 
         log.trace("alice.inviteUser(carl");
         alice.sessionV.openInvitationInterface(carl.getBaseJid());

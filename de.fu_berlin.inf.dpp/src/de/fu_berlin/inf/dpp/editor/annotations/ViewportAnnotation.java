@@ -17,7 +17,8 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.ColorUtil;
 
 /**
- * The annotation that shows the viewports of the drivers.
+ * The annotation that shows the viewports of users with
+ * {@link User.Permission#WRITE_ACCESS}.
  * 
  * Configuration of this annotation is done in the plugin-xml.
  * 

@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * This Document provider tries tell others that files are not editable if not a
- * driver.
+ * This Document provider tries tell others that files are not editable if
+ * {@link User.Permission#READONLY_ACCESS}.
  */
 @Component(module = "util")
 public class SharedDocumentProvider extends TextFileDocumentProvider {
@@ -30,14 +30,14 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     @Inject
     protected SarosSessionManager sessionManager;
 
-    protected boolean isDriver;
+    protected boolean hasWriteAccess;
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
-            isDriver = sarosSession.isDriver();
+            hasWriteAccess = sarosSession.hasWriteAccess();
             sarosSession.addListener(sharedProjectListener);
         }
 
@@ -51,11 +51,11 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             if (sarosSession != null) {
-                isDriver = sarosSession.isDriver();
+                hasWriteAccess = sarosSession.hasWriteAccess();
             } else {
-                log.warn("Internal error: Shared project null in roleChanged!");
+                log.warn("Internal error: Shared project null in permissionChanged!");
             }
         }
     };
@@ -96,7 +96,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
             return super.isModifiable(element);
         }
 
-        return this.isDriver && super.isModifiable(element);
+        return this.hasWriteAccess && super.isModifiable(element);
     }
 
     @Override

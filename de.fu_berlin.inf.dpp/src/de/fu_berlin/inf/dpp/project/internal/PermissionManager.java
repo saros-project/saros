@@ -7,9 +7,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -22,12 +22,12 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 
 /**
- * This manager is responsible for handling driver changes.
+ * This manager is responsible for handling {@link User.Permission} changes.
  * 
  * @author rdjemili
  */
 @Component(module = "core")
-public class RoleManager implements IActivityProvider {
+public class PermissionManager implements IActivityProvider {
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
@@ -36,28 +36,28 @@ public class RoleManager implements IActivityProvider {
     private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
 
             /*
              * Not nice to have GUI stuff here, but it can't be handled in
              * SessionView because it is not guaranteed there actually is a
              * session view open.
              */
-            SessionView.showNotification("Role changed", String.format(
-                "%s %s now %s of this session.", user.getHumanReadableName(),
-                user.isLocal() ? "are" : "is", user.isDriver() ? "a driver"
-                    : "an observer"));
+            SessionView.showNotification("Permission changed", String.format(
+                "%s %s now %s access for this session.",
+                user.getHumanReadableName(), user.isLocal() ? "have" : "has",
+                user.hasWriteAccess() ? "write" : "read-only"));
         }
 
         @Override
         public void userJoined(User user) {
-            SessionView.showNotification("Buddy joined",
+            SessionView.showNotification("Buddy joined the session",
                 user.getHumanReadableName() + " joined the session.");
         }
 
         @Override
         public void userLeft(User user) {
-            SessionView.showNotification("Buddy left",
+            SessionView.showNotification("Buddy left the session",
                 user.getHumanReadableName() + " left the session.");
         }
     };
@@ -65,7 +65,7 @@ public class RoleManager implements IActivityProvider {
     @Inject
     protected Saros saros;
 
-    public RoleManager(SarosSessionManager sessionManager) {
+    public PermissionManager(SarosSessionManager sessionManager) {
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
@@ -75,14 +75,14 @@ public class RoleManager implements IActivityProvider {
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
             sarosSession.addListener(sharedProjectListener);
-            sarosSession.addActivityProvider(RoleManager.this);
+            sarosSession.addActivityProvider(PermissionManager.this);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             assert sarosSession == oldSarosSession;
             sarosSession.removeListener(sharedProjectListener);
-            sarosSession.removeActivityProvider(RoleManager.this);
+            sarosSession.removeActivityProvider(PermissionManager.this);
             sarosSession = null;
         }
     };
@@ -111,15 +111,15 @@ public class RoleManager implements IActivityProvider {
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(IActivity activity) {
-        if (activity instanceof RoleActivity) {
-            RoleActivity roleActivity = (RoleActivity) activity;
-            User user = roleActivity.getAffectedUser();
+        if (activity instanceof PermissionActivity) {
+            PermissionActivity permissionActivity = (PermissionActivity) activity;
+            User user = permissionActivity.getAffectedUser();
             if (!user.isInSarosSession()) {
                 throw new IllegalArgumentException("Buddy " + user
                     + " is not a participant in this shared project");
             }
-            UserRole role = roleActivity.getRole();
-            this.sarosSession.setUserRole(user, role);
+            Permission permission = permissionActivity.getPermission();
+            this.sarosSession.setPermission(user, permission);
         }
     }
 }

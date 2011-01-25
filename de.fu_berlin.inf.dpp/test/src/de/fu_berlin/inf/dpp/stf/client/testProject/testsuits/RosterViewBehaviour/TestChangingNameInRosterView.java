@@ -17,8 +17,8 @@ public class TestChangingNameInRosterView extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
      * <li>Alice share a java project with bob</li>
      * </ol>
      * 

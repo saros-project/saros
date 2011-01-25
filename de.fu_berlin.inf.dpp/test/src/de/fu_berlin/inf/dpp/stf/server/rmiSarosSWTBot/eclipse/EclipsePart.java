@@ -70,9 +70,9 @@ public abstract class EclipsePart {
     // Shell
     protected final static String SHELL_PROGRESS_INFORMATION = "Progress Information";
 
-    // Role:Driver
+    // Permission: Write Access
     public static final String OWN_CONTACT_NAME = "You";
-    protected final static String ROLENAME = " (Driver)";
+    protected final static String ROLENAME = "";
 
     // exported objects
     public static TableImp tableW = TableImp.getInstance();

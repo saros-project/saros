@@ -15,9 +15,9 @@ public class SharedProjectListenerDispatch implements ISharedProjectListener {
         }
     }
 
-    public void roleChanged(User user) {
+    public void permissionChanged(User user) {
         for (ISharedProjectListener listener : this.listeners) {
-            listener.roleChanged(user);
+            listener.permissionChanged(user);
         }
     }
 

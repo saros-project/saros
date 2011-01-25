@@ -17,8 +17,8 @@ public interface ISharedEditorListener {
      * This method implies that the editor is being opened.
      * 
      * @param path
-     *            the project-relative path of the resource that is the new
-     *            driver resource.
+     *            the project-relative path of the resource that is the new user
+     *            with {@link User.Permission#WRITE_ACCESS} resource.
      * @param user
      *            the user which removed an editor (can be the local user)
      * 
@@ -30,7 +30,8 @@ public interface ISharedEditorListener {
      * the given user has currently open.
      * 
      * @param path
-     *            the path to the resource that the driver was editing.
+     *            the path to the resource that the user with
+     *            {@link User.Permission#WRITE_ACCESS} was editing.
      * 
      * @param user
      *            the user which removed an editor (can be the local user)
@@ -38,18 +39,19 @@ public interface ISharedEditorListener {
     public void editorRemoved(User user, SPath path);
 
     /**
-     * Is fired when the driver editor is saved.
+     * Is fired when the user with {@link User.Permission#WRITE_ACCESS} editor
+     * is saved.
      * 
      * @param path
-     *            the project-relative path of the resource that is the new
-     *            driver resource.
+     *            the project-relative path of the resource that is the new user
+     *            with {@link User.Permission#WRITE_ACCESS} resource.
      * 
      * @param replicated
      *            <code>false</code> if this action originates on this client.
      *            <code>false</code> if it is an replication of an action from
      *            another participant of the shared project.
      */
-    public void driverEditorSaved(SPath path, boolean replicated);
+    public void userWithWriteAccessEditorSaved(SPath path, boolean replicated);
 
     /**
      * Is fired when the follow mode is changed.

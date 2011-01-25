@@ -231,7 +231,7 @@ public class InviteAction extends SelectionProviderAction {
 
     private String makeDescription() {
         return sessionManager.getSarosSession().getHost().getJID().getBase()
-            + " has invited you to a Saros shared project session";
+            + " has invited you to a Saros session";
 
     }
 }

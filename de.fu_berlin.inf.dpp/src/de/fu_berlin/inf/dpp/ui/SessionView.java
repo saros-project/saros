@@ -78,13 +78,12 @@ import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.JumpToDriverPositionAction;
+import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
+import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
+import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
@@ -96,8 +95,8 @@ import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
 /**
  * View responsible for showing who is in a SarosSession session using which
- * color, who is being followed, and provide actions for changing roles and
- * follow mode.
+ * color, who is being followed, and provide actions for changing
+ * {@link User.Permission}s and follow mode.
  */
 @Component(module = "ui")
 public class SessionView extends ListExplanatoryViewPart {
@@ -109,10 +108,10 @@ public class SessionView extends ListExplanatoryViewPart {
         .getImage("icons/elcl16/away.png");
     public static final Image userImage = SarosUI
         .getImage("icons/obj16/user.png");
-    public static final Image driverImage = SarosUI
-        .getImage("icons/obj16/driver.png");
-    public static final Image observerImage = SarosUI
-        .getImage("icons/obj16/observer.png");
+    public static final Image participantImage = SarosUI
+        .getImage("icons/obj16/participant.png");
+    public static final Image participantReadOnlyImage = SarosUI
+        .getImage("icons/obj16/participant_readonly.png");
 
     protected IRosterListener rosterListener;
 
@@ -282,7 +281,7 @@ public class SessionView extends ListExplanatoryViewPart {
             return participants;
         }
 
-        public void roleChanged(User user) {
+        public void permissionChanged(User user) {
             refreshTable();
         }
 
@@ -320,7 +319,7 @@ public class SessionView extends ListExplanatoryViewPart {
 
             User participant = (User) obj;
             return participant.getHumanReadableName()
-                + (participant.isDriver() ? " (Driver)" : "")
+                + (participant.hasReadOnlyAccess() ? " (read-only)" : "")
                 + (participant.isInvitationComplete() ? "" : " [Joining...]");
         }
 
@@ -330,10 +329,10 @@ public class SessionView extends ListExplanatoryViewPart {
             if (user.isAway()) {
                 return awayImage;
             } else {
-                if (user.isDriver())
-                    return driverImage;
-                else if (user.isObserver())
-                    return observerImage;
+                if (user.hasWriteAccess())
+                    return participantImage;
+                else if (user.hasReadOnlyAccess())
+                    return participantReadOnlyImage;
             }
 
             return userImage;
@@ -507,16 +506,15 @@ public class SessionView extends ListExplanatoryViewPart {
         container.addComponent(StoppedAction.class);
         container.addComponent(ChangeColorAction.class);
         container.addComponent(ConsistencyAction.class);
-        container.addComponent(GiveExclusiveDriverRoleAction.class);
-        container.addComponent(GiveDriverRoleAction.class);
+        container.addComponent(GiveWriteAccessAction.class);
         container.addComponent(FollowModeAction.class);
         container.addComponent(FollowThisPersonAction.class);
-        container.addComponent(JumpToDriverPositionAction.class);
+        container.addComponent(JumpToUserWithWriteAccessPositionAction.class);
         container.addComponent(LeaveSessionAction.class);
         container.addComponent(OpenInviteInterface.class);
         container.addComponent(SessionViewTableViewer.class, this.viewer);
-        container.addComponent(RemoveAllDriverRoleAction.class);
-        container.addComponent(RemoveDriverRoleAction.class);
+        container.addComponent(RestrictInviteesToReadOnlyAccessAction.class);
+        container.addComponent(RestrictToReadOnlyAccessAction.class);
         container.addComponent(SessionViewContextMenu.class);
         container.addComponent(SessionViewToolBar.class);
         container.addComponent(SessionView.class, this);
@@ -532,8 +530,6 @@ public class SessionView extends ListExplanatoryViewPart {
         }
 
         updateEnablement();
-
-        setPartName("Shared Project Session");
 
         getViewSite().getPage().addPartListener(viewPartListener);
     }

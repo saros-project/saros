@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -25,18 +26,16 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  * <br>
  * Ignoring the warnings will lead to inconsistencies. Note that we can't
  * prevent these actions, just detect them. Currently detected: File/folder
- * activities as an observer, and deletion of a shared project.
+ * activities as a user with {@link User.Permission#READONLY_ACCESS}, and
+ * deletion of a shared project.
  */
 @Component(module = "core")
 public class ResourceChangeValidator extends ModelProvider {
     private static final Logger log = Logger
         .getLogger(ResourceChangeValidator.class.getName());
 
-    private static final String ERROR_TEXT = "Only the driver should edit"
+    private static final String ERROR_TEXT = "Only participants with write access should edit"
         + " the resources of this shared project.";
-    private static final String EXCLUSIVE_ERROR_TEXT = "The project host"
-        + " should be the exclusive driver to edit resources of this shared"
-        + " project.";
     private static final String DELETE_PROJECT_ERROR_TEXT = "You should leave"
         + " the Saros session before deleting a shared project. Deleting a"
         + " project has no effect on the other session participants, so the"
@@ -48,10 +47,6 @@ public class ResourceChangeValidator extends ModelProvider {
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
         "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null);
 
-    private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(
-        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
-        EXCLUSIVE_ERROR_TEXT, null);
-
     private static final IStatus DELETE_PROJECT_ERROR_STATUS = new Status(
         IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
         DELETE_PROJECT_ERROR_TEXT, null);
@@ -61,7 +56,8 @@ public class ResourceChangeValidator extends ModelProvider {
 
     /**
      * Check each resource delta whether it is in a shared project. If we are
-     * not the exclusive driver set the appropriate flag.
+     * not the exclusive user with {@link User.Permission#WRITE_ACCESS} set the
+     * appropriate flag.
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
@@ -94,7 +90,7 @@ public class ResourceChangeValidator extends ModelProvider {
                     return false;
                 }
 
-                if (sarosSession.isExclusiveDriver()) {
+                if (sarosSession.hasExclusiveWriteAccess()) {
                     return false;
                 }
                 return true;
@@ -145,12 +141,9 @@ public class ResourceChangeValidator extends ModelProvider {
             log.error("Could not run visitor: ", e);
         }
 
-        if (!sarosSession.isDriver() && visitor.isAffectingSharedProjectFiles) {
-            return ERROR_STATUS;
-        }
-        if (!sarosSession.isExclusiveDriver()
+        if (!sarosSession.hasWriteAccess()
             && visitor.isAffectingSharedProjectFiles) {
-            return EXCLUSIVE_ERROR_STATUS;
+            return ERROR_STATUS;
         }
         if (visitor.isDeletingSharedProject) {
             return DELETE_PROJECT_ERROR_STATUS;

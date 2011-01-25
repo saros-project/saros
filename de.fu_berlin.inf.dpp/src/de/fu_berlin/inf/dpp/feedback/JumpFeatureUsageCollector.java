@@ -31,29 +31,26 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This Collector collects data about the jump feature usage. It stores data
- * about the total count of jumps performed as well as the jumps to a driver or
- * observer
+ * about the total count of jumps performed as well as the jumps to a user with
+ * {@link User.Permission#WRITE_ACCESS} or
+ * {@link User.Permission#READONLY_ACCESS}.
  */
 @Component(module = "feedback")
 public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
 
     protected static final Logger log = Logger
-        .getLogger(RoleChangeCollector.class.getName());
-    protected int jumpedToDriver = 0;
-    protected int jumpedToObserver = 0;
+        .getLogger(PermissionChangeCollector.class.getName());
+    protected int jumpedToWriteAccessHolder = 0;
+    protected int jumpedToReadOnlyAccessHolder = 0;
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void jumpedToUser(User jumpedTo) {
-            /*
-             * determine the role of the user jumped to and increment the count
-             * of either jumpedToDriver or jumpedToObserver
-             */
-            if (jumpedTo.isDriver()) {
-                jumpedToDriver++;
+            if (jumpedTo.hasWriteAccess()) {
+                jumpedToWriteAccessHolder++;
             } else {
-                jumpedToObserver++;
+                jumpedToReadOnlyAccessHolder++;
             }
         }
     };
@@ -67,16 +64,17 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     @Override
     protected void processGatheredData() {
         // write counts to statistics
-        data.setJumpedToObserverCount(jumpedToObserver);
-        data.setJumpedToDriverCount(jumpedToDriver);
-        data.setJumpedToCount(jumpedToDriver + jumpedToObserver);
+        data.setJumpedToUserWithReadOnlyAccessCount(jumpedToReadOnlyAccessHolder);
+        data.setJumpedToUserWithWriteAccessCount(jumpedToWriteAccessHolder);
+        data.setJumpedToCount(jumpedToWriteAccessHolder
+            + jumpedToReadOnlyAccessHolder);
     }
 
     @Override
     protected void clearPreviousData() {
         // set the counts to null again
-        jumpedToDriver = 0;
-        jumpedToObserver = 0;
+        jumpedToWriteAccessHolder = 0;
+        jumpedToReadOnlyAccessHolder = 0;
 
         super.clearPreviousData();
     }

@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.IPath;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -101,11 +102,11 @@ public class SessionStatistic {
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
 
-    // Keys for role changes
-    protected static final String KEY_ROLE = "role";
-    protected static final String KEY_ROLE_OBSERVER = "role.observer";
-    protected static final String KEY_ROLE_DRIVER = "role.driver";
-    protected static final String KEY_ROLE_CHANGES = "role.changes";
+    // Keys for permission changes
+    protected static final String KEY_PERMISSION = "role";
+    protected static final String KEY_PERMISSION_READONLY = "role.observer";
+    protected static final String KEY_PERMISSION_WRITE = "role.driver";
+    protected static final String KEY_PERMISSION_CHANGES = "role.changes";
 
     protected static final String KEY_DURATION = "duration";
     protected static final String KEY_PERCENT = "percent";
@@ -142,11 +143,17 @@ public class SessionStatistic {
     protected static final String KEY_PSEUDONYM = "user.pseudonym";
 
     // Keys for jumpFeatureUsageCollector
-    /** Count of jumps to an observers position */
-    protected static final String KEY_JUMPED_TO_OBSERVER = "jumped.observer.count";
+    /**
+     * Count of jumps to a user with {@link User.Permission#READONLY_ACCESS}
+     * position
+     */
+    protected static final String KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS = "jumped.observer.count";
 
-    /** Count of jumps to a drivers position */
-    protected static final String KEY_JUMPED_TO_DRIVER = "jumped.driver.count";
+    /**
+     * Count of jumps to a user with {@link User.Permission#WRITE_ACCESS}
+     * position
+     */
+    protected static final String KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS = "jumped.driver.count";
 
     /** Total count of jumps */
     protected static final String KEY_TOTAL_JUMP_COUNT = "jumped.count";
@@ -165,21 +172,22 @@ public class SessionStatistic {
     protected static final String KEY_FOLLOWMODE_TOGGLES = "followmode.toggles";
 
     // Further Keys for SessionDataCollector
-    /** Preference setting of multi-driver support */
-    protected static final String KEY_MULTI_DRIVER_ENABLED = "multidriver.enabled";
 
     /** Preference setting of auto follow mode */
     protected static final String KEY_AUTO_FOLLOW_MODE_ENABLED = "auto.followmode.enabled";
 
-    /** Preference setting of follow exclusive driver */
-    protected static final String KEY_FOLLOW_EXCL_DRIVER_ENABLED = "follow.exclusivedriver.enabled";
-
     // Keys for selections and gestures
-    /** Key for total observer selection count */
-    protected static final String KEY_TOTAL_OBSERVER_SELECTION_COUNT = "observer.selection.count";
+    /**
+     * Key for total users with {@link User.Permission#READONLY_ACCESS}
+     * selection count
+     */
+    protected static final String KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count";
 
-    /** Key for witnessed observer selections */
-    protected static final String KEY_WITNESSED_OBSERVER_SELECTION_COUNT = "observer.selection.count.witnessed";
+    /**
+     * Key for witnessed users with {@link User.Permission#READONLY_ACCESS}
+     * selections
+     */
+    protected static final String KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count.witnessed";
 
     /** Key for gesture count */
     protected static final String KEY_GESTURE_COUNT = "gesture.count";
@@ -392,8 +400,9 @@ public class SessionStatistic {
      * time they were together in the session.
      */
     public void setSessionTimePercentForUsers(int numberOfUsers, int percent) {
-        data.setProperty(appendToKey(KEY_SESSION_TIME_USERS, numberOfUsers,
-            KEY_PERCENT), String.valueOf(percent));
+        data.setProperty(
+            appendToKey(KEY_SESSION_TIME_USERS, numberOfUsers, KEY_PERCENT),
+            String.valueOf(percent));
     }
 
     public String getSessionID() {
@@ -417,92 +426,91 @@ public class SessionStatistic {
      * didn't had to be present at the same time.
      */
     public void setSessionUsersTotal(int numberOfUsers) {
-        data
-            .setProperty(KEY_SESSION_USERS_TOTAL, String.valueOf(numberOfUsers));
+        data.setProperty(KEY_SESSION_USERS_TOTAL, String.valueOf(numberOfUsers));
     }
 
     /**
-     * Returns the n-th role of the user.
+     * Returns the n-th permission of the user.
      */
-    public String getRole(int n) {
-        return data.getProperty(appendToKey(KEY_ROLE, n));
+    public String getPermission(int n) {
+        return data.getProperty(appendToKey(KEY_PERMISSION, n));
     }
 
     /**
-     * Sets the n-th role of the user.
+     * Sets the n-th permission of the user.
      */
-    public void setRole(int n, String role) {
-        data.setProperty(appendToKey(KEY_ROLE, n), role);
+    public void setPermission(int n, String permission) {
+        data.setProperty(appendToKey(KEY_PERMISSION, n), permission);
     }
 
     /**
-     * Returns the time the user executed the n-th role.
+     * Returns the time the user executed the n-th permission.
      */
-    public double getRoleDuration(int n) {
-        return Double.parseDouble(data.getProperty(appendToKey(KEY_ROLE, n,
-            KEY_DURATION)));
+    public double getPermissionDuration(int n) {
+        return Double.parseDouble(data.getProperty(appendToKey(KEY_PERMISSION,
+            n, KEY_DURATION)));
     }
 
     /**
-     * Sets the time the user executed the n-th role.
+     * Sets the time the user executed the n-th permission.
      */
-    public void setRoleDuration(int n, double time) {
-        data.setProperty(appendToKey(KEY_ROLE, n, KEY_DURATION), String
-            .valueOf(time));
+    public void setPermissionDuration(int n, double time) {
+        data.setProperty(appendToKey(KEY_PERMISSION, n, KEY_DURATION),
+            String.valueOf(time));
     }
 
     /**
-     * Returns the total amount of the local user's role changes.
+     * Returns the total amount of the local user's permission changes.
      */
-    public int getRoleChanges() {
-        return Integer.parseInt(data.getProperty(KEY_ROLE_CHANGES));
+    public int getPermissionChanges() {
+        return Integer.parseInt(data.getProperty(KEY_PERMISSION_CHANGES));
     }
 
     /**
-     * Sets the total amount of the local user's role changes.
+     * Sets the total amount of the local user's permission changes.
      */
-    public void setRoleChanges(int changes) {
-        data.setProperty(KEY_ROLE_CHANGES, String.valueOf(changes));
+    public void setPermissionChanges(int changes) {
+        data.setProperty(KEY_PERMISSION_CHANGES, String.valueOf(changes));
     }
 
-    public double getTotalRoleDurationObserver() {
+    public double getTotalPermissionDurationReadOnlyAccess() {
         return Double.parseDouble(data.getProperty(appendToKey(
-            KEY_ROLE_OBSERVER, KEY_DURATION)));
+            KEY_PERMISSION_READONLY, KEY_DURATION)));
     }
 
-    public void setTotalRoleDurationObserver(double time) {
-        data.setProperty(appendToKey(KEY_ROLE_OBSERVER, KEY_DURATION), String
-            .valueOf(time));
+    public void setTotalPermissionDurationReadOnlyAccess(double time) {
+        data.setProperty(appendToKey(KEY_PERMISSION_READONLY, KEY_DURATION),
+            String.valueOf(time));
     }
 
-    public int getTotalRolePercentObserver() {
-        return Integer.parseInt(data.getProperty(appendToKey(KEY_ROLE_OBSERVER,
-            KEY_PERCENT)));
+    public int getTotalPermissionPercentReadOnlyAcccess() {
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_PERMISSION_READONLY, KEY_PERCENT)));
     }
 
-    public void setTotalRolePercentObserver(int percent) {
-        data.setProperty(appendToKey(KEY_ROLE_OBSERVER, KEY_PERCENT), String
-            .valueOf(percent));
+    public void setTotalPermissionPercentReadOnlyAccess(int percent) {
+        data.setProperty(appendToKey(KEY_PERMISSION_READONLY, KEY_PERCENT),
+            String.valueOf(percent));
     }
 
-    public double getTotalRoleDurationDriver() {
-        return Double.parseDouble(data.getProperty(appendToKey(KEY_ROLE_DRIVER,
-            KEY_DURATION)));
+    public double getTotalPermissionDurationWriteAccess() {
+        return Double.parseDouble(data.getProperty(appendToKey(
+            KEY_PERMISSION_WRITE, KEY_DURATION)));
     }
 
-    public void setTotalRoleDurationDriver(double time) {
-        data.setProperty(appendToKey(KEY_ROLE_DRIVER, KEY_DURATION), String
-            .valueOf(time));
+    public void setTotalPermissionDurationWriteAccess(double time) {
+        data.setProperty(appendToKey(KEY_PERMISSION_WRITE, KEY_DURATION),
+            String.valueOf(time));
     }
 
-    public int getTotalRolePercentDriver() {
-        return Integer.parseInt(data.getProperty(appendToKey(KEY_ROLE_DRIVER,
-            KEY_PERCENT)));
+    public int getTotalPermissionPercentWriteAccess() {
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_PERMISSION_WRITE, KEY_PERCENT)));
     }
 
-    public void setTotalRolePercentDriver(int percent) {
-        data.setProperty(appendToKey(KEY_ROLE_DRIVER, KEY_PERCENT), String
-            .valueOf(percent));
+    public void setTotalPermissionPercentWriteAccess(int percent) {
+        data.setProperty(appendToKey(KEY_PERMISSION_WRITE, KEY_PERCENT),
+            String.valueOf(percent));
     }
 
     /**
@@ -547,8 +555,9 @@ public class SessionStatistic {
      * given interval with other users.
      */
     public void setParallelTextEdits(int interval, long chars) {
-        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
-            KEY_CHARS), String.valueOf(chars));
+        data.setProperty(
+            appendToKey(KEY_PARALLEL_TEXT_EDITS, interval, KEY_CHARS),
+            String.valueOf(chars));
     }
 
     /**
@@ -565,8 +574,9 @@ public class SessionStatistic {
      * interval.
      */
     public void setParallelTextEditsPercent(int interval, int percent) {
-        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
-            KEY_PERCENT), String.valueOf(percent));
+        data.setProperty(
+            appendToKey(KEY_PARALLEL_TEXT_EDITS, interval, KEY_PERCENT),
+            String.valueOf(percent));
     }
 
     public int getParallelTextEditsCount(int interval) {
@@ -575,8 +585,9 @@ public class SessionStatistic {
     }
 
     public void setParallelTextEditsCount(int interval, int count) {
-        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
-            KEY_COUNT), String.valueOf(count));
+        data.setProperty(
+            appendToKey(KEY_PARALLEL_TEXT_EDITS, interval, KEY_COUNT),
+            String.valueOf(count));
     }
 
     public long getNonParallelTextEdits() {
@@ -620,12 +631,12 @@ public class SessionStatistic {
 
         String key = appendToKey(KEY_TRANSFER_STATS, transferMode);
 
-        data.setProperty(appendToKey(key, TRANSFER_STATS_EVENT_SUFFIX), String
-            .valueOf(transferEvents));
-        data.setProperty(appendToKey(key, TRANSFER_STATS_SIZE_SUFFIX), String
-            .valueOf(totalSize));
-        data.setProperty(appendToKey(key, TRANSFER_STATS_TIME_SUFFIX), String
-            .valueOf(totalTransferTime));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_EVENT_SUFFIX),
+            String.valueOf(transferEvents));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_SIZE_SUFFIX),
+            String.valueOf(totalSize));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_TIME_SUFFIX),
+            String.valueOf(totalTransferTime));
         data.setProperty(appendToKey(key, TRANSFER_STATS_THROUGHPUT_SUFFIX),
             String.valueOf(Math.round(throughput * 10.0) / 10.0));
     }
@@ -635,51 +646,59 @@ public class SessionStatistic {
     }
 
     public void setLocalSessionStartTime(DateTime localSessionStart) {
-        data.setProperty(KEY_SESSION_LOCAL_START, localSessionStart.toDateTime(
-            DateTimeZone.UTC).toString());
+        data.setProperty(KEY_SESSION_LOCAL_START,
+            localSessionStart.toDateTime(DateTimeZone.UTC).toString());
     }
 
     public void setLocalSessionEndTime(DateTime localSessionEnd) {
-        data.setProperty(KEY_SESSION_LOCAL_START, localSessionEnd.toDateTime(
-            DateTimeZone.UTC).toString());
+        data.setProperty(KEY_SESSION_LOCAL_START,
+            localSessionEnd.toDateTime(DateTimeZone.UTC).toString());
     }
 
     /**
-     * Sets the number of jumps to the position of an observer
+     * Sets the number of jumps to the position of a user with
+     * {@link User.Permission#READONLY_ACCESS}
      */
-    public void setJumpedToObserverCount(int jumpedToObserver) {
-        data.setProperty(appendToKey(KEY_JUMPED_TO_OBSERVER), String
-            .valueOf(jumpedToObserver));
+    public void setJumpedToUserWithReadOnlyAccessCount(
+        int jumpedToUserWithReadOnlyAccess) {
+        data.setProperty(appendToKey(KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS),
+            String.valueOf(jumpedToUserWithReadOnlyAccess));
     }
 
     /**
-     * Sets the number of jumps to the position of a driver
+     * Sets the number of jumps to the position of a user with
+     * {@link User.Permission#WRITE_ACCESS}
      */
-    public void setJumpedToDriverCount(int jumpedToDriver) {
-        data.setProperty(appendToKey(KEY_JUMPED_TO_DRIVER), String
-            .valueOf(jumpedToDriver));
+    public void setJumpedToUserWithWriteAccessCount(
+        int jumpedToUserWithWriteAccess) {
+        data.setProperty(appendToKey(KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS),
+            String.valueOf(jumpedToUserWithWriteAccess));
     }
 
     /**
      * Sets the total count for jumps performed
      */
     public void setJumpedToCount(int jumpedToTotal) {
-        data.setProperty(appendToKey(KEY_TOTAL_JUMP_COUNT), String
-            .valueOf(jumpedToTotal));
+        data.setProperty(appendToKey(KEY_TOTAL_JUMP_COUNT),
+            String.valueOf(jumpedToTotal));
     }
 
     /**
-     * Returns the number of jumps to the position of an observer
+     * Returns the number of jumps to the position of a user with
+     * {@link User.Permission#READONLY_ACCESS}
      */
-    public int getJumpedToObserverCount() {
-        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_OBSERVER));
+    public int getJumpedToUserWithReadOnlyAccessCount() {
+        return Integer.parseInt(data
+            .getProperty(KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS));
     }
 
     /**
-     * Returns the number of jumps to the position of a driver
+     * Returns the number of jumps to the position of a user with
+     * {@link User.Permission#WRITE_ACCESS}
      */
-    public int getJumpedToDriverCount() {
-        return Integer.parseInt(data.getProperty(KEY_JUMPED_TO_DRIVER));
+    public int getJumpedToUserWithWriteAccessCount() {
+        return Integer.parseInt(data
+            .getProperty(KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS));
     }
 
     /**
@@ -733,37 +752,11 @@ public class SessionStatistic {
     }
 
     /**
-     * Sets the state of multi-driver support from configuration settings
-     */
-    public void setMultiDriverEnabled(boolean mutliDriverEnabled) {
-        data.setProperty(KEY_MULTI_DRIVER_ENABLED, String
-            .valueOf(mutliDriverEnabled));
-    }
-
-    /**
      * Sets the state of the auto follow mode from configuration settings
      */
     public void setAutoFollowModeEnabled(boolean autoFollowEnabled) {
-        data.setProperty(KEY_AUTO_FOLLOW_MODE_ENABLED, String
-            .valueOf(autoFollowEnabled));
-    }
-
-    /**
-     * Sets the state of the follow exclusive driver setting from configuration
-     * settings
-     */
-    public void setFollowExclusiveDriverEnabled(
-        boolean followExclusiveDriverEnabled) {
-        data.setProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED, String
-            .valueOf(followExclusiveDriverEnabled));
-    }
-
-    /**
-     * Returns the state as <code>boolean</code> of multi-driver support from
-     * configuration settings
-     */
-    public boolean getMultiDriverEnabled() {
-        return Boolean.parseBoolean(data.getProperty(KEY_MULTI_DRIVER_ENABLED));
+        data.setProperty(KEY_AUTO_FOLLOW_MODE_ENABLED,
+            String.valueOf(autoFollowEnabled));
     }
 
     /**
@@ -776,59 +769,58 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the state as <code>boolean</code> of the follow exclusive driver
-     * setting
-     */
-    public boolean getFollowExclusiveDriverEnabled() {
-        return Boolean.parseBoolean(data
-            .getProperty(KEY_FOLLOW_EXCL_DRIVER_ENABLED));
-    }
-
-    /**
-     * Sets the count of selections made by observers
+     * Sets the count of selections made by users with
+     * {@link User.Permission#READONLY_ACCESS}
      * 
-     * @param observerSelectionCount
+     * @param userWithReadOnlyAccessSelectionCount
      */
-    public void setTotalOberserverSelectionCount(int observerSelectionCount) {
-        data.setProperty(appendToKey(KEY_TOTAL_OBSERVER_SELECTION_COUNT),
-            String.valueOf(observerSelectionCount));
+    public void setTotalOberserverSelectionCount(
+        int userWithReadOnlyAccessSelectionCount) {
+        data.setProperty(
+            appendToKey(KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT),
+            String.valueOf(userWithReadOnlyAccessSelectionCount));
     }
 
     /**
-     * Sets the count of observer selections that were witnessed by another user
+     * Sets the count of user with {@link User.Permission#READONLY_ACCESS}
+     * selections that were witnessed by another user
      * 
-     * @param numberOfWitnessedObserverSelections
+     * @param numberOfWitnessedUserWithReadOnlyAccessSelections
      */
-    public void setWitnessedObserverSelections(
-        int numberOfWitnessedObserverSelections) {
-        data.setProperty(appendToKey(KEY_WITNESSED_OBSERVER_SELECTION_COUNT),
-            String.valueOf(numberOfWitnessedObserverSelections));
+    public void setWitnessedUserWithReadOnlyAccessSelections(
+        int numberOfWitnessedUserWithReadOnlyAccessSelections) {
+        data.setProperty(
+            appendToKey(KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT),
+            String.valueOf(numberOfWitnessedUserWithReadOnlyAccessSelections));
     }
 
     /**
-     * Sets the number of observer selections where an edit occured.
+     * Sets the number of user with {@link User.Permission#READONLY_ACCESS}
+     * selections where an edit occured.
      * 
-     * @param driverSelectionCount
+     * @param userWithWriteAccessSelectionCount
      */
-    public void setGestureCount(int driverSelectionCount) {
-        data.setProperty(appendToKey(KEY_GESTURE_COUNT), String
-            .valueOf(driverSelectionCount));
+    public void setGestureCount(int userWithWriteAccessSelectionCount) {
+        data.setProperty(appendToKey(KEY_GESTURE_COUNT),
+            String.valueOf(userWithWriteAccessSelectionCount));
     }
 
     /**
-     * Returns the number of observer selections made
+     * Returns the number of user with {@link User.Permission#READONLY_ACCESS}
+     * selections made
      */
     public int getTotalOberserverSelectionCount() {
         return Integer.parseInt(data
-            .getProperty(KEY_TOTAL_OBSERVER_SELECTION_COUNT));
+            .getProperty(KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT));
     }
 
     /**
-     * Returns the number of witnessed observer selections
+     * Returns the number of witnessed user with {@link User.Permission#READONLY_ACCESS} selections
      */
-    public int getWitnessedObserverSelections() {
-        return Integer.parseInt(data
-            .getProperty(KEY_WITNESSED_OBSERVER_SELECTION_COUNT));
+    public int getWitnessedUserWithReadOnlyAccessSelections() {
+        return Integer
+            .parseInt(data
+                .getProperty(KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT));
     }
 
     /**
@@ -866,8 +858,8 @@ public class SessionStatistic {
      * @param pasteCount
      */
     public void setLocalUserPastes(int pasteCount) {
-        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES), String
-            .valueOf(pasteCount));
+        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES),
+            String.valueOf(pasteCount));
     }
 
     /**
@@ -877,8 +869,9 @@ public class SessionStatistic {
      * @param pasteChars
      */
     public void setRemoteUserPasteChars(int userNumber, Integer pasteChars) {
-        data.setProperty(appendToKey(KEY_REMOTE_USER, userNumber, KEY_PASTES,
-            KEY_CHARS), String.valueOf(pasteChars));
+        data.setProperty(
+            appendToKey(KEY_REMOTE_USER, userNumber, KEY_PASTES, KEY_CHARS),
+            String.valueOf(pasteChars));
     }
 
     /**
@@ -887,8 +880,8 @@ public class SessionStatistic {
      * @param pasteChars
      */
     public void setLocalUserPasteChars(Integer pasteChars) {
-        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES, KEY_CHARS), String
-            .valueOf(pasteChars));
+        data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES, KEY_CHARS),
+            String.valueOf(pasteChars));
     }
 
     /**
@@ -943,8 +936,8 @@ public class SessionStatistic {
      * @param percentage
      */
     public void setVoIPPercentage(int percentage) {
-        data.setProperty(appendToKey(KEY_VOIP_PERCENT), String
-            .valueOf(percentage));
+        data.setProperty(appendToKey(KEY_VOIP_PERCENT),
+            String.valueOf(percentage));
     }
 
     /**
@@ -953,8 +946,8 @@ public class SessionStatistic {
      * @param numberVoIPSessions
      */
     public void setVoIPSessionCount(int numberVoIPSessions) {
-        data.setProperty(appendToKey(KEY_VOIP_COUNT), String
-            .valueOf(numberVoIPSessions));
+        data.setProperty(appendToKey(KEY_VOIP_COUNT),
+            String.valueOf(numberVoIPSessions));
     }
 
     /**

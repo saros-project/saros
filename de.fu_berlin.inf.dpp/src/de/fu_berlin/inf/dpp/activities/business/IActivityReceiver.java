@@ -18,7 +18,7 @@ public interface IActivityReceiver {
 
     void receive(TextEditActivity textEditActivity);
 
-    void receive(RoleActivity roleActivity);
+    void receive(PermissionActivity permissionActivity);
 
     void receive(FolderActivity folderActivity);
 

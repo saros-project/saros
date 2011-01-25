@@ -99,7 +99,7 @@ public class LeaveSessionAction extends Action {
                     .openQuestion(
                         shell,
                         "Confirm Closing Session",
-                        "Are you sure that you want to close this Saros session? Since you are the host of this session, it will be closed for all participants.");
+                        "Are you sure that you want to close this Saros session? Since you are the creator of this session, it will be closed for all participants.");
             }
         } else {
             reallyLeave = MessageDialog.openQuestion(shell,

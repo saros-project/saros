@@ -77,7 +77,7 @@ public class TestCreatingNewFile extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>carl assigns exclusive driver role to alice.</li>
+     * <li>carl grants write access to alice.</li>
      * <li>carl creates a new file named "myFile.xml"</li>
      * <li>bob and carl activate "Follow-Mode"</li>
      * <li>alice creates new XML file myFile2.xml and edits it with the Eclipse
@@ -98,12 +98,12 @@ public class TestCreatingNewFile extends STFTest {
      */
 
     @Test
-    public void testCarlGiveExclusiveDriverRole() throws IOException,
+    public void testCarlGrantWriteAccess() throws IOException,
         CoreException {
-        carl.sessionV.giveExclusiveDriverRoleGUI(alice.sessionV);
+        carl.sessionV.grantWriteAccessGUI(alice.sessionV);
 
-        assertFalse(carl.sessionV.isDriver());
-        assertTrue(alice.sessionV.isDriver());
+        assertFalse(carl.sessionV.hasWriteAccess());
+        assertTrue(alice.sessionV.hasWriteAccess());
 
         carl.fileM.newFolder(FOLDER1, PROJECT1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);

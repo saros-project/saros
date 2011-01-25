@@ -73,15 +73,13 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String NO_ENTRY_SELECTED_TEXT = "Please select account in list.";
     public static final String STARTUP_CONNECT_TEXT = "Automatically connect on startup";
     public static final String FOLLOW_MODE_TEXT = "Start in Follow Mode.";
-    public static final String ROLE_CHANGE_TEXT = "On role changes follow exclusive driver automatically.";
-    public static final String MULTI_DRIVER_SUPPORT_TEXT = "Enable multi driver support";
     public static final String CONCURRENT_UNDO_TEXT = "Enable concurrent undo (only local changes are undone, session restart necessary).";
     public static final String DISABLE_VERSION_CONTROL_TEXT = "Disable Version Control support";
     public static final String DISABLE_VERSION_CONTROL_TOOLTIP = "Saros tries to share VCS operations"
         + " like checkout during the invitation, or switch or update during a session. (Currently, only SVN "
         + "is supported.) You can disable VCS support in case you have problems with the repository.\n"
         + "Disabling VCS support during a running session is possible, but enabling VCS support won't have"
-        + " any effect until you rejoin the session (restart if you're the host).";
+        + " any effect until you rejoin the session (restart if you're the creator).";
 
     // icons
     public static final Image ADD_IMAGE = SarosUI
@@ -118,8 +116,8 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         createAccountsGroup();
         createAutomaticConnectField(this.parent);
         createVersionControlPreferences(this.parent);
-        createFollowModePreferences();
-        createMultiDriverPreferences();
+        createConcurrentUndoField(this.parent);
+        createFollowModePreferences(this.parent);
     }
 
     /*
@@ -384,25 +382,18 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         addField(editor);
     }
 
-    protected void createFollowModePreferences() {
-        Composite group = createGroupWithGridLayout(1, "Follow Mode");
+    protected void createConcurrentUndoField(Composite group) {
+        addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
+            CONCURRENT_UNDO_TEXT, group));
+    }
+
+    protected void createFollowModePreferences(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
             FOLLOW_MODE_TEXT, group));
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, ROLE_CHANGE_TEXT,
-            group));
     }
 
     protected Composite createGroup(String text, Composite parent) {
         return createGroupWithGridLayout(1, text);
-    }
-
-    protected void createMultiDriverPreferences() {
-        Composite group = createGroupWithGridLayout(1, "Multi Driver");
-        addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
-            MULTI_DRIVER_SUPPORT_TEXT, group));
-        addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
-            CONCURRENT_UNDO_TEXT, group));
     }
 
     public void init(IWorkbench workbench) {

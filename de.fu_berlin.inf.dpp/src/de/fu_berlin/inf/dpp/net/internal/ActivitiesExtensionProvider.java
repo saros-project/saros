@@ -32,8 +32,8 @@ import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
@@ -56,7 +56,8 @@ public class ActivitiesExtensionProvider extends
         super("activityDataObjects", TimedActivities.class,
             AbstractActivityDataObject.class, EditorActivityDataObject.class,
             FileActivityDataObject.class, FolderActivityDataObject.class,
-            RoleActivityDataObject.class, TextEditActivityDataObject.class,
+            PermissionActivityDataObject.class,
+            TextEditActivityDataObject.class,
             TextSelectionActivityDataObject.class,
             ViewportActivityDataObject.class, TimedActivityDataObject.class,
             JupiterActivityDataObject.class, JupiterVectorTime.class,

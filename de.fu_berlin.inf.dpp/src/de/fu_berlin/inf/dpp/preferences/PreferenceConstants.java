@@ -61,11 +61,7 @@ public class PreferenceConstants {
 
     public static final String MILLIS_UPDATE = "millis.update.setting";
 
-    public static final String MULTI_DRIVER = "multidriver";
-
     public static final String AUTO_ACCEPT_INVITATION = "AUTO_ACCEPT_INVITATION";
-
-    public static final String FOLLOW_EXCLUSIVE_DRIVER = "FOLLOW_EXCLUSIVE_DRIVER";
 
     public static final String AUTO_INVITE = "AUTO_INVITE";
 

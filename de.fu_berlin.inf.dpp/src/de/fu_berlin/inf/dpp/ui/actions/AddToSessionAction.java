@@ -109,13 +109,13 @@ public class AddToSessionAction implements IObjectActionDelegate {
 
             assert shell != null : "Action should not be run if the display is disposed";
 
-            String message = "Enter the name of the project on the host side (case-sensitive):";
+            String message = "Enter the name of the project as on the inviter side (case-sensitive):";
 
             InputDialog dialog = new InputDialog(shell, "Set new nickname",
                 message, this.selectedProject.getName(), new IInputValidator() {
                     public String isValid(String newText) {
                         if (newText == null || newText.trim().length() == 0) {
-                            return "Saros needs the name of the project on the host side!";
+                            return "Saros needs the name of the project as it is displayed in the inviter's Eclipse window!";
                         } else {
                             if (sarosSession.getProject(newText) != null)
                                 return "Project Name is already used to share a project!";

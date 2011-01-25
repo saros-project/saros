@@ -42,9 +42,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -235,13 +235,12 @@ public class SarosSession implements ISarosSession, Disposable {
         this(transmitter, threadContext, 0, sessionStart);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
-        localUser.setUserRole(UserRole.DRIVER);
         host = localUser;
         host.invitationCompleted();
 
         participants.put(host.getJID(), host);
 
-        /* add host to driver list. */
+        /** add host to {@link User.Permission#WRITE_ACCESS} list. */
         concurrentDocumentServer = new ConcurrentDocumentServer(this);
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
@@ -257,7 +256,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();
-        host.setUserRole(UserRole.DRIVER);
 
         participants.put(hostID, host);
         participants.put(saros.getMyJID(), localUser);
@@ -277,41 +275,41 @@ public class SarosSession implements ISarosSession, Disposable {
         return participants.values();
     }
 
-    public List<User> getRemoteObservers() {
+    public List<User> getRemoteUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
             if (user.isLocal())
                 continue;
-            if (user.isObserver())
+            if (user.hasReadOnlyAccess())
                 result.add(user);
         }
         return result;
     }
 
-    public List<User> getObservers() {
+    public List<User> getUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
-            if (user.isObserver())
+            if (user.hasReadOnlyAccess())
                 result.add(user);
         }
         return result;
     }
 
-    public List<User> getDrivers() {
+    public List<User> getUsersWithWriteAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
-            if (user.isDriver())
+            if (user.hasWriteAccess())
                 result.add(user);
         }
         return result;
     }
 
-    public List<User> getRemoteDrivers() {
+    public List<User> getRemoteUsersWithWriteAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
             if (user.isLocal())
                 continue;
-            if (user.isDriver())
+            if (user.hasWriteAccess())
                 result.add(user);
         }
         return result;
@@ -333,35 +331,36 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
-    public void initiateRoleChange(final User user, final UserRole newRole,
-        SubMonitor progress) throws CancellationException, InterruptedException {
+    public void initiatePermissionChange(final User user,
+        final Permission newPermission, SubMonitor progress)
+        throws CancellationException, InterruptedException {
 
         if (!localUser.isHost()) {
             throw new IllegalArgumentException(
-                "Only the host can initiate role changes.");
+                "Only the inviter can initiate permission changes.");
         }
 
         if (user.isHost()) {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivity(getLocalUser(), user,
-                        newRole));
+                    activityCreated(new PermissionActivity(getLocalUser(),
+                        user, newPermission));
 
-                    setUserRole(user, newRole);
+                    setPermission(user, newPermission);
                 }
             });
 
         } else {
             StartHandle startHandle = stopManager.stop(user,
-                "Performing role change", progress);
+                "Performing permission change", progress);
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivity(getLocalUser(), user,
-                        newRole));
+                    activityCreated(new PermissionActivity(getLocalUser(),
+                        user, newPermission));
 
-                    setUserRole(user, newRole);
+                    setPermission(user, newPermission);
                 }
             });
 
@@ -374,18 +373,18 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
-    public void setUserRole(final User user, final UserRole role) {
+    public void setPermission(final User user, final Permission permission) {
 
         assert Util.isSWT() : "Must be called from SWT Thread";
 
-        if (user == null || role == null)
+        if (user == null || permission == null)
             throw new IllegalArgumentException();
 
-        user.setUserRole(role);
+        user.setPermission(permission);
 
-        log.info("Buddy " + user + " is now a " + role);
+        log.info("Buddy " + user + " is now a " + permission);
 
-        listenerDispatch.roleChanged(user);
+        listenerDispatch.permissionChanged(user);
     }
 
     /**
@@ -437,16 +436,16 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public boolean isDriver() {
-        return localUser.isDriver();
+    public boolean hasWriteAccess() {
+        return localUser.hasWriteAccess();
     }
 
-    public boolean isExclusiveDriver() {
-        if (!isDriver()) {
+    public boolean hasExclusiveWriteAccess() {
+        if (!hasWriteAccess()) {
             return false;
         }
         for (User user : getParticipants()) {
-            if (user.isRemote() && user.isDriver()) {
+            if (user.isRemote() && user.hasWriteAccess()) {
                 return false;
             }
         }
@@ -483,7 +482,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         activitySequencer.userLeft(jid);
 
-        // TODO what is to do here if no driver exists anymore?
+        // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
 
         log.info("Buddy " + Util.prefix(jid) + " left session");

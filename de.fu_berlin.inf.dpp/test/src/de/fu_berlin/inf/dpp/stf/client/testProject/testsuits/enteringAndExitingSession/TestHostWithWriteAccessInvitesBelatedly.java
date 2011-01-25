@@ -15,15 +15,15 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestHostAsDriverInvitesBelatedly extends STFTest {
+public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
 
     /**
      * Preconditions:
      * <ol>
-     * <li>Alice (Host, Driver)</li>
-     * <li>Bob (Observer)</li>
-     * <li>Carl (Observer)</li>
-     * <li>All observers enable follow mode</li>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>All read-only users enable follow mode</li>
      * </ol>
      * 
      * @throws AccessException

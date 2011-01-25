@@ -90,8 +90,8 @@ public class STFTest {
     public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
         + CLASS_SUFIX;
 
-    /* Role */
-    public static final String ROLE_NAME = " (Driver)";
+    /* Permissions */
+    public static final String PERMISSION_NAME = " (Driver)";
     public static final String OWN_CONTACT_NAME = "You";
 
     /* SVN infos */
@@ -254,16 +254,17 @@ public class STFTest {
         }
     }
 
-    public static void resetDriverRole(Tester host, Tester... invitees)
+    public static void resetWriteAccess(Tester host, Tester... invitees)
         throws RemoteException {
         for (Tester tester : invitees) {
-            if (tester.sessionV.isInSession() && tester.sessionV.isDriver()) {
-                host.sessionV.removeDriverRoleGUI(tester.sessionV);
+            if (tester.sessionV.isInSession()
+                && tester.sessionV.hasWriteAccess()) {
+                host.sessionV.restrictToReadOnlyAccessGUI(tester.sessionV);
             }
         }
 
-        if (host.sessionV.isInSession() && !host.sessionV.isDriver()) {
-            host.sessionV.giveDriverRoleGUI(host.sessionV);
+        if (host.sessionV.isInSession() && !host.sessionV.hasWriteAccess()) {
+            host.sessionV.grantWriteAccessGUI(host.sessionV);
         }
     }
 

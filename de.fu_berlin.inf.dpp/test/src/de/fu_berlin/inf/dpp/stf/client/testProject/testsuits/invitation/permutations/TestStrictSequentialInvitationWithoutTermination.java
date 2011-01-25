@@ -20,9 +20,9 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>alice (Host, Driver)</li>
-     * <li>bob (Observer)</li>
-     * <li>carl (Observer)</li>
+     * <li>alice (Host, Write Access)</li>
+     * <li>bob (Read-Only Access)</li>
+     * <li>carl (Read-Only Access)</li>
      * </ol>
      * 
      * @throws RemoteException
