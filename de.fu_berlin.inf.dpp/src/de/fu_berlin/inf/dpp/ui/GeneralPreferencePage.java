@@ -64,7 +64,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String GROUP_ACTIVE_LABEL = "activate";
     public static final String GROUP_DEACTIVE_LABEL = "deactivate";
     public static final int COLUMNS_IN_ACCOUNTGROUP = 2;
-    public static final String ACCOUNT_GROUP_TITLE = "XMPP-Accounts";
+    public static final String ACCOUNT_GROUP_TITLE = "XMPP/Jabber Accounts";
     public static final String ACTIVATE_BTN_TEXT = "Activate Account";
     public static final String CHANGE_BTN_TEXT = "Change Account";
     public static final String ADD_BTN_TEXT = "Add Account";

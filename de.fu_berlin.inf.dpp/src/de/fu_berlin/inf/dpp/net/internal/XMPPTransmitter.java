@@ -336,13 +336,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     public void sendUserList(JID to, String invitationID, Collection<User> users) {
-        log.trace("Sending userList to " + Util.prefix(to));
+        log.trace("Sending buddy list to " + Util.prefix(to));
         sendMessageToProjectUser(to, userListExtProv.create(new UserListInfo(
             sessionID, invitationID, users)));
     }
 
     public void sendUserListConfirmation(JID to) {
-        log.trace("Sending userListConfirmation to " + Util.prefix(to));
+        log.trace("Sending buddy list confirmation to " + Util.prefix(to));
         sendMessageToProjectUser(to,
             userListConfExtProv.create(new DefaultSessionInfo(sessionID)));
     }
@@ -380,10 +380,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
                 jid = new JID(result.getFrom());
                 if (!fromUserJIDs.remove(jid)) {
-                    log.warn("UserListConfirmation from unknown user: "
+                    log.warn("Buddy list confirmation from unknown buddy: "
                         + Util.prefix(jid));
                 } else {
-                    log.debug("UserListConfirmation from: " + Util.prefix(jid));
+                    log.debug("Buddy list confirmation from: "
+                        + Util.prefix(jid));
                 }
                 /*
                  * TODO: what if a user goes offline during the invitation? The
@@ -747,7 +748,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         User participant = sarosSessionObservable.getValue().getUser(jid);
         if (participant == null) {
-            log.warn("User not in session:" + Util.prefix(jid));
+            log.warn("Buddy not in session:" + Util.prefix(jid));
             return;
         }
 
@@ -758,11 +759,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
              */
             // remove participant if he/she is offline too long
             if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
-                log.info("Removing offline user from session...");
+                log.info("Removing offline buddy from session...");
                 sarosSessionObservable.getValue().removeUser(participant);
             } else {
                 queueMessage(jid, message);
-                log.info("User known as offline - Message queued!");
+                log.info("Buddy known as offline - Message queued!");
             }
             return;
         }
@@ -780,7 +781,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         if (isConnectionInvalid())
             return null;
 
-        // Request the version from a remote user
+        // Request the version from a buddy
         IQ request = provider.createIQ(payload);
 
         request.setType(IQ.Type.GET);

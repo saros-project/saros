@@ -249,7 +249,7 @@ public class StopManager implements IActivityProvider, Disposable {
                             + " to resulting handles.");
                         doneSignal.countDown();
                     } catch (CancellationException e) {
-                        log.debug("User canceled the Stopping");
+                        log.debug("Buddy canceled the Stopping");
                         monitor.setCanceled(true);
                     } catch (InterruptedException e) {
                         log.debug("Canceling because of an InterruptedException");
@@ -263,12 +263,12 @@ public class StopManager implements IActivityProvider, Disposable {
                 // waiting for all startHandles
                 doneSignal.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                log.error("Stopping was interrupted. Not all users could successfully be stopped.");
+                log.error("Stopping was interrupted. Not all buddies could successfully be stopped.");
             }
         }
         if (monitor.isCanceled()) {
             // Restart the already stopped users
-            log.debug("Monitor was canceled. Restarting already stopped users.");
+            log.debug("Monitor was canceled. Restarting already stopped buddies.");
             for (StartHandle startHandle : resultingHandles)
                 startHandle.start();
             throw new CancellationException();

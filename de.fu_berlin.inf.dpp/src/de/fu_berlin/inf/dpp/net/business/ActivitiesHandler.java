@@ -74,14 +74,12 @@ public class ActivitiesHandler {
                     List<TimedActivityDataObject> timedActivities = payload
                         .getTimedActivities();
 
-                    if (!ObjectUtils.equals(sessionID.getValue(), payload
-                        .getSessionID())) {
-                        log
-                            .warn("Rcvd ("
-                                + String.format("%03d", timedActivities.size())
-                                + ") " + Util.prefix(from)
-                                + "from an old/unknown session: "
-                                + timedActivities);
+                    if (!ObjectUtils.equals(sessionID.getValue(),
+                        payload.getSessionID())) {
+                        log.warn("Rcvd ("
+                            + String.format("%03d", timedActivities.size())
+                            + ") " + Util.prefix(from)
+                            + "from an old/unknown session: " + timedActivities);
                         return;
                     }
 
@@ -95,21 +93,23 @@ public class ActivitiesHandler {
             }
         }, provider.getPacketFilter());
 
-        receiver.addPacketListener(new PacketListener() {
+        receiver.addPacketListener(
+            new PacketListener() {
 
-            public void processPacket(final Packet packet) {
+                public void processPacket(final Packet packet) {
 
-                activityDownloadThreadPool.execute(Util.wrapSafe(log,
-                    new Runnable() {
-                        public void run() {
-                            receiveActivities(provider, incomingExtProv, packet);
-                        }
-                    }));
-            }
+                    activityDownloadThreadPool.execute(Util.wrapSafe(log,
+                        new Runnable() {
+                            public void run() {
+                                receiveActivities(provider, incomingExtProv,
+                                    packet);
+                            }
+                        }));
+                }
 
-        }, PacketExtensionUtils.getIncomingTransferObjectFilter(
-            incomingExtProv, sessionID, null,
-            FileTransferType.ACTIVITY_TRANSFER));
+            }, PacketExtensionUtils.getIncomingTransferObjectFilter(
+                incomingExtProv, sessionID, null,
+                FileTransferType.ACTIVITY_TRANSFER));
     }
 
     private void receiveActivities(final ActivitiesExtensionProvider provider,
@@ -172,8 +172,8 @@ public class ActivitiesHandler {
 
         if (session == null || session.getUser(fromJID) == null) {
             log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
-                + ") " + Util.prefix(fromJID) + " but User is no participant: "
-                + timedActivities);
+                + ") " + Util.prefix(fromJID)
+                + " but buddy is no participant: " + timedActivities);
             return;
         } else {
             String msg = "Rcvd ("

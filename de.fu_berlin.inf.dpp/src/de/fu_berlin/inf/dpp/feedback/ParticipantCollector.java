@@ -69,7 +69,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
             log.info(Util.prefix(user.getJID())
                 + "joined. Session now contains " + currentNumberOfParticipants
-                + " users.");
+                + " buddies.");
         }
 
         @Override
@@ -79,7 +79,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             handleUserEvent(currentNumberOfParticipants + 1);
 
             log.info(Util.prefix(user.getJID()) + "left. Session now contains "
-                + currentNumberOfParticipants + " users.");
+                + currentNumberOfParticipants + " buddies.");
         }
 
     };
@@ -116,8 +116,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
         // store the number of users and associated times
         for (Entry<Integer, Long> e : participantTimes.entrySet()) {
             int percent = getPercentage(e.getValue(), sessionTime);
-            data.setSessionTimeForUsers(e.getKey(), StatisticManager
-                .getTimeInMinutes(e.getValue()));
+            data.setSessionTimeForUsers(e.getKey(),
+                StatisticManager.getTimeInMinutes(e.getValue()));
             data.setSessionTimePercentForUsers(e.getKey(), percent);
         }
     }

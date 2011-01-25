@@ -64,12 +64,12 @@ public class ChangeColorManager implements IActivityProvider {
             ChangeColorActivity changeColorActivity = (ChangeColorActivity) activity;
             User user = changeColorActivity.getSource();
             if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException("User " + user
+                throw new IllegalArgumentException("Buddy " + user
                     + " is not a participant in this shared project");
             }
 
             log.info("received color: " + changeColorActivity.getColor()
-                + " from user: " + user);
+                + " from buddy: " + user);
             SarosAnnotation.setUserColor(user, changeColorActivity.getColor());
 
             editorManager.colorChanged();

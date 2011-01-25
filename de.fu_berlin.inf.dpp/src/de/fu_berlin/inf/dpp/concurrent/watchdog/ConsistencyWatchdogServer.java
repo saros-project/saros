@@ -203,7 +203,7 @@ public class ConsistencyWatchdogServer extends Job {
                         }
                         if (!remoteEditors.contains(docPath)) {
                             /*
-                             * Since remote users do not report this document as
+                             * Since buddies do not report this document as
                              * open, they are right (and our EditorPool might be
                              * confused)
                              */

@@ -839,7 +839,7 @@ public class SessionStatistic {
     }
 
     /**
-     * Sets the characters edited by each remote user
+     * Sets the characters edited by each buddy
      * 
      * @param userNumber
      * @param charCount
@@ -850,7 +850,7 @@ public class SessionStatistic {
     }
 
     /**
-     * Sets the number of remote paste events for each remote user
+     * Sets the number of remote paste events for each buddy
      * 
      * @param userNumber
      * @param pasteCount

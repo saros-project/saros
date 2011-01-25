@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * remote users as we believe it to be by listening to the activityDataObjects
+ * buddies as we believe it to be by listening to the activityDataObjects
  * we receive.
  */
 public class RemoteEditorManager {
@@ -75,7 +75,7 @@ public class RemoteEditorManager {
 
     /**
      * This class represents the state of the editors, viewports, selection of
-     * one remote user.
+     * one buddy.
      */
     public static class RemoteEditorState {
 
@@ -92,7 +92,7 @@ public class RemoteEditorManager {
         public void setSelection(SPath path, ITextSelection selection) {
 
             if (!openEditors.containsKey(path)) {
-                log.warn("Received selection from user [" + this.user
+                log.warn("Received selection from buddy [" + this.user
                     + "] for editor which was never activated: " + path);
                 return;
             }
@@ -232,7 +232,7 @@ public class RemoteEditorManager {
         }
 
         /**
-         * Returns a snapshot copy of the editors open for the remote user
+         * Returns a snapshot copy of the editors open for the buddy
          * represented by this RemoteEditorState.
          */
         public Set<SPath> getRemoteOpenEditors() {
@@ -307,7 +307,7 @@ public class RemoteEditorManager {
 
     /**
      * Returns a set of all paths representing the editors which are currently
-     * opened by the remote users of this shared session (i.e. not our own).
+     * opened by the buddies of this shared session (i.e. not our own).
      * 
      * If no editors are opened an empty set is being returned.
      */
@@ -321,7 +321,7 @@ public class RemoteEditorManager {
 
     /**
      * Returns a snapshot copy of all paths representing the editors which are
-     * currently opened by the given remote user of this shared session (i.e.
+     * currently opened by the given buddy of this shared session (i.e.
      * not our own).
      * 
      * If no editors are opened by the given user an empty set is being

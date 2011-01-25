@@ -118,8 +118,8 @@ public class RemoteProgressManager {
         public synchronized void receive(ProgressActivity progressActivity) {
             if (!source.equals(progressActivity.getSource())) {
                 log.warn("RemoteProgress with ID: " + progressID
-                    + " is owned by user " + source
-                    + " rejecting packet from other user: " + progressActivity);
+                    + " is owned by buddy " + source
+                    + " rejecting packet from other buddy: " + progressActivity);
                 return;
             }
             if (activities == null) {

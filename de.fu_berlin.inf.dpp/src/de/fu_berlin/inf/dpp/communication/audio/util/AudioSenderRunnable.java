@@ -48,7 +48,7 @@ public class AudioSenderRunnable implements Runnable {
             WarningMessageDialog
                 .showWarningMessage(
                     "VoIP Warning",
-                    "An error occured while initializing the audio record device. The VoIP Session will start anyway. Please check the VoIP Settings at Window > Preferences > Saros > Communication. Maybe this session will be pointless if the other user has also no record device.");
+                    "An error occured while initializing the audio record device. The VoIP Session will start anyway. Please check the VoIP Settings at Window > Preferences > Saros > Communication. Maybe this session will be pointless if the other buddy has also no record device.");
             log.warn("No record device initialized");
             return;
         }
@@ -56,8 +56,9 @@ public class AudioSenderRunnable implements Runnable {
         AudioFormat audioFormat = preferenceUtils.getEncodingFormat();
         log.debug("Starting Encoder with " + audioFormat.toString());
         log.info("AudioEncoder will be initalized.");
-        encoderStream = new Pcm2SpeexAudioInputStream(recorder
-            .getAudioInputStream(), audioFormat, AudioSystem.NOT_SPECIFIED);
+        encoderStream = new Pcm2SpeexAudioInputStream(
+            recorder.getAudioInputStream(), audioFormat,
+            AudioSystem.NOT_SPECIFIED);
 
         if (preferenceUtils.isDtxEnabled()) {
             encoderStream.getEncoder().setDtx(true);

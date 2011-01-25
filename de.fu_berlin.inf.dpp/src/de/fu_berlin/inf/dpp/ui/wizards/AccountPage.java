@@ -65,7 +65,7 @@ public class AccountPage extends WizardPage {
         Label label = new Label(parent, SWT.NONE);
         label.setText("Info:");
         Link link = new Link(parent, SWT.NONE);
-        link.setText("For a list of public XMPP servers click <a href=\""
+        link.setText("For a list of public XMPP/Jabber servers click <a href=\""
             + LIST_OF_XMPP_SERVERS + "\">here</a>");
         link.addListener(SWT.Selection, new LinkListener());
     }

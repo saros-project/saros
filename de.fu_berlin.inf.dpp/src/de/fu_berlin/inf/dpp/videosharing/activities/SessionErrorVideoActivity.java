@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 package de.fu_berlin.inf.dpp.videosharing.activities;
 
 /**
- * Carries an exception to the remote user for information.
+ * Carries an exception to the buddy for information.
  * 
  * @author s-lau
  */

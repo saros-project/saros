@@ -383,7 +383,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         user.setUserRole(role);
 
-        log.info("User " + user + " is now a " + role);
+        log.info("Buddy " + user + " is now a " + role);
 
         listenerDispatch.roleChanged(user);
     }
@@ -460,20 +460,20 @@ public class SarosSession implements ISarosSession, Disposable {
         JID jid = user.getJID();
 
         if (participants.putIfAbsent(jid, user) != null) {
-            log.error("User " + Util.prefix(jid)
+            log.error("Buddy " + Util.prefix(jid)
                 + " added twice to SarosSession", new StackTrace());
             throw new IllegalArgumentException();
         }
 
         listenerDispatch.userJoined(user);
 
-        log.info("User " + Util.prefix(jid) + " joined session.");
+        log.info("Buddy " + Util.prefix(jid) + " joined session.");
     }
 
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
-            log.warn("Tried to remove user who was not in participants: "
+            log.warn("Tried to remove buddy who was not in participants: "
                 + Util.prefix(jid));
             return;
         }
@@ -486,7 +486,7 @@ public class SarosSession implements ISarosSession, Disposable {
         // TODO what is to do here if no driver exists anymore?
         listenerDispatch.userLeft(user);
 
-        log.info("User " + Util.prefix(jid) + " left session");
+        log.info("Buddy " + Util.prefix(jid) + " left session");
     }
 
     /*

@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * e.g. when a new line is started), how many text edit activityDataObjects he
  * produced (which can be different to the number of characters he wrote, e.g.
  * when copy&paste or Eclipse's method generation was used) and how concurrent
- * the local user's writing was to remote users using different sample
+ * the local user's writing was to buddies using different sample
  * intervals. <br>
  * Furthermore, it accumulates the characters edited for all remote
  * participants. <br>
@@ -60,10 +60,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The threshold was chosen to be 16 due to some testing. The characters within
  * a textEditActivity heavily depends on the connection speed. When a the local
  * user fires several textEdits within a short interval he might see those edits
- * as several single edits with a few characters but a remote user will most
+ * as several single edits with a few characters but a buddy will most
  * likely get less textEditActivities containing a bunch of characters. The
  * manual tests results were: When "typing" (rather thrashing the keyboard) as
- * fast as one could, the remote user received text edits with up to 20
+ * fast as one could, the buddy received text edits with up to 20
  * characters. As this typing speed is beyond human capabilities, I've decided
  * to set the threshold to 16 which will most likely prevent getting false
  * positives (e.g. a really fast typer is typing instead of a paste).
@@ -111,8 +111,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
  * 1);
  * 
- * TODO: synchronize the numbers the remote users get with the other collectors
- * (E.g. Alice as remote user should appear as user.2 in all statistic fields.
+ * TODO: synchronize the numbers the buddies get with the other collectors
+ * (E.g. Alice as buddy should appear as user.2 in all statistic fields.
  * 
  * @author Lisa Dohrmann, Moritz von Hoffen
  */
@@ -276,15 +276,15 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected void processGatheredData() {
 
         /*
-         * a variable to distinguish between remote users and assign a number to
-         * each of these remote users.
+         * a variable to distinguish between buddies and assign a number to
+         * each of these buddies.
          */
         int userNumber = 1;
 
         // iterate through the map and write written char count to session data
         for (Map.Entry<JID, Integer> entry : remoteCharCount.entrySet()) {
             JID currentId = entry.getKey();
-            // get character count for this remote user
+            // get character count for this buddy
             Integer charCount = entry.getValue();
             // write the count to the session data
             data.setRemoteUserCharCount(userNumber, charCount);

@@ -99,7 +99,7 @@ public class ActivitySequencer {
     protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
     /**
-     * A priority queue for timed activityDataObjects. For each remote user
+     * A priority queue for timed activityDataObjects. For each buddy
      * there is one ActivityQueue, in which received events from those are
      * stored.<br>
      * TODO "Timestamps" are treated more like consecutive sequence numbers, so

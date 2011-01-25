@@ -51,13 +51,13 @@ public class RoleManager implements IActivityProvider {
 
         @Override
         public void userJoined(User user) {
-            SessionView.showNotification("User joined",
+            SessionView.showNotification("Buddy joined",
                 user.getHumanReadableName() + " joined the session.");
         }
 
         @Override
         public void userLeft(User user) {
-            SessionView.showNotification("User left",
+            SessionView.showNotification("Buddy left",
                 user.getHumanReadableName() + " left the session.");
         }
     };
@@ -115,7 +115,7 @@ public class RoleManager implements IActivityProvider {
             RoleActivity roleActivity = (RoleActivity) activity;
             User user = roleActivity.getAffectedUser();
             if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException("User " + user
+                throw new IllegalArgumentException("Buddy " + user
                     + " is not a participant in this shared project");
             }
             UserRole role = roleActivity.getRole();

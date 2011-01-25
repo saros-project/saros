@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public interface IActivityDataObject {
 
     /**
-     * Returns the Jabber ID of the user which has caused this
+     * Returns the JID of the user which has caused this
      * activityDataObject.
      */
     public JID getSource();

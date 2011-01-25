@@ -42,7 +42,7 @@ public class MessagingAction extends SelectionProviderAction {
         this.mucManager = messagingManager;
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Start a IM session with this user");
+        setToolTipText("Start a IM session with this buddy");
         setImageDescriptor(SarosUI.getImageDescriptor("XXX")); // please read
                                                                // http://wiki.eclipse.org/User_Interface_Guidelines#Naming_Conventions
                                                                // for correct

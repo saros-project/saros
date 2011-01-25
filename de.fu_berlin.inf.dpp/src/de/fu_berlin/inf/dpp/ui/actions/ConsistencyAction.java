@@ -133,7 +133,7 @@ public class ConsistencyAction extends Action {
         Util.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
-                log.debug("User activated CW recovery.");
+                log.debug("Buddy activated CW recovery.");
 
                 Shell dialogShell = EditorAPI.getShell();
                 if (dialogShell == null)

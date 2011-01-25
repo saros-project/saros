@@ -130,7 +130,7 @@ public class InvitationWizard extends Wizard {
             return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openConfirm(getAShell(),
-                        "Invite user who does not support Saros?", "User "
+                        "Invite buddy who does not support Saros?", "User "
                             + peer + " does not seem to use Saros "
                             + "(but rather a normal Instant Messaging client),"
                             + " invite anyway?");

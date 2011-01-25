@@ -52,7 +52,7 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
 
         User user = sarosSession.getUser(source);
         if (user == null)
-            throw new IllegalArgumentException("User is not in shared project");
+            throw new IllegalArgumentException("Buddy is not in shared project");
 
         return new ProgressActivity(user, progressID, workCurrent, workTotal,
             taskName, action);

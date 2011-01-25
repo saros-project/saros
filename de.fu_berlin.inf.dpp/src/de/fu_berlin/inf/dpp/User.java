@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * There is one user who is the host, all others are clients.
  * 
  * There is one local user representing the person in front of the current
- * eclipse instance, all others are remote users.
+ * eclipse instance, all others are buddies.
  * 
  * The public and mutable properties are the role (Driver/Observer), time since
  * going off-line, connection state, away information and whether this user is
@@ -178,7 +178,7 @@ public class User {
     public void invitationCompleted() {
         if (invitationComplete)
             throw new IllegalStateException(
-                "The invitation status of the user can be set only once!");
+                "The invitation status of the buddy can be set only once!");
         invitationComplete = true;
     }
 
@@ -240,8 +240,8 @@ public class User {
 
     /**
      * Returns true if this User object identifies the user which is using the
-     * local Eclipse instance as opposed to the remote users in different
-     * Eclipse instances.
+     * local Eclipse instance as opposed to the buddies in different Eclipse
+     * instances.
      */
     public boolean isLocal() {
         return this.equals(sarosSession.getLocalUser());

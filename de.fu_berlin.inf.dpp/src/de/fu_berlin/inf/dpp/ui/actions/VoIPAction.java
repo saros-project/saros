@@ -116,7 +116,7 @@ public class VoIPAction extends Action {
                 WarningMessageDialog
                     .showWarningMessage(
                         "No Record device",
-                        "Your record device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session will be started, but it could be pointless if the other user has also no record device.");
+                        "Your record device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session will be started, but it could be pointless if the other buddy has also no record device.");
                 audioServiceManager.setRecordDeviceOk(false);
             }
 

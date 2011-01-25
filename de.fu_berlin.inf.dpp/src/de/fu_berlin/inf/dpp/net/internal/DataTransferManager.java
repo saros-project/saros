@@ -301,7 +301,7 @@ public class DataTransferManager implements IConnectionListener,
      * Dispatch to Transmitter.
      * 
      * @throws SarosCancellationException
-     *             It will be thrown if the local or remote user has canceled
+     *             It will be thrown if the local or buddy has canceled
      *             the transfer.
      * @throws IOException
      *             If a technical problem occurred.

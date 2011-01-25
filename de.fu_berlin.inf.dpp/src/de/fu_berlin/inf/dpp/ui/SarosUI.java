@@ -296,7 +296,7 @@ public class SarosUI {
                             user, newRole, progress);
 
                     } catch (CancellationException e) {
-                        log.warn("Role change failed because user"
+                        log.warn("Role change failed because buddy"
                             + " canceled the role change");
                         Util.runSafeSWTSync(log, new Runnable() {
                             public void run() {

@@ -90,10 +90,9 @@ public class ConnectionTestManager {
                         + "Connection Test Data received: " + data.length
                         + " bytes, hashCode==" + result.dataHash);
                 } catch (SarosCancellationException e) {
-                    log
-                        .error(
-                            "Connection Test failed because of an CancelationException",
-                            e);
+                    log.error(
+                        "Connection Test failed because of an CancelationException",
+                        e);
                     result.errorMessage = "SarosCancellationException: "
                         + Util.getMessage(e);
                 } catch (IOException e) {
@@ -109,8 +108,9 @@ public class ConnectionTestManager {
 
                     saros.getConnection().sendPacket(iqResponse);
                 } catch (Exception e) {
-                    log.error("Could not send test results to "
-                        + Util.prefix(new JID(packet.getFrom())), e);
+                    log.error(
+                        "Could not send test results to "
+                            + Util.prefix(new JID(packet.getFrom())), e);
                 }
             }
         }, new PacketFilter() {
@@ -166,7 +166,7 @@ public class ConnectionTestManager {
         TestResult result = new TestResult();
         result.dataSize = size;
 
-        progress.beginTask("Connection Test with user " + plainJID, 68);
+        progress.beginTask("Connection Test with buddy " + plainJID, 68);
         try {
             XMPPConnection connection = saros.getConnection();
             if (connection == null || !connection.isConnected())
@@ -175,11 +175,11 @@ public class ConnectionTestManager {
 
             String id = Packet.nextID();
 
-            progress.subTask("Checking if remote user is using Saros");
+            progress.subTask("Checking if buddy is using Saros");
             JID user = discoManager.getSupportingPresence(plainJID,
                 Saros.NAMESPACE);
             if (user == null)
-                throw new XMPPException("User " + plainJID
+                throw new XMPPException("Buddy " + plainJID
                     + " is not using Saros");
             progress.worked(1);
 

@@ -63,14 +63,13 @@ public class UserListHandler {
                     return;
                 }
 
-                ISarosSession sarosSession = sessionManager
-                    .getSarosSession();
+                ISarosSession sarosSession = sessionManager.getSarosSession();
                 assert sarosSession != null;
 
                 User fromUser = sarosSession.getUser(fromJID);
 
                 if (fromUser == null || !fromUser.isHost()) {
-                    log.error("Received UserList from user which "
+                    log.error("Received userList from buddy who "
                         + "is not part of our session or is not host: "
                         + Util.prefix(fromJID));
                     return;

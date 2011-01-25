@@ -28,7 +28,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * A Jabber ID which is used to identify the users of the Jabber network.
+ * A JID which is used to identify the users of the XMPP network.
  * 
  * @valueObject A JID is a value object, i.e. it is immutable!
  * 
@@ -63,11 +63,11 @@ public class JID implements Serializable {
     }
 
     /**
-     * Construct a new Jabber-ID
+     * Construct a new JID
      * 
      * @param jid
-     *            the Jabber ID in the format of user@host[/resource]. Resource
-     *            is optional.
+     *            the JID in the format of user@host[/resource]. Resource is
+     *            optional.
      */
     public JID(String jid) {
         if (jid == null)
@@ -77,7 +77,7 @@ public class JID implements Serializable {
     }
 
     /**
-     * @return the name segment of this Jabber ID.
+     * @return the name segment of this JID.
      * @see StringUtils#parseName(String)
      */
     public String getName() {
@@ -85,7 +85,7 @@ public class JID implements Serializable {
     }
 
     /**
-     * @return the Jabber ID without resource qualifier.
+     * @return the JID without resource qualifier.
      * @see StringUtils#parseBareAddress(String)
      */
     public String getBase() {
@@ -93,7 +93,7 @@ public class JID implements Serializable {
     }
 
     /**
-     * @return the domain segment of this Jabber ID.
+     * @return the domain segment of this JID.
      * @see StringUtils#parseServer(String)
      */
     public String getDomain() {
@@ -101,8 +101,8 @@ public class JID implements Serializable {
     }
 
     /**
-     * @return the resource segment of this Jabber ID or the empty string if
-     *         there is none.
+     * @return the resource segment of this JID or the empty string if there is
+     *         none.
      * @see StringUtils#parseResource(String)
      */
     public String getResource() {

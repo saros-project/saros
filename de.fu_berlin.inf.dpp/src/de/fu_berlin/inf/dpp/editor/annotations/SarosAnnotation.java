@@ -29,7 +29,7 @@ public abstract class SarosAnnotation extends Annotation {
     private static Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
-     * Source of this annotation (jabber id).
+     * Source of this annotation (JID).
      * 
      * All access should use getSource()
      */

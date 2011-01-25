@@ -34,11 +34,10 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
     public JumpToDriverPositionAction(Saros saros,
         SarosSessionManager sessionManager, EditorManager editorManager,
         ISelectionProvider provider) {
-        super(provider, "Jump to position of selected user");
+        super(provider, "Jump to position of selected buddy");
 
-        setToolTipText("Jump to position of selected user");
-        setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/elcl16/jump.png"));
+        setToolTipText("Jump to position of selected buddy");
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/elcl16/jump.png"));
 
         this.saros = saros;
         this.editorManager = editorManager;

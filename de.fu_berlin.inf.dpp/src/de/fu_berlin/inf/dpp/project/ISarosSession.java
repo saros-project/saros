@@ -56,7 +56,7 @@ public interface ISarosSession extends IActivityListener {
     public Collection<User> getParticipants();
 
     /**
-     * @return a snap-shot copy of all remote users.
+     * @return a snap-shot copy of all buddies.
      */
     public List<User> getRemoteUsers();
 
@@ -256,7 +256,7 @@ public interface ISarosSession extends IActivityListener {
      * in the UI.
      * 
      * The given activity will be transformed by the ConcurrentDocumentManager
-     * and then send to all remote users.
+     * and then send to all buddies.
      * 
      * @see IActivityListener
      * 

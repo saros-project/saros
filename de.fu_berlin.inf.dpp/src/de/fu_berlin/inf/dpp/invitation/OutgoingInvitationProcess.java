@@ -122,7 +122,8 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         IProject project, String description, int colorID,
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, StopManager stopManager,
-        DiscoveryManager discoveryManager, MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
+        DiscoveryManager discoveryManager,
+        MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
         boolean doStream) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
@@ -423,7 +424,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
-        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+        log.debug("Inv" + Util.prefix(peer) + ": Stopping buddies: "
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
@@ -469,7 +470,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
-                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
+                log.debug("Inv" + Util.prefix(peer) + ": Starting buddy "
                     + Util.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
@@ -512,7 +513,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
-        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+        log.debug("Inv" + Util.prefix(peer) + ": Stopping buddies: "
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
@@ -552,7 +553,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
-                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
+                log.debug("Inv" + Util.prefix(peer) + ": Starting buddy "
                     + Util.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
@@ -683,7 +684,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         Collection<User> participants = sarosSession.getParticipants();
-        log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
+        log.debug("Inv" + Util.prefix(peer) + ": Synchronizing buddy list "
             + participants);
 
         SarosPacketCollector userListConfirmationCollector = transmitter
@@ -694,11 +695,11 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         }
 
         log.debug("Inv" + Util.prefix(peer)
-            + ": Waiting for user list confirmations...");
+            + ": Waiting for buddy list confirmations...");
         transmitter.receiveUserListConfirmation(userListConfirmationCollector,
             sarosSession.getRemoteUsers(), monitor);
         log.debug("Inv" + Util.prefix(peer)
-            + ": All user list confirmations have arrived.");
+            + ": All buddy list confirmations have arrived.");
     }
 
     /**
@@ -812,12 +813,12 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
             errorMsg = e.getMessage();
             if (errorMsg != null) {
-                cancelMessage = "Invitation was cancelled by the remote user "
+                cancelMessage = "Invitation was cancelled by the buddy "
                     + " because of an error on his/her side: " + errorMsg;
                 log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation failed.");
             } else {
-                cancelMessage = "Invitation was cancelled by the remote user.";
+                cancelMessage = "Invitation was cancelled by the buddy.";
                 log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation has been cancelled.");
             }

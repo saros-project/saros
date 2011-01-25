@@ -60,7 +60,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         super(provider, "Give driver role");
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/elcl16/givedriver.png"));
-        setToolTipText("Give the driver role to this user");
+        setToolTipText("Give the driver role to this buddy");
 
         Saros.injectDependenciesOnly(this);
         /*

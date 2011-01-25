@@ -61,7 +61,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         this.sessionManager = sessionManager;
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/elcl16/giveexcldriver.png"));
-        setToolTipText("Give the exclusive driver role to this user");
+        setToolTipText("Give the exclusive driver role to this buddy");
 
         /*
          * if SessionView is not "visible" on session start up this constructor

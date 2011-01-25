@@ -138,7 +138,7 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Send the given Skype user name to all our contacts that are currently
+     * Send the given Skype user name to all our buddies that are currently
      * available.
      * 
      * TODO SS only send to those, that we know use Saros.
@@ -226,7 +226,7 @@ public class SkypeManager implements IConnectionListener {
             return null;
         }
 
-        // Request the time from a remote user.
+        // Request the time from a buddy.
         IQ request = skypeProvider.createIQ(null);
 
         request.setType(IQ.Type.GET);

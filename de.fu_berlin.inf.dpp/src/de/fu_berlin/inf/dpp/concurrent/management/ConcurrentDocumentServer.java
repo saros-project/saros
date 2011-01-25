@@ -123,8 +123,8 @@ public class ConcurrentDocumentServer implements Disposable {
 
         assert !Util.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
 
-        TransformationResult result = new TransformationResult(sarosSession
-            .getLocalUser());
+        TransformationResult result = new TransformationResult(
+            sarosSession.getLocalUser());
 
         for (IActivity activityDataObject : activityDataObjects) {
             try {
@@ -170,7 +170,7 @@ public class ConcurrentDocumentServer implements Disposable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown user in transformation result: "
+                log.error("Unknown buddy in transformation result: "
                     + Util.prefix(jid));
                 continue;
             }
@@ -223,7 +223,7 @@ public class ConcurrentDocumentServer implements Disposable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown user in transformation result: "
+                log.error("Unknown buddy in transformation result: "
                     + Util.prefix(jid));
                 continue;
             }

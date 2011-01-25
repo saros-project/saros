@@ -33,13 +33,13 @@ public class SkypeAction extends SelectionProviderAction {
     protected SkypeManager skypeManager;
 
     public SkypeAction(ISelectionProvider provider) {
-        super(provider, "Skype this user");
+        super(provider, "Skype this buddy");
 
         Saros.injectDependenciesOnly(this);
 
         setEnabled(false);
 
-        setToolTipText("Start a Skype-VoIP session with this user");
+        setToolTipText("Start a Skype-VoIP session with this buddy");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/telephone.png"));
     }
 

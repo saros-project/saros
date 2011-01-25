@@ -85,7 +85,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * Builder for moving files.
      * 
      * @param source
-     *            JabberID of the origin user
+     *            JID of the origin user
      * 
      * @param destPath
      *            path where the file moved to

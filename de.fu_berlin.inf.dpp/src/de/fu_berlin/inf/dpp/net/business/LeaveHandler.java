@@ -46,8 +46,8 @@ public class LeaveHandler {
 
         @Override
         public PacketFilter getFilter() {
-            return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getSessionIDPacketFilter(sessionID));
+            return new AndFilter(super.getFilter(),
+                PacketExtensionUtils.getSessionIDPacketFilter(sessionID));
         }
 
         @Override
@@ -63,7 +63,7 @@ public class LeaveHandler {
 
             final User user = sarosSession.getUser(fromJID);
             if (user == null) {
-                log.warn("Received leave message from user which"
+                log.warn("Received leave message from buddy who"
                     + " is not part of our shared project session: " + fromJID);
                 return;
             }

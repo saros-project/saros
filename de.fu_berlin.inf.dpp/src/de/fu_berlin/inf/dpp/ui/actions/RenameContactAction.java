@@ -55,7 +55,7 @@ public class RenameContactAction extends SelectionProviderAction {
         this.saros = saros;
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Set the nickname of this contact.");
+        setToolTipText("Set the nickname of this buddy.");
     }
 
     /**
@@ -79,7 +79,7 @@ public class RenameContactAction extends SelectionProviderAction {
 
         assert shell != null : "Action should not be run if the display is disposed";
 
-        String message = "Enter the new nickname of this contact '"
+        String message = "Enter the new nickname of this buddy '"
             + entry.getUser() + "'";
         if (entry.getName() != null) {
             message += " with current nickname '" + entry.getName() + "'";

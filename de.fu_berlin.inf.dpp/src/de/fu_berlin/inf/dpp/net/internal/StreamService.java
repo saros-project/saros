@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -50,7 +50,7 @@ public abstract class StreamService {
     public abstract void startSession(StreamSession newSession);
 
     /**
-     * Remote user requests a session
+     * buddy requests a session
      * 
      * @param from
      *            {@link User} to start a session with

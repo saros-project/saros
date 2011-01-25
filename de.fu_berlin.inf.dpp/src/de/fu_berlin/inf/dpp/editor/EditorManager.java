@@ -638,7 +638,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         if (sarosSession == null) {
             log.error("Shared Project has ended, but text edits"
-                + " are received from local user.");
+                + " are received from local buddy.");
             return;
         }
 
@@ -688,7 +688,7 @@ public class EditorManager implements IActivityProvider, Disposable {
              * 
              * But watch out for changes because of a consistency check!
              */
-            log.warn("Local user caused text changes as an observer: "
+            log.warn("Local buddy caused text changes as an observer: "
                 + textEdit);
             return;
         }
@@ -731,7 +731,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         User sender = activity.getSource();
         if (!sender.isInSarosSession()) {
-            log.warn("Trying to execute activityDataObject for unknown user: "
+            log.warn("Trying to execute activityDataObject for unknown buddy: "
                 + activity);
             return;
         }
@@ -1318,7 +1318,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (!provider.canSaveDocument(input)) {
             /*
              * This happens when a file which is already saved is saved again by
-             * a remote user
+             * a buddy
              */
             log.debug(".saveText File " + file.getName()
                 + " does not need to be saved");
@@ -1368,7 +1368,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
 
             if (monitor.isCanceled()) {
-                log.warn("Saving was canceled by user: " + path);
+                log.warn("Saving was canceled by buddy: " + path);
             }
 
             dirtyStateListener.enabled = true;
@@ -1529,7 +1529,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void setFollowing(User userToFollow) {
 
         assert userToFollow == null
-            || !userToFollow.equals(sarosSession.getLocalUser()) : "Local user cannot follow himself!";
+            || !userToFollow.equals(sarosSession.getLocalUser()) : "Local buddy cannot follow himself!";
 
         this.userToFollow = userToFollow;
 
@@ -1665,7 +1665,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     /**
      * Returns the set of paths representing the editors which are currently
-     * opened by the remote users and the local user.
+     * opened by the buddies and the local user.
      * 
      * Returns an empty set if no editors are opened.
      */

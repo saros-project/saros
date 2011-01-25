@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
- * A wizard to configure Saros (Jabber account, network settings, statistic
+ * A wizard to configure Saros (XMPP account, network settings, statistic
  * submission).
  * 
  */

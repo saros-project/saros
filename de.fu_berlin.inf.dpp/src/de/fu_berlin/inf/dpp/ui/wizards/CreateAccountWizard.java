@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
 /**
- * An wizard that is used to create Jabber accounts.
+ * An wizard that is used to create XMPP accounts.
  * 
  * @author rdjemili
  * @author coezbek
@@ -36,13 +36,12 @@ public class CreateAccountWizard extends Wizard {
     protected final RegisterAccountPage page;
 
     protected final Saros saros;
-    
+
     public CreateAccountWizard(Saros saros, PreferenceUtils preferenceUtils,
-        boolean createAccount, boolean showUseNowButton,
-        boolean useNowDefault) {
-        
+        boolean createAccount, boolean showUseNowButton, boolean useNowDefault) {
+
         if (createAccount) {
-            setWindowTitle("Create New User Account");
+            setWindowTitle("Create New XMPP Account");
         } else {
             setWindowTitle("Enter User Account");
         }

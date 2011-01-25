@@ -47,8 +47,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Wizard for adding a new contact to the roster of the currently connected
- * user.
+ * Wizard for adding a new buddy to the roster of the currently connected user.
  */
 public class AddContactWizard extends Wizard {
 
@@ -62,7 +61,7 @@ public class AddContactWizard extends Wizard {
     protected final AddContactPage page = new AddContactPage();
 
     public AddContactWizard(Saros saros) {
-        setWindowTitle("New Contact");
+        setWindowTitle("New Buddy");
         this.saros = saros;
 
         this.addPage(page);
@@ -78,8 +77,8 @@ public class AddContactWizard extends Wizard {
         protected AddContactPage() {
             super("create");
 
-            setTitle("New Contact");
-            setDescription("Add a new contact to your Jabber roster");
+            setTitle("New Buddy");
+            setDescription("Add a new buddy to your Saros buddies");
         }
 
         public void createControl(Composite parent) {
@@ -88,7 +87,7 @@ public class AddContactWizard extends Wizard {
             composite.setLayout(new GridLayout(2, false));
 
             Label idLabel = new Label(composite, SWT.NONE);
-            idLabel.setText("Jabber ID");
+            idLabel.setText("XMPP/Jabber ID");
 
             this.idText = new Text(composite, SWT.BORDER);
             this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
@@ -149,14 +148,14 @@ public class AddContactWizard extends Wizard {
 
             if (!done) {
                 this.setErrorMessage(null);
-                this.setMessage("Please enter a Jabber-ID");
+                this.setMessage("Please enter a XMPP/Jabber ID");
                 this.setPageComplete(false);
                 return;
             }
 
             if (!userAtHostPattern.matcher(this.idText.getText().trim())
                 .matches()) {
-                this.setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
+                this.setErrorMessage("Not a valid XMPP/Jabber ID (should be: id@server.domain)!");
                 this.setMessage(null);
                 this.setPageComplete(false);
                 return;
@@ -165,7 +164,7 @@ public class AddContactWizard extends Wizard {
             if (allowToEnterNick) {
                 if (getNickname().length() == 0) {
                     this.setMessage(
-                        "Enter a Nickname for the Contact (optional)",
+                        "Enter a nickname for the buddy (optional)",
                         IMessageProvider.INFORMATION);
                 } else {
                     this.setMessage(null);
@@ -201,7 +200,7 @@ public class AddContactWizard extends Wizard {
             // leave wizard open
             return false;
         } catch (InterruptedException e) {
-            log.debug("Adding contact " + jid.toString()
+            log.debug("Adding buddy " + jid.toString()
                 + " was canceled by the user.");
         }
         // close the wizard
@@ -215,23 +214,23 @@ public class AddContactWizard extends Wizard {
         try {
             try {
                 if (saros.getRoster().contains(jid.toString())) {
-                    openError("Contact already added", "The contanct "
+                    openError("Buddy already added", "The buddy "
                         + "you were looking to add is already stored in your "
-                        + "contact list.");
+                        + "buddy list.");
                 }
 
                 else if (!saros.isJIDonServer(jid, monitor.newChild(1))) {
-                    if (!openQuestionDialog("Contact not found", "The contact "
+                    if (!openQuestionDialog("Buddy not found", "The buddy "
                         + jid + " could not be found on the server."
                         + " Please make sure you spelled the name correctly.\n"
                         + "It is also possible that the server didn't"
-                        + " return a correct answer for this contact."
+                        + " return a correct answer for this buddy."
                         + " Do you want to add it anyway?")) {
                         throw new InvocationTargetException(new XMPPException(
-                            "ServiceDiscovery returned no results."),
-                            "Contact " + jid + " couldn't be found on server.");
+                            "ServiceDiscovery returned no results."), "Buddy "
+                            + jid + " couldn't be found on server.");
                     }
-                    log.debug("The contact " + jid + " couldn't be found."
+                    log.debug("The buddy " + jid + " couldn't be found."
                         + " The user chose to add it anyway.");
                 }
             } catch (XMPPException e) {
@@ -239,21 +238,21 @@ public class AddContactWizard extends Wizard {
                 String error = extractDiscoveryErrorString(jid, e);
 
                 // ask the user what to do
-                if (!openQuestionDialog("Contact look-up failed",
-                    "We weren't able to determine wether your contact's JID "
+                if (!openQuestionDialog("Buddy look-up failed",
+                    "We weren't able to determine wether your buddy's JID "
                         + jid + " is valid because of the following error:\n\n"
                         + error + "\n\n" + "Do you want to add it anyway?")) {
-                    // don't add contact
+                    // don't add buddy
                     throw new InvocationTargetException(e,
-                        "The XMPP server did not support a query for whether "
+                        "The XMPP/Jabber server did not support a query for whether "
                             + jid + " is a valid JID.");
                 }
-                log.warn("The XMPP server did not support a query for"
+                log.warn("The XMPP/Jabber server did not support a query for"
                     + " whether " + jid + " is a valid JID: " + e.getMessage()
                     + ". The user chose to add it anyway.", e);
             }
 
-            // now add the contact to the Roster
+            // now add the buddy to the Roster
             try {
                 if (allowToEnterNick && !(nickname.length() == 0)) {
                     saros.addContact(jid, nickname, null, monitor.newChild(1));
@@ -262,8 +261,8 @@ public class AddContactWizard extends Wizard {
                         monitor.newChild(1));
                 }
             } catch (XMPPException e) {
-                throw new InvocationTargetException(e, "Couldn't add contact "
-                    + jid + " to Roster: " + e.getMessage());
+                throw new InvocationTargetException(e, "Couldn't add buddy "
+                    + jid + " to Saros buddies: " + e.getMessage());
             }
         } finally {
             monitor.done();
@@ -273,12 +272,12 @@ public class AddContactWizard extends Wizard {
     public String extractDiscoveryErrorString(JID jid, XMPPException e) {
 
         if (e.getMessage().contains("item-not-found")) {
-            return "Contact " + jid + " couldn't be found on server.";
+            return "Buddy " + jid + " couldn't be found on server.";
         } else if (e.getMessage().contains("remote-server-not-found")) {
             return "The server " + jid.getDomain()
                 + " couldn't be connected to.";
         } else if (e.getMessage().contains("No response from the server")) {
-            return "Checking for contact " + jid.getName()
+            return "Checking for buddy " + jid.getName()
                 + " timed out on server " + jid.getDomain();
         } else {
             return e.getMessage();

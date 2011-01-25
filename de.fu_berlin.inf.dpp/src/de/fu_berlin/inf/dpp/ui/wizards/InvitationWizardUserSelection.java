@@ -62,7 +62,7 @@ public class InvitationWizardUserSelection extends WizardPage {
         ISarosSession sarosSession, RosterTracker rosterTracker,
         DiscoveryManager discoveryManager,
         InvitationProcessObservable invitationProcesses) {
-        super("Select users to invite");
+        super("Select buddies to invite");
         this.saros = saros;
         this.roster = saros.getRoster();
         this.sarosSession = sarosSession;
@@ -70,7 +70,7 @@ public class InvitationWizardUserSelection extends WizardPage {
         this.discoveryManager = discoveryManager;
         this.invitationProcesses = invitationProcesses;
         setTitle("Participant selection");
-        setDescription("Select the users you would like to invite");
+        setDescription("Select the buddies you would like to invite");
     }
 
     public void createControl(Composite parent) {
@@ -101,7 +101,7 @@ public class InvitationWizardUserSelection extends WizardPage {
 
         TableColumn userColumn = new TableColumn(userListTable, SWT.NONE);
         userColumn.setWidth(250);
-        userColumn.setText("User");
+        userColumn.setText("Buddy");
 
         TableColumn sarosEnabledColumn = new TableColumn(userListTable,
             SWT.CENTER);
@@ -134,9 +134,9 @@ public class InvitationWizardUserSelection extends WizardPage {
         // CheckBox to show only users with Saros support.
         onlySaros = new Button(composite, SWT.CHECK);
         onlySaros.setSelection(false);
-        onlySaros.setText("Hide users without Saros support");
+        onlySaros.setText("Hide buddies without Saros support");
         onlySaros
-            .setToolTipText("Hide users who are not logged in with Saros, but e.g. with a chat client.");
+            .setToolTipText("Hide buddies who are not logged in with Saros, but e.g. with a chat client.");
         onlySarosListener = new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
                 // do nothing

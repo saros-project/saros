@@ -66,7 +66,7 @@ public interface ITransmitter {
      * @param projectID
      *            the ID of the IProject to which the user should be invited to.
      * @param jid
-     *            the Jabber ID of the user that is to be invited.
+     *            the JID of the user that is to be invited.
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
@@ -82,7 +82,7 @@ public interface ITransmitter {
      * is canceled.
      * 
      * @param jid
-     *            the Jabber ID of the recipient.
+     *            the JID of the recipient.
      * @param errorMsg
      *            the reason why the invitation was canceled or
      *            <code>null</code>.
@@ -92,12 +92,11 @@ public interface ITransmitter {
     /* ---------- files --------- */
 
     /**
-     * Sends given file list to given Jabber user. This methods blocks until the
+     * Sends given file list to given XMPP user. This methods blocks until the
      * file transfer is done or failed.
      * 
      * @param jid
-     *            the Jabber ID of the user to which the file list is to be
-     *            sent.
+     *            the JID of the user to which the file list is to be sent.
      * 
      * @param fileList
      *            the file list that is to be sent.
@@ -182,7 +181,7 @@ public interface ITransmitter {
      * Sends a request-for-file-list-message to given user.
      * 
      * @param recipient
-     *            the Jabber ID of the recipient.
+     *            the JID of the recipient.
      */
     public void sendFileListRequest(JID recipient, String invitationID);
 
@@ -192,7 +191,7 @@ public interface ITransmitter {
      * This is a blocking method.
      * 
      * @param recipient
-     *            the Jabber ID of the recipient.
+     *            the JID of the recipient.
      * @param archive
      *            the project-relative path of the resource that is to be sent.
      * @param monitor

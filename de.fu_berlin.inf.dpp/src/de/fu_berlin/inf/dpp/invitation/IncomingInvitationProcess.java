@@ -835,7 +835,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         log.debug("Inv"
             + Util.prefix(peer)
             + ": remoteCancel "
-            + (errorMsg == null ? " by user" : " because of error: " + errorMsg));
+            + (errorMsg == null ? " by buddy" : " because of error: "
+                + errorMsg));
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new RemoteCancellationException(errorMsg);
@@ -896,11 +897,11 @@ public class IncomingInvitationProcess extends InvitationProcess {
             RemoteCancellationException e = (RemoteCancellationException) cancellationCause;
             errorMsg = e.getMessage();
             if (errorMsg != null) {
-                cancelMessage = "Invitation was cancelled by the remote user "
+                cancelMessage = "Invitation was cancelled by the buddy "
                     + " because of an error on his/her side: " + errorMsg;
                 log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
             } else {
-                cancelMessage = "Invitation was cancelled by the remote user.";
+                cancelMessage = "Invitation was cancelled by the buddy.";
                 log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
             }
         } else {

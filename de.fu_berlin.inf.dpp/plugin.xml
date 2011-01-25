@@ -11,7 +11,7 @@
             class="de.fu_berlin.inf.dpp.ui.RosterView"
             icon="icons/view16/rostr_misc.png"
             id="de.fu_berlin.inf.dpp.ui.RosterView"
-            name="Roster"/>
+            name="Saros Buddies"/>
       <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.SessionView"
@@ -23,7 +23,7 @@
             class="de.fu_berlin.inf.dpp.ui.chat.ChatView"
             icon="icons/view16/chat_misc.png"
             id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            name="Chat View"/>
+            name="Saros Chat"/>
      <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
@@ -546,7 +546,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of remote user 1"
+            label="DPP Selection of buddy 1"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -564,7 +564,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of remote user 2"
+            label="DPP Selection of buddy 2"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -582,7 +582,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of remote user 3"
+            label="DPP Selection of buddy 3"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -600,7 +600,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of remote user 4"
+            label="DPP Selection of buddy 4"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -618,7 +618,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of remote user 5"
+            label="DPP Selection of buddy 5"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"

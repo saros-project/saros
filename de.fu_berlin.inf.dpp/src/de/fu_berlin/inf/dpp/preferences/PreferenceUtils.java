@@ -64,7 +64,7 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns if the user has specified a user name for a Jabber account.
+     * Returns true if the user has specified a user name for a XMPP account.
      * 
      * @return true if there is a user name that is not equal to the empty
      *         string

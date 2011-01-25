@@ -204,7 +204,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * The name of the resource identifier used by Saros when connecting to the
-     * XMPP Server (for instance when logging in as john@doe.com, Saros will
+     * XMPP server (for instance when logging in as john@doe.com, Saros will
      * connect using john@doe.com/Saros)
      */
     public final static String RESOURCE = "Saros";
@@ -843,8 +843,8 @@ public class Saros extends AbstractUIPlugin {
                 if (cause instanceof UnknownHostException) {
                     log.info("Unknown host: " + cause);
 
-                    question = "Error Connecting to XMPP server: '" + server
-                        + "'.\n\nDo you want to use other parameters?";
+                    question = "Error Connecting to XMPP/Jabber server: '"
+                        + server + "'.\n\nDo you want to use other parameters?";
                 } else {
                     log.info("xmpp: " + cause.getMessage(), cause);
 
@@ -899,7 +899,7 @@ public class Saros extends AbstractUIPlugin {
         if (server == null) {
             throw new URISyntaxException(
                 prefStore.getString(PreferenceConstants.SERVER),
-                "The XMPP server address is invalid: " + serverString);
+                "The XMPP/Jabber server address is invalid: " + serverString);
         }
 
         ProxyInfo proxyInfo = getProxyInfo(uri.getHost());
@@ -1021,7 +1021,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Creates the given account on the given Jabber server.
+     * Creates the given account on the given XMPP server.
      * 
      * @blocking
      * 
@@ -1086,12 +1086,12 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Adds given contact to the roster.
+     * Adds given buddy to the roster.
      * 
      * @blocking
      * 
      * @param jid
-     *            the Jabber ID of the contact.
+     *            the JID of the contact.
      * @param nickname
      *            the nickname under which the new contact should appear in the
      *            roster.
@@ -1108,7 +1108,7 @@ public class Saros extends AbstractUIPlugin {
     public void addContact(JID jid, String nickname, String[] groups,
         SubMonitor monitor) throws XMPPException {
 
-        monitor.beginTask("Adding contact " + jid + " to Roster..", 2);
+        monitor.beginTask("Adding buddy " + jid + " to Saros buddies...", 2);
 
         try {
             assertConnection();
@@ -1119,8 +1119,7 @@ public class Saros extends AbstractUIPlugin {
             if (connection.getRoster().contains(jid.toString())) {
                 monitor.worked(1);
 
-                throw new XMPPException("RosterEntry for user " + jid
-                    + " already exists");
+                throw new XMPPException(jid + " already exists.");
             }
             /*
              * if user is trying to add himself, throw exception since there is
@@ -1129,7 +1128,7 @@ public class Saros extends AbstractUIPlugin {
             if (jid.equals(getMyJID())) {
                 monitor.worked(1);
                 throw new XMPPException(
-                    "You can't add yourself to your own roster.");
+                    "You can't add yourself to your own buddies.");
             }
             monitor.worked(1);
 
@@ -1204,12 +1203,12 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Removes given contact from the roster.
+     * Removes given buddy from the roster.
      * 
      * @blocking
      * 
      * @param rosterEntry
-     *            the contact that is to be removed
+     *            the buddy that is to be removed
      * @throws XMPPException
      *             is thrown if no connection is established.
      */
@@ -1326,8 +1325,8 @@ public class Saros extends AbstractUIPlugin {
                         MessageDialog.openError(
                             EditorAPI.getShell(),
                             "Connection error",
-                            "You have been disconnected from Jabber, because of a resource conflict.\n"
-                                + "This indicates that you might have logged on again using the same Jabber account"
+                            "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
+                                + "This indicates that you might have logged on again using the same XMPP/Jabber account"
                                 + " and XMPP resource, for instance using Saros or an other instant messaging client.");
                     }
                 });

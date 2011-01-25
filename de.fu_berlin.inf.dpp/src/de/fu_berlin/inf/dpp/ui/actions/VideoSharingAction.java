@@ -51,8 +51,8 @@ public class VideoSharingAction extends Action {
 
     protected static final String ACTION_ID = VideoSharingAction.class
         .getName();
-    public static final String TOOLTIP_START_SESSION = "Share your screen with selected user";
-    public static final String TOOLTIP_STOP_SESSION = "Stop session with user ";
+    public static final String TOOLTIP_START_SESSION = "Share your screen with selected buddy";
+    public static final String TOOLTIP_STOP_SESSION = "Stop session with buddy";
 
     @Inject
     protected VideoSharing videoSharing;

@@ -1434,7 +1434,7 @@ public class StreamServiceManager implements Startable {
                 final User from = sarosSession
                     .getUser(transferDescription.sender);
                 if (from == null) {
-                    log.warn("User left, discarding packet!");
+                    log.warn("Buddy left, discarding packet!");
                     return;
                 }
 
@@ -1884,10 +1884,12 @@ public class StreamServiceManager implements Startable {
             // NOP
         }
 
+        @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             StreamServiceManager.this.start();
         }
 
+        @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             StreamServiceManager.this.stop();
         }

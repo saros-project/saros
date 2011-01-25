@@ -72,11 +72,11 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     /**
      * 
      * @param createAccount
-     *          are we going to create a new account?
+     *            are we going to create a new account?
      * @param showUseNowButton
-     *          show button for setting "useNow"
+     *            show button for setting "useNow"
      * @param useNow
-     *          default value for activating this account
+     *            default value for activating this account
      * @param preferenceUtils
      */
     public RegisterAccountPage(Saros saros, boolean createAccount,
@@ -99,15 +99,15 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         root.setLayout(new GridLayout(2, false));
 
         if (this.createAccount) {
-            setTitle("Create New User Account");
-            setDescription("Create a new user account for a Jabber server");
+            setTitle("Create New XMPP Account");
+            setDescription("Create a new account on a XMPP/Jabber server");
         } else {
             setTitle("Enter User Account");
-            setDescription("Enter your account information and Jabber server");
+            setDescription("Enter your account information and XMPP/Jabber server");
         }
         // present a link to a list of public XMPP servers
         Link link = new Link(root, SWT.NONE);
-        link.setText("For a list of public XMPP servers click <a href=\""
+        link.setText("For a list of public XMPP/Jabber servers click <a href=\""
             + LIST_OF_XMPP_SERVERS + "\">here</a>");
         GridData gdLayout = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gdLayout.horizontalSpan = 2;
@@ -117,7 +117,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         createSpacer(root, 2);
 
         Label serverLabel = new Label(root, SWT.NONE);
-        serverLabel.setText("Jabber Server");
+        serverLabel.setText("XMPP/Jabber Server");
 
         this.serverText = new Text(root, SWT.BORDER);
         this.serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
@@ -147,8 +147,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 SWT.CENTER, true, false));
             this.repeatPasswordText.setEchoChar('*');
         }
-        
-        
+
         if (this.showUseNowButton) {
             this.prefButton = new Button(root, SWT.CHECK | SWT.SEPARATOR);
             this.prefButton.setSelection(this.useNow);
@@ -161,7 +160,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         if (!this.createAccount) {
             Group group = new Group(root, SWT.NONE);
             group.setLayout(new GridLayout(2, false));
-            group.setText("Create new Jabber-Account");
+            group.setText("Create new XMPP/Jabber account");
             GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
             gd.horizontalSpan = 2;
             gd.verticalIndent = 30;
@@ -169,7 +168,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
             Label createAccountLabel = new Label(group, SWT.WRAP);
             createAccountLabel
-                .setText("If you don't have an existing Jabber account you can create one now");
+                .setText("If you don't have an existing XMPP/Jabber account you can create one now");
             gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
             gd.widthHint = 250;
             createAccountLabel.setLayoutData(gd);
@@ -323,7 +322,6 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 return false;
         }
 
-        
         XMPPAccount account = accountStore.createNewAccount(username, password,
             server);
         accountStore.saveAccounts();

@@ -126,7 +126,7 @@ public class ConsistencyWatchdogHandler {
                     // TODO add some text
                     // "Inconsitent file state has detected. File "
                     // + pathes
-                    // + " from user "
+                    // + " from buddy "
                     // + from.getBase()
                     // +
                     // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
@@ -193,7 +193,7 @@ public class ConsistencyWatchdogHandler {
             }
             if (inconsistentStartHandle == null) {
                 log.error("Could not find the StartHandle"
-                    + " of the inconsistent user");
+                    + " of the inconsistent buddy");
             } else {
                 inconsistentStartHandle.startAndAwait(progress.newChild(200));
                 startHandles.remove(inconsistentStartHandle);

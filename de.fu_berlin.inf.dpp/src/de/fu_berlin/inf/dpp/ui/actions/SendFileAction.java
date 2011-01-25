@@ -98,7 +98,7 @@ public class SendFileAction extends Action {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
         setId(ACTION_ID);
-        setToolTipText("Send a file to selected user");
+        setToolTipText("Send a file to selected buddy");
         setEnabled(false);
         this.streamServiceManager = streamServiceManager;
         this.tableViewer = viewer;
@@ -235,8 +235,8 @@ public class SendFileAction extends Action {
             monitor.setTaskName("Sending");
 
             try {
-                send(getStreamSession(), fileToSend, monitor.newChild(100,
-                    SubMonitor.SUPPRESS_SETTASKNAME));
+                send(getStreamSession(), fileToSend,
+                    monitor.newChild(100, SubMonitor.SUPPRESS_SETTASKNAME));
 
             } catch (InterruptedIOException e) {
                 monitor.subTask("Canceled");
@@ -289,7 +289,7 @@ public class SendFileAction extends Action {
          * @throws IOException
          *             Error while reading file or writing to stream.
          * @throws RemoteCancellationException
-         *             Remote user canceled.
+         *             buddy canceled.
          * @throws SarosCancellationException
          *             Local user canceled monitor.
          */
@@ -366,8 +366,8 @@ public class SendFileAction extends Action {
 
                 File file;
                 try {
-                    file = saveFile(fileDescription.name, monitor.newChild(1,
-                        SubMonitor.SUPPRESS_SETTASKNAME));
+                    file = saveFile(fileDescription.name,
+                        monitor.newChild(1, SubMonitor.SUPPRESS_SETTASKNAME));
                 } catch (SarosCancellationException e) {
                     monitor.subTask("Canceled");
                     return Status.CANCEL_STATUS;
@@ -389,8 +389,8 @@ public class SendFileAction extends Action {
                 }
 
                 try {
-                    receive(getStreamSession(), fileOutputStream, monitor
-                        .newChild(100, SubMonitor.SUPPRESS_SETTASKNAME));
+                    receive(getStreamSession(), fileOutputStream,
+                        monitor.newChild(100, SubMonitor.SUPPRESS_SETTASKNAME));
                 } catch (RemoteCancellationException e) {
                     monitor.subTask("Canceled");
                     return Status.CANCEL_STATUS;
@@ -595,11 +595,12 @@ public class SendFileAction extends Action {
 
                 public Boolean call() throws Exception {
 
-                    return EclipseUtils.openQuestionMessageDialog(EditorAPI
-                        .getShell(), "Incoming file transfer", "Accept '"
-                        + description.name + "' ("
-                        + Util.formatByte(description.size) + ") from " + from
-                        + " ?");
+                    return EclipseUtils.openQuestionMessageDialog(
+                        EditorAPI.getShell(),
+                        "Incoming file transfer",
+                        "Accept '" + description.name + "' ("
+                            + Util.formatByte(description.size) + ") from "
+                            + from + " ?");
                 }
             };
 

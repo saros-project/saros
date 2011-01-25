@@ -70,7 +70,7 @@ public class ConnectionTestAction extends SelectionProviderAction {
 
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Test the data transfer connection to the selected user.");
+        setToolTipText("Test the data transfer connection to the selected buddy.");
     }
 
     /**
@@ -95,26 +95,31 @@ public class ConnectionTestAction extends SelectionProviderAction {
                         throws InvocationTargetException, InterruptedException {
                         try {
                             testResult[0] = connectionTestManager
-                                .runConnectionTest(recipient, 65536, SubMonitor
-                                    .convert(progress));
+                                .runConnectionTest(recipient, 65536,
+                                    SubMonitor.convert(progress));
                         } catch (XMPPException e) {
                             throw new InvocationTargetException(e);
                         }
                     }
                 });
         } catch (InvocationTargetException e) {
-            ErrorDialog.openError(EditorAPI.getShell(),
-                "Connection Test failed", "Connection Test with user "
-                    + recipient + " failed", new Status(IStatus.ERROR,
-                    "de.fu_berlin.inf.dpp", IStatus.ERROR, Util.getMessage(e
-                        .getCause()), e.getCause()));
+            ErrorDialog
+                .openError(
+                    EditorAPI.getShell(),
+                    "Connection Test failed",
+                    "Connection Test with buddy " + recipient + " failed",
+                    new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                        IStatus.ERROR, Util.getMessage(e.getCause()), e
+                            .getCause()));
             return;
         } catch (InterruptedException e) {
             log.error(e);
             return;
         }
-        MessageDialog.openInformation(EditorAPI.getShell(),
-            "Connection test successful", "Connection Test with user "
+        MessageDialog.openInformation(
+            EditorAPI.getShell(),
+            "Connection test successful",
+            "Connection Test with buddy "
                 + recipient
                 + " using "
                 + testResult[0].mode.toString()

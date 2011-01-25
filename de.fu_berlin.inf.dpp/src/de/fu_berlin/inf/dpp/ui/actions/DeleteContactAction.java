@@ -50,7 +50,7 @@ public class DeleteContactAction extends SelectionProviderAction {
 
     protected SarosSessionManager sessionManager;
 
-    protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this user "
+    protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this buddy "
         + "because they are currently in your Saros session.";
 
     public DeleteContactAction(SarosSessionManager sessionManager, Saros saros,
@@ -58,7 +58,7 @@ public class DeleteContactAction extends SelectionProviderAction {
         super(provider, "Delete");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Delete this contact.");
+        setToolTipText("Delete this buddy.");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
@@ -110,7 +110,7 @@ public class DeleteContactAction extends SelectionProviderAction {
                     // If so, stop the deletion from completing
                     if (entryJid.equals(pJid)) {
                         MessageDialog.openError(shell,
-                            "Cannot delete a user in the session",
+                            "Cannot delete a buddy in the session",
                             DELETE_ERROR_IN_SESSION);
                         return;
                     }
@@ -120,13 +120,12 @@ public class DeleteContactAction extends SelectionProviderAction {
 
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
             "Are you sure you want to delete " + toString(entry)
-                + " from your roster?")) {
+                + " from your buddies?")) {
 
             try {
                 saros.removeContact(entry);
             } catch (XMPPException e) {
-                log.error("Could not delete contact " + toString(entry) + ":",
-                    e);
+                log.error("Could not delete buddy " + toString(entry) + ":", e);
             }
         }
     }

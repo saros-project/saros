@@ -120,7 +120,7 @@ public class SessionView extends ListExplanatoryViewPart {
         SWT.ICON_INFORMATION,
         "To begin a Saros session you can either:",
         "Right-click on a project in the Package Explorer and select \"Share project\" in the Saros sub-menu.",
-        "Sign into the Roster, right-click on the invitee(s) and select \"Invite user\".");
+        "Sign into the Saros buddies, right-click on the invitee(s) and select \"Invite buddy\".");
 
     IPartListener2 viewPartListener = new IPartListener2() {
         public void partVisible(IWorkbenchPartReference partRef) {

@@ -82,8 +82,8 @@ public class InviteAction extends SelectionProviderAction {
     public InviteAction(SarosSessionManager sessionManager, Saros saros,
         ISelectionProvider provider, DiscoveryManager discoManager,
         InvitationProcessObservable invitationProcesses) {
-        super(provider, "Invite user...");
-        setToolTipText("Invites the selected users to a Saros session. A new session will be started if none exists.");
+        super(provider, "Invite buddy...");
+        setToolTipText("Invites the selected buddies to a Saros session. A new session will be started if none exists.");
 
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/elcl16/inv_wiz.png"));

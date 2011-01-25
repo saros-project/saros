@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -694,7 +694,7 @@ public class VideoSharing {
 
         /**
          * Reports an error during the session, disposes it and reports to the
-         * local and remote user. Only the first one in this session will be
+         * local and buddy. Only the first one in this session will be
          * reported, subsequent errors (which may occur while disposing) will be
          * ignored.
          * 

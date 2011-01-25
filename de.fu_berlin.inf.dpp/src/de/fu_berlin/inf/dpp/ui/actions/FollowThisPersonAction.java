@@ -62,7 +62,7 @@ public class FollowThisPersonAction extends SelectionProviderAction {
 
     public FollowThisPersonAction(ISelectionProvider provider, Saros saros,
         SarosSessionManager sessionManager, EditorManager editorManager) {
-        super(provider, "Follow this user");
+        super(provider, "Follow this buddy");
 
         this.saros = saros;
         this.sessionManager = sessionManager;
@@ -118,12 +118,12 @@ public class FollowThisPersonAction extends SelectionProviderAction {
         setEnabled(canFollow);
 
         if (!canFollow) {
-            setText("Follow this user");
+            setText("Follow this buddy");
         } else {
             if (editorManager.getFollowedUser() == selectedUser) {
-                setText("Stop following this user");
+                setText("Stop following this buddy");
             } else {
-                setText("Follow this user");
+                setText("Follow this buddy");
             }
         }
     }

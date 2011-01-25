@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.exceptions;
 
 /**
- * Exception used for signaling that the remote user canceled an operation
+ * Exception used for signaling that the buddy canceled an operation
  */
 public class RemoteCancellationException extends SarosCancellationException {
 

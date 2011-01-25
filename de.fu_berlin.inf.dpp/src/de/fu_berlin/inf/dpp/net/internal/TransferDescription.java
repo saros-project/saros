@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
- * FileTransfers to a remote user via Jingle, IBB or Chat.
+ * FileTransfers to a buddy via Jingle, IBB or Chat.
  * 
  * Instances of this class may not be reused but should be treated as value
  * objects, otherwise serialization will fail.

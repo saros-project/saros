@@ -402,7 +402,7 @@ public class SarosSessionManager implements IConnectionListener,
 
             } catch (RemoteCancellationException e) {
 
-                if (e.getMessage() == null) { // remote user canceled purposely
+                if (e.getMessage() == null) { // buddy canceled purposely
 
                     SessionView.showNotification("Canceled Invitation", peer
                         + " has canceled your Invitation.");

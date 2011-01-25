@@ -98,7 +98,7 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
 
             assert count == roles.size();
         } else {
-            log.warn("The role of the user couldn't be determined");
+            log.warn("The role of the buddy couldn't be determined");
             data.setRole(0, "none");
         }
 

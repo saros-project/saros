@@ -83,7 +83,7 @@ public class AudioService extends StreamService {
                             "Incoming VoIP Invitation",
                             "Accept new VoIP Invitation from "
                                 + from.getJID()
-                                + " ?\n Warning: Your record device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session can be started anyway. Maybe this session will be pointless if the other user has also no record device.");
+                                + " ?\n Warning: Your record device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session can be started anyway. Maybe this session will be pointless if the other buddy has also no record device.");
                 }
             };
             audioServiceManager.setRecordDeviceOk(false);
@@ -92,8 +92,8 @@ public class AudioService extends StreamService {
 
                 public Boolean call() throws Exception {
 
-                    return EclipseUtils.openQuestionMessageDialog(EditorAPI
-                        .getShell(), "Incoming VoIP Invitation",
+                    return EclipseUtils.openQuestionMessageDialog(
+                        EditorAPI.getShell(), "Incoming VoIP Invitation",
                         "Accept new VoIP Invitation from " + from.getJID()
                             + " ?");
                 }

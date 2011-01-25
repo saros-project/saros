@@ -138,7 +138,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             inviteGroup));
 
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
-            "Show Jabber debug window (needs restart).", getFieldEditorParent()));
+            "Show XMPP/Jabber debug window (needs restart).",
+            getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(
             PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
@@ -178,7 +179,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new StringFieldEditor(
             PreferenceConstants.AUTO_INVITE,
-            "Automatically invite the following comma separated users (for debugging)",
+            "Automatically invite the following comma separated buddies (for debugging)",
             inviteGroup));
 
         addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,

@@ -88,10 +88,10 @@ public class DiscoveryManager implements Disposable {
             DiscoverInfoWrapper infoWrapper = cache.remove(rjid);
             if (infoWrapper != null) {
                 if (infoWrapper.isAvailable()) {
-                    log.debug("Clearing cache entry of user " + rjid + ": "
+                    log.debug("Clearing cache entry of buddy " + rjid + ": "
                         + infoWrapper.item.getChildElementXML());
                 } else {
-                    log.debug("Clearing cache entry of user " + rjid
+                    log.debug("Clearing cache entry of buddy " + rjid
                         + " but cache entry is empty (a discovery is "
                         + "still running or the last one failed)");
                 }
@@ -167,8 +167,8 @@ public class DiscoveryManager implements Disposable {
 
     /**
      * This method returns true if {@link Jingle#NAMESPACE} is supported by the
-     * Jabber client connected under the given plain JID (a RQ-JID is stripped
-     * of its resource)
+     * XMPP client connected under the given plain JID (a RQ-JID is stripped of
+     * its resource)
      * 
      * This method is syntactic sugar for
      * 

@@ -60,8 +60,8 @@ public class RequestForActivityHandler {
 
         @Override
         public PacketFilter getFilter() {
-            return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getSessionIDPacketFilter(sessionID));
+            return new AndFilter(super.getFilter(),
+                PacketExtensionUtils.getSessionIDPacketFilter(sessionID));
         }
 
         @Override
@@ -71,10 +71,8 @@ public class RequestForActivityHandler {
             ISarosSession sarosSession = sessionManager.getSarosSession();
 
             if (sarosSession.getUser(fromJID) == null) {
-                log
-                    .warn("Received Request for activityDataObject from user which"
-                        + " is not part of our shared project session: "
-                        + fromJID);
+                log.warn("Received Request for activityDataObject from buddy who"
+                    + " is not part of our shared project session: " + fromJID);
                 return;
             }
 

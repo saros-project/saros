@@ -59,7 +59,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/elcl16/removedriver.png"));
-        setToolTipText("Remove the driver role from this user.");
+        setToolTipText("Remove the driver role from this buddy.");
 
         /*
          * if SessionView is not "visible" on session start up this constructor
@@ -92,7 +92,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         if (selectedUser.isDriver()) {
             sarosUI.performRoleChange(selectedUser, UserRole.OBSERVER);
         } else {
-            log.warn("User is no driver: " + selectedUser);
+            log.warn("Buddy is no driver: " + selectedUser);
         }
         updateEnablement();
     }

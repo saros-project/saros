@@ -24,12 +24,12 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
  * 
- * If a request for subscription is received (when a remote user added the local
+ * If a request for subscription is received (when a buddy added the local
  * user) a dialog is shown to the user asking him/her to confirm the request. If
  * he accepts the request a new entry in the roster will be created and a
  * subscribed-message sent.
  * 
- * If a request for removal is received (when a remote user deleted the local
+ * If a request for removal is received (when a buddy deleted the local
  * user from his or her roster or rejected a request of subscription) the
  * corresponding entry is removed from the roster.
  * 
@@ -93,15 +93,15 @@ public class SubscriptionListener implements IConnectionListener {
             return;
 
         case subscribed:
-            log.info("User subscribed to us: " + userName);
+            log.info("Buddy subscribed to us: " + userName);
             break;
 
         case unsubscribed:
-            log.info("User unsubscribed from us: " + userName);
+            log.info("Buddy unsubscribed from us: " + userName);
             break;
 
         case subscribe:
-            log.info("User requests to subscribe to" + " us: " + userName);
+            log.info("Buddy requests to subscribe to" + " us: " + userName);
 
             // ask user for confirmation of subscription
             if (askUserForSubscriptionConfirmation(presence.getFrom())) {
@@ -129,7 +129,7 @@ public class SubscriptionListener implements IConnectionListener {
             break;
 
         case unsubscribe:
-            log.info("User requests to unsubscribe from us: " + userName);
+            log.info("Buddy requests to unsubscribe from us: " + userName);
             // if appropriate entry exists remove that
             RosterEntry e = connection.getRoster().getEntry(presence.getFrom());
             if (e != null) {
@@ -165,7 +165,7 @@ public class SubscriptionListener implements IConnectionListener {
             public void run() {
                 // TODO Should flash dialog
                 result.set(MessageDialog.openConfirm(EditorAPI.getShell(),
-                    "Request of subscription received", "The User " + from
+                    "Request of subscription received", "The buddy " + from
                         + " has requested subscription."));
             }
         });
@@ -176,7 +176,7 @@ public class SubscriptionListener implements IConnectionListener {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openInformation(EditorAPI.getShell(),
-                    "Removal of subscription", "User " + from
+                    "Removal of subscription", "Buddy " + from
                         + " has rejected your request"
                         + " of subsription or has removed"
                         + " you from her or his roster.");
