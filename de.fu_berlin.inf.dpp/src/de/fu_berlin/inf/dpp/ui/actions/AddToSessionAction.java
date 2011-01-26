@@ -19,36 +19,30 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Add another IProject to the Saros session, on the fly.
  * 
- * This is a HACK to test Saros multi project support! Need better UI and sync
- * for added project.
- * 
  * This action is created by Eclipse!
  * 
- * @author coezbek
+ * @author coezbek, cdohnert
  */
 @Component(module = "action")
 public class AddToSessionAction implements IObjectActionDelegate {
@@ -56,7 +50,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
     private static final Logger log = Logger
         .getLogger(AddToSessionAction.class);
 
-    protected IProject selectedProject;
+    protected List<IProject> selectedProjects;
 
     @Inject
     protected SarosSessionManager sessionManager;
@@ -71,67 +65,68 @@ public class AddToSessionAction implements IObjectActionDelegate {
 
     public void selectionChanged(IAction action, ISelection selection) {
 
-        this.selectedProject = getProject(selection);
+        this.selectedProjects = getProjects(selection);
+        boolean allAccessible = true;
+        boolean oneIsShared = false;
+        if (sessionManager.getSarosSession() == null) {
+            action.setEnabled(false);
+            return;
+        }
 
-        action
-            .setEnabled(saros.isConnected()
-                && sessionManager.getSarosSession() != null
-                && (this.selectedProject != null)
-                && this.selectedProject.isAccessible()
-                && !sessionManager.getSarosSession().isShared(
-                    this.selectedProject));
+        for (IProject p : this.selectedProjects) {
+            if (!p.isAccessible()) {
+                allAccessible = false;
+            }
+            if (sessionManager.getSarosSession().isShared(p)) {
+                oneIsShared = true;
+            }
+        }
+        /*
+         * Enable button if we are connected, have a session, have at least one
+         * project selected, every selected is accessible and not already shared
+         */
+        action.setEnabled(saros.isConnected()
+            && sessionManager.getSarosSession() != null
+            && !this.selectedProjects.isEmpty() && allAccessible
+            && !oneIsShared);
     }
 
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
         // We deal with everything in selectionChanged
     }
 
-    protected IProject getProject(ISelection selection) {
-        Object element = ((IStructuredSelection) selection).getFirstElement();
-        if (element instanceof IResource) {
-            return ((IResource) element).getProject();
+    /**
+     * @return List of selected Projects. If no project is selected an empty
+     *         list is returned
+     */
+    protected List<IProject> getProjects(ISelection selection) {
+        List<IProject> result = new ArrayList<IProject>();
+        for (Object o : ((IStructuredSelection) selection).toArray()) {
+            if (o instanceof IResource) {
+                if (!(result.contains(((IResource) o).getProject()))) {
+                    result.add(((IResource) o).getProject());
+                }
+            }
         }
-        return null;
+        return result;
     }
 
     protected void runSafe() {
-        final ISarosSession sarosSession = sessionManager.getSarosSession();
-
-        if (sarosSession.isHost()) {
-            sarosSession.addSharedProject(this.selectedProject,
-                this.selectedProject.getName());
-
-            log.info("Added project: " + this.selectedProject.getName()
-                + " using its name");
-
-        } else {
-            Shell shell = EditorAPI.getShell();
-
-            assert shell != null : "Action should not be run if the display is disposed";
-
-            String message = "Enter the name of the project as on the inviter side (case-sensitive):";
-
-            InputDialog dialog = new InputDialog(shell, "Set new nickname",
-                message, this.selectedProject.getName(), new IInputValidator() {
-                    public String isValid(String newText) {
-                        if (newText == null || newText.trim().length() == 0) {
-                            return "Saros needs the name of the project as it is displayed in the inviter's Eclipse window!";
-                        } else {
-                            if (sarosSession.getProject(newText) != null)
-                                return "Project Name is already used to share a project!";
-                        }
-                        // Okay...
-                        return null;
-                    }
-                });
-
-            if (dialog.open() == Window.OK) {
-                sarosSession.addSharedProject(this.selectedProject,
-                    dialog.getValue());
-                log.info("Added project: " + this.selectedProject.getName()
-                    + " using ID: " + dialog.getValue());
+        if (this.selectedProjects.size() > 1) {
+            String message = "You selected the Projects:\n";
+            for (IProject p : this.selectedProjects) {
+                message += "- " + p.getName() + "\n";
+            }
+            message += "\nAdding multiple projects is not supported yet.\nIf you continue only project "
+                + this.selectedProjects.get(0) + " will be added to session.";
+            if (!Util.popUpYesNoQuestion("Multiple Projects marked", message,
+                false)) {
+                return;
             }
         }
+        List<IProject> projectsToAdd = new ArrayList<IProject>();
+        projectsToAdd.add(this.selectedProjects.get(0));
+        sessionManager.addProjectsToSession(projectsToAdd);
     }
 
     public void run(IAction action) {

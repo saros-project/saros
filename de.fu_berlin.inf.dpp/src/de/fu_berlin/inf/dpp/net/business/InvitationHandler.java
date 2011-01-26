@@ -60,10 +60,9 @@ public class InvitationHandler {
                 log.debug("Inv" + Util.prefix(fromJID)
                     + ": Received invitation (invitationID: "
                     + invInfo.invitationID + ", sessionID: "
-                    + invInfo.sessionID + ", projectID: " + invInfo.projectID
-                    + ", colorID: " + invInfo.colorID + ", sarosVersion: "
-                    + invInfo.versionInfo.version + ", sarosComp: "
-                    + invInfo.versionInfo.compatibility + ")");
+                    + invInfo.sessionID + ", colorID: " + invInfo.colorID
+                    + ", sarosVersion: " + invInfo.versionInfo.version
+                    + ", sarosComp: " + invInfo.versionInfo.compatibility + ")");
 
                 String sessionID = invInfo.sessionID;
                 String invitationID = invInfo.invitationID;
@@ -71,11 +70,9 @@ public class InvitationHandler {
                 if (sessionIDObservable.getValue().equals(
                     SessionIDObservable.NOT_IN_SESSION)) {
                     sessionManager.invitationReceived(
-                        new JID(packet.getFrom()), sessionID,
-                        invInfo.projectID, invInfo.projectDesc,
-                        invInfo.colorID, invInfo.versionInfo,
-                        invInfo.sessionStart, sarosUI, invitationID,
-                        invInfo.doStream, invInfo.comPrefs);
+                        new JID(packet.getFrom()), sessionID, invInfo.colorID,
+                        invInfo.versionInfo, invInfo.sessionStart, sarosUI,
+                        invitationID, invInfo.comPrefs, invInfo.description);
                 } else {
                     transmitter.sendMessageToUser(new JID(packet.getFrom()),
                         cancelInviteExtension.create(sessionID,

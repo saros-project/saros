@@ -49,11 +49,13 @@ import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
@@ -98,7 +100,7 @@ public class SarosUI {
     }
 
     public JoinSessionWizard showIncomingInvitationUI(
-        IncomingInvitationProcess process) {
+        IncomingSessionNegotiation process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
             dataTransferManager, preferenceUtils, manager);
@@ -118,6 +120,25 @@ public class SarosUI {
             }
         });
         return sessionWizard;
+    }
+
+    public AddProjectToSessionWizard showIncomingProjectUI(
+        IncomingProjectNegotiation process) {
+        AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
+            process, dataTransferManager, preferenceUtils, process.getPeer(),
+            process.getRemoteFileList(), process.getProjectName());
+        final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
+            EditorAPI.getShell(), projectWizard);
+
+        wizardDialog.setHelpAvailable(false);
+        projectWizard.setWizardDlg(wizardDialog);
+        Util.runSafeSWTAsync(log, new Runnable() {
+
+            public void run() {
+                EclipseUtils.openWindow(wizardDialog);
+            }
+        });
+        return projectWizard;
     }
 
     /**

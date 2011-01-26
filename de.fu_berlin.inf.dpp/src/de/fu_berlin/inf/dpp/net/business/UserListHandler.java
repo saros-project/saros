@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -34,9 +33,6 @@ public class UserListHandler {
 
     @Inject
     protected SarosSessionManager sessionManager;
-
-    @Inject
-    protected CancelInviteExtension cancelInviteExtension;
 
     @Inject
     protected SarosUI sarosUI;

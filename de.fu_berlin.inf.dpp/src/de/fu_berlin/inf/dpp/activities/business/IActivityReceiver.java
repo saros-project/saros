@@ -41,4 +41,6 @@ public interface IActivityReceiver {
     void receive(VCSActivity activity);
 
     void receive(ChangeColorActivity changeColorActivity);
+
+    void receive(FileListActivity fileListActivity);
 }

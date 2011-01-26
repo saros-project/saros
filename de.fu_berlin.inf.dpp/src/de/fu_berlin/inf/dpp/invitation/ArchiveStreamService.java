@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 
 public class ArchiveStreamService extends StreamService {
     private static Logger log = Logger
-        .getLogger(IncomingInvitationProcess.class);
+        .getLogger(IncomingProjectNegotiation.class);
 
     protected IProject sharedProject;
     protected int numOfFiles;

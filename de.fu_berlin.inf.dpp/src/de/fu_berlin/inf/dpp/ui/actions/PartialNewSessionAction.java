@@ -45,7 +45,7 @@ public class PartialNewSessionAction extends GeneralNewSessionAction {
      */
     public void run(IAction action) {
         final PartialProjectSelectionDialog dialog = new PartialProjectSelectionDialog(
-            null, this.selectedProject);
+            null, this.selectedProjects.get(0));
 
         if (dialog.open() == Window.OK) {
             Util.runSafeSync(log, new Runnable() {

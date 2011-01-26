@@ -41,4 +41,9 @@ public class AbstractSarosSessionListener implements ISarosSessionListener {
     public void sessionEnded(ISarosSession oldSarosSession) {
         // do nothing
     }
+
+    public void projectAdded(String projectID) {
+        // do nothing
+
+    }
 }

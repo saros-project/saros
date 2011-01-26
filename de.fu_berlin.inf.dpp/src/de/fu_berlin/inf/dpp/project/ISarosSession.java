@@ -35,6 +35,8 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 
@@ -379,4 +381,23 @@ public interface ISarosSession extends IActivityListener {
      */
     public void addSharedProject(IProject project, String projectID);
 
+    /**
+     * Returns all shared Projects in their current state
+     * 
+     * @return
+     */
+    public List<SharedProject> getSharedProjects();
+
+    /**
+     * Synchronizing the userList with <code>peer</code>. This happens during
+     * invitation and while other participants are joining or leaving the
+     * session
+     * 
+     * @param peer
+     * @param invitationID
+     * @throws SarosCancellationException
+     */
+    public void synchronizeUserList(ITransmitter transmitter, JID peer,
+        String invitationID, SubMonitor monitor)
+        throws SarosCancellationException;
 }

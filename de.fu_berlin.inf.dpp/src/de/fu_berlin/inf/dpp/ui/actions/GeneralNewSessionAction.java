@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -51,7 +52,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
     private static final Logger log = Logger
         .getLogger(GeneralNewSessionAction.class.getName());
 
-    protected IProject selectedProject;
+    protected List<IProject> selectedProjects;
 
     @Inject
     protected SarosSessionManager sessionManager;
@@ -78,9 +79,38 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
                 saros.connect(false);
             }
             if (running) {
-                sessionManager.openInviteDialog(null);
+                // sessionManager.openInviteDialog(null);
+                if (this.selectedProjects.size() > 1) {
+                    String message = "You selected the Projects:\n";
+                    for (IProject p : this.selectedProjects) {
+                        message += "- " + p.getName() + "\n";
+                    }
+                    message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
+                        + this.selectedProjects.get(0) + " will be shared.";
+                    if (!Util.popUpYesNoQuestion("Multiple Projects marked",
+                        message, false)) {
+                        return;
+                    }
+                }
+                List<IProject> projectsToShare = new ArrayList<IProject>();
+                projectsToShare.add(this.selectedProjects.get(0));
+                sessionManager.addProjectsToSession(projectsToShare);
             } else {
-                sessionManager.startSession(this.selectedProject, resource);
+                if (this.selectedProjects.size() > 1) {
+                    String message = "You selected the Projects:\n";
+                    for (IProject p : this.selectedProjects) {
+                        message += "- " + p.getName() + "\n";
+                    }
+                    message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
+                        + this.selectedProjects.get(0) + " will be shared.";
+                    if (!Util.popUpYesNoQuestion("Multiple Projects marked",
+                        message, false)) {
+                        return;
+                    }
+                }
+                List<IProject> projectsToShare = new ArrayList<IProject>();
+                projectsToShare.add(this.selectedProjects.get(0));
+                sessionManager.startSession(projectsToShare, resource);
                 sessionManager.openInviteDialog(preferenceUtils
                     .getAutoInviteUsers());
             }
@@ -98,7 +128,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
     }
 
     public void selectionChanged(IAction action, ISelection selection) {
-        this.selectedProject = getProject(selection);
+        this.selectedProjects = getProjects(selection);
         action.setEnabled(true);
     }
 
@@ -106,11 +136,16 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
         // We deal with everything in selectionChanged
     }
 
-    protected IProject getProject(ISelection selection) {
-        Object element = ((IStructuredSelection) selection).getFirstElement();
-        if (element instanceof IResource) {
-            return ((IResource) element).getProject();
+    protected List<IProject> getProjects(ISelection selection) {
+        List<IProject> result = new ArrayList<IProject>();
+        IStructuredSelection elements = ((IStructuredSelection) selection);
+        for (Object element : elements.toArray()) {
+            if (element instanceof IResource
+                && (!result.contains(((IResource) element).getProject()))) {
+                result.add(((IResource) element).getProject());
+            }
         }
-        return null;
+
+        return result;
     }
 }

@@ -116,6 +116,11 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             // Update all
             updateDecoratorsAsync(decoratedElements.toArray());
         }
+
+        @Override
+        public void projectAdded(String projectID) {
+            updateDecoratorsAsync(decoratedElements.toArray());
+        }
     };
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {

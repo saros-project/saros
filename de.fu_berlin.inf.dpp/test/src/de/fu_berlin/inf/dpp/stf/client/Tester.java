@@ -163,7 +163,8 @@ public class Tester {
         sarosC.shareProjectWith(projectName, howToShareProject,
             baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.sarosC.confirmWizardSessionInvitationUsingWhichProject(
+            invitee.sarosC.confirmSessionInvitationWizard();
+            invitee.sarosC.confirmProjectSharingWizardUsingWhichProject(
                 projectName, usingWhichProject);
         }
     }
@@ -181,8 +182,9 @@ public class Tester {
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
+                    invitee.sarosC.confirmSessionInvitationWizard();
                     invitee.sarosC
-                        .confirmWizardSessionInvitationUsingWhichProject(
+                        .confirmProjectSharingWizardUsingWhichProject(
                             projectName, usingWhichProject);
                     invitee.sessionV.waitUntilIsInSession();
                     return null;
@@ -424,10 +426,9 @@ public class Tester {
         for (final Tester tester : peers) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosC
-                        .confirmWizardSessionInvitationUsingWhichProject(
-                            projectName, usingWhichProject);
-
+                    tester.sarosC.confirmSessionInvitationWizard();
+                    tester.sarosC.confirmProjectSharingWizardUsingWhichProject(
+                        projectName, usingWhichProject);
                     return null;
                 }
             });

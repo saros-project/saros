@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+
 /**
  * A listener for SarosSession life-cycle related events.
  * 
@@ -64,4 +65,10 @@ public interface ISarosSessionListener {
      *            <code>null</code>.
      */
     public void sessionEnded(ISarosSession oldSarosSession);
+
+    /**
+     * Is fired when a project is added to session
+     * @param projectID TODO
+     */
+    void projectAdded(String projectID);
 }

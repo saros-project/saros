@@ -7,7 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -18,11 +18,13 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 class ShowDescriptionPage extends WizardPage {
 
     private final JoinSessionWizard joinSessionWizard;
+    private String description;
 
     protected ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
-        VersionManager manager, IncomingInvitationProcess invProcess) {
+        VersionManager manager, IncomingSessionNegotiation invProcess) {
         super("firstPage");
         this.joinSessionWizard = joinSessionWizard;
+        this.description = joinSessionWizard.process.getDescription();
 
         setTitle("Session Invitation");
         setDescription("You have been invited to join a Saros session."
@@ -72,7 +74,7 @@ class ShowDescriptionPage extends WizardPage {
         composite.setLayout(new GridLayout(2, false));
 
         Label inviterText = new Label(composite, SWT.WRAP);
-        inviterText.setText(this.joinSessionWizard.process.getDescription());
+        inviterText.setText(this.description);
 
         setControl(composite);
 

@@ -32,6 +32,13 @@ public class DefaultInvitationInfo extends DefaultSessionInfo {
         }
     }
 
+    public static class UserListRequestExtensionProvider extends
+        XStreamExtensionProvider<DefaultInvitationInfo> {
+        public UserListRequestExtensionProvider() {
+            super("userListRequest", DefaultInvitationInfo.class);
+        }
+    }
+
     public static class InvitationCompleteExtensionProvider extends
         XStreamExtensionProvider<DefaultInvitationInfo> {
         public InvitationCompleteExtensionProvider() {

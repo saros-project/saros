@@ -114,6 +114,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
+import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
@@ -133,12 +134,14 @@ import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
@@ -152,6 +155,7 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
+import de.fu_berlin.inf.dpp.project.internal.FileListManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
@@ -349,10 +353,12 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(XMPPTransmitter.class);
         this.container.addComponent(RemoteProgressManager.class);
         this.container.addComponent(XMPPAccountStore.class);
+        this.container.addComponent(FileListManager.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
         this.container.addComponent(InvitationProcessObservable.class);
+        this.container.addComponent(ProjectNegotiationObservable.class);
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(SessionIDObservable.class);
@@ -362,6 +368,7 @@ public class Saros extends AbstractUIPlugin {
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);
+        this.container.addComponent(CancelProjectSharingHandler.class);
         this.container.addComponent(UserListHandler.class);
         this.container.addComponent(InvitationHandler.class);
         this.container.addComponent(LeaveHandler.class);
@@ -372,6 +379,7 @@ public class Saros extends AbstractUIPlugin {
 
         // Extensions
         this.container.addComponent(CancelInviteExtension.class);
+        this.container.addComponent(CancelProjectSharingExtension.class);
         this.container.addComponent(UserListExtension.class);
         this.container.addComponent(RequestActivityExtension.class);
         this.container.addComponent(LeaveExtension.class);

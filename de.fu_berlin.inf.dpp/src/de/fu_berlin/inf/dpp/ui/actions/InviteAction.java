@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -117,10 +118,13 @@ public class InviteAction extends SelectionProviderAction {
 
             IProject chosenProject = ResourcesPlugin.getWorkspace().getRoot()
                 .findMember((Path) result[0]).getProject();
+            List<IProject> chosenProjects = new ArrayList<IProject>();
+            chosenProjects.add(chosenProject);
 
             // Start new Saros session, invite selected user
             try {
-                sessionManager.startSession(chosenProject, null);
+
+                sessionManager.startSession(chosenProjects, null);
                 sessionManager.invite(getSelected(), makeDescription());
             } catch (final XMPPException e) {
                 Util.runSafeSWTSync(log, new Runnable() {
@@ -230,8 +234,22 @@ public class InviteAction extends SelectionProviderAction {
     }
 
     private String makeDescription() {
-        return sessionManager.getSarosSession().getHost().getJID().getBase()
+        String result = sessionManager.getSarosSession().getHost().getJID()
+            .getBase()
             + " has invited you to a Saros session";
+        List<SharedProject> sharedProjects = sessionManager.getSarosSession()
+            .getSharedProjects();
+        if (sharedProjects.size() == 1) {
+            result += " with the shared Project\n";
+        } else if (sharedProjects.size() > 1) {
+            result += " with the shared Projects\n";
+        }
+        for (SharedProject sharedProject : sharedProjects) {
+            result += "\n - " + sharedProject.getName();
+        }
+        return result;
+        // return sessionManager.getSarosSession().getHost().getJID().getBase()
+        // + " has invited you to a Saros shared project session";
 
     }
 }

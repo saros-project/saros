@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.ConnectionListener;
@@ -64,7 +65,6 @@ import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.exceptions.StreamServiceNotValidException;
-import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -1862,16 +1862,17 @@ public class StreamServiceManager implements Startable {
         public void invitationCompleted(User user) {
             // NOP
         }
+
+        public void projectAdded(IProject project) {
+            // NOP
+
+        }
     }
 
     /**
      * Resets the {@link StreamServiceManager} when saros' session stopped.
      */
     protected final class SessionListener extends AbstractSarosSessionListener {
-
-        public void invitationReceived(IncomingInvitationProcess invitation) {
-            // NOP
-        }
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {

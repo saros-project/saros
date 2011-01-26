@@ -464,4 +464,8 @@ public class SharedProject {
         log.error(msg, e);
         // throw e;
     }
+
+    public String getName() {
+        return this.project.getName();
+    }
 }

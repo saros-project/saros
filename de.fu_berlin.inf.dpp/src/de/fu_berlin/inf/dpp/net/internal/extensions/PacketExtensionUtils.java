@@ -175,6 +175,35 @@ public class PacketExtensionUtils {
         });
     }
 
+    public static PacketFilter getIncomingFileListFilter(
+        final IncomingTransferObjectExtensionProvider extProv,
+        final String sessionID, final String projectID, final JID peer) {
+        return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
+
+            public boolean accept(Packet packet) {
+                IncomingTransferObject payload = extProv.getPayload(packet);
+
+                if (payload == null) {
+                    log.error("Invalid payload in packet: " + packet);
+                    return false;
+                }
+                TransferDescription transferDescription = payload
+                    .getTransferDescription();
+                if (!Util.equals(transferDescription.sender, peer)) {
+                    return false;
+                }
+                if (!Util.equals(transferDescription.sessionID, sessionID)) {
+                    return false;
+                }
+                if (!Util.equals(transferDescription.projectID, projectID)) {
+                    return false;
+                }
+
+                return true;
+            }
+        });
+    }
+
     /**
      * @return {@link PacketFilter} that only accepts messages which belong to
      *         the current session and invitation.

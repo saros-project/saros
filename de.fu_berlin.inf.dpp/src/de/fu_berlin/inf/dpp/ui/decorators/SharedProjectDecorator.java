@@ -74,6 +74,12 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
             sarosSession = null;
             updateDecoratorsAsync(oldSarosSession.getProjects().toArray());
         }
+
+        @Override
+        public void projectAdded(String projectID) {
+            log.debug("PROJECT ADDED: " + projectID);
+            updateDecoratorsAsync(sarosSession.getProjects());
+        }
     };
 
     @Inject
@@ -129,12 +135,14 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
      * workspace.
      */
     protected void updateDecoratorsAsync(final Object... projects) {
+        log.debug("LETS REPAINT THE DECORATOR");
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     SharedProjectDecorator.this, projects);
 
                 for (ILabelProviderListener listener : listeners) {
+                    log.debug("NOTIFY THE CHANGE");
                     listener.labelProviderChanged(event);
                 }
             }

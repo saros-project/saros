@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -164,41 +165,27 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected ContributionAnnotationManager contributionAnnotationManager;
 
-    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+    protected Queue<IActivity> queuedActivities = new LinkedList<IActivity>();
+
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(EditorActivity editorActivity) {
-
-            User sender = editorActivity.getSource();
-            SPath sPath = editorActivity.getPath();
-            switch (editorActivity.getType()) {
-            case Activated:
-                execActivated(sender, sPath);
-                break;
-            case Closed:
-                execClosed(sender, sPath);
-                break;
-            case Saved:
-                saveText(sPath);
-                break;
-            default:
-                log.warn("Unexpected type: " + editorActivity.getType());
-            }
+            execEditorActivity(editorActivity);
         }
 
         @Override
-        public void receive(TextEditActivity textEditActivityDataObject) {
-            execTextEdit(textEditActivityDataObject);
+        public void receive(TextEditActivity textEditActivity) {
+            execTextEdit(textEditActivity);
         }
 
         @Override
-        public void receive(
-            TextSelectionActivity textSelectionActivityDataObject) {
-            execTextSelection(textSelectionActivityDataObject);
+        public void receive(TextSelectionActivity textSelectionActivity) {
+            execTextSelection(textSelectionActivity);
         }
 
         @Override
-        public void receive(ViewportActivity viewportActivityDataObject) {
-            execViewport(viewportActivityDataObject);
+        public void receive(ViewportActivity viewportActivity) {
+            execViewport(viewportActivity);
         }
     };
 
@@ -309,31 +296,6 @@ public class EditorManager implements IActivityProvider, Disposable {
                 public void run() {
 
                     editorAPI.addEditorPartListener(EditorManager.this);
-
-                    // Calling this method might cause openPart events
-                    Set<IEditorPart> allOpenEditorParts = EditorAPI
-                        .getOpenEditors();
-
-                    Set<IEditorPart> editorsOpenedByRestoring = editorPool
-                        .getAllEditors();
-
-                    for (IEditorPart editorPart : allOpenEditorParts) {
-                        // Make sure that we open those editors twice
-                        // (print a warning)
-                        if (!editorsOpenedByRestoring.contains(editorPart))
-                            partOpened(editorPart);
-                    }
-
-                    IEditorPart activeEditor = editorAPI.getActiveEditor();
-                    if (activeEditor != null) {
-                        partActivated(activeEditor);
-                    }
-
-                    // register bufferManager and initialize user's permission
-                    // in
-                    // session
-                    buffListener = new RevertBufferListener(EditorManager.this,
-                        sarosSession, fileReplacementInProgressObservable);
                 }
             });
         }
@@ -378,6 +340,45 @@ public class EditorManager implements IActivityProvider, Disposable {
                     remoteWriteAccessManager = null;
                     locallyActiveEditor = null;
                     locallyOpenEditors.clear();
+                }
+            });
+        }
+
+        @Override
+        public void projectAdded(String projectID) {
+            Util.runSafeSWTSync(log, new Runnable() {
+
+                /*
+                 * When Alice invites Bob to a session with a project and Alice
+                 * has some Files of the shared project already open, Bob will
+                 * not receive any Actions (Selection, Contribution etc.) for
+                 * the open editors. When Alice closes and reopens this Files
+                 * again everything is going back to normal. To prevent that
+                 * from happening this method is needed.
+                 */
+                public void run() {
+                    // Calling this method might cause openPart events
+                    Set<IEditorPart> allOpenEditorParts = EditorAPI
+                        .getOpenEditors();
+
+                    Set<IEditorPart> editorsOpenedByRestoring = editorPool
+                        .getAllEditors();
+
+                    // for every open file (editorPart) we act as if we just
+                    // opened it
+                    for (IEditorPart editorPart : allOpenEditorParts) {
+                        // Make sure that we open those editors twice
+                        // (print a warning)
+                        log.debug(editorPart.getTitle());
+                        if (!editorsOpenedByRestoring.contains(editorPart))
+                            partOpened(editorPart);
+                    }
+
+                    IEditorPart activeEditor = editorAPI.getActiveEditor();
+                    if (activeEditor != null) {
+                        partActivated(activeEditor);
+                    }
+
                 }
             });
         }
@@ -709,7 +710,25 @@ public class EditorManager implements IActivityProvider, Disposable {
         remoteEditorManager.exec(activity);
         remoteWriteAccessManager.exec(activity);
 
-        activity.dispatch(activityDataObjectReceiver);
+        activity.dispatch(activityReceiver);
+    }
+
+    protected void execEditorActivity(EditorActivity editorActivity) {
+        User sender = editorActivity.getSource();
+        SPath sPath = editorActivity.getPath();
+        switch (editorActivity.getType()) {
+        case Activated:
+            execActivated(sender, sPath);
+            break;
+        case Closed:
+            execClosed(sender, sPath);
+            break;
+        case Saved:
+            saveText(sPath);
+            break;
+        default:
+            log.warn("Unexpected type: " + editorActivity.getType());
+        }
     }
 
     protected void execTextEdit(TextEditActivity textEdit) {

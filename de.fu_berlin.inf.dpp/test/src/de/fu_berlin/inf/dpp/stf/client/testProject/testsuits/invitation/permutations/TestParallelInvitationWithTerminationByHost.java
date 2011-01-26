@@ -100,7 +100,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.sarosC.confirmFirstPageOfWizardSessionInvitation();
+        carl.sarosC.confirmSessionInvitationWizard();
         alice.progressV.removeProcess(0);
         carl.sarosC.waitUntilWindowInvitationCnacelledActive();
         assertTrue(carl.sarosC.isWindowInvitationCancelledActive());
@@ -108,7 +108,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.sarosC.confirmFirstPageOfWizardSessionInvitation();
+        dave.sarosC.confirmSessionInvitationWizard();
 
         dave.button.clickButton(FINISH);
         alice.progressV.removeProcess(0);

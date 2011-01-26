@@ -135,6 +135,12 @@ public class TransferDescription implements Serializable {
      */
     protected String testID = null;
 
+    /**
+     * The projectID of this TransferDescription or null if this
+     * TransferDescription is not used during an project exchange.
+     */
+    public String projectID = null;
+
     @Override
     public String toString() {
 
@@ -164,13 +170,13 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createFileListTransferDescription(
-        JID recipient, JID sender, String sessionID, String invitationID) {
+        JID recipient, JID sender, String sessionID, String projectID) {
         TransferDescription result = new TransferDescription();
         result.sender = sender;
         result.recipient = recipient;
         result.type = FileTransferType.FILELIST_TRANSFER;
         result.sessionID = sessionID;
-        result.invitationID = invitationID;
+        result.projectID = projectID;
         result.compressed = false;
         return result;
     }

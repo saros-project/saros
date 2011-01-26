@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -45,16 +46,20 @@ import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelOption;
-import de.fu_berlin.inf.dpp.invitation.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -63,9 +68,9 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -125,6 +130,9 @@ public class SarosSessionManager implements IConnectionListener,
     // FIXME dependency of other class
     protected DispatchThreadContext dispatchThreadContext;
 
+    @Inject
+    protected ProjectNegotiationObservable projectExchangeProcesses;
+
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
     protected Saros saros;
@@ -135,6 +143,7 @@ public class SarosSessionManager implements IConnectionListener,
      * Should invitations send the project archive via StreamSession?
      */
     protected IPreferenceStore prefStore;
+
     protected boolean doStreamingInvitation = false;
 
     public SarosSessionManager(Saros saros) {
@@ -144,7 +153,7 @@ public class SarosSessionManager implements IConnectionListener,
 
     protected static final Random sessionRandom = new Random();
 
-    public void startSession(IProject project,
+    public void startSession(List<IProject> projects,
         List<IResource> partialProjectResources) throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
@@ -154,36 +163,33 @@ public class SarosSessionManager implements IConnectionListener,
             .nextInt(Integer.MAX_VALUE)));
         this.partialProjectResources = partialProjectResources;
 
-        this.prefStore = saros.getPreferenceStore();
-        this.doStreamingInvitation = prefStore
-            .getBoolean(PreferenceConstants.STREAM_PROJECT);
-
         SarosSession sarosSession = new SarosSession(this.transmitter,
             dispatchThreadContext, new DateTime());
-        // TODO Add project after starting the session.
-        sarosSession.addSharedProject(project, project.getName());
 
         this.sarosSessionObservable.setValue(sarosSession);
 
         notifySarosSessionStarting(sarosSession);
         sarosSession.start();
         notifySarosSessionStarted(sarosSession);
+
+        for (IProject project : projects) {
+            sarosSession.addSharedProject(project, project.getName());
+            notifyProjectAdded(project);
+        }
+
         SarosSessionManager.log.info("Session started");
     }
 
     /**
      * {@inheritDoc}
      */
-    public ISarosSession joinSession(String projectID, IProject project,
-        JID host, int colorID, DateTime sessionStart) {
+    public ISarosSession joinSession(JID host, int colorID,
+        DateTime sessionStart) {
 
-        SarosSession sarosSession = new SarosSession(this.transmitter,
+        SarosSession sarosSession = new SarosSession(transmitter,
             dispatchThreadContext, host, colorID, sessionStart);
-        sarosSession.addSharedProject(project, projectID);
-        this.sarosSessionObservable.setValue(sarosSession);
 
-        notifySarosSessionStarting(sarosSession);
-        notifySarosSessionStarted(sarosSession);
+        this.sarosSessionObservable.setValue(sarosSession);
 
         log.info("Saros session joined");
 
@@ -251,17 +257,16 @@ public class SarosSessionManager implements IConnectionListener,
         return this.sarosSessionObservable.getValue();
     }
 
-    public void invitationReceived(JID from, String sessionID,
-        String projectName, String description, int colorID,
+    public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID, boolean doStream, MUCSessionPreferences comPrefs) {
+        String invitationID, MUCSessionPreferences comPrefs, String description) {
 
         this.sessionID.setValue(sessionID);
 
-        final IncomingInvitationProcess process = new IncomingInvitationProcess(
-            this.transmitter, from, projectName, description, colorID,
-            invitationProcesses, versionInfo, sessionStart, invitationID,
-            doStream);
+        final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
+            this, transmitter, from, colorID, invitationProcesses,
+            versionManager, versionInfo, sessionStart, sarosUI, invitationID,
+            saros, description);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Util.runSafeSWTAsync(log, new Runnable() {
@@ -270,6 +275,22 @@ public class SarosSessionManager implements IConnectionListener,
                 sarosUI.showIncomingInvitationUI(process);
                 sarosUI.openSarosViews();
             }
+        });
+    }
+
+    public void incomingProjectReceived(JID from, List<FileList> fileLists,
+        final SarosUI sarosUI, String description, String projectID) {
+        final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
+            transmitter, from, description, projectExchangeProcesses,
+            projectID, projectID, false, fileLists.get(0));
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+
+            public void run() {
+                sarosUI.showIncomingProjectUI(process);
+
+            }
+
         });
     }
 
@@ -335,17 +356,10 @@ public class SarosSessionManager implements IConnectionListener,
     public void invite(JID toInvite, String description) {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
-        // TODO We want to invite to all projects!!
-        IProject toInviteTo = sarosSession.getProjects().iterator().next();
-
-        doStreamingInvitation = prefStore
-            .getBoolean(PreferenceConstants.STREAM_PROJECT);
-
-        OutgoingInvitationProcess result = new OutgoingInvitationProcess(
-            transmitter, toInvite, sarosSession, partialProjectResources,
-            toInviteTo, description, sarosSession.getFreeColor(),
-            invitationProcesses, versionManager, stopManager, discoveryManager,
-            comNegotiatingManager, doStreamingInvitation);
+        OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
+            (transmitter), toInvite, sarosSession.getFreeColor(),
+            invitationProcesses, sarosSession, description, versionManager,
+            discoveryManager, comNegotiatingManager);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -360,8 +374,8 @@ public class SarosSessionManager implements IConnectionListener,
     /**
      * 
      * OutgoingInvitationJob wraps the instance of
-     * {@link OutgoingInvitationProcess} and cares about handling the exceptions
-     * like local or remote cancellation.
+     * {@link OutgoingSessionNegotiation} and cares about handling the
+     * exceptions like local or remote cancellation.
      * 
      * It notifies the user about the progress using the Eclipse Jobs API and
      * interrupts the process if the session closes.
@@ -369,7 +383,7 @@ public class SarosSessionManager implements IConnectionListener,
      */
     protected class OutgoingInvitationJob extends Job {
 
-        protected OutgoingInvitationProcess process;
+        protected OutgoingSessionNegotiation process;
         protected String peer;
         protected ISarosSessionListener cancelListener = new AbstractSarosSessionListener() {
 
@@ -380,7 +394,7 @@ public class SarosSessionManager implements IConnectionListener,
 
         };
 
-        public OutgoingInvitationJob(OutgoingInvitationProcess process) {
+        public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super("Inviting " + process.getPeer().getBase() + "...");
             this.process = process;
             this.peer = process.getPeer().getBase();
@@ -466,6 +480,147 @@ public class SarosSessionManager implements IConnectionListener,
         }
     }
 
+    /**
+     * Adds projects to an existing session and starts to share the
+     * {@code projectsToAdd}
+     * 
+     * @param projectsToAdd
+     *            List of projects that will be added to the session
+     * 
+     */
+    public void addProjectsToSession(List<IProject> projectsToAdd) {
+        for (IProject project : projectsToAdd) {
+            this.getSarosSession().addSharedProject(project, project.getName());
+            notifyProjectAdded(project);
+        }
+        for (User user : this.getSarosSession().getRemoteUsers()) {
+            OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
+                transmitter, user.getJID(), this.getSarosSession(), null,
+                projectsToAdd, projectExchangeProcesses, stopManager,
+                sessionID, false);
+            OutgoingProjectJob job = new OutgoingProjectJob(out);
+            job.schedule();
+        }
+    }
+
+    /**
+     * Will start sharing all projects in session with a participant. This
+     * should be called after a the invitation to a session was completed
+     * successfully.
+     * 
+     * @param user
+     *            JID of session participant to share projects with
+     */
+    public void startSharingProjects(JID user) {
+        List<IProject> projectsToShare = new ArrayList<IProject>(this
+            .getSarosSession().getProjects());
+
+        if (!projectsToShare.isEmpty()) {
+            OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
+                transmitter, user, this.getSarosSession(), null,
+                projectsToShare, projectExchangeProcesses, stopManager,
+                sessionID, false);
+            OutgoingProjectJob job = new OutgoingProjectJob(out);
+            job.schedule();
+        }
+
+    }
+
+    protected class OutgoingProjectJob extends Job {
+
+        protected OutgoingProjectNegotiation process;
+        protected String peer;
+        protected ISarosSessionListener cancelListener = new AbstractSarosSessionListener() {
+
+            @Override
+            public void sessionEnded(ISarosSession oldSharedProject) {
+                process.localCancel(null, CancelOption.NOTIFY_PEER);
+            }
+
+        };
+
+        public OutgoingProjectJob(
+            OutgoingProjectNegotiation outgoingProjectNegotiation) {
+            super("Sharing project "
+                + outgoingProjectNegotiation.getProjectName() + ".");
+            this.process = outgoingProjectNegotiation;
+            this.peer = process.getPeer().getBase();
+            setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
+            setProperty(IProgressConstants.ICON_PROPERTY,
+                SarosUI.getImageDescriptor("/icons/invites.png"));
+        }
+
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+            try {
+
+                registerCancelListener();
+                process.start(SubMonitor.convert(monitor));
+
+            } catch (LocalCancellationException e) {
+
+                return Status.CANCEL_STATUS;
+
+            } catch (RemoteCancellationException e) {
+
+                if (e.getMessage() == null) { // remote user canceled purposely
+                    String message = peer
+                        + " has canceled the project sharing.";
+
+                    SessionView.showNotification("Canceled project sharing",
+                        message);
+
+                    return new Status(IStatus.ERROR, Saros.SAROS, message);
+
+                } else {
+                    String message = "The project sharing with "
+                        + peer
+                        + " has been canceled remotely because of an error:\n\n"
+                        + e.getMessage();
+                    SessionView.showNotification(
+                        "Error during project sharing", message);
+
+                    return new Status(IStatus.ERROR, Saros.SAROS, message);
+                }
+
+            } catch (Exception e) {
+
+                log.error("This exception is not expected here: ", e);
+                return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
+
+            } finally {
+
+                releaseCancelListener();
+
+            }
+
+            return Status.OK_STATUS;
+        }
+
+        protected void registerCancelListener() {
+            Util.runSafeSWTSync(log, new Runnable() {
+
+                public void run() {
+                    SarosSessionManager.this
+                        .addSarosSessionListener(cancelListener);
+                }
+
+            });
+        }
+
+        protected void releaseCancelListener() {
+            Util.runSafeSWTSync(log, new Runnable() {
+
+                public void run() {
+                    SarosSessionManager.this
+                        .removeSarosSessionListener(cancelListener);
+                }
+
+            });
+        }
+
+    }
+
     public void addSarosSessionListener(ISarosSessionListener listener) {
         if (!this.sarosSessionListeners.contains(listener)) {
             /*
@@ -488,19 +643,19 @@ public class SarosSessionManager implements IConnectionListener,
         this.sarosSessionListeners.remove(listener);
     }
 
-    protected void notifySarosSessionStarting(ISarosSession sarosSession) {
+    public void notifySarosSessionStarting(ISarosSession sarosSession) {
         for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
             sarosSessionListener.sessionStarting(sarosSession);
         }
     }
 
-    protected void notifySarosSessionStarted(ISarosSession sarosSession) {
+    public void notifySarosSessionStarted(ISarosSession sarosSession) {
         for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
             sarosSessionListener.sessionStarted(sarosSession);
         }
     }
 
-    protected void notifySessionEnding(ISarosSession sarosSession) {
+    public void notifySessionEnding(ISarosSession sarosSession) {
         for (ISarosSessionListener saroSessionListener : this.sarosSessionListeners) {
             try {
                 saroSessionListener.sessionEnding(sarosSession);
@@ -511,10 +666,21 @@ public class SarosSessionManager implements IConnectionListener,
         }
     }
 
-    protected void notifySessionEnd(ISarosSession sarosSession) {
+    public void notifySessionEnd(ISarosSession sarosSession) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {
                 listener.sessionEnded(sarosSession);
+            } catch (RuntimeException e) {
+                log.error("Internal error in notifying listener"
+                    + " of SarosSession end: ", e);
+            }
+        }
+    }
+
+    public void notifyProjectAdded(IProject project) {
+        for (ISarosSessionListener listener : this.sarosSessionListeners) {
+            try {
+                listener.projectAdded(getSarosSession().getProjectID(project));
             } catch (RuntimeException e) {
                 log.error("Internal error in notifying listener"
                     + " of SarosSession end: ", e);

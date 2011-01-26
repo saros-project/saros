@@ -46,4 +46,8 @@ class SarosProjectMapper {
     public synchronized Set<IProject> getProjects() {
         return Collections.unmodifiableSet(mapping.values());
     }
+
+    public synchronized int size() {
+        return mapping.size();
+    }
 }

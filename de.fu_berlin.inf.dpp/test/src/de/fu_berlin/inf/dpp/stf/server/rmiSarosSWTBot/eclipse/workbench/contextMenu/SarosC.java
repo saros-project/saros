@@ -50,7 +50,7 @@ public interface SarosC extends Remote {
      * <li>The share session process is only completely done after host first
      * run {@link SarosC#shareProjectWith(String, TypeOfShareProject, String[])}
      * , and then the invited users confirm the popup window
-     * {@link SarosC#confirmWizardSessionInvitationUsingWhichProject(String, TypeOfCreateProject)}
+     * {@link SarosC#confirmProjectSharingWizardUsingWhichProject(String, TypeOfCreateProject)}
      * . Since the share session process is very often used, so a convenient
      * method
      * {@link Tester#buildSessionDoneSequentially(String, TypeOfShareProject, TypeOfCreateProject, Tester...)}
@@ -190,7 +190,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmFirstPageOfWizardSessionInvitation()
+    public void confirmSessionInvitationWizard()
         throws RemoteException;
 
     /**
@@ -202,7 +202,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmSecondPageOfWizardSessionInvitationUsingNewproject()
+    public void confirmProjectSharingWizardUsingNewproject()
         throws RemoteException;
 
     /**
@@ -216,7 +216,7 @@ public interface SarosC extends Remote {
      *            which you want to share with others.
      * @throws RemoteException
      */
-    public void confirmSecondPageOfWizardSessionInvitationUsingExistProject(
+    public void confirmProjectSharingWizardSessionInvitationUsingExistProject(
         String projectName) throws RemoteException;
 
     /**
@@ -231,7 +231,7 @@ public interface SarosC extends Remote {
      *            which you want to share with others.
      * @throws RemoteException
      */
-    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(
+    public void confirmProjectSharingWizardUsingExistProjectWithCopy(
         String projectName) throws RemoteException;
 
     /**
@@ -250,7 +250,7 @@ public interface SarosC extends Remote {
      *            which you want to share with others.
      * @throws RemoteException
      */
-    public void confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCancelLocalChange(
+    public void confirmProjectSharingWizardUsingExistProjectWithCancelLocalChange(
         String projectName) throws RemoteException;
 
     /**
@@ -261,7 +261,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmWirzardSessionInvitationWithNewProject(String projectname)
+    public void confirmProjectSharingWirzardWithNewProject(String projectname)
         throws RemoteException;
 
     /**
@@ -272,7 +272,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmWizardSessionInvitationUsingExistProject(
+    public void confirmProjectSharingWizardUsingExistProject(
         String projectName) throws RemoteException;
 
     /**
@@ -284,7 +284,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmWizardSessionInvitationUsingExistProjectWithCopyAfterCancelLocalChange(
+    public void confirmProjectSharingWizardUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException;
 
     /**
@@ -295,7 +295,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmWizardSessionInvitationUsingExistProjectWithCopy(
+    public void confirmSessionInvitationUsingExistProjectWithCopy(
         String projectName) throws RemoteException;
 
     /**
@@ -307,7 +307,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmWizardSessionInvitationUsingWhichProject(
+    public void confirmProjectSharingWizardUsingWhichProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException;
 

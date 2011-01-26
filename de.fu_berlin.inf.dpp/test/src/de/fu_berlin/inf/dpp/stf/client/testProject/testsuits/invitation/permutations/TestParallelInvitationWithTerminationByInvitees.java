@@ -102,7 +102,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.sarosC.confirmFirstPageOfWizardSessionInvitation();
+        carl.sarosC.confirmSessionInvitationWizard();
         carl.button.clickButton(CANCEL);
         alice.sarosC.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
@@ -111,7 +111,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.sarosC.confirmFirstPageOfWizardSessionInvitation();
+        dave.sarosC.confirmSessionInvitationWizard();
         dave.button.clickButton(CANCEL);
         alice.sarosC.waitUntilWindowProblemOccurredActive();
         assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
@@ -120,7 +120,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         edna.shell.waitUntilShellOpen(SESSION_INVITATION);
         edna.shell.activateShellWithText(SESSION_INVITATION);
-        edna.sarosC.confirmWirzardSessionInvitationWithNewProject(PROJECT1);
+        edna.sarosC.confirmSessionInvitationWizard();
+        edna.sarosC.confirmProjectSharingWirzardWithNewProject(PROJECT1);
         edna.sessionV.leaveTheSessionByPeer();
         assertFalse(edna.sessionV.isInSessionGUI());
         assertFalse(alice.sessionV.hasReadOnlyAccess(edna.jid));

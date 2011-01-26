@@ -22,15 +22,16 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -43,6 +44,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -50,11 +54,14 @@ import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -63,6 +70,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -89,6 +97,9 @@ public class SarosSession implements ISarosSession, Disposable {
     @Inject
     protected StopManager stopManager;
 
+    @Inject
+    protected ProjectNegotiationObservable projectNegotiationObservable;
+
     protected ActivitySequencer activitySequencer;
 
     protected ConcurrentDocumentClient concurrentDocumentClient;
@@ -97,7 +108,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
 
-    private List<IActivityDataObject> queuedActivities = new ArrayList<IActivityDataObject>();
+    private MappedList<IActivityDataObject> queuedActivities = new MappedList<IActivityDataObject>();
 
     /* Instance fields */
     protected User localUser;
@@ -119,6 +130,8 @@ public class SarosSession implements ISarosSession, Disposable {
     protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
 
     protected SharedProject sharedProject;
+
+    protected Map<String, SharedProject> sharedProjects = new HashMap<String, SharedProject>();
 
     public boolean cancelActivityDispatcher = false;
 
@@ -265,10 +278,8 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void addSharedProject(IProject project, String projectID) {
         projectMapper.addMapping(projectID, project);
-        if (sharedProject != null)
-            throw new NotImplementedException(
-                "More than one project not supported.");
-        sharedProject = new SharedProject(project, this);
+        sharedProjects.put(projectID, new SharedProject(project, this));
+        execQueuedActivities(projectID);
     }
 
     public Collection<User> getParticipants() {
@@ -521,7 +532,6 @@ public class SarosSession implements ISarosSession, Disposable {
         if (!stopped) {
             throw new IllegalStateException();
         }
-
         activitySequencer.start();
 
         stopped = false;
@@ -650,7 +660,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         for (IActivityDataObject dataObject : activityDataObjects) {
             try {
-                if (!willBeQueued(dataObject)) {
+                if (!hadToBeQueued(dataObject)) {
                     result.add(dataObject.getActivity(this));
                 }
 
@@ -668,19 +678,28 @@ public class SarosSession implements ISarosSession, Disposable {
      * @param dataObject
      * @return <code>true</code> if this activity can be executed now
      */
-    private boolean willBeQueued(IActivityDataObject dataObject) {
+    private boolean hadToBeQueued(IActivityDataObject dataObject) {
         if (dataObject instanceof IProjectActivityDataObject) {
-            IProjectActivityDataObject pado = (IProjectActivityDataObject) dataObject;
-            String projectID = pado.getProjectID();
+            String projectID = ((IProjectActivityDataObject) dataObject)
+                .getProjectID();
             /*
              * some activities (e.g. EditorActivity) can return null for
              * projectID
              */
             if (projectID != null) {
                 IProject project = getProject(projectID);
+                /*
+                 * If we don't have that shared project, but will have it in
+                 * future we will queue the activity.
+                 * 
+                 * When the project negotiation is done the method
+                 * execQueuedActivities() will be executed
+                 */
                 if (project == null) {
-                    if (!queuedActivities.contains(dataObject)) {
-                        queuedActivities.add(dataObject);
+                    log.info("Activity " + dataObject.toString()
+                        + " for Project " + projectID + " was queued.");
+                    if (!queuedActivities.containsValue(dataObject)) {
+                        queuedActivities.put(projectID, dataObject);
                     }
                     return true;
                 }
@@ -689,8 +708,20 @@ public class SarosSession implements ISarosSession, Disposable {
         return false;
     }
 
-    public void execQueuedActivities() {
-        exec(queuedActivities);
+    /**
+     * Execute activities queued in the SarosSession. At the moment these can
+     * only be activities which belong to a specific project. Therefore we need
+     * the <code><b>projectID</b></code> to identify the now executable
+     * activities
+     */
+    protected void execQueuedActivities(String projectID) {
+        List<IActivityDataObject> list = queuedActivities.remove(projectID);
+        if (list == null) {
+            return;
+        }
+        log.info("All activities for project \"" + projectID
+            + "\" will be executed now");
+        exec(list);
     }
 
     public void activityCreated(IActivity activity) {
@@ -726,7 +757,15 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (activity == null)
             throw new IllegalArgumentException();
-
+        /*
+         * If we don't have any sharedProjects don't send File-, Folder- or
+         * EditorActivities.
+         */
+        if (projectMapper.size() == 0
+            && (activity instanceof EditorActivity
+                || activity instanceof FolderActivity || activity instanceof FileActivity)) {
+            return;
+        }
         try {
             activitySequencer.sendActivity(toWhom,
                 activity.getActivityDataObject(this));
@@ -768,14 +807,12 @@ public class SarosSession implements ISarosSession, Disposable {
     public SharedProject getSharedProject(IProject project) {
         if (!isShared(project))
             return null;
+        return sharedProjects.get(projectMapper.getID(project));
+    }
 
-        if (!sharedProject.belongsTo(project)) {
-            // TODO support more than one project...
-            throw new NotImplementedException("More than one shared project "
-                + "not supported.");
-        }
+    public List<SharedProject> getSharedProjects() {
+        return new ArrayList<SharedProject>(sharedProjects.values());
 
-        return sharedProject;
     }
 
     public String getProjectID(IProject project) {
@@ -784,5 +821,29 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public IProject getProject(String projectID) {
         return projectMapper.getProject(projectID);
+    }
+
+    public void synchronizeUserList(ITransmitter transmitter, JID peer,
+        String invitationID, SubMonitor monitor)
+        throws SarosCancellationException {
+
+        Collection<User> participants = this.getParticipants();
+        log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
+            + participants);
+
+        SarosPacketCollector userListConfirmationCollector = transmitter
+            .getUserListConfirmationCollector();
+
+        for (User user : this.getRemoteUsers()) {
+            transmitter.sendUserList(user.getJID(), invitationID, participants);
+        }
+
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Waiting for user list confirmations...");
+        transmitter.receiveUserListConfirmation(userListConfirmationCollector,
+            this.getRemoteUsers(), monitor);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": All user list confirmations have arrived.");
+
     }
 }

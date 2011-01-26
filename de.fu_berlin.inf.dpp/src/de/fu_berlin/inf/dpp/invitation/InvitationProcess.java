@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * @author rdjemili
@@ -48,6 +49,8 @@ public abstract class InvitationProcess {
     protected StreamServiceManager streamServiceManager;
     @Inject
     protected ArchiveStreamService archiveStreamService;
+    @Inject
+    protected SarosSessionManager sarosSessionManager;
     protected StreamSession streamSession;
 
     protected InvitationProcessObservable invitationProcesses;
@@ -101,38 +104,6 @@ public abstract class InvitationProcess {
     @Override
     public String toString() {
         return "InvitationProcess(peer:" + this.peer + ")";
-    }
-
-    /**
-     * 
-     * @return the name of the project that is shared by the peer.
-     */
-    public abstract String getProjectName();
-
-    public enum CancelOption {
-        /**
-         * Use this option if the peer should be notified that the invitation
-         * has been canceled. He gets a message with the cancellation reason.
-         */
-        NOTIFY_PEER,
-        /**
-         * Use this option if the peer should not be notified that the
-         * invitation has been canceled.
-         */
-        DO_NOT_NOTIFY_PEER;
-    }
-
-    public enum CancelLocation {
-        /**
-         * Use this option if the invitation has been canceled by the local
-         * user.
-         */
-        LOCAL,
-        /**
-         * Use this option if the invitation has been canceled by the remote
-         * user.
-         */
-        REMOTE;
     }
 
     public abstract void remoteCancel(String errorMsg);

@@ -77,6 +77,9 @@ public class InvitationWizard extends Wizard {
                 if (projectSetIterator.hasNext())
                     projectString.append("\n");
             }
+            log.debug(projectString);
+        } else {
+            log.debug("There are no Projects to share");
         }
 
         for (JID user : usersToInvite) {
@@ -104,6 +107,8 @@ public class InvitationWizard extends Wizard {
                 }
             }
         });
+
+        // TODO this.dispose();
 
         return true;
     }

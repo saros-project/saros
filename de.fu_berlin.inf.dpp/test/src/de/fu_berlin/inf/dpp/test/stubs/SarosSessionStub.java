@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -220,5 +221,19 @@ public class SarosSessionStub implements ISarosSession {
     public void activityCreated(IActivity activity) {
         throw new RuntimeException("Unexpected call to Stub");
 
+    }
+
+    public List<SharedProject> getSharedProjects() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void synchronizeUserList(ITransmitter transmitter, JID peer,
+        String invitationID, SubMonitor monitor)
+        throws SarosCancellationException {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void execQueuedActivities() {
+        throw new RuntimeException("Unexpected call to Stub");
     }
 }

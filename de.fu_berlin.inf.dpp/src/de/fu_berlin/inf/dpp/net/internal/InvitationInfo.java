@@ -31,26 +31,21 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  */
 @Component(module = "net")
 public class InvitationInfo extends DefaultInvitationInfo {
-    public String projectID;
-    public String projectDesc;
     public int colorID;
     public VersionInfo versionInfo;
     public DateTime sessionStart;
-    public boolean doStream;
     public MUCSessionPreferences comPrefs;
+    public String description;
 
     public InvitationInfo(SessionIDObservable sessionID, String invitationID,
-        String projectID, String projectDesc, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, boolean doStream,
-        MUCSessionPreferences comPrefs) {
+        int colorID, String description, VersionInfo versionInfo,
+        DateTime sessionStart, MUCSessionPreferences comPrefs) {
         super(sessionID, invitationID);
-        this.projectID = projectID;
-        this.projectDesc = projectDesc;
         this.colorID = colorID;
         this.versionInfo = versionInfo;
         this.sessionStart = sessionStart;
-        this.doStream = doStream;
         this.comPrefs = comPrefs;
+        this.description = description;
     }
 
     public static class InvitationExtensionProvider extends

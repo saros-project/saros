@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Packet;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -40,8 +41,10 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -158,6 +161,20 @@ public interface ITransmitter {
         throws SarosCancellationException, IOException;
 
     /**
+     * 
+     * @param projectID
+     * @param peer
+     *            TODO
+     * @blocking If forceWait is true.
+     * @throws IOException
+     *             If the operation fails because of a problem with the XMPP
+     *             Connection.
+     */
+    public FileList receiveFileList(String projectID, JID peer,
+        SubMonitor monitor, boolean forceWait)
+        throws SarosCancellationException, IOException;
+
+    /**
      * @param b
      * @param archiveCollector
      * @throws IOException
@@ -168,6 +185,25 @@ public interface ITransmitter {
     public InputStream receiveArchive(SarosPacketCollector archiveCollector,
         SubMonitor monitor, boolean b) throws IOException,
         SarosCancellationException;
+
+    public InputStream receiveArchive(String projectID, SubMonitor monitor,
+        boolean forceWait) throws IOException, SarosCancellationException;
+
+    /**
+     * a generic receive method
+     * 
+     * @param collector
+     *            - {@link SarosPacketCollector} knows what to collect
+     * @param timeout
+     *            - how long do we wait
+     * @param forceWait
+     * @return
+     * @throws LocalCancellationException
+     * @throws IOException
+     */
+    public Packet receive(SubMonitor monitor, SarosPacketCollector collector,
+        long timeout, boolean forceWait) throws LocalCancellationException,
+        IOException;
 
     // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
@@ -327,10 +363,19 @@ public interface ITransmitter {
 
     public SarosPacketCollector getFileListRequestCollector(String invitationID);
 
+    public SarosPacketCollector getUserListRequestCollector(
+        String invitationID,
+        UserListRequestExtensionProvider userListRequestExtProv);
+
     public SarosPacketCollector getInvitationCompleteCollector(
         String invitationID);
 
     public SarosPacketCollector getUserListConfirmationCollector();
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID);
+
+    public void sendCancelSharingProjectMessage(JID peer, String errorMsg);
+
+    public void sendMessageToUser(JID peer,
+        XStreamPacketExtension<DefaultInvitationInfo> create);
 }

@@ -66,4 +66,9 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     public void receive(ChangeColorActivity changeColorActivity) {
         // do nothing
     }
+
+    public void receive(FileListActivity fileListActivity) {
+        // do nothing
+
+    }
 }

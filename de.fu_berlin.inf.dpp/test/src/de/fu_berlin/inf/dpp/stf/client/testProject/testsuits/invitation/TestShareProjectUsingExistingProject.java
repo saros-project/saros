@@ -75,9 +75,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
                 TypeOfShareProject.SHARE_PROJECT,
                 TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
                 bob);
-        assertTrue(bob.sarosC.isWIndowSessionInvitationActive());
-        bob.sarosC
-            .confirmSecondPageOfWizardSessionInvitationUsingExistProjectWithCopy(PROJECT1);
+        // assertTrue(bob.sarosC.isWIndowSessionInvitationActive());
+        // bob.sarosC
+        // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
         assertTrue(bob.fileM.existsProject(PROJECT1));
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));

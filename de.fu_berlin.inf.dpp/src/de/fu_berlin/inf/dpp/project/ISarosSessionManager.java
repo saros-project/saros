@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -37,32 +38,26 @@ public interface ISarosSessionManager {
     /**
      * Starts a new Saros session with the local user as only participant.
      * 
-     * @param project
-     *            the local Eclipse project which should become shared.
+     * @param projects
+     *            the local Eclipse projects which should become shared.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(IProject project, List<IResource> resources)
+    public void startSession(List<IProject> projects, List<IResource> resources)
         throws XMPPException;
 
     /**
-     * Creates a Saros session for a shared project hosted remotely. The
-     * returned session is NOT started!
+     * Creates a Saros session. The returned session is NOT started!
      * 
-     * @param projectID
-     *            the ID to use when sending activities. This ID is set by the
-     *            host for all session participants
-     * @param project
-     *            the local Eclipse project which should be used to replicate
-     *            the remote shared project.
      * @param host
      *            the host of the session.
      * @param myColorID
      *            Color ID of the local user
+     * 
      * @return the new Saros session.
      */
-    public ISarosSession joinSession(String projectID, IProject project,
-        JID host, int myColorID, DateTime sessionStart);
+    public ISarosSession joinSession(JID host, int myColorID,
+        DateTime sessionStart);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -100,18 +95,14 @@ public interface ISarosSessionManager {
      * 
      * @param from
      *            the sender of this invitation.
-     * @param description
-     *            the informal description text that can be given with
-     *            invitations.
      * @param colorID
      *            the assigned color id for the invited participant.
      * @param comPrefs
      *            multi user chat parameters.
      */
-    public void invitationReceived(JID from, String sessionID,
-        String projectName, String description, int colorID,
+    public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID, boolean doStream, MUCSessionPreferences comPrefs);
+        String invitationID, MUCSessionPreferences comPrefs, String description);
 
     /*
      * @see IConnectionListener
@@ -120,5 +111,11 @@ public interface ISarosSessionManager {
         ConnectionState newState);
 
     public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);
+
+    /**
+     * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with
+     * user
+     */
+    public void startSharingProjects(JID user);
 
 }
