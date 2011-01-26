@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector.CancelHook;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -211,24 +210,32 @@ public class XMPPReceiver {
         SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
 
         String name = description.type;
-        String namespace = PacketExtensionUtils.NAMESPACE;
+        String namespace = description.namespace;
         // IQ provider?
 
         PacketExtensionProvider provider = (PacketExtensionProvider) ProviderManager
             .getInstance().getExtensionProvider(name, namespace);
 
-        if (provider == null)
-            return;
-
         byte[] data;
         try {
+
+            if (provider == null) {
+                /*
+                 * We MUST reject. Else the peer will remain in a endless cycle
+                 * in BinaryChannel.sendDirect()
+                 */
+                transferObject.reject();
+                return;
+            }
+
             data = transferObject.accept(monitor);
+
         } catch (SarosCancellationException e) {
             log.error("User canceled. This is unexpected", e);
             return;
         } catch (IOException e) {
             log.error("Could not deserialize incoming "
-                + "transfer object or an connection error occurred", e);
+                + "transfer object or a connection error occurred", e);
             return;
         }
 
@@ -237,14 +244,21 @@ public class XMPPReceiver {
 
         try {
             parser.setInput(new ByteArrayInputStream(data), "UTF-8");
+            /*
+             * We have to skip the empty start tag because Smack expects a
+             * parser that already has started parsing.
+             */
+            parser.next();
             extension = provider.parseExtension(parser);
 
         } catch (XmlPullParserException e) {
-            log.error("Unexpected encoding error.", e);
+            log.error("Unexpected encoding error:", e);
+            return;
         } catch (Exception e) {
             log.error(
                 "Could not parse packet extension from bytestream. Maybe a wrong transfer description is used?",
                 e);
+            return;
         }
 
         final Packet packet = new Message();
