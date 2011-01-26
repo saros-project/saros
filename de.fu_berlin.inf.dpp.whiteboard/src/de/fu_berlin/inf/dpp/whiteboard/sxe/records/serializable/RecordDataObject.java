@@ -34,7 +34,6 @@ public abstract class RecordDataObject implements Serializable {
 	private final RecordType type;
 	private NodeType nodeType;
 	private final Map<RecordEntry, String> valuePairs = new HashMap<RecordEntry, String>();
-	private String sender;
 
 	public RecordDataObject(RecordType recordType) {
 		if (recordType == null)

@@ -20,11 +20,15 @@ import org.eclipse.swt.widgets.Event;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool;
 
 /**
+ * <p>
  * An extension of the GEF graphical editor with a locking feature using the
  * setEnabled() method.
+ * </p>
  * 
+ * <p>
  * It uses a custom EditDomain and a custom ActionRegistry to block all
  * currently possible edits. Zoom and panning tools will work though.
+ * </p>
  * 
  * @author jurke
  * 
@@ -76,10 +80,18 @@ public abstract class BlockableGraphicalEditor extends
 
 		// actually just used for select all, other actions auto-update
 		actionRegistry.setEnabled(enable);
+		// we have to update the registered actions
+		updateActions();
 	}
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	protected void updateActions() {
+		updateActions(getSelectionActions());
+		// to disable re/undo
+		commandStackChanged(null);
 	}
 
 	/**

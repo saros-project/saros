@@ -80,11 +80,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
 			public void processPacket(Packet packet) {
 				final SXEExtension extension = (SXEExtension) packet
 						.getExtension(SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
-				/*
-				 * TODO consider the lastModifiedBy issue. Maybe set it here to
-				 * sender on every RecordDataObject where it is null
-				 */
 				extension.getMessage().setFrom(packet.getFrom());
+				/*
+				 * TODO consider the lastModifiedBy field: if not sent in the
+				 * record it may be set here like the sender
+				 */
 				setSender(extension.getMessage().getRecords(), packet.getFrom());
 				Util.runSafeSWTAsync(log, new Runnable() {
 
@@ -119,11 +119,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
 		try {
 			if (msg.getTo() == null) {
 				for (User u : sarosSession.getRemoteUsers()) {
-					transmitter.sendMessageToProjectUser(u.getJID(), extension);
+					transmitter.sendToProjectUser(u.getJID(), extension);
 				}
 			} else {
 				JID jid = new JID(msg.getTo());
-				transmitter.sendMessageToProjectUser(jid, extension);
+				transmitter.sendToProjectUser(jid, extension);
 			}
 		} catch (Exception e) {
 			log.error(

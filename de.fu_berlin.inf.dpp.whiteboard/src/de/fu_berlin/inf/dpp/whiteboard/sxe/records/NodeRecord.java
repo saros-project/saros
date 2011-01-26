@@ -281,8 +281,6 @@ public abstract class NodeRecord extends AbstractRecord implements
 	public void setPrimaryWeight(Float primaryWeight) {
 		if (isCommitted())
 			throw new CommittedRecordException();
-		if (primaryWeight == null)
-			throw new NullPointerException();
 		currentPrimaryWeight = primaryWeight;
 		initialSet.setPrimaryWeight(primaryWeight);
 	}

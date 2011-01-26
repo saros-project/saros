@@ -44,7 +44,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.actions.ActionFactory;
 
-import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.CopyRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.PasteRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.SXEDeleteAction;
@@ -53,7 +52,6 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.tools.CreationToolWithoutSelection;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool.PanningToolEntry;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PointlistCreationTool;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
-import de.fu_berlin.inf.dpp.whiteboard.net.RoleChangeManager.RoleChangeListener;
 import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
 import de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardContextMenuProvider;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler.MessageAdapter;
@@ -70,7 +68,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
  * @author jurke
  * 
  */
-public class WhiteboardEditor extends BlockableGraphicalEditor {
+public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 
 	public static final String ID = "de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor";
 
@@ -80,8 +78,6 @@ public class WhiteboardEditor extends BlockableGraphicalEditor {
 	public static final double ZOOM_UI_MULTIPLIER = 10d;
 
 	private KeyHandler keyHandler;
-
-	private WhiteboardManager whiteboardManager;
 
 	/**
 	 * Creates the editor with a custom command stack
@@ -155,17 +151,7 @@ public class WhiteboardEditor extends BlockableGraphicalEditor {
 			}
 		});
 
-		WhiteboardManager.getInstance().addRoleChangeListener(
-				new RoleChangeListener() {
-
-					@Override
-					public void roleChanged(UserRole role) {
-						WhiteboardEditor.this
-								.setEnabled(role == UserRole.DRIVER);
-						updateActions();
-					}
-				});
-		setEnabled(WhiteboardManager.getInstance().getLocalUserRole() == UserRole.DRIVER);
+		super.initializeGraphicalViewer();
 	}
 
 	protected void updateViewerContents(ElementRecord root) {
@@ -472,20 +458,11 @@ public class WhiteboardEditor extends BlockableGraphicalEditor {
 		return false;
 	}
 
-	protected void updateActions() {
-		updateSelectionActions();
-		// to disable re/undo
-		commandStackChanged(null);
-	}
-
+	/*
+	 * Updates the registered selection actions, needed for the copy command
+	 */
 	public void updateSelectionActions() {
 		updateActions(getSelectionActions());
-	}
-
-	@Override
-	public void dispose() {
-		whiteboardManager.dispose();
-		super.dispose();
 	}
 
 	// public void createPartControl(Composite parent) {

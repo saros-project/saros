@@ -81,7 +81,7 @@ public class SXEPacketFilter implements PacketFilter {
 			}
 
 		} catch (Exception e) {
-			log.debug("Received malformed packet: " + e.getMessage());
+			log.debug("Received malformed packet: ", e);
 		}
 		return false;
 	}
