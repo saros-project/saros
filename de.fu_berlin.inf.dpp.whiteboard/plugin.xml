@@ -9,7 +9,7 @@
 	<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
-            icon="icons/saros-logo.png"
+            icon="icons/etool16/saros_menu.png"
             id="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
             name="Saros Whiteboard"/>
 	</extension>

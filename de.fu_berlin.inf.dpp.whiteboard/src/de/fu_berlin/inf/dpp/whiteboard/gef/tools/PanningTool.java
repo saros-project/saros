@@ -18,6 +18,7 @@ public class PanningTool extends PanningSelectionTool {
 	/**
 	 * set state to panning always
 	 */
+	@Override
 	protected boolean handleButtonDown(int which) {
 		setState(PAN);
 		return super.handleButtonDown(which);
@@ -26,6 +27,7 @@ public class PanningTool extends PanningSelectionTool {
 	/**
 	 * always returns a the hand as curser
 	 */
+	@Override
 	protected Cursor getDefaultCursor() {
 		return SharedCursors.HAND;
 	}
@@ -59,8 +61,9 @@ public class PanningTool extends PanningSelectionTool {
 		 */
 		public PanningToolEntry(String label, String shortDesc) {
 			super(label, shortDesc, Activator
-					.getImageDescriptor("icons/hand.png"), Activator
-					.getImageDescriptor("icons/hand.png"), PanningTool.class);
+					.getImageDescriptor("icons/etool16/hand.png"), Activator
+					.getImageDescriptor("icons/etool16/hand.png"),
+					PanningTool.class);
 			if (label == null || label.length() == 0)
 				setLabel("Panning");
 			setUserModificationPermission(PERMISSION_NO_MODIFICATION);

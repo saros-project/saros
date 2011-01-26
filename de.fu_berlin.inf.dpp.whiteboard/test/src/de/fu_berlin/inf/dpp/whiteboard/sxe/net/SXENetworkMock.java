@@ -6,6 +6,10 @@ public class SXENetworkMock {
 		return new MockedSXETransmitter(this);
 	}
 
+	public void sendMessage(String raw, String to) {
+		// TODO Auto-generated method stub
+	}
+
 	// public ISXETransmitter getHostMock();
 
 }
