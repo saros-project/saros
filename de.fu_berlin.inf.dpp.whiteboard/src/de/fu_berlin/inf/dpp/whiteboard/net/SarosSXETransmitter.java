@@ -43,6 +43,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
 public class SarosSXETransmitter implements ISXETransmitter {
 
 	public static final long SXE_TIMEOUT = 3000L;
+	public static final long SXE_START_SYNC_TIMEOUT = 30000L;
 
 	public static final Logger log = Logger
 			.getLogger(SarosSXETransmitter.class);
@@ -147,9 +148,14 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 		sendWithoutDispatch(msg);
 
-		// receive automatically removes collector
-		Packet packet = transmitter.receive(monitor, collector, SXE_TIMEOUT,
-				false);
+		// we have to use a longer timeout for start sync
+		long timeout = SXE_TIMEOUT;
+		if (Arrays.asList(awaitFor).contains(SXEMessageType.STATE)) {
+			timeout = SXE_START_SYNC_TIMEOUT;
+		}
+
+		// receiving automatically removes collector
+		Packet packet = transmitter.receive(monitor, collector, timeout, false);
 
 		SXEMessage response = ((SXEExtension) packet.getExtension(
 				SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS)).getMessage();
