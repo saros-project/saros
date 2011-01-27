@@ -9,15 +9,18 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 
 public class TestApplyRecords {
 
+	private final SXEDefaultRecordFactory recordFactory = new SXEDefaultRecordFactory();
+	private final SXEController controller = new SXEController(recordFactory);
+	private final DocumentRecord document = recordFactory
+			.createDocument(controller);
+	private final ElementRecord root = recordFactory.createRoot(document);
+
+	{
+		root.apply(document);
+	}
+
 	@Test
 	public void testNewRecords() {
-		SXEDefaultRecordFactory recordFactory = new SXEDefaultRecordFactory();
-		SXEController controller = new SXEController(recordFactory);
-
-		DocumentRecord document = recordFactory.createDocument(controller);
-		ElementRecord root = recordFactory.createRoot(document);
-
-		root.apply(document);
 
 		ElementRecord r = recordFactory.createElementRecord(document, null,
 				"rect");
@@ -27,13 +30,52 @@ public class TestApplyRecords {
 
 		assertTrue(document.contains(r));
 
-		// RemoveRecord rr = new RemoveRecord(r);
+		SetRecord rr = r.getRemoveRecord();
 
-		// rr.apply(document);
+		rr.apply(document);
 
-		assertFalse(document.contains(r));
-		// assertTrue(document.isRemoved(r.getRid()));
-
+		assertFalse(r.isVisible());
 	}
 
+	@Test
+	public void testConflictingSetRecords() {
+		for (int i = 0; i < 3; i++) {
+			testConflictingSetRecords(i);
+		}
+	}
+
+	public void testConflictingSetRecords(int setRecordsBeforeConflict) {
+
+		ElementRecord r = recordFactory.createElementRecord(document, null,
+				"rect");
+
+		r.setParent(root);
+
+		r.apply(document);
+
+		for (int i = 0; i < setRecordsBeforeConflict; i++) {
+
+			SetRecord set0 = new SetRecord(r);
+			set0.setPrimaryWeight((float) i);
+			set0.apply(document);
+		}
+
+		float pwOrig = r.getPrimaryWeight();
+		float pw1 = pwOrig + 1f;
+		float pw2 = pwOrig + 2f;
+
+		SetRecord set1 = new SetRecord(r, r.getVersion() + 1);
+		set1.setPrimaryWeight(pw1);
+
+		SetRecord set2 = new SetRecord(r, r.getVersion() + 1);
+		set2.setPrimaryWeight(pw2);
+
+		set1.apply(document);
+
+		assertTrue(r.getPrimaryWeight() == pw1);
+
+		set2.apply(document);
+
+		assertTrue(r.getPrimaryWeight() == pwOrig);
+	}
 }

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.records;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.NodeType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordType;
+import de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions.CommittedRecordException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.SetRecordDataObject;
 
@@ -148,6 +149,12 @@ public class SetRecord extends AbstractRecord {
 		return version;
 	}
 
+	public void setVersion(int version) {
+		if (this.isCommitted())
+			throw new CommittedRecordException();
+		this.version = version;
+	}
+
 	/**
 	 * 
 	 * @return the difference between this and the target version (will be one
@@ -217,7 +224,7 @@ public class SetRecord extends AbstractRecord {
 		if (primaryWeight == null && previous.getPrimaryWeight() != null) {
 			setPrimaryWeight(previous.getPrimaryWeight());
 		}
-		if (primaryWeight == null && previous.getChdata() != null) {
+		if (chdata == null && previous.getChdata() != null) {
 			setChdata(previous.getChdata());
 		}
 		if (setVisible == null && previous.getSetVisibilityTo() != null) {
