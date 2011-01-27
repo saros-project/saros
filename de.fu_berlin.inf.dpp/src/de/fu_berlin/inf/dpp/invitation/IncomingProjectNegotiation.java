@@ -13,6 +13,7 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -51,6 +52,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public class IncomingProjectNegotiation extends ProjectNegotiation {
 
@@ -159,6 +161,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         assignLocalProject(baseProject, newProjectName, vcs, monitor);
+
+        if (vcs != null) {
+            initVcState(localProject, vcs, monitor);
+        }
 
         FileList requiredFiles = computeRequiredFiles(skipSync, vcs, monitor);
 
@@ -748,5 +754,82 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Override
     public String getProjectID() {
         return projectID;
+    }
+
+    /**
+     * Recursively synchronizes the version control state (URL and revision) of
+     * each resource in the project with the host by switching or updating when
+     * necessary.<br>
+     * <br>
+     * It's very hard to predict how many resources have to be changed. In the
+     * worst case, every resource has to be changed as many times as the number
+     * of segments in its path. Due to these complications, the monitor is only
+     * used for cancellation and the label, but not for the progress bar.
+     * 
+     * @throws SarosCancellationException
+     */
+    private void initVcState(IResource resource, VCSAdapter vcs,
+        SubMonitor monitor) throws SarosCancellationException {
+        if (monitor.isCanceled())
+            return;
+
+        if (!vcs.isManaged(resource))
+            return;
+
+        final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
+        final IPath path = resource.getProjectRelativePath();
+        if (resource instanceof IProject) {
+            /*
+             * We have to revert the project first because the invitee could
+             * have deleted a managed resource. Also, we don't want an update or
+             * switch to cause an unresolved conflict here. The revert might
+             * leave some unmanaged files, but these will get cleaned up later;
+             * we're only concerned with managed files here.
+             */
+            vcs.revert(resource, monitor);
+        }
+
+        String url = remoteFileList.getVCSUrl(path);
+        String revision = remoteFileList.getVCSRevision(path);
+        if (url == null || revision == null) {
+            // The resource might have been deleted.
+            return;
+        }
+        if (!info.url.equals(url)) {
+            log.trace("Switching " + resource.getName() + " from " + info.url
+                + " to " + url);
+            vcs.switch_(resource, url, revision, monitor);
+        } else if (!info.revision.equals(revision)) {
+            log.trace("Updating " + resource.getName() + " from "
+                + info.revision + " to " + revision);
+            vcs.update(resource, revision, monitor);
+        }
+        if (monitor.isCanceled())
+            return;
+
+        if (resource instanceof IContainer) {
+            // Recurse.
+            try {
+                final IResource[] children = ((IContainer) resource).members();
+                for (IResource child : children) {
+                    initVcState(child, vcs, monitor);
+                    if (monitor.isCanceled())
+                        break;
+                }
+            } catch (CoreException e) {
+                /*
+                 * We shouldn't ever get here. CoreExceptions are thrown e.g. if
+                 * the project is closed or the resource doesn't exist, both of
+                 * which are impossible at this point.
+                 */
+                log.error("Unknown error while trying to initialize the "
+                    + "children of " + resource.toString() + ".", e);
+                localCancel(
+                    "Could not initialize the project's version control state, "
+                        + "please try again without VCS support.",
+                    CancelOption.NOTIFY_PEER);
+                executeCancellation();
+            }
+        }
     }
 }
