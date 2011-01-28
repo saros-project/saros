@@ -26,6 +26,13 @@ public class SarosMImp extends EclipsePart implements SarosM {
     /* title of treeItem Saros and it's sub treeItems in the preferences dialog */
     private static final String P_SAROS = "Saros";
 
+    /* confirm Shell 'Create new xmpp account' */
+    private final static String SHELL_CREATE_NEW_XMPP_ACCOUNT = "Create New XMPP Account";
+    private final static String XMPP_JABBER_SERVER = "XMPP/Jabber Server";
+    private final static String USER_NAME = "Username";
+    private final static String PASSWORD = "Password";
+    private final static String REPEAT_PASSWORD = "Repeat Password";
+
     /**
      * {@link SarosMImp} is a singleton, but inheritance is possible.
      */
@@ -55,8 +62,21 @@ public class SarosMImp extends EclipsePart implements SarosM {
     public void creatAccount(JID jid, String password,
         boolean usesThisAccountNow) throws RemoteException {
         menuW.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        rosterV.confirmWindowCreateXMPPAccount(jid.getDomain(), jid.getName(),
+        confirmWindowCreateNewXMPPAccount(jid.getDomain(), jid.getName(),
             password, usesThisAccountNow);
+    }
+
+    public void confirmWindowCreateNewXMPPAccount(String xmppServer,
+        String jid, String password, boolean usesThisAccountNow)
+        throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
+            shellC.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        textW.setTextInTextWithLabel(xmppServer, XMPP_JABBER_SERVER);
+        textW.setTextInTextWithLabel(jid, USER_NAME);
+        textW.setTextInTextWithLabel(password, PASSWORD);
+        textW.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        buttonW.clickButton(FINISH);
+        shellC.waitUntilShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
 
     public void createAccountInPeferences(String server, String username,
@@ -86,7 +106,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         shellC.activateShellWithWaitingOpen(SHELL_SAROS_CONFIGURATION);
-        textW.setTextInTextWithLabel(jid.getDomain(), "Jabber Server");
+        textW.setTextInTextWithLabel(jid.getDomain(), "XMPP/Jabber Server");
         textW.setTextInTextWithLabel(jid.getName(), "Username");
         textW.setTextInTextWithLabel(password, "Password");
         buttonW.waitUntilButtonEnabled(NEXT);

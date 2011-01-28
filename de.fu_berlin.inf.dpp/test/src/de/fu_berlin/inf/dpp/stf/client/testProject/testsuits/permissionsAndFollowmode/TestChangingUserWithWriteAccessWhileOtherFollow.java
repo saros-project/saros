@@ -92,7 +92,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
     @Test
     public void testChangingWriteAccessWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.sessionV.grantWriteAccessGUI(carl.sessionV);
+        alice.sarosSessionV.grantWriteAccessGUI(carl.sarosSessionV);
         /*
          * After new release 10.10.28 all read-only users is automatically in
          * follow mode(are the read-only users really in follow mode???) when

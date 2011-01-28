@@ -193,8 +193,7 @@ public interface SessionView extends Remote {
      *         the session view.
      * @throws RemoteException
      */
-    public boolean isContactInSessionViewGUI(JID contactJID)
-        throws RemoteException;
+    public boolean existsParticipant(JID contactJID) throws RemoteException;
 
     /**
      * @return <tt>true</tt> if the local client has
@@ -211,15 +210,6 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      */
     public boolean hasWriteAccess(JID jid) throws RemoteException;
-
-    /**
-     * 
-     * @return <tt>true</tt> if the given {@link JID} is the only one with
-     *         {@link User.Permission#WRITE_ACCESS} in this
-     *         {@link SharedProject}.
-     * @throws RemoteException
-     */
-    public boolean hasExclusiveWriteAccess() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if all given {@link JID}s have
@@ -365,8 +355,7 @@ public interface SessionView extends Remote {
      *         "contactJID" which listed in the session view.
      * @throws RemoteException
      */
-    public String getContactStatusInSessionView(JID contactJID)
-        throws RemoteException;
+    public String getParticipantLabel(JID contactJID) throws RemoteException;
 
     /**
      * 
@@ -398,7 +387,7 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to follow.
      * @throws RemoteException
      */
-    public void followThisUserGUI(JID jidOfFollowedUser) throws RemoteException;
+    public void followThisBuddyGUI(JID jidOfFollowedUser) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if you are currently following another user.
@@ -414,14 +403,14 @@ public interface SessionView extends Remote {
      * @return <tt>true</tt>, if you are currently following the given user.
      * @throws RemoteException
      */
-    public boolean isFollowingUser(String baseJID) throws RemoteException;
+    public boolean isFollowingBuddy(String baseJID) throws RemoteException;
 
     /**
      * @return the JID of the followed user or null if currently no user is
      *         followed.
      * @throws RemoteException
      */
-    public JID getFollowedUserJID() throws RemoteException;
+    public JID getFollowedBuddyJID() throws RemoteException;
 
     /**
      * Test if you are in follow mode. <br>
@@ -449,11 +438,11 @@ public interface SessionView extends Remote {
 
     /**
      * This function do same as the
-     * {@link SessionView#stopFollowingThisUserGUI(SarosState)} except you don't
+     * {@link SessionView#stopFollowingThisBuddyGUI(SarosState)} except you don't
      * need to pass the {@link SarosState} of the followed user to the function.
      * It is very useful, if you don't exactly know whom you are now following.
      * Instead, we get the followed user JID from the method
-     * {@link SarosState#getFollowedUserJID()}.
+     * {@link SarosState#getFollowedBuddyJID()}.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -478,7 +467,7 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to stop following.
      * @throws RemoteException
      */
-    public void stopFollowingThisUserGUI(JID jidOfFollowedUser)
+    public void stopFollowingThisBuddyGUI(JID jidOfFollowedUser)
         throws RemoteException;
 
     /**
@@ -494,7 +483,7 @@ public interface SessionView extends Remote {
      *         passed contactName listed in the session view is enabled.
      * @throws RemoteException
      */
-    public boolean isCMStopFollowingThisUserEnabled(String baseJIDOfFollowedUser)
+    public boolean isCMStopFollowingThisBuddyEnabled(String baseJIDOfFollowedUser)
         throws RemoteException;
 
     /**
@@ -509,7 +498,7 @@ public interface SessionView extends Remote {
      *         passed contactName listed in the session view is visible.
      * @throws RemoteException
      */
-    public boolean isCMStopFollowingThisUserVisible(String baseJIDOfFollowedUser)
+    public boolean isCMStopFollowingThisBuddyVisible(String baseJIDOfFollowedUser)
         throws RemoteException;
 
     /**
@@ -521,7 +510,7 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g. assert bob's workbench
      * state after bob follow the given user by running the
-     * {@link SessionViewImp#followThisUserGUI(SarosState)}without this
+     * {@link SessionViewImp#followThisBuddyGUI(SarosState)}without this
      * waitUntil. In this case, you may get the AssertException, because bob
      * should not really in the follow mode yet during asserting a condition or
      * performing a following action. So it is recommended that you wait until
@@ -531,7 +520,7 @@ public interface SessionView extends Remote {
      * @param baseJIDOfFollowedUser
      * @throws RemoteException
      */
-    public void waitUntilIsFollowingUser(String baseJIDOfFollowedUser)
+    public void waitUntilIsFollowingBuddy(String baseJIDOfFollowedUser)
         throws RemoteException;
 
     /**
@@ -549,7 +538,7 @@ public interface SessionView extends Remote {
      *            screen.
      * @throws RemoteException
      */
-    public void shareYourScreenWithSelectedUserGUI(JID jidOfPeer)
+    public void shareYourScreenWithSelectedBuddyGUI(JID jidOfPeer)
         throws RemoteException;
 
     /**
@@ -557,7 +546,7 @@ public interface SessionView extends Remote {
      * activated by clicking the tool bar button with the tooltip text
      * "Stop share session with user" on the session view, This toolbar button
      * is only visible after clicking the
-     * {@link SessionView#shareYourScreenWithSelectedUserGUI(JID)}
+     * {@link SessionView#shareYourScreenWithSelectedBuddyGUI(JID)}
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -728,7 +717,7 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to stop following.
      * @throws RemoteException
      */
-    public void jumpToPositionOfSelectedUserGUI(JID jidOfselectedUser)
+    public void jumpToPositionOfSelectedBuddyGUI(JID jidOfselectedUser)
         throws RemoteException;
 
     /**
@@ -823,7 +812,7 @@ public interface SessionView extends Remote {
 
     /**
      * After perform the
-     * {@link SessionView#shareYourScreenWithSelectedUserGUI(SarosState)} the
+     * {@link SessionView#shareYourScreenWithSelectedBuddyGUI(SarosState)} the
      * selected user should get this popup window.
      * 
      * @throws RemoteException

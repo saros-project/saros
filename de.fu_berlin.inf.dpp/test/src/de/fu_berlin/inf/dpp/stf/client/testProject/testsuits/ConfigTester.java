@@ -96,7 +96,7 @@ public class ConfigTester {
             Tester musican = musicians.get(i);
             for (int j = i + 1; j < musicians.size(); j++) {
                 Tester addedMuscian = musicians.get(j);
-                if (!musican.rosterV.hasBuddy(addedMuscian.jid))
+                if (!musican.sarosBuddiesV.hasBuddy(addedMuscian.jid))
                     musican.addBuddyGUIDone(addedMuscian);
             }
         }

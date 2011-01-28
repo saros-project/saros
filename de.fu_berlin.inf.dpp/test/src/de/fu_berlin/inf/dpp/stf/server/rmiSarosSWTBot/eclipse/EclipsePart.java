@@ -72,7 +72,7 @@ public abstract class EclipsePart {
 
     // Permission: Write Access
     public static final String OWN_CONTACT_NAME = "You";
-    protected final static String ROLENAME = "";
+    protected final static String PERMISSION_NAME = " (read-only)";
 
     // exported objects
     public static TableImp tableW = TableImp.getInstance();

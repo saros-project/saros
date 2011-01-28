@@ -69,8 +69,8 @@ public class TestSVNStateInitialization extends STFTest {
     public static void resetSaros() throws RemoteException {
         bob.workbench.resetSaros();
         if (ConfigTester.DEVELOPMODE) {
-            if (alice.sessionV.isInSessionGUI())
-                alice.sessionV.leaveTheSessionByHost();
+            if (alice.sarosSessionV.isInSessionGUI())
+                alice.sarosSessionV.leaveTheSessionByHost();
             // don't delete SVN_PROJECT_COPY
         } else {
             alice.workbench.resetSaros();
@@ -125,12 +125,12 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.sessionV.hasWriteAccess());
-        assertTrue(alice.sessionV.isParticipant(bob.jid));
-        assertTrue(bob.sessionV.hasReadOnlyAccess(bob.jid));
+        assertTrue(alice.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosSessionV.isParticipant(bob.jid));
+        assertTrue(bob.sarosSessionV.hasReadOnlyAccess(bob.jid));
     }
 
     /**
@@ -158,7 +158,7 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_REV1, bob.team.getRevision(SVN_CLS1_FULL_PATH));
@@ -190,8 +190,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
-        bob.sessionV.waitUntilIsInSession();
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
+        bob.sarosSessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
@@ -226,8 +226,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
-        bob.sessionV.waitUntilIsInSession();
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
+        bob.sarosSessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL,
@@ -267,8 +267,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
-        bob.sessionV.waitUntilIsInSession();
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
+        bob.sarosSessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(cls1_content_after,

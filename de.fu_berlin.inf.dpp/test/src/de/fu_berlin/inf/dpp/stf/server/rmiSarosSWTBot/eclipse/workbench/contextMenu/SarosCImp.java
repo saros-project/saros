@@ -25,7 +25,7 @@ public class SarosCImp extends EclipsePart implements SarosC {
     private final static String INVITATION = "Invitation";
     private final static String INVITATIONCANCELLED = "Invitation Cancelled";
     private final static String SESSION_INVITATION = "Session Invitation";
-    private final static String PROJECT_INCOMING = "Add Project";
+    private final static String SHELL_ADD_PROJECT = "Add Project";
     private final static String PROBLEMOCCURRED = "Problem Occurred";
     private final static String WARNING_LOCAL_CHANGES_DELETED = "Warning: Local changes will be deleted";
     private final static String FOLDER_SELECTION = "Folder Selection";
@@ -79,65 +79,30 @@ public class SarosCImp extends EclipsePart implements SarosC {
         default:
             break;
         }
-        confirmWindowInvitation(baseJIDOfInvitees);
+        confirmShellInvitation(baseJIDOfInvitees);
     }
 
     public void shareProject(String projectName, String... baseJIDOfInvitees)
         throws RemoteException {
         clickContextMenushareProject(projectName);
-        confirmWindowInvitation(baseJIDOfInvitees);
+        confirmShellInvitation(baseJIDOfInvitees);
     }
 
-    public void confirmWindowInvitation(String... baseJIDOfinvitees)
+    public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
         shellC.activateShellWithText(INVITATION);
         shellC
             .confirmWindowWithCheckBoxs(INVITATION, FINISH, baseJIDOfinvitees);
     }
 
-    public void confirmProjectSharingWirzardWithNewProject(String projectname)
+    public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
-        if (!shellC.activateShellWithText(PROJECT_INCOMING))
-            shellC.waitUntilShellActive(PROJECT_INCOMING);
-        confirmProjectSharingWizardUsingNewproject();
-
-    }
-
-    public void confirmProjectSharingWizardUsingExistProject(String projectName)
-        throws RemoteException {
-        if (!shellC.activateShellWithText(PROJECT_INCOMING))
-            shellC.waitUntilShellActive(PROJECT_INCOMING);
-        confirmProjectSharingWizardSessionInvitationUsingExistProject(projectName);
-    }
-
-    public void confirmProjectSharingWizardUsingExistProjectWithCopyAfterCancelLocalChange(
-        String projectName) throws RemoteException {
-        if (!shellC.activateShellWithText(PROJECT_INCOMING))
-            shellC.waitUntilShellActive(PROJECT_INCOMING);
-        confirmProjectSharingWizardUsingExistProjectWithCancelLocalChange(projectName);
-    }
-
-    public void confirmSessionInvitationUsingExistProjectWithCopy(
-        String projectName) throws RemoteException {
-        if (!shellC.activateShellWithText(PROJECT_INCOMING))
-            shellC.waitUntilShellActive(PROJECT_INCOMING);
-        confirmProjectSharingWizardUsingExistProjectWithCopy(projectName);
-    }
-
-    public void confirmSessionInvitationWizard() throws RemoteException {
-        if (!shellC.activateShellWithText(SESSION_INVITATION))
-            shellC.waitUntilShellActive(SESSION_INVITATION);
-        bot.button(FINISH).click();
-    }
-
-    public void confirmProjectSharingWizardUsingNewproject()
-        throws RemoteException {
-        if (!shellC.activateShellWithText(PROJECT_INCOMING))
-            shellC.waitUntilShellActive(PROJECT_INCOMING);
+        if (!shellC.activateShellWithText(SHELL_ADD_PROJECT))
+            shellC.waitUntilShellActive(SHELL_ADD_PROJECT);
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
         try {
-            shellC.waitLongUntilShellClosed(PROJECT_INCOMING);
+            shellC.waitLongUntilShellClosed(SHELL_ADD_PROJECT);
         } catch (Exception e) {
             /*
              * sometimes session can not be completely builded because of
@@ -149,15 +114,18 @@ public class SarosCImp extends EclipsePart implements SarosC {
              */
             workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
                 + "/sessionInvitationFailedUsingNewProject.png");
-            if (bot.activeShell().getText().equals(PROJECT_INCOMING)) {
+            if (bot.activeShell().getText().equals(SHELL_ADD_PROJECT)) {
                 bot.activeShell().bot().toggleButton().click();
             }
             throw new RuntimeException("session invitation is failed!");
         }
+
     }
 
-    public void confirmProjectSharingWizardSessionInvitationUsingExistProject(
-        String projectName) throws RemoteException {
+    public void confirmShellAddProjectUsingExistProject(String projectName)
+        throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_ADD_PROJECT))
+            shellC.waitUntilShellActive(SHELL_ADD_PROJECT);
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
 
         // bot.button(BUTTON_BROWSE).click();
@@ -199,34 +167,46 @@ public class SarosCImp extends EclipsePart implements SarosC {
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (shellC.isShellActive(PROJECT_INCOMING)) {
+        if (shellC.isShellActive(SHELL_ADD_PROJECT)) {
             try {
-                shellC.waitLongUntilShellClosed(PROJECT_INCOMING);
+                shellC.waitLongUntilShellClosed(SHELL_ADD_PROJECT);
             } catch (Exception e) {
                 workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
                     + "/sessionInvitationFailedUsingExistProject.png");
-                if (bot.activeShell().getText().equals(PROJECT_INCOMING)) {
+                if (bot.activeShell().getText().equals(SHELL_ADD_PROJECT)) {
                     bot.activeShell().bot().toggleButton().click();
                 }
             }
         }
     }
 
-    public void confirmProjectSharingWizardUsingExistProjectWithCancelLocalChange(
+    public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_ADD_PROJECT))
+            shellC.waitUntilShellActive(SHELL_ADD_PROJECT);
         bot.radio("Use existing project").click();
         bot.textWithLabel("Project name", 1).setText(projectName);
         bot.button(FINISH).click();
         shellC.confirmShell(WARNING_LOCAL_CHANGES_DELETED, NO);
+
+        confirmShellAddProjectUsingExistProjectWithCopy(projectName);
     }
 
-    public void confirmProjectSharingWizardUsingExistProjectWithCopy(
+    public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_ADD_PROJECT))
+            shellC.waitUntilShellActive(SHELL_ADD_PROJECT);
         bot.radio("Use existing project").click();
         bot.checkBox("Create copy for working distributed. New project name:")
             .click();
         bot.button(FINISH).click();
-        shellC.waitLongUntilShellClosed(PROJECT_INCOMING);
+        shellC.waitLongUntilShellClosed(SHELL_ADD_PROJECT);
+    }
+
+    public void confirmShellSessionnInvitation() throws RemoteException {
+        if (!shellC.activateShellWithText(SESSION_INVITATION))
+            shellC.waitUntilShellActive(SESSION_INVITATION);
+        bot.button(FINISH).click();
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
@@ -236,59 +216,59 @@ public class SarosCImp extends EclipsePart implements SarosC {
         button.click();
     }
 
-    public void confirmProjectSharingWizardUsingWhichProject(
+    public void confirmShellAddProjectUsingWhichProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
-        shellC.waitUntilShellOpen(PROJECT_INCOMING);
-        shellC.activateShellWithText(PROJECT_INCOMING);
+        shellC.waitUntilShellOpen(SHELL_ADD_PROJECT);
+        shellC.activateShellWithText(SHELL_ADD_PROJECT);
         switch (usingWhichProject) {
         case NEW_PROJECT:
-            confirmProjectSharingWirzardWithNewProject(projectName);
+            confirmShellAddProjectWithNewProject(projectName);
             break;
         case EXIST_PROJECT:
-            confirmProjectSharingWizardUsingExistProject(projectName);
+            confirmShellAddProjectUsingExistProject(projectName);
             break;
         case EXIST_PROJECT_WITH_COPY:
-            confirmSessionInvitationUsingExistProjectWithCopy(projectName);
+            confirmShellAddProjectUsingExistProjectWithCopy(projectName);
             break;
         case EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE:
-            confirmProjectSharingWizardUsingExistProjectWithCopyAfterCancelLocalChange(projectName);
+            confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(projectName);
             break;
         default:
             break;
         }
     }
 
-    public boolean isWindowInvitationCancelledActive() throws RemoteException {
+    public boolean isShellInvitationCancelledActive() throws RemoteException {
         return shellC.isShellActive(INVITATIONCANCELLED);
     }
 
-    public void closeWindowInvitationCancelled() throws RemoteException {
+    public void closeShellInvitationCancelled() throws RemoteException {
         shellC.closeShell(INVITATIONCANCELLED);
     }
 
-    public void waitUntilWindowInvitationCnacelledActive()
+    public void waitUntilIsShellInvitationCnacelledActive()
         throws RemoteException {
         shellC.waitUntilShellActive(INVITATIONCANCELLED);
     }
 
-    public boolean isWIndowSessionInvitationActive() throws RemoteException {
+    public boolean isShellSessionInvitationActive() throws RemoteException {
         return shellC.isShellActive(SESSION_INVITATION);
     }
 
-    public void closeWIndowSessionInvitation() throws RemoteException {
+    public void closeShellSessionInvitation() throws RemoteException {
         shellC.closeShell(SESSION_INVITATION);
     }
 
-    public void waitUntilWindowSessionInvitationActive() throws RemoteException {
+    public void waitUntilIsShellSessionInvitationActive() throws RemoteException {
         shellC.waitUntilShellActive(SESSION_INVITATION);
     }
 
-    public void waitUntilWindowProblemOccurredActive() throws RemoteException {
+    public void waitUntilIsShellProblemOccurredActive() throws RemoteException {
         shellC.isShellActive(PROBLEMOCCURRED);
     }
 
-    public String getSecondLabelOfWindowProblemOccurred()
+    public String getSecondLabelOfShellProblemOccurred()
         throws RemoteException {
         return bot.shell(PROBLEMOCCURRED).bot().label(2).getText();
     }

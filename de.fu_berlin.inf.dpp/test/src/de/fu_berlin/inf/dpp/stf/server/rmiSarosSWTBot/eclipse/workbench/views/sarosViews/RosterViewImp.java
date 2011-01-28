@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.widgets.MenuItem;
@@ -41,7 +40,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
     private static transient RosterViewImp self;
 
     /* View infos */
-    private final static String VIEWNAME = "Roster";
+    private final static String VIEWNAME = "Saros Buddies";
     private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.RosterView";
 
     /*
@@ -49,31 +48,33 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * rosterview.
      */
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
-    private final static String SHELL_CONTACT_ALREADY_ADDED = "Contact already added";
-    private final static String SHELL_CREATE_NEW_USER_ACCOUNT = "Create New User Account"; // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
-    private final static String SHELL_NEW_CONTACT = "New Contact";
-    private final static String SHELL_CONTACT_LOOKUP_FAILED = "Contact look-up failed";
+    private final static String SHELL_BUDDY_ALREADY_ADDED = "Buddy already added";
+    // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
+    private final static String SHELL_NEW_BUDDY = "New Buddy";
+    private final static String SHELL_BUDDY_LOOKUP_FAILED = "Buddy look-up failed";
     private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
 
     /* Tool tip text of toolbar buttons on the session view */
     private final static String TB_DISCONNECT = "Disconnect";
-    private final static String TB_ADD_A_NEW_CONTACT = "Add a new contact";
+    private final static String TB_ADD_A_NEW_CONTACT = "Add a new buddy";
     private final static String TB_CONNECT = "Connect";
 
     /* Context menu of the table on the view */
     private final static String CM_DELETE = "Delete";
     private final static String CM_RENAME = "Rename...";
-    private final static String CM_SKYPE_THIS_USER = "Skype this user";
-    private final static String CM_INVITE_USER = "Invite user...";
+    private final static String CM_SKYPE_THIS_BUDDY = "Skype this buddy";
+    private final static String CM_INVITE_BUDDY = "Invite buddy...";
     private final static String CM_TEST_DATA_TRANSFER = "Test data transfer connection...";
 
     private final static String BUDDIES = "Buddies";
 
-    private final static String JABBER_SERVER = "Jabber Server";
+    private final static String JABBERID = "XMPP/Jabber JID";
+
+    /* confirm Shell 'Create new xmpp account' */
+    private final static String SHELL_SAROS_CONFIGURATION = "Saros Configuration";
+    private final static String XMPP_JABBER_SERVER = "XMPP/Jabber Server";
     private final static String USER_NAME = "Username";
     private final static String PASSWORD = "Password";
-    private final static String JABBERID = "JID";
-    private final static String REPEAT_PASSWORD = "Repeat Password";
 
     /**
      * {@link RosterViewImp} is a singleton, but inheritance is possible.
@@ -96,16 +97,16 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * open/close/activate the roster view
      * 
      **********************************************/
-    public void openRosterView() throws RemoteException {
-        if (!isRosterViewOpen())
+    public void openSarosBuddiesView() throws RemoteException {
+        if (!isSarosBuddiesViewOpen())
             viewW.openViewById(VIEWID);
     }
 
-    public boolean isRosterViewOpen() throws RemoteException {
+    public boolean isSarosBuddiesViewOpen() throws RemoteException {
         return viewW.isViewOpen(VIEWNAME);
     }
 
-    public void closeRosterView() throws RemoteException {
+    public void closeSarosBuddiesView() throws RemoteException {
         viewW.closeViewById(VIEWID);
     }
 
@@ -113,7 +114,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         viewW.setFocusOnViewByTitle(VIEWNAME);
     }
 
-    public boolean isRosterViewActive() throws RemoteException {
+    public boolean isSarosBuddiesViewActive() throws RemoteException {
         return viewW.isViewActive(VIEWNAME);
     }
 
@@ -129,7 +130,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
             if (!sarosM.isAccountExist(jid, password)) {
-                sarosM.createAccountNoGUI(jid.getDomain(), jid.getName(), password);
+                sarosM.createAccountNoGUI(jid.getDomain(), jid.getName(),
+                    password);
             }
             if (!sarosM.isAccountActive(jid))
                 sarosM.activateAccountNoGUI(jid);
@@ -175,16 +177,15 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         }
     }
 
-    public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
-        String password, boolean usesThisAccountNow) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
-            shellC.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
-        textW.setTextInTextWithLabel(xmppServer, JABBER_SERVER);
+    private void confirmWindowSarosConfiguration(String xmppServer, String jid,
+        String password) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_SAROS_CONFIGURATION))
+            shellC.waitUntilShellActive(SHELL_SAROS_CONFIGURATION);
+        textW.setTextInTextWithLabel(xmppServer, XMPP_JABBER_SERVER);
         textW.setTextInTextWithLabel(jid, USER_NAME);
         textW.setTextInTextWithLabel(password, PASSWORD);
-        textW.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        buttonW.clickButton(NEXT);
         buttonW.clickButton(FINISH);
-        shellC.waitUntilShellClosed(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
     public boolean isConnected() throws RemoteException {
@@ -258,19 +259,14 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * 
      * toolbar buttons on the view: add a new contact
      * 
-     * @throws XMPPException
+     * @throws RemoteException
      * 
      **********************************************/
-    public void addANewContact(JID jid) throws RemoteException, XMPPException {
-        // TODO add the correct implementation
-        // saros.addContact(jid, jid.getBase(), null, null);
-        throw new NotImplementedException();
-    }
 
-    public void addANewContactGUI(JID jid) throws RemoteException {
+    public void addANewBuddyGUI(JID jid) throws RemoteException {
         if (!hasBuddy(jid)) {
-            clickAddANewContactToolbarButton();
-            confirmNewContactWindow(jid.getBase());
+            clickToolbarButtonAddANewBuddy();
+            confirmWindowNewBuddy(jid.getBase());
         }
     }
 
@@ -282,43 +278,44 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         shellC.confirmShell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
     }
 
-    public void confirmNewContactWindow(String baseJID) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_NEW_CONTACT))
-            shellC.waitUntilShellActive(SHELL_NEW_CONTACT);
-        textW.setTextInTextWithLabel(baseJID, JABBERID);
+    public void confirmWindowNewBuddy(String baseJID) throws RemoteException {
+        if (!shellC.activateShellWithText(SHELL_NEW_BUDDY))
+            shellC.waitUntilShellActive(SHELL_NEW_BUDDY);
+        textW.setTextInTextWithLabel(baseJID, "XMPP/Jabber ID");
         buttonW.waitUntilButtonEnabled(FINISH);
         buttonW.clickButton(FINISH);
     }
 
-    public void clickAddANewContactToolbarButton() throws RemoteException {
+    public void clickToolbarButtonAddANewBuddy() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
     }
 
-    public void confirmContactLookupFailedWindow(String buttonType)
+    public void confirmShellBuddyLookupFailed(String buttonType)
         throws RemoteException {
-        shellC.confirmShell(SHELL_CONTACT_LOOKUP_FAILED, buttonType);
+        shellC.confirmShell(SHELL_BUDDY_LOOKUP_FAILED, buttonType);
     }
 
-    public void waitUntilContactLookupFailedIsActive() throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_CONTACT_LOOKUP_FAILED);
-    }
-
-    public void waitUntilWindowContactAlreadyAddedIsActive()
+    public void waitUntilIsShellBuddyLookupFailedActive()
         throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_CONTACT_ALREADY_ADDED);
+        shellC.waitUntilShellActive(SHELL_BUDDY_LOOKUP_FAILED);
     }
 
-    public boolean isWindowContactLookupFailedActive() throws RemoteException {
-        return shellC.isShellActive(SHELL_CONTACT_LOOKUP_FAILED);
+    public void waitUntilIsShellBuddyAlreadyAddedActive()
+        throws RemoteException {
+        shellC.waitUntilShellActive(SHELL_BUDDY_ALREADY_ADDED);
     }
 
-    public void closeWindowContactAlreadyAdded() throws RemoteException {
-        shellC.closeShell(SHELL_CONTACT_ALREADY_ADDED);
+    public boolean isShellBuddyLookupFailedActive() throws RemoteException {
+        return shellC.isShellActive(SHELL_BUDDY_LOOKUP_FAILED);
     }
 
-    public boolean isWindowContactAlreadyAddedActive() throws RemoteException {
-        return shellC.isShellActive(SHELL_CONTACT_ALREADY_ADDED);
+    public void closeShellBuddyAlreadyAdded() throws RemoteException {
+        shellC.closeShell(SHELL_BUDDY_ALREADY_ADDED);
+    }
+
+    public boolean isShellBuddyAlreadyAddedActive() throws RemoteException {
+        return shellC.isShellActive(SHELL_BUDDY_ALREADY_ADDED);
     }
 
     /**********************************************
@@ -450,8 +447,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_RENAME,
-            BUDDIES + ".*", buddyNickName + ".*");
+        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_RENAME, BUDDIES
+            + ".*", buddyNickName + ".*");
         if (!shellC.activateShellWithText("Set new nickname")) {
             shellC.waitUntilShellActive("Set new nickname");
         }
@@ -465,11 +462,11 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * 
      **********************************************/
 
-    public void inviteUser(JID buddyJID) throws RemoteException {
+    public void inviteBuddy(JID buddyJID) throws RemoteException {
         // add the implementation.
     }
 
-    public void inviteUserGUI(JID buddyJID) throws RemoteException {
+    public void inviteBuddyGUI(JID buddyJID) throws RemoteException {
         precondition();
         String buddyNickName = getBuddyNickName(buddyJID);
         if (buddyNickName == null)
@@ -487,7 +484,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
                 + buddyNickName
                 + ", it's possible that you've already invite him");
         }
-        item.contextMenu(CM_INVITE_USER).click();
+        item.contextMenu(CM_INVITE_BUDDY).click();
     }
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
@@ -519,7 +516,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        openRosterView();
+        openSarosBuddiesView();
         setFocusOnRosterView();
     }
 
@@ -544,10 +541,6 @@ public class RosterViewImp extends EclipsePart implements RosterView {
     protected List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
         return toolbarButtonW.getAllToolbarButtonsInView(VIEWNAME);
-    }
-
-    private boolean isWizardCreateXMPPAccountActive() throws RemoteException {
-        return shellC.isShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
     }
 
     @SuppressWarnings("static-access")

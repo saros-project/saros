@@ -94,36 +94,36 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         bob.shell.waitUntilShellOpen(SESSION_INVITATION);
         bob.shell.activateShellWithText(SESSION_INVITATION);
         bob.button.clickButton(CANCEL);
-        alice.sarosC.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+        alice.sarosC.waitUntilIsShellProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
             .matches(bob.getName() + ".*"));
 
         alice.button.clickButton(OK);
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.sarosC.confirmSessionInvitationWizard();
+        carl.sarosC.confirmShellSessionnInvitation();
         carl.button.clickButton(CANCEL);
-        alice.sarosC.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+        alice.sarosC.waitUntilIsShellProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
             .matches(carl.getName() + ".*"));
         alice.button.clickButton(OK);
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.sarosC.confirmSessionInvitationWizard();
+        dave.sarosC.confirmShellSessionnInvitation();
         dave.button.clickButton(CANCEL);
-        alice.sarosC.waitUntilWindowProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfWindowProblemOccurred()
+        alice.sarosC.waitUntilIsShellProblemOccurredActive();
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
             .matches(dave.getName() + ".*"));
         alice.button.clickButton(OK);
 
         edna.shell.waitUntilShellOpen(SESSION_INVITATION);
         edna.shell.activateShellWithText(SESSION_INVITATION);
-        edna.sarosC.confirmSessionInvitationWizard();
-        edna.sarosC.confirmProjectSharingWirzardWithNewProject(PROJECT1);
-        edna.sessionV.leaveTheSessionByPeer();
-        assertFalse(edna.sessionV.isInSessionGUI());
-        assertFalse(alice.sessionV.hasReadOnlyAccess(edna.jid));
+        edna.sarosC.confirmShellSessionnInvitation();
+        edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
+        edna.sarosSessionV.leaveTheSessionByPeer();
+        assertFalse(edna.sarosSessionV.isInSessionGUI());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccess(edna.jid));
     }
 }

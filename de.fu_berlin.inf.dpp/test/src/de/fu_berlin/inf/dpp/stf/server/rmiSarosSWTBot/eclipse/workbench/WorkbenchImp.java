@@ -54,7 +54,7 @@ public class WorkbenchImp extends EclipsePart implements Workbench {
     }
 
     public void openSarosViews() throws RemoteException {
-        rosterV.openRosterView();
+        rosterV.openSarosBuddiesView();
         sessionV.openSessionView();
         chatV.openChatView();
         remoteScreenV.openRemoteScreenView();

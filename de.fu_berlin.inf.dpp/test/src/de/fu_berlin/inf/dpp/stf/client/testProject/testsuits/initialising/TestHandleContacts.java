@@ -65,11 +65,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
         bob.deleteBuddyGUIDone(alice);
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
     }
 
     /**
@@ -87,11 +87,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
         alice.deleteBuddyGUIDone(bob);
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
     }
 
     /**
@@ -111,8 +111,8 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         alice.deleteBuddyGUIDone(bob);
         alice.addBuddyGUIDone(bob);
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
     }
 
     /**
@@ -132,8 +132,8 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         bob.deleteBuddyGUIDone(alice);
         bob.addBuddyGUIDone(alice);
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
     }
 
     /**
@@ -152,11 +152,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.rosterV.clickAddANewContactToolbarButton();
-        alice.rosterV.confirmNewContactWindow("bob@bla");
-        alice.rosterV.waitUntilContactLookupFailedIsActive();
-        assertTrue(alice.rosterV.isWindowContactLookupFailedActive());
-        alice.rosterV.confirmContactLookupFailedWindow(NO);
+        alice.sarosBuddiesV.clickToolbarButtonAddANewBuddy();
+        alice.sarosBuddiesV.confirmWindowNewBuddy("bob@bla");
+        alice.sarosBuddiesV.waitUntilIsShellBuddyLookupFailedActive();
+        assertTrue(alice.sarosBuddiesV.isShellBuddyLookupFailedActive());
+        alice.sarosBuddiesV.confirmShellBuddyLookupFailed(NO);
     }
 
     /**
@@ -175,11 +175,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddExistedContact() throws RemoteException {
-        alice.rosterV.clickAddANewContactToolbarButton();
-        alice.rosterV.confirmNewContactWindow(bob.getBaseJid());
-        alice.rosterV.waitUntilWindowContactAlreadyAddedIsActive();
-        assertTrue(alice.rosterV.isWindowContactAlreadyAddedActive());
-        alice.rosterV.closeWindowContactAlreadyAdded();
+        alice.sarosBuddiesV.clickToolbarButtonAddANewBuddy();
+        alice.sarosBuddiesV.confirmWindowNewBuddy(bob.getBaseJid());
+        alice.sarosBuddiesV.waitUntilIsShellBuddyAlreadyAddedActive();
+        assertTrue(alice.sarosBuddiesV.isShellBuddyAlreadyAddedActive());
+        alice.sarosBuddiesV.closeShellBuddyAlreadyAdded();
     }
 
 }

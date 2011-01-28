@@ -48,7 +48,7 @@ public class TestConcurrentEditing extends STFTest {
             bob);
         bob.pEV.openFile(path);
 
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
 
         bob.editor.waitUntilEditorOpen(FILE);
         bob.editor.navigateInEditor(FILE, 0, 30);
@@ -99,7 +99,7 @@ public class TestConcurrentEditing extends STFTest {
             bob);
         bob.pEV.openClass(PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorActive(CLS1);
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
 
         String fileName = CLS1 + ".java";
         alice.editor.navigateInEditor(fileName, 3, 0);
@@ -122,6 +122,6 @@ public class TestConcurrentEditing extends STFTest {
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
-        assertTrue(bob.sessionV.isInconsistencyDetectedEnabled());
+        assertTrue(bob.sarosSessionV.isInconsistencyDetectedEnabled());
     }
 }

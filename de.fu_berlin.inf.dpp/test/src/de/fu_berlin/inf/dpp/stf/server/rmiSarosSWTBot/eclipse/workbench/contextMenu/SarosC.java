@@ -50,7 +50,7 @@ public interface SarosC extends Remote {
      * <li>The share session process is only completely done after host first
      * run {@link SarosC#shareProjectWith(String, TypeOfShareProject, String[])}
      * , and then the invited users confirm the popup window
-     * {@link SarosC#confirmProjectSharingWizardUsingWhichProject(String, TypeOfCreateProject)}
+     * {@link SarosC#confirmShellAddProjectUsingWhichProject(String, TypeOfCreateProject)}
      * . Since the share session process is very often used, so a convenient
      * method
      * {@link Tester#buildSessionDoneSequentially(String, TypeOfShareProject, TypeOfCreateProject, Tester...)}
@@ -115,7 +115,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#isShellActive(String)
      */
-    public boolean isWindowInvitationCancelledActive() throws RemoteException;
+    public boolean isShellInvitationCancelledActive() throws RemoteException;
 
     /**
      * close the popup window with the title "Invitation cancel".
@@ -123,7 +123,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#closeShell(String)
      */
-    public void closeWindowInvitationCancelled() throws RemoteException;
+    public void closeShellInvitationCancelled() throws RemoteException;
 
     /**
      * waits until the popup window with the title "Invitation cancel" is
@@ -132,7 +132,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#waitUntilShellActive(String)
      */
-    public void waitUntilWindowInvitationCnacelledActive()
+    public void waitUntilIsShellInvitationCnacelledActive()
         throws RemoteException;
 
     /**
@@ -142,7 +142,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#isShellActive(String)
      */
-    public boolean isWIndowSessionInvitationActive() throws RemoteException;
+    public boolean isShellSessionInvitationActive() throws RemoteException;
 
     /**
      * close the popup window with the title "Session Invitation".
@@ -150,7 +150,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#closeShell(String)
      */
-    public void closeWIndowSessionInvitation() throws RemoteException;
+    public void closeShellSessionInvitation() throws RemoteException;
 
     /**
      * waits until the popup window with the title "Session Invitation" is
@@ -159,7 +159,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#waitUntilShellActive(String)
      */
-    public void waitUntilWindowSessionInvitationActive() throws RemoteException;
+    public void waitUntilIsShellSessionInvitationActive() throws RemoteException;
 
     /**
      * After host canceled the invitation process of a invitee, a popup window
@@ -180,103 +180,42 @@ public interface SarosC extends Remote {
      *            project.
      * @throws RemoteException
      */
-    public void confirmWindowInvitation(String... baseJIDOfinvitees)
+    public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the first page of the wizard.
      * 
      * @throws RemoteException
      */
-    public void confirmSessionInvitationWizard()
-        throws RemoteException;
+    public void confirmShellSessionnInvitation() throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the second page of the wizard,
-     * whereas check the radio button "Create new project".
-     * 
-     * 
-     * @throws RemoteException
-     */
-    public void confirmProjectSharingWizardUsingNewproject()
-        throws RemoteException;
-
-    /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the second page of the wizard,
-     * whereas check the radio button "Use existing project".
-     * 
-     * @param projectName
-     *            the name of the project located in the packageExplorer view
-     *            which you want to share with others.
-     * @throws RemoteException
-     */
-    public void confirmProjectSharingWizardSessionInvitationUsingExistProject(
-        String projectName) throws RemoteException;
-
-    /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the second page of the wizard,
-     * whereas check the radio button "Use existing project" and the checkbox
-     * "Create copy for working distributed".
-     * 
-     * @param projectName
-     *            the name of the project located in the packageExplorer view
-     *            which you want to share with others.
-     * @throws RemoteException
-     */
-    public void confirmProjectSharingWizardUsingExistProjectWithCopy(
-        String projectName) throws RemoteException;
-
-    /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the second page of the wizard,
-     * whereas check the radio button "Use existing project".
-     * 
-     * TODO the method is not completely implemented yet. The invitation session
-     * is not finished yet after clicking finish button and confirm the popup
-     * window with the title "Warning: local changes will be deleted" with
-     * cancel.
-     * 
-     * @param projectName
-     *            the name of the project located in the packageExplorer view
-     *            which you want to share with others.
-     * @throws RemoteException
-     */
-    public void confirmProjectSharingWizardUsingExistProjectWithCancelLocalChange(
-        String projectName) throws RemoteException;
-
-    /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a new project.
      * 
      * @throws RemoteException
      */
-    public void confirmProjectSharingWirzardWithNewProject(String projectname)
+    public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project.
      * 
      * @throws RemoteException
      */
-    public void confirmProjectSharingWizardUsingExistProject(
-        String projectName) throws RemoteException;
+    public void confirmShellAddProjectUsingExistProject(String projectName)
+        throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project with clicking the button browser->confirming popup window
@@ -284,22 +223,22 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmProjectSharingWizardUsingExistProjectWithCopyAfterCancelLocalChange(
+    public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project with copy
      * 
      * @throws RemoteException
      */
-    public void confirmSessionInvitationUsingExistProjectWithCopy(
+    public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmWindowInvitation(String...)} the popup
+     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a new project or a existed project according the passed parameter
@@ -307,7 +246,7 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmProjectSharingWizardUsingWhichProject(
+    public void confirmShellAddProjectUsingWhichProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException;
 
@@ -316,14 +255,14 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void waitUntilWindowProblemOccurredActive() throws RemoteException;
+    public void waitUntilIsShellProblemOccurredActive() throws RemoteException;
 
     /**
      * 
      * @return the second label text of the popup window "Problem occurredss"
      * @throws RemoteException
      */
-    public String getSecondLabelOfWindowProblemOccurred()
+    public String getSecondLabelOfShellProblemOccurred()
         throws RemoteException;
 
     /**

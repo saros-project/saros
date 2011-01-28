@@ -38,10 +38,10 @@ public class STFTest {
     public static Tester edna;
 
     // views
-    protected final static String CHAT_VIEW = "Chat View";
-    protected final static String ROSTER_VIEW = "Roster";
+    protected final static String CHAT_VIEW = "Saros Chat";
+    protected final static String ROSTER_VIEW = "Saros Buddies";
     protected final static String REMOTE_SCREEN_VIEW = "Remote Screen";
-    public static String SESSION_VIEW = "Shared Project Session";
+    public static String SESSION_VIEW = "Saros Session";
 
     // Title of Buttons
     protected final static String YES = "Yes";
@@ -91,7 +91,7 @@ public class STFTest {
         + CLASS_SUFIX;
 
     /* Permissions */
-    public static final String PERMISSION_NAME = " (Driver)";
+    public static final String PERMISSION_NAME = " (read-only)";
     public static final String OWN_CONTACT_NAME = "You";
 
     /* SVN infos */
@@ -203,7 +203,7 @@ public class STFTest {
         for (Tester tester : activeTesters) {
             tester.sarosM.disableAutomaticReminder();
             tester.workbench.openSarosViews();
-            tester.rosterV.connect(tester.jid, tester.password);
+            tester.sarosBuddiesV.connect(tester.jid, tester.password);
         }
         // check buddy lists.
         for (Tester tester : activeTesters) {
@@ -233,7 +233,7 @@ public class STFTest {
 
     public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
-        if (!host.sessionV.isInSession()) {
+        if (!host.sarosSessionV.isInSession()) {
             for (Tester tester : invitees) {
                 host.buildSessionDoneSequentially(PROJECT1,
                     TypeOfShareProject.SHARE_PROJECT,
@@ -257,23 +257,24 @@ public class STFTest {
     public static void resetWriteAccess(Tester host, Tester... invitees)
         throws RemoteException {
         for (Tester tester : invitees) {
-            if (tester.sessionV.isInSession()
-                && tester.sessionV.hasWriteAccess()) {
-                host.sessionV.restrictToReadOnlyAccessGUI(tester.sessionV);
+            if (tester.sarosSessionV.isInSession()
+                && tester.sarosSessionV.hasReadOnlyAccess()) {
+                host.sarosSessionV.grantWriteAccessGUI(tester.sarosSessionV);
             }
         }
 
-        if (host.sessionV.isInSession() && !host.sessionV.hasWriteAccess()) {
-            host.sessionV.grantWriteAccessGUI(host.sessionV);
+        if (host.sarosSessionV.isInSession()
+            && !host.sarosSessionV.hasWriteAccess()) {
+            host.sarosSessionV.grantWriteAccessGUI(host.sarosSessionV);
         }
     }
 
     public static void resetFollowModel(Tester... activeTesters)
         throws RemoteException {
         for (Tester tester : activeTesters) {
-            if (tester.sessionV.isInSession()
-                && tester.sessionV.isInFollowMode()) {
-                tester.sessionV.stopFollowingGUI();
+            if (tester.sarosSessionV.isInSession()
+                && tester.sarosSessionV.isInFollowMode()) {
+                tester.sarosSessionV.stopFollowingGUI();
             }
         }
     }
@@ -287,8 +288,8 @@ public class STFTest {
     public static void resetSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
-                tester.rosterV.resetAllBuddyName();
-                tester.rosterV.disconnectGUI();
+                tester.sarosBuddiesV.resetAllBuddyName();
+                tester.sarosBuddiesV.disconnectGUI();
                 tester.workbench.deleteAllProjects();
             }
         }

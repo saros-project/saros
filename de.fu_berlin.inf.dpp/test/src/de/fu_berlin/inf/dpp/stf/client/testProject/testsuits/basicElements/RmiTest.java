@@ -148,10 +148,10 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testViews() throws RemoteException {
-        alice.rosterV.closeRosterView();
-        assertFalse(alice.rosterV.isRosterViewOpen());
-        alice.rosterV.openRosterView();
-        assertTrue(alice.rosterV.isRosterViewOpen());
+        alice.sarosBuddiesV.closeSarosBuddiesView();
+        assertFalse(alice.sarosBuddiesV.isSarosBuddiesViewOpen());
+        alice.sarosBuddiesV.openSarosBuddiesView();
+        assertTrue(alice.sarosBuddiesV.isSarosBuddiesViewOpen());
     }
 
 }

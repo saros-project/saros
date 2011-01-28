@@ -75,30 +75,30 @@ public class TestShare3UsersConcurrently extends STFTest {
         alice.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, carl);
-        assertTrue(carl.sessionV.isParticipant());
-        assertFalse(carl.sessionV.hasReadOnlyAccess());
-        assertTrue(carl.sessionV.hasWriteAccess());
+        assertTrue(carl.sarosSessionV.isParticipant());
+        assertFalse(carl.sarosSessionV.hasReadOnlyAccess());
+        assertTrue(carl.sarosSessionV.hasWriteAccess());
 
-        assertTrue(bob.sessionV.isParticipant());
-        assertFalse(bob.sessionV.hasReadOnlyAccess());
-        assertTrue(bob.sessionV.hasWriteAccess());
+        assertTrue(bob.sarosSessionV.isParticipant());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
+        assertTrue(bob.sarosSessionV.hasWriteAccess());
 
-        assertTrue(alice.sessionV.isParticipant());
-        assertFalse(alice.sessionV.hasReadOnlyAccess());
-        assertTrue(alice.sessionV.hasWriteAccess());
+        assertTrue(alice.sarosSessionV.isParticipant());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
+        assertTrue(alice.sarosSessionV.hasWriteAccess());
 
         alice.leaveSessionPeersFirstDone(bob, carl);
 
-        assertFalse(carl.sessionV.isParticipant());
-        assertFalse(carl.sessionV.hasReadOnlyAccess());
-        assertFalse(carl.sessionV.hasWriteAccess());
+        assertFalse(carl.sarosSessionV.isParticipant());
+        assertFalse(carl.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(carl.sarosSessionV.hasWriteAccess());
 
-        assertFalse(bob.sessionV.isParticipant());
-        assertFalse(bob.sessionV.hasReadOnlyAccess());
-        assertFalse(bob.sessionV.hasWriteAccess());
+        assertFalse(bob.sarosSessionV.isParticipant());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(bob.sarosSessionV.hasWriteAccess());
 
-        assertFalse(alice.sessionV.isParticipant());
-        assertFalse(alice.sessionV.hasReadOnlyAccess());
-        assertFalse(alice.sessionV.hasWriteAccess());
+        assertFalse(alice.sarosSessionV.isParticipant());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(alice.sarosSessionV.hasWriteAccess());
     }
 }

@@ -56,16 +56,16 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
+        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.workbench.sleep(5000);
-        assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
+        assertFalse(bob.sarosSessionV.isInconsistencyDetectedEnabled());
 
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
 
         bob.workbench.sleep(5000);
-        assertFalse(bob.sessionV.isInconsistencyDetectedEnabled());
+        assertFalse(bob.sarosSessionV.isInconsistencyDetectedEnabled());
 
     }
 }

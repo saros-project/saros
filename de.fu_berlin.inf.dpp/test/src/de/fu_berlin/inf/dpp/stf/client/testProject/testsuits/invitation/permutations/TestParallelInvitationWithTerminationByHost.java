@@ -96,19 +96,19 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice.progressV.removeProcess(0);
         bob.shell.waitUntilShellOpen(INVITATIONCANCELLED);
         bob.shell.activateShellWithText(INVITATIONCANCELLED);
-        bob.sarosC.closeWindowInvitationCancelled();
+        bob.sarosC.closeShellInvitationCancelled();
 
         carl.shell.waitUntilShellOpen(SESSION_INVITATION);
         carl.shell.activateShellWithText(SESSION_INVITATION);
-        carl.sarosC.confirmSessionInvitationWizard();
+        carl.sarosC.confirmShellSessionnInvitation();
         alice.progressV.removeProcess(0);
-        carl.sarosC.waitUntilWindowInvitationCnacelledActive();
-        assertTrue(carl.sarosC.isWindowInvitationCancelledActive());
-        carl.sarosC.closeWindowInvitationCancelled();
+        carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
+        assertTrue(carl.sarosC.isShellInvitationCancelledActive());
+        carl.sarosC.closeShellInvitationCancelled();
 
         dave.shell.waitUntilShellOpen(SESSION_INVITATION);
         dave.shell.activateShellWithText(SESSION_INVITATION);
-        dave.sarosC.confirmSessionInvitationWizard();
+        dave.sarosC.confirmShellSessionnInvitation();
 
         dave.button.clickButton(FINISH);
         alice.progressV.removeProcess(0);
@@ -116,9 +116,9 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         // is so fast that the session process is already done after canceling
         // this process, so dave should never get the window
         // "Invitation canceled".
-        dave.sarosC.waitUntilWindowInvitationCnacelledActive();
-        assertTrue(dave.sarosC.isWindowInvitationCancelledActive());
-        dave.sarosC.closeWindowInvitationCancelled();
+        dave.sarosC.waitUntilIsShellInvitationCnacelledActive();
+        assertTrue(dave.sarosC.isShellInvitationCancelledActive());
+        dave.sarosC.closeShellInvitationCancelled();
 
     }
 }

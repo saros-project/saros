@@ -52,8 +52,8 @@ public class Tester {
 
     public PEView pEV;
     public ProgressView progressV;
-    public RosterView rosterV;
-    public SessionView sessionV;
+    public RosterView sarosBuddiesV;
+    public SessionView sarosSessionV;
     public RSView rSV;
     public ChatView chatV;
     public ConsoleView consoleV;
@@ -110,14 +110,14 @@ public class Tester {
         try {
 
             chatV = (ChatView) registry.lookup("chatView");
-            rosterV = (RosterView) registry.lookup("rosterView");
-            sessionV = (SessionView) registry.lookup("sessionView");
+            sarosBuddiesV = (RosterView) registry.lookup("rosterView");
+            sarosSessionV = (SessionView) registry.lookup("sessionView");
             /*
              * TODO i am not sure, if i can pass the local value to remote
              * object. It worked for the local tests, but i don't know if it
              * work for the remote tests too.
              */
-            sessionV.setJID(jid);
+            sarosSessionV.setJID(jid);
             rSV = (RSView) registry.lookup("remoteScreenView");
             pEV = (PEView) registry.lookup("packageExplorerView");
             progressV = (ProgressView) registry.lookup("progressView");
@@ -163,8 +163,8 @@ public class Tester {
         sarosC.shareProjectWith(projectName, howToShareProject,
             baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.sarosC.confirmSessionInvitationWizard();
-            invitee.sarosC.confirmProjectSharingWizardUsingWhichProject(
+            invitee.sarosC.confirmShellSessionnInvitation();
+            invitee.sarosC.confirmShellAddProjectUsingWhichProject(
                 projectName, usingWhichProject);
         }
     }
@@ -182,11 +182,11 @@ public class Tester {
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.sarosC.confirmSessionInvitationWizard();
+                    invitee.sarosC.confirmShellSessionnInvitation();
                     invitee.sarosC
-                        .confirmProjectSharingWizardUsingWhichProject(
+                        .confirmShellAddProjectUsingWhichProject(
                             projectName, usingWhichProject);
-                    invitee.sessionV.waitUntilIsInSession();
+                    invitee.sarosSessionV.waitUntilIsInSession();
                     return null;
                 }
             });
@@ -212,17 +212,17 @@ public class Tester {
         throws RemoteException, InterruptedException {
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : peers) {
-            if (tester.sessionV.isInSession()) {
+            if (tester.sarosSessionV.isInSession()) {
                 closeSessionTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
                         // Need to check for isDriver before leaving.
-                        tester.sessionV.confirmClosingTheSessionWindow();
+                        tester.sarosSessionV.confirmClosingTheSessionWindow();
                         return null;
                     }
                 });
             }
         }
-        sessionV.leaveTheSessionByHost();
+        sarosSessionV.leaveTheSessionByHost();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
@@ -247,7 +247,7 @@ public class Tester {
             final Tester tester = testers[i];
             leaveTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sessionV.leaveTheSessionByPeer();
+                    tester.sarosSessionV.leaveTheSessionByPeer();
                     return null;
                 }
             });
@@ -257,9 +257,9 @@ public class Tester {
             peerJIDs.add(tester.jid);
         }
         MakeOperationConcurrently.workAll(leaveTasks);
-        sessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-        sessionV.clickTBleaveTheSession();
-        sessionV.waitUntilSessionClosed();
+        sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
+        sarosSessionV.clickTBleaveTheSession();
+        sarosSessionV.waitUntilSessionClosed();
     }
 
     private String[] getPeersBaseJID(Tester... peers) {
@@ -274,8 +274,7 @@ public class Tester {
      * the local user can be concurrently followed by many other users.
      * 
      * @param testers
-     *            the list of the buddies who want to follow the local
-     *            user.
+     *            the list of the buddies who want to follow the local user.
      * @throws RemoteException
      * @throws InterruptedException
      */
@@ -286,7 +285,7 @@ public class Tester {
             final Tester tester = testers[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sessionV.followThisUserGUI(jid);
+                    tester.sarosSessionV.followThisBuddyGUI(jid);
                     return null;
                 }
             });
@@ -295,8 +294,7 @@ public class Tester {
     }
 
     /**
-     * stop the follow-mode of the buddies who are following the local
-     * user.
+     * stop the follow-mode of the buddies who are following the local user.
      * 
      * @param testers
      *            the list of the buddies who are following the local user.
@@ -310,7 +308,7 @@ public class Tester {
             final Tester tester = testers[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sessionV.stopFollowingThisUserGUI(jid);
+                    tester.sarosSessionV.stopFollowingThisBuddyGUI(jid);
                     return null;
                 }
             });
@@ -353,10 +351,10 @@ public class Tester {
      * 
      */
     public void addBuddyDone(Tester peer) throws RemoteException, XMPPException {
-        if (!rosterV.hasBuddy(peer.jid)) {
-            rosterV.addANewContact(peer.jid);
-            peer.rosterV.confirmShellRequestOfSubscriptionReceived();
-            rosterV.confirmShellRequestOfSubscriptionReceived();
+        if (!sarosBuddiesV.hasBuddy(peer.jid)) {
+            sarosBuddiesV.addANewBuddyGUI(peer.jid);
+            peer.sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
+            sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
         }
     }
 
@@ -368,10 +366,10 @@ public class Tester {
      * @throws RemoteException
      */
     public void addBuddyGUIDone(Tester peer) throws RemoteException {
-        if (!rosterV.hasBuddy(peer.jid)) {
-            rosterV.addANewContactGUI(peer.jid);
-            peer.rosterV.confirmShellRequestOfSubscriptionReceived();
-            rosterV.confirmShellRequestOfSubscriptionReceived();
+        if (!sarosBuddiesV.hasBuddy(peer.jid)) {
+            sarosBuddiesV.addANewBuddyGUI(peer.jid);
+            peer.sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
+            sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
         }
     }
 
@@ -379,10 +377,10 @@ public class Tester {
      * Remove given contact from Roster with GUI, if contact was added before.
      */
     public void deleteBuddyGUIDone(Tester peer) throws RemoteException {
-        if (!rosterV.hasBuddy(peer.jid))
+        if (!sarosBuddiesV.hasBuddy(peer.jid))
             return;
-        rosterV.deleteBuddyGUI(peer.jid);
-        peer.rosterV.confirmRemovelOfSubscriptionWindow();
+        sarosBuddiesV.deleteBuddyGUI(peer.jid);
+        peer.sarosBuddiesV.confirmRemovelOfSubscriptionWindow();
     }
 
     /**
@@ -392,16 +390,16 @@ public class Tester {
      */
     public void deleteBuddyDone(Tester peer) throws RemoteException,
         XMPPException {
-        if (!rosterV.hasBuddy(peer.jid))
+        if (!sarosBuddiesV.hasBuddy(peer.jid))
             return;
-        rosterV.deleteBuddy(peer.jid);
-        peer.rosterV.confirmRemovelOfSubscriptionWindow();
+        sarosBuddiesV.deleteBuddy(peer.jid);
+        peer.sarosBuddiesV.confirmRemovelOfSubscriptionWindow();
     }
 
     public void shareYourScreenWithSelectedUserDone(Tester peer)
         throws RemoteException {
-        sessionV.shareYourScreenWithSelectedUserGUI(peer.jid);
-        peer.sessionV.confirmIncomingScreensharingSesionWindow();
+        sarosSessionV.shareYourScreenWithSelectedBuddyGUI(peer.jid);
+        peer.sarosSessionV.confirmIncomingScreensharingSesionWindow();
     }
 
     /**
@@ -421,13 +419,13 @@ public class Tester {
     public void inviteUsersInSessionDone(final String projectName,
         final TypeOfCreateProject usingWhichProject, Tester... peers)
         throws RemoteException, InterruptedException {
-        sessionV.openInvitationInterface(getPeersBaseJID(peers));
+        sarosSessionV.openInvitationInterface(getPeersBaseJID(peers));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : peers) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosC.confirmSessionInvitationWizard();
-                    tester.sarosC.confirmProjectSharingWizardUsingWhichProject(
+                    tester.sarosC.confirmShellSessionnInvitation();
+                    tester.sarosC.confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
                     return null;
                 }

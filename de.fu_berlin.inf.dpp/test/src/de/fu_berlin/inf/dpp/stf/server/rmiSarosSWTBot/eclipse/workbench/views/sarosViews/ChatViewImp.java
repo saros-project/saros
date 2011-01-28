@@ -13,7 +13,7 @@ public class ChatViewImp extends EclipsePart implements ChatView {
     /*
      * View infos
      */
-    private final static String VIEWNAME = "Chat View";
+    private final static String VIEWNAME = "Saros Chat";
     private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.chat.ChatView";
 
     /**

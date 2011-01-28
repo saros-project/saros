@@ -39,15 +39,15 @@ public interface RosterView extends Remote {
      * @throws RemoteException
      * @see ViewPart#openViewById(String)
      */
-    public void openRosterView() throws RemoteException;
+    public void openSarosBuddiesView() throws RemoteException;
 
-    public boolean isRosterViewOpen() throws RemoteException;
+    public boolean isSarosBuddiesViewOpen() throws RemoteException;
 
     public void setFocusOnRosterView() throws RemoteException;
 
-    public boolean isRosterViewActive() throws RemoteException;
+    public boolean isSarosBuddiesViewActive() throws RemoteException;
 
-    public void closeRosterView() throws RemoteException;
+    public void closeSarosBuddiesView() throws RemoteException;
 
     /**********************************************
      * 
@@ -62,8 +62,7 @@ public interface RosterView extends Remote {
      * <ol>
      * <li>Make sure, the roster view is open and active.</li>
      * <li>if the test account specified by the given jid doesn't exists, create
-     * it using
-     * {@link SarosM#createAccountNoGUI(String, String, String)}</li>
+     * it using {@link SarosM#createAccountNoGUI(String, String, String)}</li>
      * <li>if the test account isn't active, then activate it using
      * {@link SarosM#activateAccountNoGUI(JID)}</li>
      * <li>Waits until the connection is really done. It guarantee that the
@@ -78,25 +77,6 @@ public interface RosterView extends Remote {
      * @throws RemoteException
      */
     public void connect(JID jid, String password) throws RemoteException;
-
-    /**
-     * Fill up the configuration wizard to create a new account.
-     * 
-     * TODO how/when to activate the configuration wizard is still not clear to
-     * me, i will complete the comments when the problems are fixed by
-     * developers
-     * 
-     * @param xmppServer
-     *            the xmpp server used by the given jid
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @param password
-     *            the password of the given jid
-     * @throws RemoteException
-     */
-    public void confirmWindowCreateXMPPAccount(String xmppServer, String jid,
-        String password, boolean usesThisAccountNow) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if Saros is connected to a XMPP server.
@@ -168,11 +148,6 @@ public interface RosterView extends Remote {
      **********************************************/
 
     /**
-     * performs the action "add a new contact" using GUI
-     */
-    public void addANewContact(JID jid) throws RemoteException, XMPPException;
-
-    /**
      * performs the action "add a new contact" which should be activated by
      * clicking the tool bar button with the tooltip text "Add a new contact" on
      * the roster view.
@@ -191,7 +166,7 @@ public interface RosterView extends Remote {
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
-    public void addANewContactGUI(JID jid) throws RemoteException;
+    public void addANewBuddyGUI(JID jid) throws RemoteException;
 
     /**
      * After adding a new contact the added user should get this popup window
@@ -206,23 +181,23 @@ public interface RosterView extends Remote {
     /**
      * confirm the popup window which should be activated by cliking the
      * toolbarbutton "add a new contact". so this method should be called by
-     * {@link RosterView#addANewContactGUI(JID)}
+     * {@link RosterView#addANewBuddyGUI(JID)}
      * 
      * @param baseJID
      *            the base JID needed for creating a new contact
      * @throws RemoteException
      */
-    public void confirmNewContactWindow(String baseJID) throws RemoteException;
+    public void confirmWindowNewBuddy(String baseJID) throws RemoteException;
 
     /**
      * click only the tool bar button with the tooltip text "Add a new contact"
      * on the roster view.This method is different as the
-     * {@link RosterView#addANewContactGUI(JID)},which should treat the
+     * {@link RosterView#addANewBuddyGUI(JID)},which should treat the
      * activated popup window.
      * 
      * @throws RemoteException
      */
-    public void clickAddANewContactToolbarButton() throws RemoteException;
+    public void clickToolbarButtonAddANewBuddy() throws RemoteException;
 
     /**
      * this popup window should be activated by adding new contact if the new
@@ -232,7 +207,7 @@ public interface RosterView extends Remote {
      *            YES or NO
      * @throws RemoteException
      */
-    public void confirmContactLookupFailedWindow(String buttonType)
+    public void confirmShellBuddyLookupFailed(String buttonType)
         throws RemoteException;
 
     /**
@@ -243,7 +218,7 @@ public interface RosterView extends Remote {
      *         "Contact lookup failed" is active
      * @throws RemoteException
      */
-    public boolean isWindowContactLookupFailedActive() throws RemoteException;
+    public boolean isShellBuddyLookupFailedActive() throws RemoteException;
 
     /**
      * waits until the popup window with the title "Contact lookup failed" is
@@ -252,7 +227,7 @@ public interface RosterView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void waitUntilContactLookupFailedIsActive() throws RemoteException;
+    public void waitUntilIsShellBuddyLookupFailedActive() throws RemoteException;
 
     /**
      * This popup window is only activated if man try to add a already existed
@@ -262,7 +237,7 @@ public interface RosterView extends Remote {
      *                       "Contact already added" is active
      * @throws RemoteException
      */
-    public boolean isWindowContactAlreadyAddedActive() throws RemoteException;
+    public boolean isShellBuddyAlreadyAddedActive() throws RemoteException;
 
     /**
      * waits until the popup window with the title "Contact already added" is
@@ -271,7 +246,7 @@ public interface RosterView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void waitUntilWindowContactAlreadyAddedIsActive()
+    public void waitUntilIsShellBuddyAlreadyAddedActive()
         throws RemoteException;
 
     /**
@@ -279,7 +254,7 @@ public interface RosterView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void closeWindowContactAlreadyAdded() throws RemoteException;
+    public void closeShellBuddyAlreadyAdded() throws RemoteException;
 
     /**********************************************
      * 
@@ -447,7 +422,7 @@ public interface RosterView extends Remote {
      * context menu of a contact on the view: invite user
      * 
      **********************************************/
-    public void inviteUserGUI(JID buddyJID) throws RemoteException;
+    public void inviteBuddyGUI(JID buddyJID) throws RemoteException;
 
     /**
      * click the toolbar button specified with the given tooltip.

@@ -100,10 +100,10 @@ public class TestCreatingNewFile extends STFTest {
     @Test
     public void testCarlGrantWriteAccess() throws IOException,
         CoreException {
-        carl.sessionV.grantWriteAccessGUI(alice.sessionV);
+        carl.sarosSessionV.grantWriteAccessGUI(alice.sarosSessionV);
 
-        assertFalse(carl.sessionV.hasWriteAccess());
-        assertTrue(alice.sessionV.hasWriteAccess());
+        assertFalse(carl.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosSessionV.hasWriteAccess());
 
         carl.fileM.newFolder(FOLDER1, PROJECT1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
@@ -112,10 +112,10 @@ public class TestCreatingNewFile extends STFTest {
         bob.workbench.sleep(500);
         assertFalse(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
 
-        if (!carl.sessionV.isFollowingUser(alice.getBaseJid()))
-            carl.sessionV.followThisUserGUI(alice.jid);
-        if (!bob.sessionV.isFollowingUser(alice.getBaseJid()))
-            bob.sessionV.followThisUserGUI(alice.jid);
+        if (!carl.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
+            carl.sarosSessionV.followThisBuddyGUI(alice.jid);
+        if (!bob.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
+            bob.sarosSessionV.followThisBuddyGUI(alice.jid);
 
         alice.fileM.newFolder(PROJECT1, FOLDER2);
         alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);

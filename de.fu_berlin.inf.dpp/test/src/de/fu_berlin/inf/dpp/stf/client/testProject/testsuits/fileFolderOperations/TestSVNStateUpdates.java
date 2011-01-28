@@ -94,7 +94,7 @@ public class TestSVNStateUpdates extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
-        alice.sessionV.waitUntilInviteeIsInSession(bob.sessionV);
+        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
     }
 
     @Override
@@ -113,8 +113,8 @@ public class TestSVNStateUpdates extends STFTest {
     public static void afterClass() throws RemoteException {
         if (ConfigTester.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
-            alice.rosterV.disconnectGUI();
-            bob.rosterV.disconnectGUI();
+            alice.sarosBuddiesV.disconnectGUI();
+            bob.sarosBuddiesV.disconnectGUI();
         } else {
             alice.workbench.resetSaros();
             bob.workbench.resetSaros();
@@ -142,8 +142,8 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
-        assertTrue(bob.sessionV.hasWriteAccess());
+        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+        assertTrue(bob.sarosSessionV.hasWriteAccess());
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
@@ -168,8 +168,8 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
-        assertTrue(bob.sessionV.hasExclusiveWriteAccess());
+        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+        assertTrue(bob.sarosSessionV.hasWriteAccess());
 
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");

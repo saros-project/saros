@@ -46,10 +46,10 @@ public class TestChangingNameInRosterView extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (alice.rosterV.hasBuddyNickName(bob.jid)) {
-            alice.rosterV.renameBuddyGUI(bob.jid, bob.jid.getBase());
+        if (alice.sarosBuddiesV.hasBuddyNickName(bob.jid)) {
+            alice.sarosBuddiesV.renameBuddyGUI(bob.jid, bob.jid.getBase());
         }
-        if (!alice.rosterV.hasBuddy(bob.jid)) {
+        if (!alice.sarosBuddiesV.hasBuddy(bob.jid)) {
             alice.addBuddyGUIDone(bob);
         }
     }
@@ -71,15 +71,15 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        alice.rosterV.renameBuddyGUI(bob.jid, bob.getName());
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        alice.sarosBuddiesV.renameBuddyGUI(bob.jid, bob.getName());
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid)
             .equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.rosterV.renameBuddyGUI(bob.jid, "new bob");
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
+        alice.sarosBuddiesV.renameBuddyGUI(bob.jid, "new bob");
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 

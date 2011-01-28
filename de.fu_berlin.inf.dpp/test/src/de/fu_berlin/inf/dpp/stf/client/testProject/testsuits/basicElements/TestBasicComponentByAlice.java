@@ -97,10 +97,10 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
-        alice.rosterV.connect(alice.jid, alice.password);
-        assertTrue(alice.tree.existsTreeItemWithRegexsInView("Roster",
+        alice.sarosBuddiesV.connect(alice.jid, alice.password);
+        assertTrue(alice.tree.existsTreeItemWithRegexsInView("Saros Buddies",
             "Buddies"));
-        assertTrue(alice.tree.existsTreeItemWithRegexsInView("Roster",
+        assertTrue(alice.tree.existsTreeItemWithRegexsInView("Saros Buddies",
             "Buddies", "bob_stf.*"));
     }
 
@@ -167,9 +167,9 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
-        alice.rosterV.connect(alice.jid, alice.password);
-        assertTrue(alice.tree.existsContextMenuOfTreeItemInView("Roster",
-            "Rename...", "Buddies", "bob_stf.*"));
+        alice.sarosBuddiesV.connect(alice.jid, alice.password);
+        assertTrue(alice.tree.existsContextMenuOfTreeItemInView(
+            "Saros Buddies", "Rename...", "Buddies", "bob_stf.*"));
     }
 
     @Test
@@ -182,11 +182,11 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
-        alice.rosterV.connect(alice.jid, alice.password);
-        assertTrue(alice.tree.isContextMenuOfTreeItemInViewEnabled("Roster",
-            "Rename...", "Buddies", "bob_stf.*"));
-        assertFalse(alice.tree.isContextMenuOfTreeItemInViewEnabled("Roster",
-            "Invite user...", "Buddies", "bob_stf.*"));
+        alice.sarosBuddiesV.connect(alice.jid, alice.password);
+        assertTrue(alice.tree.isContextMenuOfTreeItemInViewEnabled(
+            "Saros Buddies", "Rename...", "Buddies", "bob_stf.*"));
+        assertFalse(alice.tree.isContextMenuOfTreeItemInViewEnabled(
+            "Saros Buddies", "Invite buddy...", "Buddies", "bob_stf.*"));
     }
 
     @Test
@@ -203,9 +203,9 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
-        alice.rosterV.connect(alice.jid, alice.password);
-        alice.tree.clickContextMenuOfTreeItemInView("Roster", "Rename...",
-            "Buddies", "bob_stf.*");
+        alice.sarosBuddiesV.connect(alice.jid, alice.password);
+        alice.tree.clickContextMenuOfTreeItemInView("Saros Buddies",
+            "Rename...", "Buddies", "bob_stf.*");
         assertTrue(alice.shell.isShellOpen("Set new nickname"));
     }
 

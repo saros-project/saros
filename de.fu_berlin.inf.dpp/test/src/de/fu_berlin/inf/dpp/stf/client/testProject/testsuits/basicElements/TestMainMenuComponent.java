@@ -29,8 +29,8 @@ public class TestMainMenuComponent extends STFTest {
     private static final String SHELL_PREFERNCES = "Preferences";
 
     /* All infos about the shell "Create New User Account" */
-    private final static String SHELL_CREATE_NEW_USER_ACCOUNT = "Create New User Account";
-    private final static String LABEL_JABBER_SERVER = "Jabber Server";
+    private final static String SHELL_CREATE_NEW_XMPP_ACCOUNT = "Create New XMPP Account";
+    private final static String LABEL_XMPP_JABBER_SERVER = "XMPP/Jabber Server";
     private final static String LABEL_USER_NAME = "Username";
     private final static String LABEL_PASSWORD = "Password";
     private final static String LABEL_REPEAT_PASSWORD = "Repeat Password";
@@ -83,10 +83,10 @@ public class TestMainMenuComponent extends STFTest {
     @Test
     public void createAlreadyExistedAccount() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
-            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
+        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
+            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         alice.text.setTextInTextWithLabel(bob.getXmppServer(),
-            LABEL_JABBER_SERVER);
+            LABEL_XMPP_JABBER_SERVER);
         alice.text.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
@@ -94,42 +94,42 @@ public class TestMainMenuComponent extends STFTest {
         alice.button.clickButton(FINISH);
         // wait a minute,so that bot can get the error message.
         alice.button.waitUntilButtonEnabled(FINISH);
-        assertTrue(alice.shell.isShellActive(SHELL_CREATE_NEW_USER_ACCOUNT));
+        assertTrue(alice.shell.isShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT));
         String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
+            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         String[] ms = errorMessage.split("\n");
         assertTrue(ms[0].trim().equals(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS));
 
-        alice.shell.confirmShell(SHELL_CREATE_NEW_USER_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_USER_ACCOUNT));
+        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
+        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test
     public void createAccountWithDismatchedPassword() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
-            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
+        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
+            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         alice.text.setTextInTextWithLabel(bob.getXmppServer(),
-            LABEL_JABBER_SERVER);
+            LABEL_XMPP_JABBER_SERVER);
         alice.text.setTextInTextWithLabel(bob.getName(), LABEL_USER_NAME);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
         alice.text.setTextInTextWithLabel(bob.password + "d",
             LABEL_REPEAT_PASSWORD);
         assertFalse(alice.button.isButtonEnabled(FINISH));
         String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
+            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
-        alice.shell.confirmShell(SHELL_CREATE_NEW_USER_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_USER_ACCOUNT));
+        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
+        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_USER_ACCOUNT))
-            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_USER_ACCOUNT);
+        if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
+            alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         alice.text
-            .setTextInTextWithLabel("invalid server", LABEL_JABBER_SERVER);
+            .setTextInTextWithLabel("invalid server", LABEL_XMPP_JABBER_SERVER);
         alice.text.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);
@@ -137,10 +137,10 @@ public class TestMainMenuComponent extends STFTest {
         alice.button.clickButton(FINISH);
         alice.button.waitUntilButtonEnabled(FINISH);
         String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_USER_ACCOUNT);
+            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
-        alice.shell.confirmShell(SHELL_CREATE_NEW_USER_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_USER_ACCOUNT));
+        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
+        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test

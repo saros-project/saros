@@ -40,8 +40,8 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (bob.sessionV.hasWriteAccess())
-            alice.sessionV.restrictToReadOnlyAccessGUI(bob.sessionV);
+        if (!bob.sarosSessionV.hasWriteAccess())
+            alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
     }
 
     // @Test
@@ -53,49 +53,48 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
 
     @Test
     public void existsTableItemInView() throws RemoteException {
-        alice.sessionV.setFocusOnSessionView();
+        alice.sarosSessionV.setFocusOnSessionView();
         assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
             bob.getBaseJid()));
         assertTrue(alice.table.existsTableItemInView(SESSION_VIEW,
-            OWN_CONTACT_NAME + PERMISSION_NAME));
+            OWN_CONTACT_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
-        alice.sessionV.setFocusOnSessionView();
+        alice.sarosSessionV.setFocusOnSessionView();
         alice.table.selectTableItemInView(SESSION_VIEW, bob.getBaseJid());
         assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            SESSION_VIEW, "Share your screen with selected user"));
-        alice.table.selectTableItemInView(SESSION_VIEW, OWN_CONTACT_NAME
-            + PERMISSION_NAME);
+            SESSION_VIEW, "Share your screen with selected buddy"));
+        alice.table.selectTableItemInView(SESSION_VIEW, OWN_CONTACT_NAME);
         assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            SESSION_VIEW, "Share your screen with selected user"));
+            SESSION_VIEW, "Share your screen with selected buddy"));
     }
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
-        alice.sessionV.setFocusOnSessionView();
+        alice.sarosSessionV.setFocusOnSessionView();
+
         alice.table.clickContextMenuOfTableItemInView(SESSION_VIEW,
-            bob.getBaseJid(), "Grant write access");
-        alice.sessionV.grantWriteAccessGUI(bob.sessionV);
-        bob.sessionV.waitUntilHasWriteAccess();
-        assertTrue(bob.sessionV.hasWriteAccess());
+            bob.getBaseJid(), "Restrict to read-only access");
+        bob.sarosSessionV.waitUntilHasReadOnlyAccess();
+        assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
     }
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
-        alice.sessionV.setFocusOnSessionView();
+        alice.sarosSessionV.setFocusOnSessionView();
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
-            SESSION_VIEW, bob.getBaseJid(), "Grant write access"));
+            SESSION_VIEW, bob.getBaseJid(), "Restrict to read-only access"));
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
             SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
-        alice.sessionV.setFocusOnSessionView();
+        alice.sarosSessionV.setFocusOnSessionView();
         assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
-            SESSION_VIEW, bob.getBaseJid(), "Grant write access"));
+            SESSION_VIEW, bob.getBaseJid(), "Restrict to read-only access"));
         assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(
             SESSION_VIEW, bob.getBaseJid(), "Change Color"));
     }

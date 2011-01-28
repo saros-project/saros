@@ -40,13 +40,13 @@ public class TestRosterViewComponent extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob);
+        // setUpSessionByDefault(alice, bob);
     }
 
     @AfterClass
     public static void runAfterClass() throws RemoteException,
         InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
+        // alice.leaveSessionHostFirstDone(bob);
     }
 
     @Before
@@ -56,34 +56,35 @@ public class TestRosterViewComponent extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (alice.rosterV.hasBuddyNickName(bob.jid)) {
-            alice.rosterV.renameBuddy(bob.jid, bob.jid.getBase());
+        if (alice.sarosBuddiesV.hasBuddyNickName(bob.jid)) {
+            alice.sarosBuddiesV.renameBuddy(bob.jid, bob.jid.getBase());
+
         }
-        if (!alice.rosterV.hasBuddy(bob.jid)) {
+        if (!alice.sarosBuddiesV.hasBuddy(bob.jid)) {
             alice.addBuddyGUIDone(bob);
         }
     }
 
     @Test
     public void openCloseRosterView() throws RemoteException {
-        alice.rosterV.closeRosterView();
-        assertEquals(false, alice.rosterV.isRosterViewOpen());
-        alice.rosterV.openRosterView();
-        assertEquals(true, alice.rosterV.isRosterViewOpen());
+        alice.sarosBuddiesV.closeSarosBuddiesView();
+        assertEquals(false, alice.sarosBuddiesV.isSarosBuddiesViewOpen());
+        alice.sarosBuddiesV.openSarosBuddiesView();
+        assertEquals(true, alice.sarosBuddiesV.isSarosBuddiesViewOpen());
     }
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        alice.rosterV.setFocusOnRosterView();
-        assertTrue(alice.rosterV.isRosterViewActive());
-        alice.rosterV.closeRosterView();
-        assertFalse(alice.rosterV.isRosterViewActive());
+        alice.sarosBuddiesV.setFocusOnRosterView();
+        assertTrue(alice.sarosBuddiesV.isSarosBuddiesViewActive());
+        alice.sarosBuddiesV.closeSarosBuddiesView();
+        assertFalse(alice.sarosBuddiesV.isSarosBuddiesViewActive());
 
-        alice.rosterV.openRosterView();
-        assertTrue(alice.rosterV.isRosterViewActive());
+        alice.sarosBuddiesV.openSarosBuddiesView();
+        assertTrue(alice.sarosBuddiesV.isSarosBuddiesViewActive());
 
-        alice.sessionV.setFocusOnSessionView();
-        assertFalse(alice.rosterV.isRosterViewActive());
+        alice.sarosSessionV.setFocusOnSessionView();
+        assertFalse(alice.sarosBuddiesV.isSarosBuddiesViewActive());
     }
 
     /**
@@ -103,40 +104,42 @@ public class TestRosterViewComponent extends STFTest {
      */
     @Test
     public void renameBuddyWithGUI() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        alice.rosterV.renameBuddyGUI(bob.jid, bob.getName());
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
-            .equals(bob.getName()));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        alice.sarosBuddiesV.renameBuddyGUI(bob.jid, bob.getName());
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.rosterV.renameBuddyGUI(bob.jid, "new bob");
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
+        alice.sarosBuddiesV.renameBuddyGUI(bob.jid, "new bob");
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            "new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 
     @Test
     public void renameBuddyWithoutGUI() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        alice.rosterV.renameBuddy(bob.jid, bob.getName());
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid)
-            .equals(bob.getName()));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        alice.sarosBuddiesV.renameBuddy(bob.jid, bob.getName());
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.rosterV.renameBuddy(bob.jid, "new bob");
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(alice.rosterV.getBuddyNickName(bob.jid).equals("new bob"));
+        alice.sarosBuddiesV.renameBuddy(bob.jid, "new bob");
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            "new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 
     @Test
     public void addBuddyWithGUI() throws RemoteException {
         alice.deleteBuddyGUIDone(bob);
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
         alice.addBuddyGUIDone(bob);
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
     }
 
     /**
@@ -150,11 +153,11 @@ public class TestRosterViewComponent extends STFTest {
     @Ignore
     public void addBuddyWithoutGUI() throws RemoteException, XMPPException {
         alice.deleteBuddyGUIDone(bob);
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
         alice.addBuddyDone(bob);
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
-        assertTrue(bob.rosterV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
     }
 
     /**
@@ -172,18 +175,18 @@ public class TestRosterViewComponent extends STFTest {
      */
     @Test
     public void deleteBuddyWithGUI() throws RemoteException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
         alice.deleteBuddyGUIDone(bob);
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
     }
 
     @Test
     public void deleteBuddyWithoutGUI() throws RemoteException, XMPPException {
-        assertTrue(alice.rosterV.hasBuddy(bob.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
         alice.deleteBuddyDone(bob);
-        assertFalse(alice.rosterV.hasBuddy(bob.jid));
-        assertFalse(bob.rosterV.hasBuddy(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
     }
 
     /**
@@ -198,16 +201,19 @@ public class TestRosterViewComponent extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
+     * @throws InterruptedException
      */
     @Test
-    public void inviteUserWithGUI() throws RemoteException {
-        assertFalse(carl.sessionV.isInSessionGUI());
-        alice.rosterV.inviteUserGUI(carl.jid);
-        carl.sarosC.confirmSessionInvitationWizard();
-        carl.sarosC.confirmProjectSharingWirzardWithNewProject(PROJECT1);
-        carl.workbench.sleep(1000);
-
-        assertTrue(carl.sessionV.isInSessionGUI());
+    public void inviteBuddyWithGUI() throws RemoteException,
+        InterruptedException {
+        setUpSessionByDefault(alice, bob);
+        assertFalse(carl.sarosSessionV.isInSessionGUI());
+        alice.sarosBuddiesV.inviteBuddyGUI(carl.jid);
+        carl.sarosC.confirmShellSessionnInvitation();
+        carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.sarosSessionV.waitUntilIsInSession();
+        assertTrue(carl.sarosSessionV.isInSessionGUI());
+        alice.leaveSessionHostFirstDone(bob, carl);
     }
 
 }
