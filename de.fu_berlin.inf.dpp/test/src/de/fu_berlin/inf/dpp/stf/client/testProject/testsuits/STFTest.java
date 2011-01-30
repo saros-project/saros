@@ -66,6 +66,8 @@ public class STFTest {
     /* File name */
     public static final String FILE1 = "MyFile.xml";
     public static final String FILE2 = "MyFile2.xml";
+    public static final String FILE3 = "file.txt";
+    public static final String[] path = { PROJECT1, FILE3 };
 
     /* Package name */
     public static final String PKG1 = "my.pkg";
@@ -215,6 +217,15 @@ public class STFTest {
         }
     }
 
+    public static void createProjectWithFileBy(Tester... testers)
+        throws RemoteException {
+        for (Tester tester : testers) {
+            tester.fileM.newProject(PROJECT1);
+            tester.fileM.newFile(path);
+            tester.editor.waitUntilEditorOpen(FILE3);
+        }
+    }
+
     /**
      * A convenient function to quickly build a session with default value.
      * 
@@ -248,7 +259,8 @@ public class STFTest {
         }
     }
 
-    public static void deleteProjectsByActiveTesters() throws RemoteException {
+    public static void deleteAllProjectsByAllActiveTesters()
+        throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.workbench.deleteAllProjects();
         }
@@ -294,6 +306,14 @@ public class STFTest {
             }
         }
         resetAllBots();
+    }
+
+    public static void disConnectByAllActiveTesters() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            if (tester != null) {
+                tester.sarosBuddiesV.disconnectGUI();
+            }
+        }
     }
 
     public static void resetWorkbenches() throws RemoteException {

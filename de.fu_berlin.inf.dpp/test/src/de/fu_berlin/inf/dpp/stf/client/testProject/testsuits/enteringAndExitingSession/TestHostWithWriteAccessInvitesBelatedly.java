@@ -110,7 +110,7 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
         alice.inviteUsersInSessionDone(PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT, bob);
 
-        bob.editor.activateEditor(CLS1);
+        bob.editor.activateJavaEditor(CLS1);
         bob.editor.waitUntilJavaEditorContentSame(CP1, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorContentSame(CP2, PROJECT1, PKG1, CLS2);
         String CLSContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,

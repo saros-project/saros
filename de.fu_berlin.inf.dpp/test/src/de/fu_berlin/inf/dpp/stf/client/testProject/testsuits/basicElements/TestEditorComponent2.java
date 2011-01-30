@@ -13,20 +13,13 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 public class TestEditorComponent2 extends STFTest {
     private static final Logger log = Logger
         .getLogger(TestEditorComponent2.class);
-    private static final String FILE3 = "file.txt";
-    private static final String[] path = { PROJECT1, FILE3 };
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(path);
-        alice.editor.waitUntilEditorOpen(FILE3);
-        bob.fileM.newProject(PROJECT1);
-        bob.fileM.newFile(path);
-        bob.editor.waitUntilEditorOpen(FILE3);
+        createProjectWithFileBy(alice, bob);
     }
 
     @Test

@@ -121,11 +121,6 @@ public class TestSVNStateUpdates extends STFTest {
         }
     }
 
-    @Test
-    public void asdf() {
-        //
-    }
-
     /**
      * Steps:
      * <ol>
@@ -142,7 +137,7 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
-        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+
         assertTrue(bob.sarosSessionV.hasWriteAccess());
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
@@ -168,7 +163,7 @@ public class TestSVNStateUpdates extends STFTest {
      */
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
-        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+
         assertTrue(bob.sarosSessionV.hasWriteAccess());
 
         bob.fileM.newPackage(SVN_PROJECT, "new_package");

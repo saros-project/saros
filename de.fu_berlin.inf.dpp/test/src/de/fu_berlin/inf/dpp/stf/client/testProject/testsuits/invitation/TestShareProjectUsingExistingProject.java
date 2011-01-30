@@ -47,7 +47,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     public void runAfterEveryTest() throws RemoteException,
         InterruptedException {
         alice.leaveSessionHostFirstDone(bob);
-        deleteProjectsByActiveTesters();
+        deleteAllProjectsByAllActiveTesters();
 
     }
 

@@ -81,9 +81,6 @@ public class TestEditDuringInvitation extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
 
-        log.trace("alice.grantWriteAccess");
-        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
-
         assertTrue(bob.sarosSessionV.hasWriteAccess());
 
         log.trace("alice.inviteUser(carl");

@@ -38,7 +38,7 @@ public class TestBasicComponentByAlice extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        deleteProjectsByActiveTesters();
+        deleteAllProjectsByAllActiveTesters();
     }
 
     @Test

@@ -40,8 +40,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (!bob.sarosSessionV.hasWriteAccess())
-            alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+        resetWriteAccess(alice, bob);
     }
 
     // @Test

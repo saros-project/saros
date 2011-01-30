@@ -35,7 +35,7 @@ public class TestBasicSarosElements extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        alice.sarosBuddiesV.disconnectGUI();
+        disConnectByAllActiveTesters();
     }
 
     @Test

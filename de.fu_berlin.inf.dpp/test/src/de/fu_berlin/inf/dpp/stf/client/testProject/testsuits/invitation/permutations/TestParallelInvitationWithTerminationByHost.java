@@ -110,10 +110,12 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         dave.shell.activateShellWithText(SESSION_INVITATION);
         dave.sarosC.confirmShellSessionnInvitation();
 
-        dave.button.clickButton(FINISH);
+        // dave.button.clickButton(FINISH);
         alice.progressV.removeProcess(0);
-        // FIXME Timeout exception by MAC OS X, the building session under MAS
-        // is so fast that the session process is already done after canceling
+        // FIXME Timeout exception by MAC OS X, the building session under
+        // MAS
+        // is so fast that the session process is already done after
+        // canceling
         // this process, so dave should never get the window
         // "Invitation canceled".
         dave.sarosC.waitUntilIsShellInvitationCnacelledActive();
