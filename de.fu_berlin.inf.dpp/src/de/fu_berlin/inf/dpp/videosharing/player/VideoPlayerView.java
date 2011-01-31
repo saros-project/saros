@@ -225,9 +225,9 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         final IActionBars actionBars = getViewSite().getActionBars();
         final IToolBarManager toolBarManager = actionBars.getToolBarManager();
 
-        toolBarManager.add(new ChangeSourceMode());
-        toolBarManager.add(new StopVideoSession());
-        toolBarManager.add(new PauseVideoSession());
+        toolBarManager.add(new ChangeSourceModeAction());
+        toolBarManager.add(new StopVideoSessionAction());
+        toolBarManager.add(new PauseVideoSessionAction());
     }
 
     protected Label createLabel(CoolBar coolBar, String text, String toolTip) {
@@ -338,9 +338,9 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
     }
 
-    class ChangeSourceMode extends Action {
+    class ChangeSourceModeAction extends Action {
 
-        public ChangeSourceMode() {
+        public ChangeSourceModeAction() {
             setToolTipText("Change mode of image source");
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/elcl16/chvdsrc.png"));
@@ -370,9 +370,9 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         }
     }
 
-    class StopVideoSession extends Action {
+    class StopVideoSessionAction extends Action {
 
-        public StopVideoSession() {
+        public StopVideoSessionAction() {
             setToolTipText("Stop running session");
             setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                 .getImageDescriptor(ISharedImages.IMG_ELCL_STOP));
@@ -404,11 +404,11 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
     }
 
-    class PauseVideoSession extends Action {
+    class PauseVideoSessionAction extends Action {
 
-        public PauseVideoSession() {
+        public PauseVideoSessionAction() {
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/suspend_co.gif"));
+                .getImageDescriptor("icons/elcl16/pausevideo.gif"));
             setToolTipText("Pause");
             setEnabled(false);
             videoSharingSessionObservable
