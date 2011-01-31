@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
 import java.io.File;
 

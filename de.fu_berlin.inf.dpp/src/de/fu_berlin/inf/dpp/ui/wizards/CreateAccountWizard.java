@@ -24,6 +24,7 @@ import org.eclipse.jface.wizard.Wizard;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.RegisterAccountPage;
 
 /**
  * An wizard that is used to create XMPP accounts.
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
  */
 public class CreateAccountWizard extends Wizard {
 
-    protected final RegisterAccountPage page;
+    public final RegisterAccountPage page;
 
     protected final Saros saros;
 

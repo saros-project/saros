@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;

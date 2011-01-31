@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +24,7 @@ public class EnterProjectNamePageUtils {
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePageUtils.class);
 
-    protected static PreferenceUtils preferenceUtils;
+    public static PreferenceUtils preferenceUtils;
 
     public static class ScanRunner implements Runnable {
 

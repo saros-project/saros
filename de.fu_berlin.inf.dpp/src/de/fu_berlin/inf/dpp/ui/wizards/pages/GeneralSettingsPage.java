@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
@@ -25,7 +25,7 @@ public class GeneralSettingsPage extends WizardPage implements IWizardPage2 {
 
     protected PreferenceUtils preferenceUtils;
 
-    protected GeneralSettingsPage(Saros saros, PreferenceUtils preferenceUtils) {
+    public GeneralSettingsPage(Saros saros, PreferenceUtils preferenceUtils) {
         super("general settings");
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
@@ -91,10 +91,10 @@ public class GeneralSettingsPage extends WizardPage implements IWizardPage2 {
 
     public boolean performFinish() {
         IPreferenceStore preferences = saros.getPreferenceStore();
-        preferences.setValue(PreferenceConstants.AUTO_CONNECT, this.autoButton
-            .getSelection());
-        preferences.setValue(PreferenceConstants.SKYPE_USERNAME, this.skypeText
-            .getText());
+        preferences.setValue(PreferenceConstants.AUTO_CONNECT,
+            this.autoButton.getSelection());
+        preferences.setValue(PreferenceConstants.SKYPE_USERNAME,
+            this.skypeText.getText());
 
         return true;
     }

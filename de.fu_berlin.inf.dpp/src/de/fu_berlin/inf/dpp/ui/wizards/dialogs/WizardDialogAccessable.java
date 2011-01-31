@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.dialogs;
 
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;

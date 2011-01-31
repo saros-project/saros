@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.InvitationWizardUserSelectionPage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -33,7 +34,7 @@ public class InvitationWizard extends Wizard {
     protected ISarosSession sarosSession;
     protected RosterTracker rosterTracker;
     protected DiscoveryManager discoveryManager;
-    protected InvitationWizardUserSelection userSelection;
+    protected InvitationWizardUserSelectionPage userSelection;
     protected SarosSessionManager sessionManager;
     protected VersionManager versionManager;
     protected InvitationProcessObservable invitationProcesses;
@@ -115,7 +116,7 @@ public class InvitationWizard extends Wizard {
 
     @Override
     public void addPages() {
-        userSelection = new InvitationWizardUserSelection(saros, sarosSession,
+        userSelection = new InvitationWizardUserSelectionPage(saros, sarosSession,
             rosterTracker, discoveryManager, invitationProcesses);
         addPage(userSelection);
     }

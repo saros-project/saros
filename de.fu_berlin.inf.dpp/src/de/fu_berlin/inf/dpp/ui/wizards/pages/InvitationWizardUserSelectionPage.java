@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,10 +40,10 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class InvitationWizardUserSelection extends WizardPage {
+public class InvitationWizardUserSelectionPage extends WizardPage {
 
     private static final Logger log = Logger
-        .getLogger(InvitationWizardUserSelection.class);
+        .getLogger(InvitationWizardUserSelectionPage.class);
 
     protected Saros saros;
     protected Roster roster;
@@ -58,7 +58,7 @@ public class InvitationWizardUserSelection extends WizardPage {
     protected SelectionListener onlySarosListener;
     protected ISelectionChangedListener userSelectionChangedListener;
 
-    protected InvitationWizardUserSelection(Saros saros,
+    public InvitationWizardUserSelectionPage(Saros saros,
         ISarosSession sarosSession, RosterTracker rosterTracker,
         DiscoveryManager discoveryManager,
         InvitationProcessObservable invitationProcesses) {

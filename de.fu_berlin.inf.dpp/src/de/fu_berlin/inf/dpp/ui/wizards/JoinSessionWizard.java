@@ -43,6 +43,9 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
+import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -64,7 +67,7 @@ public class JoinSessionWizard extends Wizard {
 
     protected WizardDialogAccessable wizardDialog;
     protected boolean updateSelected;
-    protected IncomingSessionNegotiation process;
+    public IncomingSessionNegotiation process;
 
     protected ShowDescriptionPage descriptionPage;
     protected boolean requested = false;

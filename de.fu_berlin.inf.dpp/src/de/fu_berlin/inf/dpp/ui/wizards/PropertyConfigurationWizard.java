@@ -4,6 +4,7 @@ import org.eclipse.jface.wizard.Wizard;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsPage;
 
 public class PropertyConfigurationWizard extends Wizard {
 

@@ -30,6 +30,10 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.AllowStatisticSubmissionPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.RegisterAccountPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic

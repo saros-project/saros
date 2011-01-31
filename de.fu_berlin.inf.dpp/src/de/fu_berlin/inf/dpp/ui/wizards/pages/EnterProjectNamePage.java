@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -29,13 +29,15 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
+import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
  * overwrite a project.
  */
-class EnterProjectNamePage extends WizardPage {
+public class EnterProjectNamePage extends WizardPage {
 
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
@@ -73,7 +75,7 @@ class EnterProjectNamePage extends WizardPage {
 
     private boolean disposed;
 
-    protected EnterProjectNamePage(DataTransferManager dataTransferManager,
+    public EnterProjectNamePage(DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, FileList fileList, JID peer,
         String remoteProjectName, WizardDialogAccessable wizardDialog) {
         super("namePage");

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -37,15 +37,15 @@ public class AccountPage extends WizardPage {
     Composite parent;
     GridData data = new GridData(GridData.FILL_HORIZONTAL);
 
-    protected AccountPage() {
+    public AccountPage() {
         super("AccountManagement");
     }
 
-    protected void setJabberAccount(XMPPAccount account) {
+    public void setJabberAccount(XMPPAccount account) {
         this.account = account;
     }
 
-    protected void setPageTitle(String text) {
+    public void setPageTitle(String text) {
         setTitle(text);
     }
 
@@ -164,15 +164,15 @@ public class AccountPage extends WizardPage {
         return this.account == null;
     }
 
-    protected String getUserName() {
+    public String getUserName() {
         return this.userNameInput.getText();
     }
 
-    protected String getPassword() {
+    public String getPassword() {
         return this.passwordInput.getText();
     }
 
-    protected String getServer() {
+    public String getServer() {
         return this.serverTextInput.getText();
     }
 }

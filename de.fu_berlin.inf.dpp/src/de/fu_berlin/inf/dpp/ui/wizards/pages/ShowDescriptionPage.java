@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.wizards;
+package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardPage;
@@ -9,18 +9,19 @@ import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * A wizard page that displays the name of the inviter and the description
  * provided with the invitation.
  */
-class ShowDescriptionPage extends WizardPage {
+public class ShowDescriptionPage extends WizardPage {
 
     private final JoinSessionWizard joinSessionWizard;
     private String description;
 
-    protected ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
+    public ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
         VersionManager manager, IncomingSessionNegotiation invProcess) {
         super("firstPage");
         this.joinSessionWizard = joinSessionWizard;
