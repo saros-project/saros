@@ -38,7 +38,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        deleteAllProjectsByAllActiveTesters();
+        deleteAllProjectsByActiveTesters();
     }
 
     /**********************************************

@@ -5,9 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,22 +33,6 @@ public class TestEditDuringInvitation extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**

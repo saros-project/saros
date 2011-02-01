@@ -4,8 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.eclipse.ui.part.ViewPart;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -80,21 +78,6 @@ public interface SessionView extends Remote {
     public boolean isInSessionGUI() throws RemoteException;
 
     /**
-     * @throws RemoteException
-     * @see ViewPart#openViewById(String)
-     */
-    public void openSessionView() throws RemoteException;
-
-    /**
-     * 
-     * @return <tt>true</tt> if all the opened views contains the session view.
-     * 
-     * @throws RemoteException
-     * @see ViewPart#isViewOpen(String)
-     */
-    public boolean isSessionViewOpen() throws RemoteException;
-
-    /**
      * waits until the session is open.
      * 
      * @throws RemoteException
@@ -111,26 +94,6 @@ public interface SessionView extends Remote {
      */
     public void waitUntilInviteeIsInSession(final SessionView sessionV)
         throws RemoteException;
-
-    /**
-     * @see ViewPart#setFocusOnViewByTitle(String)
-     * @throws RemoteException
-     */
-    public void setFocusOnSessionView() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt> if session view is active.
-     * 
-     * @throws RemoteException
-     * @see ViewPart#isViewActive(String)
-     */
-    public boolean isSessionViewActive() throws RemoteException;
-
-    /**
-     * @throws RemoteException
-     * @see ViewPart#closeViewById(String)
-     */
-    public void closeSessionView() throws RemoteException;
 
     /**
      * Waits until the {@link SarosSessionManager#getSarosSession()} is null.
@@ -387,7 +350,8 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to follow.
      * @throws RemoteException
      */
-    public void followThisBuddyGUI(JID jidOfFollowedUser) throws RemoteException;
+    public void followThisBuddyGUI(JID jidOfFollowedUser)
+        throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if you are currently following another user.
@@ -438,10 +402,10 @@ public interface SessionView extends Remote {
 
     /**
      * This function do same as the
-     * {@link SessionView#stopFollowingThisBuddyGUI(SarosState)} except you don't
-     * need to pass the {@link SarosState} of the followed user to the function.
-     * It is very useful, if you don't exactly know whom you are now following.
-     * Instead, we get the followed user JID from the method
+     * {@link SessionView#stopFollowingThisBuddyGUI(SarosState)} except you
+     * don't need to pass the {@link SarosState} of the followed user to the
+     * function. It is very useful, if you don't exactly know whom you are now
+     * following. Instead, we get the followed user JID from the method
      * {@link SarosState#getFollowedBuddyJID()}.
      * <p>
      * <b>Attention:</b>
@@ -483,8 +447,8 @@ public interface SessionView extends Remote {
      *         passed contactName listed in the session view is enabled.
      * @throws RemoteException
      */
-    public boolean isCMStopFollowingThisBuddyEnabled(String baseJIDOfFollowedUser)
-        throws RemoteException;
+    public boolean isCMStopFollowingThisBuddyEnabled(
+        String baseJIDOfFollowedUser) throws RemoteException;
 
     /**
      * check if the context menu "Stop following this user" of a contact listed
@@ -498,8 +462,8 @@ public interface SessionView extends Remote {
      *         passed contactName listed in the session view is visible.
      * @throws RemoteException
      */
-    public boolean isCMStopFollowingThisBuddyVisible(String baseJIDOfFollowedUser)
-        throws RemoteException;
+    public boolean isCMStopFollowingThisBuddyVisible(
+        String baseJIDOfFollowedUser) throws RemoteException;
 
     /**
      * Waits until the {@link EditorManager#getFollowedUser()} is same as the

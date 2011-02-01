@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.stf.SarosLabels;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
@@ -51,28 +52,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public abstract class EclipsePart {
+public abstract class EclipsePart implements SarosLabels {
     protected static final transient Logger log = Logger
         .getLogger(EclipsePart.class);
-
-    // Title of Buttons
-    protected final static String YES = "Yes";
-    protected final static String OK = "OK";
-    protected final static String NO = "No";
-    protected final static String CANCEL = "Cancel";
-    protected final static String FINISH = "Finish";
-    protected final static String APPLY = "Apply";
-    protected final static String NEXT = "Next >";
-
-    public static final String SRC = "src";
-    public final static String SUFIX_JAVA = ".java";
-
-    // Shell
-    protected final static String SHELL_PROGRESS_INFORMATION = "Progress Information";
-
-    // Permission: Write Access
-    public static final String OWN_CONTACT_NAME = "You";
-    protected final static String PERMISSION_NAME = " (read-only)";
 
     // exported objects
     public static TableImp tableW = TableImp.getInstance();

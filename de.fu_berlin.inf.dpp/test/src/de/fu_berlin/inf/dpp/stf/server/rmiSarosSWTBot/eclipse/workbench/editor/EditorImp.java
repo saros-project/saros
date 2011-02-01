@@ -32,9 +32,6 @@ public class EditorImp extends EclipsePart implements Editor {
     private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
     private static String ERROR_MESSAGE_FOR_INVALID_CLASSNAME = "You need to only pass the className without sufix like e.g MyClass";
 
-    /* Title of shells */
-    private static String SHELL_SAVE_RESOURCE = "Save Resource";
-
     /**
      * {@link EditorImp} is a singleton, but inheritance is possible.
      */
@@ -202,9 +199,9 @@ public class EditorImp extends EclipsePart implements Editor {
 
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
-        shellC.waitUntilShellOpen(SHELL_SAVE_RESOURCE);
-        shellC.activateShellWithText(SHELL_SAVE_RESOURCE);
-        shellC.confirmShell(SHELL_SAVE_RESOURCE, buttonType);
+        shellC.waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
+        shellC.activateShellWithText(SHELL_SAVE_ALL_FILES_NOW);
+        shellC.confirmShell(SHELL_SAVE_ALL_FILES_NOW, buttonType);
     }
 
     // public void closeAllOpenedEditors() throws RemoteException {

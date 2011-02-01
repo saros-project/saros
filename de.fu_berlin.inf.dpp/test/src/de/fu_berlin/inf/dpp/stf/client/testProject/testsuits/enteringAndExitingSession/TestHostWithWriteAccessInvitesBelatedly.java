@@ -7,9 +7,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,23 +45,6 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl);
         alice.followedBy(carl);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        alice.addBuddyGUIDone(bob);
-        bob.addBuddyGUIDone(alice);
     }
 
     /**

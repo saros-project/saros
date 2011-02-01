@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +18,8 @@ public class TestFileOperations extends STFTest {
     /**
      * Preconditions:
      * <ol>
-     * <li>alice (Host, Write Access), aclice share a java project with bob and carl.</li>
+     * <li>alice (Host, Write Access), aclice share a java project with bob and
+     * carl.</li>
      * <li>bob (Read-Only Access)</li>
      * <li>carl (Read-Only Access)</li>
      * </ol>
@@ -35,13 +34,8 @@ public class TestFileOperations extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         setUpSessionByDefault(alice, bob, carl);
-        alice.followedBy(carl);
-    }
 
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl);
+        alice.followedBy(carl);
     }
 
     @Before
@@ -59,12 +53,6 @@ public class TestFileOperations extends STFTest {
         // Need to make sure that the preconditions are met by bob and carl too.
     }
 
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        alice.addBuddyGUIDone(bob);
-        bob.addBuddyGUIDone(alice);
-    }
-
     /**
      * Steps:
      * <ol>
@@ -80,12 +68,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testRenameFile() throws RemoteException {
-        /*
-         * TODO, sometimes i get the assertError exception by performing the
-         * following assertTrue, it seems that the building-session isn't
-         * finished yet.
-         */
-        bob.workbench.sleep(1000);
+
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
         alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
         alice.refactorM.renameClass(CLS2);

@@ -7,9 +7,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,22 +37,6 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         setUpSessionByDefault(alice, bob, carl, dave, edna);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl, dave, edna);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**

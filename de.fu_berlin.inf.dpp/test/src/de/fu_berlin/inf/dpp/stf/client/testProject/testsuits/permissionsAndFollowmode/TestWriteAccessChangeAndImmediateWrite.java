@@ -5,9 +5,6 @@ import static org.junit.Assert.assertFalse;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,22 +23,6 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
         setUpSessionByDefault(alice, bob);
     }
 
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
-    }
-
     /**
      * Steps:
      * 
@@ -56,7 +37,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
-        alice.sarosSessionV.grantWriteAccessGUI(bob.sarosSessionV);
+
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.workbench.sleep(5000);
         assertFalse(bob.sarosSessionV.isInconsistencyDetectedEnabled());

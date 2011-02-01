@@ -35,17 +35,17 @@ public class TestBasicSarosElements extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        disConnectByAllActiveTesters();
+        disConnectByActiveTesters();
     }
 
     @Test
     public void testSessionView() throws RemoteException {
-        alice.sarosSessionV.closeSessionView();
-        assertEquals(false, alice.sarosSessionV.isSessionViewOpen());
-        alice.sarosSessionV.openSessionView();
+        alice.view.closeViewById(VIEW_SAROS_SESSION_ID);
+        assertEquals(false, alice.view.isViewOpen(VIEW_SAROS_SESSION));
+        alice.view.openViewById(VIEW_SAROS_SESSION_ID);
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/session_view.png"));
-        assertEquals(true, alice.sarosSessionV.isSessionViewOpen());
+        assertEquals(true, alice.view.isViewOpen(VIEW_SAROS_SESSION));
     }
 
     @Test

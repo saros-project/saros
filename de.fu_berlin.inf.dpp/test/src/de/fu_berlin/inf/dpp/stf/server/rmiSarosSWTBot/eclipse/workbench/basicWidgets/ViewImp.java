@@ -93,6 +93,7 @@ public class ViewImp extends EclipsePart implements View {
     public void setFocusOnViewByTitle(String title) throws RemoteException {
         try {
             bot.viewByTitle(title).setFocus();
+            viewW.waitUntilIsViewActive(title);
         } catch (WidgetNotFoundException e) {
             log.warn("view not found '" + title + "'", e);
         }

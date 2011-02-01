@@ -15,24 +15,6 @@ public class SarosMImp extends EclipsePart implements SarosM {
 
     private static transient SarosMImp self;
 
-    /* name of the main menus */
-    private static final String MENU_SAROS = "Saros";
-    private static final String MENU_CREATE_ACCOUNT = "Create Account";
-
-    /* title of shells which may pop up by clicking the main menus */
-    private static final String SHELL_PREFERNCES = "Preferences";
-    private static final String SHELL_SAROS_CONFIGURATION = "Saros Configuration";
-
-    /* title of treeItem Saros and it's sub treeItems in the preferences dialog */
-    private static final String P_SAROS = "Saros";
-
-    /* confirm Shell 'Create new xmpp account' */
-    private final static String SHELL_CREATE_NEW_XMPP_ACCOUNT = "Create New XMPP Account";
-    private final static String XMPP_JABBER_SERVER = "XMPP/Jabber Server";
-    private final static String USER_NAME = "Username";
-    private final static String PASSWORD = "Password";
-    private final static String REPEAT_PASSWORD = "Repeat Password";
-
     /**
      * {@link SarosMImp} is a singleton, but inheritance is possible.
      */
@@ -71,10 +53,10 @@ public class SarosMImp extends EclipsePart implements SarosM {
         throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
             shellC.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        textW.setTextInTextWithLabel(xmppServer, XMPP_JABBER_SERVER);
-        textW.setTextInTextWithLabel(jid, USER_NAME);
-        textW.setTextInTextWithLabel(password, PASSWORD);
-        textW.setTextInTextWithLabel(password, REPEAT_PASSWORD);
+        textW.setTextInTextWithLabel(xmppServer, LABEL_XMPP_JABBER_SERVER);
+        textW.setTextInTextWithLabel(jid, LABEL_USER_NAME);
+        textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
+        textW.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
         buttonW.clickButton(FINISH);
         shellC.waitUntilShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
@@ -214,7 +196,8 @@ public class SarosMImp extends EclipsePart implements SarosM {
         clickMenuSarosPreferences();
         shellC.activateShellWithWaitingOpen(SHELL_PREFERNCES);
         SWTBotTree tree = bot.tree();
-        tree.expandNode(P_SAROS).select("Screensharing");
+        tree.expandNode(TREE_ITEM_SAROS_IN_SHELL_PREFERENCES).select(
+            "Screensharing");
         bot.ccomboBox(0).setSelection(encoder);
         bot.ccomboBox(1).setSelection(videoResolution);
         bot.button(APPLY).click();
@@ -292,7 +275,7 @@ public class SarosMImp extends EclipsePart implements SarosM {
     private void selectSarosPageInPreferences() throws RemoteException {
         clickMenuSarosPreferences();
         shellC.activateShellWithWaitingOpen(SHELL_PREFERNCES);
-        treeW.selectTreeItem(P_SAROS);
+        treeW.selectTreeItem(TREE_ITEM_SAROS_IN_SHELL_PREFERENCES);
     }
 
     /**

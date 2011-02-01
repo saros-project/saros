@@ -8,8 +8,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,21 +40,10 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         setUpSessionByDefault(alice, bob, carl, dave);
     }
 
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl, dave);
-    }
-
     @Before
     public void runBeforeEveryTest() throws RemoteException,
         InterruptedException {
         alice.followedBy(bob, carl, dave);
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**
@@ -75,6 +62,10 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
         throws RemoteException {
+        alice.editor.closeJavaEditorWithSave(CLS1);
+        bob.editor.waitUntilJavaEditorClosed(CLS1);
+        carl.editor.waitUntilJavaEditorClosed(CLS1);
+        dave.editor.waitUntilJavaEditorClosed(CLS1);
         assertFalse(bob.editor.isJavaEditorOpen(CLS1));
         assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         assertFalse(dave.editor.isJavaEditorOpen(CLS1));

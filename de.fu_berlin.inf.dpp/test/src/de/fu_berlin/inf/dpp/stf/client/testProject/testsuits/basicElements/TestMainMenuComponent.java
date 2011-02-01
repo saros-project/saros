@@ -20,26 +20,6 @@ public class TestMainMenuComponent extends STFTest {
     private final static Logger log = Logger
         .getLogger(TestMainMenuComponent.class);
 
-    /* name of all the main menus */
-    private static final String MENU_SAROS = "Saros";
-    private static final String MENU_CREATE_ACCOUNT = "Create Account";
-    private static final String MENU_PREFERENCES = "Preferences";
-
-    /* title of shells which are pop up by clicking the main menus */
-    private static final String SHELL_PREFERNCES = "Preferences";
-
-    /* All infos about the shell "Create New User Account" */
-    private final static String SHELL_CREATE_NEW_XMPP_ACCOUNT = "Create New XMPP Account";
-    private final static String LABEL_XMPP_JABBER_SERVER = "XMPP/Jabber Server";
-    private final static String LABEL_USER_NAME = "Username";
-    private final static String LABEL_PASSWORD = "Password";
-    private final static String LABEL_REPEAT_PASSWORD = "Repeat Password";
-
-    /* Error massage */
-    private final static String ERROR_MESSAGE_PASSWORDS_NOT_MATCH = "Passwords don't match.";
-    private final static String ERROR_MESSAGE_COULD_NOT_CONNECT = "Could not connect.*";
-    private final static String ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS = "conflict(409): Account already exists";
-
     /* infos about the added account */
     private final static String SERVER = "saros-con.imp.fu-berlin.de";
     private final static String USERNAME = "lin";
@@ -128,8 +108,8 @@ public class TestMainMenuComponent extends STFTest {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         if (!alice.shell.activateShellWithText(SHELL_CREATE_NEW_XMPP_ACCOUNT))
             alice.shell.waitUntilShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        alice.text
-            .setTextInTextWithLabel("invalid server", LABEL_XMPP_JABBER_SERVER);
+        alice.text.setTextInTextWithLabel("invalid server",
+            LABEL_XMPP_JABBER_SERVER);
         alice.text.setTextInTextWithLabel("invalid name", LABEL_USER_NAME);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_PASSWORD);
         alice.text.setTextInTextWithLabel(bob.password, LABEL_REPEAT_PASSWORD);

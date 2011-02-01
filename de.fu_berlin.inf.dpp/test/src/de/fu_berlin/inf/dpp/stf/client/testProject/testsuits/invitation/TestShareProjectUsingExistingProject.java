@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,11 +31,6 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         setUpSaros();
     }
 
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
@@ -47,7 +41,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     public void runAfterEveryTest() throws RemoteException,
         InterruptedException {
         alice.leaveSessionHostFirstDone(bob);
-        deleteAllProjectsByAllActiveTesters();
+        deleteAllProjectsByActiveTesters();
 
     }
 

@@ -38,7 +38,7 @@ public class TestFollowMode extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetFollowModel(bob, alice);
+        resetFollowMode(bob, alice);
     }
 
     /**

@@ -130,7 +130,7 @@ public class TestSVNStateInitialization extends STFTest {
 
         assertTrue(alice.sarosSessionV.hasWriteAccess());
         assertTrue(alice.sarosSessionV.isParticipant(bob.jid));
-        assertTrue(bob.sarosSessionV.hasReadOnlyAccess(bob.jid));
+        assertTrue(bob.sarosSessionV.hasWriteAccess());
     }
 
     /**

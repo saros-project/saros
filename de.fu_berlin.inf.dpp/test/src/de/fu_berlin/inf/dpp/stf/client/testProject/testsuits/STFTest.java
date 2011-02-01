@@ -8,19 +8,16 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import de.fu_berlin.inf.dpp.stf.SarosLabels;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 
-public class STFTest {
+public class STFTest implements SarosLabels {
+
     @Rule
     public TestName name = new TestName();
-
-    public enum TypeOfTester {
-        ALICE, BOB, CARL, DAVE, EDNA
-    }
 
     public enum TypeOfCreateProject {
         NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
@@ -30,106 +27,20 @@ public class STFTest {
         SHARE_PROJECT, SHARE_PROJECT_PARTICALLY, ADD_SESSION
     }
 
-    /* Musicians */
+    /**********************************************
+     * 
+     * Tester
+     * 
+     **********************************************/
     public static Tester alice;
     public static Tester bob;
     public static Tester carl;
     public static Tester dave;
     public static Tester edna;
 
-    // views
-    protected final static String CHAT_VIEW = "Saros Chat";
-    protected final static String ROSTER_VIEW = "Saros Buddies";
-    protected final static String REMOTE_SCREEN_VIEW = "Remote Screen";
-    public static String SESSION_VIEW = "Saros Session";
-
-    // Title of Buttons
-    protected final static String YES = "Yes";
-    protected final static String OK = "OK";
-    protected final static String NO = "No";
-    protected final static String CANCEL = "Cancel";
-    protected final static String FINISH = "Finish";
-    protected final static String NEXT = "Next >";
-
-    /* Project name */
-    public static final String PROJECT1 = "Foo_Saros1";
-    protected static final String PROJECT1_COPY = "copy_of_FOO_Saros1";
-    /** Name chosen by Saros if {@link STFTest#PROJECT1} already exists. */
-    public static final String PROJECT1_NEXT = "Foo_Saros 1";
-    public static final String PROJECT2 = "Foo_Saros2";
-    public static final String PROJECT3 = "Foo_Saros3";
-
-    /* Folder name */
-    public static final String FOLDER1 = "MyFolder";
-    public static final String FOLDER2 = "MyFolder2";
-
-    /* File name */
-    public static final String FILE1 = "MyFile.xml";
-    public static final String FILE2 = "MyFile2.xml";
-    public static final String FILE3 = "file.txt";
-    public static final String[] path = { PROJECT1, FILE3 };
-
-    /* Package name */
-    public static final String PKG1 = "my.pkg";
-    public static final String PKG2 = "my.pkg2";
-    public static final String PKG3 = "my.pkg3";
-    public static final String SRC = "src";
-
-    /* class name */
-    public static final String CLS1 = "MyClass";
-    public static final String CLS2 = "MyClass2";
-    public static final String CLS3 = "MyClass3";
-
-    /* file sufix */
-    public static final String CLASS_SUFIX = ".java";
-
-    /* content path */
-    public static final String CP1 = "test/STF/" + CLS1 + CLASS_SUFIX;
-    public static final String CP2 = "test/STF/" + CLS2 + CLASS_SUFIX;
-    public static final String CP3 = "test/STF/" + CLS3 + CLASS_SUFIX;
-    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
-        + CLASS_SUFIX;
-    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
-        + CLASS_SUFIX;
-
-    /* Permissions */
-    public static final String PERMISSION_NAME = " (read-only)";
-    public static final String OWN_CONTACT_NAME = "You";
-
-    /* SVN infos */
-    protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
-    protected static final String SVN_PROJECT = "stf_test_project";
-    protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
-    protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
-    protected static final String SVN_PROJECT_URL_SWITCHED = SVN_REPOSITORY_URL
-        + "/stf_tests/stf_test_project_copy";
-    protected static final String SVN_PKG = "pkg";
-    protected static final String SVN_CLS1 = "Test";
-    protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
-    protected static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
-    /** Initial commit in stf_test_project. */
-    protected static final String SVN_CLS1_REV1 = "2735";
-    /** copy from stf_test_project to stf_test_project_copy */
-    protected static final String SVN_CLS1_REV2 = "2736";
-    /** modified in stf_test_project_copy */
-    protected static final String SVN_CLS1_REV3 = "2737";
-    /** modified in stf_test_project_copy */
-    protected static final String SVN_CLS1_REV4 = "2767";
-
-    /*
-     * Contextmenu "Saros"
-     */
-    public final static String CONTEXT_MENU_SHARE_PROJECT_WITH_VCS = "Share project...";
-    public final static String CONTEXT_MENU_SHARE_PROJECT = "Share project...";
-
-    /*
-     * Shell title
-     */
-    protected final static String SESSION_INVITATION = "Session Invitation";
-    protected final static String INVITATIONCANCELLED = "Invitation Cancelled";
-
-    public final static String ID_JAVA_EDITOR = "org.eclipse.jdt.ui.CompilationUnitEditor";
-    public final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
+    public enum TypeOfTester {
+        ALICE, BOB, CARL, DAVE, EDNA
+    }
 
     public static List<Tester> activeTesters = new ArrayList<Tester>();
 
@@ -166,6 +77,74 @@ public class STFTest {
         return result;
     }
 
+    /**********************************************
+     * 
+     * test data
+     * 
+     **********************************************/
+    /* Project name */
+    public static final String PROJECT1 = "Foo_Saros1";
+    protected static final String PROJECT1_COPY = "copy_of_FOO_Saros1";
+    /** Name chosen by Saros if {@link STFTest#PROJECT1} already exists. */
+    public static final String PROJECT1_NEXT = "Foo_Saros 1";
+    public static final String PROJECT2 = "Foo_Saros2";
+    public static final String PROJECT3 = "Foo_Saros3";
+
+    /* Folder name */
+    public static final String FOLDER1 = "MyFolder";
+    public static final String FOLDER2 = "MyFolder2";
+
+    /* File name */
+    public static final String FILE1 = "MyFile.xml";
+    public static final String FILE2 = "MyFile2.xml";
+    public static final String FILE3 = "file.txt";
+    public static final String[] path = { PROJECT1, FILE3 };
+
+    /* Package name */
+    public static final String PKG1 = "my.pkg";
+    public static final String PKG2 = "my.pkg2";
+    public static final String PKG3 = "my.pkg3";
+    public static final String SRC = "src";
+
+    /* class name */
+    public static final String CLS1 = "MyClass";
+    public static final String CLS2 = "MyClass2";
+    public static final String CLS3 = "MyClass3";
+
+    /* content path */
+    public static final String CP1 = "test/STF/" + CLS1 + SUFIX_JAVA;
+    public static final String CP2 = "test/STF/" + CLS2 + SUFIX_JAVA;
+    public static final String CP3 = "test/STF/" + CLS3 + SUFIX_JAVA;
+    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
+        + SUFIX_JAVA;
+    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
+        + SUFIX_JAVA;
+
+    /* SVN infos */
+    protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
+    protected static final String SVN_PROJECT = "stf_test_project";
+    protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
+    protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
+    protected static final String SVN_PROJECT_URL_SWITCHED = SVN_REPOSITORY_URL
+        + "/stf_tests/stf_test_project_copy";
+    protected static final String SVN_PKG = "pkg";
+    protected static final String SVN_CLS1 = "Test";
+    protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
+    protected static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
+    /** Initial commit in stf_test_project. */
+    protected static final String SVN_CLS1_REV1 = "2735";
+    /** copy from stf_test_project to stf_test_project_copy */
+    protected static final String SVN_CLS1_REV2 = "2736";
+    /** modified in stf_test_project_copy */
+    protected static final String SVN_CLS1_REV3 = "2737";
+    /** modified in stf_test_project_copy */
+    protected static final String SVN_CLS1_REV4 = "2767";
+
+    /**********************************************
+     * 
+     * test conditions
+     * 
+     **********************************************/
     /**
      * bring workbench to a original state before beginning your tests
      * <ul>
@@ -217,13 +196,33 @@ public class STFTest {
         }
     }
 
-    public static void createProjectWithFileBy(Tester... testers)
-        throws RemoteException {
-        for (Tester tester : testers) {
-            tester.fileM.newProject(PROJECT1);
-            tester.fileM.newFile(path);
-            tester.editor.waitUntilEditorOpen(FILE3);
+    /**
+     * For all active testers, reset buddy names, disconnect, delete all
+     * projects.
+     * 
+     * @throws RemoteException
+     */
+    public static void resetSaros() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            if (tester != null) {
+                tester.sarosBuddiesV.resetAllBuddyName();
+                tester.sarosBuddiesV.disconnectGUI();
+                tester.workbench.deleteAllProjects();
+            }
         }
+        resetAllBots();
+    }
+
+    public static void resetWorkbenches() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            tester.workbench.resetWorkbench();
+        }
+    }
+
+    public static void resetAllBots() {
+        alice = bob = carl = dave = edna = null;
+        activeTesters.clear();
+        assertTrue(activeTesters.isEmpty());
     }
 
     /**
@@ -253,13 +252,23 @@ public class STFTest {
         }
     }
 
-    public static void createProjectByActiveTesters() throws RemoteException {
+    public static void createProjectWithClassByActiveTesters()
+        throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         }
     }
 
-    public static void deleteAllProjectsByAllActiveTesters()
+    public static void createProjectWithFileBy(Tester... testers)
+        throws RemoteException {
+        for (Tester tester : testers) {
+            tester.fileM.newProject(PROJECT1);
+            tester.fileM.newFile(path);
+            tester.editor.waitUntilEditorOpen(FILE3);
+        }
+    }
+
+    public static void deleteAllProjectsByActiveTesters()
         throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.workbench.deleteAllProjects();
@@ -281,7 +290,7 @@ public class STFTest {
         }
     }
 
-    public static void resetFollowModel(Tester... activeTesters)
+    public static void resetFollowMode(Tester... activeTesters)
         throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester.sarosSessionV.isInSession()
@@ -291,34 +300,11 @@ public class STFTest {
         }
     }
 
-    /**
-     * For all active testers, reset buddy names, disconnect, delete all
-     * projects.
-     * 
-     * @throws RemoteException
-     */
-    public static void resetSaros() throws RemoteException {
-        for (Tester tester : activeTesters) {
-            if (tester != null) {
-                tester.sarosBuddiesV.resetAllBuddyName();
-                tester.sarosBuddiesV.disconnectGUI();
-                tester.workbench.deleteAllProjects();
-            }
-        }
-        resetAllBots();
-    }
-
-    public static void disConnectByAllActiveTesters() throws RemoteException {
+    public static void disConnectByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
                 tester.sarosBuddiesV.disconnectGUI();
             }
-        }
-    }
-
-    public static void resetWorkbenches() throws RemoteException {
-        for (Tester tester : activeTesters) {
-            tester.workbench.resetWorkbench();
         }
     }
 
@@ -328,24 +314,6 @@ public class STFTest {
                 if (tester.fileM.existsFolder(PROJECT1, folder))
                     tester.editM.deleteFolderNoGUI(PROJECT1, folder);
             }
-        }
-    }
-
-    public static void resetAllBots() {
-        alice = bob = carl = dave = edna = null;
-        activeTesters.clear();
-        assertTrue(activeTesters.isEmpty());
-    }
-
-    @Before
-    public void before() throws Exception {
-        //
-        for (Tester m : activeTesters) {
-            // m.state
-            // .debug("\n---------------------------------------------------"
-            // + "\nExecuting @Test " + name.getMethodName() + " in "
-            // + getClass().getSimpleName()
-            // + "\n---------------------------------------------------");
         }
     }
 

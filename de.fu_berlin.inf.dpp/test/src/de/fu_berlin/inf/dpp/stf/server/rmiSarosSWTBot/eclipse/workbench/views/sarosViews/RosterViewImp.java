@@ -39,43 +39,6 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     private static transient RosterViewImp self;
 
-    /* View infos */
-    private final static String VIEWNAME = "Saros Buddies";
-    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.RosterView";
-
-    /*
-     * title of shells which are pop up by performing the actions on the
-     * rosterview.
-     */
-    public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = "Request of subscription received";
-    private final static String SHELL_BUDDY_ALREADY_ADDED = "Buddy already added";
-    // CreateNewAccountWizard.CREATE_XMPP_ACCOUNT;
-    private final static String SHELL_NEW_BUDDY = "New Buddy";
-    private final static String SHELL_BUDDY_LOOKUP_FAILED = "Buddy look-up failed";
-    private final static String SHELL_REMOVAL_OF_SUBSCRIPTION = "Removal of subscription";
-
-    /* Tool tip text of toolbar buttons on the session view */
-    private final static String TB_DISCONNECT = "Disconnect";
-    private final static String TB_ADD_A_NEW_CONTACT = "Add a new buddy";
-    private final static String TB_CONNECT = "Connect";
-
-    /* Context menu of the table on the view */
-    private final static String CM_DELETE = "Delete";
-    private final static String CM_RENAME = "Rename...";
-    private final static String CM_SKYPE_THIS_BUDDY = "Skype this buddy";
-    private final static String CM_INVITE_BUDDY = "Invite buddy...";
-    private final static String CM_TEST_DATA_TRANSFER = "Test data transfer connection...";
-
-    private final static String BUDDIES = "Buddies";
-
-    private final static String JABBERID = "XMPP/Jabber JID";
-
-    /* confirm Shell 'Create new xmpp account' */
-    private final static String SHELL_SAROS_CONFIGURATION = "Saros Configuration";
-    private final static String XMPP_JABBER_SERVER = "XMPP/Jabber Server";
-    private final static String USER_NAME = "Username";
-    private final static String PASSWORD = "Password";
-
     /**
      * {@link RosterViewImp} is a singleton, but inheritance is possible.
      */
@@ -99,23 +62,23 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      **********************************************/
     public void openSarosBuddiesView() throws RemoteException {
         if (!isSarosBuddiesViewOpen())
-            viewW.openViewById(VIEWID);
+            viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
     }
 
     public boolean isSarosBuddiesViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEW_SAROS_BUDDIES);
     }
 
     public void closeSarosBuddiesView() throws RemoteException {
-        viewW.closeViewById(VIEWID);
+        viewW.closeViewById(VIEW_SAROS_BUDDIES_ID);
     }
 
     public void setFocusOnRosterView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
     }
 
     public boolean isSarosBuddiesViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEW_SAROS_BUDDIES);
     }
 
     /**********************************************
@@ -181,9 +144,9 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         String password) throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_SAROS_CONFIGURATION))
             shellC.waitUntilShellActive(SHELL_SAROS_CONFIGURATION);
-        textW.setTextInTextWithLabel(xmppServer, XMPP_JABBER_SERVER);
-        textW.setTextInTextWithLabel(jid, USER_NAME);
-        textW.setTextInTextWithLabel(password, PASSWORD);
+        textW.setTextInTextWithLabel(xmppServer, LABEL_XMPP_JABBER_SERVER);
+        textW.setTextInTextWithLabel(jid, LABEL_USER_NAME);
+        textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
         buttonW.clickButton(NEXT);
         buttonW.clickButton(FINISH);
     }
@@ -324,7 +287,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      * 
      **********************************************/
     public void selectBuddyGUI(String baseJID) throws RemoteException {
-        treeW.getTreeItemInView(VIEWNAME, BUDDIES, baseJID);
+        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, TREE_ITEM_BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
@@ -356,8 +319,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     public boolean hasBuddyGUI(String buddyNickName) throws RemoteException {
         precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
-        return treeW.existsTreeItemWithRegexs(tree, BUDDIES, buddyNickName
+        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
+        return treeW.existsTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES, buddyNickName
             + ".*");
     }
 
@@ -402,7 +365,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (!hasBuddy(buddyJID))
             return;
         try {
-            treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_DELETE, BUDDIES
+            treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_DELETE, TREE_ITEM_BUDDIES
                 + ".*", buddyNickName + ".*");
             shellC.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
@@ -447,7 +410,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, CM_RENAME, BUDDIES
+        treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME, TREE_ITEM_BUDDIES
             + ".*", buddyNickName + ".*");
         if (!shellC.activateShellWithText("Set new nickname")) {
             shellC.waitUntilShellActive("Set new nickname");
@@ -472,8 +435,8 @@ public class RosterViewImp extends EclipsePart implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
-        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
-        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, BUDDIES + ".*",
+        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
+        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES + ".*",
             buddyNickName + ".*");
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
@@ -489,7 +452,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEW_SAROS_BUDDIES,
             tooltipText);
     }
 
@@ -530,7 +493,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
      */
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
+        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_BUDDIES, tooltip);
     }
 
     /**
@@ -540,12 +503,12 @@ public class RosterViewImp extends EclipsePart implements RosterView {
 
     protected List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return toolbarButtonW.getAllToolbarButtonsInView(VIEWNAME);
+        return toolbarButtonW.getAllToolbarButtonsInView(VIEW_SAROS_BUDDIES);
     }
 
     @SuppressWarnings("static-access")
     private void selectConnectAccount(String baseJID) {
-        SWTBotToolbarDropDownButton b = bot.viewById(VIEWID)
+        SWTBotToolbarDropDownButton b = bot.viewById(VIEW_SAROS_BUDDIES_ID)
             .toolbarDropDownButton(TB_CONNECT);
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
@@ -560,7 +523,7 @@ public class RosterViewImp extends EclipsePart implements RosterView {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private boolean isConnectAccountExist(String baseJID) {
         Matcher matcher = allOf(widgetOfType(MenuItem.class));
-        SWTBotToolbarDropDownButton b = bot.viewById(VIEWID)
+        SWTBotToolbarDropDownButton b = bot.viewById(VIEW_SAROS_BUDDIES_ID)
             .toolbarDropDownButton(TB_CONNECT);
         List<? extends SWTBotMenu> accounts = b.menuItems(matcher);
         b.pressShortcut(Keystrokes.ESC);

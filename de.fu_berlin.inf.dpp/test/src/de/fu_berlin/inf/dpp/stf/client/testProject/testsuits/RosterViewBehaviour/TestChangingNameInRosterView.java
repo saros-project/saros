@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -39,11 +38,6 @@ public class TestChangingNameInRosterView extends STFTest {
         alice.leaveSessionHostFirstDone(bob);
     }
 
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
     @After
     public void runAfterEveryTest() throws RemoteException {
         if (alice.sarosBuddiesV.hasBuddyNickName(bob.jid)) {
@@ -74,12 +68,13 @@ public class TestChangingNameInRosterView extends STFTest {
         assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
         alice.sarosBuddiesV.renameBuddyGUI(bob.jid, bob.getName());
         assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid)
-            .equals(bob.getName()));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
         alice.sarosBuddiesV.renameBuddyGUI(bob.jid, "new bob");
         assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals("new bob"));
+        assertTrue(alice.sarosBuddiesV.getBuddyNickName(bob.jid).equals(
+            "new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 

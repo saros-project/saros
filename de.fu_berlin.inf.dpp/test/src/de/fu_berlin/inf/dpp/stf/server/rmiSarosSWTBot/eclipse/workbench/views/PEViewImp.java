@@ -29,27 +29,6 @@ public class PEViewImp extends EclipsePart implements PEView {
         return pEViewImp;
     }
 
-    /* View infos */
-    protected final static String VIEWNAME = "Package Explorer";
-    protected final static String VIEWID = "org.eclipse.jdt.ui.PackageExplorer";
-
-    /*
-     * title of shells which are pop up by performing the actions on the package
-     * explorer view.
-     */
-
-    private final static String SHELL_EDITOR_SELECTION = "Editor Selection";
-
-    /* Context menu of a selected file on the package explorer view */
-    private final static String OPEN = "Open";
-    private final static String OPEN_WITH = "Open With";
-    private final static String OTHER = "Other...";
-
-    /* All the sub menus of the context menu "Open with" */
-    // private final static String TEXT_EDITOR = "Text Editor";
-    // private final static String SYSTEM_EDITOR = "System Editor";
-    // private final static String DEFAULT_EDITOR = "Default Editor";
-
     /***********************************************************************
      * 
      * exported functions
@@ -63,23 +42,23 @@ public class PEViewImp extends EclipsePart implements PEView {
      **********************************************/
     public void openPEView() throws RemoteException {
         if (!isPEViewOpen())
-            viewW.openViewById(VIEWID);
+            viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
     }
 
     public boolean isPEViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEW_PACKAGE_EXPLORER);
     }
 
     public void closePEView() throws RemoteException {
-        viewW.closeViewByTitle(VIEWNAME);
+        viewW.closeViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
     public void setFocusOnPEView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
     public boolean isPEViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEW_PACKAGE_EXPLORER);
     }
 
     /**********************************************
@@ -90,7 +69,8 @@ public class PEViewImp extends EclipsePart implements PEView {
 
     public void openFile(String... fileNodes) throws RemoteException {
         precondition();
-        treeW.clickContextMenuOfTreeItemInView(VIEWNAME, OPEN, fileNodes);
+        treeW.clickContextMenuOfTreeItemInView(VIEW_PACKAGE_EXPLORER, CM_OPEN,
+            fileNodes);
     }
 
     public void openClass(String projectName, String pkg, String className)
@@ -107,9 +87,9 @@ public class PEViewImp extends EclipsePart implements PEView {
     public void openFileWith(String whichEditor, String... fileNodes)
         throws RemoteException {
         precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEWNAME);
+        SWTBotTree tree = treeW.getTreeInView(VIEW_PACKAGE_EXPLORER);
         tree.expandNode(fileNodes).select();
-        ContextMenuHelper.clickContextMenu(tree, OPEN_WITH, OTHER);
+        ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
         shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
@@ -126,31 +106,34 @@ public class PEViewImp extends EclipsePart implements PEView {
     }
 
     public void selectProject(String projectName) throws RemoteException {
-        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+        precondition();
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
             changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        treeW.selectTreeItemWithRegexsInView(VIEWNAME, changeToRegex(nodes));
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
+            changeToRegex(nodes));
     }
 
     public void selectClass(String projectName, String pkg, String className)
         throws RemoteException {
         precondition();
         String[] nodes = getClassNodes(projectName, pkg, className);
-        treeW.selectTreeItemWithRegexsInView(VIEWNAME, changeToRegex(nodes));
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
+            changeToRegex(nodes));
 
     }
 
     public void selectFolder(String... pathToFolder) throws RemoteException {
-        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
             changeToRegex(pathToFolder));
     }
 
     public void selectFile(String... pathToFile) throws RemoteException {
-        treeW.selectTreeItemWithRegexsInView(VIEWNAME,
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
             changeToRegex(pathToFile));
     }
 

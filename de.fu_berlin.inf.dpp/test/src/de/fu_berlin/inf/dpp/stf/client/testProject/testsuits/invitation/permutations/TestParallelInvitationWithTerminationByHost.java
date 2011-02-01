@@ -7,9 +7,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,21 +32,6 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
             TypeOfTester.DAVE);
         setUpWorkbenchs();
         setUpSaros();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**
@@ -91,23 +73,23 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
             dave.getBaseJid(), carl.getBaseJid());
 
-        bob.shell.waitUntilShellOpen(SESSION_INVITATION);
-        bob.shell.activateShellWithText(SESSION_INVITATION);
+        bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        bob.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         alice.progressV.removeProcess(0);
-        bob.shell.waitUntilShellOpen(INVITATIONCANCELLED);
-        bob.shell.activateShellWithText(INVITATIONCANCELLED);
+        bob.shell.waitUntilShellOpen(SHELL_INVITATION_CANCELLED);
+        bob.shell.activateShellWithText(SHELL_INVITATION_CANCELLED);
         bob.sarosC.closeShellInvitationCancelled();
 
-        carl.shell.waitUntilShellOpen(SESSION_INVITATION);
-        carl.shell.activateShellWithText(SESSION_INVITATION);
+        carl.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        carl.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         carl.sarosC.confirmShellSessionnInvitation();
         alice.progressV.removeProcess(0);
         carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
         assertTrue(carl.sarosC.isShellInvitationCancelledActive());
         carl.sarosC.closeShellInvitationCancelled();
 
-        dave.shell.waitUntilShellOpen(SESSION_INVITATION);
-        dave.shell.activateShellWithText(SESSION_INVITATION);
+        dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        dave.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         dave.sarosC.confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);

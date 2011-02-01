@@ -9,8 +9,6 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,31 +33,18 @@ public class TestRosterViewComponent extends STFTest {
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        // setUpSessionByDefault(alice, bob);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        // alice.leaveSessionHostFirstDone(bob);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
         if (alice.sarosBuddiesV.hasBuddyNickName(bob.jid)) {
             alice.sarosBuddiesV.renameBuddy(bob.jid, bob.jid.getBase());
-
         }
+
         if (!alice.sarosBuddiesV.hasBuddy(bob.jid)) {
             alice.addBuddyGUIDone(bob);
         }
@@ -83,7 +68,7 @@ public class TestRosterViewComponent extends STFTest {
         alice.sarosBuddiesV.openSarosBuddiesView();
         assertTrue(alice.sarosBuddiesV.isSarosBuddiesViewActive());
 
-        alice.sarosSessionV.setFocusOnSessionView();
+        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
         assertFalse(alice.sarosBuddiesV.isSarosBuddiesViewActive());
     }
 

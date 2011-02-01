@@ -91,8 +91,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
             dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
-        bob.shell.waitUntilShellOpen(SESSION_INVITATION);
-        bob.shell.activateShellWithText(SESSION_INVITATION);
+        bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        bob.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         bob.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
         assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
@@ -100,8 +100,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         alice.button.clickButton(OK);
 
-        carl.shell.waitUntilShellOpen(SESSION_INVITATION);
-        carl.shell.activateShellWithText(SESSION_INVITATION);
+        carl.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        carl.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         carl.sarosC.confirmShellSessionnInvitation();
         carl.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
@@ -109,8 +109,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             .matches(carl.getName() + ".*"));
         alice.button.clickButton(OK);
 
-        dave.shell.waitUntilShellOpen(SESSION_INVITATION);
-        dave.shell.activateShellWithText(SESSION_INVITATION);
+        dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        dave.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         dave.sarosC.confirmShellSessionnInvitation();
         dave.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
@@ -118,8 +118,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             .matches(dave.getName() + ".*"));
         alice.button.clickButton(OK);
 
-        edna.shell.waitUntilShellOpen(SESSION_INVITATION);
-        edna.shell.activateShellWithText(SESSION_INVITATION);
+        edna.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        edna.shell.activateShellWithText(SHELL_SESSION_INVITATION);
         edna.sarosC.confirmShellSessionnInvitation();
         edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         edna.sarosSessionV.leaveTheSessionByPeer();

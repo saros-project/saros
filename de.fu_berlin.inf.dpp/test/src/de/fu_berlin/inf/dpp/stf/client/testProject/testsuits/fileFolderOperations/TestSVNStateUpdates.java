@@ -36,27 +36,28 @@ public class TestSVNStateUpdates extends STFTest {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void beforeClass() throws Exception {
+    public static void runBeforeClass() throws Exception {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Tester musician : activeTesters) {
+        for (final Tester t : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    if (!musician.fileM.existsProject(SVN_PROJECT_COPY)) {
-                        musician.fileM.newJavaProject(SVN_PROJECT_COPY);
-                        musician.team
-                            .shareProjectWithSVNUsingSpecifiedFolderName(
-                                SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
-                                SVN_PROJECT_PATH);
+                    if (!t.fileM.existsProject(SVN_PROJECT_COPY)) {
+                        t.fileM.newJavaProject(SVN_PROJECT_COPY);
+                        t.team.shareProjectWithSVNUsingSpecifiedFolderName(
+                            SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
+                            SVN_PROJECT_PATH);
+
                     }
                     return null;
                 }
             });
         }
         MakeOperationConcurrently.workAll(initTasks);
+
     }
 
     /**
@@ -70,14 +71,14 @@ public class TestSVNStateUpdates extends STFTest {
      * 
      * @throws RemoteException
      */
-    @Override
+
     @Before
-    public void before() throws Exception {
-        super.before();
+    public void runBeforeEveryTest() throws Exception {
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
+                    tester.workbench.resetWorkbench();
                     tester.pEV.selectProject(SVN_PROJECT_COPY);
                     tester.editM.copyProject(SVN_PROJECT);
                     assertTrue(tester.fileM.existsProject(SVN_PROJECT));
@@ -97,10 +98,8 @@ public class TestSVNStateUpdates extends STFTest {
         alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
     }
 
-    @Override
     @After
-    public void after() throws Exception {
-        super.after();
+    public void runAfterEveryTest() throws Exception {
         alice.leaveSessionHostFirstDone(bob);
         if (bob.fileM.existsProject(SVN_PROJECT))
             bob.editM.deleteProjectNoGUI(SVN_PROJECT);
@@ -110,7 +109,7 @@ public class TestSVNStateUpdates extends STFTest {
     }
 
     @AfterClass
-    public static void afterClass() throws RemoteException {
+    public static void runAfterClass() throws RemoteException {
         if (ConfigTester.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
             alice.sarosBuddiesV.disconnectGUI();
@@ -165,7 +164,6 @@ public class TestSVNStateUpdates extends STFTest {
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
         assertTrue(bob.sarosSessionV.hasWriteAccess());
-
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");
         bob.workbench.sleep(1000);

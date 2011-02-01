@@ -10,12 +10,6 @@ public class ChatViewImp extends EclipsePart implements ChatView {
 
     private static transient ChatViewImp self;
 
-    /*
-     * View infos
-     */
-    private final static String VIEWNAME = "Saros Chat";
-    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.chat.ChatView";
-
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
      */
@@ -27,20 +21,20 @@ public class ChatViewImp extends EclipsePart implements ChatView {
     }
 
     public void activateChatView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEW_SAROS_CHAT);
     }
 
     public void openChatView() throws RemoteException {
         if (!isChatViewOpen())
-            viewW.openViewById(VIEWID);
+            viewW.openViewById(VIEW_SAROS_CHAT_ID);
     }
 
     public void closeChatView() throws RemoteException {
-        viewW.closeViewById(VIEWID);
+        viewW.closeViewById(VIEW_SAROS_CHAT_ID);
     }
 
     public boolean isChatViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEW_SAROS_CHAT);
     }
 
     public void waitUntilGetChatMessage(String jid, String message)

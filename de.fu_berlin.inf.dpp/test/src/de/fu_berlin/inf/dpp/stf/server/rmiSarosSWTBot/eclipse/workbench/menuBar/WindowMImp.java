@@ -31,30 +31,6 @@ public class WindowMImp extends EclipsePart implements WindowM {
         return windowImp;
     }
 
-    /* title of shells which should pop up by clicking the main menus */
-    private static final String SHELL_PREFERNCES = "Preferences";
-
-    /* treeItems in Preferences dialog */
-    private static final String P_GENERAL = "General";
-    private static final String P_WORKSPACE = "Workspace";
-
-    /* treeItems in Show View dialog */
-    private static final String V_GENERAL = "General";
-    private static final String V_PROBLEM = "Problems";
-    private static final String V_PROJECT_EXPLORER = "Project Explorer";
-
-    /* name of all the main menus */
-    private static final String MENU_WINDOW = "Window";
-    protected static final String MENU_PREFERENCES = "Preferences";
-
-    public final static String MENU_OTHER = "Other...";
-    public final static String MENU_SHOW_VIEW = "Show View";
-
-    /* IDs of all the perspectives */
-    public final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
-    public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
-    public final static String ID_RESOURCE_PERSPECTIVE = "eclipse.ui.resourcePerspective";
-
     /**********************************************
      * 
      * change setting with preferences dialog
@@ -63,7 +39,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(P_GENERAL).select(P_WORKSPACE);
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
         if (OS.equals("Default")) {
             bot.radioInGroup("Default", "New text file line delimiter").click();
@@ -80,7 +56,7 @@ public class WindowMImp extends EclipsePart implements WindowM {
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(P_GENERAL).select(P_WORKSPACE);
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
             shellC.closeShell(SHELL_PREFERNCES);
@@ -110,11 +86,11 @@ public class WindowMImp extends EclipsePart implements WindowM {
      * 
      **********************************************/
     public void showViewProblems() throws RemoteException {
-        showViewWithName(V_GENERAL, V_PROBLEM);
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW, TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
     }
 
     public void showViewProjectExplorer() throws RemoteException {
-        showViewWithName(V_GENERAL, V_PROJECT_EXPLORER);
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW, TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
     }
 
     public void showViewWithName(String category, String nodeName)

@@ -23,44 +23,6 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     private static transient SessionViewImp self;
 
-    /*
-     * View infos
-     */
-    private final static String VIEWNAME = "Saros Session";
-    private final static String VIEWID = "de.fu_berlin.inf.dpp.ui.SessionView";
-
-    /*
-     * title of shells which are pop up by performing the actions on the view.
-     */
-    private final static String SHELL_CONFIRM_CLOSING_SESSION = "Confirm Closing Session";
-    private final static String SHELL_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
-    private final static String SHELL_SCREENSHARING_ERROR_OCCURED = "Screensharing: An error occured";
-    private final static String SHELL_INVITATION = "Invitation";
-    private final static String SHELL_ERROR_IN_SAROS_PLUGIN = "Error in Saros-Plugin";
-    private final static String CLOSING_THE_SESSION = "Closing the Session";
-    protected final static String CONFIRM_LEAVING_SESSION = "Confirm Leaving Session";
-
-    /*
-     * Tool tip text of all the toolbar buttons on the view
-     */
-    private final static String TB_SHARE_SCREEN_WITH_BUDDY = "Share your screen with selected buddy";
-    private final static String TB_STOP_SESSION_WITH_USER = "Stop session with user";
-    private final static String TB_SEND_A_FILE_TO_SELECTED_BUDDY = "Send a file to selected buddy";
-    private final static String TB_START_VOIP_SESSION = "Start a VoIP Session...";
-    private final static String TB_INCONSISTENCY_DETECTED = "Inconsistency Detected in";
-    private final static String TB_OPEN_INVITATION_INTERFACE = "Open invitation interface";
-    private final static String TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS = "Restrict Invitees To Read-Only Access";
-    private final static String TB_ENABLE_DISABLE_FOLLOW_MODE = "Enable/Disable follow mode";
-    private final static String TB_LEAVE_THE_SESSION = "Leave the session";
-
-    // Context menu's name of the table on the view
-    private final static String CM_GRANT_WRITE_ACCESS = "Grant write access";
-    private final static String CM_RESTRICT_TO_READ_ONLY_ACCESS = "Restrict to read-only access";
-    private final static String CM_FOLLOW_THIS_BUDDY = "Follow this buddy";
-    private final static String CM_STOP_FOLLOWING_THIS_BUDDY = "Stop following this buddy";
-    private final static String CM_JUMP_TO_POSITION_SELECTED_BUDDY = "Jump to position of selected buddy";
-    private final static String CM_CHANGE_COLOR = "Change Color";
-
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
      */
@@ -76,36 +38,6 @@ public class SessionViewImp extends EclipsePart implements SessionView {
      * exported functions
      * 
      **************************************************************/
-
-    /**********************************************
-     * 
-     * open/close/activate the view
-     * 
-     **********************************************/
-    public void openSessionView() throws RemoteException {
-        if (!isSessionViewOpen())
-            viewW.openViewById(VIEWID);
-    }
-
-    public boolean isSessionViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEWNAME);
-    }
-
-    public void closeSessionView() throws RemoteException {
-        if (isSessionViewOpen())
-            viewW.closeViewById(VIEWID);
-    }
-
-    public void setFocusOnSessionView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
-        workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
-            + "/focusOnsessionView.png");
-        viewW.waitUntilIsViewActive(VIEWNAME);
-    }
-
-    public boolean isSessionViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEWNAME);
-    }
 
     /**********************************************
      * 
@@ -164,7 +96,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean existsParticipant(JID contactJID) throws RemoteException {
         precondition();
         String participantLabel = getParticipantLabel(contactJID);
-        SWTBotTable table = tableW.getTableInView(VIEWNAME);
+        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().equals(participantLabel))
                 return true;
@@ -176,7 +108,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         precondition();
         if (existsParticipant(contactJID)) {
             String contactLabel = getParticipantLabel(contactJID);
-            SWTBotTable table = tableW.getTableInView(VIEWNAME);
+            SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
             table.getTableItem(contactLabel).select();
         }
     }
@@ -185,9 +117,9 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         String contactLabel;
         if (localJID.equals(contactJID)) {
             if (hasWriteAccess())
-                contactLabel = OWN_CONTACT_NAME;
+                contactLabel = OWN_PARTICIPANT_NAME;
             else
-                contactLabel = OWN_CONTACT_NAME + PERMISSION_NAME;
+                contactLabel = OWN_PARTICIPANT_NAME + PERMISSION_NAME;
         } else if (rosterV.hasBuddyNickName(contactJID)) {
             if (hasWriteAccess(contactJID))
                 contactLabel = rosterV.getBuddyNickName(contactJID) + " ("
@@ -206,12 +138,12 @@ public class SessionViewImp extends EclipsePart implements SessionView {
 
     public boolean existsLabelTextInSessionView() throws RemoteException {
         precondition();
-        return labelW.existsLabelInView(VIEWNAME);
+        return labelW.existsLabelInView(VIEW_SAROS_SESSION);
     }
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelTextInSessionView())
-            return viewW.getView(VIEWNAME).bot().label().getText();
+            return viewW.getView(VIEW_SAROS_SESSION).bot().label().getText();
         return null;
     }
 
@@ -232,8 +164,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String participantLabel = getParticipantLabel(jidOfPeer);
-        tableW.clickContextMenuOfTableItemInView(VIEWNAME, participantLabel,
-            CM_GRANT_WRITE_ACCESS);
+        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+            participantLabel, CM_GRANT_WRITE_ACCESS);
         sessionV.waitUntilHasWriteAccess();
     }
 
@@ -253,8 +185,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfPeer);
-        tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
-            CM_RESTRICT_TO_READ_ONLY_ACCESS);
+        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+            contactLabel, CM_RESTRICT_TO_READ_ONLY_ACCESS);
         sessionV.waitUntilHasReadOnlyAccess();
     }
 
@@ -444,7 +376,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean isInFollowModeGUI() throws RemoteException {
         try {
             precondition();
-            SWTBotTable table = tableW.getTableInView(VIEWNAME);
+            SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
             for (int i = 0; i < table.rowCount(); i++) {
                 try {
                     return table.getTableItem(i)
@@ -501,8 +433,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getParticipantLabel(followedUserJID);
-        tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
-            CM_STOP_FOLLOWING_THIS_BUDDY);
+        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+            contactLabel, CM_STOP_FOLLOWING_THIS_BUDDY);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isInFollowMode();
@@ -530,14 +462,14 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public boolean isCMStopFollowingThisBuddyVisible(String contactName)
         throws RemoteException {
         precondition();
-        return tableW.isContextMenuOfTableItemVisibleInView(VIEWNAME,
+        return tableW.isContextMenuOfTableItemVisibleInView(VIEW_SAROS_SESSION,
             contactName, CM_STOP_FOLLOWING_THIS_BUDDY);
     }
 
     public boolean isCMStopFollowingThisBuddyEnabled(String contactName)
         throws RemoteException {
         precondition();
-        return tableW.isContextMenuOfTableItemEnabledInView(VIEWNAME,
+        return tableW.isContextMenuOfTableItemEnabledInView(VIEW_SAROS_SESSION,
             contactName, CM_STOP_FOLLOWING_THIS_BUDDY);
     }
 
@@ -712,9 +644,9 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickTBleaveTheSession();
-        if (!shellC.activateShellWithText(CONFIRM_LEAVING_SESSION))
-            shellC.waitUntilShellActive(CONFIRM_LEAVING_SESSION);
-        shellC.confirmShell(CONFIRM_LEAVING_SESSION, YES);
+        if (!shellC.activateShellWithText(SHELL_CONFIRM_LEAVING_SESSION))
+            shellC.waitUntilShellActive(SHELL_CONFIRM_LEAVING_SESSION);
+        shellC.confirmShell(SHELL_CONFIRM_LEAVING_SESSION, YES);
         waitUntilSessionClosed();
     }
 
@@ -738,10 +670,10 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     }
 
     public void confirmClosingTheSessionWindow() throws RemoteException {
-        shellC.waitUntilShellOpen(CLOSING_THE_SESSION);
-        shellC.activateShellWithText(CLOSING_THE_SESSION);
-        shellC.confirmShell(CLOSING_THE_SESSION, OK);
-        shellC.waitUntilShellClosed(CLOSING_THE_SESSION);
+        shellC.waitUntilShellOpen(SHELL_CLOSING_THE_SESSION);
+        shellC.activateShellWithText(SHELL_CLOSING_THE_SESSION);
+        shellC.confirmShell(SHELL_CLOSING_THE_SESSION, OK);
+        shellC.waitUntilShellClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     /**********************************************
@@ -778,8 +710,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        openSessionView();
-        setFocusOnSessionView();
+        viewW.openViewById(VIEW_SAROS_SESSION_ID);
+        viewW.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
     }
 
     /**
@@ -793,7 +725,7 @@ public class SessionViewImp extends EclipsePart implements SessionView {
     private List<String> getAllContactsInSessionView() throws RemoteException {
         precondition();
         List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = tableW.getTableInView(VIEWNAME);
+        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
         for (int i = 0; i < table.rowCount(); i++) {
             allContactsName.add(table.getTableItem(i).getText());
         }
@@ -810,8 +742,8 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        tableW.clickContextMenuOfTableItemInView(VIEWNAME, contactLabel,
-            context);
+        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+            contactLabel, context);
 
     }
 
@@ -822,23 +754,24 @@ public class SessionViewImp extends EclipsePart implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
-        tableW.getTableItemInView(VIEWNAME, contactLabel);
+        tableW.getTableItemInView(VIEW_SAROS_SESSION, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEWNAME, tooltip);
+        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_SESSION,
+            tooltip);
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
-            tooltipText);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_SAROS_SESSION, tooltipText);
     }
 
     private List<SWTBotToolbarButton> getToolbarButtons()
         throws RemoteException {
-        return toolbarButtonW.getAllToolbarButtonsInView(VIEWNAME);
+        return toolbarButtonW.getAllToolbarButtonsInView(VIEW_SAROS_SESSION);
     }
 
 }

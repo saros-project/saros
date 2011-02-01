@@ -32,35 +32,6 @@ public class TeamCImp extends EclipsePart implements TeamC {
         return teamImp;
     }
 
-    private final static String SHELL_REVERT = "Revert";
-    private final static String SHELL_SHARE_PROJECT = "Share Project";
-    private final static String SHELL_SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
-    private final static String SHELL_CONFIRM_DISCONNECT_FROM_SVN = "Confirm Disconnect from SVN";
-    private static final String SHELL_IMPORT = "Import";
-    private final static String LABEL_CREATE_A_NEW_REPOSITORY_LOCATION = "Create a new repository location";
-    private final static String LABEL_URL = "Url:";
-
-    private final static String LABEL_TO_URL = "To URL:";
-
-    /* All the sub menus of the context menu "Team" */
-    private final static String REVERT = "Revert...";
-    private final static String DISCONNECT = "Disconnect...";
-    private final static String SHARE_PROJECT = "Share Project...";
-    private final static String SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION = "Switch to another Branch/Tag/Revision...";
-
-    /* table iems of the shell "Share project" of the conext menu "Team" */
-    private final static String REPOSITORY_TYPE_SVN = "SVN";
-
-    private static final String SHELL_SWITCH = "Switch";
-    private static final String SHELL_SVN_SWITCH = "SVN Switch";
-
-    /* Label of pop up windows */
-
-    private static final String LABEL_SWITCH_TOHEAD_REVISION = "Switch to HEAD revision";
-    private static final String LABEL_REVISION = "Revision:";
-    private final static String TEAM = "Team";
-    protected final static String VIEWNAME = "Package Explorer";
-
     /**************************************************************
      * 
      * exported functions
@@ -75,11 +46,11 @@ public class TeamCImp extends EclipsePart implements TeamC {
     public void shareProjectWithSVN(String projectName, String repositoryURL)
         throws RemoteException {
 
-        String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
-        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, TABLE_ITEM_REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
         if (bot.table().containsItem(repositoryURL)) {
@@ -98,11 +69,11 @@ public class TeamCImp extends EclipsePart implements TeamC {
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
         String projectName, String repositoryURL) throws RemoteException {
 
-        String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
-        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, TABLE_ITEM_REPOSITORY_TYPE_SVN,
             NEXT);
         log.debug("SVN share project text: " + bot.text());
         buttonW.waitUntilButtonEnabled(FINISH);
@@ -115,11 +86,11 @@ public class TeamCImp extends EclipsePart implements TeamC {
         throws RemoteException {
         precondition();
 
-        String[] contexts = { TEAM, SHARE_PROJECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
-        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, REPOSITORY_TYPE_SVN,
+        shellC.confirmShellWithTable(SHELL_SHARE_PROJECT, TABLE_ITEM_REPOSITORY_TYPE_SVN,
             NEXT);
 
         SWTBotTable table = null;
@@ -173,7 +144,7 @@ public class TeamCImp extends EclipsePart implements TeamC {
         precondition();
         menuW.clickMenuWithTexts("File", "Import...");
         shellC.confirmShellWithTreeWithFilterText(SHELL_IMPORT,
-            REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
+            TABLE_ITEM_REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {
             shellC.confirmShellWithTable("Checkout from SVN", repositoryURL,
                 NEXT);
@@ -192,8 +163,8 @@ public class TeamCImp extends EclipsePart implements TeamC {
 
     public void disConnect(String projectName) throws RemoteException {
 
-        String[] contexts = { TEAM, DISCONNECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_DISCONNECT };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
@@ -202,8 +173,8 @@ public class TeamCImp extends EclipsePart implements TeamC {
     public void revertProject(String projectName) throws RemoteException {
         precondition();
 
-        String[] contexts = { TEAM, REVERT };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_REVERT };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
         shellC.confirmShell(SHELL_REVERT, OK);
@@ -227,8 +198,8 @@ public class TeamCImp extends EclipsePart implements TeamC {
         throws RemoteException {
         precondition();
 
-        String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts,
+        String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts,
             changeToRegex(projectName));
 
         shellC.waitUntilShellActive(SHELL_SWITCH);
@@ -269,8 +240,8 @@ public class TeamCImp extends EclipsePart implements TeamC {
     private void switchToAnotherRevision(String[] matchTexts, String versionID)
         throws RemoteException {
         precondition();
-        String[] contexts = { TEAM, SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickContextMenusOfTreeItemInView(VIEWNAME, contexts, matchTexts);
+        String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts, matchTexts);
         shellC.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();

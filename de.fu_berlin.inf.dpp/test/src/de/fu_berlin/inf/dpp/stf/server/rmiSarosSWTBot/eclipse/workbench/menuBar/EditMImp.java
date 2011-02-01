@@ -27,15 +27,6 @@ public class EditMImp extends EclipsePart implements EditM {
         return editImp;
     }
 
-    protected final static String VIEWNAME = "Package Explorer";
-    private final static String SHELL_DELETE_RESOURCE = "Delete Resources";
-
-    /* menu names */
-    private final static String DELETE = "Delete";
-    private final static String EDIT = "Edit";
-    private final static String COPY = "Copy";
-    private final static String PASTE = "Paste";
-
     /**************************************************************
      * 
      * exported functions
@@ -77,11 +68,11 @@ public class EditMImp extends EclipsePart implements EditM {
 
     public void deleteAllProjects() throws RemoteException {
         precondition();
-        SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(VIEWNAME)
-            .getAllItems();
+        SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(
+            VIEW_PACKAGE_EXPLORER).getAllItems();
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
-                item.contextMenu(DELETE).click();
+                item.contextMenu(MENU_DELETE).click();
                 shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
                     true);
                 shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
@@ -91,14 +82,14 @@ public class EditMImp extends EclipsePart implements EditM {
 
     public void deleteProject() throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(EDIT, DELETE);
+        menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
         shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
         shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteFile() throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(EDIT, DELETE);
+        menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
         shellC.confirmShellDelete(OK);
     }
 
@@ -108,8 +99,8 @@ public class EditMImp extends EclipsePart implements EditM {
                 + " , the target already exists.");
         }
         precondition();
-        menuW.clickMenuWithTexts(EDIT, COPY);
-        menuW.clickMenuWithTexts(EDIT, PASTE);
+        menuW.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
+        menuW.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
         shellC.activateShellWithText("Copy Project");
         textW.setTextInTextWithLabel(target, "Project name:");
         buttonW.clickButton(OK);

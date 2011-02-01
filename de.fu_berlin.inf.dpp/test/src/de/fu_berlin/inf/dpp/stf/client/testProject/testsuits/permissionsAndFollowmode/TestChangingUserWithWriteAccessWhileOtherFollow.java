@@ -7,9 +7,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,22 +37,6 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         setUpSaros();
         setUpSessionByDefault(alice, bob, carl, dave);
         alice.followedBy(bob, carl, dave);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob, carl, dave);
-    }
-
-    @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        //
     }
 
     /**
@@ -92,7 +73,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
     @Test
     public void testChangingWriteAccessWhileOtherFollow() throws IOException,
         CoreException, InterruptedException {
-        alice.sarosSessionV.grantWriteAccessGUI(carl.sarosSessionV);
+
         /*
          * After new release 10.10.28 all read-only users is automatically in
          * follow mode(are the read-only users really in follow mode???) when

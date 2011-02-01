@@ -18,18 +18,6 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
         return refactorImp;
     }
 
-    /* shell titles */
-    private final static String SHELL_MOVE = "Move";
-    private final static String SHELL_RENAME_PACKAGE = "Rename Package";
-    private final static String SHELL_RENAME_RESOURCE = "Rename Resource";
-    private final static String SHELL_RENAME_COMPiIATION_UNIT = "Rename Compilation Unit";
-    private final static String LABEL_NEW_NAME = "New name:";
-
-    /* menu names */
-    private final static String REFACTOR = "Refactor";
-    private final static String RENAME = "Rename...";
-    private final static String MOVE = "Move...";
-
     /**************************************************************
      * 
      * exported functions
@@ -79,7 +67,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
     public void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(REFACTOR, RENAME);
+        menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
         shellC.activateShellWithText(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         buttonW.waitUntilButtonEnabled(buttonName);
@@ -90,7 +78,7 @@ public class RefactorMImp extends EclipsePart implements RefactorM {
     public void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(REFACTOR, MOVE);
+        menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
         shellC.waitUntilShellActive(shellTitle);
         shellC.confirmShellWithTree(shellTitle, buttonName, nodes);
         shellC.waitUntilShellClosed(shellTitle);

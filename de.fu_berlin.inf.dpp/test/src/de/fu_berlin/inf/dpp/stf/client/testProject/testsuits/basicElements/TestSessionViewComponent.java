@@ -7,7 +7,6 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -29,12 +28,6 @@ public class TestSessionViewComponent extends STFTest {
         setUpSessionByDefault(alice, bob);
     }
 
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        // alice.leaveSessionHostFirstDone(bob, carl);
-    }
-
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         reBuildSession(alice, bob);
@@ -43,33 +36,34 @@ public class TestSessionViewComponent extends STFTest {
     @After
     public void runAfterEveryTest() throws RemoteException {
         resetWriteAccess(alice, bob);
-        resetFollowModel(alice, bob);
+        resetFollowMode(alice, bob);
     }
 
     @Test
     public void testSetFocusOnSessionView() throws RemoteException {
         log.trace("alice set focus on session view.");
-        alice.sarosSessionV.setFocusOnSessionView();
-        assertTrue(alice.sarosSessionV.isSessionViewActive());
+        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        assertTrue(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("alice close session view.");
-        alice.sarosSessionV.closeSessionView();
-        assertFalse(alice.sarosSessionV.isSessionViewActive());
+        alice.view.closeViewById(VIEW_SAROS_SESSION_ID);
+        assertFalse(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("alice open session view again");
-        alice.sarosSessionV.openSessionView();
-        assertTrue(alice.sarosSessionV.isSessionViewActive());
+        alice.view.openViewById(VIEW_SAROS_SESSION_ID);
+        assertTrue(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("alice focus on roster view.");
         alice.sarosBuddiesV.setFocusOnRosterView();
-        assertFalse(alice.sarosSessionV.isSessionViewActive());
+        assertFalse(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("testSetFocusOnSessionView is done.");
     }
 
     @Test
     public void testRestrictToReadOnlyAccess() throws RemoteException {
         alice.sarosSessionV.getParticipantLabel(alice.jid).equals(
-            OWN_CONTACT_NAME);
+            OWN_PARTICIPANT_NAME);
         alice.sarosSessionV.getParticipantLabel(bob.jid).equals(
             bob.getBaseJid());
-        bob.sarosSessionV.getParticipantLabel(bob.jid).equals(OWN_CONTACT_NAME);
+        bob.sarosSessionV.getParticipantLabel(bob.jid).equals(
+            OWN_PARTICIPANT_NAME);
         bob.sarosSessionV.getParticipantLabel(alice.jid).equals(
             alice.getBaseJid());
 
@@ -83,11 +77,11 @@ public class TestSessionViewComponent extends STFTest {
         assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
 
         alice.sarosSessionV.getParticipantLabel(alice.jid).equals(
-            OWN_CONTACT_NAME);
+            OWN_PARTICIPANT_NAME);
         alice.sarosSessionV.getParticipantLabel(bob.jid).equals(
             bob.getBaseJid() + PERMISSION_NAME);
         bob.sarosSessionV.getParticipantLabel(bob.jid).equals(
-            OWN_CONTACT_NAME + PERMISSION_NAME);
+            OWN_PARTICIPANT_NAME + PERMISSION_NAME);
         bob.sarosSessionV.getParticipantLabel(alice.jid).equals(
             alice.getBaseJid());
     }
@@ -105,11 +99,11 @@ public class TestSessionViewComponent extends STFTest {
         assertTrue(bob.sarosSessionV.hasWriteAccess());
 
         assertTrue(alice.sarosSessionV.getParticipantLabel(alice.jid).equals(
-            OWN_CONTACT_NAME));
+            OWN_PARTICIPANT_NAME));
         assertTrue(alice.sarosSessionV.getParticipantLabel(bob.jid).equals(
             bob.getBaseJid()));
         assertTrue(bob.sarosSessionV.getParticipantLabel(bob.jid).equals(
-            OWN_CONTACT_NAME));
+            OWN_PARTICIPANT_NAME));
         assertTrue(bob.sarosSessionV.getParticipantLabel(alice.jid).equals(
             alice.getBaseJid()));
     }
@@ -134,7 +128,6 @@ public class TestSessionViewComponent extends STFTest {
      * @throws RemoteException
      */
     @Test
-    @Ignore
     public void jumpToSelectedUserGUI() throws RemoteException {
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         alice.editor.waitUntilJavaEditorOpen(CLS2);

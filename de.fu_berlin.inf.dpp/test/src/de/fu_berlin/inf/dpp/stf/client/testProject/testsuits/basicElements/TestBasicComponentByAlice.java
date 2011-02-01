@@ -26,19 +26,10 @@ public class TestBasicComponentByAlice extends STFTest {
         setUpWorkbenchs();
     }
 
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        deleteAllProjectsByAllActiveTesters();
+        deleteAllProjectsByActiveTesters();
     }
 
     @Test

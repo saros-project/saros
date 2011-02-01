@@ -8,8 +8,6 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,17 +29,7 @@ public class TestCreatingNewFile extends STFTest {
         carl.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, alice);
-    }
 
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        carl.leaveSessionHostFirstDone(bob, alice);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
@@ -95,13 +83,14 @@ public class TestCreatingNewFile extends STFTest {
      * 
      * @throws CoreException
      * @throws IOException
+     * @throws InterruptedException
      */
 
     @Test
-    public void testCarlGrantWriteAccess() throws IOException,
-        CoreException {
-        carl.sarosSessionV.grantWriteAccessGUI(alice.sarosSessionV);
+    public void testCarlGrantWriteAccess() throws IOException, CoreException,
+        InterruptedException {
 
+        carl.sarosSessionV.restrictToReadOnlyAccessGUI(carl.sarosSessionV);
         assertFalse(carl.sarosSessionV.hasWriteAccess());
         assertTrue(alice.sarosSessionV.hasWriteAccess());
 
@@ -112,10 +101,11 @@ public class TestCreatingNewFile extends STFTest {
         bob.workbench.sleep(500);
         assertFalse(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
 
-        if (!carl.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
-            carl.sarosSessionV.followThisBuddyGUI(alice.jid);
-        if (!bob.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
-            bob.sarosSessionV.followThisBuddyGUI(alice.jid);
+        // if (!carl.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
+        // carl.sarosSessionV.followThisBuddyGUI(alice.jid);
+        // if (!bob.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
+        // bob.sarosSessionV.followThisBuddyGUI(alice.jid);
+        alice.followedBy(carl, bob);
 
         alice.fileM.newFolder(PROJECT1, FOLDER2);
         alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);

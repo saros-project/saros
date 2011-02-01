@@ -10,16 +10,6 @@ public class RSViewImp extends EclipsePart implements RSView {
 
     private static transient RSViewImp self;
 
-    // View infos
-    private final static String VIEWNAME = "Remote Screen";
-    private final static String VIEWID = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
-
-    public final static String TB_CHANGE_MODE_IMAGE_SOURCE = "Change mode of image source";
-    public final static String SHELL_INCOMING_SCREENSHARING_SESSION = "Incoming screensharing session";
-    public final static String TB_STOP_RUNNING_SESSION = "Stop running session";
-    public final static String TB_RESUME = "Resume";
-    public final static String TB_PAUSE = "Pause";
-
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
      */
@@ -41,56 +31,56 @@ public class RSViewImp extends EclipsePart implements RSView {
      */
 
     public void activateRemoteScreenView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
+        viewW.setFocusOnViewByTitle(VIEW_REMOTE_SCREEN);
     }
 
     public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEWNAME);
+        return viewW.isViewOpen(VIEW_REMOTE_SCREEN);
     }
 
     public boolean isRemoteScreenViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEWNAME);
+        return viewW.isViewActive(VIEW_REMOTE_SCREEN);
     }
 
     public void openRemoteScreenView() throws RemoteException {
         if (!isRemoteScreenViewOpen())
-            viewW.openViewById(VIEWID);
+            viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
     }
 
     public void closeRemoteScreenView() throws RemoteException {
-        viewW.closeViewById(VIEWID);
+        viewW.closeViewById(VIEW_REMOTE_SCREEN_ID);
     }
 
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
-            TB_CHANGE_MODE_IMAGE_SOURCE);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
-            TB_STOP_RUNNING_SESSION);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_STOP_RUNNING_SESSION);
     }
 
     public void clickTBResume() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
-            TB_RESUME);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_RESUME);
     }
 
     public void clickTBPause() throws RemoteException {
         openRemoteScreenView();
         activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEWNAME,
-            TB_PAUSE);
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_PAUSE);
     }
 
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        viewW.waitUntilIsViewActive(VIEWNAME);
+        viewW.waitUntilIsViewActive(VIEW_REMOTE_SCREEN);
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)
