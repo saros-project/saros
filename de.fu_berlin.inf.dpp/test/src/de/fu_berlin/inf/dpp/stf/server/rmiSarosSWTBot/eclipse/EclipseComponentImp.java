@@ -52,9 +52,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public abstract class EclipsePart implements SarosLabels {
+public class EclipseComponentImp extends SarosLabels implements
+    EclipseComponent {
     protected static final transient Logger log = Logger
-        .getLogger(EclipsePart.class);
+        .getLogger(EclipseComponentImp.class);
 
     // exported objects
     public static TableImp tableW = TableImp.getInstance();

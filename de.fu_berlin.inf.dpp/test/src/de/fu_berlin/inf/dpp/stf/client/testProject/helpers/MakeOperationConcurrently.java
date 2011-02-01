@@ -62,7 +62,7 @@ public class MakeOperationConcurrently {
                      * before leaving.
                      */
                     musician.sarosSessionV.leaveTheSessionByPeer();
-                    return musician.sarosSessionV.isParticipant(musician.jid);
+                    return musician.sarosSessionV.isParticipantNoGUI(musician.jid);
                 }
             });
         }

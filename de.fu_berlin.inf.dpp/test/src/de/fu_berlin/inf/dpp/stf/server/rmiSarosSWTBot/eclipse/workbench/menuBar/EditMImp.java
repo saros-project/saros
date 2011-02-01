@@ -10,10 +10,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
-public class EditMImp extends EclipsePart implements EditM {
+public class EditMImp extends EclipseComponentImp implements EditM {
 
     private static transient EditMImp editImp;
 

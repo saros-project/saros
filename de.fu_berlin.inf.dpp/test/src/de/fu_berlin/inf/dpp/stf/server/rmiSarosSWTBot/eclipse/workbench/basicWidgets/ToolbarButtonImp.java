@@ -6,9 +6,9 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class ToolbarButtonImp extends EclipsePart implements ToolbarButton {
+public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButton {
 
     private static transient ToolbarButtonImp ToolbarButtonImp;
 

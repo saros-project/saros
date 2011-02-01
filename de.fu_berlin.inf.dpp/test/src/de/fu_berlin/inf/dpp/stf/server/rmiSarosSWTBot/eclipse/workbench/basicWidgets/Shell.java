@@ -19,6 +19,8 @@ public interface Shell extends Remote {
      */
     public boolean activateShellWithText(String title) throws RemoteException;
 
+    public boolean activateShellAndWait(String title) throws RemoteException;
+
     /**
      * This method first check, if the given shell is already open, if not, then
      * waits until the shell is open before activating the shell.

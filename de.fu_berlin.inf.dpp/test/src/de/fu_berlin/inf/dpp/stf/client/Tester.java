@@ -212,11 +212,11 @@ public class Tester {
         throws RemoteException, InterruptedException {
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : peers) {
-            if (tester.sarosSessionV.isInSession()) {
+            if (tester.sarosSessionV.isInSessionNoGUI()) {
                 closeSessionTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
                         // Need to check for isDriver before leaving.
-                        tester.sarosSessionV.confirmClosingTheSessionWindow();
+                        tester.sarosSessionV.confirmShellClosingTheSession();
                         return null;
                     }
                 });
@@ -259,7 +259,7 @@ public class Tester {
         MakeOperationConcurrently.workAll(leaveTasks);
         sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
         sarosSessionV.clickTBleaveTheSession();
-        sarosSessionV.waitUntilSessionClosed();
+        sarosSessionV.waitUntilIsNotInSession();
     }
 
     private String[] getPeersBaseJID(Tester... peers) {
@@ -285,7 +285,7 @@ public class Tester {
             final Tester tester = testers[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosSessionV.followThisBuddyGUI(jid);
+                    tester.sarosSessionV.followThisBuddy(jid);
                     return null;
                 }
             });
@@ -308,7 +308,7 @@ public class Tester {
             final Tester tester = testers[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosSessionV.stopFollowingThisBuddyGUI(jid);
+                    tester.sarosSessionV.stopFollowingThisBuddy(jid);
                     return null;
                 }
             });
@@ -398,7 +398,7 @@ public class Tester {
 
     public void shareYourScreenWithSelectedUserDone(Tester peer)
         throws RemoteException {
-        sarosSessionV.shareYourScreenWithSelectedBuddyGUI(peer.jid);
+        sarosSessionV.shareYourScreenWithSelectedBuddy(peer.jid);
         peer.sarosSessionV.confirmIncomingScreensharingSesionWindow();
     }
 
@@ -416,7 +416,7 @@ public class Tester {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void inviteUsersInSessionDone(final String projectName,
+    public void inviteBuddiesInSessionDone(final String projectName,
         final TypeOfCreateProject usingWhichProject, Tester... peers)
         throws RemoteException, InterruptedException {
         sarosSessionV.openInvitationInterface(getPeersBaseJID(peers));

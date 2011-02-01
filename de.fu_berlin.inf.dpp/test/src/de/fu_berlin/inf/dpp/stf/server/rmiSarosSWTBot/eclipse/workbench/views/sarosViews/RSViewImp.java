@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.s
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.STFController;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class RSViewImp extends EclipsePart implements RSView {
+public class RSViewImp extends EclipseComponentImp implements RSView {
     // public static RemoteScreenViewObjectImp classVariable;
 
     private static transient RSViewImp self;

@@ -90,9 +90,9 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlGrantWriteAccess() throws IOException, CoreException,
         InterruptedException {
 
-        carl.sarosSessionV.restrictToReadOnlyAccessGUI(carl.sarosSessionV);
-        assertFalse(carl.sarosSessionV.hasWriteAccess());
-        assertTrue(alice.sarosSessionV.hasWriteAccess());
+        carl.sarosSessionV.restrictToReadOnlyAccess(carl.jid);
+        assertFalse(carl.sarosSessionV.hasWriteAccessNoGUI());
+        assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
         carl.fileM.newFolder(FOLDER1, PROJECT1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);

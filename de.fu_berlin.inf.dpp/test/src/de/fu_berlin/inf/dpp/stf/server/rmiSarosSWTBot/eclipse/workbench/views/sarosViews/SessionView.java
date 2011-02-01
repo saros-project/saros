@@ -38,13 +38,13 @@ import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 public interface SessionView extends Remote {
     /**
      * Test if you are now in a session. <br>
-     * You can also use another function {@link SessionView#isInSessionGUI()} ,
+     * You can also use another function {@link SessionView#isInSession()} ,
      * which test the session state with GUI.
      * 
      * <p>
      * <b>Attention:</b> <br>
-     * Try to use the {@link SessionView#isInSessionGUI()} and
-     * {@link SarosState#isInSession()} together in your junittests.
+     * Try to use the {@link SessionView#isInSession()} and
+     * {@link SarosState#isInSessionNoGUI()} together in your junittests.
      * 
      * 
      * @return <tt>true</tt> if {@link SarosSessionManager#getSarosSession()} is
@@ -53,21 +53,21 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      * @see SarosSessionManager#getSarosSession()
      */
-    public boolean isInSession() throws RemoteException;
+    public boolean isInSessionNoGUI() throws RemoteException;
 
     /**
      * Test if you are now in a session. <br>
      * This function check if the tool bar button "Leave the session" in the
      * session view is enabled. You can also use another function
-     * {@link SarosState#isInSession()}, which test the session state without
-     * GUI.
+     * {@link SarosState#isInSessionNoGUI()}, which test the session state
+     * without GUI.
      * 
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use the {@link SessionView#isInSessionGUI()} and
-     * {@link SarosState#isInSession()} together in your junit tests.</li>
+     * <li>Try to use the {@link SessionView#isInSession()} and
+     * {@link SarosState#isInSessionNoGUI()} together in your junit tests.</li>
      * </ol>
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
@@ -75,7 +75,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public boolean isInSessionGUI() throws RemoteException;
+    public boolean isInSession() throws RemoteException;
 
     /**
      * waits until the session is open.
@@ -92,7 +92,7 @@ public interface SessionView extends Remote {
      *            the {@link SessionView} of the defined peer.
      * @throws RemoteException
      */
-    public void waitUntilInviteeIsInSession(final SessionView sessionV)
+    public void waitUntilIsInviteeInSession(final SessionView sessionV)
         throws RemoteException;
 
     /**
@@ -112,7 +112,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void waitUntilSessionClosed() throws RemoteException;
+    public void waitUntilIsNotInSession() throws RemoteException;
 
     /**
      * Waits until the {@link SarosSessionManager#getSarosSession()} is null.
@@ -135,7 +135,7 @@ public interface SessionView extends Remote {
      *            closed.
      * @throws RemoteException
      */
-    public void waitUntilSessionClosedBy(final SessionView sessionV)
+    public void waitUntilIsInviteeNotInSession(final SessionView sessionV)
         throws RemoteException;
 
     /**
@@ -164,7 +164,7 @@ public interface SessionView extends Remote {
      *         false otherwise.
      * @throws RemoteException
      */
-    public boolean hasWriteAccess() throws RemoteException;
+    public boolean hasWriteAccessNoGUI() throws RemoteException;
 
     /**
      * @return <tt>true</tt> if the given {@link JID} has
@@ -172,7 +172,7 @@ public interface SessionView extends Remote {
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean hasWriteAccess(JID jid) throws RemoteException;
+    public boolean hasWriteAccessByNoGUI(JID jid) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if all given {@link JID}s have
@@ -180,14 +180,34 @@ public interface SessionView extends Remote {
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean haveWriteAccess(List<JID> jids) throws RemoteException;
+    public boolean haveWriteAccessByNoGUI(List<JID> jids)
+        throws RemoteException;
+
+    /**
+     * 
+     * @return<tt>true</tt>, if name of the first tableItem in the saros session
+     *                       view is equal with the label infos of the local
+     *                       user.
+     * @throws RemoteException
+     */
+    public boolean isHost() throws RemoteException;
+
+    /**
+     * 
+     * @param jidOfParticipant
+     * @return<tt>true</tt>, if name of the first tableItem in the saros session
+     *                       view is equal with the label infos of the given
+     *                       participant.
+     * @throws RemoteException
+     */
+    public boolean isHost(JID jidOfParticipant) throws RemoteException;
 
     /**
      * 
      * @return <tt>true</tt>, if the local user is a host.
      * @throws RemoteException
      */
-    public boolean isHost() throws RemoteException;
+    public boolean isHostNoGUI() throws RemoteException;
 
     /**
      * 
@@ -196,25 +216,42 @@ public interface SessionView extends Remote {
      * @return <tt>true</tt>, if the user specified by the given jid is a host.
      * @throws RemoteException
      */
-    public boolean isHost(JID jid) throws RemoteException;
+    public boolean isHostNoGUI(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @param jids
+     * @return<tt>true</tt>, if the context menu "Restrict to read only access"
+     *                       isn't enabled by given participants
+     * @throws RemoteException
+     */
+    public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the local user has read-only access in this
      *         {@link SharedProject}.
      */
-    public boolean hasReadOnlyAccess() throws RemoteException;
+    public boolean hasReadOnlyAccessNoGUI() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the given {@link JID} has read-only access in
      *         this {@link SharedProject}.
      */
-    public boolean hasReadOnlyAccess(JID jid) throws RemoteException;
+    public boolean hasReadOnlyAccessNoGUI(JID jid) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if all given {@link JID} have read-only of the
      *         project.
      */
-    public boolean haveReadOnlyAccess(List<JID> jids) throws RemoteException;
+    public boolean haveReadOnlyAccessNoGUI(List<JID> jids)
+        throws RemoteException;
+
+    /**
+     * 
+     * @return <tt>true</tt>, if the local user is in the session view
+     * @throws RemoteException
+     */
+    public boolean isParticipant() throws RemoteException;
 
     /**
      * 
@@ -222,18 +259,37 @@ public interface SessionView extends Remote {
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean isParticipant() throws RemoteException;
+    public boolean isParticipantNoGUI() throws RemoteException;
+
+    /**
+     * @return <tt>true</tt>, if the participant with the given JID exists in
+     *         the session view
+     * 
+     */
+    public boolean isParticipant(JID jid) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the given {@link JID} is a participant of the
      *         {@link SharedProject}.
      */
-    public boolean isParticipant(JID jid) throws RemoteException;
+    public boolean isParticipantNoGUI(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @param jidOfParticipants
+     * @return <tt>true</tt>, if the participants with the given JIDs exist in
+     *         the session view
+     * @throws RemoteException
+     */
+    public boolean areParticipants(List<JID> jidOfParticipants)
+        throws RemoteException;
+
+    public boolean isFollowingBuddy(JID buddyJID) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if all given jids are participants of the project.
      */
-    public boolean areParticipants(List<JID> jids) throws RemoteException;
+    public boolean areParticipantsNoGUI(List<JID> jids) throws RemoteException;
 
     /**
      * Perform the action "Grant write access" which should be activated by
@@ -247,19 +303,19 @@ public interface SessionView extends Remote {
      * that the "Grant write access" action is completely done.</li>
      * </ol>
      * 
-     * @param sessionV
-     *            the {@link SessionView} of the user whom you want to grant
+     * @param participantJID
+     *            the {@link JID} of the user whom you want to grant
      *            {@link User.Permission#WRITE_ACCESS}.
      * @throws RemoteException
      */
-    public void grantWriteAccessGUI(final SessionView sessionV)
+    public void grantWriteAccess(final JID participantJID)
         throws RemoteException;
 
     /**
      * waits until the local user has {@link User.Permission#WRITE_ACCESS} after
      * host grants him {@link User.Permission#WRITE_ACCESS}. This method should
      * be used after performing the action
-     * {@link SessionView#grantWriteAccessGUI(SessionView)} to guarantee the
+     * {@link SessionView#grantWriteAccess(SessionView)} to guarantee the
      * invitee has really got {@link User.Permission#WRITE_ACCESS}.
      * 
      * @throws RemoteException
@@ -270,25 +326,28 @@ public interface SessionView extends Remote {
      * waits until the given user has {@link User.Permission#WRITE_ACCESS} after
      * host grant him {@link User.Permission#WRITE_ACCESS}. This method should
      * be used after performing the action
-     * {@link SessionView#grantWriteAccessGUI(SessionView)} to guarantee the
+     * {@link SessionView#grantWriteAccess(SessionView)} to guarantee the
      * invitee has really got the {@link User.Permission#WRITE_ACCESS}.
      * 
      * @throws RemoteException
      */
-    public void waitUntilHasWriteAccess(final JID jid) throws RemoteException;
+    public void waitUntilHasWriteAccessBy(final JID jid) throws RemoteException;
 
     /**
      * waits until the local user has no more
      * {@link User.Permission#WRITE_ACCESS} after host has
      * {@link User.Permission#READONLY_ACCESS}. This method should be used after
      * performing the action
-     * {@link SessionView#restrictToReadOnlyAccessGUI(SessionView)} or
-     * {@link SessionView#restrictInviteesToReadOnlyAccessGUI()} to guarantee
-     * the invitee's {@link User.Permission#WRITE_ACCESS} is really removed
+     * {@link SessionView#restrictToReadOnlyAccess(SessionView)} or
+     * {@link SessionView#restrictInviteesToReadOnlyAccess()} to guarantee the
+     * invitee's {@link User.Permission#WRITE_ACCESS} is really removed
      * 
      * @throws RemoteException
      */
     public void waitUntilHasReadOnlyAccess() throws RemoteException;
+
+    public void waitUntilHasReadOnlyAccessBy(final JID jid)
+        throws RemoteException;
 
     /**
      * performs the {@link RestrictToReadOnlyAccessAction} which should be
@@ -303,12 +362,12 @@ public interface SessionView extends Remote {
      * that the {@link RestrictToReadOnlyAccessAction} is completely done.</li>
      * </ol>
      * 
-     * @param sessionV
-     *            the {@link SessionView} of the user whom you want to remove
-     *            drive {@link User.Permission}.
+     * @param participantJID
+     *            the {@link JID} of the user whom you want to remove drive
+     *            {@link User.Permission}.
      * @throws RemoteException
      */
-    public void restrictToReadOnlyAccessGUI(final SessionView sessionV)
+    public void restrictToReadOnlyAccess(final JID participantJID)
         throws RemoteException;
 
     /**
@@ -328,6 +387,14 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      */
     public boolean existsLabelTextInSessionView() throws RemoteException;
+
+    public boolean hasWriteAccess() throws RemoteException;
+
+    public boolean hasWriteAccessBy(JID... jids) throws RemoteException;
+
+    public boolean hasReadOnlyAccess() throws RemoteException;
+
+    public boolean hastReadOnlyAccessBy(JID... jids) throws RemoteException;
 
     /**
      * @return the first label text on the session view, which should be showed
@@ -350,15 +417,14 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to follow.
      * @throws RemoteException
      */
-    public void followThisBuddyGUI(JID jidOfFollowedUser)
-        throws RemoteException;
+    public void followThisBuddy(JID jidOfFollowedUser) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if you are currently following another user.
      * @throws RemoteException
      * @see EditorManager#isFollowing
      */
-    public boolean isInFollowMode() throws RemoteException;
+    public boolean isInFollowModeNoGUI() throws RemoteException;
 
     /**
      * 
@@ -367,46 +433,15 @@ public interface SessionView extends Remote {
      * @return <tt>true</tt>, if you are currently following the given user.
      * @throws RemoteException
      */
-    public boolean isFollowingBuddy(String baseJID) throws RemoteException;
-
-    /**
-     * @return the JID of the followed user or null if currently no user is
-     *         followed.
-     * @throws RemoteException
-     */
-    public JID getFollowedBuddyJID() throws RemoteException;
-
-    /**
-     * Test if you are in follow mode. <br>
-     * This function check if the context menu "Stop following this user" of
-     * every contact listed in the session view is existed and enabled. You can
-     * also use another function {@link SarosState#isInFollowModeGUI()}, which
-     * test the following state without GUI.
-     * 
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Make sure, the session view is open and active.</li>
-     * <li>Try to use only the function {@link SessionView#isInSession()} for
-     * your junittests, because the method
-     * {@link TablePart#existsContextOfTableItem(String, String)} isn't really
-     * optimal implemented.</li>
-     * </ol>
-     * 
-     * @return <tt>true</tt> if the tool bar button "Leave the session" is
-     *         enabled.
-     * 
-     * @throws RemoteException
-     */
-    public boolean isInFollowModeGUI() throws RemoteException;
+    public boolean isFollowingBuddyNoGUI(String baseJID) throws RemoteException;
 
     /**
      * This function do same as the
-     * {@link SessionView#stopFollowingThisBuddyGUI(SarosState)} except you
-     * don't need to pass the {@link SarosState} of the followed user to the
-     * function. It is very useful, if you don't exactly know whom you are now
-     * following. Instead, we get the followed user JID from the method
-     * {@link SarosState#getFollowedBuddyJID()}.
+     * {@link SessionView#stopFollowingThisBuddy(SarosState)} except you don't
+     * need to pass the {@link SarosState} of the followed user to the function.
+     * It is very useful, if you don't exactly know whom you are now following.
+     * Instead, we get the followed user JID from the method
+     * {@link SarosState#getFollowedBuddyJIDNoGUI()}.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -415,7 +450,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void stopFollowingGUI() throws RemoteException;
+    public void stopFollowing() throws RemoteException;
 
     /**
      * Performs the action "Stop following this user" which should be activated
@@ -431,13 +466,13 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to stop following.
      * @throws RemoteException
      */
-    public void stopFollowingThisBuddyGUI(JID jidOfFollowedUser)
+    public void stopFollowingThisBuddy(JID jidOfFollowedUser)
         throws RemoteException;
 
     /**
      * checks if the context menu "Stop following this user" of a contact listed
      * in the session view is enabled. It would be used by
-     * {@link SessionViewImp#isInFollowModeGUI()}.
+     * {@link SessionViewImp#isInFollowMode()}.
      * 
      * @param baseJIDOfFollowedUser
      *            the name, which listed in the session view. e.g. "You" or
@@ -474,12 +509,12 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g. assert bob's workbench
      * state after bob follow the given user by running the
-     * {@link SessionViewImp#followThisBuddyGUI(SarosState)}without this
-     * waitUntil. In this case, you may get the AssertException, because bob
-     * should not really in the follow mode yet during asserting a condition or
-     * performing a following action. So it is recommended that you wait until
-     * the session is completely closed before you run the assertion or perform
-     * a following action.
+     * {@link SessionViewImp#followThisBuddy(SarosState)}without this waitUntil.
+     * In this case, you may get the AssertException, because bob should not
+     * really in the follow mode yet during asserting a condition or performing
+     * a following action. So it is recommended that you wait until the session
+     * is completely closed before you run the assertion or perform a following
+     * action.
      * 
      * @param baseJIDOfFollowedUser
      * @throws RemoteException
@@ -502,7 +537,7 @@ public interface SessionView extends Remote {
      *            screen.
      * @throws RemoteException
      */
-    public void shareYourScreenWithSelectedBuddyGUI(JID jidOfPeer)
+    public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
         throws RemoteException;
 
     /**
@@ -510,7 +545,7 @@ public interface SessionView extends Remote {
      * activated by clicking the tool bar button with the tooltip text
      * "Stop share session with user" on the session view, This toolbar button
      * is only visible after clicking the
-     * {@link SessionView#shareYourScreenWithSelectedBuddyGUI(JID)}
+     * {@link SessionView#shareYourScreenWithSelectedBuddy(JID)}
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -522,7 +557,7 @@ public interface SessionView extends Remote {
      *            screen session.
      * @throws RemoteException
      */
-    public void stopSessionWithUserGUI(JID jidOfPeer) throws RemoteException;
+    public void stopSessionWithUser(JID jidOfPeer) throws RemoteException;
 
     /**
      * performs the action "Send a file to selected user" which should be
@@ -590,7 +625,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void inconsistencyDetectedGUI() throws RemoteException;
+    public void inconsistencyDetected() throws RemoteException;
 
     /**
      * performs the {@link RestrictInviteesToReadOnlyAccessAction} which should
@@ -609,7 +644,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void restrictInviteesToReadOnlyAccessGUI() throws RemoteException;
+    public void restrictInviteesToReadOnlyAccess() throws RemoteException;
 
     /**
      * 
@@ -681,7 +716,7 @@ public interface SessionView extends Remote {
      *            the {@link JID} of the user whom you want to stop following.
      * @throws RemoteException
      */
-    public void jumpToPositionOfSelectedBuddyGUI(JID jidOfselectedUser)
+    public void jumpToPositionOfSelectedBuddy(JID jidOfselectedUser)
         throws RemoteException;
 
     /**
@@ -776,7 +811,7 @@ public interface SessionView extends Remote {
 
     /**
      * After perform the
-     * {@link SessionView#shareYourScreenWithSelectedBuddyGUI(SarosState)} the
+     * {@link SessionView#shareYourScreenWithSelectedBuddy(SarosState)} the
      * selected user should get this popup window.
      * 
      * @throws RemoteException
@@ -794,6 +829,6 @@ public interface SessionView extends Remote {
     public void confirmWindowScreensharingAErrorOccured()
         throws RemoteException;
 
-    public void confirmClosingTheSessionWindow() throws RemoteException;
+    public void confirmShellClosingTheSession() throws RemoteException;
 
 }

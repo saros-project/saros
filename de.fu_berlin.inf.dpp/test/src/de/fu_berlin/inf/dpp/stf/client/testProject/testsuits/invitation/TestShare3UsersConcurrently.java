@@ -57,30 +57,30 @@ public class TestShare3UsersConcurrently extends STFTest {
         alice.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, carl);
-        assertTrue(carl.sarosSessionV.isParticipant());
-        assertFalse(carl.sarosSessionV.hasReadOnlyAccess());
-        assertTrue(carl.sarosSessionV.hasWriteAccess());
+        assertTrue(carl.sarosSessionV.isParticipantNoGUI());
+        assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertTrue(carl.sarosSessionV.hasWriteAccessNoGUI());
 
-        assertTrue(bob.sarosSessionV.isParticipant());
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(bob.sarosSessionV.isParticipantNoGUI());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
 
-        assertTrue(alice.sarosSessionV.isParticipant());
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
-        assertTrue(alice.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosSessionV.isParticipantNoGUI());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
         alice.leaveSessionPeersFirstDone(bob, carl);
 
-        assertFalse(carl.sarosSessionV.isParticipant());
-        assertFalse(carl.sarosSessionV.hasReadOnlyAccess());
-        assertFalse(carl.sarosSessionV.hasWriteAccess());
+        assertFalse(carl.sarosSessionV.isParticipantNoGUI());
+        assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertFalse(carl.sarosSessionV.hasWriteAccessNoGUI());
 
-        assertFalse(bob.sarosSessionV.isParticipant());
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
-        assertFalse(bob.sarosSessionV.hasWriteAccess());
+        assertFalse(bob.sarosSessionV.isParticipantNoGUI());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertFalse(bob.sarosSessionV.hasWriteAccessNoGUI());
 
-        assertFalse(alice.sarosSessionV.isParticipant());
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
-        assertFalse(alice.sarosSessionV.hasWriteAccess());
+        assertFalse(alice.sarosSessionV.isParticipantNoGUI());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertFalse(alice.sarosSessionV.hasWriteAccessNoGUI());
     }
 }

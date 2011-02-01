@@ -51,9 +51,9 @@ public class TestFollowMode extends STFTest {
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
-        bob.sarosSessionV.followThisBuddyGUI(alice.jid);
+        bob.sarosSessionV.followThisBuddy(alice.jid);
         bob.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.sarosSessionV.isInFollowMode());
+        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         assertTrue(bob.editor.isJavaEditorActive(CLS1));
 
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
@@ -78,10 +78,10 @@ public class TestFollowMode extends STFTest {
         // alice.sessionV.followThisUser(bob.state);
         bob.editor.activateJavaEditor(CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(alice.sarosSessionV.isInFollowMode());
+        assertTrue(alice.sarosSessionV.isInFollowModeNoGUI());
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
 
-        bob.sarosSessionV.followThisBuddyGUI(alice.jid);
+        bob.sarosSessionV.followThisBuddy(alice.jid);
         alice.fileM.newClass(PROJECT1, PKG1, CLS3);
         alice.editor.waitUntilJavaEditorActive(CLS3);
         alice.editor.setTextInJavaEditorWithSave(CP3, PROJECT1, PKG1, CLS3);

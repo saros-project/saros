@@ -16,10 +16,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
-public class WorkbenchImp extends EclipsePart implements Workbench {
+public class WorkbenchImp extends EclipseComponentImp implements Workbench {
 
     private static transient WorkbenchImp self;
 

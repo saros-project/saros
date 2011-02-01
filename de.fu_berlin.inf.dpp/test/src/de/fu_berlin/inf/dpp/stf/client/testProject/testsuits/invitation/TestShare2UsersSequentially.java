@@ -61,25 +61,25 @@ public class TestShare2UsersSequentially extends STFTest {
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
-        assertTrue(bob.sarosSessionV.isParticipant());
-        assertTrue(alice.sarosSessionV.isParticipant());
+        assertTrue(bob.sarosSessionV.isParticipantNoGUI());
+        assertTrue(alice.sarosSessionV.isParticipantNoGUI());
 
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
 
-        assertTrue(alice.sarosSessionV.hasWriteAccess());
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
+        assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
 
         alice.leaveSessionPeersFirstDone(bob);
 
-        assertFalse(bob.sarosSessionV.isParticipant());
-        assertFalse(alice.sarosSessionV.isParticipant());
+        assertFalse(bob.sarosSessionV.isParticipantNoGUI());
+        assertFalse(alice.sarosSessionV.isParticipantNoGUI());
 
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
 
-        assertFalse(alice.sarosSessionV.hasWriteAccess());
-        assertFalse(bob.sarosSessionV.hasWriteAccess());
+        assertFalse(alice.sarosSessionV.hasWriteAccessNoGUI());
+        assertFalse(bob.sarosSessionV.hasWriteAccessNoGUI());
 
     }
 }

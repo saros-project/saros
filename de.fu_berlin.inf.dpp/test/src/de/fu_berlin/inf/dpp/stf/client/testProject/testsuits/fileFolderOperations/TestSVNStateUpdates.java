@@ -95,7 +95,7 @@ public class TestSVNStateUpdates extends STFTest {
         alice.buildSessionDoneSequentially(SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
-        alice.sarosSessionV.waitUntilInviteeIsInSession(bob.sarosSessionV);
+        alice.sarosSessionV.waitUntilIsInviteeInSession(bob.sarosSessionV);
     }
 
     @After
@@ -137,7 +137,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
 
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
@@ -163,7 +163,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");
         bob.workbench.sleep(1000);

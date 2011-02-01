@@ -8,13 +8,14 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
 import de.fu_berlin.inf.dpp.stf.SarosLabels;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 
-public class STFTest implements SarosLabels {
+public class STFTest extends SarosLabels {
 
     @Rule
     public TestName name = new TestName();
@@ -162,6 +163,7 @@ public class STFTest implements SarosLabels {
     public static void setUpWorkbenchs() throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.workbench.activateWorkbench();
+            // tester.sarosBuddiesV.disconnectGUI();
             tester.workbench.setUpWorkbench();
             tester.view.closeViewByTitle("Welcome");
             tester.windowM.openPerspective();
@@ -243,7 +245,7 @@ public class STFTest implements SarosLabels {
 
     public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
-        if (!host.sarosSessionV.isInSession()) {
+        if (!host.sarosSessionV.isInSessionNoGUI()) {
             for (Tester tester : invitees) {
                 host.buildSessionDoneSequentially(PROJECT1,
                     TypeOfShareProject.SHARE_PROJECT,
@@ -280,22 +282,22 @@ public class STFTest implements SarosLabels {
         for (Tester tester : invitees) {
             if (tester.sarosSessionV.isInSession()
                 && tester.sarosSessionV.hasReadOnlyAccess()) {
-                host.sarosSessionV.grantWriteAccessGUI(tester.sarosSessionV);
+                host.sarosSessionV.grantWriteAccess(tester.jid);
             }
         }
 
-        if (host.sarosSessionV.isInSession()
-            && !host.sarosSessionV.hasWriteAccess()) {
-            host.sarosSessionV.grantWriteAccessGUI(host.sarosSessionV);
+        if (host.sarosSessionV.isInSessionNoGUI()
+            && !host.sarosSessionV.hasWriteAccessNoGUI()) {
+            host.sarosSessionV.grantWriteAccess(host.jid);
         }
     }
 
     public static void resetFollowMode(Tester... activeTesters)
         throws RemoteException {
         for (Tester tester : activeTesters) {
-            if (tester.sarosSessionV.isInSession()
-                && tester.sarosSessionV.isInFollowMode()) {
-                tester.sarosSessionV.stopFollowingGUI();
+            if (tester.sarosSessionV.isInSessionNoGUI()
+                && tester.sarosSessionV.isInFollowModeNoGUI()) {
+                tester.sarosSessionV.stopFollowing();
             }
         }
     }
@@ -315,6 +317,11 @@ public class STFTest implements SarosLabels {
                     tester.editM.deleteFolderNoGUI(PROJECT1, folder);
             }
         }
+    }
+
+    @Before
+    public void before() throws Exception {
+        resetWorkbenches();
     }
 
     @After

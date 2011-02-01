@@ -6,9 +6,9 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class ConsoleViewImp extends EclipsePart implements ConsoleView {
+public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
 
     private static transient ConsoleViewImp consoleViewObject;
 

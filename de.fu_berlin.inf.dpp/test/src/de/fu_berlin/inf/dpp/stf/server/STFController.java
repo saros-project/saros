@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.LabelImp;
@@ -73,12 +73,12 @@ public class STFController {
         DataTransferManager dataTransferManager, EditorManager editorManager,
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
-        EclipsePart.saros = saros;
-        EclipsePart.sessionManager = sessionManager;
-        EclipsePart.dataTransferManager = dataTransferManager;
-        EclipsePart.editorManager = editorManager;
-        EclipsePart.xmppAccountStore = xmppAccountStore;
-        EclipsePart.feedbackManager = feedbackManager;
+        EclipseComponentImp.saros = saros;
+        EclipseComponentImp.sessionManager = sessionManager;
+        EclipseComponentImp.dataTransferManager = dataTransferManager;
+        EclipseComponentImp.editorManager = editorManager;
+        EclipseComponentImp.xmppAccountStore = xmppAccountStore;
+        EclipseComponentImp.feedbackManager = feedbackManager;
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {

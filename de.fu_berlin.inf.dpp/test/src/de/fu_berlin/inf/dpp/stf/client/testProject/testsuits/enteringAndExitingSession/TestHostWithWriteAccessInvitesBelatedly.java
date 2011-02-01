@@ -87,7 +87,7 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
         bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT1, PKG1,
             CLS2);
 
-        alice.inviteUsersInSessionDone(PROJECT1,
+        alice.inviteBuddiesInSessionDone(PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT, bob);
 
         bob.editor.activateJavaEditor(CLS1);

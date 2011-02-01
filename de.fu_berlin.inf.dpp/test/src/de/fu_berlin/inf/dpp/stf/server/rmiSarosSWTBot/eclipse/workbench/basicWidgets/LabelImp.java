@@ -4,9 +4,9 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class LabelImp extends EclipsePart implements Label {
+public class LabelImp extends EclipseComponentImp implements Label {
 
     private static transient LabelImp labelImp;
 

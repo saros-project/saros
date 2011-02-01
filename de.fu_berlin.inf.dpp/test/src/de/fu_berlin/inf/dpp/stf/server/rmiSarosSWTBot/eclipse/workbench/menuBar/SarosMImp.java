@@ -8,10 +8,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
-public class SarosMImp extends EclipsePart implements SarosM {
+public class SarosMImp extends EclipseComponentImp implements SarosM {
 
     private static transient SarosMImp self;
 

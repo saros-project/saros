@@ -78,7 +78,7 @@ public class TestBasicComponentByAliceAndBob extends STFTest {
         alice.table.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             bob.getBaseJid(), "Restrict to read-only access");
         bob.sarosSessionV.waitUntilHasReadOnlyAccess();
-        assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
+        assertTrue(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
     }
 
     @Test

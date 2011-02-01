@@ -192,12 +192,12 @@ public class TestRosterViewComponent extends STFTest {
     public void inviteBuddyWithGUI() throws RemoteException,
         InterruptedException {
         setUpSessionByDefault(alice, bob);
-        assertFalse(carl.sarosSessionV.isInSessionGUI());
+        assertFalse(carl.sarosSessionV.isInSession());
         alice.sarosBuddiesV.inviteBuddyGUI(carl.jid);
         carl.sarosC.confirmShellSessionnInvitation();
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosSessionV.waitUntilIsInSession();
-        assertTrue(carl.sarosSessionV.isInSessionGUI());
+        assertTrue(carl.sarosSessionV.isInSession());
         alice.leaveSessionHostFirstDone(bob, carl);
     }
 

@@ -11,10 +11,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 
-public class ShellImp extends EclipsePart implements Shell {
+public class ShellImp extends EclipseComponentImp implements Shell {
     private static transient ShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
@@ -58,6 +58,13 @@ public class ShellImp extends EclipsePart implements Shell {
         }
         log.error("No shell found matching \"" + title + "\"!");
         return false;
+    }
+
+    public boolean activateShellAndWait(String title) throws RemoteException {
+        if (!activateShellWithText(title))
+            waitUntilShellOpen(title);
+        return activateShellWithText(title);
+
     }
 
     public boolean activateShellWithRegexText(String matchText)

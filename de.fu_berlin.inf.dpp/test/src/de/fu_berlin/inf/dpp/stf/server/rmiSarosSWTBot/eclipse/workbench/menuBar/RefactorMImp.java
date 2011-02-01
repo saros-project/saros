@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class RefactorMImp extends EclipsePart implements RefactorM {
+public class RefactorMImp extends EclipseComponentImp implements RefactorM {
 
     private static transient RefactorMImp refactorImp;
 

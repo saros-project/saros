@@ -71,7 +71,7 @@ public class TestEditorComponentByAliceAndBob extends STFTest {
     public void waitUntilBobJavaEditorOpen() throws RemoteException,
         InterruptedException {
         alice.followedBy(bob);
-        assertTrue(bob.sarosSessionV.isInFollowMode());
+        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         alice.pEV.openClass(PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         assertTrue(bob.editor.isJavaEditorOpen(CLS1));
@@ -82,7 +82,7 @@ public class TestEditorComponentByAliceAndBob extends STFTest {
         InterruptedException {
         alice.followedBy(bob);
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.sarosSessionV.isInFollowMode());
+        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         bob.editor.waitUntilJavaEditorActive(CLS2);
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
         assertFalse(bob.editor.isJavaEditorActive(CLS1));

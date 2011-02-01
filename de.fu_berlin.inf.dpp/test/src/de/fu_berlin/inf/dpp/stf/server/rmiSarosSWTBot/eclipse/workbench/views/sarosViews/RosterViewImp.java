@@ -28,14 +28,14 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipsePart;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
 /**
  * This implementation of {@link RosterView}
  * 
  * @author Lin
  */
-public class RosterViewImp extends EclipsePart implements RosterView {
+public class RosterViewImp extends EclipseComponentImp implements RosterView {
 
     private static transient RosterViewImp self;
 
