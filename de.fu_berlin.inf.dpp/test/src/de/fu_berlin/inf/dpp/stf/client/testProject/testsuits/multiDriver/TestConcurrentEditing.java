@@ -119,6 +119,8 @@ public class TestConcurrentEditing extends STFTest {
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
-        assertTrue(bob.sarosSessionV.isInconsistencyDetectedEnabled());
+        assertTrue(bob.toolbarButton.isToolbarButtonInViewEnabled(
+            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
+
     }
 }

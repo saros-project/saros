@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -269,4 +270,12 @@ public class EclipseComponentImp extends SarosLabels implements
         }
         return newInputText;
     }
+
+    public void confirmShellInvitation(String... baseJIDOfinvitees)
+        throws RemoteException {
+        shellC.activateShellWithText(SHELL_INVITATION);
+        shellC.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
+            baseJIDOfinvitees);
+    }
+
 }

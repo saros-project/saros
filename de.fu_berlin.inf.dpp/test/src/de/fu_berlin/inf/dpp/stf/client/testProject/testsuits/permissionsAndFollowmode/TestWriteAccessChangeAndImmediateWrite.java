@@ -40,13 +40,13 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
 
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.workbench.sleep(5000);
-        assertFalse(bob.sarosSessionV.isInconsistencyDetectedEnabled());
-
+        assertFalse(bob.toolbarButton.isToolbarButtonInViewEnabled(
+            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
-
         bob.workbench.sleep(5000);
-        assertFalse(bob.sarosSessionV.isInconsistencyDetectedEnabled());
+        assertFalse(bob.toolbarButton.isToolbarButtonInViewEnabled(
+            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
 
     }
 }

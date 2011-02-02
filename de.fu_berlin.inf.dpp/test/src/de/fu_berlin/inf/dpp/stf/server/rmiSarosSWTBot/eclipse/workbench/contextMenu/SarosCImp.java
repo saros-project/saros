@@ -54,13 +54,6 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
         confirmShellInvitation(baseJIDOfInvitees);
     }
 
-    public void confirmShellInvitation(String... baseJIDOfinvitees)
-        throws RemoteException {
-        shellC.activateShellWithText(SHELL_INVITATION);
-        shellC
-            .confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH, baseJIDOfinvitees);
-    }
-
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
         if (!shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT))
@@ -243,7 +236,8 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
         precondition();
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { CM_SAROS, CM_SHARE_PROJECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts, matchTexts);
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
+            contexts, matchTexts);
     }
 
     /**************************************************************
@@ -294,7 +288,8 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
         throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
         String[] contexts = { CM_SAROS, contextName };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER, contexts, matchTexts);
+        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
+            contexts, matchTexts);
     }
 
     protected void precondition() throws RemoteException {

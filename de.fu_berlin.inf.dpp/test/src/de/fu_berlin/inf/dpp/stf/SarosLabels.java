@@ -240,7 +240,7 @@ public class SarosLabels {
      */
     protected final static String TB_SHARE_SCREEN_WITH_BUDDY = sarosLabels
         .getString("tb_share_screen_with_buddy");
-    protected final static String TB_STOP_SESSION_WITH_USER = sarosLabels
+    protected final static String TB_STOP_SESSION_WITH_BUDDY = sarosLabels
         .getString("tb_stop_session_with_user");
     protected final static String TB_SEND_A_FILE_TO_SELECTED_BUDDY = sarosLabels
         .getString("tb_send_a_file_to_selected_buddy");

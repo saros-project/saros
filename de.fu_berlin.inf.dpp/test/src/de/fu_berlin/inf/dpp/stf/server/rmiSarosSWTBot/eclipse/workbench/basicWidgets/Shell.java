@@ -138,6 +138,9 @@ public interface Shell extends Remote {
     public void confirmShell(String title, String buttonText)
         throws RemoteException;
 
+    public void confirmShellAndWait(String title, String buttonText)
+        throws RemoteException;
+
     /**
      * confirm a pop-up window with a tree. You should first select a tree node
      * and then confirm with button.

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.SarosLabels;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
@@ -47,7 +48,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Tester {
+public class Tester extends SarosLabels {
     private static final Logger log = Logger.getLogger(Tester.class);
 
     public PEView pEV;
@@ -164,8 +165,8 @@ public class Tester {
             baseJIDOfInvitees);
         for (Tester invitee : invitees) {
             invitee.sarosC.confirmShellSessionnInvitation();
-            invitee.sarosC.confirmShellAddProjectUsingWhichProject(
-                projectName, usingWhichProject);
+            invitee.sarosC.confirmShellAddProjectUsingWhichProject(projectName,
+                usingWhichProject);
         }
     }
 
@@ -183,9 +184,8 @@ public class Tester {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     invitee.sarosC.confirmShellSessionnInvitation();
-                    invitee.sarosC
-                        .confirmShellAddProjectUsingWhichProject(
-                            projectName, usingWhichProject);
+                    invitee.sarosC.confirmShellAddProjectUsingWhichProject(
+                        projectName, usingWhichProject);
                     invitee.sarosSessionV.waitUntilIsInSession();
                     return null;
                 }
@@ -258,7 +258,8 @@ public class Tester {
         }
         MakeOperationConcurrently.workAll(leaveTasks);
         sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-        sarosSessionV.clickTBleaveTheSession();
+        toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_SAROS_SESSION, TB_LEAVE_THE_SESSION);
         sarosSessionV.waitUntilIsNotInSession();
     }
 
@@ -399,7 +400,8 @@ public class Tester {
     public void shareYourScreenWithSelectedUserDone(Tester peer)
         throws RemoteException {
         sarosSessionV.shareYourScreenWithSelectedBuddy(peer.jid);
-        peer.sarosSessionV.confirmIncomingScreensharingSesionWindow();
+        peer.shell.confirmShellAndWait(SHELL_INCOMING_SCREENSHARING_SESSION,
+            YES);
     }
 
     /**

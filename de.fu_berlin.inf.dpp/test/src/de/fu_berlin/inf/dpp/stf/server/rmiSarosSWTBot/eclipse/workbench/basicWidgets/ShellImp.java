@@ -104,6 +104,12 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         }
     }
 
+    public void confirmShellAndWait(String title, String buttonText)
+        throws RemoteException {
+        activateShellAndWait(title);
+        confirmShell(title, buttonText);
+    }
+
     public void confirmShellWithTree(String title, String buttonText,
         String... nodes) throws RemoteException {
         bot.shell(title).activate();

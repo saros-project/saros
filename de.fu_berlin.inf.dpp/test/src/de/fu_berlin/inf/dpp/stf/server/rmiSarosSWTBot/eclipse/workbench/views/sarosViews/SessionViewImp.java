@@ -44,14 +44,6 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
      * actions
      * 
      **********************************************/
-    public void selectParticipant(JID participantJID) throws RemoteException {
-        precondition();
-        if (existsParticipant(participantJID)) {
-            String contactLabel = getParticipantLabel(participantJID);
-            SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
-            table.getTableItem(contactLabel).select();
-        }
-    }
 
     public void grantWriteAccess(final JID participantJID)
         throws RemoteException {
@@ -115,7 +107,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
             contactLabel, CM_STOP_FOLLOWING_THIS_BUDDY);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !isInFollowModeNoGUI();
+                return !isFollowingBuddy(followedUserJID);
             }
 
             public String getFailureMessage() {
@@ -147,51 +139,35 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
 
     public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
         throws RemoteException {
-        selectUser(
+        selectParticipant(
             jidOfPeer,
             "Hi guy, you can't share screen with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_BUDDY);
     }
 
-    public void stopSessionWithUser(JID jidOfPeer) throws RemoteException {
-        selectUser(
+    public void stopSessionWithBuddy(JID jidOfPeer) throws RemoteException {
+        selectParticipant(
             jidOfPeer,
             "Hi guy, you can't stop screen session with youself, it makes no sense! Please pass a correct parameter to the method.");
-        clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_USER);
-    }
-
-    public void confirmIncomingScreensharingSesionWindow()
-        throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_INCOMING_SCREENSHARING_SESSION);
-        shellC.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YES);
-    }
-
-    public void confirmWindowScreensharingAErrorOccured()
-        throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_SCREENSHARING_ERROR_OCCURED);
-        shellC.confirmShell(SHELL_SCREENSHARING_ERROR_OCCURED, OK);
+        clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
     }
 
     public void sendAFileToSelectedUserGUI(JID jidOfPeer)
         throws RemoteException {
-        selectUser(
+        selectParticipant(
             jidOfPeer,
             "Hi guy, you can't send a file to youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
     }
 
-    public void startAVoIPSessionGUI(JID jidOfPeer) throws RemoteException {
-        selectUser(
+    public void startAVoIPSession(JID jidOfPeer) throws RemoteException {
+        selectParticipant(
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
         if (shellC.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
-            confirmErrorInSarosPluginWindow();
+            shellC.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
         }
-    }
-
-    public void confirmErrorInSarosPluginWindow() throws RemoteException {
-        shellC.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
     }
 
     public void restrictInviteesToReadOnlyAccess() throws RemoteException {
@@ -199,26 +175,16 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
             throw new RuntimeException("Only host can perform this action.");
         }
         precondition();
-        if (isRestrictInviteesToReadOnlyAccessEnabled()) {
+        if (isToolbarButtonEnabled(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)) {
             clickToolbarButtonWithTooltip(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS);
             for (JID invitee : getInvitees())
                 waitUntilHasReadOnlyAccessBy(invitee);
         }
     }
 
-    public void enableDisableFollowModeGUI() throws RemoteException {
-        precondition();
-        if (isEnableDisableFollowModeEnabled())
-            clickToolbarButtonWithTooltip(TB_ENABLE_DISABLE_FOLLOW_MODE);
-    }
-
-    public void clickTBleaveTheSession() throws RemoteException {
-        clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-    }
-
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
-        clickTBleaveTheSession();
+        clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
         shellC.activateShellAndWait(SHELL_CONFIRM_LEAVING_SESSION);
         shellC.confirmShell(SHELL_CONFIRM_LEAVING_SESSION, YES);
         waitUntilIsNotInSession();
@@ -226,7 +192,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
 
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
-        clickTBleaveTheSession();
+        clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
         shellC.activateShellAndWait(SHELL_CONFIRM_CLOSING_SESSION);
         shellC.confirmShell(SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilIsNotInSession();
@@ -242,7 +208,12 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        sarosC.confirmShellInvitation(jidOfInvitees);
+        confirmShellInvitation(jidOfInvitees);
+    }
+    public void inconsistencyDetected() throws RemoteException {
+        precondition();
+        clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
+        shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -367,47 +338,13 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         }
     }
 
-    public boolean isCMStopFollowingThisBuddyVisible(String contactName)
-        throws RemoteException {
-        precondition();
-        return tableW.isContextMenuOfTableItemVisibleInView(VIEW_SAROS_SESSION,
-            contactName, CM_STOP_FOLLOWING_THIS_BUDDY);
-    }
-
-    public boolean isCMStopFollowingThisBuddyEnabled(String contactName)
-        throws RemoteException {
-        precondition();
-        return tableW.isContextMenuOfTableItemEnabledInView(VIEW_SAROS_SESSION,
-            contactName, CM_STOP_FOLLOWING_THIS_BUDDY);
-    }
-
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelTextInSessionView())
             return viewW.getView(VIEW_SAROS_SESSION).bot().label().getText();
         return null;
     }
 
-    public boolean isInconsistencyDetectedEnabled() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_INCONSISTENCY_DETECTED);
-    }
-
-    public void inconsistencyDetected() throws RemoteException {
-        precondition();
-        clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
-    }
-
-    public boolean isRestrictInviteesToReadOnlyAccessEnabled()
-        throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS);
-    }
-
-    public boolean isEnableDisableFollowModeEnabled() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_ENABLE_DISABLE_FOLLOW_MODE);
-    }
+  
 
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
@@ -431,6 +368,17 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
                 contactLabel = participantJID.getBase() + PERMISSION_NAME;
         }
         return contactLabel;
+    }
+
+    public List<String> getAllParticipantsInSessionView()
+        throws RemoteException {
+        precondition();
+        List<String> allParticipantsName = new ArrayList<String>();
+        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
+        for (int i = 0; i < table.rowCount(); i++) {
+            allParticipantsName.add(table.getTableItem(i).getText());
+        }
+        return allParticipantsName;
     }
 
     /**********************************************
@@ -739,30 +687,11 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         viewW.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
     }
 
-    /**
-     * 
-     * It get all contact names listed in the session view and would be used by
-     * {@link SessionViewImp#isInFollowMode}.
-     * 
-     * @return list, which contain all the contact names.
-     * @throws RemoteException
-     */
-    private List<String> getAllContactsInSessionView() throws RemoteException {
-        precondition();
-        List<String> allContactsName = new ArrayList<String>();
-        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
-        for (int i = 0; i < table.rowCount(); i++) {
-            allContactsName.add(table.getTableItem(i).getText());
-        }
-        return allContactsName;
-    }
-
     private void clickContextMenuOfSelectedBuddy(JID jidOfSelectedUser,
         String context, String message) throws RemoteException {
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
-
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
         workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
@@ -772,7 +701,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
 
     }
 
-    private void selectUser(JID jidOfSelectedUser, String message)
+    private void selectParticipant(JID jidOfSelectedUser, String message)
         throws RemoteException {
         if (localJID.equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);

@@ -159,7 +159,8 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see ShellImp#waitUntilShellActive(String)
      */
-    public void waitUntilIsShellSessionInvitationActive() throws RemoteException;
+    public void waitUntilIsShellSessionInvitationActive()
+        throws RemoteException;
 
     /**
      * After host canceled the invitation process of a invitee, a popup window
@@ -169,19 +170,6 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      */
     public void confirmWindowInvitationCancelled() throws RemoteException;
-
-    /**
-     * After clicking one of the sub menu of the context menu "Saros" in the
-     * package explorer view host will get the popup window with the title
-     * "Invitation". This method confirm the popup window.
-     * 
-     * @param baseJIDOfinvitees
-     *            the base JID of the users with whom you want to share your
-     *            project.
-     * @throws RemoteException
-     */
-    public void confirmShellInvitation(String... baseJIDOfinvitees)
-        throws RemoteException;
 
     /**
      * After the {@link SarosC#confirmShellInvitation(String...)} the popup
@@ -246,9 +234,8 @@ public interface SarosC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmShellAddProjectUsingWhichProject(
-        String projectName, TypeOfCreateProject usingWhichProject)
-        throws RemoteException;
+    public void confirmShellAddProjectUsingWhichProject(String projectName,
+        TypeOfCreateProject usingWhichProject) throws RemoteException;
 
     /**
      * waits until the popup window with the title "Rroblem occurred" is active
@@ -262,8 +249,7 @@ public interface SarosC extends Remote {
      * @return the second label text of the popup window "Problem occurredss"
      * @throws RemoteException
      */
-    public String getSecondLabelOfShellProblemOccurred()
-        throws RemoteException;
+    public String getSecondLabelOfShellProblemOccurred() throws RemoteException;
 
     /**
      * Clicks the sub menu "Share project" of the context menu "Saros" of the

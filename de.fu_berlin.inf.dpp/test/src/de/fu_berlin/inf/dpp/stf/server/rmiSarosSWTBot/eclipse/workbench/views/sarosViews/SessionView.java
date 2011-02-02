@@ -381,6 +381,16 @@ public interface SessionView extends Remote {
 
     /**
      * 
+     * It get all participant names listed in the session view
+     * 
+     * @return list, which contain all the contact names.
+     * @throws RemoteException
+     */
+    public List<String> getAllParticipantsInSessionView()
+        throws RemoteException;
+
+    /**
+     * 
      * @return<tt>true</tt>, if there are some label texts existed in the
      *                       session view. You can only see the label texts when
      *                       you are not in a session.
@@ -470,37 +480,6 @@ public interface SessionView extends Remote {
         throws RemoteException;
 
     /**
-     * checks if the context menu "Stop following this user" of a contact listed
-     * in the session view is enabled. It would be used by
-     * {@link SessionViewImp#isInFollowMode()}.
-     * 
-     * @param baseJIDOfFollowedUser
-     *            the name, which listed in the session view. e.g. "You" or
-     *            "alice1_fu@jabber.ccc.de" or
-     *            "Bob1_fu@jabber.ccc.de (read-only)".
-     * @return <tt>true</tt> if the context menu "Following this user" of the
-     *         passed contactName listed in the session view is enabled.
-     * @throws RemoteException
-     */
-    public boolean isCMStopFollowingThisBuddyEnabled(
-        String baseJIDOfFollowedUser) throws RemoteException;
-
-    /**
-     * check if the context menu "Stop following this user" of a contact listed
-     * in the session view is visible.
-     * 
-     * @param baseJIDOfFollowedUser
-     *            the name, which listed in the session view. e.g. "You" or
-     *            "alice1_fu@jabber.ccc.de" or
-     *            "Bob1_fu@jabber.ccc.de (read-only)".
-     * @return <tt>true</tt> if the context menu "Following this user" of the
-     *         passed contactName listed in the session view is visible.
-     * @throws RemoteException
-     */
-    public boolean isCMStopFollowingThisBuddyVisible(
-        String baseJIDOfFollowedUser) throws RemoteException;
-
-    /**
      * Waits until the {@link EditorManager#getFollowedUser()} is same as the
      * given user.
      * <p>
@@ -557,7 +536,7 @@ public interface SessionView extends Remote {
      *            screen session.
      * @throws RemoteException
      */
-    public void stopSessionWithUser(JID jidOfPeer) throws RemoteException;
+    public void stopSessionWithBuddy(JID jidOfPeer) throws RemoteException;
 
     /**
      * performs the action "Send a file to selected user" which should be
@@ -605,7 +584,7 @@ public interface SessionView extends Remote {
      *            screen.
      * @throws RemoteException
      */
-    public void startAVoIPSessionGUI(JID jidOfPeer) throws RemoteException;
+    public void startAVoIPSession(JID jidOfPeer) throws RemoteException;
 
     /**
      * performs the action "inconsistency detected in ..." which should be
@@ -647,40 +626,6 @@ public interface SessionView extends Remote {
     public void restrictInviteesToReadOnlyAccess() throws RemoteException;
 
     /**
-     * 
-     * @return <tt>true</tt>, if the toolbar button
-     *         {@link RestrictInviteesToReadOnlyAccessAction} is enabled
-     * @throws RemoteException
-     */
-    public boolean isRestrictInviteesToReadOnlyAccessEnabled()
-        throws RemoteException;
-
-    /**
-     * performs the action "Enable/disable follow mode" which should be
-     * activated by clicking the tool bar button with the tooltip text
-     * "REnable/disable follow mode" on the session view. The button is only
-     * enabled, if there are participant who is in follow mode.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the session view is open and active.</li>
-     * <li>If there are some following actions which are activated by the action
-     * "Enable/disable follow mode", e.g. a popup window. In this case, the
-     * method should handle the popup window too.</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void enableDisableFollowModeGUI() throws RemoteException;
-
-    /**
-     * click the toolbar button "Leave the session" on the sesion view
-     * 
-     * @throws RemoteException
-     */
-    public void clickTBleaveTheSession() throws RemoteException;
-
-    /**
      * Waits until all the given users are not in the session.
      * <p>
      * <b>Attention</b>:<br/>
@@ -718,13 +663,6 @@ public interface SessionView extends Remote {
      */
     public void jumpToPositionOfSelectedBuddy(JID jidOfselectedUser)
         throws RemoteException;
-
-    /**
-     * 
-     * @return <tt>true</tt>, if the toolbar button is existed and enabled.
-     * @throws RemoteException
-     */
-    public boolean isInconsistencyDetectedEnabled() throws RemoteException;
 
     /**
      * waits until the toolbar button "inconsistency detected..." is enabled.
@@ -808,26 +746,6 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      */
     public void leaveTheSessionByPeer() throws RemoteException;
-
-    /**
-     * After perform the
-     * {@link SessionView#shareYourScreenWithSelectedBuddy(SarosState)} the
-     * selected user should get this popup window.
-     * 
-     * @throws RemoteException
-     * @see Tester#shareYourScreenWithSelectedUserDone(Tester)
-     */
-    public void confirmIncomingScreensharingSesionWindow()
-        throws RemoteException;
-
-    /**
-     * during sharing screen you will get this error popup window, when Xuggler
-     * is not isntalled by you.
-     * 
-     * @throws RemoteException
-     */
-    public void confirmWindowScreensharingAErrorOccured()
-        throws RemoteException;
 
     public void confirmShellClosingTheSession() throws RemoteException;
 

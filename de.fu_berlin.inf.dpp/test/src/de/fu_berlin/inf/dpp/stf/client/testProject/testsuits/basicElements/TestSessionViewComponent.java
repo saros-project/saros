@@ -163,7 +163,7 @@ public class TestSessionViewComponent extends STFTest {
         alice.shareYourScreenWithSelectedUserDone(bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
-        alice.sarosSessionV.stopSessionWithUser(bob.jid);
+        alice.sarosSessionV.stopSessionWithBuddy(bob.jid);
     }
 
     @Test
@@ -187,10 +187,10 @@ public class TestSessionViewComponent extends STFTest {
     public void testRestrictInviteesToReadOnlyAccessGUI()
         throws RemoteException {
         assertTrue(alice.sarosSessionV.isHost());
-        assertTrue(alice.sarosSessionV
-            .isRestrictInviteesToReadOnlyAccessEnabled());
-        assertFalse(bob.sarosSessionV
-            .isRestrictInviteesToReadOnlyAccessEnabled());
+        assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
+            VIEW_SAROS_SESSION, TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS));
+        assertFalse(bob.toolbarButton.isToolbarButtonInViewEnabled(
+            VIEW_SAROS_SESSION, TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS));
 
         assertTrue(alice.sarosSessionV.hasWriteAccess());
         assertTrue(bob.sarosSessionV.hasWriteAccess());
