@@ -295,7 +295,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmWizardNewProject(String projectName)
         throws RemoteException {
-        shellC.confirmShellWithTree(SHELL_NEW_PROJECT, NEXT, CATEGORY_GENERAL,
+        shellC.confirmShellWithTree(SHELL_NEW_PROJECT, NEXT, NODE_GENERAL,
             NODE_PROJECT);
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();

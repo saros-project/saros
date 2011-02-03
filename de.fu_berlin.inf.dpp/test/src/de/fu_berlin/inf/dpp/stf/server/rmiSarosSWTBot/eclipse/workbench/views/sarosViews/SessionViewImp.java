@@ -354,12 +354,12 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
                 contactLabel = OWN_PARTICIPANT_NAME;
             else
                 contactLabel = OWN_PARTICIPANT_NAME + PERMISSION_NAME;
-        } else if (rosterV.hasBuddyNickName(participantJID)) {
+        } else if (rosterV.hasBuddyNickNameNoGUI(participantJID)) {
             if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = rosterV.getBuddyNickName(participantJID) + " ("
+                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID) + " ("
                     + participantJID.getBase() + ")";
             else
-                contactLabel = rosterV.getBuddyNickName(participantJID) + " ("
+                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID) + " ("
                     + participantJID.getBase() + ")" + PERMISSION_NAME;
         } else {
             if (hasWriteAccessByNoGUI(participantJID))

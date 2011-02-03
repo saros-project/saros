@@ -200,7 +200,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
         shellC.waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
-        shellC.activateShellWithText(SHELL_SAVE_ALL_FILES_NOW);
+        shellC.activateShell(SHELL_SAVE_ALL_FILES_NOW);
         shellC.confirmShell(SHELL_SAVE_ALL_FILES_NOW, buttonType);
     }
 

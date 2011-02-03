@@ -101,7 +101,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
-        shellC.activateShellWithText("Copy Project");
+        shellC.activateShell("Copy Project");
         textW.setTextInTextWithLabel(target, "Project name:");
         buttonW.clickButton(OK);
         shellC.waitUntilShellClosed("Copy Project");

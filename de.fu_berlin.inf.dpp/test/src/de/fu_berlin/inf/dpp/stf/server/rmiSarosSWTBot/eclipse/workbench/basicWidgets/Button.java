@@ -20,6 +20,8 @@ public interface Button extends Remote {
      */
     public void clickButton(String mnemonicText) throws RemoteException;
 
+    public void clickButtonAndWait(String mnemonicText) throws RemoteException;
+
     /**
      * clicks the button specified with the given tooltip.
      * 
@@ -28,6 +30,11 @@ public interface Button extends Remote {
      * @throws RemoteException
      */
     public void clickButtonWithTooltip(String tooltip) throws RemoteException;
+
+    public void clickButtonInGroup(String groupTitle) throws RemoteException;
+
+    public void clickButtonInGroup(String mnemonicText, String inGroup)
+        throws RemoteException;
 
     /**
      * 

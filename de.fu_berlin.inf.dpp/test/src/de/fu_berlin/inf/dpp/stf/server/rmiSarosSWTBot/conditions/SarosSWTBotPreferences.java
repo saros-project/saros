@@ -9,6 +9,8 @@ public class SarosSWTBotPreferences extends SWTBotPreferences {
 
     public static long SAROS_LONG_TIMEOUT = 20000;
 
+    public static long SAROS_SHORT_TIMEOUT = 3000;
+
     private static long toLong(String timeoutValue, long defaultValue) {
         try {
             Long timeout = Long.valueOf(timeoutValue);
@@ -17,4 +19,5 @@ public class SarosSWTBotPreferences extends SWTBotPreferences {
             return defaultValue;
         }
     }
+
 }

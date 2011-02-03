@@ -112,8 +112,8 @@ public class TestSVNStateUpdates extends STFTest {
     public static void runAfterClass() throws RemoteException {
         if (ConfigTester.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
-            alice.sarosBuddiesV.disconnectGUI();
-            bob.sarosBuddiesV.disconnectGUI();
+            alice.sarosBuddiesV.disconnect();
+            bob.sarosBuddiesV.disconnect();
         } else {
             alice.workbench.resetSaros();
             bob.workbench.resetSaros();

@@ -92,7 +92,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
         bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        bob.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        bob.shell.activateShell(SHELL_SESSION_INVITATION);
         bob.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
         assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
@@ -101,7 +101,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.button.clickButton(OK);
 
         carl.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        carl.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        carl.shell.activateShell(SHELL_SESSION_INVITATION);
         carl.sarosC.confirmShellSessionnInvitation();
         carl.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
@@ -110,7 +110,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.button.clickButton(OK);
 
         dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        dave.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        dave.shell.activateShell(SHELL_SESSION_INVITATION);
         dave.sarosC.confirmShellSessionnInvitation();
         dave.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
@@ -119,7 +119,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.button.clickButton(OK);
 
         edna.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        edna.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        edna.shell.activateShell(SHELL_SESSION_INVITATION);
         edna.sarosC.confirmShellSessionnInvitation();
         edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         edna.sarosSessionV.leaveTheSessionByPeer();

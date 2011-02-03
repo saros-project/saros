@@ -12,10 +12,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-import de.fu_berlin.inf.dpp.stf.SarosLabels;
+import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 
-public class STFTest extends SarosLabels {
+public class STFTest extends STF {
 
     @Rule
     public TestName name = new TestName();
@@ -184,9 +184,9 @@ public class STFTest extends SarosLabels {
      */
     public static void setUpSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.sarosM.disableAutomaticReminder();
+            tester.sarosM.disableAutomaticReminderNoGUI();
             tester.workbench.openSarosViews();
-            tester.sarosBuddiesV.connect(tester.jid, tester.password);
+            tester.sarosBuddiesV.connectNoGUI(tester.jid, tester.password);
         }
         // check buddy lists.
         for (Tester tester : activeTesters) {
@@ -207,8 +207,8 @@ public class STFTest extends SarosLabels {
     public static void resetSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
-                tester.sarosBuddiesV.resetAllBuddyName();
-                tester.sarosBuddiesV.disconnectGUI();
+                tester.sarosBuddiesV.resetAllBuddyNameNoGUI();
+                tester.sarosBuddiesV.disconnect();
                 tester.workbench.deleteAllProjects();
             }
         }
@@ -305,7 +305,7 @@ public class STFTest extends SarosLabels {
     public static void disConnectByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
-                tester.sarosBuddiesV.disconnectGUI();
+                tester.sarosBuddiesV.disconnect();
             }
         }
     }

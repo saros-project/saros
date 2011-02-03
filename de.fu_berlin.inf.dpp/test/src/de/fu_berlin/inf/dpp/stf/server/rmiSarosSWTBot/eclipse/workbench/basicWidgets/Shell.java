@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWi
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
 
 public interface Shell extends Remote {
 
@@ -17,7 +18,7 @@ public interface Shell extends Remote {
      *            the title of the shell.
      * @return <tt>true</tt>, it the given shell is open and can be activated.
      */
-    public boolean activateShellWithText(String title) throws RemoteException;
+    public boolean activateShell(String title) throws RemoteException;
 
     public boolean activateShellAndWait(String title) throws RemoteException;
 
@@ -112,6 +113,9 @@ public interface Shell extends Remote {
      */
     public void waitUntilShellClosed(String title) throws RemoteException;
 
+    public void waitShortUntilIsShellClosed(String title)
+        throws RemoteException;
+
     /**
      * waits until the given Shell is closed.
      * 
@@ -156,6 +160,13 @@ public interface Shell extends Remote {
      */
     public void confirmShellWithTree(String title, String buttonText,
         String... nodes) throws RemoteException;
+
+    public void confirmShellWithTextField(String title, String textLabel,
+        String text, String buttonText) throws RemoteException;
+
+    public void confirmShellWithTextFieldAndWait(String title,
+        Map<String, String> labelsAndTexts, String buttonText)
+        throws RemoteException;
 
     public void confirmShellWithTreeWithWaitingExpand(String title,
         String buttonText, String... nodes) throws RemoteException;

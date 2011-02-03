@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -53,11 +55,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
-        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         bob.deleteBuddyGUIDone(alice);
-        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
-        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
 
     /**
@@ -75,11 +77,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
-        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         alice.deleteBuddyGUIDone(bob);
-        assertFalse(bob.sarosBuddiesV.hasBuddy(alice.jid));
-        assertFalse(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
 
     /**
@@ -99,8 +101,8 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         alice.deleteBuddyGUIDone(bob);
         alice.addBuddyGUIDone(bob);
-        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
-        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
 
     /**
@@ -120,8 +122,8 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         bob.deleteBuddyGUIDone(alice);
         bob.addBuddyGUIDone(alice);
-        assertTrue(bob.sarosBuddiesV.hasBuddy(alice.jid));
-        assertTrue(alice.sarosBuddiesV.hasBuddy(bob.jid));
+        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
 
     /**
@@ -140,11 +142,18 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.sarosBuddiesV.clickToolbarButtonAddANewBuddy();
-        alice.sarosBuddiesV.confirmWindowNewBuddy("bob@bla");
-        alice.sarosBuddiesV.waitUntilIsShellBuddyLookupFailedActive();
-        assertTrue(alice.sarosBuddiesV.isShellBuddyLookupFailedActive());
-        alice.sarosBuddiesV.confirmShellBuddyLookupFailed(NO);
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_SAROS_BUDDIES, TB_ADD_A_NEW_CONTACT);
+        Map<String, String> labelsAndTexts = new HashMap<String, String>();
+        labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
+
+        alice.shell.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
+            labelsAndTexts, FINISH);
+
+        alice.shell.waitUntilShellActive(SHELL_BUDDY_LOOKUP_FAILED);
+        assertTrue(alice.shell.isShellActive(SHELL_BUDDY_LOOKUP_FAILED));
+        alice.shell.confirmShell(SHELL_BUDDY_LOOKUP_FAILED, NO);
+
     }
 
     /**
@@ -163,11 +172,15 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddExistedContact() throws RemoteException {
-        alice.sarosBuddiesV.clickToolbarButtonAddANewBuddy();
-        alice.sarosBuddiesV.confirmWindowNewBuddy(bob.getBaseJid());
-        alice.sarosBuddiesV.waitUntilIsShellBuddyAlreadyAddedActive();
-        assertTrue(alice.sarosBuddiesV.isShellBuddyAlreadyAddedActive());
-        alice.sarosBuddiesV.closeShellBuddyAlreadyAdded();
-    }
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_SAROS_BUDDIES, TB_ADD_A_NEW_CONTACT);
+        Map<String, String> labelsAndTexts = new HashMap<String, String>();
+        labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
 
+        alice.shell.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
+            labelsAndTexts, FINISH);
+        alice.shell.waitUntilShellActive(SHELL_BUDDY_ALREADY_ADDED);
+        assertTrue(alice.shell.isShellActive(SHELL_BUDDY_ALREADY_ADDED));
+        alice.shell.closeShell(SHELL_BUDDY_ALREADY_ADDED);
+    }
 }

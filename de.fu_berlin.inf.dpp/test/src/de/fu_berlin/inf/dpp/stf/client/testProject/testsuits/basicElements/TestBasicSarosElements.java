@@ -50,12 +50,12 @@ public class TestBasicSarosElements extends STFTest {
 
     @Test
     public void testRosterView() throws RemoteException {
-        alice.sarosBuddiesV.closeSarosBuddiesView();
-        assertEquals(false, alice.sarosBuddiesV.isSarosBuddiesViewOpen());
-        alice.sarosBuddiesV.openSarosBuddiesView();
+        alice.view.closeViewById(VIEW_SAROS_BUDDIES_ID);
+        assertEquals(false, alice.view.isViewOpen(VIEW_SAROS_BUDDIES));
+        alice.view.openViewById(VIEW_SAROS_BUDDIES_ID);
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/roster_view.png"));
-        assertEquals(true, alice.sarosBuddiesV.isSarosBuddiesViewOpen());
+        assertEquals(true, alice.view.isViewOpen(VIEW_SAROS_BUDDIES));
     }
 
     @Test
@@ -77,27 +77,27 @@ public class TestBasicSarosElements extends STFTest {
     @Test
     public void connectWithoutGUI() throws RemoteException {
         log.trace("xmppConnect");
-        alice.sarosBuddiesV.connect(alice.jid, alice.password);
+        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
         log.trace("captureScreenshot");
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.sarosBuddiesV.isConnected());
+        assertEquals(true, alice.sarosBuddiesV.isConnectedNoGUI());
     }
 
     @Test
     public void disconnectWithoutGUI() throws RemoteException {
-        alice.sarosBuddiesV.connect(alice.jid, alice.password);
-        alice.sarosBuddiesV.disconnect();
-        assertEquals(false, alice.sarosBuddiesV.isConnected());
+        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBuddiesV.disconnectNoGUI();
+        assertEquals(false, alice.sarosBuddiesV.isConnectedNoGUI());
     }
 
     @Test
     public void disconnectGUI() throws RemoteException {
-        alice.sarosBuddiesV.connect(alice.jid, alice.password);
-        alice.sarosBuddiesV.disconnectGUI();
+        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBuddiesV.disconnect();
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.sarosBuddiesV.isConnected());
+        assertEquals(false, alice.sarosBuddiesV.isConnectedNoGUI());
     }
 
 }

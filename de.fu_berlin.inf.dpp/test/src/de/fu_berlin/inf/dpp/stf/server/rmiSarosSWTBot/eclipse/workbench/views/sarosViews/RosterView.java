@@ -1,16 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.SarosM;
 
 /**
@@ -33,21 +32,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar.
  * 
  * @author Lin
  */
-public interface RosterView extends Remote {
-
-    /**
-     * @throws RemoteException
-     * @see ViewPart#openViewById(String)
-     */
-    public void openSarosBuddiesView() throws RemoteException;
-
-    public boolean isSarosBuddiesViewOpen() throws RemoteException;
-
-    public void setFocusOnRosterView() throws RemoteException;
-
-    public boolean isSarosBuddiesViewActive() throws RemoteException;
-
-    public void closeSarosBuddiesView() throws RemoteException;
+public interface RosterView extends SarosComponent {
 
     /**********************************************
      * 
@@ -76,13 +61,25 @@ public interface RosterView extends Remote {
      *            the password of the given jid
      * @throws RemoteException
      */
-    public void connect(JID jid, String password) throws RemoteException;
+    public void connectNoGUI(JID jid, String password) throws RemoteException;
+
+    /**
+     * connect using GUI-variant.
+     * <p>
+     * <b>Note</b>: This method isn't completely implemented yet, because
+     * GUI-people will make big change on the roster view.
+     * 
+     * @param jid
+     * @param password
+     * @throws RemoteException
+     */
+    public void connectWith(JID jid, String password) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if Saros is connected to a XMPP server.
      * @throws RemoteException
      */
-    public boolean isConnected() throws RemoteException;
+    public boolean isConnectedNoGUI() throws RemoteException;
 
     /**
      * 
@@ -90,56 +87,56 @@ public interface RosterView extends Remote {
      *                       "Disconnect.*" is visible.
      * @throws RemoteException
      */
-    public boolean isConnectedGUI() throws RemoteException;
+    public boolean isConnected() throws RemoteException;
 
     /**
      * waits until the xmpp connection is really created without GUI
      * 
      * @throws RemoteException
      */
-    public void waitUntilConnected() throws RemoteException;
+    public void waitUntilIsConnectedNoGUI() throws RemoteException;
 
     /**
      * waits until the xmpp connection is really created
      * 
      * @throws RemoteException
      */
-    public void waitUntilConnectedGUI() throws RemoteException;
+    public void waitUntilIsConnected() throws RemoteException;
 
     /**
      * disconnect without GUI
      * 
      * @throws RemoteException
      */
-    public void disconnect() throws RemoteException;
+    public void disconnectNoGUI() throws RemoteException;
 
     /**
      * 
      * @return<tt>true</tt>, if Saros is not connected to a XMPP Server
      * @throws RemoteException
      */
-    public boolean isDisConnected() throws RemoteException;
+    public boolean isDisConnectedNoGUI() throws RemoteException;
 
     /**
      * disconnect using GUI variant
      * 
      * @throws RemoteException
      */
-    public void disconnectGUI() throws RemoteException;
+    public void disconnect() throws RemoteException;
 
     /**
      * Waits until the connection is disconnected without GUI
      * 
      * @throws RemoteException
      */
-    public void waitUntilDisConnected() throws RemoteException;
+    public void waitUntilDisConnectedNoGUI() throws RemoteException;
 
     /**
      * Waits until the connection is disconnected using GUI
      * 
      * @throws RemoteException
      */
-    public void waitUntilDisConnectedGUI() throws RemoteException;
+    public void waitUntilDisConnected() throws RemoteException;
 
     /**********************************************
      * 
@@ -166,95 +163,7 @@ public interface RosterView extends Remote {
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
-    public void addANewBuddyGUI(JID jid) throws RemoteException;
-
-    /**
-     * After adding a new contact the added user should get this popup window
-     * with the title "Request of subscription received", which should be run by
-     * {@link Tester#addBuddyGUIDone(Tester)}
-     * 
-     * @throws RemoteException
-     */
-    public void confirmShellRequestOfSubscriptionReceived()
-        throws RemoteException;
-
-    /**
-     * confirm the popup window which should be activated by cliking the
-     * toolbarbutton "add a new contact". so this method should be called by
-     * {@link RosterView#addANewBuddyGUI(JID)}
-     * 
-     * @param baseJID
-     *            the base JID needed for creating a new contact
-     * @throws RemoteException
-     */
-    public void confirmWindowNewBuddy(String baseJID) throws RemoteException;
-
-    /**
-     * click only the tool bar button with the tooltip text "Add a new contact"
-     * on the roster view.This method is different as the
-     * {@link RosterView#addANewBuddyGUI(JID)},which should treat the
-     * activated popup window.
-     * 
-     * @throws RemoteException
-     */
-    public void clickToolbarButtonAddANewBuddy() throws RemoteException;
-
-    /**
-     * this popup window should be activated by adding new contact if the new
-     * contact is invalid.
-     * 
-     * @param buttonType
-     *            YES or NO
-     * @throws RemoteException
-     */
-    public void confirmShellBuddyLookupFailed(String buttonType)
-        throws RemoteException;
-
-    /**
-     * This popup window is only activated if man try to add a invalid contact
-     * using the {@link RosterView#addANewContactGUI}
-     * 
-     * @return <tt>true</tt>, is the popup window with the title
-     *         "Contact lookup failed" is active
-     * @throws RemoteException
-     */
-    public boolean isShellBuddyLookupFailedActive() throws RemoteException;
-
-    /**
-     * waits until the popup window with the title "Contact lookup failed" is
-     * active. This popup window is only activated if man try to add a invalid
-     * contact using the {@link RosterView#addANewContactGUI}
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilIsShellBuddyLookupFailedActive() throws RemoteException;
-
-    /**
-     * This popup window is only activated if man try to add a already existed
-     * contact using the {@link RosterView#addANewContactGUI}
-     * 
-     * @return<tt>true</tt>, is the popup window with the title
-     *                       "Contact already added" is active
-     * @throws RemoteException
-     */
-    public boolean isShellBuddyAlreadyAddedActive() throws RemoteException;
-
-    /**
-     * waits until the popup window with the title "Contact already added" is
-     * active. This popup window is only activated if man try to add a already
-     * existed contact using the {@link RosterView#addANewContactGUI}
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilIsShellBuddyAlreadyAddedActive()
-        throws RemoteException;
-
-    /**
-     * close the popup window with the title "Contact already added"
-     * 
-     * @throws RemoteException
-     */
-    public void closeShellBuddyAlreadyAdded() throws RemoteException;
+    public void addANewBuddy(JID jid) throws RemoteException;
 
     /**********************************************
      * 
@@ -270,7 +179,7 @@ public interface RosterView extends Remote {
      *            want to select
      * @throws RemoteException
      */
-    public void selectBuddyGUI(String baseJID) throws RemoteException;
+    public void selectBuddy(String baseJID) throws RemoteException;
 
     /**
      * 
@@ -281,14 +190,14 @@ public interface RosterView extends Remote {
      *                       buddyJID
      * @throws RemoteException
      */
-    public boolean hasBuddy(JID buddyJID) throws RemoteException;
+    public boolean hasBuddyNoGUI(JID buddyJID) throws RemoteException;
 
     /**
      * 
      * @return the BaseJID list of all the buddies existed in the roster view.
      * @throws RemoteException
      */
-    public List<String> getAllBuddies() throws RemoteException;
+    public List<String> getAllBuddiesNoGUI() throws RemoteException;
 
     /**
      * 
@@ -299,7 +208,7 @@ public interface RosterView extends Remote {
      *         exists.
      * @throws RemoteException
      */
-    public boolean hasBuddyGUI(String buddyNickName) throws RemoteException;
+    public boolean hasBuddy(String buddyNickName) throws RemoteException;
 
     /**
      * 
@@ -309,7 +218,7 @@ public interface RosterView extends Remote {
      * @return the nickname of the given user.
      * @throws RemoteException
      */
-    public String getBuddyNickName(JID buddyJID) throws RemoteException;
+    public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
 
     /**
      * 
@@ -319,7 +228,7 @@ public interface RosterView extends Remote {
      * @return <tt>true</tt>, if you've given the given user a nickname.
      * @throws RemoteException
      */
-    public boolean hasBuddyNickName(JID buddyJID) throws RemoteException;
+    public boolean hasBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
 
     /**********************************************
      * 
@@ -333,7 +242,8 @@ public interface RosterView extends Remote {
      *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
      */
-    public void deleteBuddy(JID buddyJID) throws RemoteException, XMPPException;
+    public void deleteBuddyNoGUI(JID buddyJID) throws RemoteException,
+        XMPPException;
 
     /**
      * performs the action "Delete contact" which should be activated by
@@ -354,7 +264,7 @@ public interface RosterView extends Remote {
      *            network, more about it please see {@link JID}.
      * @throws RemoteException
      */
-    public void deleteBuddyGUI(JID buddyJID) throws RemoteException;
+    public void deleteBuddy(JID buddyJID) throws RemoteException;
 
     /**
      * This popup window should be appeared by you, after someone else deleted
@@ -364,7 +274,7 @@ public interface RosterView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void confirmRemovelOfSubscriptionWindow() throws RemoteException;
+    public void confirmShellRemovelOfSubscription() throws RemoteException;
 
     /**********************************************
      * 
@@ -381,7 +291,7 @@ public interface RosterView extends Remote {
      * @param newBuddyName
      *            the new name , to which the contact should be changed
      */
-    public void renameBuddy(JID buddyJID, String newBuddyName)
+    public void renameBuddyNoGUI(JID buddyJID, String newBuddyName)
         throws RemoteException;
 
     /**
@@ -393,7 +303,7 @@ public interface RosterView extends Remote {
      * @param newBuddyName
      *            the new name , to which the contact should be changed
      */
-    public void renameBuddy(String buddyBaseJID, String newBuddyName)
+    public void renameBuddyNoGUI(String buddyBaseJID, String newBuddyName)
         throws RemoteException;
 
     /**
@@ -401,7 +311,7 @@ public interface RosterView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void resetAllBuddyName() throws RemoteException;
+    public void resetAllBuddyNameNoGUI() throws RemoteException;
 
     /**
      * rename the buddy'name specified with the given baseJID to the given
@@ -414,7 +324,7 @@ public interface RosterView extends Remote {
      *            the new name , to which the contact should be changed
      * @throws RemoteException
      */
-    public void renameBuddyGUI(JID buddyJID, String newBuddyName)
+    public void renameBuddy(JID buddyJID, String newBuddyName)
         throws RemoteException;
 
     /**********************************************
@@ -422,15 +332,6 @@ public interface RosterView extends Remote {
      * context menu of a contact on the view: invite user
      * 
      **********************************************/
-    public void inviteBuddyGUI(JID buddyJID) throws RemoteException;
+    public void inviteBuddy(JID buddyJID) throws RemoteException;
 
-    /**
-     * click the toolbar button specified with the given tooltip.
-     * 
-     * @param tooltipText
-     *            the tooltip text of the toolbar button which you want to
-     *            click.
-     */
-    public void clickToolbarButtonWithTooltip(String tooltipText)
-        throws RemoteException;
 }

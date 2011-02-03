@@ -56,7 +56,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
 
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT))
+        if (!shellC.activateShell(SHELL_SHELL_ADD_PROJECT))
             shellC.waitUntilShellActive(SHELL_SHELL_ADD_PROJECT);
         bot.radio(RADIO_CREATE_NEW_PROJECT).click();
         bot.button(FINISH).click();
@@ -83,7 +83,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT))
+        if (!shellC.activateShell(SHELL_SHELL_ADD_PROJECT))
             shellC.waitUntilShellActive(SHELL_SHELL_ADD_PROJECT);
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
 
@@ -141,7 +141,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT))
+        if (!shellC.activateShell(SHELL_SHELL_ADD_PROJECT))
             shellC.waitUntilShellActive(SHELL_SHELL_ADD_PROJECT);
         bot.radio("Use existing project").click();
         bot.textWithLabel("Project name", 1).setText(projectName);
@@ -153,7 +153,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT))
+        if (!shellC.activateShell(SHELL_SHELL_ADD_PROJECT))
             shellC.waitUntilShellActive(SHELL_SHELL_ADD_PROJECT);
         bot.radio("Use existing project").click();
         bot.checkBox("Create copy for working distributed. New project name:")
@@ -163,7 +163,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
     }
 
     public void confirmShellSessionnInvitation() throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SESSION_INVITATION))
+        if (!shellC.activateShell(SHELL_SESSION_INVITATION))
             shellC.waitUntilShellActive(SHELL_SESSION_INVITATION);
         bot.button(FINISH).click();
     }
@@ -178,7 +178,7 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
         shellC.waitUntilShellOpen(SHELL_SHELL_ADD_PROJECT);
-        shellC.activateShellWithText(SHELL_SHELL_ADD_PROJECT);
+        shellC.activateShell(SHELL_SHELL_ADD_PROJECT);
         switch (usingWhichProject) {
         case NEW_PROJECT:
             confirmShellAddProjectWithNewProject(projectName);

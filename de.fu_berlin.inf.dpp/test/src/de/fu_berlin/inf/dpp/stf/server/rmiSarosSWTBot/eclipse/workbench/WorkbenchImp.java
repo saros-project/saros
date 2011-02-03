@@ -54,7 +54,7 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     }
 
     public void openSarosViews() throws RemoteException {
-        rosterV.openSarosBuddiesView();
+        viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
         viewW.openViewById(VIEW_SAROS_SESSION_ID);
         chatV.openChatView();
         remoteScreenV.openRemoteScreenView();
@@ -74,8 +74,8 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     }
 
     public void resetSaros() throws RemoteException {
-        rosterV.resetAllBuddyName();
-        rosterV.disconnectGUI();
+        rosterV.resetAllBuddyNameNoGUI();
+        rosterV.disconnect();
         deleteAllProjects();
     }
 

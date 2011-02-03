@@ -74,14 +74,14 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
             dave.getBaseJid(), carl.getBaseJid());
 
         bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        bob.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        bob.shell.activateShell(SHELL_SESSION_INVITATION);
         alice.progressV.removeProcess(0);
         bob.shell.waitUntilShellOpen(SHELL_INVITATION_CANCELLED);
-        bob.shell.activateShellWithText(SHELL_INVITATION_CANCELLED);
+        bob.shell.activateShell(SHELL_INVITATION_CANCELLED);
         bob.sarosC.closeShellInvitationCancelled();
 
         carl.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        carl.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        carl.shell.activateShell(SHELL_SESSION_INVITATION);
         carl.sarosC.confirmShellSessionnInvitation();
         alice.progressV.removeProcess(0);
         carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
@@ -89,7 +89,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         carl.sarosC.closeShellInvitationCancelled();
 
         dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        dave.shell.activateShellWithText(SHELL_SESSION_INVITATION);
+        dave.shell.activateShell(SHELL_SESSION_INVITATION);
         dave.sarosC.confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);

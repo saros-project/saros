@@ -68,7 +68,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
-        shellC.activateShellWithText(shellTitle);
+        shellC.activateShell(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         buttonW.waitUntilButtonEnabled(buttonName);
         bot.button(buttonName).click();

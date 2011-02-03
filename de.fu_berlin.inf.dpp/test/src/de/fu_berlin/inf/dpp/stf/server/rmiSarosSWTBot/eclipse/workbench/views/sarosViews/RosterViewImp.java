@@ -6,7 +6,9 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widget
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -28,14 +30,14 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 
 /**
  * This implementation of {@link RosterView}
  * 
  * @author Lin
  */
-public class RosterViewImp extends EclipseComponentImp implements RosterView {
+public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     private static transient RosterViewImp self;
 
@@ -57,51 +59,191 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
 
     /**********************************************
      * 
-     * open/close/activate the roster view
+     * actions
      * 
      **********************************************/
-    public void openSarosBuddiesView() throws RemoteException {
-        if (!isSarosBuddiesViewOpen())
-            viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
+
+    public void connectWith(JID jid, String password) throws RemoteException {
+        precondition();
+        log.trace("connectedByXMPP");
+        if (!isConnected()) {
+            log.trace("click the toolbar button \"Connect\" in the r�oster view");
+            if (!sarosM.isAccountExistNoGUI(jid, password))
+                sarosM.createAccountWithButtonAddAccountInShellSarosPeferences(
+                    jid, password);
+
+            if (!sarosM.isAccountActiveNoGUI(jid))
+                sarosM.activateAccount(jid, password);
+            clickToolbarButtonWithTooltip(TB_CONNECT);
+
+            waitUntilIsConnected();
+        }
     }
 
-    public boolean isSarosBuddiesViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEW_SAROS_BUDDIES);
+    public void connectWithCurrentActiveAccount() throws RemoteException {
+        precondition();
+        if (!isConnected()) {
+            // assert isAccountExistNoGUI(jid, password) : "the account ("
+            // + jid.getBase() + ") doesn't exist yet!";
+            clickToolbarButtonWithTooltip(TB_CONNECT);
+            waitUntilIsConnected();
+        }
     }
 
-    public void closeSarosBuddiesView() throws RemoteException {
-        viewW.closeViewById(VIEW_SAROS_BUDDIES_ID);
+    public void selectBuddy(String baseJID) throws RemoteException {
+        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, TREE_ITEM_BUDDIES, baseJID);
     }
 
-    public void setFocusOnRosterView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
+    public boolean hasBuddy(String buddyNickName) throws RemoteException {
+        precondition();
+        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
+        return treeW.existsTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES,
+            buddyNickName + ".*");
     }
 
-    public boolean isSarosBuddiesViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEW_SAROS_BUDDIES);
+    public String getBuddyNickName(JID buddyJID) throws RemoteException {
+        // TODO add the implementation
+        return null;
+    }
+
+    public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
+        // TODO add the implementation
+        return false;
+    }
+
+    public void deleteBuddy(JID buddyJID) throws RemoteException {
+        String buddyNickName = getBuddyNickNameNoGUI(buddyJID);
+        if (!hasBuddyNoGUI(buddyJID))
+            return;
+        try {
+            treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES,
+                CM_DELETE, TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+            shellC.confirmShellDelete(YES);
+        } catch (WidgetNotFoundException e) {
+            log.info("Contact not found: " + buddyJID.getBase(), e);
+        }
+    }
+
+    public void confirmShellRemovelOfSubscription() throws RemoteException {
+        if (!shellC.activateShell(SHELL_REMOVAL_OF_SUBSCRIPTION))
+            shellC.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        shellC.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
+    }
+
+    public void renameBuddy(JID buddyJID, String newBuddyName)
+        throws RemoteException {
+        precondition();
+        String buddyNickName = getBuddyNickNameNoGUI(buddyJID);
+        if (buddyNickName == null)
+            throw new RuntimeException(
+                "the buddy dones't exist, which you want to rename.");
+        treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME,
+            TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+        if (!shellC.activateShell("Set new nickname")) {
+            shellC.waitUntilShellActive("Set new nickname");
+        }
+        bot.text(buddyNickName).setText(newBuddyName);
+        bot.button(OK).click();
+    }
+
+    public void inviteBuddy(JID buddyJID) throws RemoteException {
+        precondition();
+        String buddyNickName = getBuddyNickNameNoGUI(buddyJID);
+        if (buddyNickName == null)
+            throw new RuntimeException(
+                "the buddy dones't exist, which you want to invite.");
+        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
+        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree,
+            TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+        if (!item.isEnabled()) {
+            throw new RuntimeException("You can't invite this user "
+                + buddyNickName + ", he isn't conntected yet");
+        }
+        if (!item.contextMenu(CM_RENAME).isEnabled()) {
+            throw new RuntimeException("You can't invite this user "
+                + buddyNickName
+                + ", it's possible that you've already invite him");
+        }
+        item.contextMenu(CM_INVITE_BUDDY).click();
+    }
+
+    public void addANewBuddy(JID jid) throws RemoteException {
+        if (!hasBuddyNoGUI(jid)) {
+            precondition();
+            clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
+            Map<String, String> labelsAndTexts = new HashMap<String, String>();
+            labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
+
+            shellC.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
+                labelsAndTexts, FINISH);
+        }
+    }
+
+    public void disconnect() throws RemoteException {
+        precondition();
+        if (isConnected()) {
+            clickToolbarButtonWithTooltip(TB_DISCONNECT);
+            waitUntilDisConnected();
+        }
     }
 
     /**********************************************
      * 
-     * toolbar buttons on the view: connect/disconnect
+     * state
      * 
      **********************************************/
 
-    public void connect(JID jid, String password) throws RemoteException {
+    public boolean isConnectedNoGUI() throws RemoteException {
+        return saros.isConnected();
+    }
+
+    public boolean isConnected() throws RemoteException {
+        precondition();
+        return isToolbarButtonEnabled(TB_DISCONNECT);
+    }
+
+    public boolean isDisConnected() throws RemoteException {
+        precondition();
+        return isToolbarButtonEnabled(TB_CONNECT);
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+
+    public void waitUntilIsConnected() throws RemoteException {
+        precondition();
+        waitUntil(SarosConditions.isConnect(getToolbarButtons(), TB_DISCONNECT));
+    }
+
+    public void waitUntilDisConnected() throws RemoteException {
+        waitUntil(SarosConditions.isDisConnected(getToolbarButtons(),
+            TB_CONNECT));
+    }
+
+    /**********************************************
+     * 
+     * No GUI
+     * 
+     **********************************************/
+
+    public void connectNoGUI(JID jid, String password) throws RemoteException {
         precondition();
         log.trace("connectedByXMPP");
-        if (!isConnected()) {
+        if (!isConnectedNoGUI()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
-            if (!sarosM.isAccountExist(jid, password)) {
+            if (!sarosM.isAccountExistNoGUI(jid, password)) {
                 sarosM.createAccountNoGUI(jid.getDomain(), jid.getName(),
                     password);
             }
-            if (!sarosM.isAccountActive(jid))
+            if (!sarosM.isAccountActiveNoGUI(jid))
                 sarosM.activateAccountNoGUI(jid);
             saros.connect(true);
             waitUntil(new DefaultCondition() {
                 public boolean test() throws Exception {
-                    return isConnected();
+                    return isConnectedNoGUI();
                 }
 
                 public String getFailureMessage() {
@@ -111,186 +253,46 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
         }
     }
 
-    /**
-     * connect using GUI-variant.
-     * <p>
-     * <b>Note</b>: This method isn't completely implemented yet, because
-     * GUI-people will make big change on the roster view.
-     * 
-     * @param jid
-     * @param password
-     * @throws RemoteException
-     */
-    public void connectGUI(JID jid, String password) throws RemoteException {
-        precondition();
-        log.trace("connectedByXMPP");
-        if (!isConnectedGUI()) {
-            log.trace("click the toolbar button \"Connect\" in the r�oster view");
-            /*
-             * TODO if the test-account doesn't exists, we need to first create
-             * it.
-             */
-
-            /*
-             * TODO if the test-account isn't active, we need to activate it
-             * first.
-             */
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            waitUntilConnectedGUI();
-        }
-    }
-
-    private void confirmWindowSarosConfiguration(String xmppServer, String jid,
-        String password) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_SAROS_CONFIGURATION))
-            shellC.waitUntilShellActive(SHELL_SAROS_CONFIGURATION);
-        textW.setTextInTextWithLabel(xmppServer, LABEL_XMPP_JABBER_SERVER);
-        textW.setTextInTextWithLabel(jid, LABEL_USER_NAME);
-        textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
-        buttonW.clickButton(NEXT);
-        buttonW.clickButton(FINISH);
-    }
-
-    public boolean isConnected() throws RemoteException {
-        return saros.isConnected();
-    }
-
-    public boolean isConnectedGUI() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_DISCONNECT);
-    }
-
-    public void waitUntilConnected() throws RemoteException {
-        waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return isConnected();
-            }
-
-            public String getFailureMessage() {
-                return "can't connect.";
-            }
-        });
-    }
-
-    public void waitUntilConnectedGUI() throws RemoteException {
-        precondition();
-        waitUntil(SarosConditions.isConnect(getToolbarButtons(), TB_DISCONNECT));
-    }
-
-    public void disconnect() throws RemoteException {
-        if (isConnected()) {
-            saros.disconnect();
-            waitUntilDisConnected();
-        }
-    }
-
-    public void disconnectGUI() throws RemoteException {
-        precondition();
-        if (isConnectedGUI()) {
-            clickToolbarButtonWithTooltip(TB_DISCONNECT);
-            waitUntilDisConnectedGUI();
-        }
-    }
-
-    public boolean isDisConnected() throws RemoteException {
-        return getXmppConnectionState() == ConnectionState.NOT_CONNECTED;
-    }
-
-    public boolean isDisConnectedGUI() throws RemoteException {
-        precondition();
-        return isToolbarButtonEnabled(TB_CONNECT);
-    }
-
-    public void waitUntilDisConnected() throws RemoteException {
-        waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return !isConnected();
-            }
-
-            public String getFailureMessage() {
-                return "can't connect.";
-            }
-        });
-    }
-
-    public void waitUntilDisConnectedGUI() throws RemoteException {
-        waitUntil(SarosConditions.isDisConnected(getToolbarButtons(),
-            TB_CONNECT));
-    }
-
-    /**********************************************
-     * 
-     * toolbar buttons on the view: add a new contact
-     * 
-     * @throws RemoteException
-     * 
-     **********************************************/
-
-    public void addANewBuddyGUI(JID jid) throws RemoteException {
-        if (!hasBuddy(jid)) {
-            clickToolbarButtonAddANewBuddy();
-            confirmWindowNewBuddy(jid.getBase());
-        }
-    }
-
-    public void confirmShellRequestOfSubscriptionReceived()
+    public void renameBuddyNoGUI(JID buddyJID, String newBuddyName)
         throws RemoteException {
-        if (!shellC
-            .activateShellWithText(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED))
-            shellC.waitUntilShellActive(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        shellC.confirmShell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+        renameBuddyNoGUI(buddyJID.getBase(), newBuddyName);
     }
 
-    public void confirmWindowNewBuddy(String baseJID) throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_NEW_BUDDY))
-            shellC.waitUntilShellActive(SHELL_NEW_BUDDY);
-        textW.setTextInTextWithLabel(baseJID, "XMPP/Jabber ID");
-        buttonW.waitUntilButtonEnabled(FINISH);
-        buttonW.clickButton(FINISH);
-    }
-
-    public void clickToolbarButtonAddANewBuddy() throws RemoteException {
-        precondition();
-        clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
-    }
-
-    public void confirmShellBuddyLookupFailed(String buttonType)
+    public void renameBuddyNoGUI(String baseJID, String newBuddyName)
         throws RemoteException {
-        shellC.confirmShell(SHELL_BUDDY_LOOKUP_FAILED, buttonType);
+        Roster roster = saros.getRoster();
+        roster.getEntry(baseJID).setName(newBuddyName);
     }
 
-    public void waitUntilIsShellBuddyLookupFailedActive()
-        throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_BUDDY_LOOKUP_FAILED);
+    public void resetAllBuddyNameNoGUI() throws RemoteException {
+        List<String> allBuddies = getAllBuddiesNoGUI();
+        if (allBuddies != null && !allBuddies.isEmpty())
+            for (String buddyName : allBuddies) {
+                renameBuddyNoGUI(buddyName, buddyName);
+            }
     }
 
-    public void waitUntilIsShellBuddyAlreadyAddedActive()
-        throws RemoteException {
-        shellC.waitUntilShellActive(SHELL_BUDDY_ALREADY_ADDED);
+    public void deleteBuddyNoGUI(JID buddyJID) throws RemoteException,
+        XMPPException {
+        saros.removeContact(saros.getRoster().getEntry(buddyJID.getBase()));
     }
 
-    public boolean isShellBuddyLookupFailedActive() throws RemoteException {
-        return shellC.isShellActive(SHELL_BUDDY_LOOKUP_FAILED);
+    public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException {
+        Roster roster = saros.getRoster();
+        if (roster.getEntry(buddyJID.getBase()) == null)
+            return null;
+        return roster.getEntry(buddyJID.getBase()).getName();
     }
 
-    public void closeShellBuddyAlreadyAdded() throws RemoteException {
-        shellC.closeShell(SHELL_BUDDY_ALREADY_ADDED);
+    public boolean hasBuddyNickNameNoGUI(JID buddyJID) throws RemoteException {
+        if (getBuddyNickNameNoGUI(buddyJID) == null)
+            return false;
+        if (!getBuddyNickNameNoGUI(buddyJID).equals(buddyJID.getBase()))
+            return true;
+        return false;
     }
 
-    public boolean isShellBuddyAlreadyAddedActive() throws RemoteException {
-        return shellC.isShellActive(SHELL_BUDDY_ALREADY_ADDED);
-    }
-
-    /**********************************************
-     * 
-     * get buddy /buddyNickName on the roster view
-     * 
-     **********************************************/
-    public void selectBuddyGUI(String baseJID) throws RemoteException {
-        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, TREE_ITEM_BUDDIES, baseJID);
-    }
-
-    public boolean hasBuddy(JID buddyJID) throws RemoteException {
+    public boolean hasBuddyNoGUI(JID buddyJID) throws RemoteException {
         Roster roster = saros.getRoster();
         String baseJID = buddyJID.getBase();
         Collection<RosterEntry> entries = roster.getEntries();
@@ -303,7 +305,7 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
         return roster.contains(baseJID);
     }
 
-    public List<String> getAllBuddies() throws RemoteException {
+    public List<String> getAllBuddiesNoGUI() throws RemoteException {
         Roster roster = saros.getRoster();
         if (roster == null)
             return null;
@@ -317,143 +319,39 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
         return allBuddyBaseJIDs;
     }
 
-    public boolean hasBuddyGUI(String buddyNickName) throws RemoteException {
-        precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        return treeW.existsTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES, buddyNickName
-            + ".*");
-    }
-
-    public String getBuddyNickName(JID buddyJID) throws RemoteException {
-        Roster roster = saros.getRoster();
-        if (roster.getEntry(buddyJID.getBase()) == null)
-            return null;
-        return roster.getEntry(buddyJID.getBase()).getName();
-    }
-
-    public String getBuddyNickNameGUI(JID buddyJID) throws RemoteException {
-        // TODO add the implementation
-        return null;
-    }
-
-    public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
-        if (getBuddyNickName(buddyJID) == null)
-            return false;
-        if (!getBuddyNickName(buddyJID).equals(buddyJID.getBase()))
-            return true;
-        return false;
-    }
-
-    public boolean hasBuddyNickNameGUI(JID buddyJID) throws RemoteException {
-        // TODO add the implementation
-        return false;
-    }
-
-    /**********************************************
-     * 
-     * context menu of a contact on the view: delete Contact
-     * 
-     * @throws XMPPException
-     * 
-     **********************************************/
-    public void deleteBuddy(JID buddyJID) throws RemoteException, XMPPException {
-        saros.removeContact(saros.getRoster().getEntry(buddyJID.getBase()));
-    }
-
-    public void deleteBuddyGUI(JID buddyJID) throws RemoteException {
-        String buddyNickName = getBuddyNickName(buddyJID);
-        if (!hasBuddy(buddyJID))
-            return;
-        try {
-            treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_DELETE, TREE_ITEM_BUDDIES
-                + ".*", buddyNickName + ".*");
-            shellC.confirmShellDelete(YES);
-        } catch (WidgetNotFoundException e) {
-            log.info("Contact not found: " + buddyJID.getBase(), e);
+    public void disconnectNoGUI() throws RemoteException {
+        if (isConnectedNoGUI()) {
+            saros.disconnect();
+            waitUntilDisConnectedNoGUI();
         }
     }
 
-    public void confirmRemovelOfSubscriptionWindow() throws RemoteException {
-        if (!shellC.activateShellWithText(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            shellC.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        shellC.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
-    }
-
-    /**********************************************
-     * 
-     * context menu of a contact on the view: rename Contact
-     * 
-     **********************************************/
-    public void renameBuddy(JID buddyJID, String newBuddyName)
-        throws RemoteException {
-        renameBuddy(buddyJID.getBase(), newBuddyName);
-    }
-
-    public void renameBuddy(String baseJID, String newBuddyName)
-        throws RemoteException {
-        Roster roster = saros.getRoster();
-        roster.getEntry(baseJID).setName(newBuddyName);
-    }
-
-    public void resetAllBuddyName() throws RemoteException {
-        List<String> allBuddies = getAllBuddies();
-        if (allBuddies != null && !allBuddies.isEmpty())
-            for (String buddyName : allBuddies) {
-                renameBuddy(buddyName, buddyName);
+    public void waitUntilIsConnectedNoGUI() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isConnectedNoGUI();
             }
+
+            public String getFailureMessage() {
+                return "can't connect.";
+            }
+        });
     }
 
-    public void renameBuddyGUI(JID buddyJID, String newBuddyName)
-        throws RemoteException {
-        precondition();
-        String buddyNickName = getBuddyNickName(buddyJID);
-        if (buddyNickName == null)
-            throw new RuntimeException(
-                "the buddy dones't exist, which you want to rename.");
-        treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME, TREE_ITEM_BUDDIES
-            + ".*", buddyNickName + ".*");
-        if (!shellC.activateShellWithText("Set new nickname")) {
-            shellC.waitUntilShellActive("Set new nickname");
-        }
-        bot.text(buddyNickName).setText(newBuddyName);
-        bot.button(OK).click();
+    public boolean isDisConnectedNoGUI() throws RemoteException {
+        return getXmppConnectionState() == ConnectionState.NOT_CONNECTED;
     }
 
-    /**********************************************
-     * 
-     * context menu of a contact on the view: invite user
-     * 
-     **********************************************/
+    public void waitUntilDisConnectedNoGUI() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isConnectedNoGUI();
+            }
 
-    public void inviteBuddy(JID buddyJID) throws RemoteException {
-        // add the implementation.
-    }
-
-    public void inviteBuddyGUI(JID buddyJID) throws RemoteException {
-        precondition();
-        String buddyNickName = getBuddyNickName(buddyJID);
-        if (buddyNickName == null)
-            throw new RuntimeException(
-                "the buddy dones't exist, which you want to invite.");
-        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES + ".*",
-            buddyNickName + ".*");
-        if (!item.isEnabled()) {
-            throw new RuntimeException("You can't invite this user "
-                + buddyNickName + ", he isn't conntected yet");
-        }
-        if (!item.contextMenu(CM_RENAME).isEnabled()) {
-            throw new RuntimeException("You can't invite this user "
-                + buddyNickName
-                + ", it's possible that you've already invite him");
-        }
-        item.contextMenu(CM_INVITE_BUDDY).click();
-    }
-
-    public void clickToolbarButtonWithTooltip(String tooltipText)
-        throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(VIEW_SAROS_BUDDIES,
-            tooltipText);
+            public String getFailureMessage() {
+                return "can't connect.";
+            }
+        });
     }
 
     /**************************************************************
@@ -461,6 +359,12 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
      * Inner functions
      * 
      **************************************************************/
+
+    public void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException {
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_SAROS_BUDDIES, tooltipText);
+    }
 
     /**
      * @return the {@link ConnectionState}. It can be: NOT_CONNECTED,
@@ -479,30 +383,17 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        openSarosBuddiesView();
-        setFocusOnRosterView();
+        viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
+        viewW.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
     }
 
-    /**
-     * 
-     * @param tooltip
-     *            the tooltip text of the toolbar button which you want to know,
-     *            if it is enabled.
-     * @return <tt>true</tt>, if the toolbar button specified with the given
-     *         tooltip is enabled
-     */
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_BUDDIES, tooltip);
+        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_BUDDIES,
+            tooltip);
     }
 
-    /**
-     * 
-     * @return all the {@link SWTBotToolbarButton} in this view.
-     */
-
-    protected List<SWTBotToolbarButton> getToolbarButtons()
-        throws RemoteException {
+    protected List<SWTBotToolbarButton> getToolbarButtons() {
         return toolbarButtonW.getAllToolbarButtonsInView(VIEW_SAROS_BUDDIES);
     }
 
@@ -535,4 +426,5 @@ public class RosterViewImp extends EclipseComponentImp implements RosterView {
         }
         return false;
     }
+
 }

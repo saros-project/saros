@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.SarosLabels;
+import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class EclipseComponentImp extends SarosLabels implements
+public class EclipseComponentImp extends STF implements
     EclipseComponent {
     protected static final transient Logger log = Logger
         .getLogger(EclipseComponentImp.class);
@@ -116,6 +116,10 @@ public class EclipseComponentImp extends SarosLabels implements
 
     protected void waitLongUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+    }
+
+    protected void waitShortUntil(ICondition condition) {
+        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
     }
 
     public String getClassPath(String projectName, String pkg, String className) {
@@ -273,7 +277,7 @@ public class EclipseComponentImp extends SarosLabels implements
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        shellC.activateShellWithText(SHELL_INVITATION);
+        shellC.activateShell(SHELL_INVITATION);
         shellC.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
             baseJIDOfinvitees);
     }

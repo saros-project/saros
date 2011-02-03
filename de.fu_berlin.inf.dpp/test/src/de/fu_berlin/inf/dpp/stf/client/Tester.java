@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.SarosLabels;
+import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Tester extends SarosLabels {
+public class Tester extends STF {
     private static final Logger log = Logger.getLogger(Tester.class);
 
     public PEView pEV;
@@ -352,10 +352,12 @@ public class Tester extends SarosLabels {
      * 
      */
     public void addBuddyDone(Tester peer) throws RemoteException, XMPPException {
-        if (!sarosBuddiesV.hasBuddy(peer.jid)) {
-            sarosBuddiesV.addANewBuddyGUI(peer.jid);
-            peer.sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
-            sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
+        if (!sarosBuddiesV.hasBuddyNoGUI(peer.jid)) {
+            sarosBuddiesV.addANewBuddy(peer.jid);
+            peer.shell.confirmShellAndWait(
+                SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+            shell.confirmShellAndWait(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED,
+                OK);
         }
     }
 
@@ -367,10 +369,12 @@ public class Tester extends SarosLabels {
      * @throws RemoteException
      */
     public void addBuddyGUIDone(Tester peer) throws RemoteException {
-        if (!sarosBuddiesV.hasBuddy(peer.jid)) {
-            sarosBuddiesV.addANewBuddyGUI(peer.jid);
-            peer.sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
-            sarosBuddiesV.confirmShellRequestOfSubscriptionReceived();
+        if (!sarosBuddiesV.hasBuddyNoGUI(peer.jid)) {
+            sarosBuddiesV.addANewBuddy(peer.jid);
+            peer.shell.confirmShellAndWait(
+                SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+            shell.confirmShellAndWait(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED,
+                OK);
         }
     }
 
@@ -378,10 +382,10 @@ public class Tester extends SarosLabels {
      * Remove given contact from Roster with GUI, if contact was added before.
      */
     public void deleteBuddyGUIDone(Tester peer) throws RemoteException {
-        if (!sarosBuddiesV.hasBuddy(peer.jid))
+        if (!sarosBuddiesV.hasBuddyNoGUI(peer.jid))
             return;
-        sarosBuddiesV.deleteBuddyGUI(peer.jid);
-        peer.sarosBuddiesV.confirmRemovelOfSubscriptionWindow();
+        sarosBuddiesV.deleteBuddy(peer.jid);
+        peer.sarosBuddiesV.confirmShellRemovelOfSubscription();
     }
 
     /**
@@ -391,10 +395,10 @@ public class Tester extends SarosLabels {
      */
     public void deleteBuddyDone(Tester peer) throws RemoteException,
         XMPPException {
-        if (!sarosBuddiesV.hasBuddy(peer.jid))
+        if (!sarosBuddiesV.hasBuddyNoGUI(peer.jid))
             return;
-        sarosBuddiesV.deleteBuddy(peer.jid);
-        peer.sarosBuddiesV.confirmRemovelOfSubscriptionWindow();
+        sarosBuddiesV.deleteBuddyNoGUI(peer.jid);
+        peer.sarosBuddiesV.confirmShellRemovelOfSubscription();
     }
 
     public void shareYourScreenWithSelectedUserDone(Tester peer)

@@ -51,7 +51,7 @@ public class TestSessionViewComponent extends STFTest {
         alice.view.openViewById(VIEW_SAROS_SESSION_ID);
         assertTrue(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("alice focus on roster view.");
-        alice.sarosBuddiesV.setFocusOnRosterView();
+        alice.view.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
         assertFalse(alice.view.isViewActive(VIEW_SAROS_SESSION));
         log.trace("testSetFocusOnSessionView is done.");
     }

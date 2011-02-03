@@ -1,14 +1,14 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponent;
 
-public interface SarosM extends Remote {
+public interface SarosM extends SarosComponent {
 
     /**********************************************
      * setting for Account.
@@ -29,8 +29,8 @@ public interface SarosM extends Remote {
      * 
      * @throws RemoteException
      */
-    public void createAccountNoGUI(String server, String username, String password)
-        throws RemoteException;
+    public void createAccountNoGUI(String server, String username,
+        String password) throws RemoteException;
 
     /**
      * Creates an account with GUI, which should be done with the following
@@ -50,8 +50,7 @@ public interface SarosM extends Remote {
      *            TODO not implement yet.
      * @throws RemoteException
      */
-    public void creatAccount(JID jid, String password,
-        boolean usesThisAccountNow) throws RemoteException;
+    public void creatAccount(JID jid, String password) throws RemoteException;
 
     /**
      * Creates an account with GUI, which should be done with the following
@@ -62,16 +61,14 @@ public interface SarosM extends Remote {
      * <li>in the popup window click button "Create New Account"</li>
      * </ol>
      * 
-     * @param server
-     *            the server of the new account.
-     * @param username
-     *            the username of the new account.
+     * @param jid
+     * 
      * @param password
      *            the password of the new account.
      * @throws RemoteException
      */
-    public void createAccountInPeferences(String server, String username,
-        String password) throws RemoteException;
+    public void createAccountWithButtonAddAccountInShellSarosPeferences(JID jid, String password)
+        throws RemoteException;
 
     /**
      * add an account in the XMPP-Accounts list with GUI, which should be done
@@ -100,7 +97,7 @@ public interface SarosM extends Remote {
      * @throws RemoteException
      * @see XMPPAccountStore#getAllAccounts()
      */
-    public boolean isAccountExist(JID jid, String password)
+    public boolean isAccountExistNoGUI(JID jid, String password)
         throws RemoteException;
 
     /**
@@ -114,7 +111,7 @@ public interface SarosM extends Remote {
      *         saros-preferences-page.
      * @throws RemoteException
      */
-    public boolean isAccountExistGUI(JID jid, String password)
+    public boolean isAccountExist(JID jid, String password)
         throws RemoteException;
 
     /**
@@ -155,7 +152,7 @@ public interface SarosM extends Remote {
      * @throws RemoteException
      * @see XMPPAccount#isActive()
      */
-    public boolean isAccountActive(JID jid) throws RemoteException;
+    public boolean isAccountActiveNoGUI(JID jid) throws RemoteException;
 
     /**
      * 
@@ -166,7 +163,7 @@ public interface SarosM extends Remote {
      *         "active: jid.getBase()" is visible in the saros-preferences-page.
      * @throws RemoteException
      */
-    public boolean isAccountActiveGUI(JID jid) throws RemoteException;
+    public boolean isAccountActive(JID jid) throws RemoteException;
 
     /**
      * 
@@ -272,7 +269,7 @@ public interface SarosM extends Remote {
      * 
      * @throws RemoteException
      */
-    public void disableAutomaticReminder() throws RemoteException;
+    public void disableAutomaticReminderNoGUI() throws RemoteException;
 
     /**
      * Set feeback disabled using GUI.<br/>
@@ -287,5 +284,5 @@ public interface SarosM extends Remote {
      * 
      * @throws RemoteException
      */
-    public void disableAutomaticReminderGUI() throws RemoteException;
+    public void disableAutomaticReminder() throws RemoteException;
 }

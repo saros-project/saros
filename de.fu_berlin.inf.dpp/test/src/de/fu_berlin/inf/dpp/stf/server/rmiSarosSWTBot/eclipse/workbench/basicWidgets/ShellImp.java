@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
 import java.rmi.RemoteException;
+import java.util.Map;
 
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
@@ -43,7 +44,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
      * 
      **********************************************/
 
-    public boolean activateShellWithText(String title) throws RemoteException {
+    public boolean activateShell(String title) throws RemoteException {
         waitUntilShellOpen(title);
         SWTBotShell[] shells = bot.shells();
         for (SWTBotShell shell : shells) {
@@ -61,9 +62,9 @@ public class ShellImp extends EclipseComponentImp implements Shell {
     }
 
     public boolean activateShellAndWait(String title) throws RemoteException {
-        if (!activateShellWithText(title))
+        if (!activateShell(title))
             waitUntilShellOpen(title);
-        return activateShellWithText(title);
+        return activateShell(title);
 
     }
 
@@ -89,7 +90,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         if (!isShellOpen(title)) {
             waitUntilShellOpen(title);
         }
-        return activateShellWithText(title);
+        return activateShell(title);
     }
 
     public void closeShell(String title) throws RemoteException {
@@ -98,7 +99,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
 
     public void confirmShell(String title, String buttonText)
         throws RemoteException {
-        if (activateShellWithText(title)) {
+        if (activateShell(title)) {
             bot.button(buttonText).click();
             bot.sleep(sleepTime);
         }
@@ -118,6 +119,27 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         bot.button(buttonText).click();
     }
 
+    public void confirmShellWithTextField(String title, String textLabel,
+        String text, String buttonText) throws RemoteException {
+        activateShell(title);
+        textW.setTextInTextWithLabel(textLabel, text);
+        buttonW.waitUntilButtonEnabled(buttonText);
+        buttonW.clickButton(buttonText);
+    }
+
+    public void confirmShellWithTextFieldAndWait(String title,
+        Map<String, String> labelsAndTexts, String buttonText)
+        throws RemoteException {
+        activateShellAndWait(title);
+        for (String label : labelsAndTexts.keySet()) {
+            String text = labelsAndTexts.get(label);
+            textW.setTextInTextWithLabel(text, label);
+        }
+        buttonW.waitUntilButtonEnabled(buttonText);
+        buttonW.clickButton(buttonText);
+
+    }
+
     public void confirmShellWithTreeWithWaitingExpand(String title,
         String buttonText, String... nodes) throws RemoteException {
         SWTBotTree tree = bot.tree();
@@ -128,7 +150,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
 
     public void confirmWindowWithCheckBox(String title, String buttonText,
         boolean isChecked) throws RemoteException {
-        activateShellWithText(title);
+        activateShell(title);
         if (isChecked)
             bot.checkBox().click();
         bot.button(buttonText).click();
@@ -174,7 +196,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
     }
 
     public void confirmShellDelete(String buttonName) throws RemoteException {
-        if (!activateShellWithText(CONFIRM_DELETE))
+        if (!activateShell(CONFIRM_DELETE))
             waitUntilShellActive(CONFIRM_DELETE);
         confirmShell(CONFIRM_DELETE, buttonName);
     }
@@ -229,7 +251,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
 
     public boolean existsTableItemInShell(String title, String label)
         throws RemoteException {
-        activateShellWithText(title);
+        activateShell(title);
         return tableW.existsTableItem(label);
     }
 
@@ -252,6 +274,11 @@ public class ShellImp extends EclipseComponentImp implements Shell {
     public void waitUntilShellClosed(String title) throws RemoteException {
         waitUntil(SarosConditions.isShellClosed(bot, title));
         bot.sleep(10);
+    }
+
+    public void waitShortUntilIsShellClosed(String title)
+        throws RemoteException {
+        waitShortUntil(SarosConditions.isShellClosed(bot, title));
     }
 
     public void waitLongUntilShellClosed(String title) throws RemoteException {

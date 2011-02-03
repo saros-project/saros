@@ -36,8 +36,22 @@ public class ButtonImp extends EclipseComponentImp implements Button {
         bot.button(mnemonicText).click();
     }
 
+    public void clickButtonAndWait(String mnemonicText) throws RemoteException {
+        waitUntilButtonEnabled(mnemonicText);
+        clickButton(mnemonicText);
+    }
+
     public void clickButtonWithTooltip(String tooltip) throws RemoteException {
         bot.buttonWithTooltip(tooltip).click();
+    }
+
+    public void clickButtonInGroup(String groupTitle) throws RemoteException {
+        bot.buttonInGroup(groupTitle).click();
+    }
+
+    public void clickButtonInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        bot.buttonInGroup(mnemonicText, inGroup).click();
     }
 
     /**********************************************
