@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +22,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -62,8 +59,6 @@ public class DiscoveryManager implements Disposable {
 
     @Inject
     protected RosterTracker rosterTracker;
-
-    protected List<DiscoveryManagerListener> discoveryManagerListeners = new ArrayList<DiscoveryManagerListener>();
 
     /*
      * Queues incoming calls that check Saros support by going to the discovery
@@ -374,13 +369,9 @@ public class DiscoveryManager implements Disposable {
         }
 
         // Null means that the discovery failed
-        if (disco == null) {
-            notifyFeatureSupportUpdated(recipient, feature, false);
+        if (disco == null)
             return false;
-        }
 
-        notifyFeatureSupportUpdated(recipient, feature,
-            disco.containsFeature(feature));
         return disco.containsFeature(feature);
     }
 
@@ -422,38 +413,6 @@ public class DiscoveryManager implements Disposable {
                 "Service Discovery failed on recipient " + recipient.toString()
                     + " server:" + saros.getConnection().getHost() + ":", e);
             return null;
-        }
-    }
-
-    /**
-     * Adds a {@link DiscoveryManagerListener}
-     * 
-     * @param discoveryManagerListener
-     */
-    public void addDiscoveryManagerListener(
-        DiscoveryManagerListener discoveryManagerListener) {
-        this.discoveryManagerListeners.add(discoveryManagerListener);
-    }
-
-    /**
-     * Removes a {@link DiscoveryManagerListener}
-     * 
-     * @param discoveryManagerListener
-     */
-    public void removeDiscoveryManagerListener(
-        DiscoveryManagerListener discoveryManagerListener) {
-        this.discoveryManagerListeners.remove(discoveryManagerListener);
-    }
-
-    /**
-     * Notify all {@link DiscoveryManagerListener}s about an updated feature
-     * support.
-     */
-    public void notifyFeatureSupportUpdated(JID jid, String feature,
-        boolean isSupported) {
-        for (DiscoveryManagerListener discoveryManagerListener : this.discoveryManagerListeners) {
-            discoveryManagerListener.featureSupportUpdated(jid, feature,
-                isSupported);
         }
     }
 }

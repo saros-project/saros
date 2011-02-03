@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnecti
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -217,24 +216,6 @@ public class RosterView extends ViewPart {
             });
         }
 
-    };
-
-    /**
-     * This {@link DiscoveryManagerListener}Êupdates it's view whenever a
-     * buddy's Saros support changes.
-     */
-    protected final DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
-
-        public void featureSupportUpdated(JID jid, String feature,
-            boolean isSupported) {
-            if (Saros.NAMESPACE.equals(feature)) {
-                if (RosterView.this.viewer != null
-                    && RosterView.this.viewer.getTree() != null
-                    && !RosterView.this.viewer.getTree().isDisposed()) {
-                    RosterView.this.viewer.refresh();
-                }
-            }
-        }
     };
 
     protected final class RosterViewTransferModeListener implements
@@ -646,7 +627,6 @@ public class RosterView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        discoveryManager.addDiscoveryManagerListener(discoveryManagerListener);
 
         this.composite = parent;
         this.composite.setBackground(Display.getDefault().getSystemColor(
@@ -705,8 +685,6 @@ public class RosterView extends ViewPart {
             disposable.dispose();
         }
 
-        discoveryManager
-            .removeDiscoveryManagerListener(discoveryManagerListener);
         saros.removeListener(connectionListener);
 
         dataTransferManager.getTransferModeDispatch().remove(
