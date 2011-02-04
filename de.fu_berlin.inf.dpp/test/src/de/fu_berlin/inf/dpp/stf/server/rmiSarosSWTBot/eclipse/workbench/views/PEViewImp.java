@@ -90,11 +90,11 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         SWTBotTree tree = treeW.getTreeInView(VIEW_PACKAGE_EXPLORER);
         tree.expandNode(fileNodes).select();
         ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
-        shellC.waitUntilShellActive(SHELL_EDITOR_SELECTION);
+        shellW.waitUntilShellActive(SHELL_EDITOR_SELECTION);
         SWTBotTable table = bot.table();
         table.select(whichEditor);
         buttonW.waitUntilButtonEnabled(OK);
-        shellC.confirmShell(SHELL_EDITOR_SELECTION, OK);
+        shellW.confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
     public void openClassWithSystemEditor(String projectName, String pkg,

@@ -165,8 +165,8 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (shellC.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
-            shellC.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
+        if (shellW.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
+            shellW.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
         }
     }
 
@@ -185,23 +185,23 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shellC.activateShellAndWait(SHELL_CONFIRM_LEAVING_SESSION);
-        shellC.confirmShell(SHELL_CONFIRM_LEAVING_SESSION, YES);
+        shellW.activateShellAndWait(SHELL_CONFIRM_LEAVING_SESSION);
+        shellW.confirmShell(SHELL_CONFIRM_LEAVING_SESSION, YES);
         waitUntilIsNotInSession();
     }
 
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shellC.activateShellAndWait(SHELL_CONFIRM_CLOSING_SESSION);
-        shellC.confirmShell(SHELL_CONFIRM_CLOSING_SESSION, YES);
+        shellW.activateShellAndWait(SHELL_CONFIRM_CLOSING_SESSION);
+        shellW.confirmShell(SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilIsNotInSession();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
-        shellC.activateShellAndWait(SHELL_CLOSING_THE_SESSION);
-        shellC.confirmShell(SHELL_CLOSING_THE_SESSION, OK);
-        shellC.waitUntilShellClosed(SHELL_CLOSING_THE_SESSION);
+        shellW.activateShellAndWait(SHELL_CLOSING_THE_SESSION);
+        shellW.confirmShell(SHELL_CLOSING_THE_SESSION, OK);
+        shellW.waitUntilShellClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     public void openInvitationInterface(String... jidOfInvitees)
@@ -213,7 +213,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        shellC.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
+        shellW.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -694,7 +694,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
-        workbenchC.captureScreenshot(workbenchC.getPathToScreenShot()
+        workbench.captureScreenshot(workbench.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
         tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             contactLabel, context);

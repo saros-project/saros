@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPref
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.LabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListWImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.MenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
@@ -53,12 +54,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sa
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.SessionViewImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class EclipseComponentImp extends STF implements
-    EclipseComponent {
+public class EclipseComponentImp extends STF implements EclipseComponent {
     protected static final transient Logger log = Logger
         .getLogger(EclipseComponentImp.class);
 
-    // exported objects
+    // simple widgets
     public static TableImp tableW = TableImp.getInstance();
     public static TreeImp treeW = TreeImp.getInstance();
     public static ButtonImp buttonW = ButtonImp.getInstance();
@@ -68,11 +68,12 @@ public class EclipseComponentImp extends STF implements
     public static MenuImp menuW = MenuImp.getInstance();
     public static LabelImp labelW = LabelImp.getInstance();
     public static TextImp textW = TextImp.getInstance();
+    public static Shell shellW = ShellImp.getInstance();
+    public static EditorImp editorW = EditorImp.getInstance();
+    public static ListWImp listW = ListWImp.getInstance();
 
-    public static EditorImp editor = EditorImp.getInstance();
-    public static WorkbenchImp workbenchC = WorkbenchImp.getInstance();
-
-    public static Shell shellC = ShellImp.getInstance();
+    // workbench
+    public static WorkbenchImp workbench = WorkbenchImp.getInstance();
 
     // Views
     public static RosterViewImp rosterV = RosterViewImp.getInstance();
@@ -277,8 +278,8 @@ public class EclipseComponentImp extends STF implements
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        shellC.activateShell(SHELL_INVITATION);
-        shellC.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
+        shellW.activateShell(SHELL_INVITATION);
+        shellW.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
             baseJIDOfinvitees);
     }
 

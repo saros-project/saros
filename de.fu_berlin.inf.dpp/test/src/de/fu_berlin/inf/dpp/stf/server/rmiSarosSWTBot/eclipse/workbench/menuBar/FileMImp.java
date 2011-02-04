@@ -147,7 +147,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.textWithLabel("Package:").setText(pkg);
         bot.textWithLabel("Name:").setText(className);
         bot.button("Add...").click();
-        shellC.waitUntilShellActive("Implemented Interfaces Selection");
+        shellW.waitUntilShellActive("Implemented Interfaces Selection");
         bot.shell("Implemented Interfaces Selection").activate();
         SWTBotText text = bot.textWithLabel("Choose interfaces:");
         bot.sleep(2000);
@@ -214,7 +214,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     }
 
     public boolean existsFiletWithGUI(String... nodes) throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
         precondition();
         SWTBotTree tree = treeW.getTreeInView(VIEW_PACKAGE_EXPLORER);
         return treeW.existsTreeItemWithRegexs(tree, nodes);
@@ -277,7 +277,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
      * 
      **************************************************************/
     protected void precondition() throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
         pEV.openPEView();
         pEV.setFocusOnPEView();
     }
@@ -295,11 +295,11 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmWizardNewProject(String projectName)
         throws RemoteException {
-        shellC.confirmShellWithTree(SHELL_NEW_PROJECT, NEXT, NODE_GENERAL,
+        shellW.confirmShellWithTree(SHELL_NEW_PROJECT, NEXT, NODE_GENERAL,
             NODE_PROJECT);
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();
-        shellC.waitUntilShellClosed(SHELL_NEW_PROJECT);
+        shellW.waitUntilShellClosed(SHELL_NEW_PROJECT);
         bot.sleep(50);
     }
 
@@ -320,7 +320,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.textWithLabel("Source folder:").setText((projectName + "/src"));
         bot.textWithLabel("Name:").setText(pkg);
         bot.button(FINISH).click();
-        shellC.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
+        shellW.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
     }
 
     private void confirmWindowNewFolder(String newFolderName) {
@@ -337,7 +337,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         shell.activate();
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();
-        shellC.waitUntilShellClosed(SHELL_NEW_JAVA_PROJECT);
+        shellW.waitUntilShellClosed(SHELL_NEW_JAVA_PROJECT);
     }
 
 }

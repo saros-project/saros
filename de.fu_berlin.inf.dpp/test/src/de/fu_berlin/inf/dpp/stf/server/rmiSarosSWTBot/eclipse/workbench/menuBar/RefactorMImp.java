@@ -56,7 +56,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
     }
 
     protected void precondition() throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
     }
 
     /**************************************************************
@@ -68,20 +68,20 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
-        shellC.activateShell(shellTitle);
+        shellW.activateShell(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         buttonW.waitUntilButtonEnabled(buttonName);
         bot.button(buttonName).click();
-        shellC.waitUntilShellClosed(shellTitle);
+        shellW.waitUntilShellClosed(shellTitle);
     }
 
     public void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
-        shellC.waitUntilShellActive(shellTitle);
-        shellC.confirmShellWithTree(shellTitle, buttonName, nodes);
-        shellC.waitUntilShellClosed(shellTitle);
+        shellW.waitUntilShellActive(shellTitle);
+        shellW.confirmShellWithTree(shellTitle, buttonName, nodes);
+        shellW.waitUntilShellClosed(shellTitle);
     }
 
 }

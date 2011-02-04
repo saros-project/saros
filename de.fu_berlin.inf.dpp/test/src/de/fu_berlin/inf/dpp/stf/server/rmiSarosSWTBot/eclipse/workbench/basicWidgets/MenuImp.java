@@ -33,7 +33,7 @@ public class MenuImp extends EclipseComponentImp implements Menu {
      * 
      **********************************************/
     public void clickMenuWithTexts(String... texts) throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
         SWTBotMenu selectedmenu = null;
         for (String text : texts) {
             try {

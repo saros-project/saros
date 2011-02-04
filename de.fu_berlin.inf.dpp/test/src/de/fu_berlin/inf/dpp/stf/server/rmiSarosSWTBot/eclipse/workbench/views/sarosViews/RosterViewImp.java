@@ -69,11 +69,10 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the r�oster view");
             if (!sarosM.isAccountExistNoGUI(jid, password))
-                sarosM.createAccountWithButtonAddAccountInShellSarosPeferences(
-                    jid, password);
+                sarosM.createAccountInShellSarosPeferences(jid, password);
 
             if (!sarosM.isAccountActiveNoGUI(jid))
-                sarosM.activateAccount(jid, password);
+                sarosM.activateAccount(jid);
             clickToolbarButtonWithTooltip(TB_CONNECT);
 
             waitUntilIsConnected();
@@ -118,16 +117,16 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         try {
             treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES,
                 CM_DELETE, TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
-            shellC.confirmShellDelete(YES);
+            shellW.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
-        if (!shellC.activateShell(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            shellC.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        shellC.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
+        if (!shellW.activateShell(SHELL_REMOVAL_OF_SUBSCRIPTION))
+            shellW.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        shellW.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
     }
 
     public void renameBuddy(JID buddyJID, String newBuddyName)
@@ -139,8 +138,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
                 "the buddy dones't exist, which you want to rename.");
         treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME,
             TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
-        if (!shellC.activateShell("Set new nickname")) {
-            shellC.waitUntilShellActive("Set new nickname");
+        if (!shellW.activateShell("Set new nickname")) {
+            shellW.waitUntilShellActive("Set new nickname");
         }
         bot.text(buddyNickName).setText(newBuddyName);
         bot.button(OK).click();
@@ -174,7 +173,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             Map<String, String> labelsAndTexts = new HashMap<String, String>();
             labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
 
-            shellC.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
+            shellW.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
                 labelsAndTexts, FINISH);
         }
     }

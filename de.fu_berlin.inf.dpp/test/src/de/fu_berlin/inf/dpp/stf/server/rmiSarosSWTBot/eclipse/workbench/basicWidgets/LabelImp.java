@@ -35,9 +35,14 @@ public class LabelImp extends EclipseComponentImp implements Label {
         return bot.label().getText();
     }
 
+    public String getTextOfLabelInGroup(String inGroup) throws RemoteException {
+        return bot.labelInGroup(inGroup).getText();
+    }
+
     public boolean existsLabel(String mnemonicText) throws RemoteException {
         try {
             bot.label(mnemonicText);
+
             return true;
         } catch (WidgetNotFoundException e) {
             return false;

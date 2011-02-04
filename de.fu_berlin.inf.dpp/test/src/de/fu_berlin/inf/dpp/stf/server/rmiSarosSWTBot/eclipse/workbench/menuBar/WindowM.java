@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
@@ -28,7 +27,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbenc
  * 
  * @author Lin
  */
-public interface WindowM extends Remote {
+public interface WindowM extends Preferences {
 
     /**********************************************
      * 

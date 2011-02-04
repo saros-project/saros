@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 
@@ -83,6 +85,27 @@ public class STFTest extends STF {
      * test data
      * 
      **********************************************/
+    /* test data for modifying account */
+    public final static String SERVER = "saros-con.imp.fu-berlin.de";
+    public final static String NEW_USER_NAME = "new_alice_stf";
+
+    public final static String REGISTERED_USER_NAME = "bob_stf";
+
+    public static final String INVALID_SERVER_NAME = "saros-con";
+
+    // need to change, if you want to test creatAccount
+    public static JID JID_TO_CREATE = new JID(
+        ("test3@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE));
+
+    public final static JID JID_TO_ADD = new JID(
+        ("bob_stf@" + SERVER + "/" + Saros.RESOURCE));
+
+    public final static JID JID_TO_CHANGE = new JID((NEW_USER_NAME + "@"
+        + SERVER + "/" + Saros.RESOURCE));
+
+    public static String PASSWORD = "dddfffggg";
+    public static String NO_MATCHED_REPEAT_PASSWORD = "dd";
+
     /* Project name */
     public static final String PROJECT1 = "Foo_Saros1";
     protected static final String PROJECT1_COPY = "copy_of_FOO_Saros1";
@@ -199,6 +222,22 @@ public class STFTest extends STF {
     }
 
     /**
+     * A convenient function to quickly build a session with default value.
+     * 
+     * @param inviter
+     * @param invitees
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void setUpSessionByDefault(Tester inviter, Tester... invitees)
+        throws RemoteException, InterruptedException {
+        inviter.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        inviter.buildSessionDoneConcurrently(PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            invitees);
+    }
+
+    /**
      * For all active testers, reset buddy names, disconnect, delete all
      * projects.
      * 
@@ -227,20 +266,17 @@ public class STFTest extends STF {
         assertTrue(activeTesters.isEmpty());
     }
 
-    /**
-     * A convenient function to quickly build a session with default value.
-     * 
-     * @param inviter
-     * @param invitees
-     * @throws RemoteException
-     * @throws InterruptedException
-     */
-    public static void setUpSessionByDefault(Tester inviter, Tester... invitees)
-        throws RemoteException, InterruptedException {
-        inviter.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        inviter.buildSessionDoneConcurrently(PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            invitees);
+    public static void resetDefaultAccount() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            if (tester != null) {
+                if (!tester.sarosM.isAccountExist(tester.jid))
+                    tester.sarosM.addAccount(tester.jid, tester.password);
+                if (!tester.sarosM.isAccountActive(tester.jid))
+                    tester.sarosM.activateAccount(tester.jid);
+                tester.sarosM.deleteAllNoActiveAccounts();
+
+            }
+        }
     }
 
     public static void reBuildSession(Tester host, Tester... invitees)

@@ -73,9 +73,9 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
                 item.contextMenu(MENU_DELETE).click();
-                shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
+                shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
                     true);
-                shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+                shellW.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }
@@ -83,14 +83,14 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     public void deleteProject() throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shellC.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        shellC.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+        shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
+        shellW.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteFile() throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shellC.confirmShellDelete(OK);
+        shellW.confirmShellDelete(OK);
     }
 
     public void copyProject(String target) throws RemoteException {
@@ -101,10 +101,10 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
-        shellC.activateShell("Copy Project");
+        shellW.activateShell("Copy Project");
         textW.setTextInTextWithLabel(target, "Project name:");
         buttonW.clickButton(OK);
-        shellC.waitUntilShellClosed("Copy Project");
+        shellW.waitUntilShellClosed("Copy Project");
         bot.sleep(1000);
     }
 
@@ -115,7 +115,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
     }
 
     private void deleteNoGUI(IPath path) {

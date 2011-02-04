@@ -128,6 +128,9 @@ public class STF {
     protected final static String SHELL_SAROS_CONFIGURATION = SarosMessages
         .getString("shell_saros_configuration");
 
+    protected final static String SHELL_CHANGE_ACCOUNT = SarosMessages
+        .getString("shell_change_xmpp_account");
+
     protected final static String LABEL_XMPP_JABBER_SERVER = SarosMessages
         .getString("text_label_xmpp_jabber_server");
     protected final static String LABEL_USER_NAME = SarosMessages
@@ -146,9 +149,6 @@ public class STF {
 
     protected final static String ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS = SarosMessages
         .getString("error_message_too_fast_register_accounts");
-
-    static protected final String TREE_ITEM_SAROS_IN_SHELL_PREFERENCES = SarosMessages
-        .getString("tree_item_label_saros_in_shell_preferences");
 
     static protected final String GROUP_TITLE_XMPP_JABBER_ACCOUNTS = SarosMessages
         .getString("group_title_xmpp_jabber_accounts_in_shell-saros-preferences");

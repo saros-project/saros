@@ -1,11 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
-public interface Label extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface Label extends EclipseComponent {
 
     /**
      * 
@@ -13,6 +14,8 @@ public interface Label extends Remote {
      * @throws RemoteException
      */
     public String getTextOfLabel() throws RemoteException;
+
+    public String getTextOfLabelInGroup(String inGroup) throws RemoteException;
 
     /**
      * 

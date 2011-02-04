@@ -156,7 +156,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).close();
-            if (shellC.isShellActive("Save Resource"))
+            if (shellW.isShellActive("Save Resource"))
                 confirmWindowSaveSource(YES);
         }
     }
@@ -199,9 +199,9 @@ public class EditorImp extends EclipseComponentImp implements Editor {
 
     public void confirmWindowSaveSource(String buttonType)
         throws RemoteException {
-        shellC.waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
-        shellC.activateShell(SHELL_SAVE_ALL_FILES_NOW);
-        shellC.confirmShell(SHELL_SAVE_ALL_FILES_NOW, buttonType);
+        shellW.waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
+        shellW.activateShell(SHELL_SAVE_ALL_FILES_NOW);
+        shellW.confirmShell(SHELL_SAVE_ALL_FILES_NOW, buttonType);
     }
 
     // public void closeAllOpenedEditors() throws RemoteException {
@@ -378,7 +378,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
         SWTBotEclipseEditor editor = getEditor(fileName);
         editor.setFocus();
         editor.typeText(text);
@@ -469,7 +469,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         editor.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbenchC.sleep(500);
+        workbench.sleep(500);
     }
 
     public void selectLine(String fileName, int line) throws RemoteException {
@@ -477,7 +477,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         editor.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbenchC.sleep(1000);
+        workbench.sleep(1000);
 
     }
 
@@ -487,7 +487,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         editor.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbenchC.sleep(800);
+        workbench.sleep(800);
     }
 
     public String getSelection(String fileName) throws RemoteException {
@@ -546,7 +546,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
             editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        workbenchC.sleep(1000);
+        workbench.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'j');
     }
 
@@ -558,7 +558,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
             editor.pressShortcut(SWT.COMMAND, '.');
         else
             editor.pressShortcut(SWT.CTRL, '.');
-        workbenchC.sleep(20);
+        workbench.sleep(20);
     }
 
     public void pressShortCutQuickAssignToLocalVariable(String fileName)
@@ -568,7 +568,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
             editor.pressShortcut(SWT.COMMAND, '2');
         else
             editor.pressShortcut(SWT.CTRL, '2');
-        workbenchC.sleep(1000);
+        workbench.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'l');
 
     }

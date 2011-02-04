@@ -36,6 +36,9 @@ public interface Button extends Remote {
     public void clickButtonInGroup(String mnemonicText, String inGroup)
         throws RemoteException;
 
+    public void selectCComboBox(int indexOfCComboBox, int indexOfSelection)
+        throws RemoteException;
+
     /**
      * 
      * @param mnemonicText

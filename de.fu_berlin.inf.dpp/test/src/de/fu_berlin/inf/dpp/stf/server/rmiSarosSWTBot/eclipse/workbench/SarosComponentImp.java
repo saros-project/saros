@@ -12,16 +12,16 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        shellC.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shellW.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
         textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
         textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
         textW.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
         buttonW.clickButton(FINISH);
         try {
-            shellC.waitShortUntilIsShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            shellW.waitShortUntilIsShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         } catch (TimeoutException e) {
-            String errorMessage = shellC
+            String errorMessage = shellW
                 .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
@@ -36,11 +36,12 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        shellC.activateShellAndWait(SHELL_SAROS_CONFIGURATION);
+        shellW.activateShellAndWait(SHELL_SAROS_CONFIGURATION);
         textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
         textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
         textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
         buttonW.clickButton(NEXT);
         buttonW.clickButton(FINISH);
     }
+
 }

@@ -14,10 +14,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Perspective;
 
-public class WindowMImp extends EclipseComponentImp implements WindowM {
+public class WindowMImp extends PreferencesImp implements WindowM {
 
     private static transient WindowMImp windowImp;
 
@@ -39,7 +38,8 @@ public class WindowMImp extends EclipseComponentImp implements WindowM {
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(TREE_ITEM_WORKSPACE_IN_PREFERENCES);
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
+            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
         if (OS.equals("Default")) {
             bot.radioInGroup("Default", "New text file line delimiter").click();
@@ -50,26 +50,27 @@ public class WindowMImp extends EclipseComponentImp implements WindowM {
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellC.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         SWTBotTree tree = bot.tree();
-        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(TREE_ITEM_WORKSPACE_IN_PREFERENCES);
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
+            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            shellC.closeShell(SHELL_PREFERNCES);
+            shellW.closeShell(SHELL_PREFERNCES);
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            shellC.closeShell(SHELL_PREFERNCES);
+            shellW.closeShell(SHELL_PREFERNCES);
             return itemName;
         }
-        shellC.closeShell(SHELL_PREFERNCES);
+        shellW.closeShell(SHELL_PREFERNCES);
         return "";
     }
 
@@ -86,18 +87,20 @@ public class WindowMImp extends EclipseComponentImp implements WindowM {
      * 
      **********************************************/
     public void showViewProblems() throws RemoteException {
-        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW, TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
+            TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
     }
 
     public void showViewProjectExplorer() throws RemoteException {
-        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW, TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
+            TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
     }
 
     public void showViewWithName(String category, String nodeName)
         throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
         menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        shellC.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
+        shellW.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
             nodeName, OK);
     }
 
@@ -144,7 +147,7 @@ public class WindowMImp extends EclipseComponentImp implements WindowM {
     }
 
     protected void precondition() throws RemoteException {
-        workbenchC.activateWorkbench();
+        workbench.activateWorkbench();
     }
 
     /**
@@ -167,7 +170,7 @@ public class WindowMImp extends EclipseComponentImp implements WindowM {
     public void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
-            workbenchC.activateWorkbench();
+            workbench.activateWorkbench();
             try {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
