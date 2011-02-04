@@ -179,7 +179,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new StringFieldEditor(
             PreferenceConstants.AUTO_INVITE,
-            "Automatically invite the following comma separated buddies (for debugging)",
+            "Automatically invite the following comma separated buddies (use JabberIDs; for debugging)",
             inviteGroup));
 
         addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
