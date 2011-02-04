@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface EditM extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface EditM extends EclipseComponent {
 
     /**********************************************
      * 

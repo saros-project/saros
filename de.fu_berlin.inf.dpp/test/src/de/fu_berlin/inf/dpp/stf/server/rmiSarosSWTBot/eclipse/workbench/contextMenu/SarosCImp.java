@@ -293,8 +293,8 @@ public class SarosCImp extends EclipseComponentImp implements SarosC {
     }
 
     protected void precondition() throws RemoteException {
-        pEV.openPEView();
-        pEV.setFocusOnPEView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
 }

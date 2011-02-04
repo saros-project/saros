@@ -55,10 +55,6 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         rename(SHELL_RENAME_PACKAGE, OK, newName);
     }
 
-    protected void precondition() throws RemoteException {
-        workbench.activateWorkbench();
-    }
-
     /**************************************************************
      * 
      * inner functions
@@ -82,6 +78,10 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         shellW.waitUntilShellActive(shellTitle);
         shellW.confirmShellWithTree(shellTitle, buttonName, nodes);
         shellW.waitUntilShellClosed(shellTitle);
+    }
+
+    protected void precondition() throws RemoteException {
+        workbench.activateWorkbench();
     }
 
 }

@@ -100,7 +100,7 @@ public class TestSessionViewComponent extends STFTest {
         bob.sarosSessionV.followThisBuddy(alice.jid);
         assertTrue(bob.sarosSessionV.isFollowingBuddy(alice.jid));
 
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         assertTrue(bob.editor.isJavaEditorOpen(CLS1));
 
@@ -147,7 +147,7 @@ public class TestSessionViewComponent extends STFTest {
             + "/after_jump_to_position.png");
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.activateJavaEditor(CLS1);
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
         assertFalse(bob.editor.isJavaEditorOpen(CLS1));

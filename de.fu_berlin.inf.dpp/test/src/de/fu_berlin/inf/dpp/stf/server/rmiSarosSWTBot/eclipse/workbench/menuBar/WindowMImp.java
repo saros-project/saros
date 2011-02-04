@@ -32,7 +32,7 @@ public class WindowMImp extends PreferencesImp implements WindowM {
 
     /**********************************************
      * 
-     * change setting with preferences dialog
+     * actions
      * 
      **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
@@ -53,27 +53,6 @@ public class WindowMImp extends PreferencesImp implements WindowM {
         shellW.waitUntilShellClosed(SHELL_PREFERNCES);
     }
 
-    public String getTextFileLineDelimiter() throws RemoteException {
-        clickMenuPreferences();
-        SWTBotTree tree = bot.tree();
-        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
-            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
-        if (bot.radioInGroup("Default", "New text file line delimiter")
-            .isSelected()) {
-            shellW.closeShell(SHELL_PREFERNCES);
-            return "Default";
-        } else if (bot.radioInGroup("Other:", "New text file line delimiter")
-            .isSelected()) {
-            SWTBotCombo combo = bot
-                .comboBoxInGroup("New text file line delimiter");
-            String itemName = combo.items()[combo.selectionIndex()];
-            shellW.closeShell(SHELL_PREFERNCES);
-            return itemName;
-        }
-        shellW.closeShell(SHELL_PREFERNCES);
-        return "";
-    }
-
     public void clickMenuPreferences() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
             menuW.clickMenuWithTexts("Eclipse", "Preferences...");
@@ -81,11 +60,6 @@ public class WindowMImp extends PreferencesImp implements WindowM {
             menuW.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
     }
 
-    /**********************************************
-     * 
-     * show view with main menu
-     * 
-     **********************************************/
     public void showViewProblems() throws RemoteException {
         showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
             TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
@@ -104,11 +78,6 @@ public class WindowMImp extends PreferencesImp implements WindowM {
             nodeName, OK);
     }
 
-    /**********************************************
-     * 
-     * all related actions with perspective
-     * 
-     **********************************************/
     public void openPerspective() throws RemoteException {
         switch (Perspective.WHICH_PERSPECTIVE) {
         case JAVA:
@@ -134,18 +103,49 @@ public class WindowMImp extends PreferencesImp implements WindowM {
         openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
     }
 
-    public boolean isJavaPerspectiveActive() throws RemoteException {
-        return isPerspectiveActive(ID_JAVA_PERSPECTIVE);
-    }
-
     public void openPerspectiveDebug() throws RemoteException {
         openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public String getTextFileLineDelimiter() throws RemoteException {
+        clickMenuPreferences();
+        SWTBotTree tree = bot.tree();
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
+            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
+        if (bot.radioInGroup("Default", "New text file line delimiter")
+            .isSelected()) {
+            shellW.closeShell(SHELL_PREFERNCES);
+            return "Default";
+        } else if (bot.radioInGroup("Other:", "New text file line delimiter")
+            .isSelected()) {
+            SWTBotCombo combo = bot
+                .comboBoxInGroup("New text file line delimiter");
+            String itemName = combo.items()[combo.selectionIndex()];
+            shellW.closeShell(SHELL_PREFERNCES);
+            return itemName;
+        }
+        shellW.closeShell(SHELL_PREFERNCES);
+        return "";
+    }
+
+    public boolean isJavaPerspectiveActive() throws RemoteException {
+        return isPerspectiveActive(ID_JAVA_PERSPECTIVE);
     }
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
         return isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
     }
 
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
     protected void precondition() throws RemoteException {
         workbench.activateWorkbench();
     }

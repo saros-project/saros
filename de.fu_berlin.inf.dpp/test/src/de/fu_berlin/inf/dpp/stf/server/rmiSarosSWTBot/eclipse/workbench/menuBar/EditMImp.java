@@ -39,33 +39,6 @@ public class EditMImp extends EclipseComponentImp implements EditM {
      * 
      **********************************************/
 
-    public void deleteProjectNoGUI(String projectName) throws RemoteException {
-        IPath path = new Path(projectName);
-        deleteNoGUI(path);
-    }
-
-    public void deleteFolderNoGUI(String... folderNodes) throws RemoteException {
-        IPath path = new Path(getPath(folderNodes));
-        deleteNoGUI(path);
-    }
-
-    public void deletePkgNoGUI(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
-            IPath path = new Path(getPkgPath(projectName, pkg));
-            deleteNoGUI(path);
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void deleteClassNoGUI(String projectName, String pkg,
-        String className) throws RemoteException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        deleteNoGUI(path);
-    }
-
     public void deleteAllProjects() throws RemoteException {
         precondition();
         SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(
@@ -106,6 +79,39 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         buttonW.clickButton(OK);
         shellW.waitUntilShellClosed("Copy Project");
         bot.sleep(1000);
+    }
+
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
+
+    public void deleteProjectNoGUI(String projectName) throws RemoteException {
+        IPath path = new Path(projectName);
+        deleteNoGUI(path);
+    }
+
+    public void deleteFolderNoGUI(String... folderNodes) throws RemoteException {
+        IPath path = new Path(getPath(folderNodes));
+        deleteNoGUI(path);
+    }
+
+    public void deletePkgNoGUI(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            IPath path = new Path(getPkgPath(projectName, pkg));
+            deleteNoGUI(path);
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void deleteClassNoGUI(String projectName, String pkg,
+        String className) throws RemoteException {
+        IPath path = new Path(getClassPath(projectName, pkg, className));
+        deleteNoGUI(path);
     }
 
     /**************************************************************

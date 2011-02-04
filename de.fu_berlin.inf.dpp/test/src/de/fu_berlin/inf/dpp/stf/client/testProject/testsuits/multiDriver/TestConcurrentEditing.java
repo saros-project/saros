@@ -46,7 +46,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.buildSessionDoneSequentially(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        bob.pEV.openFile(path);
+        bob.openC.openFile(VIEW_PACKAGE_EXPLORER, path);
 
         bob.editor.waitUntilEditorOpen(FILE);
         bob.editor.navigateInEditor(FILE, 0, 30);
@@ -95,7 +95,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.buildSessionDoneConcurrently(PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
-        bob.pEV.openClass(PROJECT1, PKG1, CLS1);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorActive(CLS1);
 
         String fileName = CLS1 + SUFIX_JAVA;

@@ -161,7 +161,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
         String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS2);
-        carl.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS2);
+        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
+            PROJECT1, PKG1, CLS2);
 
         carl.editor.waitUntilJavaEditorContentSame(dirtyCls2ContentOfAlice,
             PROJECT1, PKG1, CLS2);
@@ -196,7 +197,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
-        carl.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS2);
+        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
+            PROJECT1, PKG1, CLS2);
         carl.editor.closeJavaEditorWithSave(CLS2);
 
         alice.editor.setTextInJavaEditorWithSave(CP2_CHANGE, PROJECT1, PKG1,
@@ -220,7 +222,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         System.out.println(dirtyCls2ChangeContentOfAlice);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.pEV.openClass(PROJECT1, PKG1, CLS2);
+        carl.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         carl.editor.waitUntilJavaEditorContentSame(
             dirtyCls2ChangeContentOfAlice, PROJECT1, PKG1, CLS2);
         String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,

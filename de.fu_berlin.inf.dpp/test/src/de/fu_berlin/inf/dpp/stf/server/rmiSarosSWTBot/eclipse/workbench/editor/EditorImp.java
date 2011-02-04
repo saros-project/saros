@@ -427,7 +427,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public boolean isClassDirty(String projectName, String pkg,
         String className, final String idOfEditor) throws RemoteException {
         if (!isJavaEditorOpen(className))
-            pEV.openClass(projectName, pkg, className);
+            openC.openClass(VIEW_PACKAGE_EXPLORER, projectName, pkg, className);
         if (!isJavaEditorActive(className))
             activateJavaEditor(className);
         return getJavaEditor(className).isDirty();
@@ -617,7 +617,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     private void precondition(String... fileNodes) throws RemoteException {
         String fileName = fileNodes[fileNodes.length - 1];
         if (!isEditorOpen(fileName)) {
-            pEV.openFile(fileNodes);
+            openC.openFile(VIEW_PACKAGE_EXPLORER, fileNodes);
         }
         if (!isEditorActive(fileName)) {
             activateEditor(fileName);

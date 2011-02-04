@@ -273,13 +273,13 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     /**************************************************************
      * 
-     * exported functions
+     * Inner functions
      * 
      **************************************************************/
     protected void precondition() throws RemoteException {
         workbench.activateWorkbench();
-        pEV.openPEView();
-        pEV.setFocusOnPEView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
     private void confirmWindowNewJavaClass(String projectName, String pkg,

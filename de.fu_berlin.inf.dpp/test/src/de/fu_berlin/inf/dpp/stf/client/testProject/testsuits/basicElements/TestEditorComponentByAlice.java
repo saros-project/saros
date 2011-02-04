@@ -62,7 +62,7 @@ public class TestEditorComponentByAlice extends STFTest {
     @Test
     public void testDeleteInEditor() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
         alice.editor.navigateInEditor(fileName, 3, 0);
@@ -77,7 +77,7 @@ public class TestEditorComponentByAlice extends STFTest {
     @Test
     public void testEnterInEditor() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
         alice.editor.navigateInEditor(fileName, 3, 0);
@@ -90,7 +90,7 @@ public class TestEditorComponentByAlice extends STFTest {
     @Test
     public void autoComplateProposal() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
         assertDoesNotContain("public static void main",
@@ -104,7 +104,7 @@ public class TestEditorComponentByAlice extends STFTest {
     @Test
     public void getAutoComplateProposal() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
         List<String> autoCompleteProposals = alice.editor
@@ -120,7 +120,7 @@ public class TestEditorComponentByAlice extends STFTest {
     @Test
     public void pressShortCutSave() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
         alice.editor.autoCompleteProposal(CLS1 + ".java", "main",

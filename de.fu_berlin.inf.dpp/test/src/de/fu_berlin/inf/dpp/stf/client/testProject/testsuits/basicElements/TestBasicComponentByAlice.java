@@ -8,8 +8,6 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,7 +23,6 @@ public class TestBasicComponentByAlice extends STFTest {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
     }
-
 
     @After
     public void runAfterEveryTest() throws RemoteException {
@@ -58,7 +55,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void existsTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.setFocusOnPEView();
+        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemInTreeInView("Package Explorer",
             PROJECT1));
         assertTrue(alice.fileM.existsProject(PROJECT1));
@@ -70,7 +67,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.setFocusOnPEView();
+        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemWithRegexsInView(
             "Package Explorer", PROJECT1));
         assertTrue(alice.fileM.existsProject(PROJECT1));
@@ -98,7 +95,7 @@ public class TestBasicComponentByAlice extends STFTest {
     @Test
     public void selectTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.setFocusOnPEView();
+        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
             "Package Explorer", "Collapse All");
@@ -131,7 +128,7 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
-        alice.pEV.setFocusOnPEView();
+        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
             SVN_PROJECT_COPY, "pkg", "Test")));
     }
@@ -141,8 +138,9 @@ public class TestBasicComponentByAlice extends STFTest {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
-        alice.pEV.setFocusOnPEView();
-        alice.pEV.openClass(SVN_PROJECT_COPY, "pkg", "Test");
+        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, "pkg",
+            "Test");
         alice.editor.setTextInJavaEditorWithoutSave(CP1, SVN_PROJECT_COPY,
             "pkg", "Test");
         assertTrue(alice.editor.isClassDirty(SVN_PROJECT_COPY, "pkg", "Test",

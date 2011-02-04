@@ -70,7 +70,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertFalse(carl.editor.isJavaEditorOpen(CLS1));
         assertFalse(dave.editor.isJavaEditorOpen(CLS1));
 
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
 
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         carl.editor.waitUntilJavaEditorOpen(CLS1);
@@ -154,7 +154,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.pEV.openClass(PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
         carl.editor.waitUntilJavaEditorOpen(CLS1);
         dave.editor.waitUntilJavaEditorOpen(CLS1);

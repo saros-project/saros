@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class STF {
 
     /**********************************************
@@ -459,5 +462,14 @@ public class STF {
      * 
      **********************************************/
     protected final static String STRING_REGEX_WITH_LINE_BREAK = ".*\n*.*";
+
+    protected final static Map<String, String> viewTitlesAndIDs = new HashMap<String, String>();
+    static {
+        viewTitlesAndIDs.put(VIEW_PACKAGE_EXPLORER, VIEW_PACKAGE_EXPLORER_ID);
+        viewTitlesAndIDs.put(VIEW_REMOTE_SCREEN, VIEW_REMOTE_SCREEN_ID);
+        viewTitlesAndIDs.put(VIEW_SAROS_BUDDIES, VIEW_SAROS_BUDDIES_ID);
+        viewTitlesAndIDs.put(VIEW_SAROS_CHAT, VIEW_SAROS_CHAT_ID);
+        viewTitlesAndIDs.put(VIEW_SAROS_SESSION, VIEW_SAROS_SESSION_ID);
+    }
 
 }

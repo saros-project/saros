@@ -31,8 +31,18 @@ public class SarosMImp extends PreferencesImp implements SarosM {
      **********************************************/
 
     public void creatAccount(JID jid, String password) throws RemoteException {
+        precondition();
         menuW.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         confirmShellCreateNewXMPPAccount(jid, password);
     }
 
+    /**********************************************
+     * 
+     * Inner functions
+     * 
+     **********************************************/
+
+    protected void precondition() throws RemoteException {
+        workbench.activateWorkbench();
+    }
 }

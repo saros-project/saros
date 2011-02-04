@@ -112,7 +112,7 @@ public class TestPackageExplorerViewComponent extends STFTest {
         assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.editor.closeEditorWithSave(FILE1);
         assertFalse(alice.editor.isEditorOpen(FILE1));
-        alice.pEV.openFile(PROJECT1, FOLDER1, FILE1);
+        alice.openC.openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.editM.deleteFile();
@@ -125,7 +125,8 @@ public class TestPackageExplorerViewComponent extends STFTest {
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.editor.closeEditorWithSave(FILE1);
-        alice.pEV.openFileWith("Text Editor", PROJECT1, FOLDER1, FILE1);
+        alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
+            PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.editM.deleteFile();
@@ -358,8 +359,9 @@ public class TestPackageExplorerViewComponent extends STFTest {
     // close it.
     public void testOpenWith() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.pEV.openClassWith("Text Editor", PROJECT1, PKG1, CLS1);
-        alice.pEV.openClassWithSystemEditor(PROJECT1, PKG1, CLS1);
+        alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
+            PROJECT1, PKG1, CLS1);
+        alice.openC.openClassWithSystemEditor(PROJECT1, PKG1, CLS1);
     }
 
     @Test

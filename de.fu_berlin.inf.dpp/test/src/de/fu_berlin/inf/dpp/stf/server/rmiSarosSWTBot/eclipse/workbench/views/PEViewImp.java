@@ -2,18 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.program.Program;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
@@ -27,82 +17,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
             return pEViewImp;
         pEViewImp = new PEViewImp();
         return pEViewImp;
-    }
-
-    /***********************************************************************
-     * 
-     * exported functions
-     * 
-     ***********************************************************************/
-
-    /**********************************************
-     * 
-     * open/close/activate the package explorer view
-     * 
-     **********************************************/
-    public void openPEView() throws RemoteException {
-        if (!isPEViewOpen())
-            viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-    }
-
-    public boolean isPEViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEW_PACKAGE_EXPLORER);
-    }
-
-    public void closePEView() throws RemoteException {
-        viewW.closeViewByTitle(VIEW_PACKAGE_EXPLORER);
-    }
-
-    public void setFocusOnPEView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
-    }
-
-    public boolean isPEViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEW_PACKAGE_EXPLORER);
-    }
-
-    /**********************************************
-     * 
-     * all related actions with the sub menus of the context menu "Open"
-     * 
-     **********************************************/
-
-    public void openFile(String... fileNodes) throws RemoteException {
-        precondition();
-        treeW.clickContextMenuOfTreeItemInView(VIEW_PACKAGE_EXPLORER, CM_OPEN,
-            fileNodes);
-    }
-
-    public void openClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        String[] classNodes = getClassNodes(projectName, pkg, className);
-        openFile(changeToRegex(classNodes));
-    }
-
-    public void openClassWith(String whichEditor, String projectName,
-        String pkg, String className) throws RemoteException {
-        openFileWith(whichEditor, getClassNodes(projectName, pkg, className));
-    }
-
-    public void openFileWith(String whichEditor, String... fileNodes)
-        throws RemoteException {
-        precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEW_PACKAGE_EXPLORER);
-        tree.expandNode(fileNodes).select();
-        ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
-        shellW.waitUntilShellActive(SHELL_EDITOR_SELECTION);
-        SWTBotTable table = bot.table();
-        table.select(whichEditor);
-        buttonW.waitUntilButtonEnabled(OK);
-        shellW.confirmShell(SHELL_EDITOR_SELECTION, OK);
-    }
-
-    public void openClassWithSystemEditor(String projectName, String pkg,
-        String className) throws RemoteException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        Program.launch(resource.getLocation().toString());
     }
 
     public void selectProject(String projectName) throws RemoteException {
@@ -144,8 +58,8 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        openPEView();
-        setFocusOnPEView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
 }
