@@ -284,6 +284,8 @@ public interface SessionView extends Remote {
     public boolean areParticipants(List<JID> jidOfParticipants)
         throws RemoteException;
 
+    public boolean isFollowing() throws RemoteException;
+
     public boolean isFollowingBuddy(JID buddyJID) throws RemoteException;
 
     /**

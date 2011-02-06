@@ -285,4 +285,12 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
             baseJIDOfinvitees);
     }
 
+    public boolean isValidClassPath(String projectName, String pkg,
+        String className) {
+        boolean isVailid = true;
+        isVailid &= projectName.matches("\\w*");
+        isVailid &= pkg.matches("[\\w*\\.]*\\w*");
+        isVailid &= className.matches("\\w*");
+        return isVailid;
+    }
 }

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.menuBar;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

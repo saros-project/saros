@@ -5,7 +5,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.RosterViewBehaviour.TestChangingNameInRosterView;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements.TestBasicSarosElements;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFileOperations;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFolderOperations;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestSVNStateUpdates;
@@ -18,6 +17,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShar
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShareProjectUsingExistingProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations.TestParallelInvitationWithTerminationByHost;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations.TestParallelInvitationWithTerminationByInvitees;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestBasicSarosElements.class,

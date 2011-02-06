@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,10 +14,10 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestSessionViewComponent extends STFTest {
+public class TestSessionView extends STFTest {
 
     private static final Logger log = Logger
-        .getLogger(TestSessionViewComponent.class);
+        .getLogger(TestSessionView.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,

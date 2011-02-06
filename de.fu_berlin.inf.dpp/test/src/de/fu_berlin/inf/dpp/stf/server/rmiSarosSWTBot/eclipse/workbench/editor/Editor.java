@@ -301,8 +301,8 @@ public interface Editor extends Remote {
      * 
      * <p>
      * <b>Note:</b> the mothod is different from
-     * {@link Editor#waitUntilEditorContentSame(String, String...)},
-     * which compare the contents which may be dirty.
+     * {@link Editor#waitUntilEditorContentSame(String, String...)}, which
+     * compare the contents which may be dirty.
      * </p>
      * 
      * @param otherFileContent
@@ -342,8 +342,8 @@ public interface Editor extends Remote {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @return only the saved content of the specified file, if it is dirty.
      *         This method is different from
-     *         {@link Editor#getTextOfEditor(String...)}, which can
-     *         return a not saved content.
+     *         {@link Editor#getTextOfEditor(String...)}, which can return a not
+     *         saved content.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException
@@ -361,8 +361,8 @@ public interface Editor extends Remote {
      *            name of the class without suffix, e.g. MyClass
      * @return only the saved content of the specified class file, if it is
      *         dirty. This method is different from
-     *         {@link Editor#getTextOfJavaEditor(String, String, String)}
-     *         , which can return a not saved content.
+     *         {@link Editor#getTextOfJavaEditor(String, String, String)} ,
+     *         which can return a not saved content.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException

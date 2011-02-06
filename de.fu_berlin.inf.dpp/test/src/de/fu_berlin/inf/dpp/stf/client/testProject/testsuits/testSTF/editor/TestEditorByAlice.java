@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.editor;
 
 import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertContains;
 import static org.eclipse.swtbot.swt.finder.SWTBotAssert.assertDoesNotContain;
@@ -19,8 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
 
-public class TestEditorComponentByAlice extends STFTest {
+public class TestEditorByAlice extends STFTest {
 
     private static final Logger log = Logger
         .getLogger(TestBasicSarosElements.class);

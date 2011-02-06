@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.basicWidgets;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,10 +14,10 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestBasicComponentByAliceAndBob extends STFTest {
+public class TestBasicWidgetsByAliceAndBob extends STFTest {
 
     private static final Logger log = Logger
-        .getLogger(TestBasicComponentByAliceAndBob.class);
+        .getLogger(TestBasicWidgetsByAliceAndBob.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,

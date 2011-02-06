@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.basicElements;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.editor;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestEditorComponent2 extends STFTest {
+public class TestEditor2 extends STFTest {
     private static final Logger log = Logger
-        .getLogger(TestEditorComponent2.class);
+        .getLogger(TestEditor2.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {

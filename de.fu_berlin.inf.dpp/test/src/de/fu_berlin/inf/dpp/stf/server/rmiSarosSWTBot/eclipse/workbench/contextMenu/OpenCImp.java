@@ -8,7 +8,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
@@ -48,6 +47,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     public void openClass(String viewTitle, String projectName, String pkg,
         String className) throws RemoteException {
+        assert isValidClassPath(projectName, pkg, className) : "The given classPath is not invalid!";
         String[] classNodes = getClassNodes(projectName, pkg, className);
         openFile(viewTitle, changeToRegex(classNodes));
     }
@@ -55,6 +55,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openClassWith(String viewTitle, String whichEditor,
         String projectName, String pkg, String className)
         throws RemoteException {
+        assert isValidClassPath(projectName, pkg, className) : "The given classPath is not invalid!";
         openFileWith(viewTitle, whichEditor,
             getClassNodes(projectName, pkg, className));
     }
@@ -62,17 +63,21 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openFileWith(String viewTitle, String whichEditor,
         String... fileNodes) throws RemoteException {
         precondition(viewTitle);
-        SWTBotTree tree = treeW.getTreeInView(VIEW_PACKAGE_EXPLORER);
-        tree.expandNode(fileNodes).select();
+        SWTBotTree tree = treeW.getTreeInView(viewTitle);
+        treeW.selectTreeItemInView(viewTitle, fileNodes);
         ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
         shellW.waitUntilShellActive(SHELL_EDITOR_SELECTION);
-        SWTBotTable table = bot.table();
-        table.select(whichEditor);
+        tableW.selectTableItem(whichEditor);
         buttonW.waitUntilButtonEnabled(OK);
         shellW.confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
-    public void openClassWithSystemEditor(String projectName, String pkg,
+    /**************************************************************
+     * 
+     * No GUI
+     * 
+     **************************************************************/
+    public void openClassWithSystemEditorNoGUI(String projectName, String pkg,
         String className) throws RemoteException {
         IPath path = new Path(getClassPath(projectName, pkg, className));
         final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();

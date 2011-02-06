@@ -210,6 +210,7 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
         confirmShellInvitation(jidOfInvitees);
     }
+
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
@@ -328,6 +329,13 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         return result;
     }
 
+    public boolean isFollowing() throws RemoteException {
+        JID followedBuddy = getFollowedBuddyJIDNoGUI();
+        if (followedBuddy == null)
+            return false;
+        return isFollowingBuddy(followedBuddy);
+    }
+
     public boolean isFollowingBuddy(JID buddyJID) throws RemoteException {
         try {
             return tableW.isContextMenuOfTableItemEnabledInView(
@@ -344,8 +352,6 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
         return null;
     }
 
-  
-
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
         String contactLabel;
@@ -356,11 +362,11 @@ public class SessionViewImp extends EclipseComponentImp implements SessionView {
                 contactLabel = OWN_PARTICIPANT_NAME + PERMISSION_NAME;
         } else if (rosterV.hasBuddyNickNameNoGUI(participantJID)) {
             if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID) + " ("
-                    + participantJID.getBase() + ")";
+                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID)
+                    + " (" + participantJID.getBase() + ")";
             else
-                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID) + " ("
-                    + participantJID.getBase() + ")" + PERMISSION_NAME;
+                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID)
+                    + " (" + participantJID.getBase() + ")" + PERMISSION_NAME;
         } else {
             if (hasWriteAccessByNoGUI(participantJID))
                 contactLabel = participantJID.getBase();

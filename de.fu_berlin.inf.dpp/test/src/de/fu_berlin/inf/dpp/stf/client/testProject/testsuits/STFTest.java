@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,6 +19,8 @@ import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 
 public class STFTest extends STF {
+
+    protected final static Logger log = Logger.getLogger(STFTest.class);
 
     @Rule
     public TestName name = new TestName();
@@ -118,7 +121,7 @@ public class STFTest extends STF {
     public static final String FOLDER1 = "MyFolder";
     public static final String FOLDER2 = "MyFolder2";
 
-    /* File name */
+    /* File */
     public static final String FILE1 = "MyFile.xml";
     public static final String FILE2 = "MyFile2.xml";
     public static final String FILE3 = "file.txt";
@@ -332,7 +335,7 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester.sarosSessionV.isInSessionNoGUI()
-                && tester.sarosSessionV.isInFollowModeNoGUI()) {
+                && tester.sarosSessionV.isFollowing()) {
                 tester.sarosSessionV.stopFollowing();
             }
         }

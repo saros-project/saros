@@ -106,7 +106,7 @@ public interface OpenC extends EclipseComponent {
      *            name of the class, e.g. MyClass
      * @throws RemoteException
      */
-    public void openClassWithSystemEditor(String projectName, String pkg,
+    public void openClassWithSystemEditorNoGUI(String projectName, String pkg,
         String className) throws RemoteException;
 
 }
