@@ -46,7 +46,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionDoneConcurrently(PROJECT1,
+        alice.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();

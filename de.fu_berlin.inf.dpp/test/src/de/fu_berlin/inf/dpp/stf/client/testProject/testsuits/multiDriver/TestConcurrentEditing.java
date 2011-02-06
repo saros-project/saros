@@ -43,7 +43,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.editor.setTextInEditorWithSave("test/STF/lorem.txt", path);
         alice.editor.navigateInEditor(FILE, 0, 6);
 
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         bob.openC.openFile(VIEW_PACKAGE_EXPLORER, path);
@@ -92,7 +92,7 @@ public class TestConcurrentEditing extends STFTest {
     public void AliceAndBobeditInSameLine() throws RemoteException,
         InterruptedException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionDoneConcurrently(PROJECT1,
+        alice.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);

@@ -36,7 +36,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     /**********************************************
      * 
-     * all related actions with the sub menus of the context menu "Open"
+     * actions
      * 
      **********************************************/
 

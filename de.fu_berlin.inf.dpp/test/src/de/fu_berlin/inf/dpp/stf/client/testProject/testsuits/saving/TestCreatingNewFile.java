@@ -26,7 +26,7 @@ public class TestCreatingNewFile extends STFTest {
         /*
          * carl build session with bob, and alice simultaneously
          */
-        carl.buildSessionDoneConcurrently(PROJECT1,
+        carl.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob, alice);
 

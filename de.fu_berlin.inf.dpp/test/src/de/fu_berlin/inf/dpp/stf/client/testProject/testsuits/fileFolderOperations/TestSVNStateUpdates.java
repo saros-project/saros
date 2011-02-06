@@ -48,8 +48,8 @@ public class TestSVNStateUpdates extends STFTest {
                     if (!t.fileM.existsProject(SVN_PROJECT_COPY)) {
                         t.fileM.newJavaProject(SVN_PROJECT_COPY);
                         t.team.shareProjectWithSVNUsingSpecifiedFolderName(
-                            SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
-                            SVN_PROJECT_PATH);
+                            VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY,
+                            SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
 
                     }
                     return null;
@@ -92,7 +92,7 @@ public class TestSVNStateUpdates extends STFTest {
         int numberOfThreads = 1;
         MakeOperationConcurrently.workAll(initTasks, numberOfThreads);
 
-        alice.buildSessionDoneSequentially(SVN_PROJECT,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
         alice.sarosSessionV.waitUntilIsInviteeInSession(bob.sarosSessionV);
@@ -215,11 +215,11 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testDisconnectAndConnect() throws RemoteException {
-        alice.team.disConnect(SVN_PROJECT);
+        alice.team.disConnect(VIEW_PACKAGE_EXPLORER, SVN_PROJECT);
         bob.team.waitUntilProjectNotInSVN(SVN_PROJECT);
         assertFalse(bob.team.isProjectManagedBySVN(SVN_PROJECT));
         alice.team.shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
-            SVN_PROJECT, STFTest.SVN_REPOSITORY_URL);
+            VIEW_PACKAGE_EXPLORER, SVN_PROJECT, STFTest.SVN_REPOSITORY_URL);
         bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
         bob.team.waitUntilProjectInSVN(SVN_PROJECT);
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
@@ -240,11 +240,11 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testUpdate() throws RemoteException {
-        alice.team.updateProject(SVN_PROJECT, "115");
+        alice.team.updateProject(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, "115");
         bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
         assertTrue(alice.team.getURLOfRemoteResource(SVN_PROJECT).equals(
             bob.team.getURLOfRemoteResource(SVN_PROJECT)));
-        alice.team.updateProject(SVN_PROJECT, "116");
+        alice.team.updateProject(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, "116");
         bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
     }
 
@@ -264,7 +264,8 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     @Ignore
     public void testUpdateSingleFile() throws RemoteException {
-        alice.team.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "102");
+        alice.team.updateClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
+            SVN_CLS1, "102");
         bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
         assertTrue(alice.team.getRevision(STFTest.SVN_CLS1_FULL_PATH).equals(
             "102"));
@@ -273,7 +274,8 @@ public class TestSVNStateUpdates extends STFTest {
             "102"));
         bob.team.waitUntilRevisionIsSame(SVN_PROJECT, "116");
         assertTrue(bob.team.getRevision(SVN_PROJECT).equals("116"));
-        alice.team.updateClass(SVN_PROJECT, SVN_PKG, SVN_CLS1, "116");
+        alice.team.updateClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
+            SVN_CLS1, "116");
         bob.team.waitUntilWindowSarosRunningVCSOperationClosed();
     }
 
@@ -297,7 +299,7 @@ public class TestSVNStateUpdates extends STFTest {
         alice.editM.deleteProjectNoGUI(STFTest.SVN_CLS1_FULL_PATH);
         bob.fileM.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
-        alice.team.revertProject(SVN_PROJECT);
+        alice.team.revertProject(VIEW_PACKAGE_EXPLORER, SVN_PROJECT);
         bob.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertTrue(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
     }

@@ -161,13 +161,13 @@ public class Tester extends STF {
 
     // ********** Component, which consist of other simple functions ***********
 
-    public void buildSessionDoneSequentially(String projectName,
-        TypeOfShareProject howToShareProject,
+    public void buildSessionDoneSequentially(String viewTitle,
+        String projectName, TypeOfShareProject howToShareProject,
         TypeOfCreateProject usingWhichProject, Tester... invitees)
         throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-        sarosC.shareProjectWith(projectName, howToShareProject,
+        sarosC.shareProjectWith(viewTitle, projectName, howToShareProject,
             baseJIDOfInvitees);
         for (Tester invitee : invitees) {
             invitee.sarosC.confirmShellSessionnInvitation();
@@ -176,13 +176,13 @@ public class Tester extends STF {
         }
     }
 
-    public void buildSessionDoneConcurrently(final String projectName,
-        TypeOfShareProject howToShareProject,
+    public void buildSessionDoneConcurrently(String viewTitle,
+        final String projectName, TypeOfShareProject howToShareProject,
         final TypeOfCreateProject usingWhichProject, Tester... invitees)
         throws RemoteException, InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        this.sarosC.shareProjectWith(projectName, howToShareProject,
+        this.sarosC.shareProjectWith(viewTitle, projectName, howToShareProject,
             getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();

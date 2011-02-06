@@ -41,7 +41,7 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
         /*
          * alice build session with carl and is followed by carl.
          */
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl);
         alice.followedBy(carl);

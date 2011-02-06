@@ -43,12 +43,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
      * actions
      * 
      **********************************************/
-    public void shareProjectWithSVN(String projectName, String repositoryURL)
-        throws RemoteException {
+    public void shareProjectWithSVN(String viewTitle, String projectName,
+        String repositoryURL) throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -67,11 +67,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     }
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
-        String projectName, String repositoryURL) throws RemoteException {
+        String viewTitle, String projectName, String repositoryURL)
+        throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -81,14 +82,14 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         shellW.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
-    public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
-        String repositoryURL, String specifiedFolderName)
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String viewTitle,
+        String projectName, String repositoryURL, String specifiedFolderName)
         throws RemoteException {
-        precondition();
+        precondition(viewTitle);
 
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -120,7 +121,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             if (!viewWasOpen)
                 repoView.close();
             // recur...
-            shareProjectWithSVNUsingSpecifiedFolderName(projectName,
+            shareProjectWithSVNUsingSpecifiedFolderName(viewTitle, projectName,
                 repositoryURL, specifiedFolderName);
             return;
         }
@@ -141,7 +142,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
-        precondition();
+
         menuW.clickMenuWithTexts("File", "Import...");
         shellW.confirmShellWithTreeWithFilterText(SHELL_IMPORT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
@@ -161,46 +162,48 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         shellW.waitUntilShellClosed("SVN Checkout");
     }
 
-    public void disConnect(String projectName) throws RemoteException {
+    public void disConnect(String viewTitle, String projectName)
+        throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_DISCONNECT };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.confirmShell(SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
     }
 
-    public void revertProject(String projectName) throws RemoteException {
-        precondition();
+    public void revertProject(String viewTitle, String projectName)
+        throws RemoteException {
+        precondition(viewTitle);
 
         String[] contexts = { CM_TEAM, CM_REVERT };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.confirmShell(SHELL_REVERT, OK);
         shellW.waitUntilShellClosed(SHELL_REVERT);
     }
 
-    public void updateProject(String projectName, String versionID)
-        throws RemoteException {
+    public void updateProject(String viewTitle, String projectName,
+        String versionID) throws RemoteException {
         String[] nodes = { projectName + ".*" };
-        switchToAnotherRevision(nodes, versionID);
+        switchToAnotherRevision(viewTitle, nodes, versionID);
     }
 
-    public void updateClass(String projectName, String pkg, String className,
-        String revision) throws RemoteException {
+    public void updateClass(String viewTitle, String projectName, String pkg,
+        String className, String revision) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
         nodes = changeToRegex(nodes);
-        switchToAnotherRevision(nodes, revision);
+        switchToAnotherRevision(viewTitle, nodes, revision);
     }
 
-    public void switchProjectWithGui(String projectName, String url)
-        throws RemoteException {
-        precondition();
+    public void switchProjectWithGui(String viewTitle, String projectName,
+        String url) throws RemoteException {
+        precondition(viewTitle);
 
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, changeToRegex(projectName));
+        treeW.clickContextMenusOfTreeItemInView(viewTitle, contexts,
+            changeToRegex(projectName));
 
         shellW.waitUntilShellActive(SHELL_SWITCH);
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
@@ -220,7 +223,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     public void switchResource(String fullPath, String url, String revision)
         throws RemoteException {
-        precondition();
+
         final IPath path = new Path(fullPath);
         final IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
@@ -237,12 +240,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         vcs.switch_(resource, url, revision, new NullProgressMonitor());
     }
 
-    private void switchToAnotherRevision(String[] matchTexts, String versionID)
-        throws RemoteException {
-        precondition();
+    private void switchToAnotherRevision(String viewTitle, String[] matchTexts,
+        String versionID) throws RemoteException {
+        precondition(viewTitle);
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
-        treeW.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contexts, matchTexts);
+        treeW
+            .clickContextMenusOfTreeItemInView(viewTitle, contexts, matchTexts);
         shellW.waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
@@ -327,9 +330,9 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         waitUntil(SarosConditions.isUrlSame(fullPath, url));
     }
 
-    protected void precondition() throws RemoteException {
-        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+    protected void precondition(String viewTitle) throws RemoteException {
+        viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
+        viewW.setFocusOnViewByTitle(viewTitle);
     }
 
 }

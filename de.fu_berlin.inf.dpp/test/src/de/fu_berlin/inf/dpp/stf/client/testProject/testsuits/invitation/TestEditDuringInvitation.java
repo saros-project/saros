@@ -58,7 +58,7 @@ public class TestEditDuringInvitation extends STFTest {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         log.trace("starting testEditDuringInvitation, alice.buildSession");
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             bob);
 

@@ -72,7 +72,7 @@ public interface SarosC extends Remote {
      * @see Tester#buildSessionDoneSequentially(String, TypeOfShareProject,
      *      TypeOfCreateProject, Tester...)
      */
-    public void shareProjectWith(String projectName,
+    public void shareProjectWith(String viewTitle, String projectName,
         TypeOfShareProject howToshareProject, String[] inviteeBaseJIDs)
         throws RemoteException;
 
@@ -106,8 +106,8 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * @see Tester#buildSessionSequentially(String, String, Tester...)
      */
-    public void shareProject(String projectName, String... inviteeBaseJIDS)
-        throws RemoteException;
+    public void shareProject(String viewTitle, String projectName,
+        String... inviteeBaseJIDS) throws RemoteException;
 
     /**
      * 
@@ -260,6 +260,6 @@ public interface SarosC extends Remote {
      *            peoples.
      * @throws RemoteException
      */
-    public void clickContextMenushareProject(String projectName)
-        throws RemoteException;
+    public void clickContextMenushareProject(String viewTitle,
+        String projectName) throws RemoteException;
 }

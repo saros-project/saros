@@ -85,7 +85,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         InterruptedException {
         alice.windowM.setNewTextFileLineDelimiter("Unix");
 
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl, bob);
 

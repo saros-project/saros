@@ -49,7 +49,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     public void shareProjectUsingExistingProject() throws RemoteException {
         assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
         assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
         bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS1);
@@ -65,6 +65,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
         alice
             .buildSessionDoneSequentially(
+                VIEW_PACKAGE_EXPLORER,
                 PROJECT1,
                 TypeOfShareProject.SHARE_PROJECT,
                 TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
@@ -83,7 +84,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
-        alice.buildSessionDoneSequentially(PROJECT1,
+        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, bob);
         assertTrue(bob.fileM.existsProject(PROJECT1));

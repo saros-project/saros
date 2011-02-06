@@ -127,7 +127,8 @@ public class TestBasicComponentByAlice extends STFTest {
     public void selectTreeItemWithRegexs() throws RemoteException {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-            SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+            VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
+            SVN_PROJECT_PATH);
         alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
             SVN_PROJECT_COPY, "pkg", "Test")));
@@ -137,7 +138,8 @@ public class TestBasicComponentByAlice extends STFTest {
     public void selectTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-            SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+            VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
+            SVN_PROJECT_PATH);
         alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, "pkg",
             "Test");

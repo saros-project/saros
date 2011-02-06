@@ -232,7 +232,7 @@ public class STFTest extends STF {
     public static void setUpSessionByDefault(Tester inviter, Tester... invitees)
         throws RemoteException, InterruptedException {
         inviter.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        inviter.buildSessionDoneConcurrently(PROJECT1,
+        inviter.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             invitees);
     }
@@ -283,8 +283,8 @@ public class STFTest extends STF {
         throws RemoteException {
         if (!host.sarosSessionV.isInSessionNoGUI()) {
             for (Tester tester : invitees) {
-                host.buildSessionDoneSequentially(PROJECT1,
-                    TypeOfShareProject.SHARE_PROJECT,
+                host.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER,
+                    PROJECT1, TypeOfShareProject.SHARE_PROJECT,
                     TypeOfCreateProject.EXIST_PROJECT, tester);
             }
         }
