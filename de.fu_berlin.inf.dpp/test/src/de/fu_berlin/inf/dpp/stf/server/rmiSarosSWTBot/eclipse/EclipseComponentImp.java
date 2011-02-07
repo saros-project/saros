@@ -1,18 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.rmi.RemoteException;
-import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.osgi.framework.Bundle;
 
@@ -25,6 +22,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
@@ -113,6 +111,111 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     public final static String SCREENSHOTDIR = "test/STF/screenshot";
 
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilFolderExisted(String... folderNodes)
+        throws RemoteException {
+        String fullPath = getPath(folderNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void waitUntilPkgExisted(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
+                pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void waitUntilPkgNotExist(String projectName, String pkg)
+        throws RemoteException {
+        if (pkg.matches("[\\w\\.]*\\w+")) {
+            waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
+                projectName, pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
+
+    public void waitUntilFileExisted(String... fileNodes)
+        throws RemoteException {
+        String fullPath = getPath(fileNodes);
+        waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void waitUntilClassExisted(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceExist(path));
+    }
+
+    public void waitUntilClassNotExist(String projectName, String pkg,
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        waitUntil(SarosConditions.isResourceNotExist(path));
+    }
+
+    /**********************************************
+     * 
+     * No GUI
+     * 
+     **********************************************/
+    public boolean existsProjectNoGUI(String projectName)
+        throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        return project.exists();
+    }
+
+    public boolean existsFolderNoGUI(String... folderNodes)
+        throws RemoteException {
+        IPath path = new Path(getPath(folderNodes));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            return false;
+        return true;
+    }
+
+    public boolean existsPkgNoGUI(String projectName, String pkg)
+        throws RemoteException {
+        IPath path = new Path(getPkgPath(projectName, pkg));
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource != null)
+            return true;
+        return false;
+    }
+
+    public boolean existsFileNoGUI(String filePath) throws RemoteException {
+        IPath path = new Path(filePath);
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+        return file.exists();
+    }
+
+    public boolean existsFileNoGUI(String... nodes) throws RemoteException {
+        return existsFileNoGUI(getPath(nodes));
+    }
+
+    public boolean existsClassNoGUI(String projectName, String pkg,
+        String className) throws RemoteException {
+        return existsFileNoGUI(getClassPath(projectName, pkg, className));
+    }
+
+    /**********************************************
+     * 
+     * Inner functions
+     * 
+     **********************************************/
     protected void waitUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
@@ -123,38 +226,6 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     protected void waitShortUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
-    }
-
-    public String getClassPath(String projectName, String pkg, String className) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
-            + className + ".java";
-    }
-
-    public String getPkgPath(String projectName, String pkg) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/");
-    }
-
-    public String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + SUFIX_JAVA };
-        return nodes;
-    }
-
-    public String[] getPkgNodes(String projectName, String pkg) {
-        String[] nodes = { projectName, SRC, pkg };
-        return nodes;
-    }
-
-    public String getPath(String... nodes) {
-        String folderpath = "";
-        for (int i = 0; i < nodes.length; i++) {
-            if (i == nodes.length - 1) {
-
-                folderpath += nodes[i];
-            } else
-                folderpath += nodes[i] + "/";
-        }
-        return folderpath;
     }
 
     public String getTestFileContents(String testFilePath) {
@@ -168,129 +239,4 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         return contents;
     }
 
-    public String[] changeToRegex(String... texts) {
-        String[] matchTexts = new String[texts.length];
-        for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + "( .*)?";
-        }
-        return matchTexts;
-    }
-
-    public String ConvertStreamToString(InputStream is) throws IOException {
-        // BufferedReader bufferedReader = new BufferedReader(
-        // new InputStreamReader(is));
-        // StringBuilder stringBuilder = new StringBuilder();
-        // String line = null;
-        //
-        // while ((line = bufferedReader.readLine()) != null) {
-        // stringBuilder.append(line + "\n");
-        // }
-        //
-        // bufferedReader.close();
-        // return stringBuilder.toString();
-        if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[5024];
-            try {
-                Reader reader = new BufferedReader(new InputStreamReader(is,
-                    "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            } finally {
-                is.close();
-                writer.close();
-            }
-            return writer.toString();
-        } else {
-            return "";
-        }
-    }
-
-    public boolean isSame(InputStream input1, InputStream input2)
-        throws IOException {
-        boolean error = false;
-        try {
-            byte[] buffer1 = new byte[1024];
-            byte[] buffer2 = new byte[1024];
-            try {
-                int numRead1 = 0;
-                int numRead2 = 0;
-                while (true) {
-                    numRead1 = input1.read(buffer1);
-                    numRead2 = input2.read(buffer2);
-                    if (numRead1 > -1) {
-                        if (numRead2 != numRead1)
-                            return false;
-                        // Otherwise same number of bytes read
-                        if (!Arrays.equals(buffer1, buffer2))
-                            return false;
-                        // Otherwise same bytes read, so continue ...
-                    } else {
-                        // Nothing more in stream 1 ...
-                        return numRead2 < 0;
-                    }
-                }
-            } finally {
-                input1.close();
-            }
-        } catch (IOException e) {
-            error = true;
-            throw e;
-        } catch (RuntimeException e) {
-            error = true;
-            throw e;
-        } finally {
-            try {
-                input2.close();
-            } catch (IOException e) {
-                if (!error)
-                    throw e;
-            }
-        }
-    }
-
-    public enum TypeOfOS {
-        MAC, WINDOW
-    }
-
-    public TypeOfOS getOS() {
-        String osName = System.getProperty("os.name");
-        if (osName.matches("Windows.*"))
-            return TypeOfOS.WINDOW;
-        else if (osName.matches("Mac OS X.*")) {
-            return TypeOfOS.MAC;
-        }
-        return TypeOfOS.WINDOW;
-    }
-
-    public String checkInputText(String inputText) {
-        char[] chars = inputText.toCharArray();
-        String newInputText = "";
-        log.debug("keyboard layout: " + SWTBotPreferences.KEYBOARD_LAYOUT);
-        for (char c : chars) {
-            if (c == 'y' && SWTBotPreferences.KEYBOARD_LAYOUT.equals("MAC_DE")) {
-                newInputText += 'z';
-            } else
-                newInputText += c;
-        }
-        return newInputText;
-    }
-
-    public void confirmShellInvitation(String... baseJIDOfinvitees)
-        throws RemoteException {
-        shellW.activateShell(SHELL_INVITATION);
-        shellW.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
-            baseJIDOfinvitees);
-    }
-
-    public boolean isValidClassPath(String projectName, String pkg,
-        String className) {
-        boolean isVailid = true;
-        isVailid &= projectName.matches("\\w*");
-        isVailid &= pkg.matches("[\\w*\\.]*\\w*");
-        isVailid &= className.matches("\\w*");
-        return isVailid;
-    }
 }

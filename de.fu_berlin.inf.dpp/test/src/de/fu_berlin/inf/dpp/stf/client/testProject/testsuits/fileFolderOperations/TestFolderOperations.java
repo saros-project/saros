@@ -36,10 +36,10 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.fileM.existsClass(PROJECT1, PKG1, CLS1))
+        if (!alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1))
             alice.fileM.newClass(PROJECT1, PKG1, CLS1);
-        if (!alice.fileM.existsFolder(PROJECT1, FOLDER1))
-            alice.fileM.newFolder(FOLDER1, PROJECT1);
+        if (!alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1))
+            alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
     }
 
     /**
@@ -61,7 +61,7 @@ public class TestFolderOperations extends STFTest {
         alice.pEV.selectFolder(PROJECT1, FOLDER1);
         alice.refactorM.renameFolder(newFolderName);
         bob.fileM.waitUntilFolderExisted(PROJECT1, newFolderName);
-        assertTrue(bob.fileM.existsFolder(PROJECT1, newFolderName));
-        assertFalse(bob.fileM.existsFolder(PROJECT1, FOLDER1));
+        assertTrue(bob.fileM.existsFolderNoGUI(PROJECT1, newFolderName));
+        assertFalse(bob.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 }

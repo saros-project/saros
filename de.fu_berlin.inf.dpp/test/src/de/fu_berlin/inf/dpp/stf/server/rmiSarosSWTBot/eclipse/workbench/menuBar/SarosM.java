@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public interface SarosM extends Preferences {
+public interface SarosM extends SarosPreferences {
 
     /**
      * Creates an account with GUI, which should be done with the following

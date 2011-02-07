@@ -41,6 +41,9 @@ public interface EditM extends EclipseComponent {
      */
     public void deleteProject() throws RemoteException;
 
+    public void deleteAllChildrenOfProject(String viewTitle, String projectName)
+        throws RemoteException;
+
     /**
      * Delete the specified folder using FileUntil.delete(resource).
      * 

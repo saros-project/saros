@@ -16,7 +16,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Perspective;
 
-public class WindowMImp extends PreferencesImp implements WindowM {
+public class WindowMImp extends SarosPreferencesImp implements WindowM {
 
     private static transient WindowMImp windowImp;
 

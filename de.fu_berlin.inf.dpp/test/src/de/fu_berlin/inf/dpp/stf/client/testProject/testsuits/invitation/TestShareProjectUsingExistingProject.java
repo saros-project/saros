@@ -47,21 +47,21 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void shareProjectUsingExistingProject() throws RemoteException {
-        assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
         alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, bob);
         bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS1);
-        assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
         throws RemoteException {
-        assertFalse(bob.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
 
         alice
             .buildSessionDoneSequentially(
@@ -74,10 +74,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.fileM.existsProject(PROJECT1));
-        assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.fileM.existsProject(PROJECT1_NEXT));
-        assertTrue(bob.fileM.existsClass(PROJECT1_NEXT, PKG1, CLS1));
+        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
         bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
     }
 
@@ -87,10 +87,10 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, bob);
-        assertTrue(bob.fileM.existsProject(PROJECT1));
-        assertTrue(bob.fileM.existsClass(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.fileM.existsProject(PROJECT1_NEXT));
-        assertTrue(bob.fileM.existsClass(PROJECT1_NEXT, PKG1, CLS1));
+        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
         bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
 
     }

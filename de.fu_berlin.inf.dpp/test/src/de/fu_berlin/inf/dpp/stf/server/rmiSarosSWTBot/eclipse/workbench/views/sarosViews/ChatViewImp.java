@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.s
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 
-public class ChatViewImp extends EclipseComponentImp implements ChatView {
+public class ChatViewImp extends SarosComponentImp implements ChatView {
 
     private static transient ChatViewImp self;
 
@@ -43,9 +43,7 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
     }
 
     public void sendChatMessage(String message) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         SarosSWTBotChatInput chatInput = bot.chatInput();
         chatInput.setText(message);
         bot.text();
@@ -56,9 +54,7 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("user name of the first chat line partner change separator: "
             + bot.chatLinePartnerChangeSeparator().getPlainID());
         return bot.chatLinePartnerChangeSeparator().getPlainID();
@@ -66,9 +62,7 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
 
     public String getUserNameOnChatLinePartnerChangeSeparator(int index)
         throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("user name of the chat line partner change separator with the index"
             + index
             + ": "
@@ -78,9 +72,7 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
 
     public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
         throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("user name of the chat line partner change separator with the plainID "
             + plainID
             + ": "
@@ -89,34 +81,26 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
     }
 
     public String getTextOfChatLine() throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("text of the first chat line: " + bot.chatLine().getText());
         return bot.chatLine().getText();
     }
 
     public String getTextOfChatLine(int index) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("text of the chat line with the index " + index + ": "
             + bot.chatLine(index).getText());
         return bot.chatLine(index).getText();
     }
 
     public String getTextOfLastChatLine() throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("text of the last chat line: " + bot.lastChatLine().getText());
         return bot.lastChatLine().getText();
     }
 
     public String getTextOfChatLine(String regex) throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("text of the chat line with the specifed regex: "
             + bot.chatLine(regex).getText());
         return bot.chatLine(regex).getText();
@@ -124,13 +108,17 @@ public class ChatViewImp extends EclipseComponentImp implements ChatView {
 
     public boolean compareChatMessage(String jid, String message)
         throws RemoteException {
-        if (!isChatViewOpen())
-            openChatView();
-        activateChatView();
+        precondition();
         log.debug("chatLine: " + bot.lastChatLine());
         log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
         String text = bot.lastChatLine().getText();
         return text.equals(message);
+    }
+
+    private void precondition() throws RemoteException {
+        workbench.activateWorkbench();
+        openChatView();
+        activateChatView();
     }
 
 }

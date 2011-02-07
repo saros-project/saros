@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -14,9 +13,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestContextMenuOpen extends STFTest {
-
-    private final static Logger log = Logger
-        .getLogger(TestContextMenuOpen.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
@@ -91,13 +87,11 @@ public class TestContextMenuOpen extends STFTest {
     }
 
     @Test
-    @Ignore
-    // TODO Somehow verify that the external editor was actually opened, then
-    // close it.
-    public void testOpenWith() throws RemoteException {
+    @Ignore("Can't close the external editor")
+    public void testOpenFileWithSystemEditor() throws RemoteException {
         alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
-            PROJECT1, PKG1, CLS1);
+        alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
+            CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
         alice.openC.openClassWithSystemEditorNoGUI(PROJECT1, PKG1, CLS1);
     }
 

@@ -138,24 +138,32 @@ public class STFTest extends STF {
     public static final String CLS2 = "MyClass2";
     public static final String CLS3 = "MyClass3";
 
+    /* class name with suffix */
+    public static final String CLS1_SUFFIX = "MyClass" + SUFFIX_JAVA;
+    public static final String CLS2_SUFFIX = "MyClass2" + SUFFIX_JAVA;
+    public static final String CLS3_SUFFIX = "MyClass3" + SUFFIX_JAVA;
+
     /* content path */
-    public static final String CP1 = "test/STF/" + CLS1 + SUFIX_JAVA;
-    public static final String CP2 = "test/STF/" + CLS2 + SUFIX_JAVA;
-    public static final String CP3 = "test/STF/" + CLS3 + SUFIX_JAVA;
+    public static final String CP1 = "test/STF/" + CLS1 + SUFFIX_JAVA;
+    public static final String CP2 = "test/STF/" + CLS2 + SUFFIX_JAVA;
+    public static final String CP3 = "test/STF/" + CLS3 + SUFFIX_JAVA;
     public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
-        + SUFIX_JAVA;
+        + SUFFIX_JAVA;
     public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
-        + SUFIX_JAVA;
+        + SUFFIX_JAVA;
 
     /* SVN infos */
     protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
     protected static final String SVN_PROJECT = "stf_test_project";
     protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
-    protected static final String SVN_PROJECT_PATH = "/stf_tests/stf_test_project";
+    protected static String SVN_PROJECT_PATH = getOS() == TypeOfOS.MAC ? "stf_tests/stf_test_project"
+        : "/stf_tests/stf_test_project";
+
     protected static final String SVN_PROJECT_URL_SWITCHED = SVN_REPOSITORY_URL
         + "/stf_tests/stf_test_project_copy";
     protected static final String SVN_PKG = "pkg";
     protected static final String SVN_CLS1 = "Test";
+    protected static final String SVN_CLS1_SUFFIX = SVN_CLS1 + SUFFIX_JAVA;
     protected static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
     protected static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
     /** Initial commit in stf_test_project. */
@@ -304,7 +312,7 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester tester : testers) {
             tester.fileM.newProject(PROJECT1);
-            tester.fileM.newFile(path);
+            tester.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
             tester.editor.waitUntilEditorOpen(FILE3);
         }
     }
@@ -341,6 +349,11 @@ public class STFTest extends STF {
         }
     }
 
+    public static void resetSharedProject(Tester host) throws RemoteException {
+        host.editM.deleteAllChildrenOfProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
+        host.fileM.newClass(PROJECT1, PKG1, CLS1);
+    }
+
     public static void disConnectByActiveTesters() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
@@ -352,7 +365,7 @@ public class STFTest extends STF {
     public static void deleteFolders(String... folders) throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.fileM.existsFolder(PROJECT1, folder))
+                if (tester.fileM.existsFolderNoGUI(PROJECT1, folder))
                     tester.editM.deleteFolderNoGUI(PROJECT1, folder);
             }
         }
@@ -373,12 +386,14 @@ public class STFTest extends STF {
         resetSaros();
     }
 
+    @Override
     public String[] getClassNodes(String projectName, String pkg,
         String className) {
         String[] nodes = { projectName, SRC, pkg, className + ".java" };
         return nodes;
     }
 
+    @Override
     public String[] changeToRegex(String... texts) {
         String[] matchTexts = new String[texts.length];
         for (int i = 0; i < texts.length; i++) {

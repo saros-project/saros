@@ -10,7 +10,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
-public class PreferencesImp extends SarosComponentImp implements Preferences {
+public class SarosPreferencesImp extends SarosComponentImp implements
+    SarosPreferences {
 
     /**********************************************
      * 
@@ -153,6 +154,7 @@ public class PreferencesImp extends SarosComponentImp implements Preferences {
      * states
      * 
      **********************************************/
+
     public boolean isAccountExist(JID jid) throws RemoteException {
         preCondition();
         SWTBotList list = bot.listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
@@ -180,11 +182,11 @@ public class PreferencesImp extends SarosComponentImp implements Preferences {
         return isActive;
     }
 
-    /**************************************************************
+    /**********************************************
      * 
-     * NO GUI
+     * No GUI
      * 
-     *************************************************************/
+     **********************************************/
 
     // Actions
     public void createAccountNoGUI(String server, String username,
@@ -213,7 +215,7 @@ public class PreferencesImp extends SarosComponentImp implements Preferences {
         xmppAccountStore.setAccountActive(account);
     }
 
-    // States
+    // states
     public boolean isAccountActiveNoGUI(JID jid) throws RemoteException {
         XMPPAccount account = getXMPPAccount(jid);
         if (account == null)
@@ -253,6 +255,16 @@ public class PreferencesImp extends SarosComponentImp implements Preferences {
     }
 
     /**
+     * click the main menu Saros-> Preferences
+     * 
+     * @throws RemoteException
+     */
+    private void clickMenuSarosPreferences() throws RemoteException {
+        workbench.activateWorkbench();
+        menuW.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+    }
+
+    /**
      * 
      * @param jid
      *            a JID which is used to identify the users of the Jabber
@@ -267,16 +279,6 @@ public class PreferencesImp extends SarosComponentImp implements Preferences {
             }
         }
         return null;
-    }
-
-    /**
-     * click the main menu Saros-> Preferences
-     * 
-     * @throws RemoteException
-     */
-    private void clickMenuSarosPreferences() throws RemoteException {
-        workbench.activateWorkbench();
-        menuW.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
     }
 
 }

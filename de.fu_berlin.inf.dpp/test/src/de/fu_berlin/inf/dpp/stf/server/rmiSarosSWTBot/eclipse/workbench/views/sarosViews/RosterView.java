@@ -210,26 +210,6 @@ public interface RosterView extends SarosComponent {
      */
     public boolean hasBuddy(String buddyNickName) throws RemoteException;
 
-    /**
-     * 
-     * @param buddyJID
-     *            the JID of the user, which should be located in your buddy
-     *            list, if you already have added the user.
-     * @return the nickname of the given user.
-     * @throws RemoteException
-     */
-    public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
-
-    /**
-     * 
-     * @param buddyJID
-     *            the JID of the user, which should be located in your buddy
-     *            list, if you already have added the user.
-     * @return <tt>true</tt>, if you've given the given user a nickname.
-     * @throws RemoteException
-     */
-    public boolean hasBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
-
     /**********************************************
      * 
      * context menu of a contact on the view: delete Contact
@@ -333,5 +313,25 @@ public interface RosterView extends SarosComponent {
      * 
      **********************************************/
     public void inviteBuddy(JID buddyJID) throws RemoteException;
+
+    /**
+     * 
+     * @param buddyJID
+     *            the JID of the user, which should be located in your buddy
+     *            list, if you already have added the user.
+     * @return the nickname of the given user.
+     * @throws RemoteException
+     */
+    public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
+
+    /**
+     * 
+     * @param buddyJID
+     *            the JID of the user, which should be located in your buddy
+     *            list, if you already have added the user.
+     * @return <tt>true</tt>, if you've given the given user a nickname.
+     * @throws RemoteException
+     */
+    public boolean hasBuddyNickNameNoGUI(JID buddyJID) throws RemoteException;
 
 }

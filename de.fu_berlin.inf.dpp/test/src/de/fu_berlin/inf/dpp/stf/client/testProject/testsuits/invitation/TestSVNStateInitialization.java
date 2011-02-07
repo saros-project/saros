@@ -58,7 +58,7 @@ public class TestSVNStateInitialization extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        if (!alice.fileM.existsProject(SVN_PROJECT_COPY)) {
+        if (!alice.fileM.existsProjectNoGUI(SVN_PROJECT_COPY)) {
             alice.fileM.newJavaProject(SVN_PROJECT_COPY);
             alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
                 VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
@@ -93,16 +93,16 @@ public class TestSVNStateInitialization extends STFTest {
     public void setUp() throws RemoteException {
         alice.pEV.selectProject(SVN_PROJECT_COPY);
         alice.editM.copyProject(SVN_PROJECT);
-        assertTrue(alice.fileM.existsProject(SVN_PROJECT));
+        assertTrue(alice.fileM.existsProjectNoGUI(SVN_PROJECT));
         assertTrue(alice.team.isProjectManagedBySVN(SVN_PROJECT));
-        assertTrue(alice.fileM.existsFile(SVN_CLS1_FULL_PATH));
+        assertTrue(alice.fileM.existsFileNoGUI(SVN_CLS1_FULL_PATH));
     }
 
     @After
     public void tearDown() throws RemoteException, InterruptedException {
         alice.leaveSessionHostFirstDone(bob);
 
-        if (alice.fileM.existsProject(SVN_PROJECT))
+        if (alice.fileM.existsProjectNoGUI(SVN_PROJECT))
             alice.editM.deleteProjectNoGUI(SVN_PROJECT);
         bob.workbench.deleteAllProjects();
     }
@@ -257,7 +257,7 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithModification() throws RemoteException {
-        assertTrue(alice.fileM.existsClass(SVN_PROJECT, SVN_PKG, SVN_CLS1));
+        assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
         String cls1_content_before = alice.editor.getTextOfJavaEditor(
             SVN_PROJECT, SVN_PKG, SVN_CLS1);
         alice.editor.setTextInJavaEditorWithSave(CP1, SVN_PROJECT, SVN_PKG,

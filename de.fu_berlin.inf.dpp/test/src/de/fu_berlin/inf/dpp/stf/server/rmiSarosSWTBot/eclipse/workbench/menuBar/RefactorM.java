@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RefactorM extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface RefactorM extends EclipseComponent {
 
     /**
      * Performs the action "move class to another package" which should be done

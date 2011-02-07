@@ -53,8 +53,8 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newPackage(PROJECT1, PKG2);
         alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
         alice.refactorM.moveClassTo(PROJECT1, PKG2);
-        assertFalse(alice.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.fileM.existsClass(PROJECT1, PKG2, CLS1));
+        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG2, CLS1));
     }
 
     @Test
@@ -63,8 +63,8 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newClass(PROJECT1, PKG1, CLS1);
         alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
         alice.refactorM.renameClass(CLS2);
-        assertFalse(alice.fileM.existsClass(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.fileM.existsClass(PROJECT1, PKG1, CLS2));
+        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
     @Test
@@ -74,8 +74,8 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.refactorM.renameFile(FILE2);
-        assertFalse(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
-        assertTrue(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE2));
+        assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE2));
     }
 
     @Test
@@ -84,8 +84,8 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         alice.pEV.selectFolder(PROJECT1, FOLDER1);
         alice.refactorM.renameFolder(FOLDER2);
-        assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
-        assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER2));
+        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
+        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER2));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newPackage(PROJECT1, PKG1);
         alice.pEV.selectPkg(PROJECT1, PKG1);
         alice.refactorM.renamePkg(PKG2);
-        assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1));
-        assertTrue(alice.fileM.existsPkg(PROJECT1, PKG2));
+        assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG2));
     }
 
     @Test
@@ -115,12 +115,12 @@ public class TestMenuRefactor extends STFTest {
     public void testRenameProject() throws Exception {
         alice.fileM.newJavaProject(PROJECT1);
 
-        assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertFalse(alice.fileM.existsProject(PROJECT2));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT2));
         alice.pEV.selectProject(PROJECT1);
         alice.refactorM.renameJavaProject(PROJECT2);
 
-        assertFalse(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.fileM.existsProject(PROJECT2));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT2));
     }
 }

@@ -1,7 +1,17 @@
 package de.fu_berlin.inf.dpp.stf;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 public class STF {
 
@@ -21,7 +31,7 @@ public class STF {
     protected final static String BROWSE = "Browse";
 
     protected final static String SRC = "src";
-    protected final static String SUFIX_JAVA = ".java";
+    protected final static String SUFFIX_JAVA = ".java";
 
     /**********************************************
      * 
@@ -30,6 +40,15 @@ public class STF {
      **********************************************/
     protected final static String SHELL_PROGRESS_INFORMATION = "Progress Information";
 
+    /**********************************************
+     * 
+     * Dialog Preferences
+     * 
+     **********************************************/
+    static protected final String NODE_CONSOLE = "Console";
+    static protected final String NODE_EDITORS = "Editors";
+    static protected final String NODE_TEXT_EDITORS = "Text Editors";
+    static protected final String NODE_ANNOTATIONS = "Annotations";
     /**********************************************
      * 
      * Main Menu File
@@ -43,6 +62,12 @@ public class STF {
     static protected final String MENU_CLASS = "Class";
     static protected final String MENU_PACKAGE = "Package";
     static protected final String MENU_JAVA_PROJECT = "Java Project";
+    static protected final String MENU_CLOSE = "Close";
+    static protected final String MENU_CLOSE_ALL = "Close All";
+
+    static protected final String MENU_SAVE = "Save";
+    static protected final String MENU_SAVE_AS = "Save As...";
+    static protected final String MENU_SAVE_All = "Save All";
 
     protected final static String SHELL_NEW_FOLDER = "New Folder";
     protected final static String SHELL_NEW_FILE = "New File";
@@ -105,6 +130,8 @@ public class STF {
     static protected final String MENU_WINDOW = "Window";
     protected final static String MENU_OTHER = "Other...";
     protected final static String MENU_SHOW_VIEW = "Show View";
+
+    static protected final String SHELL_SHOW_VIEW = "Show View";
 
     /* IDs of all the perspectives */
     protected final static String ID_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
@@ -221,6 +248,9 @@ public class STF {
     protected final static String SHELL_REMOVAL_OF_SUBSCRIPTION = SarosMessages
         .getString("shell_removal_of_subscription");
 
+    protected final static String SHELL_SET_NEW_NICKNAME = SarosMessages
+        .getString("shell_set_new_nickname");
+
     protected final static String TB_DISCONNECT = SarosMessages
         .getString("tb_disconnect");
     protected final static String TB_ADD_A_NEW_CONTACT = SarosMessages
@@ -239,7 +269,7 @@ public class STF {
     protected final static String CM_TEST_DATA_TRANSFER = SarosMessages
         .getString("cm_test_data_transfer_connection");
 
-    protected final static String TREE_ITEM_BUDDIES = SarosMessages
+    protected final static String NODE_BUDDIES = SarosMessages
         .getString("tree_item_label_buddies");
 
     protected final static String LABEL_XMPP_JABBER_JID = SarosMessages
@@ -401,6 +431,17 @@ public class STF {
 
     /**********************************************
      * 
+     * ContextMenu: Open/Open With
+     * 
+     **********************************************/
+    /* Context menu of a selected file on the package explorer view */
+    protected final static String CM_OPEN = "Open";
+    protected final static String CM_OPEN_WITH = "Open With";
+    protected final static String CM_OTHER = "Other...";
+    protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text Editor";
+
+    /**********************************************
+     * 
      * Editor
      * 
      **********************************************/
@@ -422,11 +463,7 @@ public class STF {
 
     protected final static String SHELL_EDITOR_SELECTION = "Editor Selection";
 
-    /* Context menu of a selected file on the package explorer view */
-    protected final static String CM_OPEN = "Open";
-    protected final static String CM_OPEN_WITH = "Open With";
-    protected final static String CM_OTHER = "Other...";
-    protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text Editor";
+    protected final static String TB_COLLAPSE_ALL = "Collapse All";
 
     /**********************************************
      * 
@@ -473,4 +510,148 @@ public class STF {
         viewTitlesAndIDs.put(VIEW_SAROS_SESSION, VIEW_SAROS_SESSION_ID);
     }
 
+    /**********************************************
+     * 
+     * Common convenient functions
+     * 
+     **********************************************/
+    public static TypeOfOS getOS() {
+        String osName = System.getProperty("os.name");
+        if (osName.matches("Windows.*"))
+            return TypeOfOS.WINDOW;
+        else if (osName.matches("Mac OS X.*")) {
+            return TypeOfOS.MAC;
+        }
+        return TypeOfOS.WINDOW;
+    }
+
+    public enum TypeOfOS {
+        MAC, WINDOW
+    }
+
+    public String getClassPath(String projectName, String pkg, String className) {
+        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
+            + className + ".java";
+    }
+
+    public String getPkgPath(String projectName, String pkg) {
+        return projectName + "/src/" + pkg.replaceAll("\\.", "/");
+    }
+
+    public String[] getClassNodes(String projectName, String pkg,
+        String className) {
+        String[] nodes = { projectName, SRC, pkg, className + SUFFIX_JAVA };
+        return nodes;
+    }
+
+    public String[] getPkgNodes(String projectName, String pkg) {
+        String[] nodes = { projectName, SRC, pkg };
+        return nodes;
+    }
+
+    public String getPath(String... nodes) {
+        String folderpath = "";
+        for (int i = 0; i < nodes.length; i++) {
+            if (i == nodes.length - 1) {
+
+                folderpath += nodes[i];
+            } else
+                folderpath += nodes[i] + "/";
+        }
+        return folderpath;
+    }
+
+    public String[] changeToRegex(String... texts) {
+        String[] matchTexts = new String[texts.length];
+        for (int i = 0; i < texts.length; i++) {
+            matchTexts[i] = texts[i] + "( .*)?";
+        }
+        return matchTexts;
+    }
+
+    public String ConvertStreamToString(InputStream is) throws IOException {
+        if (is != null) {
+            Writer writer = new StringWriter();
+            char[] buffer = new char[5024];
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(is,
+                    "UTF-8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } finally {
+                is.close();
+                writer.close();
+            }
+            return writer.toString();
+        } else {
+            return "";
+        }
+    }
+
+    public boolean isSame(InputStream input1, InputStream input2)
+        throws IOException {
+        boolean error = false;
+        try {
+            byte[] buffer1 = new byte[1024];
+            byte[] buffer2 = new byte[1024];
+            try {
+                int numRead1 = 0;
+                int numRead2 = 0;
+                while (true) {
+                    numRead1 = input1.read(buffer1);
+                    numRead2 = input2.read(buffer2);
+                    if (numRead1 > -1) {
+                        if (numRead2 != numRead1)
+                            return false;
+                        // Otherwise same number of bytes read
+                        if (!Arrays.equals(buffer1, buffer2))
+                            return false;
+                        // Otherwise same bytes read, so continue ...
+                    } else {
+                        // Nothing more in stream 1 ...
+                        return numRead2 < 0;
+                    }
+                }
+            } finally {
+                input1.close();
+            }
+        } catch (IOException e) {
+            error = true;
+            throw e;
+        } catch (RuntimeException e) {
+            error = true;
+            throw e;
+        } finally {
+            try {
+                input2.close();
+            } catch (IOException e) {
+                if (!error)
+                    throw e;
+            }
+        }
+    }
+
+    public String checkInputText(String inputText) {
+        char[] chars = inputText.toCharArray();
+        String newInputText = "";
+
+        for (char c : chars) {
+            if (c == 'y' && SWTBotPreferences.KEYBOARD_LAYOUT.equals("MAC_DE")) {
+                newInputText += 'z';
+            } else
+                newInputText += c;
+        }
+        return newInputText;
+    }
+
+    public boolean isValidClassPath(String projectName, String pkg,
+        String className) {
+        boolean isVailid = true;
+        isVailid &= projectName.matches("\\w*");
+        isVailid &= pkg.matches("[\\w*\\.]*\\w*");
+        isVailid &= className.matches("\\w*");
+        return isVailid;
+    }
 }

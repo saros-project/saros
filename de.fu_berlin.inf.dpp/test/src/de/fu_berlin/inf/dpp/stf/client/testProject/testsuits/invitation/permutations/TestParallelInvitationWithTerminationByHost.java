@@ -70,8 +70,8 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
-            dave.getBaseJid(), carl.getBaseJid());
+        alice.sarosC.shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1,
+            bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid());
 
         bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
         bob.shell.activateShell(SHELL_SESSION_INVITATION);

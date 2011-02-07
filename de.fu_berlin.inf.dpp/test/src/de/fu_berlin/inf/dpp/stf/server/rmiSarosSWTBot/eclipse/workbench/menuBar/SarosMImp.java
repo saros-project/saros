@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class SarosMImp extends PreferencesImp implements SarosM {
+public class SarosMImp extends SarosPreferencesImp implements SarosM {
 
     private static transient SarosMImp self;
 

@@ -38,7 +38,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.fileM.newProject(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
         String[] path = { PROJECT1, FILE };
-        alice.fileM.newFile(path);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
         alice.editor.waitUntilEditorOpen(FILE);
         alice.editor.setTextInEditorWithSave("test/STF/lorem.txt", path);
         alice.editor.navigateInEditor(FILE, 0, 6);
@@ -98,7 +98,7 @@ public class TestConcurrentEditing extends STFTest {
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorActive(CLS1);
 
-        String fileName = CLS1 + SUFIX_JAVA;
+        String fileName = CLS1 + SUFFIX_JAVA;
         alice.editor.navigateInEditor(fileName, 3, 0);
         bob.editor.navigateInEditor(fileName, 3, 0);
         char[] content = "Merry Christmas and Happy New Year!".toCharArray();

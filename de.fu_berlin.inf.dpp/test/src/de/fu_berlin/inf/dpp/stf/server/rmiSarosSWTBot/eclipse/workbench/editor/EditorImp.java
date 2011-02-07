@@ -69,7 +69,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
             getJavaEditor(className).setFocus();
         } catch (TimeoutException e) {
             log.warn("The tab of the editor with the title " + className
-                + SUFIX_JAVA + " can't be activated.", e);
+                + SUFFIX_JAVA + " can't be activated.", e);
         }
     }
 
@@ -95,7 +95,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void closeJavaEditorWithSave(String className)
         throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        closeEditorWithSave(className + SUFIX_JAVA);
+        closeEditorWithSave(className + SUFFIX_JAVA);
         // Display.getDefault().syncExec(new Runnable() {
         // public void run() {
         // final IWorkbench wb = PlatformUI.getWorkbench();
@@ -114,7 +114,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void closejavaEditorWithoutSave(String className)
         throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        closeEditorWithoutSave(className + SUFIX_JAVA);
+        closeEditorWithoutSave(className + SUFFIX_JAVA);
     }
 
     public void confirmWindowSaveSource(String buttonType)
@@ -346,7 +346,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void setBreakPoint(int line, String projectName, String packageName,
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
-        selectLine(className + SUFIX_JAVA, line);
+        selectLine(className + SUFFIX_JAVA, line);
         menuW.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
@@ -363,7 +363,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
 
     public boolean isJavaEditorOpen(String className) throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        return isEditorOpen(className + SUFIX_JAVA);
+        return isEditorOpen(className + SUFFIX_JAVA);
     }
 
     public boolean isEditorActive(String fileName) throws RemoteException {
@@ -379,7 +379,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
         if (!isJavaEditorOpen(className))
             return false;
-        return isEditorActive(className + SUFIX_JAVA);
+        return isEditorActive(className + SUFFIX_JAVA);
     }
 
     public String getTextOfEditor(String... fileNodes) throws RemoteException {
@@ -524,7 +524,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void waitUntilJavaEditorOpen(String className)
         throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorOpen(className + SUFIX_JAVA);
+        waitUntilEditorOpen(className + SUFFIX_JAVA);
     }
 
     public void waitUntilEditorActive(String fileName) throws RemoteException {
@@ -535,7 +535,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void waitUntilJavaEditorActive(String className)
         throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorActive(className + SUFIX_JAVA);
+        waitUntilEditorActive(className + SUFFIX_JAVA);
     }
 
     public void waitUntilEditorClosed(String fileName) throws RemoteException {
@@ -546,7 +546,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
     public void waitUntilJavaEditorClosed(String className)
         throws RemoteException {
         assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorClosed(className + SUFIX_JAVA);
+        waitUntilEditorClosed(className + SUFFIX_JAVA);
     }
 
     public void waitUntilFileContentSame(String otherClassContent,
@@ -631,7 +631,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
      * 
      */
     public SWTBotEclipseEditor getJavaEditor(String className) {
-        return getEditor(className + SUFIX_JAVA);
+        return getEditor(className + SUFFIX_JAVA);
     }
 
 }

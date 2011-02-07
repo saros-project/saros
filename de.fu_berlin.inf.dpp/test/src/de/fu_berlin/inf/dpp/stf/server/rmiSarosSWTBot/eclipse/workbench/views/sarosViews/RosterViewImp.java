@@ -90,14 +90,14 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void selectBuddy(String baseJID) throws RemoteException {
-        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, TREE_ITEM_BUDDIES, baseJID);
+        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, NODE_BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(String buddyNickName) throws RemoteException {
         precondition();
         SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        return treeW.existsTreeItemWithRegexs(tree, TREE_ITEM_BUDDIES,
-            buddyNickName + ".*");
+        return treeW.existsTreeItemWithRegexs(tree, NODE_BUDDIES, buddyNickName
+            + ".*");
     }
 
     public String getBuddyNickName(JID buddyJID) throws RemoteException {
@@ -116,7 +116,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             return;
         try {
             treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES,
-                CM_DELETE, TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+                CM_DELETE, NODE_BUDDIES + ".*", buddyNickName + ".*");
             shellW.confirmShellDelete(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
@@ -137,7 +137,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
         treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME,
-            TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+            NODE_BUDDIES + ".*", buddyNickName + ".*");
         if (!shellW.activateShell("Set new nickname")) {
             shellW.waitUntilShellActive("Set new nickname");
         }
@@ -152,8 +152,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
         SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree,
-            TREE_ITEM_BUDDIES + ".*", buddyNickName + ".*");
+        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, NODE_BUDDIES
+            + ".*", buddyNickName + ".*");
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
                 + buddyNickName + ", he isn't conntected yet");

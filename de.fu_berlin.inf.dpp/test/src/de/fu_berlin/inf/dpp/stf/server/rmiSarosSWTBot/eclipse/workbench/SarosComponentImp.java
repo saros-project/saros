@@ -44,4 +44,11 @@ public class SarosComponentImp extends EclipseComponentImp implements
         buttonW.clickButton(FINISH);
     }
 
+    public void confirmShellInvitation(String... baseJIDOfinvitees)
+        throws RemoteException {
+        shellW.activateShell(SHELL_INVITATION);
+        shellW.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
+            baseJIDOfinvitees);
+    }
+
 }

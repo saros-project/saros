@@ -1,11 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
-public interface Text extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface Text extends EclipseComponent {
 
     /**
      * set the given text into the {@link SWTBotText} with the specified

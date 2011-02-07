@@ -62,9 +62,9 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void isEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isEditorOpen(CLS1 + SUFIX_JAVA));
-        alice.editor.closeEditorWithSave(CLS1 + SUFIX_JAVA);
-        assertFalse(alice.editor.isEditorOpen(CLS1 + SUFIX_JAVA));
+        assertTrue(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
+        alice.editor.closeEditorWithSave(CLS1 + SUFFIX_JAVA);
+        assertFalse(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
     }
 
     @Test

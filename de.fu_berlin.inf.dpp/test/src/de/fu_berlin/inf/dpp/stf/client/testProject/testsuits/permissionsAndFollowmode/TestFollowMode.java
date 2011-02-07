@@ -7,8 +7,6 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,17 +21,6 @@ public class TestFollowMode extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         setUpSessionByDefault(alice, bob);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After

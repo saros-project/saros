@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbenc
  * 
  * @author Lin
  */
-public interface WindowM extends Preferences {
+public interface WindowM extends SarosPreferences {
 
     /**********************************************
      * 

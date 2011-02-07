@@ -12,6 +12,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
@@ -133,11 +134,13 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot.button(FINISH).click();
         shellW.waitUntilShellActive("Remote Project Exists");
         shellW.confirmShell("Remote Project Exists", YES);
-        bot.sleep(500);
-        if (shellW.isShellOpen("Confirm Open Perspective"))
+        try {
+            shellW.waitUntilShellActive("Confirm Open Perspective");
             shellW.confirmShell("Confirm Open Perspective", NO);
-        else
-            shellW.waitUntilShellClosed(SHELL_SHARE_PROJECT);
+        } catch (TimeoutException e) {
+            // ignore
+        }
+        shellW.waitUntilShellClosed(SHELL_SHARE_PROJECT);
     }
 
     public void importProjectFromSVN(String repositoryURL)

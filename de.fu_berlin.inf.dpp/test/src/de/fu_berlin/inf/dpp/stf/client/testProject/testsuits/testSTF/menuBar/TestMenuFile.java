@@ -45,13 +45,13 @@ public class TestMenuFile extends STFTest {
     @Test
     public void testNewProject() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        assertTrue(alice.fileM.existsProject(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testNewJavaProject() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        assertTrue(alice.fileM.existsProject(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
     }
 
     @Test
@@ -59,12 +59,12 @@ public class TestMenuFile extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         alice.fileM.newFolder(FOLDER2, PROJECT1, FOLDER1);
-        assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1));
-        assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1, FOLDER2));
+        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
+        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
         alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
-        assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1, FOLDER2));
+        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
         alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
-        assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
+        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 
     @Test
@@ -72,12 +72,12 @@ public class TestMenuFile extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newPackage(PROJECT1, PKG1);
         alice.fileM.newPackage(PROJECT1, PKG1 + ".subpkg");
-        assertTrue(alice.fileM.existsPkg(PROJECT1, PKG1));
-        assertTrue(alice.fileM.existsPkg(PROJECT1, PKG1 + ".subpkg"));
+        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
         alice.editM.deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
-        assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1 + ".subpkg"));
+        assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
         alice.editM.deletePkgNoGUI(PROJECT1, PKG1);
-        assertFalse(alice.fileM.existsPkg(PROJECT1, PKG1));
+        assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
     }
 
     @Test
@@ -85,41 +85,41 @@ public class TestMenuFile extends STFTest {
         alice.fileM.newProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
     @Test
     public void testNewClass() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.fileM.existsClass(PROJECT1, PKG1, CLS1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass() throws RemoteException {
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
         alice.fileM.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_2() throws RemoteException {
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
         alice.fileM.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_3() throws RemoteException {
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
         alice.fileM.newJavaProjectWithClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProject(PROJECT1));
-        assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
@@ -129,29 +129,29 @@ public class TestMenuFile extends STFTest {
         final String className = "Cls";
 
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
         log.trace("alice.newProjectWithClass()");
 
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, pkg, className);
         log.trace("alice.isJavaProjectExist()");
-        assertTrue(alice.fileM.existsProject(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.fileM.existsClass(PROJECT1, pkg, className));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className));
 
         log.trace("alice.isJavaClassExist()");
         final String className2 = "Cls2";
-        assertFalse(alice.fileM.existsClass(PROJECT1, pkg, className2));
+        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className2));
         log.trace("alice.newJavaClassInProject()");
         alice.fileM.newClass(PROJECT1, pkg, className2);
 
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.fileM.existsClass(PROJECT1, pkg, className2));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className2));
 
         log.trace("deleteResource()");
         alice.editM.deleteProjectNoGUI(PROJECT1);
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class TestMenuFile extends STFTest {
     @Ignore
     public void testNewFileNewFolderInEmptyProject() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        assertTrue(alice.fileM.existsProject(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
         alice.fileM.newFolder(FOLDER1, PROJECT1);

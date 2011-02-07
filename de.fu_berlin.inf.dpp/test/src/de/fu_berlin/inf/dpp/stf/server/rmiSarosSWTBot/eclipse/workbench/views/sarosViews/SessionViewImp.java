@@ -12,14 +12,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 
 /**
  * This implementation of {@link SessionView}
  * 
  * @author Lin
  */
-public class SessionViewImp extends EclipseComponentImp implements SessionView {
+public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     private static transient SessionViewImp self;
 

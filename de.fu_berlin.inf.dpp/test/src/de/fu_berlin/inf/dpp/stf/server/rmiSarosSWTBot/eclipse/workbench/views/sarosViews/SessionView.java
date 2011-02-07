@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponent;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 
@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
  * 
  * @author Lin
  */
-public interface SessionView extends Remote {
+public interface SessionView extends SarosComponent {
     /**
      * Test if you are now in a session. <br>
      * You can also use another function {@link SessionView#isInSession()} ,

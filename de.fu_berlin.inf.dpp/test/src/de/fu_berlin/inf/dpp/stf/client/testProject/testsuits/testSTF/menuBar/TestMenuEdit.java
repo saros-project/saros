@@ -41,37 +41,37 @@ public class TestMenuEdit extends STFTest {
     @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        assertTrue(alice.fileM.existsProject(PROJECT1));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
         alice.editM.deleteProjectNoGUI(PROJECT1);
-        assertFalse(alice.fileM.existsProject(PROJECT1));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testDeleteFileUsingGUI() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
+        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
         alice.pEV.selectClass(PROJECT1, "pkg", "Cls");
         alice.editM.deleteFile();
-        assertFalse(alice.fileM.existsClass(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     public void testCopyProject() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        assertFalse(alice.fileM.existsProject(PROJECT2));
+        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT2));
         alice.pEV.selectProject(PROJECT1);
         alice.editM.copyProject(PROJECT2);
-        assertTrue(alice.fileM.existsProject(PROJECT2));
+        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT2));
     }
 
     @Test
     public void testDeleteFolder() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(FOLDER1, PROJECT1);
-        assertTrue(alice.fileM.existsFolder(PROJECT1, FOLDER1));
+        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
         alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
-        assertFalse(alice.fileM.existsFolder(PROJECT1, FOLDER1));
+        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 
 }

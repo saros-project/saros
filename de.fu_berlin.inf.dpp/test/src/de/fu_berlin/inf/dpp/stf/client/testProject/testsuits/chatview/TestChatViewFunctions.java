@@ -1,11 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.chatview;
 
+import static org.junit.Assert.assertEquals;
+
 import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -34,22 +33,6 @@ public class TestChatViewFunctions extends STFTest {
         setUpWorkbenchs();
         setUpSaros();
         setUpSessionByDefault(alice, bob);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**
@@ -96,11 +79,12 @@ public class TestChatViewFunctions extends STFTest {
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
-        alice.workbench.sleep(2000);
-        System.out.println(alice.chatV.getTextOfLastChatLine());
+        alice.workbench.sleep(1000);
+        String messageByAlice = alice.chatV.getTextOfLastChatLine();
 
-        bob.workbench.sleep(2000);
-        System.out.println(bob.chatV.getTextOfLastChatLine());
+        bob.workbench.sleep(1000);
+        String messageByBob = bob.chatV.getTextOfLastChatLine();
+        assertEquals(messageByAlice, messageByBob);
         System.out.println(bob.chatV
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
 

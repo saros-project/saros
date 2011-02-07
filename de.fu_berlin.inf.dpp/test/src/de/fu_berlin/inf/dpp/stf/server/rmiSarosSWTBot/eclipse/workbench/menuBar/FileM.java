@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface FileM extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface FileM extends EclipseComponent {
     /**
      * Performs the action "create a project" which should be done with the
      * following steps:
@@ -51,14 +52,6 @@ public interface FileM extends Remote {
     public void newJavaProject(String projectName) throws RemoteException;
 
     /**
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @return <tt>true</tt>, if the given project is exist
-     */
-    public boolean existsProject(String projectName) throws RemoteException;
-
-    /**
      * Performs the action "create a new folder" which should be done with the
      * following steps:
      * <ol>
@@ -83,28 +76,8 @@ public interface FileM extends Remote {
      *            the path specified by the parent node array parameter.e.g.
      *            {"Foo-saros","parentFolder" }
      */
-    public void newFolder(String newFolderName, String... parentNodes)
-        throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if the given folder already exists.
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}
-     */
-    public boolean existsFolder(String... folderNodes) throws RemoteException;
-
-    /**
-     * waits until the specified folder is exist
-     * 
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}
-     */
-    public void waitUntilFolderExisted(String... folderNodes)
-        throws RemoteException;
+    public void newFolder(String viewTitle, String newFolderName,
+        String... parentNodes) throws RemoteException;
 
     /**
      * Performs the action "create a new package" which should be done with the
@@ -133,41 +106,6 @@ public interface FileM extends Remote {
         throws RemoteException;
 
     /**
-     * @return <tt>true</tt>, if the specified package already exists.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @throws RemoteException
-     */
-    public boolean existsPkg(String projectName, String pkg)
-        throws RemoteException;
-
-    /**
-     * wait until the given package is exist
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @throws RemoteException
-     */
-    public void waitUntilPkgExisted(String projectName, String pkg)
-        throws RemoteException;
-
-    /**
-     * waits until the given package isn't exist
-     ** 
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @throws RemoteException
-     */
-    public void waitUntilPkgNotExist(String projectName, String pkg)
-        throws RemoteException;
-
-    /**
      * Performs the action "create a new file" which should be done with the
      * following steps:
      * <ol>
@@ -190,43 +128,7 @@ public interface FileM extends Remote {
      *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
      * 
      */
-    public void newFile(String... filePath) throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if the file specified by the passed parameter
-     *         "filePath" exists.
-     * @param filePath
-     *            path of the file, e.g. "Foo_Saros/myFolder/myFile.xml" or path
-     *            of a class file, e.g. "Foo_Saros/src/my/pkg/myClass.java
-     * 
-     */
-    public boolean existsFile(String filePath) throws RemoteException;
-
-    /**
-     * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
-     * @return<tt>true</tt>, if the file specified by the passed array parameter
-     *                       exists.
-     * @throws RemoteException
-     */
-    public boolean existsFile(String... nodes) throws RemoteException;
-
-    /**
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @return <tt>true</tt>, if the class file specified by the passed
-     *         parameters exists.
-     * @throws RemoteException
-     */
-    public boolean existsClass(String projectName, String pkg, String className)
+    public void newFile(String viewTitle, String... filePath)
         throws RemoteException;
 
     /**
@@ -257,34 +159,6 @@ public interface FileM extends Remote {
      */
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException;
-
-    /**
-     * waits until the specified class is exist
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @throws RemoteException
-     */
-    public void waitUntilClassExisted(String projectName, String pkg,
-        String className) throws RemoteException;
-
-    /**
-     * waits until the specified class isn't exist
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @throws RemoteException
-     */
-    public void waitUntilClassNotExist(String projectName, String pkg,
-        String className) throws RemoteException;
 
     /**
      * Performs the action "create a new class that implements runnable" which
@@ -337,15 +211,6 @@ public interface FileM extends Remote {
         String className) throws RemoteException;
 
     /**
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g. {"Foo-saros",
-     *            "myFolder", "myFile.xml"}
-     */
-    public void waitUntilFileExisted(String... fileNodes)
-        throws RemoteException;
-
-    /**
      * 
      * @param nodes
      *            node path to expand. Attempts to expand all nodes along the
@@ -355,5 +220,5 @@ public interface FileM extends Remote {
      *         exists
      * @throws RemoteException
      */
-    public boolean existsFiletWithGUI(String... nodes) throws RemoteException;
+    public boolean existsFile(String... nodes) throws RemoteException;
 }

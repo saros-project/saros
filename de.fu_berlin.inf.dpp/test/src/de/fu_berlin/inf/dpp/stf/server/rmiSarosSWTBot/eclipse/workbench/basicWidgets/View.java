@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -9,8 +8,9 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface View extends Remote {
+public interface View extends EclipseComponent {
 
     /**
      * Waits until the {@link SarosSWTBotPreferences#SAROS_TIMEOUT} is reached

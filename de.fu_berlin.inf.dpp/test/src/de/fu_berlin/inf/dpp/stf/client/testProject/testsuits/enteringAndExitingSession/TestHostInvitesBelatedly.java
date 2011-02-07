@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
+public class TestHostInvitesBelatedly extends STFTest {
 
     /**
      * Preconditions:
@@ -39,7 +39,7 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
         bob.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
         bob.fileM.newClass(PROJECT1, PKG1, CLS2);
         /*
-         * alice build session with carl and is followed by carl.
+         * alice build session only with carl and is followed by carl.
          */
         alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
@@ -63,14 +63,13 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
      * 
      * 6. The question about the changed files at bob is answered with YES.
      * 
-     * 7. bob accepts and uses project from test X.
      * 
      * Expected Results:
      * 
      * 7. bob has the same project like host.
      * 
-     * TODO: There are some bugs, if bob leave session and alice try it again,
-     * bob will not get the same project like alice.
+     * FIXME: There are some bugs, if bob's editors are not closed, bob has the
+     * different project like host.
      * 
      * @throws CoreException
      * @throws IOException
@@ -80,19 +79,28 @@ public class TestHostWithWriteAccessInvitesBelatedly extends STFTest {
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
+        String dirtyContent1ByAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT1, PKG1, CLS1);
+
         bob.editor
             .setTextInJavaEditorWithSave(CP1_CHANGE, PROJECT1, PKG1, CLS1);
 
         alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT1, PKG1, CLS2);
+        String dirtyContent2ByAlice = alice.editor.getTextOfJavaEditor(
+            PROJECT1, PKG1, CLS2);
+
         bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT1, PKG1,
             CLS2);
+        // bob.editor.closeJavaEditorWithSave(CLS1);
+        // bob.editor.closeJavaEditorWithSave(CLS2);
 
         alice.inviteBuddiesInSessionDone(PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT, bob);
 
-        bob.editor.activateJavaEditor(CLS1);
-        bob.editor.waitUntilJavaEditorContentSame(CP1, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorContentSame(CP2, PROJECT1, PKG1, CLS2);
+        bob.editor.waitUntilJavaEditorContentSame(dirtyContent1ByAlice,
+            PROJECT1, PKG1, CLS1);
+        bob.editor.waitUntilJavaEditorContentSame(dirtyContent2ByAlice,
+            PROJECT1, PKG1, CLS2);
         String CLSContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
             PKG1, CLS1);
         String CLS2ContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,

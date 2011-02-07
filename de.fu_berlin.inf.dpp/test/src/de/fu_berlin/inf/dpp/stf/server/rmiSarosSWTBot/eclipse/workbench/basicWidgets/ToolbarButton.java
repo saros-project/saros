@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ToolbarButton extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface ToolbarButton extends EclipseComponent {
 
     /**
      * click the toolbar button specified with the given buttonTooltip in the

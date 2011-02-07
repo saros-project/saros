@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponent;
 
-public interface Preferences extends SarosComponent {
+public interface SarosPreferences extends SarosComponent {
 
     /**********************************************
      * setting for Account.
@@ -69,31 +69,6 @@ public interface Preferences extends SarosComponent {
     public void addAccount(JID jid, String password) throws RemoteException;
 
     /**
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the account specified by the given jid and
-     *         password exists in preference store
-     * @throws RemoteException
-     * @see XMPPAccountStore#getAllAccounts()
-     */
-    public boolean isAccountExistNoGUI(JID jid, String password)
-        throws RemoteException;
-
-    /**
-     * 
-     * 
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the account specified by the given parameters
-     *         exists in the XMPP-Accounts list on the right
-     *         saros-preferences-page.
-     * @throws RemoteException
-     */
-    public boolean isAccountExist(JID jid) throws RemoteException;
-
-    /**
      * activate the account specified by the given jid with
      * XMPPAccountStore#setAccountActive(XMPPAccount)
      * 
@@ -119,28 +94,6 @@ public interface Preferences extends SarosComponent {
      * @throws RemoteException
      */
     public void activateAccount(JID jid) throws RemoteException;
-
-    /**
-     * 
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the acount specified by the given jid is active
-     * @throws RemoteException
-     * @see XMPPAccount#isActive()
-     */
-    public boolean isAccountActiveNoGUI(JID jid) throws RemoteException;
-
-    /**
-     * 
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @return <tt>true</tt> if the red label with the text
-     *         "active: jid.getBase()" is visible in the saros-preferences-page.
-     * @throws RemoteException
-     */
-    public boolean isAccountActive(JID jid) throws RemoteException;
 
     /**
      * 
@@ -266,4 +219,51 @@ public interface Preferences extends SarosComponent {
      * @throws RemoteException
      */
     public void disableAutomaticReminder() throws RemoteException;
+
+    /**
+     * 
+     * @param jid
+     *            a JID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the acount specified by the given jid is active
+     * @throws RemoteException
+     * @see XMPPAccount#isActive()
+     */
+    public boolean isAccountActiveNoGUI(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @param jid
+     *            a JID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the red label with the text
+     *         "active: jid.getBase()" is visible in the saros-preferences-page.
+     * @throws RemoteException
+     */
+    public boolean isAccountActive(JID jid) throws RemoteException;
+
+    /**
+     * @param jid
+     *            a JID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the account specified by the given jid and
+     *         password exists in preference store
+     * @throws RemoteException
+     * @see XMPPAccountStore#getAllAccounts()
+     */
+    public boolean isAccountExistNoGUI(JID jid, String password)
+        throws RemoteException;
+
+    /**
+     * 
+     * 
+     * @param jid
+     *            a JID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return <tt>true</tt> if the account specified by the given parameters
+     *         exists in the XMPP-Accounts list on the right
+     *         saros-preferences-page.
+     * @throws RemoteException
+     */
+    public boolean isAccountExist(JID jid) throws RemoteException;
 }

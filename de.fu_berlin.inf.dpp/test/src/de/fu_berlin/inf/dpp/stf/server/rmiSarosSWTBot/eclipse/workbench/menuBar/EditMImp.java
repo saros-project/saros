@@ -60,6 +60,18 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         shellW.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
     }
 
+    public void deleteAllChildrenOfProject(String viewTitle, String projectName)
+        throws RemoteException {
+        SWTBotTreeItem treeItem = treeW.getTreeItemInView(viewTitle,
+            projectName, SRC);
+
+        for (SWTBotTreeItem item : treeItem.getItems()) {
+            item.select();
+            menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+            shellW.confirmShellDelete(OK);
+        }
+    }
+
     public void deleteFile() throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
@@ -67,7 +79,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     }
 
     public void copyProject(String target) throws RemoteException {
-        if (fileM.existsProject(target)) {
+        if (existsProjectNoGUI(target)) {
             throw new RemoteException("Can't copy project" + " to " + target
                 + " , the target already exists.");
         }

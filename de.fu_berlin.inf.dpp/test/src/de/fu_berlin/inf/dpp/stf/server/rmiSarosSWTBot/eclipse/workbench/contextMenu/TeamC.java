@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.PEView;
 
-public interface TeamC extends Remote {
+public interface TeamC extends EclipseComponent {
 
     /**
      * Perform the action "share project with SVN" which should be done with the

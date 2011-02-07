@@ -1,12 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 
-public interface Table extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface Table extends EclipseComponent {
 
     /**********************************************
      * 

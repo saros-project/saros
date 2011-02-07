@@ -57,9 +57,9 @@ public class TestCreatingNewFile extends STFTest {
         carl.fileM.newFolder(FOLDER1, PROJECT1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
     /**
@@ -97,9 +97,9 @@ public class TestCreatingNewFile extends STFTest {
         carl.fileM.newFolder(FOLDER1, PROJECT1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.workbench.sleep(500);
-        assertFalse(alice.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         bob.workbench.sleep(500);
-        assertFalse(bob.fileM.existsFile(PROJECT1, FOLDER1, FILE1));
+        assertFalse(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
 
         // if (!carl.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
         // carl.sarosSessionV.followThisBuddyGUI(alice.jid);
@@ -111,9 +111,9 @@ public class TestCreatingNewFile extends STFTest {
         alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
 
         carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.fileM.existsFile(PROJECT1, FOLDER2, FILE2));
+        assertTrue(carl.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
         bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.fileM.existsFile(PROJECT1, FOLDER2, FILE2));
+        assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
         alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
 

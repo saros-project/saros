@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ChatView extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponent;
+
+public interface ChatView extends SarosComponent {
 
     public void openChatView() throws RemoteException;
 

@@ -5,19 +5,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestBasicWidgetsByAliceAndBob extends STFTest {
-
-    private static final Logger log = Logger
-        .getLogger(TestBasicWidgetsByAliceAndBob.class);
+public class TestBasicWidgetsTable extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
@@ -28,27 +22,10 @@ public class TestBasicWidgetsByAliceAndBob extends STFTest {
         setUpSessionByDefault(alice, bob);
     }
 
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
     @After
     public void runAfterEveryTest() throws RemoteException {
         resetWriteAccess(alice, bob);
     }
-
-    // @Test
-    // public void existsTableItemInShell() throws RemoteException {
-    // alice.pEV.newJavaProject(PROJECT1);
-    // alice.pEV.clickContextMenushareProject(PROJECT1);
-    // assertTrue(alice.basic.existsTableItem(bob.getBaseJid()));
-    // }
 
     @Test
     public void existsTableItemInView() throws RemoteException {
@@ -64,11 +41,11 @@ public class TestBasicWidgetsByAliceAndBob extends STFTest {
         alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION, bob.getBaseJid());
         assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            VIEW_SAROS_SESSION, "Share your screen with selected buddy"));
+            VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION,
             OWN_PARTICIPANT_NAME);
         assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
-            VIEW_SAROS_SESSION, "Share your screen with selected buddy"));
+            VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
     }
 
     @Test
@@ -76,9 +53,9 @@ public class TestBasicWidgetsByAliceAndBob extends STFTest {
         alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
 
         alice.table.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
-            bob.getBaseJid(), "Restrict to read-only access");
+            bob.getBaseJid(), CM_RESTRICT_TO_READ_ONLY_ACCESS);
         bob.sarosSessionV.waitUntilHasReadOnlyAccess();
-        assertTrue(bob.sarosSessionV.hasReadOnlyAccessNoGUI());
+        assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
     }
 
     @Test
@@ -86,9 +63,9 @@ public class TestBasicWidgetsByAliceAndBob extends STFTest {
         alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
-            "Restrict to read-only access"));
+            CM_RESTRICT_TO_READ_ONLY_ACCESS));
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(), "Change Color"));
+            VIEW_SAROS_SESSION, bob.getBaseJid(), CM_CHANGE_COLOR));
     }
 
     @Test
@@ -96,8 +73,8 @@ public class TestBasicWidgetsByAliceAndBob extends STFTest {
         alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
         assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
-            "Restrict to read-only access"));
+            CM_RESTRICT_TO_READ_ONLY_ACCESS));
         assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(), "Change Color"));
+            VIEW_SAROS_SESSION, bob.getBaseJid(), CM_CHANGE_COLOR));
     }
 }

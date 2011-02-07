@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor;
 
 import java.io.IOException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
 /**
  * This interface contains convenience API to perform actions in the editor
@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * 
  * @author Lin
  */
-public interface Editor extends Remote {
+public interface Editor extends EclipseComponent {
 
     /**********************************************
      * 

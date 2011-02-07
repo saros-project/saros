@@ -45,7 +45,7 @@ public class TestSVNStateUpdates extends STFTest {
         for (final Tester t : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    if (!t.fileM.existsProject(SVN_PROJECT_COPY)) {
+                    if (!t.fileM.existsProjectNoGUI(SVN_PROJECT_COPY)) {
                         t.fileM.newJavaProject(SVN_PROJECT_COPY);
                         t.team.shareProjectWithSVNUsingSpecifiedFolderName(
                             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY,
@@ -81,9 +81,9 @@ public class TestSVNStateUpdates extends STFTest {
                     tester.workbench.resetWorkbench();
                     tester.pEV.selectProject(SVN_PROJECT_COPY);
                     tester.editM.copyProject(SVN_PROJECT);
-                    assertTrue(tester.fileM.existsProject(SVN_PROJECT));
+                    assertTrue(tester.fileM.existsProjectNoGUI(SVN_PROJECT));
                     assertTrue(tester.team.isProjectManagedBySVN(SVN_PROJECT));
-                    assertTrue(tester.fileM.existsFile(SVN_CLS1_FULL_PATH));
+                    assertTrue(tester.fileM.existsFileNoGUI(SVN_CLS1_FULL_PATH));
                     return null;
                 }
             });
@@ -101,10 +101,10 @@ public class TestSVNStateUpdates extends STFTest {
     @After
     public void runAfterEveryTest() throws Exception {
         alice.leaveSessionHostFirstDone(bob);
-        if (bob.fileM.existsProject(SVN_PROJECT))
+        if (bob.fileM.existsProjectNoGUI(SVN_PROJECT))
             bob.editM.deleteProjectNoGUI(SVN_PROJECT);
 
-        if (alice.fileM.existsProject(SVN_PROJECT))
+        if (alice.fileM.existsProjectNoGUI(SVN_PROJECT))
             alice.editM.deleteProjectNoGUI(SVN_PROJECT);
     }
 
@@ -141,7 +141,7 @@ public class TestSVNStateUpdates extends STFTest {
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
-        assertTrue(alice.fileM.existsClass(SVN_PROJECT, SVN_PKG, "Asdf"));
+        assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, SVN_PKG, "Asdf"));
     }
 
     /**
@@ -172,7 +172,7 @@ public class TestSVNStateUpdates extends STFTest {
         bob.refactorM.moveClassTo(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
         assertTrue(alice.fileM
-            .existsClass(SVN_PROJECT, "new_package", SVN_CLS1));
+            .existsClassNoGUI(SVN_PROJECT, "new_package", SVN_CLS1));
     }
 
     /**
@@ -298,10 +298,10 @@ public class TestSVNStateUpdates extends STFTest {
     public void testRevert() throws RemoteException {
         alice.editM.deleteProjectNoGUI(STFTest.SVN_CLS1_FULL_PATH);
         bob.fileM.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertFalse(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
+        assertFalse(bob.fileM.existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
         alice.team.revertProject(VIEW_PACKAGE_EXPLORER, SVN_PROJECT);
         bob.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertTrue(bob.fileM.existsFile(STFTest.SVN_CLS1_FULL_PATH));
+        assertTrue(bob.fileM.existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
     }
 
 }

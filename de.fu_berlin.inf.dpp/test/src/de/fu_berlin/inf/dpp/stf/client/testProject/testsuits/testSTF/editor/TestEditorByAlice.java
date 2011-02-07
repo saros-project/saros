@@ -52,7 +52,7 @@ public class TestEditorByAlice extends STFTest {
         alice.fileM.newProject(PROJECT1);
         String fileName = "test.txt";
         String[] path = { PROJECT1, fileName };
-        alice.fileM.newFile(path);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
         alice.editor.waitUntilEditorActive(fileName);
 
         String expected = "Hello World";

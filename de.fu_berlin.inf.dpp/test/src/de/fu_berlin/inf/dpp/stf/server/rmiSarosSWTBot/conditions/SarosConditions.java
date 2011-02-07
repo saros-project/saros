@@ -99,13 +99,6 @@ public class SarosConditions extends Conditions {
         return new ExistsNoInvitationProgress(bot);
     }
 
-    public static ICondition isJavaEditorContentsSame(Editor editor,
-        String projectName, String packageName, String className,
-        String otherContent) {
-        return new IsJavaEditorContentsSame(editor, projectName, packageName,
-            className, otherContent);
-    }
-
     public static ICondition isEditorContentsSame(Editor editor,
         String otherContent, String... filePath) {
         return new IsEditorContentsSame(editor, otherContent, filePath);

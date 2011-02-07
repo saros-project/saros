@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -8,7 +7,9 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-public interface Tree extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
+
+public interface Tree extends EclipseComponent {
 
     /**********************************************
      * 
@@ -208,8 +209,8 @@ public interface Tree extends Remote {
      * @return<tt>true</tt>, if the contextMenu of the selected TreeItem exists.
      * @throws RemoteException
      */
-    public boolean existsContextMenuOfTreeItem(String contextName, String... nodes)
-        throws RemoteException;
+    public boolean existsContextMenuOfTreeItem(String contextName,
+        String... nodes) throws RemoteException;
 
     /**
      * This method is suitable for view widget.
