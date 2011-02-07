@@ -14,12 +14,12 @@ import org.eclipse.swt.widgets.Text;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class AddContactWizardPage extends WizardPage {
+public class AddBuddyWizardPage extends WizardPage {
     protected Text idText;
 
     protected Text nicknameText;
 
-    public AddContactWizardPage() {
+    public AddBuddyWizardPage() {
         super("create");
 
         setTitle("New Buddy");

@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class NewContactAction extends Action {
@@ -70,7 +70,7 @@ public class NewContactAction extends Action {
 
     public void runNewContact() {
         Shell shell = EditorAPI.getShell();
-        WizardDialog wd = new WizardDialog(shell, new AddContactWizard(saros));
+        WizardDialog wd = new WizardDialog(shell, new AddBuddyWizard(saros));
         wd.setHelpAvailable(false);
         wd.open();
     }

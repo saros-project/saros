@@ -33,21 +33,21 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Wizard for adding a new buddy to the roster of the currently connected user.
  */
-public class AddContactWizard extends Wizard {
+public class AddBuddyWizard extends Wizard {
 
-    private static final Logger log = Logger.getLogger(AddContactWizard.class
+    private static final Logger log = Logger.getLogger(AddBuddyWizard.class
         .getName());
 
     protected Saros saros;
-    protected final AddContactWizardPage page = new AddContactWizardPage();
+    protected final AddBuddyWizardPage page = new AddBuddyWizardPage();
 
-    public AddContactWizard(Saros saros) {
+    public AddBuddyWizard(Saros saros) {
         setWindowTitle("New Buddy");
         this.saros = saros;
 
