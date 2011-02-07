@@ -22,28 +22,18 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -54,11 +44,8 @@ public class AddContactWizard extends Wizard {
     private static final Logger log = Logger.getLogger(AddContactWizard.class
         .getName());
 
-    // TODO Just to make the code more complicated!? And why false?
-    public static final boolean allowToEnterNick = false;
-
     protected Saros saros;
-    protected final AddContactPage page = new AddContactPage();
+    protected final AddContactWizardPage page = new AddContactWizardPage();
 
     public AddContactWizard(Saros saros) {
         setWindowTitle("New Buddy");
@@ -69,118 +56,9 @@ public class AddContactWizard extends Wizard {
         this.setHelpAvailable(false);
     }
 
-    public static class AddContactPage extends WizardPage {
-        protected Text idText;
-
-        protected Text nicknameText;
-
-        protected AddContactPage() {
-            super("create");
-
-            setTitle("New Buddy");
-            setDescription("Add a new buddy to your Saros buddies");
-        }
-
-        public void createControl(Composite parent) {
-            Composite composite = new Composite(parent, SWT.NONE);
-
-            composite.setLayout(new GridLayout(2, false));
-
-            Label idLabel = new Label(composite, SWT.NONE);
-            idLabel.setText("XMPP/Jabber ID");
-
-            this.idText = new Text(composite, SWT.BORDER);
-            this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false));
-
-            if (allowToEnterNick) {
-
-                Label nicknameLabel = new Label(composite, SWT.NONE);
-                nicknameLabel.setText("Nickname");
-
-                this.nicknameText = new Text(composite, SWT.BORDER);
-                this.nicknameText.setLayoutData(new GridData(SWT.FILL,
-                    SWT.CENTER, true, false));
-            }
-            hookListeners();
-            updateNextEnablement();
-
-            setControl(composite);
-        }
-
-        public JID getJID() {
-            return new JID(this.idText.getText().trim());
-        }
-
-        public String getNickname() {
-            if (!allowToEnterNick) {
-                throw new IllegalStateException();
-            }
-            return this.nicknameText.getText().trim();
-        }
-
-        private void hookListeners() {
-            ModifyListener listener = new ModifyListener() {
-                public void modifyText(ModifyEvent e) {
-                    updateNextEnablement();
-                }
-            };
-
-            this.idText.addModifyListener(listener);
-            if (allowToEnterNick) {
-                this.nicknameText.addModifyListener(listener);
-            }
-        }
-
-        /**
-         * Email-Pattern was too strict:
-         * 
-         * <code> Pattern emailPattern = Pattern.compile(
-         * "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$\\.[A-Z]{2,4}",
-         * Pattern.CASE_INSENSITIVE); </code>
-         */
-        Pattern userAtHostPattern = Pattern.compile(
-            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
-
-        private void updateNextEnablement() {
-
-            boolean done = (this.idText.getText().length() > 0);
-
-            if (!done) {
-                this.setErrorMessage(null);
-                this.setMessage("Please enter a XMPP/Jabber ID");
-                this.setPageComplete(false);
-                return;
-            }
-
-            if (!userAtHostPattern.matcher(this.idText.getText().trim())
-                .matches()) {
-                this.setErrorMessage("Not a valid XMPP/Jabber ID (should be: id@server.domain)!");
-                this.setMessage(null);
-                this.setPageComplete(false);
-                return;
-            }
-
-            if (allowToEnterNick) {
-                if (getNickname().length() == 0) {
-                    this.setMessage(
-                        "Enter a nickname for the buddy (optional)",
-                        IMessageProvider.INFORMATION);
-                } else {
-                    this.setMessage(null);
-                }
-            }
-
-            this.setErrorMessage(null);
-            setPageComplete(true);
-        }
-    }
-
     @Override
     public boolean performFinish() {
-
         final JID jid = this.page.getJID();
-        final String nickname = allowToEnterNick ? page.getNickname() : "";
 
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
@@ -188,7 +66,7 @@ public class AddContactWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        doAddContact(jid, nickname, SubMonitor.convert(monitor));
+                        doAddContact(jid, SubMonitor.convert(monitor));
                     } catch (CancellationException e) {
                         throw new InterruptedException();
                     }
@@ -207,7 +85,7 @@ public class AddContactWizard extends Wizard {
         return true;
     }
 
-    protected void doAddContact(JID jid, String nickname, SubMonitor monitor)
+    protected void doAddContact(JID jid, SubMonitor monitor)
         throws InvocationTargetException {
 
         monitor.beginTask("Adding " + jid, 2);
@@ -254,12 +132,8 @@ public class AddContactWizard extends Wizard {
 
             // now add the buddy to the Roster
             try {
-                if (allowToEnterNick && !(nickname.length() == 0)) {
-                    saros.addContact(jid, nickname, null, monitor.newChild(1));
-                } else {
-                    saros.addContact(jid, jid.toString(), null,
-                        monitor.newChild(1));
-                }
+                saros
+                    .addContact(jid, jid.toString(), null, monitor.newChild(1));
             } catch (XMPPException e) {
                 throw new InvocationTargetException(e, "Couldn't add buddy "
                     + jid + " to Saros buddies: " + e.getMessage());
