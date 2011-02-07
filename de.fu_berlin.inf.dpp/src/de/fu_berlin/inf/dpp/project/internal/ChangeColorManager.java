@@ -14,6 +14,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -60,21 +61,31 @@ public class ChangeColorManager implements IActivityProvider {
     }
 
     public void exec(IActivity activity) {
-        if (activity instanceof ChangeColorActivity) {
-            ChangeColorActivity changeColorActivity = (ChangeColorActivity) activity;
-            User user = changeColorActivity.getSource();
-            if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException("Buddy " + user
-                    + " is not a participant in this shared project");
-            }
+        activity.dispatch(receiver);
+    }
 
-            log.info("received color: " + changeColorActivity.getColor()
-                + " from buddy: " + user);
-            SarosAnnotation.setUserColor(user, changeColorActivity.getColor());
+    protected AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
 
-            editorManager.colorChanged();
-            editorManager.refreshAnnotations();
+        @Override
+        public void receive(ChangeColorActivity activity) {
+            handleChangeColorActivity(activity);
         }
+    };
+
+    protected void handleChangeColorActivity(ChangeColorActivity activity) {
+
+        User user = activity.getSource();
+        if (!user.isInSarosSession()) {
+            throw new IllegalArgumentException("Buddy " + user
+                + " is not a participant in this shared project");
+        }
+
+        log.info("received color: " + activity.getColor() + " from buddy: "
+            + user);
+        SarosAnnotation.setUserColor(user, activity.getColor());
+
+        editorManager.colorChanged();
+        editorManager.refreshAnnotations();
     }
 
     public void removeActivityListener(IActivityListener listener) {
