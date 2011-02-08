@@ -136,11 +136,8 @@ public class VersionManager {
         /**
          * Version 11.1.28.r2959
          */
-        compatibilityChart.put(new Version("11.1.28.r2959"), Arrays.asList(
-            new Version("11.1.28.r2959"), new Version("11.1.7.r2897"),
-            new Version("10.11.26.r2744"), new Version("10.10.29.r2640"),
-            new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
-            new Version("10.7.30.r2310")));
+        compatibilityChart.put(new Version("11.1.28.r2959"),
+            Arrays.asList(new Version("11.1.28.r2959")));
 
         /**
          * Version 11.1.7.r2897
