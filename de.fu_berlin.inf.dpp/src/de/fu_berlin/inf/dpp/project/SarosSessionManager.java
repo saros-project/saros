@@ -644,14 +644,24 @@ public class SarosSessionManager implements IConnectionListener,
     }
 
     public void notifySarosSessionStarting(ISarosSession sarosSession) {
-        for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
-            sarosSessionListener.sessionStarting(sarosSession);
+        try {
+            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+                sarosSessionListener.sessionStarting(sarosSession);
+            }
+        } catch (RuntimeException e) {
+            log.error("Internal error in notifying listener"
+                + " of SarosSession starting: ", e);
         }
     }
 
     public void notifySarosSessionStarted(ISarosSession sarosSession) {
         for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
-            sarosSessionListener.sessionStarted(sarosSession);
+            try {
+                sarosSessionListener.sessionStarted(sarosSession);
+            } catch (RuntimeException e) {
+                log.error("Internal error in notifying listener"
+                    + " of SarosSession start: ", e);
+            }
         }
     }
 
