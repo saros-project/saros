@@ -15,25 +15,17 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.ISelectionRetriever;
  * <p>
  * E.g. if you wish to retrieve all selected {@link IResource} in order to get
  * their surrounding {@link IProject}
- * 
- * <dl>
- * <dt>
- * <b>Example:</b></dt>
- * <dd>
+ * <p>
+ * For example,
  * 
  * <pre>
- * <code>
  * ISelectionRetriever&lt;IProject&gt; mySelectionRetriever = 
  *      new AbstractSelectionConvertingRetriever<IResource, IProject>(IResource.class) {
  *      protected IProject convert(IResource resource) {
  *              return resource.getProject();
  *      }
  * }
- * </code>
  * </pre>
- * 
- * </dd>
- * </dl>
  * 
  * @param <AdapterType>
  *            selections need to be adaptable to
