@@ -1100,7 +1100,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @param jid
      *            the JID of the contact.
-     * @param nickname
+     * @param name
      *            the nickname under which the new contact should appear in the
      *            roster.
      * @param groups
@@ -1113,35 +1113,34 @@ public class Saros extends AbstractUIPlugin {
      *             occurred when adding the user to the roster (which does not
      *             mean that the user really exists on the server)
      */
-    public void addContact(JID jid, String nickname, String[] groups,
+    public void addContact(JID jid, String name, String[] groups,
         SubMonitor monitor) throws XMPPException {
 
-        monitor.beginTask("Adding buddy " + jid + " to Saros buddies...", 2);
+        monitor.beginTask("Adding buddy " + jid + "...", 2);
 
         try {
             assertConnection();
 
             monitor.worked(1);
 
-            // if roster already contains user with this jid, throw an exception
             if (connection.getRoster().contains(jid.toString())) {
                 monitor.worked(1);
-
-                throw new XMPPException(jid + " already exists.");
+                throw new XMPPException("Buddy already exists.");
             }
+
             /*
-             * if user is trying to add himself, throw exception since there is
-             * a strange behaviour if he does (he appears as not using Saros)
+             * If user is trying to add himself, throw exception since there is
+             * a strange behaviour if he does (he appears as not using Saros).
              */
             if (jid.equals(getMyJID())) {
                 monitor.worked(1);
                 throw new XMPPException(
                     "You can't add yourself to your own buddies.");
             }
+
             monitor.worked(1);
 
-            connection.getRoster()
-                .createEntry(jid.toString(), nickname, groups);
+            connection.getRoster().createEntry(jid.toString(), name, groups);
         } finally {
             monitor.done();
         }
