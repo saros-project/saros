@@ -4,33 +4,18 @@ import static org.junit.Assert.assertEquals;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestBasicSarosElements extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestBasicSarosElements.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After

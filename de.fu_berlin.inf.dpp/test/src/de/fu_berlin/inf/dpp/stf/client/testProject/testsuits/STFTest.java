@@ -325,6 +325,12 @@ public class STFTest extends STF {
         }
     }
 
+    public static void resetBuddiesName() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            tester.sarosBuddiesV.resetAllBuddyNameNoGUI();
+        }
+    }
+
     public static void resetBuddies() throws RemoteException {
         // check buddy lists.
         for (Tester tester : activeTesters) {
@@ -417,7 +423,7 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester tester : testers) {
             tester.fileM.newProject(PROJECT1);
-            tester.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
+            tester.fileM.newFile(path);
             tester.editor.waitUntilEditorOpen(FILE3);
         }
     }

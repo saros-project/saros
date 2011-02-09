@@ -38,7 +38,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.fileM.newProject(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
         String[] path = { PROJECT1, FILE };
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
+        alice.fileM.newFile(path);
         alice.editor.waitUntilEditorOpen(FILE);
         alice.editor.setTextInEditorWithSave("test/STF/lorem.txt", path);
         alice.editor.navigateInEditor(FILE, 0, 6);

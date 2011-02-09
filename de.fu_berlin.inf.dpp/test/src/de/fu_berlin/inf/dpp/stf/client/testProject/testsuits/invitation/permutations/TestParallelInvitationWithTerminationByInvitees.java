@@ -8,9 +8,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -39,21 +36,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbenchs();
         setUpSaros();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
     }
 
     /**
@@ -95,8 +77,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         bob.shell.activateShell(SHELL_SESSION_INVITATION);
         bob.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
-            .matches(bob.getName() + ".*"));
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
+            bob.getName() + ".*"));
 
         alice.button.clickButton(OK);
 
@@ -105,8 +87,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         carl.sarosC.confirmShellSessionnInvitation();
         carl.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
-            .matches(carl.getName() + ".*"));
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
+            carl.getName() + ".*"));
         alice.button.clickButton(OK);
 
         dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
@@ -114,8 +96,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         dave.sarosC.confirmShellSessionnInvitation();
         dave.button.clickButton(CANCEL);
         alice.sarosC.waitUntilIsShellProblemOccurredActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred()
-            .matches(dave.getName() + ".*"));
+        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
+            dave.getName() + ".*"));
         alice.button.clickButton(OK);
 
         edna.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);

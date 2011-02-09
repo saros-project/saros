@@ -34,7 +34,7 @@ public class TestContextMenuOpen extends STFTest {
     public void testOpenFile() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.editor.closeEditorWithSave(FILE1);
         assertFalse(alice.editor.isEditorOpen(FILE1));
@@ -76,7 +76,7 @@ public class TestContextMenuOpen extends STFTest {
     public void testOpenFileWith() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.editor.closeEditorWithSave(FILE1);
         alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, FOLDER1, FILE1);

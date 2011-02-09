@@ -5,18 +5,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestEditorByAliceAndBob extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestEditorByAliceAndBob.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
@@ -27,17 +22,6 @@ public class TestEditorByAliceAndBob extends STFTest {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        leaveSessionHostFirst();
-    }
-
-    @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        // resetFollowModel(bob);
     }
 
     @After

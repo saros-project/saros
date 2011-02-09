@@ -6,8 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,16 +18,6 @@ public class TestPackageExplorerView extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
@@ -53,11 +41,9 @@ public class TestPackageExplorerView extends STFTest {
     public void testIsFileExistWithGUI() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsFile(PROJECT1, "src", "pkg",
-            "Cls.java"));
+        assertTrue(alice.fileM.existsFile(PROJECT1, "src", "pkg", "Cls.java"));
         alice.editM.deleteClassNoGUI(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.fileM.existsFile(PROJECT1, "src", "pkg",
-            "Cls.java"));
+        assertFalse(alice.fileM.existsFile(PROJECT1, "src", "pkg", "Cls.java"));
     }
 
 }

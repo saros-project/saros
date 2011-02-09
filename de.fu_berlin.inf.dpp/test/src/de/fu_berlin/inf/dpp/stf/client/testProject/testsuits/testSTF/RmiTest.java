@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -15,7 +14,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class RmiTest extends STFTest {
-    private final static Logger log = Logger.getLogger(RmiTest.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {

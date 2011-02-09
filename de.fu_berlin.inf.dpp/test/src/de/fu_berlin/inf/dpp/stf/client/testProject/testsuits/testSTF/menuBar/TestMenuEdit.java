@@ -6,8 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,16 +18,6 @@ public class TestMenuEdit extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After

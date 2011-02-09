@@ -47,7 +47,7 @@ public class TestCreatingNewFile extends STFTest {
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
         carl.fileM.newFolder(PROJECT1, FOLDER1);
-        carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
@@ -87,7 +87,7 @@ public class TestCreatingNewFile extends STFTest {
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
         carl.fileM.newFolder(PROJECT1, FOLDER1);
-        carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         waitsUntilTransferedDataIsArrived(alice);
         assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         waitsUntilTransferedDataIsArrived(bob);
@@ -96,7 +96,7 @@ public class TestCreatingNewFile extends STFTest {
         setFollowMode(alice, carl, bob);
 
         alice.fileM.newFolder(PROJECT1, FOLDER2);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER2, FILE2);
+        alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
 
         carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
         assertTrue(carl.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));

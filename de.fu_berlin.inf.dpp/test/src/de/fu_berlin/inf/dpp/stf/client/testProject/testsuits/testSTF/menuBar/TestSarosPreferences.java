@@ -7,7 +7,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -16,9 +15,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestSarosPreferences extends STFTest {
-
-    private static final Logger log = Logger
-        .getLogger(TestSarosPreferences.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {

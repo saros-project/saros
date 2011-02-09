@@ -121,14 +121,13 @@ public interface FileM extends EclipseComponent {
      * the sub menu's name "File" on the package Explorer view.</li>
      * </ol>
      * 
-     * @param filePath
+     * @param fileNodes
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
      * 
      */
-    public void newFile(String viewTitle, String... filePath)
-        throws RemoteException;
+    public void newFile(String... fileNodes) throws RemoteException;
 
     /**
      * Performs the action "create a new class" which should be done with the

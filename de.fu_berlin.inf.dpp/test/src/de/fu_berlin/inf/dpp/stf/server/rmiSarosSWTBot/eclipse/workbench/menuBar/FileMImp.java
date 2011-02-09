@@ -84,22 +84,12 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         }
     }
 
-    public void newFile(String viewTitle, String... fileNodes)
-        throws RemoteException {
+    public void newFile(String... fileNodes) throws RemoteException {
         if (!existsFileNoGUI(getPath(fileNodes)))
             try {
-                precondition(viewTitle);
-                String[] parentNodes = new String[fileNodes.length - 1];
-                String newFileName = "";
-                for (int i = 0; i < fileNodes.length; i++) {
-                    if (i == fileNodes.length - 1)
-                        newFileName = fileNodes[i];
-                    else
-                        parentNodes[i] = fileNodes[i];
-                }
-                treeW.getTreeItemInView(viewTitle, parentNodes);
+                precondition();
                 menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FILE);
-                confirmWindowNewFile(newFileName);
+                confirmWindowNewFile(fileNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
                 log.error(cause, e);
@@ -204,14 +194,16 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.sleep(50);
     }
 
-    private void confirmWindowNewFile(String newFileName)
+    private void confirmWindowNewFile(String... fileNodes)
         throws RemoteException {
-        SWTBotShell shell = bot.shell(SHELL_NEW_FILE);
-        shell.activate();
-        bot.textWithLabel(LABEL_FILE_NAME).setText(newFileName);
+
+        shellW.activateShell(SHELL_NEW_FILE);
+        textW.setTextInTextWithLabel(getPath(getParentNodes(fileNodes)),
+            LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
+        bot.textWithLabel(LABEL_FILE_NAME).setText(getLastNode(fileNodes));
         buttonW.waitUntilButtonEnabled(FINISH);
-        bot.button(FINISH).click();
-        bot.waitUntil(Conditions.shellCloses(shell));
+        buttonW.clickButton(FINISH);
+        shellW.waitUntilShellClosed(SHELL_NEW_FILE);
     }
 
     private void confirmWindowNewJavaPackage(String projectName, String pkg)
@@ -227,8 +219,6 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     private void confirmShellNewFolder(String... folderNodes)
         throws RemoteException {
         shellW.activateShell(SHELL_NEW_FOLDER);
-        System.out.println("parent path:"
-            + getPath(getParentNodes(folderNodes)));
         bot.text().setText(getPath(getParentNodes(folderNodes)));
         // textW.setTextInTextWithLabel(getPath(getParentNodes(folderNodes)),
         // LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);

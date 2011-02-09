@@ -4,16 +4,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestEditDuringInvitation extends STFTest {
-
-    private static final Logger log = Logger
-        .getLogger(TestEditDuringInvitation.class);
 
     /**
      * Preconditions:

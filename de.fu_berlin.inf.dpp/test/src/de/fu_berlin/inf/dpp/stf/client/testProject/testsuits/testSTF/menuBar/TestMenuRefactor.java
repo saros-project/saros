@@ -5,35 +5,18 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.TestPackageExplorerView;
 
 public class TestMenuRefactor extends STFTest {
-
-    private final static Logger log = Logger
-        .getLogger(TestPackageExplorerView.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
@@ -71,7 +54,7 @@ public class TestMenuRefactor extends STFTest {
     public void testRenameFile() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.refactorM.renameFile(FILE2);
         assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));

@@ -9,37 +9,20 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.swt.SWT;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
 
 public class TestEditorByAlice extends STFTest {
-
-    private static final Logger log = Logger
-        .getLogger(TestBasicSarosElements.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
@@ -52,7 +35,7 @@ public class TestEditorByAlice extends STFTest {
         alice.fileM.newProject(PROJECT1);
         String fileName = "test.txt";
         String[] path = { PROJECT1, fileName };
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
+        alice.fileM.newFile(path);
         alice.editor.waitUntilEditorActive(fileName);
 
         String expected = "Hello World";
@@ -150,7 +133,7 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void getSelection() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FILE1);
+        alice.fileM.newFile(PROJECT1, FILE1);
         alice.editor.navigateInEditor(FILE1, 0, 0);
         alice.editor.typeTextInEditor("pleese", PROJECT1, FILE1);
         alice.editor.selectRange(FILE1, 0, 0, 6);
@@ -161,7 +144,7 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void quickFixWithSpellChecker() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FILE1);
+        alice.fileM.newFile(PROJECT1, FILE1);
         alice.editor
             .typeTextInEditor("pleese open the window", PROJECT1, FILE1);
         alice.editor.selectLine(FILE1, 0);

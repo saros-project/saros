@@ -38,13 +38,8 @@ public class TestRosterView extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (alice.sarosBuddiesV.hasBuddyNickNameNoGUI(bob.jid)) {
-            alice.sarosBuddiesV.renameBuddyNoGUI(bob.jid, bob.jid.getBase());
-        }
-
-        if (!alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid)) {
-            addBuddies(alice, bob);
-        }
+        resetBuddies();
+        resetBuddiesName();
     }
 
     @Test
@@ -195,7 +190,7 @@ public class TestRosterView extends STFTest {
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosSessionV.waitUntilIsInSession();
         assertTrue(carl.sarosSessionV.isInSession());
-        leaveSessionHostFirst();
+
     }
 
 }

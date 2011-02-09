@@ -6,8 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,16 +18,6 @@ public class TestMenuFile extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbenchs();
-    }
-
-    @AfterClass
-    public static void runAfterClass() {
-        //
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
     }
 
     @After
@@ -84,7 +72,7 @@ public class TestMenuFile extends STFTest {
     public void testNewFile() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
