@@ -76,8 +76,7 @@ public interface FileM extends EclipseComponent {
      *            the path specified by the parent node array parameter.e.g.
      *            {"Foo-saros","parentFolder" }
      */
-    public void newFolder(String viewTitle, String newFolderName,
-        String... parentNodes) throws RemoteException;
+    public void newFolder(String... folderNodes) throws RemoteException;
 
     /**
      * Performs the action "create a new package" which should be done with the

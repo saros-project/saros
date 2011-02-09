@@ -70,7 +70,7 @@ public class TestMenuRefactor extends STFTest {
     @Test
     public void testRenameFile() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.refactorM.renameFile(FILE2);
@@ -81,7 +81,7 @@ public class TestMenuRefactor extends STFTest {
     @Test
     public void testRenameFolder() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.pEV.selectFolder(PROJECT1, FOLDER1);
         alice.refactorM.renameFolder(FOLDER2);
         assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));

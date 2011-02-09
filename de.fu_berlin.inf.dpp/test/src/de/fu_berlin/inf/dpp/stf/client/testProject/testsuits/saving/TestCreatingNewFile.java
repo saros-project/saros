@@ -21,15 +21,7 @@ public class TestCreatingNewFile extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        carl.fileM.newProject(PROJECT1);
-
-        /*
-         * carl build session with bob, and alice simultaneously
-         */
-        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            carl, bob, alice);
-
+        setUpSessionWithAJavaProjectAndAClass(carl, bob, alice);
     }
 
     @After
@@ -54,7 +46,7 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        carl.fileM.newFolder(PROJECT1, FOLDER1);
         carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
@@ -94,7 +86,7 @@ public class TestCreatingNewFile extends STFTest {
         assertFalse(carl.sarosSessionV.hasWriteAccessNoGUI());
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
-        carl.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        carl.fileM.newFolder(PROJECT1, FOLDER1);
         carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         waitsUntilTransferedDataIsArrived(alice);
         assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
@@ -103,7 +95,7 @@ public class TestCreatingNewFile extends STFTest {
 
         setFollowMode(alice, carl, bob);
 
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER2, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER2);
         alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER2, FILE2);
 
         carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);

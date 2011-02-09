@@ -4,15 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestEditor2 extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestEditor2.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
@@ -34,5 +31,4 @@ public class TestEditor2 extends STFTest {
         assertEquals(aliceText, alice.editor.getTextOfEditor(path));
         assertEquals(bobText, bob.editor.getTextOfEditor(path));
     }
-
 }

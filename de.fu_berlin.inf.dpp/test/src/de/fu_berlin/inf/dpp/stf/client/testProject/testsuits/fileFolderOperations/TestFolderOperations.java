@@ -39,7 +39,7 @@ public class TestFolderOperations extends STFTest {
         if (!alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1))
             alice.fileM.newClass(PROJECT1, PKG1, CLS1);
         if (!alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1))
-            alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+            alice.fileM.newFolder(PROJECT1, FOLDER1);
     }
 
     /**

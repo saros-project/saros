@@ -57,9 +57,8 @@ public class TestMenuFile extends STFTest {
     @Test
     public void testNewFolder() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
-        alice.fileM
-            .newFolder(VIEW_PACKAGE_EXPLORER, FOLDER2, PROJECT1, FOLDER1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1, FOLDER2);
         assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
         assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
         alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
@@ -84,7 +83,7 @@ public class TestMenuFile extends STFTest {
     @Test
     public void testNewFile() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
@@ -161,7 +160,7 @@ public class TestMenuFile extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.fileM.newFolder(FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
         // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
     }
@@ -173,7 +172,7 @@ public class TestMenuFile extends STFTest {
         assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.fileM.newFolder(FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
         // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);

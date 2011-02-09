@@ -68,7 +68,7 @@ public class TestMenuEdit extends STFTest {
     @Test
     public void testDeleteFolder() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFolder(PROJECT1, FOLDER1);
         assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
         alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
         assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));

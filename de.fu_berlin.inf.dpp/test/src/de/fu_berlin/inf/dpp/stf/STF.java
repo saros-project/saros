@@ -83,6 +83,7 @@ public class STF {
     static protected final String LABEL_PROJECT_NAME = "Project name:";
     static protected final String LABEL_FILE_NAME = "File name:";
     static protected final String LABEL_FOLDER_NAME = "Folder name:";
+    static protected final String LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER = "Enter or select the parent folder:";
 
     /**********************************************
      * 
@@ -653,5 +654,17 @@ public class STF {
         isVailid &= pkg.matches("[\\w*\\.]*\\w*");
         isVailid &= className.matches("\\w*");
         return isVailid;
+    }
+
+    public String[] getParentNodes(String... nodes) {
+        String[] parentNodes = new String[nodes.length - 1];
+        for (int i = 0; i < nodes.length - 1; i++) {
+            parentNodes[i] = nodes[i];
+        }
+        return parentNodes;
+    }
+
+    public String getLastNode(String... nodes) {
+        return nodes[nodes.length - 1];
     }
 }

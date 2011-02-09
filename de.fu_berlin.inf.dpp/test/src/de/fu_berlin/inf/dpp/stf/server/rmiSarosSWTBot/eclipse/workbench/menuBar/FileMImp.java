@@ -51,19 +51,12 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         }
     }
 
-    public void newFolder(String viewTitle, String newFolderName,
-        String... parentNodes) throws RemoteException {
-        precondition(viewTitle);
-        String[] folderNodes = new String[parentNodes.length];
-        for (int i = 0; i < parentNodes.length; i++) {
-            folderNodes[i] = parentNodes[i];
-        }
-        folderNodes[folderNodes.length - 1] = newFolderName;
+    public void newFolder(String... folderNodes) throws RemoteException {
+        precondition();
         if (!existsFolderNoGUI(folderNodes)) {
             try {
-                treeW.getTreeItemInView(viewTitle, parentNodes);
                 menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FOLDER);
-                confirmWindowNewFolder(newFolderName);
+                confirmShellNewFolder(folderNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
                 log.error(cause, e);
@@ -231,12 +224,17 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         shellW.waitUntilShellClosed(SHELL_NEW_JAVA_PACKAGE);
     }
 
-    private void confirmWindowNewFolder(String newFolderName) {
-        SWTBotShell shell = bot.shell(SHELL_NEW_FOLDER);
-        shell.activate();
-        bot.textWithLabel(LABEL_FOLDER_NAME).setText(newFolderName);
-        bot.button(FINISH).click();
-        bot.waitUntil(Conditions.shellCloses(shell));
+    private void confirmShellNewFolder(String... folderNodes)
+        throws RemoteException {
+        shellW.activateShell(SHELL_NEW_FOLDER);
+        System.out.println("parent path:"
+            + getPath(getParentNodes(folderNodes)));
+        bot.text().setText(getPath(getParentNodes(folderNodes)));
+        // textW.setTextInTextWithLabel(getPath(getParentNodes(folderNodes)),
+        // LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
+        bot.textWithLabel(LABEL_FOLDER_NAME).setText(getLastNode(folderNodes));
+        buttonW.clickButton(FINISH);
+        shellW.waitUntilShellClosed(SHELL_NEW_FOLDER);
     }
 
     private void confirmWindowNewJavaProject(String projectName)
