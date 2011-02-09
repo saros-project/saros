@@ -35,7 +35,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 
     @AfterClass
@@ -85,9 +85,9 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         InterruptedException {
         alice.windowM.setNewTextFileLineDelimiter("Unix");
 
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            carl, bob);
+            carl, alice, bob);
 
         String delimiterByAlice = alice.windowM.getTextFileLineDelimiter();
         String delimiterByCarl = carl.windowM.getTextFileLineDelimiter();
@@ -104,7 +104,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         assertTrue(delimiterByAlice.equals(delimiterByCarl));
         assertTrue(delimiterByAlice.equals(delimiterByBob));
 
-        alice.leaveSessionPeersFirstDone(carl, bob);
+        leaveSessionPeersFirst();
 
     }
 }

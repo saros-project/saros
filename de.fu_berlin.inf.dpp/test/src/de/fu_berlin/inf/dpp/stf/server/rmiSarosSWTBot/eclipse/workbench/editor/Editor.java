@@ -211,7 +211,7 @@ public interface Editor extends EclipseComponent {
      *            YES or NO
      * @throws RemoteException
      */
-    public void confirmWindowSaveSource(String buttonType)
+    public void confirmShellSaveSource(String buttonType)
         throws RemoteException;
 
     /**********************************************

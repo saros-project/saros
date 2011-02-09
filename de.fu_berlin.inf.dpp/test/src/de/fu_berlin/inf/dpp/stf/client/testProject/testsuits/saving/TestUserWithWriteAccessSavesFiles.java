@@ -8,9 +8,6 @@ import java.rmi.AccessException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -39,34 +36,18 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbenchs();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         alice.fileM.newClass(PROJECT1, PKG1, CLS3);
 
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        alice.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            edna, bob, carl, dave);
+            alice, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
-        alice.followedBy(dave, edna);
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException,
-        InterruptedException {
-        alice.leaveSessionHostFirstDone(edna, bob, carl, dave);
-    }
-
-    @Before
-    public void runBeforeEveryTest() {
-        //
-    }
-
-    @After
-    public void runAfterEveryTest() {
-        //
+        setFollowMode(alice, dave, edna);
     }
 
     /**

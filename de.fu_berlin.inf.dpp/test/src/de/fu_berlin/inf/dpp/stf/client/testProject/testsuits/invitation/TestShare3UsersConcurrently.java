@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -13,8 +12,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestShare3UsersConcurrently extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestShare3UsersConcurrently.class);
 
     /**
      * Preconditions:
@@ -53,10 +50,10 @@ public class TestShare3UsersConcurrently extends STFTest {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            bob, carl);
+            alice, bob, carl);
         assertTrue(carl.sarosSessionV.isParticipantNoGUI());
         assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());
         assertTrue(carl.sarosSessionV.hasWriteAccessNoGUI());
@@ -69,7 +66,7 @@ public class TestShare3UsersConcurrently extends STFTest {
         assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
-        alice.leaveSessionPeersFirstDone(bob, carl);
+        leaveSessionPeersFirst();
 
         assertFalse(carl.sarosSessionV.isParticipantNoGUI());
         assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());

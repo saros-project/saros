@@ -52,7 +52,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemInTreeInView(VIEW_PACKAGE_EXPLORER,
             PROJECT1));
@@ -64,7 +64,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemWithRegexsInView(
             VIEW_PACKAGE_EXPLORER, PROJECT1));
@@ -92,7 +92,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void selectTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(

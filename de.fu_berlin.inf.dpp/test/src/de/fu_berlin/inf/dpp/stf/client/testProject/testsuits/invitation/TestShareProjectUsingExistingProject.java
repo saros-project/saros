@@ -33,14 +33,14 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        bob.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS2);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        bob.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS2);
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException,
         InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
         deleteAllProjectsByActiveTesters();
 
     }
@@ -49,9 +49,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     public void shareProjectUsingExistingProject() throws RemoteException {
         assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
         assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
-            TypeOfCreateProject.EXIST_PROJECT, bob);
+            TypeOfCreateProject.EXIST_PROJECT, alice, bob);
         bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS1);
         assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
         assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
@@ -63,13 +63,12 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
         assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
 
-        alice
-            .buildSessionDoneSequentially(
-                VIEW_PACKAGE_EXPLORER,
-                PROJECT1,
-                TypeOfShareProject.SHARE_PROJECT,
-                TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
-                bob);
+        buildSessionSequentially(
+            VIEW_PACKAGE_EXPLORER,
+            PROJECT1,
+            TypeOfShareProject.SHARE_PROJECT,
+            TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
+            alice, bob);
         // assertTrue(bob.sarosC.isWIndowSessionInvitationActive());
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
@@ -84,9 +83,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
-            TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, bob);
+            TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
         assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1));
         assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
         assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1_NEXT));

@@ -62,7 +62,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void testDeleteInEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
@@ -77,7 +77,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void testEnterInEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         String fileName = CLS1 + ".java";
@@ -90,7 +90,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void autoComplateProposal() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -104,7 +104,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void getAutoComplateProposal() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -120,7 +120,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void pressShortCutSave() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.editor.waitUntilJavaEditorActive(CLS1);
         alice.editor.navigateInEditor(CLS1 + ".java", 3, 0);
@@ -150,7 +150,7 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void getSelection() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(PROJECT1, FILE1);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FILE1);
         alice.editor.navigateInEditor(FILE1, 0, 0);
         alice.editor.typeTextInEditor("pleese", PROJECT1, FILE1);
         alice.editor.selectRange(FILE1, 0, 0, 6);
@@ -161,7 +161,7 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void quickFixWithSpellChecker() throws RemoteException {
         alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(PROJECT1, FILE1);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FILE1);
         alice.editor
             .typeTextInEditor("pleese open the window", PROJECT1, FILE1);
         alice.editor.selectLine(FILE1, 0);

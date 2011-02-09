@@ -33,8 +33,7 @@ public class TestHandleContacts extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        alice.addBuddyGUIDone(bob);
-        bob.addBuddyGUIDone(alice);
+        resetBuddies();
     }
 
     // FIXME these testAddContact assumes that testRemoveContact succeeds
@@ -57,7 +56,7 @@ public class TestHandleContacts extends STFTest {
     public void testBobRemoveBuddyAlice() throws RemoteException {
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
-        bob.deleteBuddyGUIDone(alice);
+        deleteBuddies(bob, alice);
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
@@ -79,7 +78,7 @@ public class TestHandleContacts extends STFTest {
     public void testAliceRemoveBuddyBob() throws RemoteException {
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
-        alice.deleteBuddyGUIDone(bob);
+        deleteBuddies(alice, bob);
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
@@ -99,8 +98,8 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceAddBuddyBob() throws RemoteException {
-        alice.deleteBuddyGUIDone(bob);
-        alice.addBuddyGUIDone(bob);
+        deleteBuddies(alice, bob);
+        addBuddies(alice, bob);
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }
@@ -120,8 +119,8 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobAddBuddyAlice() throws RemoteException {
-        bob.deleteBuddyGUIDone(alice);
-        bob.addBuddyGUIDone(alice);
+        deleteBuddies(bob, alice);
+        addBuddies(bob, alice);
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
     }

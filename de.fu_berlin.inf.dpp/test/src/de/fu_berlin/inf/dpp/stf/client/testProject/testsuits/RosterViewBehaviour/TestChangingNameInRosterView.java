@@ -29,13 +29,13 @@ public class TestChangingNameInRosterView extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @AfterClass
     public static void runAfterClass() throws RemoteException,
         InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
     }
 
     @After
@@ -44,7 +44,7 @@ public class TestChangingNameInRosterView extends STFTest {
             alice.sarosBuddiesV.renameBuddy(bob.jid, bob.jid.getBase());
         }
         if (!alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid)) {
-            alice.addBuddyGUIDone(bob);
+            addBuddies(alice, bob);
         }
     }
 

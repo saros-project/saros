@@ -104,4 +104,11 @@ public interface EditM extends EclipseComponent {
      * @throws RemoteException
      */
     public void copyProject(String target) throws RemoteException;
+
+    /**
+     * Delete all the projects in this workspace.
+     * 
+     * @throws RemoteException
+     */
+    public void deleteAllProjectsNoGUI() throws RemoteException;
 }

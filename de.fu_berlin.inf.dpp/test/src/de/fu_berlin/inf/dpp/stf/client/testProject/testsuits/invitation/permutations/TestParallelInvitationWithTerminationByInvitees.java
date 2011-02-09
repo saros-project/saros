@@ -83,7 +83,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
     @Test
     public void parallelInvitationWihtTerminationByInvitees()
         throws IOException, CoreException, InterruptedException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously

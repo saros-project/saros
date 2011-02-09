@@ -207,8 +207,8 @@ public interface FileM extends EclipseComponent {
      * @param className
      *            name of the class, e.g. MyClass
      */
-    public void newJavaProjectWithClass(String projectName, String pkg,
-        String className) throws RemoteException;
+    public void newJavaProjectWithClasses(String projectName, String pkg,
+        String... className) throws RemoteException;
 
     /**
      * 

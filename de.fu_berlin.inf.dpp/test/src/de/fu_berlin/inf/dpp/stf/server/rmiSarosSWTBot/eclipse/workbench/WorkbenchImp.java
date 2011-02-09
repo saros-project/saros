@@ -2,11 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -17,7 +12,6 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 
 public class WorkbenchImp extends EclipseComponentImp implements Workbench {
 
@@ -76,7 +70,7 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     public void resetSaros() throws RemoteException {
         rosterV.resetAllBuddyNameNoGUI();
         rosterV.disconnect();
-        deleteAllProjects();
+        editM.deleteAllProjectsNoGUI();
     }
 
     public SWTBotShell getEclipseShell() throws RemoteException {
@@ -127,22 +121,8 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
 
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
-        deleteAllProjects();
+        editM.deleteAllProjectsNoGUI();
         editM.deleteAllProjects();
 
     }
-
-    public void deleteAllProjects() throws RemoteException {
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IProject[] projects = root.getProjects();
-        for (int i = 0; i < projects.length; i++) {
-            try {
-                FileUtil.delete(projects[i]);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete files ", e);
-            }
-        }
-    }
-
 }

@@ -33,8 +33,8 @@ public class TestFileOperations extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob, carl);
-        alice.followedBy(carl);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob, carl);
+        setFollowMode(alice, carl);
     }
 
     @Before

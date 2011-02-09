@@ -154,10 +154,13 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
-    public void newJavaProjectWithClass(String projectName, String pkg,
-        String className) throws RemoteException {
+    public void newJavaProjectWithClasses(String projectName, String pkg,
+        String... classNames) throws RemoteException {
         newJavaProject(projectName);
-        newClass(projectName, pkg, className);
+        for (String className : classNames) {
+            newClass(projectName, pkg, className);
+        }
+
     }
 
     /**********************************************

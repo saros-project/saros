@@ -92,15 +92,15 @@ public class TestSVNStateUpdates extends STFTest {
         int numberOfThreads = 1;
         MakeOperationConcurrently.workAll(initTasks, numberOfThreads);
 
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT,
-            TypeOfCreateProject.EXIST_PROJECT, bob);
+            TypeOfCreateProject.EXIST_PROJECT, alice, bob);
         alice.sarosSessionV.waitUntilIsInviteeInSession(bob.sarosSessionV);
     }
 
     @After
     public void runAfterEveryTest() throws Exception {
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
         if (bob.fileM.existsProjectNoGUI(SVN_PROJECT))
             bob.editM.deleteProjectNoGUI(SVN_PROJECT);
 
@@ -171,8 +171,8 @@ public class TestSVNStateUpdates extends STFTest {
 
         bob.refactorM.moveClassTo(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
-        assertTrue(alice.fileM
-            .existsClassNoGUI(SVN_PROJECT, "new_package", SVN_CLS1));
+        assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, "new_package",
+            SVN_CLS1));
     }
 
     /**

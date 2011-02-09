@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -13,8 +12,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestShare2UsersSequentially extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestShare2UsersSequentially.class);
 
     /**
      * Preconditions:
@@ -52,10 +49,10 @@ public class TestShare2UsersSequentially extends STFTest {
     @Test
     public void aliceShareProjectWithBobSequentially() throws RemoteException,
         InterruptedException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            bob);
+            alice, bob);
         bob.workbench
             .captureScreenshot((bob.workbench.getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice.workbench.captureScreenshot((alice.workbench
@@ -70,7 +67,7 @@ public class TestShare2UsersSequentially extends STFTest {
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
         assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
 
-        alice.leaveSessionPeersFirstDone(bob);
+        leaveSessionPeersFirst();
 
         assertFalse(bob.sarosSessionV.isParticipantNoGUI());
         assertFalse(alice.sarosSessionV.isParticipantNoGUI());

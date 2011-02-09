@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,16 +15,13 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestSessionView extends STFTest {
 
-    private static final Logger log = Logger
-        .getLogger(TestSessionView.class);
-
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @Before
@@ -36,7 +32,7 @@ public class TestSessionView extends STFTest {
     @After
     public void runAfterEveryTest() throws RemoteException {
         resetWriteAccess(alice, bob);
-        resetFollowMode(alice, bob);
+        resetFollowModeSequentially(alice, bob);
     }
 
     @Test
@@ -160,7 +156,7 @@ public class TestSessionView extends STFTest {
     // FIXME dialog with error message "Xuggler not installed"
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
-        alice.shareYourScreenWithSelectedUserDone(bob);
+        shareYourScreen(alice, bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.rSV.isRemoteScreenViewActive());
         alice.sarosSessionV.stopSessionWithBuddy(bob.jid);
@@ -213,7 +209,7 @@ public class TestSessionView extends STFTest {
         throws RemoteException, InterruptedException {
         assertTrue(alice.sarosSessionV.isInSession());
         assertTrue(bob.sarosSessionV.isInSession());
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
         assertFalse(alice.sarosSessionV.isInSession());
         assertFalse(bob.sarosSessionV.isInSession());
     }
@@ -231,7 +227,7 @@ public class TestSessionView extends STFTest {
         assertFalse(bob.sarosSessionV.existsLabelTextInSessionView());
         assertTrue(alice.sarosSessionV.isInSession());
         assertTrue(bob.sarosSessionV.isInSession());
-        alice.leaveSessionPeersFirstDone(bob);
+        leaveSessionPeersFirst();
         assertFalse(alice.sarosSessionV.isInSession());
         assertFalse(bob.sarosSessionV.isInSession());
         assertTrue(alice.sarosSessionV.existsLabelTextInSessionView());
@@ -244,7 +240,7 @@ public class TestSessionView extends STFTest {
         assertTrue(alice.sarosSessionV.isInSession());
         assertTrue(bob.sarosSessionV.isInSessionNoGUI());
         assertTrue(bob.sarosSessionV.isInSession());
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
         assertFalse(alice.sarosSessionV.isInSessionNoGUI());
         assertFalse(bob.sarosSessionV.isInSessionNoGUI());
         assertFalse(alice.sarosSessionV.isInSession());
@@ -257,8 +253,8 @@ public class TestSessionView extends STFTest {
         bob.sarosSessionV.leaveTheSessionByPeer();
         bob.editM.deleteProjectNoGUI(PROJECT1);
         assertFalse(bob.sarosSessionV.isInSession());
-        alice.inviteBuddiesInSessionDone(PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, bob, carl);
+        inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,
+            carl);
         assertTrue(carl.sarosSessionV.isInSession());
         assertTrue(bob.sarosSessionV.isInSession());
     }

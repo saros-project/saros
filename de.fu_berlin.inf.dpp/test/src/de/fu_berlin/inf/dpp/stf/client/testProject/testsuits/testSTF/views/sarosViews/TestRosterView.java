@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -17,8 +16,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RosterView;
 
 public class TestRosterView extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestRosterView.class);
 
     /**
      * Preconditions:
@@ -46,7 +43,7 @@ public class TestRosterView extends STFTest {
         }
 
         if (!alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid)) {
-            alice.addBuddyGUIDone(bob);
+            addBuddies(alice, bob);
         }
     }
 
@@ -119,10 +116,10 @@ public class TestRosterView extends STFTest {
 
     @Test
     public void addBuddyWithGUI() throws RemoteException {
-        alice.deleteBuddyGUIDone(bob);
+        deleteBuddies(alice, bob);
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
-        alice.addBuddyGUIDone(bob);
+        addBuddies(alice, bob);
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
     }
@@ -137,10 +134,10 @@ public class TestRosterView extends STFTest {
     @Test
     @Ignore
     public void addBuddyWithoutGUI() throws RemoteException, XMPPException {
-        alice.deleteBuddyGUIDone(bob);
+        deleteBuddies(alice, bob);
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
-        alice.addBuddyDone(bob);
+        addBuddies(alice, bob);
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
     }
@@ -159,17 +156,17 @@ public class TestRosterView extends STFTest {
      * @throws RemoteException
      */
     @Test
-    public void deleteBuddyWithGUI() throws RemoteException {
+    public void deleteBuddy() throws RemoteException {
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        alice.deleteBuddyGUIDone(bob);
+        deleteBuddies(alice, bob);
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
     }
 
     @Test
-    public void deleteBuddyWithoutGUI() throws RemoteException, XMPPException {
+    public void deleteBuddyNoGUI() throws RemoteException, XMPPException {
         assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        alice.deleteBuddyDone(bob);
+        deleteBuddiesNoGUI(alice, bob);
         assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
     }
@@ -191,14 +188,14 @@ public class TestRosterView extends STFTest {
     @Test
     public void inviteBuddyWithGUI() throws RemoteException,
         InterruptedException {
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
         assertFalse(carl.sarosSessionV.isInSession());
         alice.sarosBuddiesV.inviteBuddy(carl.jid);
         carl.sarosC.confirmShellSessionnInvitation();
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosSessionV.waitUntilIsInSession();
         assertTrue(carl.sarosSessionV.isInSession());
-        alice.leaveSessionHostFirstDone(bob, carl);
+        leaveSessionHostFirst();
     }
 
 }

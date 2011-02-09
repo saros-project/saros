@@ -26,15 +26,15 @@ public class TestCreatingNewFile extends STFTest {
         /*
          * carl build session with bob, and alice simultaneously
          */
-        carl.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            bob, alice);
+            carl, bob, alice);
 
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        deleteFolders(FOLDER1, FOLDER2);
+        deleteFoldersByActiveTesters(FOLDER1, FOLDER2);
     }
 
     /**
@@ -54,8 +54,8 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.fileM.newFolder(FOLDER1, PROJECT1);
-        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        carl.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
@@ -94,21 +94,17 @@ public class TestCreatingNewFile extends STFTest {
         assertFalse(carl.sarosSessionV.hasWriteAccessNoGUI());
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
-        carl.fileM.newFolder(FOLDER1, PROJECT1);
-        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.workbench.sleep(500);
+        carl.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        carl.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        waitsUntilTransferedDataIsArrived(alice);
         assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        bob.workbench.sleep(500);
+        waitsUntilTransferedDataIsArrived(bob);
         assertFalse(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
 
-        // if (!carl.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
-        // carl.sarosSessionV.followThisBuddyGUI(alice.jid);
-        // if (!bob.sarosSessionV.isFollowingBuddy(alice.getBaseJid()))
-        // bob.sarosSessionV.followThisBuddyGUI(alice.jid);
-        alice.followedBy(carl, bob);
+        setFollowMode(alice, carl, bob);
 
-        alice.fileM.newFolder(PROJECT1, FOLDER2);
-        alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
+        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER2, PROJECT1);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER2, FILE2);
 
         carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
         assertTrue(carl.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));

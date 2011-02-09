@@ -34,17 +34,16 @@ public class TestHostInvitesBelatedly extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
-        bob.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        bob.fileM.newClass(PROJECT1, PKG1, CLS2);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
+        bob.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
+
         /*
          * alice build session only with carl and is followed by carl.
          */
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            carl);
-        alice.followedBy(carl);
+            alice, carl);
+        setFollowMode(alice, carl);
     }
 
     /**
@@ -94,8 +93,7 @@ public class TestHostInvitesBelatedly extends STFTest {
         // bob.editor.closeJavaEditorWithSave(CLS1);
         // bob.editor.closeJavaEditorWithSave(CLS2);
 
-        alice.inviteBuddiesInSessionDone(PROJECT1,
-            TypeOfCreateProject.EXIST_PROJECT, bob);
+        inviteBuddies(PROJECT1, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
 
         bob.editor.waitUntilJavaEditorContentSame(dirtyContent1ByAlice,
             PROJECT1, PKG1, CLS1);

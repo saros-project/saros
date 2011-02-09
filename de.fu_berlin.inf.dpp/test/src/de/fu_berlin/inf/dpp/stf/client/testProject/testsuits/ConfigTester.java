@@ -90,18 +90,6 @@ public class ConfigTester {
         return MakeOperationConcurrently.workAll(initTasks);
     }
 
-    public static void addContacts(List<Tester> musicians)
-        throws RemoteException {
-        for (int i = 0; i < musicians.size(); i++) {
-            Tester musican = musicians.get(i);
-            for (int j = i + 1; j < musicians.size(); j++) {
-                Tester addedMuscian = musicians.get(j);
-                if (!musican.sarosBuddiesV.hasBuddyNoGUI(addedMuscian.jid))
-                    musican.addBuddyGUIDone(addedMuscian);
-            }
-        }
-    }
-
     public static Callable<Tester> newAliceCallable() {
         return new Callable<Tester>() {
             public Tester call() throws Exception {

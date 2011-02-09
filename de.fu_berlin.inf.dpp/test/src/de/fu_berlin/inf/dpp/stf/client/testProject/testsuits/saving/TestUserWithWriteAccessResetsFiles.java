@@ -36,7 +36,7 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob, carl, dave, edna);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave, edna);
     }
 
     /**
@@ -58,8 +58,10 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
      * 
      * @throws CoreException
      * @throws IOException
+     * 
+     *             FIXME: this test don't work under OS MAC, because there are
+     *             no popUp window "save source".
      */
-
     @Test
     public void testAliceResetsFile() throws IOException, CoreException {
         dave.sarosSessionV.followThisBuddy(alice.jid);
@@ -67,8 +69,9 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
 
         alice.editor.closejavaEditorWithoutSave(CLS1);
-        dave.editor.confirmWindowSaveSource(NO);
-        edna.editor.confirmWindowSaveSource(NO);
+
+        dave.editor.confirmShellSaveSource(NO);
+        edna.editor.confirmShellSaveSource(NO);
 
         String contentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);

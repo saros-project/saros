@@ -37,13 +37,13 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
             TypeOfTester.DAVE);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob, carl, dave);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException,
         InterruptedException {
-        alice.followedBy(bob, carl, dave);
+        setFollowMode(alice, bob, carl, dave);
     }
 
     /**

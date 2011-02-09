@@ -49,10 +49,10 @@ public class TestShare3UsersSequentially extends STFTest {
     @Test
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        alice.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            carl, bob);
+            alice, carl, bob);
 
         assertTrue(carl.sarosSessionV.isParticipantNoGUI());
         assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());
@@ -66,7 +66,7 @@ public class TestShare3UsersSequentially extends STFTest {
         assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI());
         assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
 
-        alice.leaveSessionPeersFirstDone(carl, bob);
+        leaveSessionPeersFirst();
 
         assertFalse(carl.sarosSessionV.isParticipantNoGUI());
         assertFalse(carl.sarosSessionV.hasReadOnlyAccessNoGUI());

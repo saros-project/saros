@@ -20,7 +20,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     /**

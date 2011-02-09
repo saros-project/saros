@@ -24,15 +24,15 @@ public class TestEditorByAliceAndBob extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @AfterClass
     public static void runAfterClass() throws RemoteException,
         InterruptedException {
-        alice.leaveSessionHostFirstDone(bob);
+        leaveSessionHostFirst();
     }
 
     @Before
@@ -70,7 +70,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorOpen() throws RemoteException,
         InterruptedException {
-        alice.followedBy(bob);
+        setFollowMode(alice, bob);
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorOpen(CLS1);
@@ -80,7 +80,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorActive() throws RemoteException,
         InterruptedException {
-        alice.followedBy(bob);
+        setFollowMode(alice, bob);
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         bob.editor.waitUntilJavaEditorActive(CLS2);
@@ -95,7 +95,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorClosed() throws RemoteException,
         InterruptedException {
-        alice.followedBy(bob);
+        setFollowMode(alice, bob);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.editor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.editor.isJavaEditorActive(CLS1));

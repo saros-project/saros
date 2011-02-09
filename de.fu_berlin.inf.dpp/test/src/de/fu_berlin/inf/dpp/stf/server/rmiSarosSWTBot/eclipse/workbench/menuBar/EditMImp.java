@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar
 
 import java.rmi.RemoteException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -95,7 +96,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     /**************************************************************
      * 
-     * inner functions
+     * No GUI
      * 
      **************************************************************/
 
@@ -124,6 +125,19 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         String className) throws RemoteException {
         IPath path = new Path(getClassPath(projectName, pkg, className));
         deleteNoGUI(path);
+    }
+
+    public void deleteAllProjectsNoGUI() throws RemoteException {
+        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IProject[] projects = root.getProjects();
+        for (int i = 0; i < projects.length; i++) {
+            try {
+                FileUtil.delete(projects[i]);
+                root.refreshLocal(IResource.DEPTH_INFINITE, null);
+            } catch (CoreException e) {
+                log.debug("Couldn't delete files ", e);
+            }
+        }
     }
 
     /**************************************************************

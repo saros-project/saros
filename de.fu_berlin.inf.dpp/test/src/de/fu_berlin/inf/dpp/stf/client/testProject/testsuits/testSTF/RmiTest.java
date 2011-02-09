@@ -76,7 +76,7 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testCloseEditorWithSave() throws IOException, CoreException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
@@ -89,7 +89,7 @@ public class RmiTest extends STFTest {
     @Test
     @Ignore
     public void testCloseEditorWithoutSave() throws IOException, CoreException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
@@ -101,7 +101,7 @@ public class RmiTest extends STFTest {
 
     @Test
     public void testIsClassDirty() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertFalse(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
         alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
@@ -113,7 +113,7 @@ public class RmiTest extends STFTest {
     @Ignore
     public void testIsClassesSame() throws RemoteException, CoreException,
         IOException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.fileM.newClass(PROJECT1, PKG2, CLS1);
         String clsOfPkgProject = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
@@ -121,7 +121,7 @@ public class RmiTest extends STFTest {
             CLS1);
         assertFalse(clsOfPkgProject.equals(clsOfpkg2Project));
 
-        alice.fileM.newJavaProjectWithClass(PROJECT2, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT2, PKG1, CLS1);
         String clsOfPkgProject2 = alice.editor.getClassContent(PROJECT2, PKG1,
             CLS1);
         assertTrue(clsOfPkgProject.equals(clsOfPkgProject2));

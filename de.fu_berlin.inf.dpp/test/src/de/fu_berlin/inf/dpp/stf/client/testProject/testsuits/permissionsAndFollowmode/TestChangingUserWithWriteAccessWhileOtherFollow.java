@@ -35,8 +35,8 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
             TypeOfTester.DAVE);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob, carl, dave);
-        alice.followedBy(bob, carl, dave);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave);
+        setFollowMode(alice, bob, carl, dave);
     }
 
     /**
@@ -106,7 +106,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         assertTrue(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
 
-        carl.stopFollowedBy(alice, bob, dave);
+        resetFollowModeSequentially(alice, bob, dave);
         carl.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
         carl.editor.closeJavaEditorWithSave(CLS1);

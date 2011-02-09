@@ -20,12 +20,12 @@ public class TestFollowMode extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetFollowMode(bob, alice);
+        resetFollowModeSequentially(bob, alice);
     }
 
     /**

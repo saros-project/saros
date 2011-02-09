@@ -4,9 +4,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,6 +21,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 
 public class STFTest extends STF {
 
@@ -44,7 +49,7 @@ public class STFTest extends STF {
     public static Tester dave;
     public static Tester edna;
 
-    public enum TypeOfTester {
+    public static enum TypeOfTester {
         ALICE, BOB, CARL, DAVE, EDNA
     }
 
@@ -131,7 +136,6 @@ public class STFTest extends STF {
     public static final String PKG1 = "my.pkg";
     public static final String PKG2 = "my.pkg2";
     public static final String PKG3 = "my.pkg3";
-    public static final String SRC = "src";
 
     /* class name */
     public static final String CLS1 = "MyClass";
@@ -177,14 +181,36 @@ public class STFTest extends STF {
 
     /**********************************************
      * 
-     * test conditions
+     * Before/After conditions
      * 
      **********************************************/
+
+    @Before
+    public void before() throws Exception {
+        resetWorkbenches();
+    }
+
+    @After
+    public void after() throws Exception {
+        resetWorkbenches();
+    }
+
+    @AfterClass
+    public static void afterClass() throws Exception {
+        resetSaros();
+    }
+
+    /**********************************************
+     * 
+     * often used to define preconditions
+     * 
+     **********************************************/
+
     /**
      * bring workbench to a original state before beginning your tests
      * <ul>
      * <li>activate saros-instance workbench</li>
-     * <li>close all opened popup windows</li>
+     * <li>close all opened popUp windows</li>
      * <li>close all opened editors</li>
      * <li>delete all existed projects</li>
      * <li>close welcome view, if it is open</li>
@@ -197,7 +223,6 @@ public class STFTest extends STF {
     public static void setUpWorkbenchs() throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.workbench.activateWorkbench();
-            // tester.sarosBuddiesV.disconnectGUI();
             tester.workbench.setUpWorkbench();
             tester.view.closeViewByTitle("Welcome");
             tester.windowM.openPerspective();
@@ -222,32 +247,48 @@ public class STFTest extends STF {
             tester.workbench.openSarosViews();
             tester.sarosBuddiesV.connectNoGUI(tester.jid, tester.password);
         }
-        // check buddy lists.
-        for (Tester tester : activeTesters) {
-            for (Tester otherTester : activeTesters) {
-                if (tester != otherTester) {
-                    tester.addBuddyGUIDone(otherTester);
-                }
-            }
-        }
+        resetBuddies();
     }
 
     /**
-     * A convenient function to quickly build a session with default value.
+     * A convenient function to quickly build a session which share a java
+     * project with a class.
      * 
      * @param inviter
      * @param invitees
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public static void setUpSessionByDefault(Tester inviter, Tester... invitees)
-        throws RemoteException, InterruptedException {
-        inviter.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        inviter.buildSessionDoneConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
+    public static void setUpSessionWithAJavaProjectAndAClass(Tester inviter,
+        Tester... invitees) throws RemoteException, InterruptedException {
+        inviter.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            invitees);
+            inviter, invitees);
     }
 
+    public static void setUpSessionWithJavaProjects(
+        Map<String, List<String>> projectsPkgsClasses, Tester inviter,
+        Tester... invitees) throws RemoteException {
+        List<String> createdProjects = new ArrayList<String>();
+        for (Iterator<String> i = projectsPkgsClasses.keySet().iterator(); i
+            .hasNext();) {
+            String key = i.next();
+            if (!createdProjects.contains(key)) {
+                createdProjects.add(key);
+                inviter.fileM.newJavaProject(key);
+                List<String> pkgAndclass = projectsPkgsClasses.get(key);
+                inviter.fileM.newClass(key, pkgAndclass.get(0),
+                    pkgAndclass.get(1));
+            }
+        }
+    }
+
+    /**********************************************
+     * 
+     * often used to define afterConditions
+     * 
+     **********************************************/
     /**
      * For all active testers, reset buddy names, disconnect, delete all
      * projects.
@@ -259,7 +300,7 @@ public class STFTest extends STF {
             if (tester != null) {
                 tester.sarosBuddiesV.resetAllBuddyNameNoGUI();
                 tester.sarosBuddiesV.disconnect();
-                tester.workbench.deleteAllProjects();
+                tester.editM.deleteAllProjectsNoGUI();
             }
         }
         resetAllBots();
@@ -269,12 +310,6 @@ public class STFTest extends STF {
         for (Tester tester : activeTesters) {
             tester.workbench.resetWorkbench();
         }
-    }
-
-    public static void resetAllBots() {
-        alice = bob = carl = dave = edna = null;
-        activeTesters.clear();
-        assertTrue(activeTesters.isEmpty());
     }
 
     public static void resetDefaultAccount() throws RemoteException {
@@ -290,37 +325,14 @@ public class STFTest extends STF {
         }
     }
 
-    public static void reBuildSession(Tester host, Tester... invitees)
-        throws RemoteException {
-        if (!host.sarosSessionV.isInSessionNoGUI()) {
-            for (Tester tester : invitees) {
-                host.buildSessionDoneSequentially(VIEW_PACKAGE_EXPLORER,
-                    PROJECT1, TypeOfShareProject.SHARE_PROJECT,
-                    TypeOfCreateProject.EXIST_PROJECT, tester);
+    public static void resetBuddies() throws RemoteException {
+        // check buddy lists.
+        for (Tester tester : activeTesters) {
+            for (Tester otherTester : activeTesters) {
+                if (tester != otherTester) {
+                    addBuddies(tester, otherTester);
+                }
             }
-        }
-    }
-
-    public static void createProjectWithClassByActiveTesters()
-        throws RemoteException {
-        for (Tester tester : activeTesters) {
-            tester.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
-        }
-    }
-
-    public static void createProjectWithFileBy(Tester... testers)
-        throws RemoteException {
-        for (Tester tester : testers) {
-            tester.fileM.newProject(PROJECT1);
-            tester.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
-            tester.editor.waitUntilEditorOpen(FILE3);
-        }
-    }
-
-    public static void deleteAllProjectsByActiveTesters()
-        throws RemoteException {
-        for (Tester tester : activeTesters) {
-            tester.workbench.deleteAllProjects();
         }
     }
 
@@ -339,9 +351,9 @@ public class STFTest extends STF {
         }
     }
 
-    public static void resetFollowMode(Tester... activeTesters)
+    public static void resetFollowModeSequentially(Tester... buddiesFollowing)
         throws RemoteException {
-        for (Tester tester : activeTesters) {
+        for (Tester tester : buddiesFollowing) {
             if (tester.sarosSessionV.isInSessionNoGUI()
                 && tester.sarosSessionV.isFollowing()) {
                 tester.sarosSessionV.stopFollowing();
@@ -349,9 +361,72 @@ public class STFTest extends STF {
         }
     }
 
+    /**
+     * stop the follow-mode of the buddies who are following the local user.
+     * 
+     * @param buddiesFollowing
+     *            the list of the buddies who are following the local user.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void resetFollowModeConcurrently(Tester... buddiesFollowing)
+        throws RemoteException, InterruptedException {
+        List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < buddiesFollowing.length; i++) {
+            final Tester tester = buddiesFollowing[i];
+            stopFollowTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    tester.sarosSessionV.stopFollowing();
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(stopFollowTasks);
+    }
+
     public static void resetSharedProject(Tester host) throws RemoteException {
         host.editM.deleteAllChildrenOfProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
         host.fileM.newClass(PROJECT1, PKG1, CLS1);
+    }
+
+    /**********************************************
+     * 
+     * often used convenient functions
+     * 
+     **********************************************/
+
+    public static void reBuildSession(Tester host, Tester... invitees)
+        throws RemoteException {
+        if (!host.sarosSessionV.isInSessionNoGUI()) {
+            for (Tester tester : invitees) {
+                buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
+                    TypeOfShareProject.SHARE_PROJECT,
+                    TypeOfCreateProject.EXIST_PROJECT, host, tester);
+            }
+        }
+    }
+
+    public static void createSameJavaProjectByActiveTesters()
+        throws RemoteException {
+        for (Tester tester : activeTesters) {
+            tester.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        }
+    }
+
+    public static void createProjectWithFileBy(Tester... testers)
+        throws RemoteException {
+        for (Tester tester : testers) {
+            tester.fileM.newProject(PROJECT1);
+            tester.fileM.newFile(VIEW_PACKAGE_EXPLORER, path);
+            tester.editor.waitUntilEditorOpen(FILE3);
+        }
+    }
+
+    public static void deleteAllProjectsByActiveTesters()
+        throws RemoteException {
+        for (Tester tester : activeTesters) {
+            tester.editM.deleteAllProjectsNoGUI();
+        }
     }
 
     public static void disConnectByActiveTesters() throws RemoteException {
@@ -362,7 +437,8 @@ public class STFTest extends STF {
         }
     }
 
-    public static void deleteFolders(String... folders) throws RemoteException {
+    public static void deleteFoldersByActiveTesters(String... folders)
+        throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
                 if (tester.fileM.existsFolderNoGUI(PROJECT1, folder))
@@ -371,35 +447,263 @@ public class STFTest extends STF {
         }
     }
 
-    @Before
-    public void before() throws Exception {
-        resetWorkbenches();
-    }
+    public static void buildSessionSequentially(String viewTitle,
+        String projectName, TypeOfShareProject howToShareProject,
+        TypeOfCreateProject usingWhichProject, Tester inviter,
+        Tester... invitees) throws RemoteException {
+        String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-    @After
-    public void after() throws Exception {
-        resetWorkbenches();
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-        resetSaros();
-    }
-
-    @Override
-    public String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + ".java" };
-        return nodes;
-    }
-
-    @Override
-    public String[] changeToRegex(String... texts) {
-        String[] matchTexts = new String[texts.length];
-        for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + "( .*)?";
+        inviter.sarosC.shareProjectWith(viewTitle, projectName,
+            howToShareProject, baseJIDOfInvitees);
+        for (Tester invitee : invitees) {
+            invitee.sarosC.confirmShellSessionnInvitation();
+            invitee.sarosC.confirmShellAddProjectUsingWhichProject(projectName,
+                usingWhichProject);
         }
-        return matchTexts;
     }
 
+    // ********** Component, which consist of other simple functions ***********
+
+    public static void buildSessionConcurrently(String viewTitle,
+        final String projectName, TypeOfShareProject howToShareProject,
+        final TypeOfCreateProject usingWhichProject, Tester inviter,
+        Tester... invitees) throws RemoteException, InterruptedException {
+
+        log.trace("alice.shareProjectParallel");
+        inviter.sarosC.shareProjectWith(viewTitle, projectName,
+            howToShareProject, getPeersBaseJID(invitees));
+
+        List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+        for (final Tester invitee : invitees) {
+            joinSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    invitee.sarosC.confirmShellSessionnInvitation();
+                    invitee.sarosC.confirmShellAddProjectUsingWhichProject(
+                        projectName, usingWhichProject);
+                    invitee.sarosSessionV.waitUntilIsInSession();
+                    return null;
+                }
+            });
+        }
+        log.trace("workAll(joinSessionTasks)");
+        MakeOperationConcurrently.workAll(joinSessionTasks);
+    }
+
+    /**
+     * Define the leave session with the following steps.
+     * <ol>
+     * <li>The host(alice) leave session first.</li>
+     * <li>Then other invitees confirm the windonws "Closing the Session"
+     * concurrently</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void leaveSessionHostFirst() throws RemoteException,
+        InterruptedException {
+        Tester host = null;
+        List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
+        for (final Tester tester : activeTesters) {
+            if (tester.sarosSessionV.isHostNoGUI()) {
+                host = tester;
+            } else {
+                if (tester.sarosSessionV.isInSessionNoGUI()) {
+                    closeSessionTasks.add(new Callable<Void>() {
+                        public Void call() throws Exception {
+                            // Need to check for isDriver before leaving.
+                            tester.sarosSessionV
+                                .confirmShellClosingTheSession();
+                            return null;
+                        }
+                    });
+                }
+            }
+        }
+        if (host != null)
+            host.sarosSessionV.leaveTheSessionByHost();
+        MakeOperationConcurrently.workAll(closeSessionTasks);
+    }
+
+    /**
+     * Define the leave session with the following steps.
+     * <ol>
+     * <li>The musicians bob and carl leave the session first.(concurrently)</li>
+     * <li>wait until bob and carl are really not in the session using
+     * "waitUntilAllPeersLeaveSession", then leave the host alice.</li>
+     * </ol>
+     * make sure,
+     * 
+     * 
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void leaveSessionPeersFirst() throws RemoteException,
+        InterruptedException {
+        Tester host = null;
+        List<JID> peerJIDs = new ArrayList<JID>();
+        List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
+        for (final Tester tester : activeTesters) {
+
+            if (tester.sarosSessionV.isHostNoGUI()) {
+                host = tester;
+            } else {
+                peerJIDs.add(tester.jid);
+                leaveTasks.add(new Callable<Void>() {
+                    public Void call() throws Exception {
+                        tester.sarosSessionV.leaveTheSessionByPeer();
+                        return null;
+                    }
+                });
+            }
+        }
+
+        MakeOperationConcurrently.workAll(leaveTasks);
+        if (host != null) {
+            host.sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
+            host.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+                VIEW_SAROS_SESSION, TB_LEAVE_THE_SESSION);
+            host.sarosSessionV.waitUntilIsNotInSession();
+        }
+
+    }
+
+    /**
+     * the local user can be concurrently followed by many other users.
+     * 
+     * @param buddiesTofollow
+     *            the list of the buddies who want to follow the local user.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void setFollowMode(final Tester followedBuddy,
+        Tester... buddiesTofollow) throws RemoteException, InterruptedException {
+        List<Callable<Void>> followTasks = new ArrayList<Callable<Void>>();
+        for (int i = 0; i < buddiesTofollow.length; i++) {
+            final Tester tester = buddiesTofollow[i];
+            followTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    tester.sarosSessionV.followThisBuddy(followedBuddy.jid);
+                    return null;
+                }
+            });
+        }
+        MakeOperationConcurrently.workAll(followTasks);
+    }
+
+    /**
+     * add buddy with GUI, which should be performed by both the users.
+     * 
+     * @param peers
+     *            the user, which should be added in your contact list
+     * @throws RemoteException
+     * 
+     * 
+     */
+    public static void addBuddies(Tester host, Tester... peers)
+        throws RemoteException {
+        for (Tester peer : peers) {
+            if (!host.sarosBuddiesV.hasBuddyNoGUI(peer.jid)) {
+                host.sarosBuddiesV.addANewBuddy(peer.jid);
+                peer.shell.confirmShellAndWait(
+                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+                host.shell.confirmShellAndWait(
+                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+            }
+        }
+    }
+
+    /**
+     * Remove given contact from Roster without GUI, if contact was added before
+     * 
+     * @throws XMPPException
+     */
+    public static void deleteBuddiesNoGUI(Tester buddy,
+        Tester... deletedBuddies) throws RemoteException, XMPPException {
+        for (Tester deletedBuddy : deletedBuddies) {
+            if (!buddy.sarosBuddiesV.hasBuddyNoGUI(deletedBuddy.jid))
+                return;
+            buddy.sarosBuddiesV.deleteBuddyNoGUI(deletedBuddy.jid);
+            deletedBuddy.sarosBuddiesV.confirmShellRemovelOfSubscription();
+        }
+    }
+
+    /**
+     * Remove given contact from Roster with GUI, if contact was added before.
+     */
+    public static void deleteBuddies(Tester buddy, Tester... deletedBuddies)
+        throws RemoteException {
+        for (Tester deletedBuddy : deletedBuddies) {
+            if (!buddy.sarosBuddiesV.hasBuddyNoGUI(deletedBuddy.jid))
+                return;
+            buddy.sarosBuddiesV.deleteBuddy(deletedBuddy.jid);
+            deletedBuddy.sarosBuddiesV.confirmShellRemovelOfSubscription();
+        }
+
+    }
+
+    public static void shareYourScreen(Tester buddy, Tester selectedBuddy)
+        throws RemoteException {
+        buddy.sarosSessionV.shareYourScreenWithSelectedBuddy(selectedBuddy.jid);
+        selectedBuddy.shell.confirmShellAndWait(
+            SHELL_INCOMING_SCREENSHARING_SESSION, YES);
+    }
+
+    /**
+     * This method is same as
+     * 
+     * . The difference to buildSessionConcurrently is that the invitation
+     * process is activated by clicking the toolbarbutton
+     * "open invitation interface" in the roster view.
+     * 
+     * @param projectName
+     *            the name of the project which is in a session now.
+     * @param invitees
+     *            the user whom you want to invite to your session.
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
+    public static void inviteBuddies(final String projectName,
+        final TypeOfCreateProject usingWhichProject, Tester inviter,
+        Tester... invitees) throws RemoteException, InterruptedException {
+        inviter.sarosSessionV
+            .openInvitationInterface(getPeersBaseJID(invitees));
+        List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+        for (final Tester tester : invitees) {
+            joinSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    tester.sarosC.confirmShellSessionnInvitation();
+                    tester.sarosC.confirmShellAddProjectUsingWhichProject(
+                        projectName, usingWhichProject);
+                    return null;
+                }
+            });
+        }
+        log.trace("workAll(joinSessionTasks)");
+        MakeOperationConcurrently.workAll(joinSessionTasks);
+    }
+
+    public void waitsUntilTransferedDataIsArrived(Tester buddy)
+        throws RemoteException {
+        buddy.workbench.sleep(500);
+    }
+
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
+    private static void resetAllBots() {
+        alice = bob = carl = dave = edna = null;
+        activeTesters.clear();
+        assertTrue(activeTesters.isEmpty());
+    }
+
+    private static String[] getPeersBaseJID(Tester... peers) {
+        String[] peerBaseJIDs = new String[peers.length];
+        for (int i = 0; i < peers.length; i++) {
+            peerBaseJIDs[i] = peers[i].getBaseJid();
+        }
+        return peerBaseJIDs;
+    }
 }

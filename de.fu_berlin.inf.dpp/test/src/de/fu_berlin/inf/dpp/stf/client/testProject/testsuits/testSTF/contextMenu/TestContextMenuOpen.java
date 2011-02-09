@@ -33,8 +33,8 @@ public class TestContextMenuOpen extends STFTest {
     @Test
     public void testOpenFile() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(FOLDER1, PROJECT1);
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.editor.isEditorOpen(FILE1));
         alice.editor.closeEditorWithSave(FILE1);
         assertFalse(alice.editor.isEditorOpen(FILE1));
@@ -47,7 +47,7 @@ public class TestContextMenuOpen extends STFTest {
 
     @Test
     public void testOpenClass() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.editor.closeJavaEditorWithSave(CLS1);
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
@@ -60,7 +60,7 @@ public class TestContextMenuOpen extends STFTest {
 
     @Test
     public void testOpenClassWith() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.editor.closeJavaEditorWithSave(CLS1);
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
@@ -75,8 +75,8 @@ public class TestContextMenuOpen extends STFTest {
     @Test
     public void testOpenFileWith() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(FOLDER1, PROJECT1);
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.fileM.newFolder(VIEW_PACKAGE_EXPLORER, FOLDER1, PROJECT1);
+        alice.fileM.newFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         alice.editor.closeEditorWithSave(FILE1);
         alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, FOLDER1, FILE1);
@@ -89,7 +89,7 @@ public class TestContextMenuOpen extends STFTest {
     @Test
     @Ignore("Can't close the external editor")
     public void testOpenFileWithSystemEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClass(PROJECT1, PKG1, CLS1);
+        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
         alice.openC.openClassWithSystemEditorNoGUI(PROJECT1, PKG1, CLS1);

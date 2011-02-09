@@ -31,7 +31,7 @@ public class TestFolderOperations extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbenchs();
         setUpSaros();
-        setUpSessionByDefault(alice, bob, carl);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob, carl);
     }
 
     @Before
