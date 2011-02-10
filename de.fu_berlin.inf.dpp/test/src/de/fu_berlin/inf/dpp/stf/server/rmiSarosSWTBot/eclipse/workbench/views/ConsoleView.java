@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * <li>
  * At first you need to create a {@link Tester} object in your junit-test. (How
  * to do it please look at the javadoc in class {@link TestPattern} or read the
- * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * user guide.</li>
  * <li>
  * then you can use the object basic initialized in {@link Tester} to access the
  * API :), e.g.
@@ -24,12 +24,22 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * 
  * </li>
  * 
- * @author Lin
+ * @author lchen
  */
 public interface ConsoleView extends Remote {
 
+    /**
+     * 
+     * @return the first styledText in the view Console
+     * @throws RemoteException
+     */
     public String getTextInConsole() throws RemoteException;
 
-    public void waitsUntilTextInConsoleExisted() throws RemoteException;
+    /**
+     * Wait until there are text existed in the console
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilTextInViewConsoleExists() throws RemoteException;
 
 }

@@ -24,30 +24,18 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      * exported functions
      * 
      **************************************************************/
-    /**********************************************
-     * 
-     * States
-     * 
-     **********************************************/
-    public boolean isRemoteScreenViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEW_REMOTE_SCREEN);
-    }
-
-    public boolean isRemoteScreenViewActive() throws RemoteException {
-        return viewW.isViewActive(VIEW_REMOTE_SCREEN);
-    }
-
-    public void selectProject(String projectName) throws RemoteException {
-        precondition();
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(projectName));
-    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
+    public void selectProject(String projectName) throws RemoteException {
+        precondition();
+        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
+            changeToRegex(projectName));
+    }
+
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
@@ -64,14 +52,14 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     }
 
-    public void selectFolder(String... pathToFolder) throws RemoteException {
+    public void selectFolder(String... folderNodes) throws RemoteException {
         treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(pathToFolder));
+            changeToRegex(folderNodes));
     }
 
-    public void selectFile(String... pathToFile) throws RemoteException {
+    public void selectFile(String... fileNodes) throws RemoteException {
         treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(pathToFile));
+            changeToRegex(fileNodes));
     }
 
     /**************************************************************
@@ -82,7 +70,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     protected void precondition() throws RemoteException {
         viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        viewW.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        viewW.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
     }
 
 }

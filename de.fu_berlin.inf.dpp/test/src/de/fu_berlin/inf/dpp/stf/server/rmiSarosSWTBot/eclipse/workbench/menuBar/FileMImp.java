@@ -63,7 +63,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     public void newPackage(String projectName, String pkg)
         throws RemoteException {
-        if (pkg.matches("[\\w*\\.]*\\w*")) {
+        if (pkg.matches(PKG_REGEX)) {
             if (!existsPkgNoGUI(projectName, pkg))
                 try {
                     precondition();

@@ -26,7 +26,7 @@ public class TestShare3UsersConcurrently extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 

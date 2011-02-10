@@ -351,7 +351,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_BUDDIES, tooltipText);
     }
 
@@ -373,17 +373,17 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
      */
     protected void precondition() throws RemoteException {
         viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
-        viewW.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
+        viewW.activateViewByTitle(VIEW_SAROS_BUDDIES);
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_BUDDIES,
+        return toolbarButtonW.isToolbarButtonOnViewEnabled(VIEW_SAROS_BUDDIES,
             tooltip);
     }
 
     protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return toolbarButtonW.getAllToolbarButtonsInView(VIEW_SAROS_BUDDIES);
+        return toolbarButtonW.getAllToolbarButtonsOnView(VIEW_SAROS_BUDDIES);
     }
 
     @SuppressWarnings("static-access")

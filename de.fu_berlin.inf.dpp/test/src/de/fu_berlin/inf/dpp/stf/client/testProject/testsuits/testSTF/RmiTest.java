@@ -18,7 +18,7 @@ public class RmiTest extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
-        setUpWorkbenchs();
+        setUpWorkbench();
     }
 
     // @Test

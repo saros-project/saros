@@ -6,6 +6,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
 public interface ToolbarButton extends EclipseComponent {
 
+    public void clickToolbarButtonInView(String viewTitle)
+        throws RemoteException;
+
+    public void clickToolbarButtonWithIndexInView(String viewTitle, int index)
+        throws RemoteException;
+
     /**
      * click the toolbar button specified with the given buttonTooltip in the
      * passed view.<br/>
@@ -18,7 +24,7 @@ public interface ToolbarButton extends EclipseComponent {
      *            the tooltip of the toolbar button which you want to click.
      * 
      */
-    public void clickToolbarButtonWithTooltipInView(String viewTitle,
+    public void clickToolbarButtonWithTooltipOnView(String viewTitle,
         String tooltipText) throws RemoteException;
 
     /**
@@ -34,7 +40,7 @@ public interface ToolbarButton extends EclipseComponent {
      *            the tooltip of the toolbar button which you want to click.
      * 
      */
-    public void clickToolbarButtonWithRegexTooltipInView(String viewName,
+    public void clickToolbarButtonWithRegexTooltipOnView(String viewName,
         String buttonTooltip) throws RemoteException;
 
     /**
@@ -46,8 +52,11 @@ public interface ToolbarButton extends EclipseComponent {
      * @param tooltip
      *            the tooltip of the toolbar button which you want to click.
      */
-    public void clickToolbarPushButtonWithTooltipInView(String viewName,
+    public void clickToolbarPushButtonWithTooltipOnView(String viewName,
         String tooltip) throws RemoteException;
+
+    public boolean existstoolbarButonInView(String viewTitle)
+        throws RemoteException;
 
     /**
      * 
@@ -59,7 +68,7 @@ public interface ToolbarButton extends EclipseComponent {
      * @return<tt>true</tt>, if the given toolbar button exists.
      * @throws RemoteException
      */
-    public boolean existsToolbarButtonInview(String viewTitle,
+    public boolean existsToolbarButtonOnview(String viewTitle,
         String tooltipText) throws RemoteException;
 
     /**
@@ -71,6 +80,6 @@ public interface ToolbarButton extends EclipseComponent {
      *            it is enabled.
      * @return <tt>true</tt>, if the given toolbar button is enabled.
      */
-    public boolean isToolbarButtonInViewEnabled(String viewName,
+    public boolean isToolbarButtonOnViewEnabled(String viewName,
         String buttonTooltip) throws RemoteException;
 }

@@ -18,7 +18,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
@@ -40,12 +40,12 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
 
         bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         bob.workbench.sleep(5000);
-        assertFalse(bob.toolbarButton.isToolbarButtonInViewEnabled(
+        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
         bob.workbench.sleep(5000);
-        assertFalse(bob.toolbarButton.isToolbarButtonInViewEnabled(
+        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
 
     }

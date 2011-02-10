@@ -477,6 +477,14 @@ public class STF {
     protected final static String VIEW_PROGRESS = "Progress";
     protected final static String VIEW_PROGRESS_ID = "org.eclipse.ui.views.ProgressView";
 
+    protected final static String TB_REMOVE_ALL_FINISHED_OPERATIONS = "Remove All Finished Operations";
+
+    /**********************************************
+     * 
+     * View Console
+     * 
+     **********************************************/
+    protected final static String VIEW_CONSOLE = "Console";
     /**********************************************
      * 
      * Context Menu Team
@@ -512,6 +520,10 @@ public class STF {
      * 
      **********************************************/
     protected final static String STRING_REGEX_WITH_LINE_BREAK = ".*\n*.*";
+    public final static String PKG_REGEX = "[\\w*\\.]*\\w*";
+    public final static String PROJECT_REGEX = "\\w*";
+
+    public final static String SCREENSHOTDIR = "test/STF/screenshot";
 
     protected final static Map<String, String> viewTitlesAndIDs = new HashMap<String, String>();
     static {
@@ -661,8 +673,8 @@ public class STF {
     public boolean isValidClassPath(String projectName, String pkg,
         String className) {
         boolean isVailid = true;
-        isVailid &= projectName.matches("\\w*");
-        isVailid &= pkg.matches("[\\w*\\.]*\\w*");
+        isVailid &= projectName.matches(PROJECT_REGEX);
+        isVailid &= pkg.matches(PKG_REGEX);
         isVailid &= className.matches("\\w*");
         return isVailid;
     }
@@ -678,4 +690,5 @@ public class STF {
     public String getLastNode(String... nodes) {
         return nodes[nodes.length - 1];
     }
+
 }

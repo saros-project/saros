@@ -17,7 +17,7 @@ public class TestBasicWidgetsTable extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
@@ -29,7 +29,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void existsTableItemInView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
         assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
             bob.getBaseJid()));
         assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
@@ -38,19 +38,19 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void selectTableItemInView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION, bob.getBaseJid());
-        assertTrue(alice.toolbarButton.isToolbarButtonInViewEnabled(
+        assertTrue(alice.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION,
             OWN_PARTICIPANT_NAME);
-        assertFalse(alice.toolbarButton.isToolbarButtonInViewEnabled(
+        assertFalse(alice.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
     }
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
 
         alice.table.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             bob.getBaseJid(), CM_RESTRICT_TO_READ_ONLY_ACCESS);
@@ -60,7 +60,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
             CM_RESTRICT_TO_READ_ONLY_ACCESS));
@@ -70,7 +70,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
         assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
             CM_RESTRICT_TO_READ_ONLY_ACCESS));

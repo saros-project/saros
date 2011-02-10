@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits;
+package de.fu_berlin.inf.dpp.stf.client;
 
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 
 public class ConfigTester {

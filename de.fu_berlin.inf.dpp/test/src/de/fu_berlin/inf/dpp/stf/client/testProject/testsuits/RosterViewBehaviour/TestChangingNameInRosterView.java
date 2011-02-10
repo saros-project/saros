@@ -27,7 +27,7 @@ public class TestChangingNameInRosterView extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }

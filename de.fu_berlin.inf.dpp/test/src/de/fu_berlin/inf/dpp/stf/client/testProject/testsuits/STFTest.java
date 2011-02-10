@@ -20,6 +20,7 @@ import org.junit.rules.TestName;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.client.ConfigTester;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 
@@ -220,7 +221,7 @@ public class STFTest extends STF {
      * 
      * @throws RemoteException
      */
-    public static void setUpWorkbenchs() throws RemoteException {
+    public static void setUpWorkbench() throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.workbench.activateWorkbench();
             tester.workbench.setUpWorkbench();
@@ -244,10 +245,17 @@ public class STFTest extends STF {
     public static void setUpSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
             tester.sarosM.disableAutomaticReminderNoGUI();
-            tester.workbench.openSarosViews();
+            openSarosViews(tester);
             tester.sarosBuddiesV.connectNoGUI(tester.jid, tester.password);
         }
         resetBuddies();
+    }
+
+    public static void openSarosViews(Tester tester) throws RemoteException {
+        tester.view.openViewById(VIEW_SAROS_BUDDIES_ID);
+        tester.view.openViewById(VIEW_SAROS_SESSION_ID);
+        tester.view.openViewById(VIEW_SAROS_CHAT_ID);
+        tester.view.openViewById(VIEW_REMOTE_SCREEN_ID);
     }
 
     /**
@@ -297,6 +305,17 @@ public class STFTest extends STF {
      */
     public static void resetSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
+            if (tester != null) {
+                tester.sarosBuddiesV.resetAllBuddyNameNoGUI();
+                tester.sarosBuddiesV.disconnect();
+                tester.editM.deleteAllProjectsNoGUI();
+            }
+        }
+        resetAllBots();
+    }
+
+    public static void resetSaros(Tester... testers) throws RemoteException {
+        for (Tester tester : testers) {
             if (tester != null) {
                 tester.sarosBuddiesV.resetAllBuddyNameNoGUI();
                 tester.sarosBuddiesV.disconnect();
@@ -567,7 +586,7 @@ public class STFTest extends STF {
         MakeOperationConcurrently.workAll(leaveTasks);
         if (host != null) {
             host.sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-            host.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+            host.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
                 VIEW_SAROS_SESSION, TB_LEAVE_THE_SESSION);
             host.sarosSessionV.waitUntilIsNotInSession();
         }

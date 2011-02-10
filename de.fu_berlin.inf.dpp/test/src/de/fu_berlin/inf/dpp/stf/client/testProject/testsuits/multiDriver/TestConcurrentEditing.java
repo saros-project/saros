@@ -15,7 +15,7 @@ public class TestConcurrentEditing extends STFTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 
@@ -119,7 +119,7 @@ public class TestConcurrentEditing extends STFTest {
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
-        assertTrue(bob.toolbarButton.isToolbarButtonInViewEnabled(
+        assertTrue(bob.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
 
     }

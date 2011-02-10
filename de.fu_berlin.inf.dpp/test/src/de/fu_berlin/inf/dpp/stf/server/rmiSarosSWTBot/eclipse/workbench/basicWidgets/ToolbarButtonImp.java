@@ -8,7 +8,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButton {
+public class ToolbarButtonImp extends EclipseComponentImp implements
+    ToolbarButton {
 
     private static transient ToolbarButtonImp ToolbarButtonImp;
 
@@ -34,12 +35,22 @@ public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButt
      * 
      **********************************************/
 
-    public void clickToolbarButtonWithTooltipInView(String viewTitle,
+    public void clickToolbarButtonInView(String viewTitle)
+        throws RemoteException {
+        bot.viewByTitle(viewTitle).bot().toolbarButton().click();
+    }
+
+    public void clickToolbarButtonWithIndexInView(String viewTitle, int index)
+        throws RemoteException {
+        bot.viewByTitle(viewTitle).bot().toolbarButton(index).click();
+    }
+
+    public void clickToolbarButtonWithTooltipOnView(String viewTitle,
         String tooltipText) throws RemoteException {
         bot.viewByTitle(viewTitle).toolbarButton(tooltipText).click();
     }
 
-    public void clickToolbarButtonWithRegexTooltipInView(String viewTitle,
+    public void clickToolbarButtonWithRegexTooltipOnView(String viewTitle,
         String tooltipText) throws RemoteException {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
             .getToolbarButtons()) {
@@ -55,7 +66,7 @@ public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButt
                 + " doesn't exist. Are you sure that the passed tooltip text is correct?");
     }
 
-    public void clickToolbarPushButtonWithTooltipInView(String viewTitle,
+    public void clickToolbarPushButtonWithTooltipOnView(String viewTitle,
         String tooltip) throws RemoteException {
         bot.viewByTitle(viewTitle).toolbarPushButton(tooltip).click();
     }
@@ -65,18 +76,29 @@ public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButt
      * states
      * 
      **********************************************/
-    public boolean existsToolbarButtonInview(String viewTitle,
+
+    public boolean existstoolbarButonInView(String viewTitle)
+        throws RemoteException {
+        try {
+            bot.viewByTitle(viewTitle).bot().toolbarButton();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean existsToolbarButtonOnview(String viewTitle,
         String tooltipText) throws RemoteException {
-        for (SWTBotToolbarButton toolbarButton : getAllToolbarButtonsInView(viewTitle)) {
+        for (SWTBotToolbarButton toolbarButton : getAllToolbarButtonsOnView(viewTitle)) {
             if (toolbarButton.getToolTipText().equals(tooltipText))
                 return true;
         }
         return false;
     }
 
-    public boolean isToolbarButtonInViewEnabled(String viewTitle,
+    public boolean isToolbarButtonOnViewEnabled(String viewTitle,
         String tooltipText) throws RemoteException {
-        SWTBotToolbarButton button = getToolbarButtonWithRegexTooltipInView(
+        SWTBotToolbarButton button = getToolbarButtonWithRegexTooltipOnView(
             viewTitle, tooltipText);
         if (button == null)
             return false;
@@ -94,11 +116,11 @@ public class ToolbarButtonImp extends EclipseComponentImp implements ToolbarButt
      *            the title on the view tab.
      * @return all {@link SWTBotToolbarButton} located in the given view.
      */
-    public List<SWTBotToolbarButton> getAllToolbarButtonsInView(String viewTitle) {
+    public List<SWTBotToolbarButton> getAllToolbarButtonsOnView(String viewTitle) {
         return bot.viewByTitle(viewTitle).getToolbarButtons();
     }
 
-    public SWTBotToolbarButton getToolbarButtonWithRegexTooltipInView(
+    public SWTBotToolbarButton getToolbarButtonWithRegexTooltipOnView(
         String viewTitle, String tooltipText) {
         for (SWTBotToolbarButton toolbarButton : bot.viewByTitle(viewTitle)
             .getToolbarButtons()) {

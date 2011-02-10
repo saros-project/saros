@@ -16,9 +16,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.client.ConfigTester;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.ConfigTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestSVNStateUpdates extends STFTest {
@@ -38,7 +38,7 @@ public class TestSVNStateUpdates extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws Exception {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
@@ -115,8 +115,7 @@ public class TestSVNStateUpdates extends STFTest {
             alice.sarosBuddiesV.disconnect();
             bob.sarosBuddiesV.disconnect();
         } else {
-            alice.workbench.resetSaros();
-            bob.workbench.resetSaros();
+            resetSaros();
         }
     }
 
@@ -140,7 +139,7 @@ public class TestSVNStateUpdates extends STFTest {
         assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         bob.refactorM.renameClass("Asdf");
-        alice.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, "Asdf");
+        alice.fileM.waitUntilClassExists(SVN_PROJECT, SVN_PKG, "Asdf");
         assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, SVN_PKG, "Asdf"));
     }
 
@@ -165,12 +164,12 @@ public class TestSVNStateUpdates extends STFTest {
 
         assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
-        alice.fileM.waitUntilPkgExisted(SVN_PROJECT, "new_package");
+        alice.fileM.waitUntilPkgExists(SVN_PROJECT, "new_package");
         bob.workbench.sleep(1000);
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
         bob.refactorM.moveClassTo(SVN_PROJECT, "new_package");
-        alice.fileM.waitUntilClassExisted(SVN_PROJECT, "new_package", SVN_CLS1);
+        alice.fileM.waitUntilClassExists(SVN_PROJECT, "new_package", SVN_CLS1);
         assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, "new_package",
             SVN_CLS1));
     }
@@ -297,10 +296,10 @@ public class TestSVNStateUpdates extends STFTest {
     @Ignore
     public void testRevert() throws RemoteException {
         alice.editM.deleteProjectNoGUI(STFTest.SVN_CLS1_FULL_PATH);
-        bob.fileM.waitUntilClassNotExist(SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        bob.fileM.waitUntilClassNotExists(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(bob.fileM.existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
         alice.team.revertProject(VIEW_PACKAGE_EXPLORER, SVN_PROJECT);
-        bob.fileM.waitUntilClassExisted(SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        bob.fileM.waitUntilClassExists(SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertTrue(bob.fileM.existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
     }
 

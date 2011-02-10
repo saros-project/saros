@@ -22,7 +22,7 @@ public class TestEditorByAlice extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
-        setUpWorkbenchs();
+        setUpWorkbench();
     }
 
     @After
@@ -198,7 +198,7 @@ public class TestEditorByAlice extends STFTest {
             ID_JAVA_EDITOR));
         alice.workbench.sleep(100);
         alice.editor.pressShortRunAsJavaApplication(CLS1 + ".java");
-        alice.consoleV.waitsUntilTextInConsoleExisted();
+        alice.consoleV.waitUntilTextInViewConsoleExists();
         assertContains("Hello World", alice.consoleV.getTextInConsole());
 
     }

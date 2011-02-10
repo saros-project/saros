@@ -2,45 +2,78 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosC;
 
 /**
- * This interface contains convenience API to perform actions in the package
- * explorer view (API to perform the specifically defined actions for saros
- * would be separately located in the sub-interface {@link SarosC} ) , then you
- * can start off as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link Tester} object in your junit-test. (How
- * to do it please look at the javadoc in class {@link TestPattern} or read the
- * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
- * <li>
- * then you can use the object pEV initialized in {@link Tester} to access the
- * API :), e.g.
+ * This interface contains only APIs to select treeItems in the package explorer
+ * view e.g.
  * 
  * <pre>
- * alice.pEV.deleteProject(...);
+ * alice.pEV.selectProject(...)
  * </pre>
  * 
  * </li>
  * 
- * @author Lin
+ * @author lchen
  */
 public interface PEView extends EclipseComponent {
 
+    /**
+     * select the given project.
+     * 
+     * @param projectName
+     *            the name of the project
+     * @throws RemoteException
+     */
     public void selectProject(String projectName) throws RemoteException;
 
+    /**
+     * select the given package
+     * 
+     * @param projectName
+     *            the name of the project, e.g.foo_bar
+     * @param pkg
+     *            the name of the package, e.g. my.pkg
+     * @throws RemoteException
+     */
     public void selectPkg(String projectName, String pkg)
         throws RemoteException;
 
+    /**
+     * select the given class
+     * 
+     * @param projectName
+     *            the name of the project, e.g.foo_bar
+     * @param pkg
+     *            the name of the package, e.g. my.pkg
+     * @param className
+     *            the name of the class, e.g. myClass
+     * @throws RemoteException
+     * 
+     */
     public void selectClass(String projectName, String pkg, String className)
         throws RemoteException;
 
-    public void selectFolder(String... pathToFolder) throws RemoteException;
+    /**
+     * select the given folder
+     * 
+     * @param folderNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","myFolder"}
+     * @throws RemoteException
+     */
+    public void selectFolder(String... folderNodes) throws RemoteException;
 
-    public void selectFile(String... pathToFile) throws RemoteException;
+    /**
+     * select the given file
+     * 
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","myFolder", "myFile.xml"}
+     * @throws RemoteException
+     */
+    public void selectFile(String... fileNodes) throws RemoteException;
 
 }

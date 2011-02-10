@@ -35,7 +35,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
             TypeOfTester.DAVE);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave);
     }

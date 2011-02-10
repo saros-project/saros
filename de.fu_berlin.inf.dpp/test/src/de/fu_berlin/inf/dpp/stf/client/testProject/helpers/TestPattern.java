@@ -66,9 +66,7 @@ public class TestPattern extends STFTest {
      */
     @AfterClass
     public static void resetSaros() throws RemoteException {
-        bob.workbench.resetSaros();
-        carl.workbench.resetSaros();
-        alice.workbench.resetSaros();
+        resetSaros();
     }
 
     /**

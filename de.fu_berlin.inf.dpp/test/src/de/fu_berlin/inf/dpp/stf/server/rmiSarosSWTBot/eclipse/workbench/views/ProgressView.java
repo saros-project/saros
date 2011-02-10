@@ -14,10 +14,6 @@ public interface ProgressView extends Remote {
      */
     public void removeProgress() throws RemoteException;
 
-    public boolean isProgressViewOpen() throws RemoteException;
-
-    // public void cancelInvitation() throws RemoteException;
-
     public void removeProcess(int index) throws RemoteException;
 
     /**
@@ -26,5 +22,5 @@ public interface ProgressView extends Remote {
      * finished yet. In this case, you can use this method to guarantee, that
      * host wait so long until all the invitation Processes are finished.
      */
-    public void waitUntilNoInvitationProgress() throws RemoteException;
+    public void waitUntilProgressNotExists() throws RemoteException;
 }

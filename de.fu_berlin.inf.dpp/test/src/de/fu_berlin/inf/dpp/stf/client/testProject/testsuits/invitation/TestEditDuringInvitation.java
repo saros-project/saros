@@ -26,7 +26,7 @@ public class TestEditDuringInvitation extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }

@@ -34,7 +34,7 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
             TypeOfTester.DAVE, TypeOfTester.EDNA);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave, edna);
     }

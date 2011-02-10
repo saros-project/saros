@@ -126,7 +126,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
 
     public void setTextInEditorWithSave(String contentPath, String... fileNodes)
         throws RemoteException {
-        String contents = getTestFileContents(contentPath);
+        String contents = getFileContentNoGUI(contentPath);
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
         // e.setFocus();
@@ -163,7 +163,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
 
     public void setTextInEditorWithoutSave(String contentPath,
         String... fileNodes) throws RemoteException {
-        String contents = getTestFileContents(contentPath);
+        String contents = getFileContentNoGUI(contentPath);
         String fileName = fileNodes[fileNodes.length - 1];
         precondition(fileNodes);
         getEditor(fileName).setText(contents);

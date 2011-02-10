@@ -17,7 +17,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.editor.closeJavaEditorWithSave(CLS1);

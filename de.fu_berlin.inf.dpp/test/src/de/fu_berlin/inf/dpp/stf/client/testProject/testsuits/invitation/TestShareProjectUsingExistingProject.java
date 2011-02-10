@@ -27,7 +27,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 
@@ -52,7 +52,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, alice, bob);
-        bob.fileM.waitUntilClassExisted(PROJECT1, PKG1, CLS1);
+        bob.fileM.waitUntilClassExists(PROJECT1, PKG1, CLS1);
         assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
         assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }

@@ -33,7 +33,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
             TypeOfTester.DAVE);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl, dave);
         setFollowMode(alice, bob, carl, dave);

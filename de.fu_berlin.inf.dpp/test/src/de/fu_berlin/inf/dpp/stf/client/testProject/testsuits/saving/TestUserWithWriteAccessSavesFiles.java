@@ -34,7 +34,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
             TypeOfTester.DAVE, TypeOfTester.EDNA);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);

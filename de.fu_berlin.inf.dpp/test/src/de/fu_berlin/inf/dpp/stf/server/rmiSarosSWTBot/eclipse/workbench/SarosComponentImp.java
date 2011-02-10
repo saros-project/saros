@@ -10,6 +10,16 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentIm
 public class SarosComponentImp extends EclipseComponentImp implements
     SarosComponent {
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+    /**********************************************
+     * 
+     * action
+     * 
+     **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
         shellW.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);

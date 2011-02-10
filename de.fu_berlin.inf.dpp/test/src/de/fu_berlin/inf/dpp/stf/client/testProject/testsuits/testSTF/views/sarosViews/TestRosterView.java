@@ -32,7 +32,7 @@ public class TestRosterView extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 
@@ -52,7 +52,7 @@ public class TestRosterView extends STFTest {
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_BUDDIES);
+        alice.view.activateViewByTitle(VIEW_SAROS_BUDDIES);
         assertTrue(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
         alice.view.closeViewById(VIEW_SAROS_BUDDIES_ID);
         assertFalse(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
@@ -60,7 +60,7 @@ public class TestRosterView extends STFTest {
         alice.view.openViewById(VIEW_SAROS_BUDDIES_ID);
         assertTrue(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
 
-        alice.view.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
         assertFalse(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
     }
 

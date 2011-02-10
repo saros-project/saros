@@ -109,7 +109,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             // in svn repos view: enter url
             viewW
                 .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
-            viewW.setFocusOnViewByTitle("SVN Repositories");
+            viewW.activateViewByTitle("SVN Repositories");
             final boolean viewWasOpen = viewW.isViewOpen("SVN Repositories");
             final SWTBotView repoView = viewW.getView("SVN Repositories");
             repoView.toolbarButton("Add SVN Repository").click();
@@ -335,7 +335,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     protected void precondition(String viewTitle) throws RemoteException {
         viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
-        viewW.setFocusOnViewByTitle(viewTitle);
+        viewW.activateViewByTitle(viewTitle);
     }
 
 }

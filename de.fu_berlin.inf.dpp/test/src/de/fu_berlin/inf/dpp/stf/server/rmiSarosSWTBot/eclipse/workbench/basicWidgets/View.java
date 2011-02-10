@@ -45,7 +45,7 @@ public interface View extends EclipseComponent {
      *            the title on the view tab.
      * @see SWTBotView#setFocus()
      */
-    public void setFocusOnViewByTitle(String title) throws RemoteException;
+    public void activateViewByTitle(String title) throws RemoteException;
 
     /**
      * @param title

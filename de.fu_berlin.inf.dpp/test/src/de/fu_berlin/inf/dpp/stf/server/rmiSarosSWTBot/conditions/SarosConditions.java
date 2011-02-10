@@ -10,7 +10,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.editor.Editor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.ChatViewImp;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 /**
  * This is a factory class to create some conditions provided with STF.
@@ -93,10 +92,6 @@ public class SarosConditions extends Conditions {
     public static ICondition isChatMessageExist(ChatViewImp chatV, String jid,
         String message) {
         return new ExistsChatMessage(chatV, jid, message);
-    }
-
-    public static ICondition existNoInvitationProgress(SarosSWTBot bot) {
-        return new ExistsNoInvitationProgress(bot);
     }
 
     public static ICondition isEditorContentsSame(Editor editor,

@@ -29,7 +29,7 @@ public class TestFolderOperations extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl);
     }
@@ -60,7 +60,7 @@ public class TestFolderOperations extends STFTest {
         final String newFolderName = FOLDER1 + "New";
         alice.pEV.selectFolder(PROJECT1, FOLDER1);
         alice.refactorM.renameFolder(newFolderName);
-        bob.fileM.waitUntilFolderExisted(PROJECT1, newFolderName);
+        bob.fileM.waitUntilFolderExists(PROJECT1, newFolderName);
         assertTrue(bob.fileM.existsFolderNoGUI(PROJECT1, newFolderName));
         assertFalse(bob.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
     }

@@ -16,7 +16,7 @@ public class TestMenuRefactor extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
-        setUpWorkbenchs();
+        setUpWorkbench();
     }
 
     @After

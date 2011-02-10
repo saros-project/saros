@@ -109,22 +109,26 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static SarosSWTBot bot = SarosSWTBot.getInstance();
     public static int sleepTime = STFController.sleepTime;
 
-    public final static String SCREENSHOTDIR = "test/STF/screenshot";
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * waits until
      * 
      **********************************************/
-    public void waitUntilFolderExisted(String... folderNodes)
+    public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
         waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
-    public void waitUntilPkgExisted(String projectName, String pkg)
+    public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
+        if (pkg.matches(PKG_REGEX)) {
             waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
                 pkg)));
         } else {
@@ -133,9 +137,9 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         }
     }
 
-    public void waitUntilPkgNotExist(String projectName, String pkg)
+    public void waitUntilPkgNotExists(String projectName, String pkg)
         throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
+        if (pkg.matches(PKG_REGEX)) {
             waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
                 projectName, pkg)));
         } else {
@@ -144,19 +148,18 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         }
     }
 
-    public void waitUntilFileExisted(String... fileNodes)
-        throws RemoteException {
+    public void waitUntilFileExists(String... fileNodes) throws RemoteException {
         String fullPath = getPath(fileNodes);
         waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
-    public void waitUntilClassExisted(String projectName, String pkg,
+    public void waitUntilClassExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
         waitUntil(SarosConditions.isResourceExist(path));
     }
 
-    public void waitUntilClassNotExist(String projectName, String pkg,
+    public void waitUntilClassNotExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
         waitUntil(SarosConditions.isResourceNotExist(path));
@@ -167,10 +170,10 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
      * state
      * 
      **********************************************/
-    public boolean existsFile(String viewTitle, String... nodes)
+    public boolean existsFile(String viewTitle, String... fileNodes)
         throws RemoteException {
 
-        return treeW.existsTreeItemWithRegexsInView(viewTitle, nodes);
+        return treeW.existsTreeItemWithRegexsInView(viewTitle, fileNodes);
     }
 
     /**********************************************
@@ -239,15 +242,15 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
     }
 
-    public String getTestFileContents(String testFilePath) {
+    protected String getFileContentNoGUI(String filePath) {
         Bundle bundle = saros.getBundle();
-        String contents;
+        String content;
         try {
-            contents = FileUtils.read(bundle.getEntry(testFilePath));
+            content = FileUtils.read(bundle.getEntry(filePath));
         } catch (NullPointerException e) {
-            throw new RuntimeException("Could not open " + testFilePath);
+            throw new RuntimeException("Could not open " + filePath);
         }
-        return contents;
+        return content;
     }
 
 }

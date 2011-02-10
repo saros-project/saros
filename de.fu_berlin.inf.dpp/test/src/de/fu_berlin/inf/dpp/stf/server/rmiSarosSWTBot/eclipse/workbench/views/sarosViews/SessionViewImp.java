@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosCom
 /**
  * This implementation of {@link SessionView}
  * 
- * @author Lin
+ * @author lchen
  */
 public class SessionViewImp extends SarosComponentImp implements SessionView {
 
@@ -152,15 +152,15 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
     }
 
-    public void sendAFileToSelectedUserGUI(JID jidOfPeer)
-        throws RemoteException {
+    public void sendAFileToSelectedBuddy(JID jidOfPeer) throws RemoteException {
         selectParticipant(
             jidOfPeer,
             "Hi guy, you can't send a file to youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
     }
 
-    public void startAVoIPSession(JID jidOfPeer) throws RemoteException {
+    public void startAVoIPSessionWithSelectedBuddy(JID jidOfPeer)
+        throws RemoteException {
         selectParticipant(
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
@@ -239,7 +239,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         return false;
     }
 
-    public boolean existsLabelTextInSessionView() throws RemoteException {
+    public boolean existsLabelInSessionView() throws RemoteException {
         precondition();
         return labelW.existsLabelInView(VIEW_SAROS_SESSION);
     }
@@ -266,7 +266,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         return getParticipantLabel(localJID).contains(PERMISSION_NAME);
     }
 
-    public boolean hastReadOnlyAccessBy(JID... jids) throws RemoteException {
+    public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException {
         precondition();
         boolean result = true;
         for (JID jid : jids) {
@@ -296,17 +296,6 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         if (participantLabelsInSessionView.equals(talbeItem))
             return true;
         return false;
-    }
-
-    public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException {
-        precondition();
-        boolean result = true;
-        for (JID jid : jids) {
-            result &= !tableW.isContextMenuOfTableItemEnabledInView(
-                VIEW_SAROS_SESSION, getParticipantLabel(jid),
-                CM_RESTRICT_TO_READ_ONLY_ACCESS);
-        }
-        return result;
     }
 
     public boolean isParticipant() throws RemoteException {
@@ -347,7 +336,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     }
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
-        if (existsLabelTextInSessionView())
+        if (existsLabelInSessionView())
             return viewW.getView(VIEW_SAROS_SESSION).bot().label().getText();
         return null;
     }
@@ -385,6 +374,10 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             allParticipantsName.add(table.getTableItem(i).getText());
         }
         return allParticipantsName;
+    }
+
+    public void setJID(JID jid) throws RemoteException {
+        localJID = jid;
     }
 
     /**********************************************
@@ -511,7 +504,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         });
     }
 
-    public void waitUntilInconsistencyDetected() throws RemoteException {
+    public void waitUntilIsInconsistencyDetected() throws RemoteException {
         precondition();
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -667,30 +660,19 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             return getFollowedBuddyJIDNoGUI().getBase().equals(baseJID);
     }
 
+    public JID getJID() throws RemoteException {
+        return localJID;
+    }
+
     /**************************************************************
      * 
      * Inner functions
      * 
      **************************************************************/
 
-    public void setJID(JID jid) throws RemoteException {
-        this.localJID = jid;
-    }
-
-    public JID getJID() throws RemoteException {
-        return localJID;
-    }
-
-    /**
-     * 
-     * Define the precondition which should be guaranteed when you want to
-     * perform actions within the session view.
-     * 
-     * @throws RemoteException
-     */
     protected void precondition() throws RemoteException {
         viewW.openViewById(VIEW_SAROS_SESSION_ID);
-        viewW.setFocusOnViewByTitle(VIEW_SAROS_SESSION);
+        viewW.activateViewByTitle(VIEW_SAROS_SESSION);
     }
 
     private void clickContextMenuOfSelectedBuddy(JID jidOfSelectedUser,
@@ -719,18 +701,18 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     private boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonInViewEnabled(VIEW_SAROS_SESSION,
+        return toolbarButtonW.isToolbarButtonOnViewEnabled(VIEW_SAROS_SESSION,
             tooltip);
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_SESSION, tooltipText);
     }
 
     private List<SWTBotToolbarButton> getToolbarButtons() {
-        return toolbarButtonW.getAllToolbarButtonsInView(VIEW_SAROS_SESSION);
+        return toolbarButtonW.getAllToolbarButtonsOnView(VIEW_SAROS_SESSION);
     }
 
     /**

@@ -19,7 +19,7 @@ public class TestCreatingNewFile extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(carl, bob, alice);
     }
@@ -48,9 +48,9 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlCreateANewFile() throws IOException, CoreException {
         carl.fileM.newFolder(PROJECT1, FOLDER1);
         carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        alice.fileM.waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER1, FILE1);
+        bob.fileM.waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
         assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
@@ -98,9 +98,9 @@ public class TestCreatingNewFile extends STFTest {
         alice.fileM.newFolder(PROJECT1, FOLDER2);
         alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        carl.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(carl.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
-        bob.fileM.waitUntilFileExisted(PROJECT1, FOLDER2, FILE2);
+        bob.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
         alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);

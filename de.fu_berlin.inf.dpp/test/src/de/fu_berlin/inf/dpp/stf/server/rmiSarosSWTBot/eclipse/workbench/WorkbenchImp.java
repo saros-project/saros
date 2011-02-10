@@ -27,6 +27,17 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
         return self;
     }
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+    /**********************************************
+     * 
+     * action
+     * 
+     **********************************************/
+
     public void sleep(long millis) throws RemoteException {
         bot.sleep(millis);
     }
@@ -35,69 +46,8 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
         bot.captureScreenshot(filename);
     }
 
-    public String getPathToScreenShot() throws RemoteException {
-        Bundle bundle = saros.getBundle();
-        log.debug("screenshot's directory: "
-            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
-        if (getOS() == TypeOfOS.WINDOW)
-            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
-        else if (getOS() == TypeOfOS.MAC) {
-            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
-        }
-        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
-    }
-
-    public void openSarosViews() throws RemoteException {
-        viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
-        viewW.openViewById(VIEW_SAROS_SESSION_ID);
-        viewW.openViewById(VIEW_SAROS_CHAT_ID);
-        viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
-
-    }
-
-    public void closeUnnecessaryViews() throws RemoteException {
-        if (viewW.isViewOpen("Problems"))
-            viewW.closeViewByTitle("Problems");
-        if (viewW.isViewOpen("Javadoc"))
-            viewW.closeViewByTitle("Javadoc");
-        if (viewW.isViewOpen("Declaration"))
-            viewW.closeViewByTitle("Declaration");
-        if (viewW.isViewOpen("Task List"))
-            viewW.closeViewByTitle("Task List");
-        if (viewW.isViewOpen("Outline"))
-            viewW.closeViewByTitle("Outline");
-    }
-
-    public void resetSaros() throws RemoteException {
-        rosterV.resetAllBuddyNameNoGUI();
-        rosterV.disconnect();
-        editM.deleteAllProjectsNoGUI();
-    }
-
-    public SWTBotShell getEclipseShell() throws RemoteException {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(".+? - .+")) {
-                log.debug("shell found matching \"" + ".+? - .+" + "\"");
-                return shell;
-            }
-        }
-        final String message = "No shell found matching \"" + ".+? - .+"
-            + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
-    }
-
     public void activateWorkbench() throws RemoteException {
         getEclipseShell().activate().setFocus();
-        // return activateShellWithMatchText(".+? - .+");
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // win.getShell().setActive();
-        // }
-        // });
     }
 
     public void resetWorkbench() throws RemoteException {
@@ -126,4 +76,56 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
         editM.deleteAllProjects(VIEW_PACKAGE_EXPLORER);
 
     }
+
+    public void closeUnnecessaryViews() throws RemoteException {
+        if (viewW.isViewOpen("Problems"))
+            viewW.closeViewByTitle("Problems");
+        if (viewW.isViewOpen("Javadoc"))
+            viewW.closeViewByTitle("Javadoc");
+        if (viewW.isViewOpen("Declaration"))
+            viewW.closeViewByTitle("Declaration");
+        if (viewW.isViewOpen("Task List"))
+            viewW.closeViewByTitle("Task List");
+        if (viewW.isViewOpen("Outline"))
+            viewW.closeViewByTitle("Outline");
+    }
+
+    /**********************************************
+     * 
+     * state
+     * 
+     **********************************************/
+
+    public String getPathToScreenShot() {
+        Bundle bundle = saros.getBundle();
+        log.debug("screenshot's directory: "
+            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
+        if (getOS() == TypeOfOS.WINDOW)
+            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        else if (getOS() == TypeOfOS.MAC) {
+            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        }
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+    }
+
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
+
+    public SWTBotShell getEclipseShell() throws RemoteException {
+        SWTBotShell[] shells = bot.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(".+? - .+")) {
+                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+                return shell;
+            }
+        }
+        final String message = "No shell found matching \"" + ".+? - .+"
+            + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
+
 }

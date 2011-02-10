@@ -90,7 +90,7 @@ public class ViewImp extends EclipseComponentImp implements View {
         });
     }
 
-    public void setFocusOnViewByTitle(String title) throws RemoteException {
+    public void activateViewByTitle(String title) throws RemoteException {
         try {
             bot.viewByTitle(title).setFocus();
             viewW.waitUntilIsViewActive(title);

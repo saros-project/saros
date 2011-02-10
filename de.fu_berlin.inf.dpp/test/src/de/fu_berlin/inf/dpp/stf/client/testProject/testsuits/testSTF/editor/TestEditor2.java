@@ -14,7 +14,7 @@ public class TestEditor2 extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         createProjectWithFileBy(alice, bob);
     }

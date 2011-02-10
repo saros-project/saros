@@ -27,7 +27,7 @@ public class TestHandleContacts extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 
@@ -141,7 +141,7 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_BUDDIES, TB_ADD_A_NEW_CONTACT);
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
@@ -171,7 +171,7 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddExistedContact() throws RemoteException {
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_BUDDIES, TB_ADD_A_NEW_CONTACT);
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());

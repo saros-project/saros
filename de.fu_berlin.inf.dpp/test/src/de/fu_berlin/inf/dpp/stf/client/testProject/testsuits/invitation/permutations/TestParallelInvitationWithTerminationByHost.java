@@ -30,7 +30,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL,
             TypeOfTester.DAVE);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
     }
 

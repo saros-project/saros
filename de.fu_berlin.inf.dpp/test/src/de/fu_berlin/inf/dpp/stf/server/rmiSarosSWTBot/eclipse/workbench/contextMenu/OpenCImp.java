@@ -95,6 +95,6 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
         viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
 
-        viewW.setFocusOnViewByTitle(viewTitle);
+        viewW.activateViewByTitle(viewTitle);
     }
 }

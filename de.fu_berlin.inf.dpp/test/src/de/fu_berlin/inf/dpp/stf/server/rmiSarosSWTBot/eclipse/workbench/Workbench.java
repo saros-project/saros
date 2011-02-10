@@ -1,38 +1,88 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 
-public interface Workbench extends Remote {
-    public void sleep(long millis) throws RemoteException;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-    public void captureScreenshot(String filename) throws RemoteException;
+/**
+ * This interface contains convenience APIs to perform actions in the workbench.
+ * The main tasks are to setUp/cleanUp the saros_instance_workbench.
+ * 
+ * @author lchen
+ */
+public interface Workbench extends EclipseComponent {
 
-    /**
-     * TODO don't work now
+    /**********************************************
      * 
-     * @return the path, in which the screenshot located.
+     * action
+     * 
+     **********************************************/
+    /**
+     * 
+     * @see SWTBot#sleep(long)
      * @throws RemoteException
      */
-    public String getPathToScreenShot() throws RemoteException;
-
-    public void openSarosViews() throws RemoteException;
-
-    public void closeUnnecessaryViews() throws RemoteException;
-
-    public void resetSaros() throws RemoteException;
-
-    public SWTBotShell getEclipseShell() throws RemoteException;
+    public void sleep(long millis) throws RemoteException;
 
     /**
-     * Open Java perspective, close all editors and dialogs.
+     * @see SWTBot#captureScreenshot(String)
+     * @throws RemoteException
+     */
+    public void captureScreenshot(String fileName) throws RemoteException;
+
+    /**
+     * close all views which are not necessary to test saros.
+     */
+    public void closeUnnecessaryViews() throws RemoteException;
+
+    /**
+     * It's very recommend to clean up the test_workbench after every tests.
+     * <ol>
+     * <li>
+     * open java perspective</li>
+     * <li>close all unexpected popUp windows</li>
+     * <li>close all opened editors</li>
+     * </ol>
+     * 
+     * @throws RemoteException
      */
     public void resetWorkbench() throws RemoteException;
 
+    /**
+     * Activate the saros-instance.This method is very useful, wenn you test
+     * saros under MAC
+     * 
+     * @throws RemoteException
+     */
     public void activateWorkbench() throws RemoteException;
 
+    /**
+     * It's very recommend to clean up the test_workbench before every tests.
+     * <ol>
+     * <li>open java perspective</li>
+     * <li>close all unexpected popUp windows</li>
+     * <li>close all opened editors</li>
+     * <li>delete all projects</li>
+     * </ol>
+     * 
+     * @throws RemoteException
+     */
     public void setUpWorkbench() throws RemoteException;
+
+    /**********************************************
+     * 
+     * state
+     * 
+     **********************************************/
+
+    /**
+     * TODO doesn't work now
+     * 
+     * @return the path, in which the screenShots located.
+     * @throws RemoteException
+     */
+    public String getPathToScreenShot() throws RemoteException;
 
 }

@@ -28,7 +28,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }

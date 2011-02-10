@@ -30,7 +30,7 @@ public class TestChatViewFunctions extends STFTest {
     public static void runBeforeClass() throws RemoteException,
         InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
-        setUpWorkbenchs();
+        setUpWorkbench();
         setUpSaros();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
@@ -74,7 +74,9 @@ public class TestChatViewFunctions extends STFTest {
 
     @Test
     public void testChat() throws RemoteException {
+
         alice.chatV.sendChatMessage(message);
+
         // System.out.println(alice.bot
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());

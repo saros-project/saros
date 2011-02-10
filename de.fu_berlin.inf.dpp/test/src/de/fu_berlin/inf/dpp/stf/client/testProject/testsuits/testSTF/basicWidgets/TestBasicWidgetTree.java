@@ -18,7 +18,7 @@ public class TestBasicWidgetTree extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
-        setUpWorkbenchs();
+        setUpWorkbench();
     }
 
     @After
@@ -53,7 +53,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemInTreeInView(VIEW_PACKAGE_EXPLORER,
             PROJECT1));
         assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
@@ -65,7 +65,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.tree.existsTreeItemWithRegexsInView(
             VIEW_PACKAGE_EXPLORER, PROJECT1));
         assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
@@ -93,9 +93,9 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
         alice.tree.selectTreeItemInView(VIEW_PACKAGE_EXPLORER, PROJECT1, SRC,
             PKG1, CLS1 + SUFFIX_JAVA);
@@ -127,7 +127,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
-        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
         alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
             SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
     }
@@ -138,13 +138,13 @@ public class TestBasicWidgetTree extends STFTest {
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
-        alice.view.setFocusOnViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
             SVN_CLS1);
         alice.editor.setTextInEditorWithoutSave(CP1, SVN_CLS1_SUFFIX);
         assertTrue(alice.editor.isClassDirty(SVN_PROJECT_COPY, SVN_PKG,
             SVN_CLS1, ID_JAVA_EDITOR));
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipInView(
+        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
         alice.tree.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
             changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));

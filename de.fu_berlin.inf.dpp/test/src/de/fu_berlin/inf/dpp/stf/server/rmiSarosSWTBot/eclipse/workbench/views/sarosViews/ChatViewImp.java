@@ -131,7 +131,7 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
     private void precondition() throws RemoteException {
         workbench.activateWorkbench();
         viewW.openViewById(VIEW_SAROS_CHAT_ID);
-        viewW.setFocusOnViewByTitle(VIEW_SAROS_CHAT);
+        viewW.activateViewByTitle(VIEW_SAROS_CHAT);
 
     }
 }

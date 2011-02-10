@@ -32,25 +32,25 @@ public class RSViewImp extends SarosComponentImp implements RSView {
      **********************************************/
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         preCondition();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_REMOTE_SCREEN, TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
         preCondition();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_REMOTE_SCREEN, TB_STOP_RUNNING_SESSION);
     }
 
     public void clickTBResume() throws RemoteException {
         preCondition();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_REMOTE_SCREEN, TB_RESUME);
     }
 
     public void clickTBPause() throws RemoteException {
         preCondition();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_REMOTE_SCREEN, TB_PAUSE);
     }
 
@@ -89,7 +89,7 @@ public class RSViewImp extends SarosComponentImp implements RSView {
 
     private void preCondition() throws RemoteException {
         viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
-        viewW.setFocusOnViewByTitle(VIEW_REMOTE_SCREEN);
+        viewW.activateViewByTitle(VIEW_REMOTE_SCREEN);
     }
 
 }
