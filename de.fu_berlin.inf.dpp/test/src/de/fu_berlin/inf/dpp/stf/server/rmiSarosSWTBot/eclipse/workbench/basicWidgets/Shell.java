@@ -112,7 +112,7 @@ public interface Shell extends EclipseComponent {
      *            the title of the shell.
      * @throws RemoteException
      */
-    public void waitUntilShellClosed(String title) throws RemoteException;
+    public void waitsUntilIsShellClosed(String title) throws RemoteException;
 
     public void waitShortUntilIsShellClosed(String title)
         throws RemoteException;

@@ -40,6 +40,8 @@ public interface Button extends EclipseComponent {
     public void selectCComboBox(int indexOfCComboBox, int indexOfSelection)
         throws RemoteException;
 
+    public void clickCheckBox(String mnemonicText) throws RemoteException;
+
     /**
      * 
      * @param mnemonicText

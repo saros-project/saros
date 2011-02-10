@@ -54,8 +54,13 @@ public class ButtonImp extends EclipseComponentImp implements Button {
         bot.buttonInGroup(mnemonicText, inGroup).click();
     }
 
-    public void selectCComboBox(int indexOfCComboBox, int indexOfSelection) throws RemoteException {
+    public void selectCComboBox(int indexOfCComboBox, int indexOfSelection)
+        throws RemoteException {
         bot.ccomboBox(indexOfCComboBox).setSelection(indexOfSelection);
+    }
+
+    public void clickCheckBox(String mnemonicText) throws RemoteException {
+        bot.checkBox(mnemonicText).click();
     }
 
     /**********************************************

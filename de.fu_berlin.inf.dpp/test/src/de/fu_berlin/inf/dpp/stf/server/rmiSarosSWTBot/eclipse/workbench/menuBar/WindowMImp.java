@@ -30,6 +30,11 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         return windowImp;
     }
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
     /**********************************************
      * 
      * actions
@@ -50,7 +55,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {
@@ -70,12 +75,12 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
             TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
     }
 
-    public void showViewWithName(String category, String nodeName)
+    public void showViewWithName(String parentNode, String node)
         throws RemoteException {
         workbench.activateWorkbench();
         menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        shellW.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, category,
-            nodeName, OK);
+        shellW.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, parentNode,
+            node, OK);
     }
 
     public void openPerspective() throws RemoteException {
@@ -146,7 +151,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      * inner functions
      * 
      **********************************************/
-    protected void precondition() throws RemoteException {
+    private void precondition() throws RemoteException {
         workbench.activateWorkbench();
     }
 
@@ -167,7 +172,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      * @param persID
      *            example: "org.eclipse.jdt.ui.JavaPerspective"
      */
-    public void openPerspectiveWithId(final String persID)
+    private void openPerspectiveWithId(final String persID)
         throws RemoteException {
         if (!isPerspectiveActive(persID)) {
             workbench.activateWorkbench();
@@ -206,7 +211,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      * @return<tt>true</tt>, if the perspective specified with the given id is
      *                       active.
      */
-    public boolean isPerspectiveActive(String id) {
+    private boolean isPerspectiveActive(String id) {
         return bot.perspectiveById(id).isActive();
     }
 
@@ -225,7 +230,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      * 
      * @return titles of all available perspectives.
      */
-    protected List<String> getPerspectiveTitles() {
+    private List<String> getPerspectiveTitles() {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotPerspective perspective : bot.perspectives())
             list.add(perspective.getLabel());

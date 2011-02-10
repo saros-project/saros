@@ -10,11 +10,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class ProgressViewImp extends EclipseComponentImp implements ProgressView {
+public class ProgressViewImp extends EclipseComponentImp implements
+    ProgressView {
 
     private static transient ProgressViewImp self;
-
-    protected final static String VIEWNAME = "Progress";
 
     /**
      * {@link ProgressViewImp} is a singleton, but inheritance is possible.
@@ -26,11 +25,11 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
         return self;
     }
 
-    /***********************************************************************
+    /**************************************************************
      * 
      * exported functions
      * 
-     ***********************************************************************/
+     **************************************************************/
 
     /**********************************************
      * 
@@ -38,18 +37,10 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
      * 
      **********************************************/
 
-    public void openProgressView() throws RemoteException {
-        viewW.openViewById("org.eclipse.ui.views.ProgressView");
-    }
-
-    public void activateProgressView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEWNAME);
-    }
-
     public void removeProgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
-        SWTBotView view = bot.viewByTitle(VIEWNAME);
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PROGRESS);
+        SWTBotView view = bot.viewByTitle(VIEW_PROGRESS);
         view.setFocus();
         SWTBot bot = view.bot();
         SWTBotToolbarButton b = bot.toolbarButton();
@@ -58,7 +49,7 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
 
     public void removeProcess(int index) throws RemoteException {
         preCondition();
-        SWTBotView view = bot.viewByTitle(VIEWNAME);
+        SWTBotView view = bot.viewByTitle(VIEW_PROGRESS);
         view.toolbarButton("Remove All Finished Operations").click();
         view.setFocus();
         SWTBot bot = view.bot();
@@ -72,12 +63,12 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
      * 
      **********************************************/
     public boolean isProgressViewOpen() throws RemoteException {
-        return viewW.isViewOpen("Progress");
+        return viewW.isViewOpen(VIEW_PROGRESS);
     }
 
     public boolean existPorgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PROGRESS);
         SWTBotView view = bot.viewByTitle("Progress");
         view.setFocus();
         view.toolbarButton("Remove All Finished Operations").click();
@@ -96,8 +87,8 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
      * 
      **********************************************/
     public void waitUntilNoInvitationProgress() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PROGRESS);
         bot.waitUntil(SarosConditions.existNoInvitationProgress(bot), 100000);
     }
 
@@ -108,8 +99,8 @@ public class ProgressViewImp extends EclipseComponentImp implements ProgressView
      **************************************************************/
 
     private void preCondition() throws RemoteException {
-        openProgressView();
-        activateProgressView();
+        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        viewW.setFocusOnViewByTitle(VIEW_PROGRESS);
     }
 
 }

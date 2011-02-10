@@ -40,7 +40,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
      * 
      **********************************************/
 
-    public void deleteAllProjects() throws RemoteException {
+    public void deleteAllProjects(String viewTitle) throws RemoteException {
         precondition();
         SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(
             VIEW_PACKAGE_EXPLORER).getAllItems();
@@ -49,7 +49,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 item.contextMenu(MENU_DELETE).click();
                 shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
                     true);
-                shellW.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+                shellW.waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }
@@ -58,10 +58,10 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
         shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        shellW.waitUntilShellClosed(SHELL_DELETE_RESOURCE);
+        shellW.waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
     }
 
-    public void deleteAllChildrenOfProject(String viewTitle, String projectName)
+    public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException {
         SWTBotTreeItem treeItem = treeW.getTreeItemInView(viewTitle,
             projectName, SRC);
@@ -90,7 +90,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         shellW.activateShell("Copy Project");
         textW.setTextInTextWithLabel(target, "Project name:");
         buttonW.clickButton(OK);
-        shellW.waitUntilShellClosed("Copy Project");
+        shellW.waitsUntilIsShellClosed("Copy Project");
         bot.sleep(1000);
     }
 
@@ -112,7 +112,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deletePkgNoGUI(String projectName, String pkg)
         throws RemoteException {
-        if (pkg.matches("[\\w\\.]*\\w+")) {
+        if (pkg.matches("[\\w*\\.]*\\w*")) {
             IPath path = new Path(getPkgPath(projectName, pkg));
             deleteNoGUI(path);
         } else {
@@ -146,7 +146,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
      * 
      **************************************************************/
 
-    protected void precondition() throws RemoteException {
+    private void precondition() throws RemoteException {
         workbench.activateWorkbench();
     }
 

@@ -271,7 +271,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         // + "\"");
     }
 
-    public void waitUntilShellClosed(String title) throws RemoteException {
+    public void waitsUntilIsShellClosed(String title) throws RemoteException {
         waitUntil(SarosConditions.isShellClosed(bot, title));
         bot.sleep(10);
     }

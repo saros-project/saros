@@ -6,6 +6,19 @@ import java.rmi.RemoteException;
 public interface EclipseComponent extends Remote {
 
     /**
+     * 
+     * @param nodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","src" "my.pkg", "myClass.java"}
+     * @return <tt>true</tt>, if the file specified by the node array parameter
+     *         exists
+     * @throws RemoteException
+     */
+    public boolean existsFile(String viewTitle, String... nodes)
+        throws RemoteException;
+
+    /**
      * @return <tt>true</tt>, if the given folder already exists.
      * @param folderNodes
      *            node path to expand. Attempts to expand all nodes along the

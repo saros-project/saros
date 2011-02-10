@@ -5,10 +5,6 @@ import java.rmi.RemoteException;
 
 public interface ProgressView extends Remote {
 
-    public void openProgressView() throws RemoteException;
-
-    public void activateProgressView() throws RemoteException;
-
     public boolean existPorgress() throws RemoteException;
 
     /**

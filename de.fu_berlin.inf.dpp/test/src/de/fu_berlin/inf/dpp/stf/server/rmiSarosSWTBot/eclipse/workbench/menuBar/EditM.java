@@ -26,7 +26,7 @@ public interface EditM extends EclipseComponent {
      * 
      * @throws RemoteException
      */
-    public void deleteAllProjects() throws RemoteException;
+    public void deleteAllProjects(String viewTitle) throws RemoteException;
 
     /**
      * Perform the action "delete project" which should be done with the
@@ -41,7 +41,7 @@ public interface EditM extends EclipseComponent {
      */
     public void deleteProject() throws RemoteException;
 
-    public void deleteAllChildrenOfProject(String viewTitle, String projectName)
+    public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException;
 
     /**

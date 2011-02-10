@@ -164,6 +164,17 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     /**********************************************
      * 
+     * state
+     * 
+     **********************************************/
+    public boolean existsFile(String viewTitle, String... nodes)
+        throws RemoteException {
+
+        return treeW.existsTreeItemWithRegexsInView(viewTitle, nodes);
+    }
+
+    /**********************************************
+     * 
      * No GUI
      * 
      **********************************************/

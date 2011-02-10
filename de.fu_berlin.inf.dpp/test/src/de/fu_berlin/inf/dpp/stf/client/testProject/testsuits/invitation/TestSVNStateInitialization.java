@@ -104,7 +104,7 @@ public class TestSVNStateInitialization extends STFTest {
 
         if (alice.fileM.existsProjectNoGUI(SVN_PROJECT))
             alice.editM.deleteProjectNoGUI(SVN_PROJECT);
-        bob.editM.deleteAllProjects();
+        bob.editM.deleteAllProjects(VIEW_PACKAGE_EXPLORER);
     }
 
     /**

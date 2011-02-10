@@ -391,7 +391,7 @@ public class STFTest extends STF {
     }
 
     public static void resetSharedProject(Tester host) throws RemoteException {
-        host.editM.deleteAllChildrenOfProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
+        host.editM.deleteAllItemsOfJavaProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
         host.fileM.newClass(PROJECT1, PKG1, CLS1);
     }
 

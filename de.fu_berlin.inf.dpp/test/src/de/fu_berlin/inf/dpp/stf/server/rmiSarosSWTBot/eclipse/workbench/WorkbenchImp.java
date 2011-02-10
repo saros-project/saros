@@ -50,8 +50,9 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     public void openSarosViews() throws RemoteException {
         viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
         viewW.openViewById(VIEW_SAROS_SESSION_ID);
-        chatV.openChatView();
-        remoteScreenV.openRemoteScreenView();
+        viewW.openViewById(VIEW_SAROS_CHAT_ID);
+        viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
+
     }
 
     public void closeUnnecessaryViews() throws RemoteException {
@@ -122,7 +123,7 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     public void setUpWorkbench() throws RemoteException {
         resetWorkbench();
         editM.deleteAllProjectsNoGUI();
-        editM.deleteAllProjects();
+        editM.deleteAllProjects(VIEW_PACKAGE_EXPLORER);
 
     }
 }

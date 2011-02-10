@@ -84,6 +84,9 @@ public class STF {
     static protected final String LABEL_FILE_NAME = "File name:";
     static protected final String LABEL_FOLDER_NAME = "Folder name:";
     static protected final String LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER = "Enter or select the parent folder:";
+    static protected final String LABEL_SOURCE_FOLDER = "Source folder:";
+    static protected final String LABEL_PACKAGE = "Package:";
+    static protected final String LABEL_NAME = "Name:";
 
     /**********************************************
      * 
@@ -465,6 +468,14 @@ public class STF {
     protected final static String SHELL_EDITOR_SELECTION = "Editor Selection";
 
     protected final static String TB_COLLAPSE_ALL = "Collapse All";
+
+    /**********************************************
+     * 
+     * View Progress
+     * 
+     **********************************************/
+    protected final static String VIEW_PROGRESS = "Progress";
+    protected final static String VIEW_PROGRESS_ID = "org.eclipse.ui.views.ProgressView";
 
     /**********************************************
      * 

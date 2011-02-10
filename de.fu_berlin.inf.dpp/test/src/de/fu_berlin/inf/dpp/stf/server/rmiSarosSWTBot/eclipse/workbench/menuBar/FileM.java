@@ -208,15 +208,4 @@ public interface FileM extends EclipseComponent {
     public void newJavaProjectWithClasses(String projectName, String pkg,
         String... className) throws RemoteException;
 
-    /**
-     * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","src" "my.pkg", "myClass.java"}
-     * @return <tt>true</tt>, if the file specified by the node array parameter
-     *         exists
-     * @throws RemoteException
-     */
-    public boolean existsFile(String... nodes) throws RemoteException;
 }

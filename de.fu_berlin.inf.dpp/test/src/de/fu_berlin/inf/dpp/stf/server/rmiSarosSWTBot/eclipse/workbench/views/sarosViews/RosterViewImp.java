@@ -100,16 +100,6 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             + ".*");
     }
 
-    public String getBuddyNickName(JID buddyJID) throws RemoteException {
-        // TODO add the implementation
-        return null;
-    }
-
-    public boolean hasBuddyNickName(JID buddyJID) throws RemoteException {
-        // TODO add the implementation
-        return false;
-    }
-
     public void deleteBuddy(JID buddyJID) throws RemoteException {
         String buddyNickName = getBuddyNickNameNoGUI(buddyJID);
         if (!hasBuddyNoGUI(buddyJID))

@@ -201,7 +201,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void confirmShellClosingTheSession() throws RemoteException {
         shellW.activateShellAndWait(SHELL_CLOSING_THE_SESSION);
         shellW.confirmShell(SHELL_CLOSING_THE_SESSION, OK);
-        shellW.waitUntilShellClosed(SHELL_CLOSING_THE_SESSION);
+        shellW.waitsUntilIsShellClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     public void openInvitationInterface(String... jidOfInvitees)
@@ -214,7 +214,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        shellW.waitUntilShellClosed(SHELL_PROGRESS_INFORMATION);
+        shellW.waitsUntilIsShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************

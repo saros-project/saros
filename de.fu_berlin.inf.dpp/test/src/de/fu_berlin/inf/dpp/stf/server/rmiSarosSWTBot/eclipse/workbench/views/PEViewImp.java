@@ -19,12 +19,35 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return pEViewImp;
     }
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
+    public boolean isRemoteScreenViewOpen() throws RemoteException {
+        return viewW.isViewOpen(VIEW_REMOTE_SCREEN);
+    }
+
+    public boolean isRemoteScreenViewActive() throws RemoteException {
+        return viewW.isViewActive(VIEW_REMOTE_SCREEN);
+    }
+
     public void selectProject(String projectName) throws RemoteException {
         precondition();
         treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
             changeToRegex(projectName));
     }
 
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };

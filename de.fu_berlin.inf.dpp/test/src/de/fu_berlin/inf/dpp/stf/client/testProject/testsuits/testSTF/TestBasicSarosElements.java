@@ -45,17 +45,17 @@ public class TestBasicSarosElements extends STFTest {
 
     @Test
     public void testChatView() throws RemoteException {
-        alice.chatV.closeChatView();
+        alice.view.closeViewById(VIEW_SAROS_CHAT_ID);
         assertEquals(false, alice.chatV.isChatViewOpen());
-        alice.chatV.openChatView();
+        alice.view.closeViewById(VIEW_SAROS_CHAT_ID);
         assertEquals(true, alice.chatV.isChatViewOpen());
     }
 
     @Test
     public void testRemoteScreenView() throws RemoteException {
-        alice.rSV.closeRemoteScreenView();
+        alice.view.closeViewById(VIEW_REMOTE_SCREEN_ID);
         assertEquals(false, alice.rSV.isRemoteScreenViewOpen());
-        alice.rSV.openRemoteScreenView();
+        alice.view.openViewById(VIEW_REMOTE_SCREEN_ID);
         assertEquals(true, alice.rSV.isRemoteScreenViewOpen());
     }
 

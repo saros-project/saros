@@ -20,27 +20,16 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
         return self;
     }
 
-    public void activateChatView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEW_SAROS_CHAT);
-    }
-
-    public void openChatView() throws RemoteException {
-        if (!isChatViewOpen())
-            viewW.openViewById(VIEW_SAROS_CHAT_ID);
-    }
-
-    public void closeChatView() throws RemoteException {
-        viewW.closeViewById(VIEW_SAROS_CHAT_ID);
-    }
-
-    public boolean isChatViewOpen() throws RemoteException {
-        return viewW.isViewOpen(VIEW_SAROS_CHAT);
-    }
-
-    public void waitUntilGetChatMessage(String jid, String message)
-        throws RemoteException {
-        waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
-    }
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
 
     public void sendChatMessage(String message) throws RemoteException {
         precondition();
@@ -50,6 +39,24 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
         log.debug("inerted message in chat view: " + chatInput.getText());
         // chatInput.pressShortcut(Keystrokes.LF);
         chatInput.pressEnterKey();
+    }
+
+    public boolean compareChatMessage(String jid, String message)
+        throws RemoteException {
+        precondition();
+        log.debug("chatLine: " + bot.lastChatLine());
+        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
+        String text = bot.lastChatLine().getText();
+        return text.equals(message);
+    }
+
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
+    public boolean isChatViewOpen() throws RemoteException {
+        return viewW.isViewOpen(VIEW_SAROS_CHAT);
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
@@ -106,19 +113,25 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
         return bot.chatLine(regex).getText();
     }
 
-    public boolean compareChatMessage(String jid, String message)
+    /**********************************************
+     * 
+     * Waits until
+     * 
+     **********************************************/
+    public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException {
-        precondition();
-        log.debug("chatLine: " + bot.lastChatLine());
-        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
-        String text = bot.lastChatLine().getText();
-        return text.equals(message);
+        waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
     }
 
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
     private void precondition() throws RemoteException {
         workbench.activateWorkbench();
-        openChatView();
-        activateChatView();
-    }
+        viewW.openViewById(VIEW_SAROS_CHAT_ID);
+        viewW.setFocusOnViewByTitle(VIEW_SAROS_CHAT);
 
+    }
 }

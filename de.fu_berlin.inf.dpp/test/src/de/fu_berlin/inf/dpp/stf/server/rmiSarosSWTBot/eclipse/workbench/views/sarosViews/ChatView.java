@@ -6,14 +6,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosCom
 
 public interface ChatView extends SarosComponent {
 
-    public void openChatView() throws RemoteException;
-
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException;
-
-    public void activateChatView() throws RemoteException;
-
-    public void closeChatView() throws RemoteException;
 
     public boolean isChatViewOpen() throws RemoteException;
 

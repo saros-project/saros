@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.s
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 
 public class RSViewImp extends SarosComponentImp implements RSView {
@@ -20,20 +19,51 @@ public class RSViewImp extends SarosComponentImp implements RSView {
         return self;
     }
 
-    /**
-     * constructs a remoteScreenViewObject, which would only be created in class
-     * {@links StartupSaros} and then exported by {@link STFController} on our
-     * local RMI Registry.
+    /**************************************************************
      * 
-     * @param rmiBot
-     *            controls Saros from the GUI perspective and manage all
-     *            exported rmi-objects.
-     */
+     * exported functions
+     * 
+     **************************************************************/
 
-    public void activateRemoteScreenView() throws RemoteException {
-        viewW.setFocusOnViewByTitle(VIEW_REMOTE_SCREEN);
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+    public void clickTBChangeModeOfImageSource() throws RemoteException {
+        preCondition();
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_CHANGE_MODE_IMAGE_SOURCE);
     }
 
+    public void clickTBStopRunningSession() throws RemoteException {
+        preCondition();
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_STOP_RUNNING_SESSION);
+    }
+
+    public void clickTBResume() throws RemoteException {
+        preCondition();
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_RESUME);
+    }
+
+    public void clickTBPause() throws RemoteException {
+        preCondition();
+        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
+            VIEW_REMOTE_SCREEN, TB_PAUSE);
+    }
+
+    public void confirmShellIncomingScreensharingSession(String YesOrNot)
+        throws RemoteException {
+        shellW.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+    }
+
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
     public boolean isRemoteScreenViewOpen() throws RemoteException {
         return viewW.isViewOpen(VIEW_REMOTE_SCREEN);
     }
@@ -42,50 +72,24 @@ public class RSViewImp extends SarosComponentImp implements RSView {
         return viewW.isViewActive(VIEW_REMOTE_SCREEN);
     }
 
-    public void openRemoteScreenView() throws RemoteException {
-        if (!isRemoteScreenViewOpen())
-            viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
-    }
-
-    public void closeRemoteScreenView() throws RemoteException {
-        viewW.closeViewById(VIEW_REMOTE_SCREEN_ID);
-    }
-
-    public void clickTBChangeModeOfImageSource() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
-            VIEW_REMOTE_SCREEN, TB_CHANGE_MODE_IMAGE_SOURCE);
-    }
-
-    public void clickTBStopRunningSession() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
-            VIEW_REMOTE_SCREEN, TB_STOP_RUNNING_SESSION);
-    }
-
-    public void clickTBResume() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
-            VIEW_REMOTE_SCREEN, TB_RESUME);
-    }
-
-    public void clickTBPause() throws RemoteException {
-        openRemoteScreenView();
-        activateRemoteScreenView();
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipInView(
-            VIEW_REMOTE_SCREEN, TB_PAUSE);
-    }
-
+    /**********************************************
+     * 
+     * Waits until
+     * 
+     **********************************************/
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
         viewW.waitUntilIsViewActive(VIEW_REMOTE_SCREEN);
     }
 
-    public void confirmShellIncomingScreensharingSession(String YesOrNot)
-        throws RemoteException {
-        shellW.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
+
+    private void preCondition() throws RemoteException {
+        viewW.openViewById(VIEW_REMOTE_SCREEN_ID);
+        viewW.setFocusOnViewByTitle(VIEW_REMOTE_SCREEN);
     }
 
 }

@@ -31,7 +31,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         buttonW.clickButton(FINISH);
         buttonW.clickButton(APPLY);
         buttonW.clickButton(OK);
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void addAccount(JID jid, String password) throws RemoteException {
@@ -42,7 +42,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         confirmWizardSarosConfiguration(jid, password);
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void activateAccount(JID jid) throws RemoteException {
@@ -59,7 +59,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         assert labelW.existsLabel("Active: " + jid.getBase());
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void changeAccount(JID jid, String newUserName, String newPassword,
@@ -72,7 +72,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         confirmShellChangeXMPPAccount(newServer, newUserName, newPassword);
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void confirmShellChangeXMPPAccount(String newServer,
@@ -102,7 +102,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
@@ -119,7 +119,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
@@ -133,7 +133,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
 
         buttonW.clickButton(APPLY);
         buttonW.clickButton(OK);
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void disableAutomaticReminder() throws RemoteException {
@@ -145,7 +145,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
                 Messages.getString("feedback.page.group.interval")).click();
             buttonW.clickButton(APPLY);
             buttonW.clickButton(OK);
-            shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+            shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
         }
     }
 
@@ -166,7 +166,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
             }
         }
         buttonW.clickButton(CANCEL);
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
         return false;
     }
 
@@ -178,7 +178,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         if (activeAccount.equals("Active: " + jid.getBase()))
             isActive = true;
         buttonW.clickButton(CANCEL);
-        shellW.waitUntilShellClosed(SHELL_PREFERNCES);
+        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
         return isActive;
     }
 
