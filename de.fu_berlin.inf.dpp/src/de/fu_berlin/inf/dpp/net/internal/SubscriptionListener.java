@@ -24,13 +24,13 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
  * 
- * If a request for subscription is received (when a buddy added the local
- * user) a dialog is shown to the user asking him/her to confirm the request. If
- * he accepts the request a new entry in the roster will be created and a
+ * If a request for subscription is received (when a buddy added the local user)
+ * a dialog is shown to the user asking him/her to confirm the request. If he
+ * accepts the request a new entry in the roster will be created and a
  * subscribed-message sent.
  * 
- * If a request for removal is received (when a buddy deleted the local
- * user from his or her roster or rejected a request of subscription) the
+ * If a request for removal is received (when a buddy deleted the local user
+ * from his or her roster or rejected a request of subscription) the
  * corresponding entry is removed from the roster.
  * 
  * @author chjacob
@@ -101,7 +101,7 @@ public class SubscriptionListener implements IConnectionListener {
             break;
 
         case subscribe:
-            log.info("Buddy requests to subscribe to" + " us: " + userName);
+            log.info("Buddy requests to subscribe to us: " + userName);
 
             // ask user for confirmation of subscription
             if (askUserForSubscriptionConfirmation(presence.getFrom())) {
