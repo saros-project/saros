@@ -8,22 +8,11 @@
             name="Saros"/>
       <view
             category="Saros"
-            class="de.fu_berlin.inf.dpp.ui.RosterView"
-            icon="icons/view16/rostr_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.RosterView"
-            name="Saros Buddies"/>
-      <view
-            category="Saros"
-            class="de.fu_berlin.inf.dpp.ui.SessionView"
-            icon="icons/transmit.png"
-            id="de.fu_berlin.inf.dpp.ui.SessionView"
-            name="Saros Session"/>
-      <view
-            category="Saros"
-            class="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            icon="icons/view16/chat_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            name="Saros Chat"/>
+            class="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+            icon="icons/view16/saros_misc.png"
+            id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+            name="Saros View">
+      </view>
      <view
             category="Saros"
             class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
@@ -36,128 +25,62 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
                ratio="0.5"
-               relationship="right"
+               relationship="stack"
                relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaBrowsingPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               minimized="false"
-               ratio="0.3"
-               relationship="top"
-               relative="org.eclipse.ui.editorss">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               minimized="false"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+               ratio="0.5"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-               minimized="false"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
+               relative="org.eclipse.ui.views.TaskList">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="org.eclipse.pde.ui.PDEPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               minimized="false"
-               relationship="right"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+               ratio="0.5"
+               relationship="stack"
                relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               minimized="false"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-               minimized="false"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="org.eclipse.php.perspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               minimized="false"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
                ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               minimized="false"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
+               relative="org.eclipse.ui.views.TaskList">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="org.python.pydev.ui.PythonPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               minimized="false"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
                ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.ProblemView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               minimized="false"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
+               relative="org.eclipse.ui.views.TaskList">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="org.eclipse.cdt.ui.CPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               minimized="false"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
                ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               minimized="false"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
+               relative="org.eclipse.ui.views.TaskList">
          </view>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.jst.j2ee.J2EEPerspective">
          <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
+               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
                ratio="0.5"
-               relationship="right"
+               relationship="stack"
                relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.ChatView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
          </view>
       </perspectiveExtension>
    </extension>
@@ -181,6 +104,7 @@
                label="Add to session (experimental)..."
                menubarPath="sarosSubMenu/group1">
          </action>
+         <!---
          <action
                class="de.fu_berlin.inf.dpp.ui.actions.PartialNewSessionAction"
                icon="icons/transmit.png"
@@ -188,6 +112,7 @@
                label="Share project partially (experimental)..."
                menubarPath="sarosSubMenu/group1">
          </action>
+         -->
          <action
                class="de.fu_berlin.inf.dpp.ui.actions.NewSessionAction"
                icon="icons/transmit.png"
