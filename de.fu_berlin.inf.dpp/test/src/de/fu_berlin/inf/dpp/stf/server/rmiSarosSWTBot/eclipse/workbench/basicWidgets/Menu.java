@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWi
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
 public interface Menu extends EclipseComponent {
@@ -15,4 +17,10 @@ public interface Menu extends EclipseComponent {
      * @throws RemoteException
      */
     public void clickMenuWithTexts(String... texts) throws RemoteException;
+
+    public void click() throws RemoteException;
+
+    public MenuImp contextMenu(String text) throws RemoteException;
+
+    public void setWidget(SWTBotMenu widget) throws RemoteException;
 }

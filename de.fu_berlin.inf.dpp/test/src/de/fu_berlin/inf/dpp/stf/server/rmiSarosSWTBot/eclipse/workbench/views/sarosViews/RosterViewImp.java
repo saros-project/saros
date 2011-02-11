@@ -105,18 +105,26 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!hasBuddyNoGUI(buddyJID))
             return;
         try {
-            treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES,
-                CM_DELETE, NODE_BUDDIES + ".*", buddyNickName + ".*");
-            shellW.confirmShellDelete(YES);
+
+            view(VIEW_SAROS_BUDDIES)
+                .bot()
+                .tree()
+                .selectTreeItemWithRegexs(NODE_BUDDIES + ".*",
+                    buddyNickName + ".*").contextMenu(CM_DELETE).click();
+
+            shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
-        if (!shellW.activateShell(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            shellW.waitUntilShellActive(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        shellW.confirmShell(SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
+        if (!shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activateShell(
+            SHELL_REMOVAL_OF_SUBSCRIPTION))
+            shell(SHELL_REMOVAL_OF_SUBSCRIPTION).waitUntilShellActive(
+                SHELL_REMOVAL_OF_SUBSCRIPTION);
+        shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirmShell(
+            SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
     }
 
     public void renameBuddy(JID buddyJID, String newBuddyName)
@@ -126,10 +134,16 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
-        treeW.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES, CM_RENAME,
-            NODE_BUDDIES + ".*", buddyNickName + ".*");
-        if (!shellW.activateShell("Set new nickname")) {
-            shellW.waitUntilShellActive("Set new nickname");
+
+        view(VIEW_SAROS_BUDDIES)
+            .bot()
+            .tree()
+            .selectTreeItemWithRegexs(NODE_BUDDIES + ".*", buddyNickName + ".*")
+            .contextMenu(CM_RENAME).click();
+
+        if (!shell(SHELL_SET_NEW_NICKNAME).activateShell("Set new nickname")) {
+            shell(SHELL_SET_NEW_NICKNAME).waitUntilShellActive(
+                "Set new nickname");
         }
         bot.text(buddyNickName).setText(newBuddyName);
         bot.button(OK).click();
@@ -163,8 +177,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             Map<String, String> labelsAndTexts = new HashMap<String, String>();
             labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
 
-            shellW.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
-                labelsAndTexts, FINISH);
+            shell(SHELL_NEW_BUDDY).confirmShellWithTextFieldAndWait(
+                SHELL_NEW_BUDDY, labelsAndTexts, FINISH);
         }
     }
 

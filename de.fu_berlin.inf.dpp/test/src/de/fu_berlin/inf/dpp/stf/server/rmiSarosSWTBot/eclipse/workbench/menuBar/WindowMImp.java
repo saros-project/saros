@@ -55,7 +55,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {
@@ -79,8 +79,8 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         throws RemoteException {
         workbench.activateWorkbench();
         menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        shellW.confirmShellWithTreeWithFilterText(MENU_SHOW_VIEW, parentNode,
-            node, OK);
+        shell(SHELL_SHOW_VIEW).confirmShellWithTreeWithFilterText(
+            MENU_SHOW_VIEW, parentNode, node, OK);
     }
 
     public void openPerspective() throws RemoteException {
@@ -124,17 +124,17 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            shellW.closeShell(SHELL_PREFERNCES);
+            shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            shellW.closeShell(SHELL_PREFERNCES);
+            shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
             return itemName;
         }
-        shellW.closeShell(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
         return "";
     }
 

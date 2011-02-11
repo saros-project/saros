@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.LabelImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListWImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.MenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TextImp;
@@ -67,7 +66,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static MenuImp menuW = MenuImp.getInstance();
     public static LabelImp labelW = LabelImp.getInstance();
     public static TextImp textW = TextImp.getInstance();
-    public static Shell shellW = ShellImp.getInstance();
+    // public static Shell shellW = ShellImp.getInstance();
     public static EditorImp editorW = EditorImp.getInstance();
     public static ListWImp listW = ListWImp.getInstance();
 
@@ -257,5 +256,11 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         ViewImp view = ViewImp.getInstance();
         view.setViewTitle(viewTitle);
         return view;
+    }
+
+    protected ShellImp shell(String shellTitle) throws RemoteException {
+        ShellImp shell = ShellImp.getInstance();
+        shell.setShellTitle(shellTitle);
+        return shell;
     }
 }

@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.wrapper.CommonWidgetsWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Bot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Button;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Label;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListW;
@@ -55,6 +56,7 @@ public class Tester extends STF {
     public ChatView chatV;
     public ConsoleView consoleV;
 
+    public Bot bot;
     public Table table;
     public Tree tree;
     public Button button;
@@ -125,6 +127,7 @@ public class Tester extends STF {
             shell = (Shell) registry.lookup("shell");
             editor = (Editor) registry.lookup("eclipseEditor");
 
+            bot = (Bot) registry.lookup("bot");
             table = (Table) registry.lookup("table");
             tree = (Tree) registry.lookup("tree");
             button = (Button) registry.lookup("button");

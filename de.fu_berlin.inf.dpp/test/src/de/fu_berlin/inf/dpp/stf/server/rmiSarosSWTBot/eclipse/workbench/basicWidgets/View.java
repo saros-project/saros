@@ -78,4 +78,6 @@ public interface View extends EclipseComponent {
 
     public void setViewTitle(String title) throws RemoteException;
 
+    public Bot bot() throws RemoteException;
+
 }

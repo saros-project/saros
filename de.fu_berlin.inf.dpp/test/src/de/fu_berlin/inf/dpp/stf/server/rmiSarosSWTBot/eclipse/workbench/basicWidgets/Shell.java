@@ -126,6 +126,10 @@ public interface Shell extends EclipseComponent {
      */
     public void waitLongUntilShellClosed(String title) throws RemoteException;
 
+    public void setShellTitle(String title) throws RemoteException;
+
+    public Bot bot() throws RemoteException;
+
     /**********************************************
      * 
      * confirm shell

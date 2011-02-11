@@ -165,8 +165,10 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (shellW.isShellActive(SHELL_ERROR_IN_SAROS_PLUGIN)) {
-            shellW.confirmShell(SHELL_ERROR_IN_SAROS_PLUGIN, OK);
+        if (shell(SHELL_ERROR_IN_SAROS_PLUGIN).isShellActive(
+            SHELL_ERROR_IN_SAROS_PLUGIN)) {
+            shell(SHELL_ERROR_IN_SAROS_PLUGIN).confirmShell(
+                SHELL_ERROR_IN_SAROS_PLUGIN, OK);
         }
     }
 
@@ -185,23 +187,30 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shellW.activateShellAndWait(SHELL_CONFIRM_LEAVING_SESSION);
-        shellW.confirmShell(SHELL_CONFIRM_LEAVING_SESSION, YES);
+        shell(SHELL_CONFIRM_LEAVING_SESSION).activateShellAndWait(
+            SHELL_CONFIRM_LEAVING_SESSION);
+        shell(SHELL_CONFIRM_LEAVING_SESSION).confirmShell(
+            SHELL_CONFIRM_LEAVING_SESSION, YES);
         waitUntilIsNotInSession();
     }
 
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shellW.activateShellAndWait(SHELL_CONFIRM_CLOSING_SESSION);
-        shellW.confirmShell(SHELL_CONFIRM_CLOSING_SESSION, YES);
+        shell(SHELL_CONFIRM_CLOSING_SESSION).activateShellAndWait(
+            SHELL_CONFIRM_CLOSING_SESSION);
+        shell(SHELL_CONFIRM_CLOSING_SESSION).confirmShell(
+            SHELL_CONFIRM_CLOSING_SESSION, YES);
         waitUntilIsNotInSession();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
-        shellW.activateShellAndWait(SHELL_CLOSING_THE_SESSION);
-        shellW.confirmShell(SHELL_CLOSING_THE_SESSION, OK);
-        shellW.waitsUntilIsShellClosed(SHELL_CLOSING_THE_SESSION);
+        shell(SHELL_CLOSING_THE_SESSION).activateShellAndWait(
+            SHELL_CLOSING_THE_SESSION);
+        shell(SHELL_CLOSING_THE_SESSION).confirmShell(
+            SHELL_CLOSING_THE_SESSION, OK);
+        shell(SHELL_CLOSING_THE_SESSION).waitsUntilIsShellClosed(
+            SHELL_CLOSING_THE_SESSION);
     }
 
     public void openInvitationInterface(String... jidOfInvitees)
@@ -214,7 +223,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        shellW.waitsUntilIsShellClosed(SHELL_PROGRESS_INFORMATION);
+        shell(SHELL_PROGRESS_INFORMATION).waitsUntilIsShellClosed(
+            SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -337,7 +347,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelInSessionView())
-            return view(VIEW_SAROS_SESSION).bot().label().getText();
+            return view(VIEW_SAROS_SESSION).bot2().label().getText();
         return null;
     }
 

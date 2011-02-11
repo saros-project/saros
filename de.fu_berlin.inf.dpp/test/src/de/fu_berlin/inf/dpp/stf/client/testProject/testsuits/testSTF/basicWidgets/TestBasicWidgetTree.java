@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -97,8 +96,8 @@ public class TestBasicWidgetTree extends STFTest {
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
-        alice.tree.selectTreeItemInView(VIEW_PACKAGE_EXPLORER, PROJECT1, SRC,
-            PKG1, CLS1 + SUFFIX_JAVA);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItem(PROJECT1, SRC, PKG1, CLS1 + SUFFIX_JAVA);
         alice.menu.clickMenuWithTexts(MENU_FILE, MENU_CLOSE);
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
     }
@@ -107,29 +106,27 @@ public class TestBasicWidgetTree extends STFTest {
     public void selectTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
         alice.shell.activateShellWithWaitingOpen(SHELL_PREFERNCES);
-        alice.tree.selectTreeItem(NODE_SAROS);
+        alice.commonWidgets().shell(SHELL_PREFERNCES).bot().tree()
+            .selectTreeItem(NODE_SAROS);
         assertTrue(alice.button.existsButtonInGroup(
             GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE));
     }
 
-    /**
-     * To select a node with given regexs in a view, you should need to use the
-     * method selectTreeItemWithRegexsInView, which use
-     * bot.getViewByTitle("view title").bot().tree() instead of using
-     * bot.tree().
-     * 
-     * @throws RemoteException
-     */
-    @Test(expected = WidgetNotFoundException.class)
+    @Test
     public void selectTreeItemWithRegexs() throws RemoteException {
         alice.fileM.newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
         alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
-        alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
-            SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
+        alice
+            .commonWidgets()
+            .view(VIEW_PACKAGE_EXPLORER)
+            .bot()
+            .tree()
+            .selectTreeItemWithRegexs(
+                changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
     }
 
     @Test
@@ -146,8 +143,14 @@ public class TestBasicWidgetTree extends STFTest {
             SVN_CLS1, ID_JAVA_EDITOR));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
-        alice.tree.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
+
+        alice
+            .commonWidgets()
+            .view(VIEW_PACKAGE_EXPLORER)
+            .bot()
+            .tree()
+            .selectTreeItemWithRegexs(
+                changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
         alice.menu.clickMenuWithTexts(MENU_FILE, MENU_SAVE);
         assertFalse(alice.editor.isClassDirty(SVN_PROJECT_COPY, SVN_PKG,
             SVN_CLS1, ID_JAVA_EDITOR));
@@ -192,8 +195,10 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
         alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
-        alice.tree.clickContextMenuOfTreeItemInView(VIEW_SAROS_BUDDIES,
-            CM_RENAME, NODE_BUDDIES, "bob_stf.*");
+        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).bot().tree()
+            .selectTreeItemWithRegexs(NODE_BUDDIES, "bob_stf.*")
+            .contextMenu(CM_RENAME).click();
+
         assertTrue(alice.shell.isShellOpen(SHELL_SET_NEW_NICKNAME));
     }
 
@@ -202,8 +207,8 @@ public class TestBasicWidgetTree extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         String[] contextNames1 = { CM_SAROS, CM_SHARE_PROJECT };
 
-        alice.tree.clickContextMenusOfTreeItemInView(VIEW_PACKAGE_EXPLORER,
-            contextNames1, PROJECT1);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .clickContextMenusOfTreeItem(contextNames1, PROJECT1);
         assertTrue(alice.shell.activateShellWithWaitingOpen(SHELL_INVITATION));
     }
 

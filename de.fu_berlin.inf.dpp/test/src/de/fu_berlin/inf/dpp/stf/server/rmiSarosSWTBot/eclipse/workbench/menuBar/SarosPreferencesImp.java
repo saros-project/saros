@@ -23,26 +23,29 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         preCondition();
         buttonW.clickButtonInGroup(BUTTON_ADD_ACCOUNT,
             GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
-        shellW.activateShellAndWait(SHELL_SAROS_CONFIGURATION);
+        shell(SHELL_SAROS_CONFIGURATION).activateShellAndWait(
+            SHELL_SAROS_CONFIGURATION);
         buttonW.clickButtonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT);
-        shellW.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateShellAndWait(
+            SHELL_CREATE_NEW_XMPP_ACCOUNT);
         confirmShellCreateNewXMPPAccount(jid, password);
         buttonW.clickButton(NEXT);
         buttonW.clickButton(FINISH);
         buttonW.clickButton(APPLY);
         buttonW.clickButton(OK);
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void addAccount(JID jid, String password) throws RemoteException {
         preCondition();
         buttonW.clickButtonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
-        shellW.activateShellAndWait(SHELL_SAROS_CONFIGURATION);
+        shell(SHELL_SAROS_CONFIGURATION).activateShellAndWait(
+            SHELL_SAROS_CONFIGURATION);
         confirmWizardSarosConfiguration(jid, password);
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void activateAccount(JID jid) throws RemoteException {
@@ -59,7 +62,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         assert labelW.existsLabel("Active: " + jid.getBase());
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void changeAccount(JID jid, String newUserName, String newPassword,
@@ -72,12 +75,13 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         confirmShellChangeXMPPAccount(newServer, newUserName, newPassword);
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void confirmShellChangeXMPPAccount(String newServer,
         String newUserName, String newPassword) throws RemoteException {
-        shellW.activateShellWithWaitingOpen(SHELL_CHANGE_ACCOUNT);
+        shell(SHELL_CHANGE_ACCOUNT).activateShellWithWaitingOpen(
+            SHELL_CHANGE_ACCOUNT);
         textW.setTextInTextWithLabel(newServer, "Server");
         textW.setTextInTextWithLabel(newUserName, "Username:");
         textW.setTextInTextWithLabel(newPassword, "Password:");
@@ -95,14 +99,16 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         buttonW.clickButtonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
         if (isAccountActiveNoGUI(jid)) {
-            shellW.activateShellAndWait("Deleting active account");
-            assert shellW.isShellActive("Deleting active account");
+            shell(SHELL_DELETING_ACTIVE_ACCOUNT).activateShellAndWait(
+                "Deleting active account");
+            assert shell(SHELL_DELETING_ACTIVE_ACCOUNT).isShellActive(
+                "Deleting active account");
             throw new RuntimeException(
                 "It's not allowd to delete a active account");
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
@@ -112,40 +118,44 @@ public class SarosPreferencesImp extends SarosComponentImp implements
             listW.selectListItemInGroup(item, GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
             buttonW.clickButtonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
-            if (shellW.isShellActive("Deleting active account")) {
-                shellW.confirmShell("Deleting active account", OK);
+            if (shell(SHELL_DELETING_ACTIVE_ACCOUNT).isShellActive(
+                "Deleting active account")) {
+                shell(SHELL_DELETING_ACTIVE_ACCOUNT).confirmShell(
+                    "Deleting active account", OK);
                 continue;
             }
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
-        shellW.activateShellWithWaitingOpen(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).activateShellWithWaitingOpen(SHELL_PREFERNCES);
 
-        treeW.selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
+        shell(SHELL_PREFERNCES).bot().tree()
+            .selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
         buttonW.selectCComboBox(0, encoder);
         buttonW.selectCComboBox(1, videoResolution);
 
         buttonW.clickButton(APPLY);
         buttonW.clickButton(OK);
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void disableAutomaticReminder() throws RemoteException {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
-            shellW.activateShellAndWait(SHELL_PREFERNCES);
-            treeW.selectTreeItem(NODE_SAROS, NODE_SAROS_FEEDBACK);
+            shell(SHELL_PREFERNCES).activateShellAndWait(SHELL_PREFERNCES);
+            shell(SHELL_PREFERNCES).bot().tree()
+                .selectTreeItem(NODE_SAROS, NODE_SAROS_FEEDBACK);
             bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
                 Messages.getString("feedback.page.group.interval")).click();
             buttonW.clickButton(APPLY);
             buttonW.clickButton(OK);
-            shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+            shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
         }
     }
 
@@ -166,7 +176,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
             }
         }
         buttonW.clickButton(CANCEL);
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
         return false;
     }
 
@@ -178,7 +188,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         if (activeAccount.equals("Active: " + jid.getBase()))
             isActive = true;
         buttonW.clickButton(CANCEL);
-        shellW.waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
         return isActive;
     }
 
@@ -250,8 +260,8 @@ public class SarosPreferencesImp extends SarosComponentImp implements
      */
     private void preCondition() throws RemoteException {
         clickMenuSarosPreferences();
-        shellW.activateShellWithWaitingOpen(SHELL_PREFERNCES);
-        treeW.selectTreeItem(NODE_SAROS);
+        shell(SHELL_PREFERNCES).activateShellWithWaitingOpen(SHELL_PREFERNCES);
+        shell(SHELL_PREFERNCES).bot().tree().selectTreeItem(NODE_SAROS);
     }
 
     /**

@@ -22,16 +22,18 @@ public class SarosComponentImp extends EclipseComponentImp implements
      **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        shellW.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateShellAndWait(
+            SHELL_CREATE_NEW_XMPP_ACCOUNT);
         textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
         textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
         textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
         textW.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
         buttonW.clickButton(FINISH);
         try {
-            shellW.waitShortUntilIsShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).waitShortUntilIsShellClosed(
+                SHELL_CREATE_NEW_XMPP_ACCOUNT);
         } catch (TimeoutException e) {
-            String errorMessage = shellW
+            String errorMessage = shell(SHELL_CREATE_NEW_XMPP_ACCOUNT)
                 .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
@@ -46,7 +48,8 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        shellW.activateShellAndWait(SHELL_SAROS_CONFIGURATION);
+        shell(SHELL_SAROS_CONFIGURATION).activateShellAndWait(
+            SHELL_SAROS_CONFIGURATION);
         textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
         textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
         textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
@@ -56,9 +59,9 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        shellW.activateShell(SHELL_INVITATION);
-        shellW.confirmWindowWithCheckBoxs(SHELL_INVITATION, FINISH,
-            baseJIDOfinvitees);
+        shell(SHELL_INVITATION).activateShell(SHELL_INVITATION);
+        shell(SHELL_INVITATION).confirmWindowWithCheckBoxs(SHELL_INVITATION,
+            FINISH, baseJIDOfinvitees);
     }
 
 }

@@ -42,7 +42,9 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openFile(String viewTitle, String... fileNodes)
         throws RemoteException {
         precondition(viewTitle);
-        treeW.clickContextMenuOfTreeItemInView(viewTitle, CM_OPEN, fileNodes);
+        view(viewTitle).bot().tree().selectTreeItemWithRegexs(fileNodes)
+            .contextMenu(CM_OPEN).click();
+
     }
 
     public void openClass(String viewTitle, String projectName, String pkg,
@@ -64,12 +66,13 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         String... fileNodes) throws RemoteException {
         precondition(viewTitle);
         SWTBotTree tree = treeW.getTreeInView(viewTitle);
-        treeW.selectTreeItemInView(viewTitle, fileNodes);
+        view(viewTitle).bot().tree().selectTreeItem(fileNodes);
         ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
-        shellW.waitUntilShellActive(SHELL_EDITOR_SELECTION);
+        shell(SHELL_EDITOR_SELECTION).waitUntilShellActive(
+            SHELL_EDITOR_SELECTION);
         tableW.selectTableItem(whichEditor);
         buttonW.waitUntilButtonEnabled(OK);
-        shellW.confirmShell(SHELL_EDITOR_SELECTION, OK);
+        shell(SHELL_EDITOR_SELECTION).confirmShell(SHELL_EDITOR_SELECTION, OK);
     }
 
     /**************************************************************

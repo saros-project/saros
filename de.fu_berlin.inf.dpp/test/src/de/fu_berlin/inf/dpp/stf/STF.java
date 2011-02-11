@@ -15,6 +15,10 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 public class STF {
 
+    protected final static String CONFIRM_DELETE = "Confirm Delete";
+    protected final static String SHELL_COPY_PROJECT = "Copy Project";
+    protected final static String SHELL_DELETING_ACTIVE_ACCOUNT = "Deleting active account";
+
     /**********************************************
      * 
      * Basic Widgets
@@ -454,7 +458,7 @@ public class STF {
     protected final static String ID_TEXT_EDITOR = "org.eclipse.ui.texteditor";
 
     /* Title of shells */
-    static String SHELL_SAVE_RESOURCE = "Save Resource";
+    protected static String SHELL_SAVE_RESOURCE = "Save Resource";
 
     /**********************************************
      * 

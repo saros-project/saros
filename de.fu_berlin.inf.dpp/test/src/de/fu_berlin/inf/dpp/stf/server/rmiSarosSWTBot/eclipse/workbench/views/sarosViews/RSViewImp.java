@@ -56,7 +56,8 @@ public class RSViewImp extends SarosComponentImp implements RSView {
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        shellW.confirmShell(SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
+        shell(SHELL_INCOMING_SCREENSHARING_SESSION).confirmShell(
+            SHELL_INCOMING_SCREENSHARING_SESSION, YesOrNot);
     }
 
     /**********************************************

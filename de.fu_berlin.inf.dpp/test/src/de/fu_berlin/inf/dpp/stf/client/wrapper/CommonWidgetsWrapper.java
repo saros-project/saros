@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.client.wrapper;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
 
 public class CommonWidgetsWrapper extends Wrapper {
@@ -15,5 +16,10 @@ public class CommonWidgetsWrapper extends Wrapper {
     public View view(String viewTitle) throws RemoteException {
         tester.view.setViewTitle(viewTitle);
         return tester.view;
+    }
+
+    public Shell shell(String title) throws RemoteException {
+        tester.shell.setShellTitle(title);
+        return tester.shell;
     }
 }

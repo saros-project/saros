@@ -133,6 +133,12 @@ public class ViewImp extends EclipseComponentImp implements View {
         return list;
     }
 
+    public Bot bot() throws RemoteException {
+        BotImp botImp = BotImp.getInstance();
+        botImp.setBot(bot2());
+        return botImp;
+    }
+
     /**********************************************
      * 
      * waits until
@@ -148,7 +154,8 @@ public class ViewImp extends EclipseComponentImp implements View {
      * 
      **************************************************************/
 
-    public SWTBot bot() {
+    public SWTBot bot2() {
         return bot.viewByTitle(viewTitle).bot();
     }
+
 }

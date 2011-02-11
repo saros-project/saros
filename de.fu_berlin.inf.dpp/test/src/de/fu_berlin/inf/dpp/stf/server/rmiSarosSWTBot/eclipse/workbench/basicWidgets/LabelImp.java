@@ -51,7 +51,7 @@ public class LabelImp extends EclipseComponentImp implements Label {
 
     public boolean existsLabelInView(String viewTitle) throws RemoteException {
         try {
-            view(viewTitle).bot().label();
+            view(viewTitle).bot2().label();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;

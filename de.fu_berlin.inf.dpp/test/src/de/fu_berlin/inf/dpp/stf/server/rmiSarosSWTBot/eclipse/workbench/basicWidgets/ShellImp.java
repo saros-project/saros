@@ -19,8 +19,8 @@ public class ShellImp extends EclipseComponentImp implements Shell {
     private static transient ShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
+
     // Title of Shells
-    protected final static String CONFIRM_DELETE = "Confirm Delete";
 
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
@@ -114,7 +114,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
     public void confirmShellWithTree(String title, String buttonText,
         String... nodes) throws RemoteException {
         bot.shell(title).activate();
-        treeW.selectTreeItem(nodes);
+        shell(title).bot().tree().selectTreeItem(nodes);
         buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();
     }
@@ -144,7 +144,7 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         String buttonText, String... nodes) throws RemoteException {
         SWTBotTree tree = bot.tree();
         log.info("allItems " + tree.getAllItems().length);
-        treeW.selectTreeItemWithWaitingExpand(tree, nodes);
+        shell(title).bot().tree().selectTreeItemAndWait(nodes);
         bot.button(buttonText).click();
     }
 
@@ -285,4 +285,15 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         waitLongUntil(SarosConditions.isShellClosed(bot, title));
     }
 
+    private String shellTitle;
+
+    public void setShellTitle(String title) throws RemoteException {
+        this.shellTitle = title;
+    }
+
+    public Bot bot() throws RemoteException {
+        BotImp botImp = BotImp.getInstance();
+        botImp.setBot(bot.shell(shellTitle).bot());
+        return botImp;
+    }
 }

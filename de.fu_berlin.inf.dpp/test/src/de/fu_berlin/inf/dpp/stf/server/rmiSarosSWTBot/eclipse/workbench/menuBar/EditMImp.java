@@ -47,9 +47,10 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         if (allTreeItems != null) {
             for (SWTBotTreeItem item : allTreeItems) {
                 item.contextMenu(MENU_DELETE).click();
-                shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK,
-                    true);
-                shellW.waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
+                shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(
+                    SHELL_DELETE_RESOURCE, OK, true);
+                shell(SHELL_DELETE_RESOURCE).waitsUntilIsShellClosed(
+                    SHELL_DELETE_RESOURCE);
             }
         }
     }
@@ -57,8 +58,10 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     public void deleteProject() throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shellW.confirmWindowWithCheckBox(SHELL_DELETE_RESOURCE, OK, true);
-        shellW.waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
+        shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(
+            SHELL_DELETE_RESOURCE, OK, true);
+        shell(SHELL_DELETE_RESOURCE).waitsUntilIsShellClosed(
+            SHELL_DELETE_RESOURCE);
     }
 
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
@@ -69,14 +72,14 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         for (SWTBotTreeItem item : treeItem.getItems()) {
             item.select();
             menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-            shellW.confirmShellDelete(OK);
+            shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, OK);
         }
     }
 
     public void deleteFile() throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shellW.confirmShellDelete(OK);
+        shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, OK);
     }
 
     public void copyProject(String target) throws RemoteException {
@@ -87,10 +90,10 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
         menuW.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
-        shellW.activateShell("Copy Project");
+        shell(SHELL_COPY_PROJECT).activateShell("Copy Project");
         textW.setTextInTextWithLabel(target, "Project name:");
         buttonW.clickButton(OK);
-        shellW.waitsUntilIsShellClosed("Copy Project");
+        shell(SHELL_COPY_PROJECT).waitsUntilIsShellClosed("Copy Project");
         bot.sleep(1000);
     }
 

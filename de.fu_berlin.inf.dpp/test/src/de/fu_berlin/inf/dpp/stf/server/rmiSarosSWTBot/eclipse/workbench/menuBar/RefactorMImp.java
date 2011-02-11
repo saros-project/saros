@@ -64,20 +64,20 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
-        shellW.activateShell(shellTitle);
+        shell(shellTitle).activateShell(shellTitle);
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         buttonW.waitUntilButtonEnabled(buttonName);
         bot.button(buttonName).click();
-        shellW.waitsUntilIsShellClosed(shellTitle);
+        shell(shellTitle).waitsUntilIsShellClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         precondition();
         menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
-        shellW.waitUntilShellActive(shellTitle);
-        shellW.confirmShellWithTree(shellTitle, buttonName, nodes);
-        shellW.waitsUntilIsShellClosed(shellTitle);
+        shell(shellTitle).waitUntilShellActive(shellTitle);
+        shell(shellTitle).confirmShellWithTree(shellTitle, buttonName, nodes);
+        shell(shellTitle).waitsUntilIsShellClosed(shellTitle);
     }
 
     private void precondition() throws RemoteException {

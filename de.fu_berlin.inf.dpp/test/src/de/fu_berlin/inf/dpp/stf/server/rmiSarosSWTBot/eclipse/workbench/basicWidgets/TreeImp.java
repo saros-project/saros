@@ -17,6 +17,10 @@ public class TreeImp extends EclipseComponentImp implements Tree {
 
     private static transient TreeImp treeImp;
 
+    private SWTBotTree swtBotTree;
+
+    private SWTBotTreeItem treeItem;
+
     /**
      * {@link TableImp} is a singleton, but inheritance is possible.
      */
@@ -25,6 +29,10 @@ public class TreeImp extends EclipseComponentImp implements Tree {
             return treeImp;
         treeImp = new TreeImp();
         return treeImp;
+    }
+
+    public void setSWTBotTree(SWTBotTree tree) {
+        swtBotTree = tree;
     }
 
     /**************************************************************
@@ -38,56 +46,23 @@ public class TreeImp extends EclipseComponentImp implements Tree {
      * actions
      * 
      **********************************************/
-    public void selectTreeItem(String... pathToTreeItem) throws RemoteException {
-        selectTreeItem(bot.tree(), pathToTreeItem);
+    public Tree selectTreeItem(String... pathToTreeItem) throws RemoteException {
+        return selectTreeItem(swtBotTree, pathToTreeItem);
     }
 
-    public void selectTreeItemInView(String viewTitle, String... pathToTreeItem)
+    public Tree selectTreeItemWithRegexs(String... regexPathToTreeItem)
         throws RemoteException {
-        selectTreeItem(getTreeInView(viewTitle), pathToTreeItem);
+        return selectTreeItemWithRegexs(swtBotTree, regexPathToTreeItem);
     }
 
-    public void selectTreeItemWithRegexs(String... regexPathToTreeItem)
+    public Tree selectTreeItemAndWait(String... pathToTreeItem)
         throws RemoteException {
-        selectTreeItemWithRegexs(bot.tree(), regexPathToTreeItem);
-    }
-
-    public void selectTreeItemWithRegexsInView(String viewTitle,
-        String... regexPathToTreeItem) throws RemoteException {
-        selectTreeItemWithRegexs(getTreeInView(viewTitle), regexPathToTreeItem);
-    }
-
-    public void selectTreeItemWithWaitingExpand(String... pathToTreeItem)
-        throws RemoteException {
-        selectTreeItemWithWaitingExpand(bot.tree(), pathToTreeItem);
-    }
-
-    public void selectTreeItemWithWaitingExpandInView(String viewTitle,
-        String... pathToTreeItem) throws RemoteException {
-        selectTreeItemWithWaitingExpand(getTreeInView(viewTitle),
-            pathToTreeItem);
-    }
-
-    public void clickContextMenuOfTreeItem(String contextName,
-        String... pathToTreeItem) throws RemoteException {
-        clickContextMenuOfTreeItem(bot.tree(), contextName, pathToTreeItem);
-    }
-
-    public void clickContextMenuOfTreeItemInView(String viewTitle,
-        String contextName, String... pathToTreeItem) throws RemoteException {
-        clickContextMenuOfTreeItem(getTreeInView(viewTitle), contextName,
-            pathToTreeItem);
+        return selectTreeItemAndWait(bot.tree(), pathToTreeItem);
     }
 
     public void clickContextMenusOfTreeItem(String[] contextNames,
         String... pathToTreeItem) throws RemoteException {
-        clickContextMenusOfTreeItem(bot.tree(), contextNames, pathToTreeItem);
-    }
-
-    public void clickContextMenusOfTreeItemInView(String viewTitle,
-        String[] contextNames, String... pathToTreeItem) throws RemoteException {
-        clickContextMenusOfTreeItem(getTreeInView(viewTitle), contextNames,
-            pathToTreeItem);
+        clickContextMenusOfTreeItem(swtBotTree, contextNames, pathToTreeItem);
     }
 
     /**********************************************
@@ -233,6 +208,13 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         waitUntilIsTreeItemInTreeExisted(bot.tree(), itemText);
     }
 
+    public Menu contextMenu(String text) throws RemoteException {
+        MenuImp menu = MenuImp.getInstance();
+        menu.setWidget(treeItem.contextMenu(text));
+
+        return menu;
+    }
+
     /**************************************************************
      * 
      * inner functions
@@ -251,12 +233,14 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         });
     }
 
-    public void selectTreeItem(SWTBotTree tree, String... pathToTreeItem) {
+    private Tree selectTreeItem(SWTBotTree tree, String... pathToTreeItem) {
         try {
-            tree.expandNode(pathToTreeItem).select();
+            treeItem = tree.expandNode(pathToTreeItem).select();
+
         } catch (WidgetNotFoundException e) {
             log.warn("tree item can't be found.", e);
         }
+        return this;
     }
 
     public boolean existsTreeItemInTree(SWTBotTree tree, String treeItemText) {
@@ -339,7 +323,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
      *            {"Buddies","bob_stf@saros-con.imp.fu-berlin.de.*" }
      * 
      */
-    public void selectTreeItemWithRegexs(SWTBotTree tree, String... regexNodes) {
+    private Tree selectTreeItemWithRegexs(SWTBotTree tree, String... regexNodes) {
         assert tree != null : "the passed tree is null.";
         SWTBotTreeItem currentItem = null;
         SWTBotTreeItem[] allChildrenOfCurrentItem;
@@ -367,7 +351,8 @@ public class TreeImp extends EclipseComponentImp implements Tree {
             }
         }
         if (currentItem != null)
-            currentItem.select();
+            treeItem = currentItem.select();
+        return this;
     }
 
     /**
@@ -392,7 +377,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         }
     }
 
-    public void selectTreeItemWithWaitingExpand(SWTBotTree tree,
+    private Tree selectTreeItemAndWait(SWTBotTree tree,
         String... pathToTreeItem) throws RemoteException {
         SWTBotTreeItem selectedTreeItem = null;
         for (String node : pathToTreeItem) {
@@ -412,9 +397,9 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         }
         if (selectedTreeItem != null) {
             log.info("treeItem name: " + selectedTreeItem.getText());
-            selectedTreeItem.select();
-
+            treeItem = selectedTreeItem.select();
         }
+        return this;
     }
 
     /**
@@ -487,5 +472,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         String[] contextMenuNames, String... pathTotreeItem) {
         selectTreeItemWithRegexs(tree, pathTotreeItem);
         ContextMenuHelper.clickContextMenu(tree, contextMenuNames);
+
     }
+
 }

@@ -28,22 +28,7 @@ public interface Tree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void selectTreeItem(String... nodes) throws RemoteException;
-
-    /**
-     * Selects the treeItem matching the given nodes in the tree:
-     * bot.getViewTitle(viewTitle).bot().tree(). This method is suitable for
-     * view widget.
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void selectTreeItemInView(String viewTitle, String... nodes)
-        throws RemoteException;
+    public Tree selectTreeItem(String... nodes) throws RemoteException;
 
     /***************** select tree item with regexs ******************/
 
@@ -59,24 +44,8 @@ public interface Tree extends EclipseComponent {
      * @throws WidgetNotFoundException
      *             If the item wasn't found.
      */
-    public void selectTreeItemWithRegexs(String... regexNodes)
+    public Tree selectTreeItemWithRegexs(String... regexNodes)
         throws RemoteException;
-
-    /**
-     * Selects the treeItem matching the given Regexnodes in the tree:
-     * bot.getViewTitle(viewTitle).bot().tree(). This method is suitable for
-     * view widget.
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param regexNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the regex array
-     *            parameter.e.g.{"Foo-saros.*", "my.pkg.*", "myClass.*"}
-     * @throws RemoteException
-     */
-    public void selectTreeItemWithRegexsInView(String viewTitle,
-        String... regexNodes) throws RemoteException;
 
     /***************** select tree item with waiting expand ****************** */
     /**
@@ -89,23 +58,8 @@ public interface Tree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public void selectTreeItemWithWaitingExpand(String... nodes)
+    public Tree selectTreeItemAndWait(String... nodes)
         throws RemoteException;;
-
-    /**
-     * Selects the treeItem matching the given nodes in the tree:
-     * bot.getViewTitle(viewTitle).bot().tree() with waiting until the
-     * parentTreeItem is expanded. This method is suitable for view widget.
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void selectTreeItemWithWaitingExpandInView(String viewTitle,
-        String... nodes) throws RemoteException;
 
     /***************** exist tree item with regexs ****************** */
 
@@ -325,40 +279,24 @@ public interface Tree extends EclipseComponent {
     public boolean isContextMenusOfTreeItemInViewEnabled(String viewTitle,
         String[] contextNames, String... nodes) throws RemoteException;
 
-    /***************** click context of tree item ****************** */
-    /**
-     * 
-     * This method is suitable for shell widget.
-     * 
-     * Clicks the contextMenu of the selected TreeItem.
-     * 
-     * @param contextName
-     *            the name on the context menu.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void clickContextMenuOfTreeItem(String contextName, String... nodes)
-        throws RemoteException;
-
-    /**
-     * 
-     * This method is suitable for view widget.
-     * 
-     * Clicks the contextMenu of the selected TreeItem.
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param contextName
-     *            the name on the context menu.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void clickContextMenuOfTreeItemInView(String viewTitle,
-        String contextName, String... nodes) throws RemoteException;
+    //
+    // /***************** click context of tree item ****************** */
+    // /**
+    // *
+    // * This method is suitable for shell widget.
+    // *
+    // * Clicks the contextMenu of the selected TreeItem.
+    // *
+    // * @param contextName
+    // * the name on the context menu.
+    // * @param nodes
+    // * node path to expand. Attempts to expand all nodes along the
+    // * path specified by the node array parameter.
+    // * @throws RemoteException
+    // */
+    // public void clickContextMenuOfTreeItem(String contextName, String...
+    // nodes)
+    // throws RemoteException;
 
     /**
      * 
@@ -376,25 +314,6 @@ public interface Tree extends EclipseComponent {
      */
     public void clickContextMenusOfTreeItem(String[] contextNames,
         String... nodes) throws RemoteException;
-
-    /**
-     * 
-     * This method is suitable for view widget.
-     * 
-     * Clicks the subMenu of the selected TreeItem.
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param contextNames
-     *            all menus'name along the path specified by the contentNames
-     *            array parameter.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void clickContextMenusOfTreeItemInView(String viewTitle,
-        String[] contextNames, String... nodes) throws RemoteException;
 
     /***************** get allItems in treeNode ****************** */
 
@@ -457,5 +376,7 @@ public interface Tree extends EclipseComponent {
 
     public void waitUntilIsSubItemInTreeItemExisted(SWTBotTreeItem treeItem,
         String nodeName) throws RemoteException;
+
+    public Menu contextMenu(String text) throws RemoteException;
 
 }

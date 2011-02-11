@@ -32,34 +32,35 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **********************************************/
     public void selectProject(String projectName) throws RemoteException {
         precondition();
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(projectName));
+        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItemWithRegexs(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(nodes));
+        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItemWithRegexs(changeToRegex(nodes));
     }
 
     public void selectClass(String projectName, String pkg, String className)
         throws RemoteException {
         precondition();
         String[] nodes = getClassNodes(projectName, pkg, className);
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(nodes));
-
+        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItemWithRegexs(changeToRegex(nodes));
     }
 
     public void selectFolder(String... folderNodes) throws RemoteException {
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(folderNodes));
+
+        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItemWithRegexs(changeToRegex(folderNodes));
     }
 
     public void selectFile(String... fileNodes) throws RemoteException {
-        treeW.selectTreeItemWithRegexsInView(VIEW_PACKAGE_EXPLORER,
-            changeToRegex(fileNodes));
+
+        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+            .selectTreeItemWithRegexs(changeToRegex(fileNodes));
     }
 
     /**************************************************************
@@ -70,7 +71,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     protected void precondition() throws RemoteException {
         view(VIEW_PACKAGE_EXPLORER).openById();
-        view(VIEW_PACKAGE_EXPLORER).setViewTitle(VIEW_PACKAGE_EXPLORER);
         view(VIEW_PACKAGE_EXPLORER).setFocus();
     }
 
