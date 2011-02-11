@@ -58,8 +58,7 @@ public interface Tree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public Tree selectTreeItemAndWait(String... nodes)
-        throws RemoteException;;
+    public Tree selectTreeItemAndWait(String... nodes) throws RemoteException;;
 
     /***************** exist tree item with regexs ****************** */
 
@@ -279,42 +278,6 @@ public interface Tree extends EclipseComponent {
     public boolean isContextMenusOfTreeItemInViewEnabled(String viewTitle,
         String[] contextNames, String... nodes) throws RemoteException;
 
-    //
-    // /***************** click context of tree item ****************** */
-    // /**
-    // *
-    // * This method is suitable for shell widget.
-    // *
-    // * Clicks the contextMenu of the selected TreeItem.
-    // *
-    // * @param contextName
-    // * the name on the context menu.
-    // * @param nodes
-    // * node path to expand. Attempts to expand all nodes along the
-    // * path specified by the node array parameter.
-    // * @throws RemoteException
-    // */
-    // public void clickContextMenuOfTreeItem(String contextName, String...
-    // nodes)
-    // throws RemoteException;
-
-    /**
-     * 
-     * This method is suitable for shell widget.
-     * 
-     * Clicks the subMenu of the selected TreeItem.
-     * 
-     * @param contextNames
-     *            all menus'name along the path specified by the contentNames
-     *            array parameter.
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public void clickContextMenusOfTreeItem(String[] contextNames,
-        String... nodes) throws RemoteException;
-
     /***************** get allItems in treeNode ****************** */
 
     /**
@@ -378,5 +341,7 @@ public interface Tree extends EclipseComponent {
         String nodeName) throws RemoteException;
 
     public Menu contextMenu(String text) throws RemoteException;
+
+    public Menu contextMenu(String... texts) throws RemoteException;
 
 }

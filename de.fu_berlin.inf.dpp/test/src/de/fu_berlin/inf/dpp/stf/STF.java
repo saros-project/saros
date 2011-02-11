@@ -546,6 +546,7 @@ public class STF {
         viewTitlesAndIDs.put(VIEW_SAROS_CHAT, VIEW_SAROS_CHAT_ID);
         viewTitlesAndIDs.put(VIEW_SAROS_SESSION, VIEW_SAROS_SESSION_ID);
         viewTitlesAndIDs.put(VIEW_SVN_REPOSITORIES, VIEW_SVN_REPOSITORIES_ID);
+        viewTitlesAndIDs.put(VIEW_PROGRESS, VIEW_PROGRESS_ID);
     }
 
     /**********************************************
@@ -703,6 +704,10 @@ public class STF {
 
     public String getLastNode(String... nodes) {
         return nodes[nodes.length - 1];
+    }
+
+    public String[] splitPkg(String pkg) {
+        return pkg.split(".");
     }
 
 }

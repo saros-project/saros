@@ -57,12 +57,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
 
     public Tree selectTreeItemAndWait(String... pathToTreeItem)
         throws RemoteException {
-        return selectTreeItemAndWait(bot.tree(), pathToTreeItem);
-    }
-
-    public void clickContextMenusOfTreeItem(String[] contextNames,
-        String... pathToTreeItem) throws RemoteException {
-        clickContextMenusOfTreeItem(swtBotTree, contextNames, pathToTreeItem);
+        return selectTreeItemAndWait(swtBotTree, pathToTreeItem);
     }
 
     /**********************************************
@@ -211,7 +206,12 @@ public class TreeImp extends EclipseComponentImp implements Tree {
     public Menu contextMenu(String text) throws RemoteException {
         MenuImp menu = MenuImp.getInstance();
         menu.setWidget(treeItem.contextMenu(text));
+        return menu;
+    }
 
+    public Menu contextMenu(String... texts) throws RemoteException {
+        MenuImp menu = MenuImp.getInstance();
+        menu.setWidget(ContextMenuHelper.getContextMenu(swtBotTree, texts));
         return menu;
     }
 

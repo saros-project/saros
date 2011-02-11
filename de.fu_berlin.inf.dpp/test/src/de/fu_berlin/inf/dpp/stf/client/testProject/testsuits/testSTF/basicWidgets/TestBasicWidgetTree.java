@@ -205,11 +205,11 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void clickSubMenuOfContextsOfTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProject(PROJECT1);
-        String[] contextNames1 = { CM_SAROS, CM_SHARE_PROJECT };
 
         alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .clickContextMenusOfTreeItem(contextNames1, PROJECT1);
+            .selectTreeItem(PROJECT1).contextMenu(CM_SAROS, CM_SHARE_PROJECT)
+            .click();
+
         assertTrue(alice.shell.activateShellWithWaitingOpen(SHELL_INVITATION));
     }
-
 }

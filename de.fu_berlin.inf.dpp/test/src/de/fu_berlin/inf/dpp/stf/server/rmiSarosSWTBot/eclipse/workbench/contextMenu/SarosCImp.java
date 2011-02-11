@@ -233,10 +233,10 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         String projectName) throws RemoteException {
         precondition(viewTitle);
         String[] matchTexts = changeToRegex(projectName);
-        String[] contexts = { CM_SAROS, CM_SHARE_PROJECT };
 
-        view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, matchTexts);
+        view(viewTitle).bot().tree().selectTreeItemWithRegexs(matchTexts)
+            .contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
+
     }
 
     /**********************************************
@@ -328,10 +328,9 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
     private void clickContextMenuOfSaros(String viewTitle, String projectName,
         String contextName) throws RemoteException {
         String[] matchTexts = changeToRegex(projectName);
-        String[] contexts = { CM_SAROS, contextName };
 
-        view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, matchTexts);
+        view(viewTitle).bot().tree().selectTreeItemWithRegexs(matchTexts)
+            .contextMenu(CM_SAROS, contextName).click();
     }
 
     protected void precondition(String viewTitle) throws RemoteException {

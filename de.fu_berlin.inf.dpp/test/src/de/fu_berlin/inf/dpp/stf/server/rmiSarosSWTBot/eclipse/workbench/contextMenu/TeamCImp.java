@@ -46,10 +46,9 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     public void shareProjectWithSVN(String viewTitle, String projectName,
         String repositoryURL) throws RemoteException {
 
-        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-
         view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+            .selectTreeItemWithRegexs(changeToRegex(projectName))
+            .contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
 
         shell(SHELL_SHARE_PROJECT).confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -74,7 +73,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
         view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+            .selectTreeItemWithRegexs(changeToRegex(projectName))
+            .contextMenu(contexts).click();
 
         shell(SHELL_SHARE_PROJECT).confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -92,7 +92,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
         view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+            .selectTreeItemWithRegexs(changeToRegex(projectName))
+            .contextMenu(contexts).click();
 
         shell(SHELL_SHARE_PROJECT).confirmShellWithTable(SHELL_SHARE_PROJECT,
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -180,7 +181,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         String[] contexts = { CM_TEAM, CM_DISCONNECT };
 
         view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+            .selectTreeItemWithRegexs(changeToRegex(projectName))
+            .contextMenu(contexts).click();
 
         shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirmShell(
             SHELL_CONFIRM_DISCONNECT_FROM_SVN, YES);
@@ -193,7 +195,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         String[] contexts = { CM_TEAM, CM_REVERT };
 
         view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+            .selectTreeItemWithRegexs(changeToRegex(projectName))
+            .contextMenu(contexts).click();
 
         shell(SHELL_REVERT).confirmShell(SHELL_REVERT, OK);
         shell(SHELL_REVERT).waitsUntilIsShellClosed(SHELL_REVERT);
@@ -218,8 +221,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, changeToRegex(projectName));
+        view(viewTitle).bot().tree().selectTreeItem(changeToRegex(projectName))
+            .contextMenu(contexts).click();
 
         shell(SHELL_SWITCH).waitUntilShellActive(SHELL_SWITCH);
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
@@ -261,8 +264,9 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         precondition(viewTitle);
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        view(viewTitle).bot().tree()
-            .clickContextMenusOfTreeItem(contexts, matchTexts);
+        view(viewTitle).bot().tree().selectTreeItemWithRegexs(matchTexts)
+            .contextMenu(contexts).click();
+
         shell(SHELL_SWITCH).waitUntilShellActive(SHELL_SWITCH);
         if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
