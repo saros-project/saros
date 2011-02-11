@@ -44,24 +44,26 @@ public class TestRosterView extends STFTest {
 
     @Test
     public void openCloseRosterView() throws RemoteException {
-        alice.view.closeViewById(VIEW_SAROS_BUDDIES_ID);
-        assertEquals(false, alice.view.isViewOpen(VIEW_SAROS_BUDDIES));
-        alice.view.openViewById(VIEW_SAROS_BUDDIES_ID);
-        assertEquals(true, alice.view.isViewOpen(VIEW_SAROS_BUDDIES));
+        alice.view.closeById(VIEW_SAROS_BUDDIES_ID);
+        assertEquals(false, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
+            .isOpen());
+        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
+        assertEquals(true, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
+            .isOpen());
     }
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        alice.view.activateViewByTitle(VIEW_SAROS_BUDDIES);
-        assertTrue(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
-        alice.view.closeViewById(VIEW_SAROS_BUDDIES_ID);
-        assertFalse(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
+        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).setFocus();
+        assertTrue(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
+        alice.view.closeById(VIEW_SAROS_BUDDIES_ID);
+        assertFalse(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
 
-        alice.view.openViewById(VIEW_SAROS_BUDDIES_ID);
-        assertTrue(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
+        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
+        assertTrue(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
 
-        alice.view.activateViewByTitle(VIEW_SAROS_SESSION);
-        assertFalse(alice.view.isViewActive(VIEW_SAROS_BUDDIES));
+        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        assertFalse(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
     }
 
     /**

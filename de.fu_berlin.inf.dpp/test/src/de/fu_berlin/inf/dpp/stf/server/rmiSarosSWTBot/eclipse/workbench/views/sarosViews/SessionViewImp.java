@@ -337,7 +337,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelInSessionView())
-            return viewW.getView(VIEW_SAROS_SESSION).bot().label().getText();
+            return view(VIEW_SAROS_SESSION).bot().label().getText();
         return null;
     }
 
@@ -671,8 +671,9 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        viewW.openViewById(VIEW_SAROS_SESSION_ID);
-        viewW.activateViewByTitle(VIEW_SAROS_SESSION);
+        view(VIEW_SAROS_SESSION).openById();
+        view(VIEW_SAROS_SESSION).setViewTitle(VIEW_SAROS_SESSION);
+        view(VIEW_SAROS_SESSION).setFocus();
     }
 
     private void clickContextMenuOfSelectedBuddy(JID jidOfSelectedUser,

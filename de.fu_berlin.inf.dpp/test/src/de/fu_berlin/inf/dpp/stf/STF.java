@@ -485,6 +485,15 @@ public class STF {
      * 
      **********************************************/
     protected final static String VIEW_CONSOLE = "Console";
+
+    /**********************************************
+     * 
+     * View SVN Respositories
+     * 
+     **********************************************/
+    protected final static String VIEW_SVN_REPOSITORIES_ID = "org.tigris.subversion.subclipse.ui.repository.RepositoriesView";
+    protected final static String VIEW_SVN_REPOSITORIES = "SVN Repositories";
+
     /**********************************************
      * 
      * Context Menu Team
@@ -532,6 +541,7 @@ public class STF {
         viewTitlesAndIDs.put(VIEW_SAROS_BUDDIES, VIEW_SAROS_BUDDIES_ID);
         viewTitlesAndIDs.put(VIEW_SAROS_CHAT, VIEW_SAROS_CHAT_ID);
         viewTitlesAndIDs.put(VIEW_SAROS_SESSION, VIEW_SAROS_SESSION_ID);
+        viewTitlesAndIDs.put(VIEW_SVN_REPOSITORIES, VIEW_SVN_REPOSITORIES_ID);
     }
 
     /**********************************************

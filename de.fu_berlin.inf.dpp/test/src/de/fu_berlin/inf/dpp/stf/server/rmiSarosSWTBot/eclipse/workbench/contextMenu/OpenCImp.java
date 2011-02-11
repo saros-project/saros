@@ -93,8 +93,8 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     protected void precondition(String viewTitle) throws RemoteException {
 
-        viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
-
-        viewW.activateViewByTitle(viewTitle);
+        view(viewTitle).openById();
+        view(viewTitle).setViewTitle(viewTitle);
+        view(viewTitle).setFocus();
     }
 }

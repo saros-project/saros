@@ -78,16 +78,21 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
     }
 
     public void closeUnnecessaryViews() throws RemoteException {
-        if (viewW.isViewOpen("Problems"))
-            viewW.closeViewByTitle("Problems");
-        if (viewW.isViewOpen("Javadoc"))
-            viewW.closeViewByTitle("Javadoc");
-        if (viewW.isViewOpen("Declaration"))
-            viewW.closeViewByTitle("Declaration");
-        if (viewW.isViewOpen("Task List"))
-            viewW.closeViewByTitle("Task List");
-        if (viewW.isViewOpen("Outline"))
-            viewW.closeViewByTitle("Outline");
+
+        if (view("Problems").isOpen())
+            view("Problems").close();
+
+        if (view("Javadoc").isOpen())
+            view("Javadoc").close();
+
+        if (view("Declaration").isOpen())
+            view("Declaration").close();
+
+        if (view("Task List").isOpen())
+            view("Task List").close();
+
+        if (view("Outline").isOpen())
+            view("Outline").close();
     }
 
     /**********************************************

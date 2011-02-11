@@ -19,7 +19,7 @@ public interface View extends EclipseComponent {
      * @param viewName
      *            name of the view, which should be active. //
      */
-    public void waitUntilIsViewActive(String viewName) throws RemoteException;
+    public void waitUntilIsActive() throws RemoteException;
 
     /**
      * open the given view specified with the viewId.
@@ -27,7 +27,7 @@ public interface View extends EclipseComponent {
      * @param viewId
      *            the id of the view, which you want to open.
      */
-    public void openViewById(final String viewId) throws RemoteException;
+    public void openById() throws RemoteException;
 
     /**
      * @param title
@@ -35,7 +35,7 @@ public interface View extends EclipseComponent {
      * @return <tt>true</tt> if the specified view is open.
      * @see ViewPart#getTitlesOfOpenedViews()
      */
-    public boolean isViewOpen(String title) throws RemoteException;
+    public boolean isOpen() throws RemoteException;
 
     /**
      * Set focus on the specified view. It should be only called if View is
@@ -45,14 +45,14 @@ public interface View extends EclipseComponent {
      *            the title on the view tab.
      * @see SWTBotView#setFocus()
      */
-    public void activateViewByTitle(String title) throws RemoteException;
+    public void setFocus() throws RemoteException;
 
     /**
      * @param title
      *            the title on the view tab.
      * @return <tt>true</tt> if the specified view is active.
      */
-    public boolean isViewActive(String title) throws RemoteException;
+    public boolean isActive() throws RemoteException;
 
     /**
      * close the specified view
@@ -60,7 +60,7 @@ public interface View extends EclipseComponent {
      * @param title
      *            the title on the view tab.
      */
-    public void closeViewByTitle(String title) throws RemoteException;
+    public void close() throws RemoteException;
 
     /**
      * close the given view specified with the viewId.
@@ -68,12 +68,14 @@ public interface View extends EclipseComponent {
      * @param viewId
      *            the id of the view, which you want to close.
      */
-    public void closeViewById(final String viewId) throws RemoteException;
+    public void closeById(final String viewId) throws RemoteException;
 
     /**
      * @return the title list of all the views which are opened currently.
      * @see SWTWorkbenchBot#views()
      */
     public List<String> getTitlesOfOpenedViews() throws RemoteException;
+
+    public void setViewTitle(String title) throws RemoteException;
 
 }

@@ -372,8 +372,9 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        viewW.openViewById(VIEW_SAROS_BUDDIES_ID);
-        viewW.activateViewByTitle(VIEW_SAROS_BUDDIES);
+        view(VIEW_SAROS_BUDDIES).openById();
+        view(VIEW_SAROS_BUDDIES).setViewTitle(VIEW_SAROS_BUDDIES);
+        view(VIEW_SAROS_BUDDIES).setFocus();
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip)

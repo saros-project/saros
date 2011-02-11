@@ -69,8 +69,9 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        viewW.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        view(VIEW_PACKAGE_EXPLORER).openById();
+        view(VIEW_PACKAGE_EXPLORER).setViewTitle(VIEW_PACKAGE_EXPLORER);
+        view(VIEW_PACKAGE_EXPLORER).setFocus();
     }
 
 }

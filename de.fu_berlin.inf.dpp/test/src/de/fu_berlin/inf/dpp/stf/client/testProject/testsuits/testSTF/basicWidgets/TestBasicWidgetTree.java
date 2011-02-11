@@ -53,7 +53,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
         assertTrue(alice.tree.existsTreeItemInTreeInView(VIEW_PACKAGE_EXPLORER,
             PROJECT1));
         assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
@@ -65,7 +65,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
         assertTrue(alice.tree.existsTreeItemWithRegexsInView(
             VIEW_PACKAGE_EXPLORER, PROJECT1));
         assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
@@ -93,7 +93,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
@@ -127,7 +127,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
-        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
         alice.tree.selectTreeItemWithRegexs(changeToRegex(getClassNodes(
             SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
     }
@@ -138,7 +138,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
-        alice.view.activateViewByTitle(VIEW_PACKAGE_EXPLORER);
+        alice.commonWidgets().view(VIEW_PACKAGE_EXPLORER).setFocus();
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
             SVN_CLS1);
         alice.editor.setTextInEditorWithoutSave(CP1, SVN_CLS1_SUFFIX);

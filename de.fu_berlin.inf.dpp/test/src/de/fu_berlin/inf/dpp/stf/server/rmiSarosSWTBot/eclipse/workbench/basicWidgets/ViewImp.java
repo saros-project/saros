@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -21,6 +22,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentIm
 public class ViewImp extends EclipseComponentImp implements View {
 
     private static transient ViewImp viewImp;
+    private String viewTitle;
+    private String viewId;
 
     /**
      * {@link TableImp} is a singleton, but inheritance is possible.
@@ -43,7 +46,7 @@ public class ViewImp extends EclipseComponentImp implements View {
      * actions
      * 
      **********************************************/
-    public void openViewById(final String viewId) throws RemoteException {
+    public void openById() throws RemoteException {
         try {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
@@ -70,13 +73,13 @@ public class ViewImp extends EclipseComponentImp implements View {
         }
     }
 
-    public void closeViewByTitle(String title) throws RemoteException {
-        if (isViewOpen(title)) {
-            bot.viewByTitle(title).close();
+    public void close() throws RemoteException {
+        if (isOpen()) {
+            bot.viewByTitle(viewTitle).close();
         }
     }
 
-    public void closeViewById(final String viewId) throws RemoteException {
+    public void closeById(final String viewId) throws RemoteException {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 final IWorkbench wb = PlatformUI.getWorkbench();
@@ -90,13 +93,18 @@ public class ViewImp extends EclipseComponentImp implements View {
         });
     }
 
-    public void activateViewByTitle(String title) throws RemoteException {
+    public void setFocus() throws RemoteException {
         try {
-            bot.viewByTitle(title).setFocus();
-            viewW.waitUntilIsViewActive(title);
+            bot.viewByTitle(viewTitle).setFocus();
+            waitUntilIsActive();
         } catch (WidgetNotFoundException e) {
-            log.warn("view not found '" + title + "'", e);
+            log.warn("view not found '" + viewTitle + "'", e);
         }
+    }
+
+    public void setViewTitle(String title) throws RemoteException {
+        this.viewTitle = title;
+        this.viewId = viewTitlesAndIDs.get(viewTitle);
     }
 
     /**********************************************
@@ -104,15 +112,15 @@ public class ViewImp extends EclipseComponentImp implements View {
      * states
      * 
      **********************************************/
-    public boolean isViewOpen(String title) throws RemoteException {
-        return getTitlesOfOpenedViews().contains(title);
+    public boolean isOpen() throws RemoteException {
+        return getTitlesOfOpenedViews().contains(viewTitle);
     }
 
-    public boolean isViewActive(String title) throws RemoteException {
-        if (!isViewOpen(title))
+    public boolean isActive() throws RemoteException {
+        if (!isOpen())
             return false;
         try {
-            return bot.activeView().getTitle().equals(title);
+            return bot.activeView().getTitle().equals(viewTitle);
         } catch (WidgetNotFoundException e) {
             return false;
         }
@@ -130,7 +138,7 @@ public class ViewImp extends EclipseComponentImp implements View {
      * waits until
      * 
      **********************************************/
-    public void waitUntilIsViewActive(String viewTitle) throws RemoteException {
+    public void waitUntilIsActive() throws RemoteException {
         waitUntil(SarosConditions.isViewActive(bot, viewTitle));
     }
 
@@ -140,12 +148,7 @@ public class ViewImp extends EclipseComponentImp implements View {
      * 
      **************************************************************/
 
-    /**
-     * @param viewTitle
-     *            the title on the view tab.
-     * @return the {@link SWTBotView} specified with the given title.
-     */
-    public SWTBotView getView(String viewTitle) {
-        return bot.viewByTitle(viewTitle);
+    public SWTBot bot() {
+        return bot.viewByTitle(viewTitle).bot();
     }
 }

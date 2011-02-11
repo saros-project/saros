@@ -63,7 +63,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static ButtonImp buttonW = ButtonImp.getInstance();
     public static ToolbarButtonImp toolbarButtonW = ToolbarButtonImp
         .getInstance();
-    public static ViewImp viewW = ViewImp.getInstance();
+    // public static ViewImp viewW = ViewImp.getInstance();
     public static MenuImp menuW = MenuImp.getInstance();
     public static LabelImp labelW = LabelImp.getInstance();
     public static TextImp textW = TextImp.getInstance();
@@ -253,4 +253,9 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         return content;
     }
 
+    protected ViewImp view(String viewTitle) throws RemoteException {
+        ViewImp view = ViewImp.getInstance();
+        view.setViewTitle(viewTitle);
+        return view;
+    }
 }

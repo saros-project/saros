@@ -312,8 +312,8 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
     }
 
     protected void precondition(String viewTitle) throws RemoteException {
-        viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
-        viewW.activateViewByTitle(viewTitle);
+        view(viewTitle).openById();
+        view(viewTitle).setViewTitle(viewTitle);
+        view(viewTitle).setFocus();
     }
-
 }

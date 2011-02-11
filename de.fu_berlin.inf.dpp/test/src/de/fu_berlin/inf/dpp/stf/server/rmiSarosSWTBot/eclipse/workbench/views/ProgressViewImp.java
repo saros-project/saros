@@ -78,8 +78,9 @@ public class ProgressViewImp extends EclipseComponentImp implements
      **************************************************************/
 
     private void preCondition() throws RemoteException {
-        viewW.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        viewW.activateViewByTitle(VIEW_PROGRESS);
+        view(VIEW_PROGRESS).openById();
+        view(VIEW_PROGRESS).setViewTitle(VIEW_PROGRESS);
+        view(VIEW_PROGRESS).setFocus();
     }
 
 }

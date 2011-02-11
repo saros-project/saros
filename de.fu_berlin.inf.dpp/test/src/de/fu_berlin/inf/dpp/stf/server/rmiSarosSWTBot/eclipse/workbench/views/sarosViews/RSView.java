@@ -6,10 +6,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosCom
 
 public interface RSView extends SarosComponent {
 
-    public boolean isRemoteScreenViewOpen() throws RemoteException;
-
-    public boolean isRemoteScreenViewActive() throws RemoteException;
-
     public void clickTBChangeModeOfImageSource() throws RemoteException;
 
     public void clickTBStopRunningSession() throws RemoteException;

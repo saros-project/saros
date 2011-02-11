@@ -8,7 +8,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -107,12 +106,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             // close window
             shareProjectShell.close();
             // in svn repos view: enter url
-            viewW
-                .openViewById("org.tigris.subversion.subclipse.ui.repository.RepositoriesView");
-            viewW.activateViewByTitle("SVN Repositories");
-            final boolean viewWasOpen = viewW.isViewOpen("SVN Repositories");
-            final SWTBotView repoView = viewW.getView("SVN Repositories");
-            repoView.toolbarButton("Add SVN Repository").click();
+            view(VIEW_SVN_REPOSITORIES).openById();
+            view(VIEW_SVN_REPOSITORIES).setViewTitle("SVN Repositories");
+            view(VIEW_SVN_REPOSITORIES).setFocus();
+            final boolean viewWasOpen = view(VIEW_SVN_REPOSITORIES).isOpen();
+            toolbarButtonW.clickToolbarButtonWithTooltipOnView(
+                VIEW_SVN_REPOSITORIES, "Add SVN Repository");
             if (!shellW.activateShell("Add SVN Repository")) {
                 shellW.waitUntilShellActive("Add SVN Repository");
             }
@@ -120,7 +119,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             bot.button(FINISH).click();
             shellW.waitsUntilIsShellClosed("Add SVN Repository");
             if (!viewWasOpen)
-                repoView.close();
+                view(VIEW_SVN_REPOSITORIES).close();
             // recur...
             shareProjectWithSVNUsingSpecifiedFolderName(viewTitle, projectName,
                 repositoryURL, specifiedFolderName);
@@ -334,8 +333,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     }
 
     protected void precondition(String viewTitle) throws RemoteException {
-        viewW.openViewById(viewTitlesAndIDs.get(viewTitle));
-        viewW.activateViewByTitle(viewTitle);
+        view(viewTitle).openById();
+        view(viewTitle).setViewTitle(viewTitle);
+        view(viewTitle).setFocus();
     }
-
 }

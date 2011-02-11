@@ -225,7 +225,7 @@ public class STFTest extends STF {
         for (Tester tester : activeTesters) {
             tester.workbench.activateWorkbench();
             tester.workbench.setUpWorkbench();
-            tester.view.closeViewByTitle("Welcome");
+            tester.commonWidgets().view("Welcome").close();
             tester.windowM.openPerspective();
             tester.workbench.closeUnnecessaryViews();
         }
@@ -252,10 +252,10 @@ public class STFTest extends STF {
     }
 
     public static void openSarosViews(Tester tester) throws RemoteException {
-        tester.view.openViewById(VIEW_SAROS_BUDDIES_ID);
-        tester.view.openViewById(VIEW_SAROS_SESSION_ID);
-        tester.view.openViewById(VIEW_SAROS_CHAT_ID);
-        tester.view.openViewById(VIEW_REMOTE_SCREEN_ID);
+        tester.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
+        tester.commonWidgets().view(VIEW_SAROS_SESSION).openById();
+        tester.commonWidgets().view(VIEW_SAROS_CHAT).openById();
+        tester.commonWidgets().view(VIEW_REMOTE_SCREEN).openById();
     }
 
     /**

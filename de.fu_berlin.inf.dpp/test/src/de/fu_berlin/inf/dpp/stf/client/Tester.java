@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.client.wrapper.CommonWidgetsWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Button;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Label;
@@ -177,4 +178,7 @@ public class Tester extends STF {
         return jid.getDomain();
     }
 
+    public CommonWidgetsWrapper commonWidgets() {
+        return new CommonWidgetsWrapper(this);
+    }
 }
