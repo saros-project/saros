@@ -186,9 +186,9 @@ public class ShellImp extends EclipseComponentImp implements Shell {
         throws RemoteException {
         // waitUntilShellActive(shellName);
         bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        treeW.waitUntilIsTreeItemInTreeExisted(rootOfTreeNode);
+        treeW.waitUntilSubItemExists(rootOfTreeNode);
         SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        treeW.waitUntilIsSubItemInTreeItemExisted(treeItem, teeNode);
+        shell(title).bot().tree().waitUntilSubItemExists(teeNode);
         treeItem.getNode(teeNode).select();
         buttonW.waitUntilButtonEnabled(buttonText);
         bot.button(buttonText).click();

@@ -20,7 +20,6 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
@@ -90,14 +89,15 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void selectBuddy(String baseJID) throws RemoteException {
-        treeW.getTreeItemInView(VIEW_SAROS_BUDDIES, NODE_BUDDIES, baseJID);
+        view(VIEW_SAROS_BUDDIES).bot().tree()
+            .selectTreeItem(NODE_BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(String buddyNickName) throws RemoteException {
         precondition();
-        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        return treeW.existsTreeItemWithRegexs(tree, NODE_BUDDIES, buddyNickName
-            + ".*");
+        return view(VIEW_SAROS_BUDDIES).bot().tree()
+            .selectTreeItem(NODE_BUDDIES)
+            .existsSubItemWithRegex(buddyNickName + ".*");
     }
 
     public void deleteBuddy(JID buddyJID) throws RemoteException {
@@ -109,7 +109,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             view(VIEW_SAROS_BUDDIES)
                 .bot()
                 .tree()
-                .selectTreeItemWithRegexs(NODE_BUDDIES + ".*",
+                .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
                     buddyNickName + ".*").contextMenu(CM_DELETE).click();
 
             shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, YES);
@@ -138,7 +138,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         view(VIEW_SAROS_BUDDIES)
             .bot()
             .tree()
-            .selectTreeItemWithRegexs(NODE_BUDDIES + ".*", buddyNickName + ".*")
+            .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
             .contextMenu(CM_RENAME).click();
 
         if (!shell(SHELL_SET_NEW_NICKNAME).activateShell("Set new nickname")) {
@@ -155,9 +155,13 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (buddyNickName == null)
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
-        SWTBotTree tree = treeW.getTreeInView(VIEW_SAROS_BUDDIES);
-        SWTBotTreeItem item = treeW.getTreeItemWithRegexs(tree, NODE_BUDDIES
-            + ".*", buddyNickName + ".*");
+
+        SWTBotTreeItem item = view(VIEW_SAROS_BUDDIES)
+            .bot()
+            .tree()
+            .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
+            .getSwtBotTreeItem();
+
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
                 + buddyNickName + ", he isn't conntected yet");

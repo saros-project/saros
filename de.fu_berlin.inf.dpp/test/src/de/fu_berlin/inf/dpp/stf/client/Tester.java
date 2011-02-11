@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Text;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosC;
@@ -59,6 +60,7 @@ public class Tester extends STF {
     public Bot bot;
     public Table table;
     public Tree tree;
+    public TreeItem treeItem;
     public Button button;
     public ToolbarButton toolbarButton;
     public Shell shell;
@@ -130,6 +132,7 @@ public class Tester extends STF {
             bot = (Bot) registry.lookup("bot");
             table = (Table) registry.lookup("table");
             tree = (Tree) registry.lookup("tree");
+            treeItem = (TreeItem) registry.lookup("treeItem");
             button = (Button) registry.lookup("button");
             toolbarButton = (ToolbarButton) registry.lookup("toolbarButton");
             menu = (Menu) registry.lookup("menu");

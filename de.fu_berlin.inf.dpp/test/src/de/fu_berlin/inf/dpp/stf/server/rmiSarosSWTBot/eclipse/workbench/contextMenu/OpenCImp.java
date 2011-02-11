@@ -8,10 +8,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
 public class OpenCImp extends EclipseComponentImp implements OpenC {
 
@@ -43,7 +41,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         throws RemoteException {
         precondition(viewTitle);
         view(viewTitle).bot().tree()
-            .selectTreeItemWithRegexs(changeToRegex(fileNodes))
+            .selectTreeItemWithRegex(changeToRegex(fileNodes))
             .contextMenu(CM_OPEN).click();
 
     }
@@ -66,9 +64,10 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openFileWith(String viewTitle, String whichEditor,
         String... fileNodes) throws RemoteException {
         precondition(viewTitle);
-        SWTBotTree tree = treeW.getTreeInView(viewTitle);
-        view(viewTitle).bot().tree().selectTreeItem(fileNodes);
-        ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
+
+        view(viewTitle).bot().tree().selectTreeItem(fileNodes)
+            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
+
         shell(SHELL_EDITOR_SELECTION).waitUntilShellActive(
             SHELL_EDITOR_SELECTION);
         tableW.selectTableItem(whichEditor);

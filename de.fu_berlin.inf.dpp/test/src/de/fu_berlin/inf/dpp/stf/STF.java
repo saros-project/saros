@@ -600,6 +600,10 @@ public class STF {
         return folderpath;
     }
 
+    public String changeToRegex(String text) {
+        return text + ".*";
+    }
+
     public String[] changeToRegex(String... texts) {
         String[] matchTexts = new String[texts.length];
         for (int i = 0; i < texts.length; i++) {

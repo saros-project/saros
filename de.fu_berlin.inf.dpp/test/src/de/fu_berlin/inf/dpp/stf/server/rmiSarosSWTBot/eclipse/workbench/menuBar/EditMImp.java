@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.menuBar;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -9,9 +10,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItem;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
 public class EditMImp extends EclipseComponentImp implements EditM {
@@ -42,11 +44,12 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteAllProjects(String viewTitle) throws RemoteException {
         precondition();
-        SWTBotTreeItem[] allTreeItems = treeW.getTreeInView(
-            VIEW_PACKAGE_EXPLORER).getAllItems();
+        Tree tree = view(VIEW_PACKAGE_EXPLORER).bot().tree();
+        List<String> allTreeItems = tree.getSubtems();
+
         if (allTreeItems != null) {
-            for (SWTBotTreeItem item : allTreeItems) {
-                item.contextMenu(MENU_DELETE).click();
+            for (String item : allTreeItems) {
+                tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
                 shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(
                     SHELL_DELETE_RESOURCE, OK, true);
                 shell(SHELL_DELETE_RESOURCE).waitsUntilIsShellClosed(
@@ -66,12 +69,13 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException {
-        SWTBotTreeItem treeItem = treeW.getTreeItemInView(viewTitle,
-            projectName, SRC);
 
-        for (SWTBotTreeItem item : treeItem.getItems()) {
-            item.select();
-            menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+        TreeItem treeItem = view(viewTitle).bot().tree()
+            .selectTreeItem(projectName, SRC);
+        for (String item : treeItem.getSubItems()) {
+            view(viewTitle).bot().tree().selectTreeItem(projectName, SRC, item)
+                .contextMenu(CM_DELETE).click();
+
             shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, OK);
         }
     }

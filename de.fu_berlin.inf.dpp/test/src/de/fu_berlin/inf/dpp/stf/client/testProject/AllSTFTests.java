@@ -15,8 +15,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShar
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShare3UsersConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShare3UsersSequentially;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShareProjectUsingExistingProject;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations.TestParallelInvitationWithTerminationByHost;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations.TestParallelInvitationWithTerminationByInvitees;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
 
 @RunWith(Suite.class)
@@ -27,8 +25,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSa
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
     TestSVNStateInitialization.class, TestFileOperations.class,
     TestFolderOperations.class,
-    TestParallelInvitationWithTerminationByHost.class,
-    TestParallelInvitationWithTerminationByInvitees.class,
+
     TestSVNStateUpdates.class })
 public class AllSTFTests {
     /**

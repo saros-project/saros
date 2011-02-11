@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWid
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItemImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosCImp;
@@ -92,6 +93,7 @@ public class STFController {
         exportObject(ShellImp.getInstance(), "shell");
         exportObject(TableImp.getInstance(), "table");
         exportObject(TreeImp.getInstance(), "tree");
+        exportObject(TreeItemImp.getInstance(), "treeItem");
         exportObject(ButtonImp.getInstance(), "button");
         exportObject(ToolbarButtonImp.getInstance(), "toolbarButton");
         exportObject(ViewImp.getInstance(), "view");
