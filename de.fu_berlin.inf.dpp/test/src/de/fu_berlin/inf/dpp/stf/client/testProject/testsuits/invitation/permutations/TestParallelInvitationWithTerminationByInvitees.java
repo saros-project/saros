@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 
 public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
@@ -74,17 +74,17 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
             dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
-        Shell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
+        STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell_bob.activateAndWait();
         shell_bob.bot_().button(CANCEL).click();
 
-        Shell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
+        STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
         assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
             bob.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
-        Shell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
+        STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
         carl.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
         carl.sarosC.confirmShellSessionnInvitation();
@@ -95,7 +95,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             carl.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
-        Shell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
+        STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activateAndWait();
         dave.sarosC.confirmShellSessionnInvitation();
         shell_dave.bot_().button(CANCEL).click();

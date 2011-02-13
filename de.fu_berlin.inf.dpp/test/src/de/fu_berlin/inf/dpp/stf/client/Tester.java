@@ -11,7 +11,8 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Editor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFList;
@@ -22,7 +23,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.r
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.contextMenu.SarosC;
@@ -62,7 +62,7 @@ public class Tester extends STF {
     public STFTreeItem treeItem;
     public STFButton button;
     public STFToolbarButton toolbarButton;
-    public Shell shell;
+    public STFBotShell shell;
     public STFView view;
     public STFMenu menu;
     public STFLabel label;
@@ -71,7 +71,7 @@ public class Tester extends STF {
 
     public Workbench workbench;
 
-    public Editor editor;
+    public STFBotEditor editor;
 
     // menuBar
     public FileM fileM;
@@ -125,8 +125,8 @@ public class Tester extends STF {
             progressV = (ProgressView) registry.lookup("progressView");
             consoleV = (ConsoleView) registry.lookup("consoleView");
             workbench = (Workbench) registry.lookup("workbench");
-            shell = (Shell) registry.lookup("shell");
-            editor = (Editor) registry.lookup("eclipseEditor");
+            shell = (STFBotShell) registry.lookup("shell");
+            editor = (STFBotEditor) registry.lookup("eclipseEditor");
 
             bot = (STFWorkbenchBot) registry.lookup("bot");
             table = (STFTable) registry.lookup("table");

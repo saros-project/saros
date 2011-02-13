@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class FileMImp extends EclipseComponentImp implements FileM {
@@ -206,7 +206,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmShellNewJavaProject(String projectName)
         throws RemoteException {
-        Shell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
         shell.activate();
         stfText.setTextInTextWithLabel(projectName, LABEL_PROJECT_NAME);
         // bot.button(FINISH).click();

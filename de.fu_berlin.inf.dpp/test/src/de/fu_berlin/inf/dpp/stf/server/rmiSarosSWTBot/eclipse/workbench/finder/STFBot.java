@@ -3,25 +3,25 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
 public interface STFBot extends EclipseComponent {
 
     public STFTree tree() throws RemoteException;
 
-    public Shell shell(String title) throws RemoteException;
+    public STFBotShell shell(String title) throws RemoteException;
 
     public List<String> getTitlesOfOpenedShells() throws RemoteException;
 
     public boolean isShellOpen(String title) throws RemoteException;
 
     /**
-     * waits until the given Shell is closed.
+     * waits until the given STFBotShell is closed.
      * 
      * @param title
      *            the title of the shell.
@@ -31,7 +31,7 @@ public interface STFBot extends EclipseComponent {
         throws RemoteException;
 
     /**
-     * waits until the given Shell is open.
+     * waits until the given STFBotShell is open.
      * 
      * @param title
      *            the title of the shell.

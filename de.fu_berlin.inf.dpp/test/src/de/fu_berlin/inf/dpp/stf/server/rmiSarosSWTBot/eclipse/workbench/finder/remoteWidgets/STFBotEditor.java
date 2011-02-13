@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFin
  * 
  * @author Lin
  */
-public interface Editor extends EclipseComponent {
+public interface STFBotEditor extends EclipseComponent {
 
     /**********************************************
      * 
@@ -301,7 +301,7 @@ public interface Editor extends EclipseComponent {
      * 
      * <p>
      * <b>Note:</b> the mothod is different from
-     * {@link Editor#waitUntilEditorContentSame(String, String...)}, which
+     * {@link STFBotEditor#waitUntilEditorContentSame(String, String...)}, which
      * compare the contents which may be dirty.
      * </p>
      * 
@@ -329,7 +329,7 @@ public interface Editor extends EclipseComponent {
      *            name of the class without suffix, e.g. MyClass
      * 
      * @throws RemoteException
-     * @see Editor#waitUntilFileContentSame(String, String...)
+     * @see STFBotEditor#waitUntilFileContentSame(String, String...)
      */
     public void waitUntilClassContentsSame(String projectName, String pkg,
         String className, String otherClassContent) throws RemoteException;
@@ -342,7 +342,7 @@ public interface Editor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @return only the saved content of the specified file, if it is dirty.
      *         This method is different from
-     *         {@link Editor#getTextOfEditor(String...)}, which can return a not
+     *         {@link STFBotEditor#getTextOfEditor(String...)}, which can return a not
      *         saved content.
      * @throws RemoteException
      * @throws IOException
@@ -361,7 +361,7 @@ public interface Editor extends EclipseComponent {
      *            name of the class without suffix, e.g. MyClass
      * @return only the saved content of the specified class file, if it is
      *         dirty. This method is different from
-     *         {@link Editor#getTextOfJavaEditor(String, String, String)} ,
+     *         {@link STFBotEditor#getTextOfJavaEditor(String, String, String)} ,
      *         which can return a not saved content.
      * @throws RemoteException
      * @throws IOException
@@ -398,7 +398,7 @@ public interface Editor extends EclipseComponent {
      * files between Alice and Bob.
      * <p>
      * <b>Note:</b> the method is different from
-     * {@link Editor#waitUntilClassContentsSame(String, String, String, String)}
+     * {@link STFBotEditor#waitUntilClassContentsSame(String, String, String, String)}
      * , which compare the contents of the class files which isn't dirty.
      * </p>
      * 
@@ -440,7 +440,7 @@ public interface Editor extends EclipseComponent {
      * class files between Alice and Bob.
      * <p>
      * <b>Note:</b> the method is different from
-     * {@link Editor#waitUntilClassContentsSame(String, String, String, String)}
+     * {@link STFBotEditor#waitUntilClassContentsSame(String, String, String, String)}
      * , which compare the contents of the class files which isn't dirty.
      * </p>
      * 
@@ -521,7 +521,7 @@ public interface Editor extends EclipseComponent {
      * @param className
      *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
-     * @see Editor#typeTextInEditor(String, String...)
+     * @see STFBotEditor#typeTextInEditor(String, String...)
      */
     public void typeTextInJavaEditor(String text, String projectName,
         String pkg, String className) throws RemoteException;

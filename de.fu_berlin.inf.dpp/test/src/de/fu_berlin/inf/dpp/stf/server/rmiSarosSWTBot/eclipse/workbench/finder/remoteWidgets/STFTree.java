@@ -19,7 +19,7 @@ public interface STFTree extends EclipseComponent {
 
     /**
      * Selects the treeItem matching the given nodes in the tree: bot.tree().
-     * This method is suitable for Shell widget.
+     * This method is suitable for STFBotShell widget.
      * 
      * @param nodes
      *            node path to expand. Attempts to expand all nodes along the

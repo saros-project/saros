@@ -10,8 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
 public class TestBasicWidgetTree extends STFTest {
@@ -30,7 +30,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        Shell shell = alice.bot.shell(SHELL_SHOW_VIEW);
+        STFBotShell shell = alice.bot.shell(SHELL_SHOW_VIEW);
         shell.activateAndWait();
         assertTrue(shell.bot_().tree().selectTreeItem(NODE_GENERAL)
             .existsSubItem(NODE_CONSOLE));
@@ -40,7 +40,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
-        Shell shell = alice.bot().shell(SHELL_PREFERNCES);
+        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activateAndWait();
         assertTrue(shell.bot_().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
@@ -50,7 +50,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
-        Shell shell = alice.bot().shell(SHELL_PREFERNCES);
+        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activateAndWait();
         assertTrue(shell.bot_().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
@@ -120,7 +120,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
-        Shell shell = alice.bot.shell(SHELL_PREFERNCES);
+        STFBotShell shell = alice.bot.shell(SHELL_PREFERNCES);
         shell.activateAndWait();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
         assertTrue(shell

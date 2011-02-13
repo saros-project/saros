@@ -14,8 +14,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -52,7 +52,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             .selectTreeItemWithRegex(changeToRegex(projectName))
             .contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
 
-        Shell shell = bot().shell(SHELL_SHARE_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmShellWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
         if (bot.table().containsItem(repositoryURL)) {
@@ -77,7 +77,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             .selectTreeItemWithRegex(changeToRegex(projectName))
             .contextMenu(contexts).click();
 
-        Shell shell = bot().shell(SHELL_SHARE_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmShellWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + bot.text());
         shell.bot_().button(FINISH).waitUntilIsEnabled();

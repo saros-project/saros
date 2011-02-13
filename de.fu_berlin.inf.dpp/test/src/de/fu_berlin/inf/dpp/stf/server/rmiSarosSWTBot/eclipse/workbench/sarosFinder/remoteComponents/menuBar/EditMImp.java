@@ -11,9 +11,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -51,7 +51,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         if (allTreeItems != null) {
             for (String item : allTreeItems) {
                 tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
-                Shell shell = bot().shell(SHELL_DELETE_RESOURCE);
+                STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
 
                 shell.confirmWindowWithCheckBox(OK, true);
                 bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
@@ -95,7 +95,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
         stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
-        Shell shell = bot().shell(SHELL_COPY_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
         shell.activate();
         stfText.setTextInTextWithLabel(target, "Project name:");
         shell.bot_().button(OK).click();

@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.SarosComponentImp;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
@@ -21,7 +21,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
      **********************************************/
     public void createAccountInShellSarosPeferences(JID jid, String password)
         throws RemoteException {
-        Shell shell_preferences = preCondition();
+        STFBotShell shell_preferences = preCondition();
         bot.buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .click();
         bot().shell(SHELL_SAROS_CONFIGURATION).activateAndWait();
@@ -254,9 +254,9 @@ public class SarosPreferencesImp extends SarosComponentImp implements
      * This is a convenient function to show the right setting-page of saros
      * item in the preferences dialog.
      */
-    private Shell preCondition() throws RemoteException {
+    private STFBotShell preCondition() throws RemoteException {
         clickMenuSarosPreferences();
-        Shell shell = bot().shell(SHELL_PREFERNCES);
+        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
         shell.activateAndWait();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
         return shell;

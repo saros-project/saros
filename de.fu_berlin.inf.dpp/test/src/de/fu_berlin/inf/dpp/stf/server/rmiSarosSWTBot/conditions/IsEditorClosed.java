@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Editor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
 
 public class IsEditorClosed extends DefaultCondition {
 
-    private Editor editorComponent;
+    private STFBotEditor editorComponent;
     private String fileName;
 
-    IsEditorClosed(Editor editorComponent, String name) {
+    IsEditorClosed(STFBotEditor editorComponent, String name) {
 
         this.fileName = name;
         this.editorComponent = editorComponent;

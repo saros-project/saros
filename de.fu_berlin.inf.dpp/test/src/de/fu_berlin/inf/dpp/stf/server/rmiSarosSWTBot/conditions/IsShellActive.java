@@ -12,7 +12,7 @@ public class IsShellActive extends DefaultCondition {
     }
 
     public String getFailureMessage() {
-        return "Shell  not found.";
+        return "STFBotShell  not found.";
     }
 
     public boolean test() throws Exception {

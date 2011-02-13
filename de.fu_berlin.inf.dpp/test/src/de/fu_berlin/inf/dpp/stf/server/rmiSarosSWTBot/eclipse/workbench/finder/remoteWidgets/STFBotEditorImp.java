@@ -24,21 +24,21 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class EditorImp extends EclipseComponentImp implements Editor {
+public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor {
 
-    private static transient EditorImp self;
+    private static transient STFBotEditorImp self;
 
     /* error messages */
     private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
     private static String ERROR_MESSAGE_FOR_INVALID_CLASSNAME = "You need to only pass the className without sufix like e.g MyClass";
 
     /**
-     * {@link EditorImp} is a singleton, but inheritance is possible.
+     * {@link STFBotEditorImp} is a singleton, but inheritance is possible.
      */
-    public static EditorImp getInstance() {
+    public static STFBotEditorImp getInstance() {
         if (self != null)
             return self;
-        self = new EditorImp();
+        self = new STFBotEditorImp();
         return self;
     }
 
@@ -104,7 +104,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         // IWorkbenchPage page = win.getActivePage();
         // if (page != null) {
         // page.closeEditor(page.getActiveEditor(), true);
-        // Shell activateShell = Display.getCurrent().getActiveShell();
+        // STFBotShell activateShell = Display.getCurrent().getActiveShell();
         // activateShell.close();
         //
         // }

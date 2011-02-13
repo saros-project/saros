@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 
 public class SarosComponentImp extends EclipseComponentImp implements
     SarosComponent {
@@ -22,7 +22,7 @@ public class SarosComponentImp extends EclipseComponentImp implements
      **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        Shell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
 
         shell.activateAndWait();
         stfText.setTextInTextWithLabel(jid.getDomain(),
@@ -48,7 +48,7 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        Shell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
+        STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
         shell.activateAndWait();
         stfText.setTextInTextWithLabel(jid.getDomain(),
             LABEL_XMPP_JABBER_SERVER);

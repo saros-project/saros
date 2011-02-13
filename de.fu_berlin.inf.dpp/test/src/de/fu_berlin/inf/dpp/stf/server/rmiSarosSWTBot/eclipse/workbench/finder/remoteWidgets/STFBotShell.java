@@ -6,7 +6,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface Shell extends EclipseComponent {
+public interface STFBotShell extends EclipseComponent {
 
     /**********************************************
      * 
@@ -66,7 +66,7 @@ public interface Shell extends EclipseComponent {
      **********************************************/
 
     /**
-     * waits until the given Shell is active.
+     * waits until the given STFBotShell is active.
      * 
      * @param title
      *            the title of the shell.
@@ -77,7 +77,7 @@ public interface Shell extends EclipseComponent {
     public void waitShortUntilIsShellClosed() throws RemoteException;
 
     /**
-     * waits until the given Shell is closed.
+     * waits until the given STFBotShell is closed.
      * 
      * @param title
      *            the title of the shell.

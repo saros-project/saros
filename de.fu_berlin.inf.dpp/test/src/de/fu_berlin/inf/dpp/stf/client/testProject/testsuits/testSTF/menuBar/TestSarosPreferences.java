@@ -13,7 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Shell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
 
 public class TestSarosPreferences extends STFTest {
 
@@ -61,7 +61,8 @@ public class TestSarosPreferences extends STFTest {
         labelsAndTexts.put(LABEL_PASSWORD, PASSWORD);
         labelsAndTexts.put(LABEL_REPEAT_PASSWORD, PASSWORD);
 
-        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        STFBotShell shell_alice = alice.bot().shell(
+            SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
         // wait a minute,so that bot can get the error message.
         shell_alice.bot_().button(FINISH).waitUntilIsEnabled();
@@ -77,7 +78,8 @@ public class TestSarosPreferences extends STFTest {
     public void createAccountWithDismatchedPassword() throws RemoteException {
 
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        STFBotShell shell_alice = alice.bot().shell(
+            SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.activateAndWait();
 
         alice.text.setTextInTextWithLabel(SERVER, LABEL_XMPP_JABBER_SERVER);
@@ -95,7 +97,8 @@ public class TestSarosPreferences extends STFTest {
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        STFBotShell shell_alice = alice.bot().shell(
+            SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.activateAndWait();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();

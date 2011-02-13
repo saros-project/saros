@@ -8,7 +8,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Editor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
@@ -49,15 +49,15 @@ public class SarosConditions extends Conditions {
      * conditions for editor
      * 
      **********************************************/
-    public static ICondition isEditorOpen(Editor editor, String name) {
+    public static ICondition isEditorOpen(STFBotEditor editor, String name) {
         return new IsEditorOpen(editor, name);
     }
 
-    public static ICondition isEditorActive(Editor editor, String name) {
+    public static ICondition isEditorActive(STFBotEditor editor, String name) {
         return new IsEditorActive(editor, name);
     }
 
-    public static ICondition isEditorClosed(Editor editor, String name) {
+    public static ICondition isEditorClosed(STFBotEditor editor, String name) {
         return new IsEditorClosed(editor, name);
     }
 
@@ -69,7 +69,7 @@ public class SarosConditions extends Conditions {
         return new IsViewActive(bot, name);
     }
 
-    public static ICondition isFileContentsSame(Editor state,
+    public static ICondition isFileContentsSame(STFBotEditor state,
         String otherClassContent, String... fileNodes) {
         return new IsFileContentsSame(state, otherClassContent, fileNodes);
     }
@@ -95,7 +95,7 @@ public class SarosConditions extends Conditions {
         return new ExistsChatMessage(chatV, jid, message);
     }
 
-    public static ICondition isEditorContentsSame(Editor editor,
+    public static ICondition isEditorContentsSame(STFBotEditor editor,
         String otherContent, String... filePath) {
         return new IsEditorContentsSame(editor, otherContent, filePath);
     }

@@ -17,7 +17,7 @@ public interface STFTable extends EclipseComponent {
 
     /***************** exists table item ****************** */
     /**
-     * this method is suitable for Shell widget
+     * this method is suitable for STFBotShell widget
      * 
      * @param itemText
      *            text of a table item.
@@ -48,7 +48,7 @@ public interface STFTable extends EclipseComponent {
      * 
      * 
      * Selects the tableItem matching the given itemText. This method is
-     * suitable for Shell widget.
+     * suitable for STFBotShell widget.
      * 
      * @param itemText
      *            text of the selected table item.

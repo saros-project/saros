@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.S
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
-public class STFShellImp extends EclipseComponentImp implements Shell {
+public class STFShellImp extends EclipseComponentImp implements STFBotShell {
     private static transient STFShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
@@ -54,7 +54,7 @@ public class STFShellImp extends EclipseComponentImp implements Shell {
         // SWTBotShell[] shells = bot.shells();
         // for (SWTBotShell shell : shells) {
         // if (shell.getText().equals(shellTitle)) {
-        // log.debug("Shell \"" + shellTitle + "\" found.");
+        // log.debug("STFBotShell \"" + shellTitle + "\" found.");
         // if (!shell.isActive()) {
         // shell.activate();
         // // waitUntilShellActive(title);

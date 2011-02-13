@@ -2,16 +2,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.Editor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
 
 public class IsFileContentsSame extends DefaultCondition {
 
-    private Editor state;
+    private STFBotEditor state;
 
     private String[] fileNodes;
     private String otherClassContent;
 
-    IsFileContentsSame(Editor state, String otherClassContent,
+    IsFileContentsSame(STFBotEditor state, String otherClassContent,
         String... fileNodes) {
         this.state = state;
         this.fileNodes = fileNodes;
