@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The editor is enabled/disabled respective the Saros user permissions,
@@ -46,7 +46,7 @@ public abstract class SarosPermissionsGraphicalEditor extends
 	};
 
 	private void setEnabledInSWTThread(final boolean enable) {
-		Util.runSafeSWTAsync(null, new Runnable() {
+		Utils.runSafeSWTAsync(null, new Runnable() {
 
 			@Override
 			public void run() {

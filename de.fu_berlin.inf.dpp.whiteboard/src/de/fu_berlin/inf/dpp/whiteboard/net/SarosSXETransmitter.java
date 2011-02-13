@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
@@ -87,7 +87,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 				 * record it may be set here like the sender
 				 */
 				setSender(extension.getMessage().getRecords(), packet.getFrom());
-				Util.runSafeSWTAsync(log, new Runnable() {
+				Utils.runSafeSWTAsync(log, new Runnable() {
 
 					@Override
 					public void run() {
@@ -104,7 +104,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 	@Override
 	public void sendAsync(final SXEMessage msg) {
-		sendingDispatch.submit(Util.wrapSafe(log, new Runnable() {
+		sendingDispatch.submit(Utils.wrapSafe(log, new Runnable() {
 
 			@Override
 			public void run() {

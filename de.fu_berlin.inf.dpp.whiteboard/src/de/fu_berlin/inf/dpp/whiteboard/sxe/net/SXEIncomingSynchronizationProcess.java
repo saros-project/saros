@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 
@@ -56,7 +56,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 		 * dispatching listener thread when awaiting answers (could not process
 		 * incoming messages, deadlock)
 		 */
-		Util.runSafeAsync("Incoming whiteboard synchronization process", log,
+		Utils.runSafeAsync("Incoming whiteboard synchronization process", log,
 				new Runnable() {
 
 					@Override
@@ -66,7 +66,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 							log.debug(prefix() + "invitation from " + peer
 									+ " received");
 
-							Util.runSafeSWTSync(log, new Runnable() {
+							Utils.runSafeSWTSync(log, new Runnable() {
 
 								@Override
 								public void run() {
@@ -98,7 +98,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 
 							log.debug(prefix() + "state received");
 
-							Util.runSafeSWTSync(log, new Runnable() {
+							Utils.runSafeSWTSync(log, new Runnable() {
 
 								@Override
 								public void run() {

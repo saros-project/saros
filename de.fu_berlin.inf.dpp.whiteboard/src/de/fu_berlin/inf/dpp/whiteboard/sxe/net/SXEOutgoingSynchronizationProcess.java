@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
@@ -62,7 +62,7 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 				log.debug(prefix() + peer + " accepted state-offer");
 
 				try {
-					List<IRecord> state = Util
+					List<IRecord> state = Utils
 							.runSWTSync(new Callable<List<IRecord>>() {
 
 								@Override
