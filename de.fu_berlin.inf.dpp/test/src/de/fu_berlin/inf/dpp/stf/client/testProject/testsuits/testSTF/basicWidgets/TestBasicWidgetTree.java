@@ -10,8 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
 public class TestBasicWidgetTree extends STFTest {

@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
 
 public class IsEditorContentsSame extends DefaultCondition {
 

@@ -13,8 +13,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.RosterView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterView;
 
 public class TestRosterView extends STFTest {
 

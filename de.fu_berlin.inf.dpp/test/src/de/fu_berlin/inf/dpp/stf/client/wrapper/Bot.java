@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.client.wrapper;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 
 public class Bot extends Wrapper {
 
