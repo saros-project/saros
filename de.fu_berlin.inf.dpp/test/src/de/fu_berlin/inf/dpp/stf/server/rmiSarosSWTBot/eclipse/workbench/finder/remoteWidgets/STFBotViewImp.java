@@ -16,21 +16,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.S
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFViewImp extends EclipseComponentImp implements STFView {
+public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
 
-    private static transient STFViewImp self;
+    private static transient STFBotViewImp self;
     private String viewTitle;
     private String viewId;
 
     private SWTBotView swtbotView;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFViewImp getInstance() {
+    public static STFBotViewImp getInstance() {
         if (self != null)
             return self;
-        self = new STFViewImp();
+        self = new STFBotViewImp();
         return self;
     }
 

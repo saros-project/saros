@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPref
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFView extends EclipseComponent {
+public interface STFBotView extends EclipseComponent {
 
     /**
      * Waits until the {@link SarosSWTBotPreferences#SAROS_TIMEOUT} is reached

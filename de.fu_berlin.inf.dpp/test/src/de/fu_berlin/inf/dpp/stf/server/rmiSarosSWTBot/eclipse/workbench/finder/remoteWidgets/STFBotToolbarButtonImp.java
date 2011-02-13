@@ -8,18 +8,18 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFToolbarButtonImp extends EclipseComponentImp implements
-    STFToolbarButton {
+public class STFBotToolbarButtonImp extends EclipseComponentImp implements
+    STFBotToolbarButton {
 
-    private static transient STFToolbarButtonImp ToolbarButtonImp;
+    private static transient STFBotToolbarButtonImp ToolbarButtonImp;
 
     /**
-     * {@link STFToolbarButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotToolbarButtonImp} is a singleton, but inheritance is possible.
      */
-    public static STFToolbarButtonImp getInstance() {
+    public static STFBotToolbarButtonImp getInstance() {
         if (ToolbarButtonImp != null)
             return ToolbarButtonImp;
-        ToolbarButtonImp = new STFToolbarButtonImp();
+        ToolbarButtonImp = new STFBotToolbarButtonImp();
         return ToolbarButtonImp;
     }
 

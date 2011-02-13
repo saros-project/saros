@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFi
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
@@ -10,7 +10,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     private static transient PEViewImp pEViewImp;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
     public static PEViewImp getInstance() {
         if (pEViewImp != null)

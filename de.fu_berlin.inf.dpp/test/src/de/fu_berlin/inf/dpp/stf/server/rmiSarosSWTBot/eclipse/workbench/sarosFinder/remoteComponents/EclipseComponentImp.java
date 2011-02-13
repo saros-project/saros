@@ -28,17 +28,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.S
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFLabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFListImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFShellImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFStyledTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFToolbarButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotLabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotListImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotStyledTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTreeImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.contextMenu.TeamCImp;
@@ -60,20 +60,20 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         .getLogger(EclipseComponentImp.class);
 
     // simple widgets
-    public static STFTableImp stfTable = STFTableImp.getInstance();
-    public static STFTreeImp stfTree = STFTreeImp.getInstance();
-    public static STFButtonImp stfButton = STFButtonImp.getInstance();
-    public static STFToolbarButtonImp stfToolbarButton = STFToolbarButtonImp
+    public static STFBotTableImp stfTable = STFBotTableImp.getInstance();
+    public static STFBotTreeImp stfTree = STFBotTreeImp.getInstance();
+    public static STFBotButtonImp stfButton = STFBotButtonImp.getInstance();
+    public static STFBotToolbarButtonImp stfToolbarButton = STFBotToolbarButtonImp
         .getInstance();
-    public static STFViewImp stfView = STFViewImp.getInstance();
-    public static STFMenuImp stfMenu = STFMenuImp.getInstance();
-    public static STFLabelImp stfLabel = STFLabelImp.getInstance();
-    public static STFStyledTextImp stfStyledText = STFStyledTextImp
+    public static STFBotViewImp stfView = STFBotViewImp.getInstance();
+    public static STFBotMenuImp stfMenu = STFBotMenuImp.getInstance();
+    public static STFBotLabelImp stfLabel = STFBotLabelImp.getInstance();
+    public static STFBotStyledTextImp stfStyledText = STFBotStyledTextImp
         .getInstance();
-    public static STFTextImp stfText = STFTextImp.getInstance();
-    public static STFBotShell stfShell = STFShellImp.getInstance();
+    public static STFBotTextImp stfText = STFBotTextImp.getInstance();
+    public static STFBotShell stfShell = STFBotShellImp.getInstance();
     public static STFBotEditorImp stfEditor = STFBotEditorImp.getInstance();
-    public static STFListImp stfList = STFListImp.getInstance();
+    public static STFBotListImp stfList = STFBotListImp.getInstance();
 
     // workbench
     public static WorkbenchImp workbench = WorkbenchImp.getInstance();

@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFButton extends EclipseComponent {
+public interface STFBotButton extends EclipseComponent {
 
     /**********************************************
      * 

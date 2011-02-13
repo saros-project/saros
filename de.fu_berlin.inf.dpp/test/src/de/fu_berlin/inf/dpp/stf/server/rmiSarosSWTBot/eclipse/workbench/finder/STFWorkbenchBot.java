@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 
 public interface STFWorkbenchBot extends STFBot {
-    public STFView view(String viewTitle) throws RemoteException;
+    public STFBotView view(String viewTitle) throws RemoteException;
 
     /**
      * @return the title list of all the views which are opened currently.

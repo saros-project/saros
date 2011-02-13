@@ -9,7 +9,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
 /**
@@ -35,11 +35,11 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(STFTable table, String tableItemName) {
+    public static ICondition existTableItem(STFBotTable table, String tableItemName) {
         return new ExistsTableItem(table, tableItemName);
     }
 
-    public static ICondition ExistContextMenuOfTableItem(STFTable table,
+    public static ICondition ExistContextMenuOfTableItem(STFBotTable table,
         String itemName, String contextName) {
         return new ExistsContextMenuOfTableItem(table, itemName, contextName);
     }

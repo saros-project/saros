@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFTree extends EclipseComponent {
+public interface STFBotTree extends EclipseComponent {
 
     /**********************************************
      * 
@@ -26,7 +26,7 @@ public interface STFTree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public STFTreeItem selectTreeItem(String... nodes) throws RemoteException;
+    public STFBotTreeItem selectTreeItem(String... nodes) throws RemoteException;
 
     /***************** select tree item with regexs ******************/
 
@@ -42,7 +42,7 @@ public interface STFTree extends EclipseComponent {
      * @throws WidgetNotFoundException
      *             If the item wasn't found.
      */
-    public STFTreeItem selectTreeItemWithRegex(String... regexNodes)
+    public STFBotTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException;
 
     /***************** select tree item with waiting expand ****************** */
@@ -56,7 +56,7 @@ public interface STFTree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public STFTreeItem selectTreeItemAndWait(String... nodes)
+    public STFBotTreeItem selectTreeItemAndWait(String... nodes)
         throws RemoteException;;
 
     /***************** exist tree item with regexs ****************** */

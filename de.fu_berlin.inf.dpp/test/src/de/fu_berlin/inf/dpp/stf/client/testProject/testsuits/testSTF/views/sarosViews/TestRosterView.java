@@ -13,7 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.RosterView;
 
 public class TestRosterView extends STFTest {
@@ -53,7 +53,7 @@ public class TestRosterView extends STFTest {
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        STFView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
+        STFBotView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
         view_buddies.setFocus();
         assertTrue(view_buddies.isActive());
         view_buddies.close();

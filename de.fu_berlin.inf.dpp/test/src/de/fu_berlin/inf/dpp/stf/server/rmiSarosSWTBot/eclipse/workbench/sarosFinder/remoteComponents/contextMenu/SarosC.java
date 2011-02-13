@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.SarosComponent;
 
 /**
@@ -113,7 +113,7 @@ public interface SarosC extends SarosComponent {
      * 
      * @return <tt>true</tr>, if the popup window with the title "Invitation cancel" is active
      * @throws RemoteException
-     * @see STFShellImp#isShellActive(String)
+     * @see STFBotShellImp#isShellActive(String)
      */
     public boolean isShellInvitationCancelledActive() throws RemoteException;
 
@@ -121,7 +121,7 @@ public interface SarosC extends SarosComponent {
      * close the popup window with the title "Invitation cancel".
      * 
      * @throws RemoteException
-     * @see STFShellImp#closeShell(String)
+     * @see STFBotShellImp#closeShell(String)
      */
     public void closeShellInvitationCancelled() throws RemoteException;
 
@@ -130,7 +130,7 @@ public interface SarosC extends SarosComponent {
      * active.
      * 
      * @throws RemoteException
-     * @see STFShellImp#waitUntilShellActive(String)
+     * @see STFBotShellImp#waitUntilShellActive(String)
      */
     public void waitUntilIsShellInvitationCnacelledActive()
         throws RemoteException;
@@ -140,7 +140,7 @@ public interface SarosC extends SarosComponent {
      * @return <tt><true</tt>, if the popup window with the title
      *         "Session Invitation" is active
      * @throws RemoteException
-     * @see STFShellImp#isShellActive(String)
+     * @see STFBotShellImp#isShellActive(String)
      */
     public boolean isShellSessionInvitationActive() throws RemoteException;
 
@@ -148,7 +148,7 @@ public interface SarosC extends SarosComponent {
      * close the popup window with the title "Session Invitation".
      * 
      * @throws RemoteException
-     * @see STFShellImp#closeShell(String)
+     * @see STFBotShellImp#closeShell(String)
      */
     public void closeShellSessionInvitation() throws RemoteException;
 
@@ -157,7 +157,7 @@ public interface SarosC extends SarosComponent {
      * active.
      * 
      * @throws RemoteException
-     * @see STFShellImp#waitUntilShellActive(String)
+     * @see STFBotShellImp#waitUntilShellActive(String)
      */
     public void waitUntilIsShellSessionInvitationActive()
         throws RemoteException;

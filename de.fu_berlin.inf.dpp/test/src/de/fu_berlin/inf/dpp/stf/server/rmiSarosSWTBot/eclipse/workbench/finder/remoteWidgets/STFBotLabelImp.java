@@ -7,19 +7,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFLabelImp extends EclipseComponentImp implements STFLabel {
+public class STFBotLabelImp extends EclipseComponentImp implements STFBotLabel {
 
-    private static transient STFLabelImp labelImp;
+    private static transient STFBotLabelImp labelImp;
 
     private SWTBotLabel swtBotLabel;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFLabelImp getInstance() {
+    public static STFBotLabelImp getInstance() {
         if (labelImp != null)
             return labelImp;
-        labelImp = new STFLabelImp();
+        labelImp = new STFBotLabelImp();
         return labelImp;
     }
 

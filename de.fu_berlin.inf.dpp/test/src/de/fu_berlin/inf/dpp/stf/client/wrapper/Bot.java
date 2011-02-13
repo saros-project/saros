@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 
 public class Bot extends Wrapper {
 
@@ -14,7 +14,7 @@ public class Bot extends Wrapper {
         // TODO Auto-generated constructor stub
     }
 
-    public STFView view(String viewTitle) throws RemoteException {
+    public STFBotView view(String viewTitle) throws RemoteException {
         tester.view.setViewTitle(viewTitle);
         return tester.view;
     }

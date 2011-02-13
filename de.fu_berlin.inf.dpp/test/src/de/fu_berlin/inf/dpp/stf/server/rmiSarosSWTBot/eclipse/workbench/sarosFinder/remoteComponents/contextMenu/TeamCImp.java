@@ -15,7 +15,7 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -113,7 +113,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             // in svn repos view: enter url
 
             bot().openById(VIEW_SVN_REPOSITORIES_ID);
-            STFView view = bot().view(VIEW_SVN_REPOSITORIES);
+            STFBotView view = bot().view(VIEW_SVN_REPOSITORIES);
             view.setViewTitle("SVN Repositories");
             view.setFocus();
             final boolean viewWasOpen = bot().isViewOpen(VIEW_SVN_REPOSITORIES);

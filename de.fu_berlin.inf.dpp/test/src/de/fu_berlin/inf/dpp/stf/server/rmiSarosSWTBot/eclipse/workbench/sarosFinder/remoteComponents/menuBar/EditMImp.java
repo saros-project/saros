@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -45,7 +45,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteAllProjects(String viewTitle) throws RemoteException {
         precondition();
-        STFTree tree = bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree();
+        STFBotTree tree = bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree();
         List<String> allTreeItems = tree.getSubtems();
 
         if (allTreeItems != null) {
@@ -69,7 +69,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException {
 
-        STFTreeItem treeItem = bot().view(viewTitle).bot_().tree()
+        STFBotTreeItem treeItem = bot().view(viewTitle).bot_().tree()
             .selectTreeItem(projectName, SRC);
         for (String item : treeItem.getSubItems()) {
             bot().view(viewTitle).bot_().tree()

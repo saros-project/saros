@@ -13,7 +13,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
 public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
@@ -31,7 +31,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
         return self;
     }
 
-    public STFView view(String viewTitle) throws RemoteException {
+    public STFBotView view(String viewTitle) throws RemoteException {
         stfView.setViewTitle(viewTitle);
         return stfView;
     }

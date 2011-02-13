@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.S
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
-public class STFShellImp extends EclipseComponentImp implements STFBotShell {
-    private static transient STFShellImp self;
+public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
+    private static transient STFBotShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
 
@@ -29,10 +29,10 @@ public class STFShellImp extends EclipseComponentImp implements STFBotShell {
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
      */
-    public static STFShellImp getInstance() {
+    public static STFBotShellImp getInstance() {
         if (self != null)
             return self;
-        self = new STFShellImp();
+        self = new STFBotShellImp();
         return self;
     }
 

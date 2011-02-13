@@ -6,20 +6,20 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFStyledTextImp extends EclipseComponentImp implements
-    STFStyledText {
+public class STFBotStyledTextImp extends EclipseComponentImp implements
+    STFBotStyledText {
 
-    private static transient STFStyledTextImp self;
+    private static transient STFBotStyledTextImp self;
 
     private SWTBotStyledText swtBotStyledText;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFStyledTextImp getInstance() {
+    public static STFBotStyledTextImp getInstance() {
         if (self != null)
             return self;
-        self = new STFStyledTextImp();
+        self = new STFBotStyledTextImp();
         return self;
     }
 

@@ -6,7 +6,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFMenu extends EclipseComponent {
+public interface STFBotMenu extends EclipseComponent {
 
     /**
      * clicks the main menus with the passed texts.
@@ -20,7 +20,7 @@ public interface STFMenu extends EclipseComponent {
 
     public void click() throws RemoteException;
 
-    public STFMenuImp contextMenu(String text) throws RemoteException;
+    public STFBotMenuImp contextMenu(String text) throws RemoteException;
 
     public void setWidget(SWTBotMenu widget) throws RemoteException;
 }

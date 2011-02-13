@@ -7,19 +7,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFMenuImp extends EclipseComponentImp implements STFMenu {
+public class STFBotMenuImp extends EclipseComponentImp implements STFBotMenu {
 
-    private static transient STFMenuImp menuImp;
+    private static transient STFBotMenuImp menuImp;
 
     private SWTBotMenu widget;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFMenuImp getInstance() {
+    public static STFBotMenuImp getInstance() {
         if (menuImp != null)
             return menuImp;
-        menuImp = new STFMenuImp();
+        menuImp = new STFBotMenuImp();
         return menuImp;
     }
 
@@ -57,7 +57,7 @@ public class STFMenuImp extends EclipseComponentImp implements STFMenu {
         this.widget = widget;
     }
 
-    public STFMenuImp contextMenu(String text) throws RemoteException {
+    public STFBotMenuImp contextMenu(String text) throws RemoteException {
         widget = widget.contextMenu(text);
         return this;
 

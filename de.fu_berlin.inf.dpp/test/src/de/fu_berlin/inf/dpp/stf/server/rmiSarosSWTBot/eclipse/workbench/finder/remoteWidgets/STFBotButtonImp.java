@@ -7,19 +7,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFButtonImp extends EclipseComponentImp implements STFButton {
+public class STFBotButtonImp extends EclipseComponentImp implements STFBotButton {
 
-    private static transient STFButtonImp buttonImp;
+    private static transient STFBotButtonImp buttonImp;
 
     private SWTBotButton swtBotButton;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFButtonImp getInstance() {
+    public static STFBotButtonImp getInstance() {
         if (buttonImp != null)
             return buttonImp;
-        buttonImp = new STFButtonImp();
+        buttonImp = new STFBotButtonImp();
         return buttonImp;
     }
 

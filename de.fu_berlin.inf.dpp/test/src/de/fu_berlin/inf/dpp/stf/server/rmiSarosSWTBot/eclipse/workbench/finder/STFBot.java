@@ -4,15 +4,15 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFStyledText;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
 public interface STFBot extends EclipseComponent {
 
-    public STFTree tree() throws RemoteException;
+    public STFBotTree tree() throws RemoteException;
 
     public STFBotShell shell(String title) throws RemoteException;
 
@@ -42,45 +42,45 @@ public interface STFBot extends EclipseComponent {
     /**
      * @param label
      *            the label on the widget.
-     * @return a {@link STFButton} with the specified <code>label</code>.
+     * @return a {@link STFBotButton} with the specified <code>label</code>.
      */
-    public STFButton buttonWithLabel(String label) throws RemoteException;
+    public STFBotButton buttonWithLabel(String label) throws RemoteException;
 
     /**
      * @param label
      *            the label on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>label</code>.
+     * @return a {@link STFBotButton} with the specified <code>label</code>.
      */
-    public STFButton buttonWithLabel(String label, int index)
+    public STFBotButton buttonWithLabel(String label, int index)
         throws RemoteException;
 
     /**
      * @param mnemonicText
      *            the mnemonicText on the widget.
-     * @return a {@link STFButton} with the specified <code>mnemonicText</code>.
+     * @return a {@link STFBotButton} with the specified <code>mnemonicText</code>.
      */
-    public STFButton button(String mnemonicText) throws RemoteException;
+    public STFBotButton button(String mnemonicText) throws RemoteException;
 
     /**
      * @param mnemonicText
      *            the mnemonicText on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>mnemonicText</code>.
+     * @return a {@link STFBotButton} with the specified <code>mnemonicText</code>.
      */
-    public STFButton button(String mnemonicText, int index)
+    public STFBotButton button(String mnemonicText, int index)
         throws RemoteException;
 
     /**
      * @param tooltip
      *            the tooltip on the widget.
-     * @return a {@link STFButton} with the specified <code>tooltip</code>.
+     * @return a {@link STFBotButton} with the specified <code>tooltip</code>.
      */
-    public STFButton buttonWithTooltip(String tooltip) throws RemoteException;
+    public STFBotButton buttonWithTooltip(String tooltip) throws RemoteException;
 
-    public STFButton buttonWithTooltip(String tooltip, int index)
+    public STFBotButton buttonWithTooltip(String tooltip, int index)
         throws RemoteException;
 
     /**
@@ -88,9 +88,9 @@ public interface STFBot extends EclipseComponent {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link STFButton} with the specified <code>key/value</code>.
+     * @return a {@link STFBotButton} with the specified <code>key/value</code>.
      */
-    public STFButton buttonWithId(String key, String value)
+    public STFBotButton buttonWithId(String key, String value)
         throws RemoteException;
 
     /**
@@ -100,9 +100,9 @@ public interface STFBot extends EclipseComponent {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>key/value</code>.
+     * @return a {@link STFBotButton} with the specified <code>key/value</code>.
      */
-    public STFButton buttonWithId(String key, String value, int index)
+    public STFBotButton buttonWithId(String key, String value, int index)
         throws RemoteException;
 
     /**
@@ -110,9 +110,9 @@ public interface STFBot extends EclipseComponent {
      *            the value for the key
      *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
      *            .
-     * @return a {@link STFButton} with the specified <code>value</code>.
+     * @return a {@link STFBotButton} with the specified <code>value</code>.
      */
-    public STFButton buttonWithId(String value) throws RemoteException;
+    public STFBotButton buttonWithId(String value) throws RemoteException;
 
     /**
      * @param value
@@ -121,49 +121,49 @@ public interface STFBot extends EclipseComponent {
      *            .
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>value</code>.
+     * @return a {@link STFBotButton} with the specified <code>value</code>.
      */
-    public STFButton buttonWithId(String value, int index)
+    public STFBotButton buttonWithId(String value, int index)
         throws RemoteException;
 
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link STFButton} with the specified <code>inGroup</code>.
+     * @return a {@link STFBotButton} with the specified <code>inGroup</code>.
      */
-    public STFButton buttonInGroup(String inGroup) throws RemoteException;
+    public STFBotButton buttonInGroup(String inGroup) throws RemoteException;
 
     /**
      * @param inGroup
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>inGroup</code>.
+     * @return a {@link STFBotButton} with the specified <code>inGroup</code>.
      */
-    public STFButton buttonInGroup(String inGroup, int index)
+    public STFBotButton buttonInGroup(String inGroup, int index)
         throws RemoteException;
 
     /**
-     * @return a {@link STFButton} with the specified <code>none</code>.
+     * @return a {@link STFBotButton} with the specified <code>none</code>.
      */
-    public STFButton button() throws RemoteException;
+    public STFBotButton button() throws RemoteException;
 
     /**
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>none</code>.
+     * @return a {@link STFBotButton} with the specified <code>none</code>.
      */
-    public STFButton button(int index) throws RemoteException;
+    public STFBotButton button(int index) throws RemoteException;
 
     /**
      * @param label
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link STFButton} with the specified <code>label</code> with
+     * @return a {@link STFBotButton} with the specified <code>label</code> with
      *         the specified <code>inGroup</code>.
      */
-    public STFButton buttonWithLabelInGroup(String label, String inGroup)
+    public STFBotButton buttonWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
 
     /**
@@ -173,10 +173,10 @@ public interface STFBot extends EclipseComponent {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>label</code> with
+     * @return a {@link STFBotButton} with the specified <code>label</code> with
      *         the specified <code>inGroup</code>.
      */
-    public STFButton buttonWithLabelInGroup(String label, String inGroup,
+    public STFBotButton buttonWithLabelInGroup(String label, String inGroup,
         int index) throws RemoteException;
 
     /**
@@ -184,10 +184,10 @@ public interface STFBot extends EclipseComponent {
      *            the mnemonicText on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link STFButton} with the specified <code>mnemonicText</code>
+     * @return a {@link STFBotButton} with the specified <code>mnemonicText</code>
      *         with the specified <code>inGroup</code> .
      */
-    public STFButton buttonInGroup(String mnemonicText, String inGroup)
+    public STFBotButton buttonInGroup(String mnemonicText, String inGroup)
         throws RemoteException;
 
     /**
@@ -197,10 +197,10 @@ public interface STFBot extends EclipseComponent {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>mnemonicText</code>
+     * @return a {@link STFBotButton} with the specified <code>mnemonicText</code>
      *         with the specified <code>inGroup</code> .
      */
-    public STFButton buttonInGroup(String mnemonicText, String inGroup,
+    public STFBotButton buttonInGroup(String mnemonicText, String inGroup,
         int index) throws RemoteException;
 
     /**
@@ -208,10 +208,10 @@ public interface STFBot extends EclipseComponent {
      *            the tooltip on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link STFButton} with the specified <code>tooltip</code> with
+     * @return a {@link STFBotButton} with the specified <code>tooltip</code> with
      *         the specified <code>inGroup</code>.
      */
-    public STFButton buttonWithTooltipInGroup(String tooltip, String inGroup)
+    public STFBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
         throws RemoteException;
 
     /**
@@ -221,14 +221,14 @@ public interface STFBot extends EclipseComponent {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link STFButton} with the specified <code>tooltip</code> with
+     * @return a {@link STFBotButton} with the specified <code>tooltip</code> with
      *         the specified <code>inGroup</code>.
      */
-    public STFButton buttonWithTooltipInGroup(String tooltip, String inGroup,
+    public STFBotButton buttonWithTooltipInGroup(String tooltip, String inGroup,
         int index) throws RemoteException;
 
-    public STFLabel label() throws RemoteException;
+    public STFBotLabel label() throws RemoteException;
 
-    public STFStyledText styledText() throws RemoteException;
+    public STFBotStyledText styledText() throws RemoteException;
 
 }

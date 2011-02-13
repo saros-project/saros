@@ -9,10 +9,10 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFStyledText;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
@@ -43,7 +43,7 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         this.swtBot = bot;
     }
 
-    public STFTree tree() throws RemoteException {
+    public STFBotTree tree() throws RemoteException {
         stfTree.setSWTBotTree(swtBot.tree());
         return stfTree;
     }
@@ -91,130 +91,130 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         });
     }
 
-    public STFButton buttonWithLabel(String label) throws RemoteException {
+    public STFBotButton buttonWithLabel(String label) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithLabel(label, 0));
         return stfButton;
     }
 
-    public STFButton buttonWithLabel(String label, int index)
+    public STFBotButton buttonWithLabel(String label, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithLabel(label, index));
         return stfButton;
     }
 
-    public STFButton button(String mnemonicText) throws RemoteException {
+    public STFBotButton button(String mnemonicText) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.button(mnemonicText, 0));
         return stfButton;
     }
 
-    public STFButton button(String mnemonicText, int index)
+    public STFBotButton button(String mnemonicText, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.button(mnemonicText, index));
         return stfButton;
     }
 
-    public STFButton buttonWithTooltip(String tooltip) throws RemoteException {
+    public STFBotButton buttonWithTooltip(String tooltip) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithTooltip(tooltip, 0));
         return stfButton;
     }
 
-    public STFButton buttonWithTooltip(String tooltip, int index)
+    public STFBotButton buttonWithTooltip(String tooltip, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithTooltip(tooltip, index));
         return stfButton;
     }
 
-    public STFButton buttonWithId(String key, String value)
+    public STFBotButton buttonWithId(String key, String value)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithId(key, value));
         return stfButton;
     }
 
-    public STFButton buttonWithId(String key, String value, int index)
+    public STFBotButton buttonWithId(String key, String value, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithId(key, value, index));
         return stfButton;
     }
 
-    public STFButton buttonWithId(String value) throws RemoteException {
+    public STFBotButton buttonWithId(String value) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithId(value));
         return stfButton;
     }
 
-    public STFButton buttonWithId(String value, int index)
+    public STFBotButton buttonWithId(String value, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithId(value, index));
         return stfButton;
     }
 
-    public STFButton buttonInGroup(String inGroup) throws RemoteException {
+    public STFBotButton buttonInGroup(String inGroup) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonInGroup(inGroup));
         return stfButton;
     }
 
-    public STFButton buttonInGroup(String inGroup, int index)
+    public STFBotButton buttonInGroup(String inGroup, int index)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonInGroup(inGroup, index));
         return stfButton;
     }
 
-    public STFButton button() throws RemoteException {
+    public STFBotButton button() throws RemoteException {
         stfButton.setSwtBotButton(swtBot.button());
         return stfButton;
     }
 
-    public STFButton button(int index) throws RemoteException {
+    public STFBotButton button(int index) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.button(index));
         return stfButton;
     }
 
-    public STFButton buttonWithLabelInGroup(String label, String inGroup)
+    public STFBotButton buttonWithLabelInGroup(String label, String inGroup)
         throws RemoteException {
         stfButton
             .setSwtBotButton(swtBot.buttonWithLabelInGroup(label, inGroup));
         return stfButton;
     }
 
-    public STFButton buttonWithLabelInGroup(String label, String inGroup,
+    public STFBotButton buttonWithLabelInGroup(String label, String inGroup,
         int index) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithLabelInGroup(label, inGroup,
             index));
         return stfButton;
     }
 
-    public STFButton buttonInGroup(String mnemonicText, String inGroup)
+    public STFBotButton buttonInGroup(String mnemonicText, String inGroup)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonInGroup(mnemonicText, inGroup));
         return stfButton;
     }
 
-    public STFButton buttonInGroup(String mnemonicText, String inGroup,
+    public STFBotButton buttonInGroup(String mnemonicText, String inGroup,
         int index) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonInGroup(mnemonicText, inGroup,
             index));
         return stfButton;
     }
 
-    public STFButton buttonWithTooltipInGroup(String tooltip, String inGroup)
+    public STFBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
         throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithTooltipInGroup(tooltip,
             inGroup));
         return stfButton;
     }
 
-    public STFButton buttonWithTooltipInGroup(String tooltip, String inGroup,
+    public STFBotButton buttonWithTooltipInGroup(String tooltip, String inGroup,
         int index) throws RemoteException {
         stfButton.setSwtBotButton(swtBot.buttonWithTooltipInGroup(tooltip,
             inGroup, index));
         return stfButton;
     }
 
-    public STFLabel label() throws RemoteException {
+    public STFBotLabel label() throws RemoteException {
         stfLabel.setSwtBotLabel(swtBot.label());
         return stfLabel;
     }
 
-    public STFStyledText styledText() throws RemoteException {
+    public STFBotStyledText styledText() throws RemoteException {
         stfStyledText.setSwtBotStyledText(swtBot.styledText());
         return stfStyledText;
     }

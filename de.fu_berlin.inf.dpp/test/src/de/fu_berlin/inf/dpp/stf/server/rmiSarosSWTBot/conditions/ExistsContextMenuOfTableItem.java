@@ -2,15 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTable;
 
 public class ExistsContextMenuOfTableItem extends DefaultCondition {
 
-    private STFTable table;
+    private STFBotTable table;
     private String itemText;
     private String contextName;
 
-    ExistsContextMenuOfTableItem(STFTable table, String itemText, String contextName) {
+    ExistsContextMenuOfTableItem(STFBotTable table, String itemText, String contextName) {
         this.table = table;
         this.itemText = itemText;
         this.contextName = contextName;

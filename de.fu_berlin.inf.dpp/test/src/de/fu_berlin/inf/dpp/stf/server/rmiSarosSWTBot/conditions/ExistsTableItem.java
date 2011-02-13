@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotTable;
 
 public class ExistsTableItem extends DefaultCondition {
 
-    private STFTable table;
+    private STFBotTable table;
     private String itemText;
 
-    ExistsTableItem(STFTable table, String itemText) {
+    ExistsTableItem(STFBotTable table, String itemText) {
         this.table = table;
         this.itemText = itemText;
     }

@@ -6,7 +6,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFLabel extends EclipseComponent {
+public interface STFBotLabel extends EclipseComponent {
 
     /**
      * 

@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFTextImp extends EclipseComponentImp implements STFText {
+public class STFBotTextImp extends EclipseComponentImp implements STFBotText {
 
-    private static transient STFTextImp textImp;
+    private static transient STFBotTextImp textImp;
 
     /**
-     * {@link STFTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
-    public static STFTextImp getInstance() {
+    public static STFBotTextImp getInstance() {
         if (textImp != null)
             return textImp;
-        textImp = new STFTextImp();
+        textImp = new STFBotTextImp();
         return textImp;
     }
 

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 
 public class TestBasicWidgetTree extends STFTest {
@@ -60,7 +60,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        STFView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
         assertTrue(view.bot_().tree().existsSubItem(PROJECT1));
 
@@ -73,7 +73,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        STFView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
 
         assertTrue(view.bot_().tree()
@@ -136,7 +136,7 @@ public class TestBasicWidgetTree extends STFTest {
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
 
-        STFView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
         view.bot_()
             .tree()
