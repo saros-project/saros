@@ -58,9 +58,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
@@ -72,9 +69,6 @@ import org.picocontainer.annotations.Nullable;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -400,8 +394,8 @@ public class Utils {
      * 
      * @param log
      *            The log to print any exception messages thrown which occur
-     *            when running the given runnable. If null, the {@link Utils#log}
-     *            is used.
+     *            when running the given runnable. If null, the
+     *            {@link Utils#log} is used.
      * 
      */
     public static Runnable wrapSafe(@Nullable Logger log,
@@ -559,56 +553,6 @@ public class Utils {
             log.warn("Waiting for the forked thread in runSafeSyncFork was"
                 + " interrupted unexpectedly");
         }
-    }
-
-    /**
-     * @return The nickname associated with the given JID in the current roster
-     *         or null if the current roster is not available or the nickname
-     *         has not been set.
-     */
-    public static String getNickname(Saros saros, JID jid) {
-
-        if (saros == null)
-            return null;
-
-        XMPPConnection connection = saros.getConnection();
-        if (connection == null)
-            return null;
-
-        Roster roster = connection.getRoster();
-        if (roster == null)
-            return null;
-
-        RosterEntry entry = roster.getEntry(jid.getBase());
-        if (entry == null)
-            return null;
-
-        String nickName = entry.getName();
-        if (nickName != null && nickName.trim().length() > 0) {
-            return nickName;
-        }
-        return null;
-    }
-
-    public static String getDisplayableName(RosterEntry entry) {
-        String nickName = entry.getName();
-        if (nickName != null && nickName.trim().length() > 0) {
-            return nickName.trim();
-        }
-        return entry.getUser();
-    }
-
-    /**
-     * @return a full sentence which describes the {@link User.Permission} of
-     *         the given user.
-     */
-    public static String getUserDescription(User user) {
-        String perm = ((user.getPermission() == Permission.WRITE_ACCESS) ? "write"
-            : "read-only")
-            + " access";
-
-        return user.isLocal() ? "You have " + perm + "." : user
-            .getHumanReadableName() + " has " + perm + ".";
     }
 
     /**
@@ -1083,8 +1027,8 @@ public class Utils {
     }
 
     /**
-     * Serializes an {@link Serializable}. Errors are logged to {@link Utils#log}
-     * . .
+     * Serializes an {@link Serializable}. Errors are logged to
+     * {@link Utils#log} . .
      * 
      * @param o
      *            {@link Serializable} to serialize
