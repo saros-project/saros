@@ -89,13 +89,13 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void selectBuddy(String baseJID) throws RemoteException {
-        view(VIEW_SAROS_BUDDIES).bot().tree()
+        bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItem(NODE_BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(String buddyNickName) throws RemoteException {
         precondition();
-        return view(VIEW_SAROS_BUDDIES).bot().tree()
+        return bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItem(NODE_BUDDIES)
             .existsSubItemWithRegex(buddyNickName + ".*");
     }
@@ -106,25 +106,24 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             return;
         try {
 
-            view(VIEW_SAROS_BUDDIES)
-                .bot()
+            bot()
+                .view(VIEW_SAROS_BUDDIES)
+                .bot_()
                 .tree()
                 .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
                     buddyNickName + ".*").contextMenu(CM_DELETE).click();
 
-            shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, YES);
+            bot().shell(CONFIRM_DELETE).confirmShellAndWait(YES);
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
-        if (!shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activateShell(
-            SHELL_REMOVAL_OF_SUBSCRIPTION))
-            shell(SHELL_REMOVAL_OF_SUBSCRIPTION).waitUntilShellActive(
-                SHELL_REMOVAL_OF_SUBSCRIPTION);
-        shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirmShell(
-            SHELL_REMOVAL_OF_SUBSCRIPTION, OK);
+        if (!bot().isShellOpen(SHELL_REMOVAL_OF_SUBSCRIPTION))
+            bot().waitUntilShellOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
+        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
     }
 
     public void renameBuddy(JID buddyJID, String newBuddyName)
@@ -135,15 +134,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
 
-        view(VIEW_SAROS_BUDDIES)
-            .bot()
-            .tree()
+        bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
             .contextMenu(CM_RENAME).click();
 
-        if (!shell(SHELL_SET_NEW_NICKNAME).activateShell("Set new nickname")) {
-            shell(SHELL_SET_NEW_NICKNAME).waitUntilShellActive(
-                "Set new nickname");
+        if (!bot().shell(SHELL_SET_NEW_NICKNAME).activate()) {
+            bot().shell(SHELL_SET_NEW_NICKNAME).waitUntilActive();
         }
         bot.text(buddyNickName).setText(newBuddyName);
         bot.button(OK).click();
@@ -156,9 +152,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
 
-        SWTBotTreeItem item = view(VIEW_SAROS_BUDDIES)
-            .bot()
-            .tree()
+        SWTBotTreeItem item = bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
             .getSwtBotTreeItem();
 
@@ -181,8 +175,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             Map<String, String> labelsAndTexts = new HashMap<String, String>();
             labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
 
-            shell(SHELL_NEW_BUDDY).confirmShellWithTextFieldAndWait(
-                SHELL_NEW_BUDDY, labelsAndTexts, FINISH);
+            bot().shell(SHELL_NEW_BUDDY).confirmWithTextFieldAndWait(
+                labelsAndTexts, FINISH);
         }
     }
 
@@ -369,7 +363,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
+        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_BUDDIES, tooltipText);
     }
 
@@ -390,19 +384,18 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        view(VIEW_SAROS_BUDDIES).openById();
-        view(VIEW_SAROS_BUDDIES).setViewTitle(VIEW_SAROS_BUDDIES);
-        view(VIEW_SAROS_BUDDIES).setFocus();
+        bot().openById(VIEW_SAROS_BUDDIES_ID);
+        bot().view(VIEW_SAROS_BUDDIES).setFocus();
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonOnViewEnabled(VIEW_SAROS_BUDDIES,
-            tooltip);
+        return stfToolbarButton.isToolbarButtonOnViewEnabled(
+            VIEW_SAROS_BUDDIES, tooltip);
     }
 
     protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return toolbarButtonW.getAllToolbarButtonsOnView(VIEW_SAROS_BUDDIES);
+        return stfToolbarButton.getAllToolbarButtonsOnView(VIEW_SAROS_BUDDIES);
     }
 
     @SuppressWarnings("static-access")

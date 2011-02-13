@@ -1,16 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface View extends EclipseComponent {
+public interface STFView extends EclipseComponent {
 
     /**
      * Waits until the {@link SarosSWTBotPreferences#SAROS_TIMEOUT} is reached
@@ -20,22 +17,6 @@ public interface View extends EclipseComponent {
      *            name of the view, which should be active. //
      */
     public void waitUntilIsActive() throws RemoteException;
-
-    /**
-     * open the given view specified with the viewId.
-     * 
-     * @param viewId
-     *            the id of the view, which you want to open.
-     */
-    public void openById() throws RemoteException;
-
-    /**
-     * @param title
-     *            the title on the view tab.
-     * @return <tt>true</tt> if the specified view is open.
-     * @see ViewPart#getTitlesOfOpenedViews()
-     */
-    public boolean isOpen() throws RemoteException;
 
     /**
      * Set focus on the specified view. It should be only called if View is
@@ -70,14 +51,8 @@ public interface View extends EclipseComponent {
      */
     public void closeById(final String viewId) throws RemoteException;
 
-    /**
-     * @return the title list of all the views which are opened currently.
-     * @see SWTWorkbenchBot#views()
-     */
-    public List<String> getTitlesOfOpenedViews() throws RemoteException;
-
     public void setViewTitle(String title) throws RemoteException;
 
-    public Bot bot() throws RemoteException;
+    public STFBot bot_() throws RemoteException;
 
 }

@@ -11,8 +11,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
-public class TreeItemImp extends EclipseComponentImp implements TreeItem {
-    private static transient TreeItemImp self;
+public class STFTreeItemImp extends EclipseComponentImp implements STFTreeItem {
+    private static transient STFTreeItemImp self;
 
     private SWTBotTreeItem swtBotTreeItem;
 
@@ -23,12 +23,12 @@ public class TreeItemImp extends EclipseComponentImp implements TreeItem {
     private SWTBotTree swtBotTree;
 
     /**
-     * {@link TableImp} is a singleton, but inheritance is possible.
+     * {@link STFTableImp} is a singleton, but inheritance is possible.
      */
-    public static TreeItemImp getInstance() {
+    public static STFTreeItemImp getInstance() {
         if (self != null)
             return self;
-        self = new TreeItemImp();
+        self = new STFTreeItemImp();
         return self;
     }
 
@@ -40,14 +40,14 @@ public class TreeItemImp extends EclipseComponentImp implements TreeItem {
         this.swtBotTree = tree;
     }
 
-    public Menu contextMenu(String text) throws RemoteException {
-        MenuImp menu = MenuImp.getInstance();
+    public STFMenu contextMenu(String text) throws RemoteException {
+        STFMenuImp menu = STFMenuImp.getInstance();
         menu.setWidget(swtBotTreeItem.contextMenu(text));
         return menu;
     }
 
-    public Menu contextMenu(String... texts) throws RemoteException {
-        MenuImp menu = MenuImp.getInstance();
+    public STFMenu contextMenu(String... texts) throws RemoteException {
+        STFMenuImp menu = STFMenuImp.getInstance();
         menu.setWidget(ContextMenuHelper.getContextMenu(swtBotTree, texts));
         return menu;
     }

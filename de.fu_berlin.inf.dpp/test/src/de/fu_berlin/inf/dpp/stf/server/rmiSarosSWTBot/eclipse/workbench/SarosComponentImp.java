@@ -6,6 +6,7 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 
 public class SarosComponentImp extends EclipseComponentImp implements
     SarosComponent {
@@ -22,19 +23,19 @@ public class SarosComponentImp extends EclipseComponentImp implements
      **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateShellAndWait(
-            SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
-        textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
-        textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
-        textW.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
-        buttonW.clickButton(FINISH);
+        Shell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+
+        shell.activateAndWait();
+        stfText.setTextInTextWithLabel(jid.getDomain(),
+            LABEL_XMPP_JABBER_SERVER);
+        stfText.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
+        stfText.setTextInTextWithLabel(password, LABEL_PASSWORD);
+        stfText.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
+        shell.bot_().button(FINISH).click();
         try {
-            shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).waitShortUntilIsShellClosed(
-                SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            shell.waitShortUntilIsShellClosed();
         } catch (TimeoutException e) {
-            String errorMessage = shell(SHELL_CREATE_NEW_XMPP_ACCOUNT)
-                .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            String errorMessage = shell.getErrorMessageInShell();
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
                 throw new RuntimeException(
@@ -48,20 +49,21 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        shell(SHELL_SAROS_CONFIGURATION).activateShellAndWait(
-            SHELL_SAROS_CONFIGURATION);
-        textW.setTextInTextWithLabel(jid.getDomain(), LABEL_XMPP_JABBER_SERVER);
-        textW.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
-        textW.setTextInTextWithLabel(password, LABEL_PASSWORD);
-        buttonW.clickButton(NEXT);
-        buttonW.clickButton(FINISH);
+        Shell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
+        shell.activateAndWait();
+        stfText.setTextInTextWithLabel(jid.getDomain(),
+            LABEL_XMPP_JABBER_SERVER);
+        stfText.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
+        stfText.setTextInTextWithLabel(password, LABEL_PASSWORD);
+        shell.bot_().button(NEXT).click();
+        shell.bot_().button(FINISH).click();
     }
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        shell(SHELL_INVITATION).activateShell(SHELL_INVITATION);
-        shell(SHELL_INVITATION).confirmWindowWithCheckBoxs(SHELL_INVITATION,
-            FINISH, baseJIDOfinvitees);
+        bot().waitUntilShellOpen(SHELL_INVITATION);
+        bot().shell(SHELL_INVITATION).activate();
+        bot().shell(SHELL_INVITATION).confirmWindowWithCheckBoxs(FINISH,
+            baseJIDOfinvitees);
     }
-
 }

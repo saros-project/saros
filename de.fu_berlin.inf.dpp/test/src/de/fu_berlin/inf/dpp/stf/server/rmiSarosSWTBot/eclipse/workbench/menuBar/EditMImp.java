@@ -12,8 +12,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
 public class EditMImp extends EclipseComponentImp implements EditM {
@@ -44,46 +45,46 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteAllProjects(String viewTitle) throws RemoteException {
         precondition();
-        Tree tree = view(VIEW_PACKAGE_EXPLORER).bot().tree();
+        STFTree tree = bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree();
         List<String> allTreeItems = tree.getSubtems();
 
         if (allTreeItems != null) {
             for (String item : allTreeItems) {
                 tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
-                shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(
-                    SHELL_DELETE_RESOURCE, OK, true);
-                shell(SHELL_DELETE_RESOURCE).waitsUntilIsShellClosed(
-                    SHELL_DELETE_RESOURCE);
+                Shell shell = bot().shell(SHELL_DELETE_RESOURCE);
+
+                shell.confirmWindowWithCheckBox(OK, true);
+                bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }
 
     public void deleteProject() throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(
-            SHELL_DELETE_RESOURCE, OK, true);
-        shell(SHELL_DELETE_RESOURCE).waitsUntilIsShellClosed(
-            SHELL_DELETE_RESOURCE);
+        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+        bot().shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(OK, true);
+        bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException {
 
-        TreeItem treeItem = view(viewTitle).bot().tree()
+        STFTreeItem treeItem = bot().view(viewTitle).bot_().tree()
             .selectTreeItem(projectName, SRC);
         for (String item : treeItem.getSubItems()) {
-            view(viewTitle).bot().tree().selectTreeItem(projectName, SRC, item)
-                .contextMenu(CM_DELETE).click();
+            bot().view(viewTitle).bot_().tree()
+                .selectTreeItem(projectName, SRC, item).contextMenu(CM_DELETE)
+                .click();
 
-            shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, OK);
+            bot().shell(CONFIRM_DELETE).confirmShellAndWait(OK);
         }
     }
 
     public void deleteFile() throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        shell(CONFIRM_DELETE).confirmShellAndWait(CONFIRM_DELETE, OK);
+        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+        bot().shell(CONFIRM_DELETE).confirmShellAndWait(OK);
+        bot.sleep(300);
     }
 
     public void copyProject(String target) throws RemoteException {
@@ -92,12 +93,13 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 + " , the target already exists.");
         }
         precondition();
-        menuW.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
-        menuW.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
-        shell(SHELL_COPY_PROJECT).activateShell("Copy Project");
-        textW.setTextInTextWithLabel(target, "Project name:");
-        buttonW.clickButton(OK);
-        shell(SHELL_COPY_PROJECT).waitsUntilIsShellClosed("Copy Project");
+        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
+        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
+        Shell shell = bot().shell(SHELL_COPY_PROJECT);
+        shell.activate();
+        stfText.setTextInTextWithLabel(target, "Project name:");
+        shell.bot_().button(OK).click();
+        bot().waitsUntilIsShellClosed(SHELL_COPY_PROJECT);
         bot.sleep(1000);
     }
 

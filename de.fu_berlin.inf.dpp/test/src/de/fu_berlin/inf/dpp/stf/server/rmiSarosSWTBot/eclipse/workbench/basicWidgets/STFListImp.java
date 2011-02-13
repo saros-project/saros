@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class ListWImp extends EclipseComponentImp implements ListW {
+public class STFListImp extends EclipseComponentImp implements STFList {
 
-    private static transient ListWImp listImp;
+    private static transient STFListImp listImp;
 
     /**
-     * {@link ListWImp} is a singleton, but inheritance is possible.
+     * {@link STFListImp} is a singleton, but inheritance is possible.
      */
-    public static ListWImp getInstance() {
+    public static STFListImp getInstance() {
         if (listImp != null)
             return listImp;
-        listImp = new ListWImp();
+        listImp = new STFListImp();
         return listImp;
     }
 

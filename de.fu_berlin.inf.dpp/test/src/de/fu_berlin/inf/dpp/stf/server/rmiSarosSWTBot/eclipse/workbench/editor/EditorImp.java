@@ -87,7 +87,8 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         if (isEditorOpen(fileName)) {
             activateEditor(fileName);
             getEditor(fileName).close();
-            if (shell(SHELL_SAVE_RESOURCE).isShellActive("Save Resource"))
+            if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
+                && bot().shell(SHELL_SAVE_RESOURCE).isActive())
                 confirmShellSaveSource(YES);
         }
     }
@@ -119,11 +120,9 @@ public class EditorImp extends EclipseComponentImp implements Editor {
 
     public void confirmShellSaveSource(String buttonType)
         throws RemoteException {
-        shell(SHELL_SAVE_ALL_FILES_NOW).waitUntilShellOpen(
-            SHELL_SAVE_ALL_FILES_NOW);
-        shell(SHELL_SAVE_ALL_FILES_NOW).activateShell(SHELL_SAVE_ALL_FILES_NOW);
-        shell(SHELL_SAVE_ALL_FILES_NOW).confirmShell(SHELL_SAVE_ALL_FILES_NOW,
-            buttonType);
+        bot().waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
+        bot().shell(SHELL_SAVE_ALL_FILES_NOW).activate();
+        bot().shell(SHELL_SAVE_ALL_FILES_NOW).confirm(buttonType);
     }
 
     public void setTextInEditorWithSave(String contentPath, String... fileNodes)
@@ -349,7 +348,7 @@ public class EditorImp extends EclipseComponentImp implements Editor {
         String className) throws RemoteException {
         precondition(getClassNodes(projectName, packageName, className));
         selectLine(className + SUFFIX_JAVA, line);
-        menuW.clickMenuWithTexts("Run", "Toggle Breakpoint");
+        stfMenu.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
     /**********************************************

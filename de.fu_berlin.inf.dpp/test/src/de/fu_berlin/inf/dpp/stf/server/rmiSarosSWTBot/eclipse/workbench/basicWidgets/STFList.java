@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface ListW extends EclipseComponent {
+public interface STFList extends EclipseComponent {
 
     public String[] getListItemsInGroup(String inGroup) throws RemoteException;
 

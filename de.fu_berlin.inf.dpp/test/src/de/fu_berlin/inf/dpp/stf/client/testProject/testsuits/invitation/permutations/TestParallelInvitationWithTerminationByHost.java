@@ -73,23 +73,23 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice.sarosC.shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1,
             bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid());
 
-        bob.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        bob.shell.activateShell(SHELL_SESSION_INVITATION);
+        bob.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        bob.bot().shell(SHELL_SESSION_INVITATION).activate();
         alice.progressV.removeProcess(0);
-        bob.shell.waitUntilShellOpen(SHELL_INVITATION_CANCELLED);
-        bob.shell.activateShell(SHELL_INVITATION_CANCELLED);
+        bob.bot().waitUntilShellOpen(SHELL_INVITATION_CANCELLED);
+        bob.bot().shell(SHELL_INVITATION_CANCELLED).activate();
         bob.sarosC.closeShellInvitationCancelled();
 
-        carl.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        carl.shell.activateShell(SHELL_SESSION_INVITATION);
+        carl.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        carl.bot().shell(SHELL_SESSION_INVITATION).activate();
         carl.sarosC.confirmShellSessionnInvitation();
         alice.progressV.removeProcess(0);
         carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
         assertTrue(carl.sarosC.isShellInvitationCancelledActive());
         carl.sarosC.closeShellInvitationCancelled();
 
-        dave.shell.waitUntilShellOpen(SHELL_SESSION_INVITATION);
-        dave.shell.activateShell(SHELL_SESSION_INVITATION);
+        dave.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        dave.bot().shell(SHELL_SESSION_INVITATION).activate();
         dave.sarosC.confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);

@@ -77,6 +77,7 @@ public class TestMenuRefactor extends STFTest {
         alice.fileM.newPackage(PROJECT1, PKG1);
         alice.pEV.selectPkg(PROJECT1, PKG1);
         alice.refactorM.renamePkg(PKG2);
+        alice.workbench.sleep(500);
         assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
         assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG2));
     }

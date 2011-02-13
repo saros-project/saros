@@ -55,14 +55,14 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         }
         bot.button(APPLY).click();
         bot.button(OK).click();
-        shell(SHELL_PREFERNCES).waitsUntilIsShellClosed(SHELL_PREFERNCES);
+        bot().waitsUntilIsShellClosed(SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            menuW.clickMenuWithTexts("Eclipse", "Preferences...");
+            stfMenu.clickMenuWithTexts("Eclipse", "Preferences...");
         else
-            menuW.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
+            stfMenu.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
     }
 
     public void showViewProblems() throws RemoteException {
@@ -78,9 +78,9 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
         workbench.activateWorkbench();
-        menuW.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
-        shell(SHELL_SHOW_VIEW).confirmShellWithTreeWithFilterText(
-            MENU_SHOW_VIEW, parentNode, node, OK);
+        stfMenu.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        bot().shell(SHELL_SHOW_VIEW).confirmShellWithTreeWithFilterText(
+            parentNode, node, OK);
     }
 
     public void openPerspective() throws RemoteException {
@@ -124,17 +124,17 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
+            bot().shell(SHELL_PREFERNCES).closeShell();
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
+            bot().shell(SHELL_PREFERNCES).closeShell();
             return itemName;
         }
-        shell(SHELL_PREFERNCES).closeShell(SHELL_PREFERNCES);
+        bot().shell(SHELL_PREFERNCES).closeShell();
         return "";
     }
 

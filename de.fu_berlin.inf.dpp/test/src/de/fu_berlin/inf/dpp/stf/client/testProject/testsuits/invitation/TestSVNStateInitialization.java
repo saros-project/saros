@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.ConfigTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 /**
@@ -69,13 +68,13 @@ public class TestSVNStateInitialization extends STFTest {
     @AfterClass
     public static void resetSaros() throws RemoteException {
         resetSaros(bob);
-        if (ConfigTester.DEVELOPMODE) {
-            if (alice.sarosSessionV.isInSession())
-                alice.sarosSessionV.leaveTheSessionByHost();
-            // don't delete SVN_PROJECT_COPY
-        } else {
-            resetSaros(alice);
-        }
+        // if (ConfigTester.DEVELOPMODE) {
+        // if (alice.sarosSessionV.isInSession())
+        // alice.sarosSessionV.leaveTheSessionByHost();
+        // // don't delete SVN_PROJECT_COPY
+        // } else {
+        resetSaros(alice);
+        // }
     }
 
     /**

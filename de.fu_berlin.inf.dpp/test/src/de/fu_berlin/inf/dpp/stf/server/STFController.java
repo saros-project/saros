@@ -20,18 +20,19 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.BotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.LabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListWImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.MenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItemImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFLabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFListImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeItemImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamCImp;
@@ -77,6 +78,7 @@ public class STFController {
         DataTransferManager dataTransferManager, EditorManager editorManager,
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
+
         EclipseComponentImp.saros = saros;
         EclipseComponentImp.sessionManager = sessionManager;
         EclipseComponentImp.dataTransferManager = dataTransferManager;
@@ -89,18 +91,19 @@ public class STFController {
             registry = LocateRegistry.getRegistry(port);
         }
 
-        exportObject(BotImp.getInstance(), "bot");
-        exportObject(ShellImp.getInstance(), "shell");
-        exportObject(TableImp.getInstance(), "table");
-        exportObject(TreeImp.getInstance(), "tree");
-        exportObject(TreeItemImp.getInstance(), "treeItem");
-        exportObject(ButtonImp.getInstance(), "button");
-        exportObject(ToolbarButtonImp.getInstance(), "toolbarButton");
-        exportObject(ViewImp.getInstance(), "view");
-        exportObject(MenuImp.getInstance(), "menu");
-        exportObject(LabelImp.getInstance(), "label");
-        exportObject(TextImp.getInstance(), "text");
-        exportObject(ListWImp.getInstance(), "list");
+        exportObject(STFBotImp.getInstance(), "stfBot");
+        exportObject(STFWorkbenchBotImp.getInstance(), "bot");
+        exportObject(STFShellImp.getInstance(), "shell");
+        exportObject(STFTableImp.getInstance(), "table");
+        exportObject(STFTreeImp.getInstance(), "tree");
+        exportObject(STFTreeItemImp.getInstance(), "treeItem");
+        exportObject(STFButtonImp.getInstance(), "button");
+        exportObject(STFToolbarButtonImp.getInstance(), "toolbarButton");
+        exportObject(STFViewImp.getInstance(), "view");
+        exportObject(STFMenuImp.getInstance(), "menu");
+        exportObject(STFLabelImp.getInstance(), "label");
+        exportObject(STFTextImp.getInstance(), "text");
+        exportObject(STFListImp.getInstance(), "list");
         exportObject(PEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
         exportObject(EditorImp.getInstance(), "eclipseEditor");

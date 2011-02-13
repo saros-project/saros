@@ -7,7 +7,7 @@ import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface Table extends EclipseComponent {
+public interface STFTable extends EclipseComponent {
 
     /**********************************************
      * 
@@ -244,7 +244,7 @@ public interface Table extends EclipseComponent {
      *            name of the table item, which you want to check,if it exists.
      * @throws RemoteException
      */
-    public void waitUntilTableItemExisted(Table basic, String itemText)
+    public void waitUntilTableItemExisted(STFTable basic, String itemText)
         throws RemoteException;
 
     /**
@@ -266,6 +266,6 @@ public interface Table extends EclipseComponent {
      *            the name on the context menu.
      * @throws RemoteException
      */
-    public void waitUntilIsContextMenuOfTableItemEnabled(Table basic,
+    public void waitUntilIsContextMenuOfTableItemEnabled(STFTable basic,
         String itemText, String contextName) throws RemoteException;
 }

@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 
 public class TestSarosPreferences extends STFTest {
 
@@ -52,7 +53,7 @@ public class TestSarosPreferences extends STFTest {
     @Test
     public void createAccountWhichAlreadyExisted() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        alice.shell.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateAndWait();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put(LABEL_XMPP_JABBER_SERVER, SERVER);
@@ -60,42 +61,42 @@ public class TestSarosPreferences extends STFTest {
         labelsAndTexts.put(LABEL_PASSWORD, PASSWORD);
         labelsAndTexts.put(LABEL_REPEAT_PASSWORD, PASSWORD);
 
-        alice.shell.confirmShellWithTextFieldAndWait(
-            SHELL_CREATE_NEW_XMPP_ACCOUNT, labelsAndTexts, FINISH);
-
+        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell_alice.confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
         // wait a minute,so that bot can get the error message.
-        alice.button.waitUntilButtonEnabled(FINISH);
-        assertTrue(alice.shell.isShellActive(SHELL_CREATE_NEW_XMPP_ACCOUNT));
-        String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell_alice.bot_().button(FINISH).waitUntilIsEnabled();
+        assertTrue(shell_alice.isActive());
+        String errorMessage = shell_alice.getErrorMessageInShell();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS
             + STRING_REGEX_WITH_LINE_BREAK));
-        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
+        shell_alice.confirm(CANCEL);
+        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test
     public void createAccountWithDismatchedPassword() throws RemoteException {
+
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        alice.shell.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell_alice.activateAndWait();
 
         alice.text.setTextInTextWithLabel(SERVER, LABEL_XMPP_JABBER_SERVER);
         alice.text.setTextInTextWithLabel(NEW_USER_NAME, LABEL_USER_NAME);
         alice.text.setTextInTextWithLabel(PASSWORD, LABEL_PASSWORD);
         alice.text.setTextInTextWithLabel(NO_MATCHED_REPEAT_PASSWORD,
             LABEL_REPEAT_PASSWORD);
-        assertFalse(alice.button.isButtonEnabled(FINISH));
-        String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        assertFalse(shell_alice.bot_().button(FINISH).isEnabled());
+        String errorMessage = shell_alice.getErrorMessageInShell();
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
-        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
+        shell_alice.confirm(CANCEL);
+        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        alice.shell.activateShellAndWait(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        Shell shell_alice = alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell_alice.activateAndWait();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put(LABEL_XMPP_JABBER_SERVER, INVALID_SERVER_NAME);
@@ -103,15 +104,13 @@ public class TestSarosPreferences extends STFTest {
         labelsAndTexts.put(LABEL_PASSWORD, PASSWORD);
         labelsAndTexts.put(LABEL_REPEAT_PASSWORD, PASSWORD);
 
-        alice.shell.confirmShellWithTextFieldAndWait(
-            SHELL_CREATE_NEW_XMPP_ACCOUNT, labelsAndTexts, FINISH);
+        shell_alice.confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
 
-        alice.button.waitUntilButtonEnabled(FINISH);
-        String errorMessage = alice.shell
-            .getErrorMessageInShell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell_alice.bot_().button(FINISH).waitUntilIsEnabled();
+        String errorMessage = shell_alice.getErrorMessageInShell();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
-        alice.shell.confirmShell(SHELL_CREATE_NEW_XMPP_ACCOUNT, CANCEL);
-        assertFalse(alice.shell.isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
+        shell_alice.confirm(CANCEL);
+        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
     }
 
     @Test

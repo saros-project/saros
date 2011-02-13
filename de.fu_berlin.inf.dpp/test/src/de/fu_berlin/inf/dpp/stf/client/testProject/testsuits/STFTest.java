@@ -225,7 +225,8 @@ public class STFTest extends STF {
         for (Tester tester : activeTesters) {
             tester.workbench.activateWorkbench();
             tester.workbench.setUpWorkbench();
-            tester.commonWidgets().view("Welcome").close();
+            if (tester.bot.isViewOpen("Welcome"))
+                tester.bot().view("Welcome").close();
             tester.windowM.openPerspective();
             tester.workbench.closeUnnecessaryViews();
         }
@@ -252,10 +253,17 @@ public class STFTest extends STF {
     }
 
     public static void openSarosViews(Tester tester) throws RemoteException {
-        tester.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
-        tester.commonWidgets().view(VIEW_SAROS_SESSION).openById();
-        tester.commonWidgets().view(VIEW_SAROS_CHAT).openById();
-        tester.commonWidgets().view(VIEW_REMOTE_SCREEN).openById();
+        if (!tester.bot().isViewOpen(VIEW_SAROS_BUDDIES)) {
+            tester.windowM.showViewWithName(NODE_SAROS, VIEW_SAROS_BUDDIES);
+        }
+        if (!tester.bot().isViewOpen(VIEW_SAROS_SESSION))
+            tester.windowM.showViewWithName(NODE_SAROS, VIEW_SAROS_SESSION);
+
+        if (!tester.bot().isViewOpen(VIEW_REMOTE_SCREEN))
+            tester.windowM.showViewWithName(NODE_SAROS, VIEW_REMOTE_SCREEN);
+
+        if (!tester.bot().isViewOpen(VIEW_SAROS_CHAT))
+            tester.windowM.showViewWithName(NODE_SAROS, VIEW_SAROS_CHAT);
     }
 
     /**
@@ -630,10 +638,10 @@ public class STFTest extends STF {
         for (Tester peer : peers) {
             if (!host.sarosBuddiesV.hasBuddyNoGUI(peer.jid)) {
                 host.sarosBuddiesV.addANewBuddy(peer.jid);
-                peer.shell.confirmShellAndWait(
-                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
-                host.shell.confirmShellAndWait(
-                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED, OK);
+                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
+                    .confirmShellAndWait(OK);
+                host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
+                    .confirmShellAndWait(OK);
             }
         }
     }
@@ -670,8 +678,8 @@ public class STFTest extends STF {
     public static void shareYourScreen(Tester buddy, Tester selectedBuddy)
         throws RemoteException {
         buddy.sarosSessionV.shareYourScreenWithSelectedBuddy(selectedBuddy.jid);
-        selectedBuddy.shell.confirmShellAndWait(
-            SHELL_INCOMING_SCREENSHARING_SESSION, YES);
+        selectedBuddy.bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
+            .confirmShellAndWait(YES);
     }
 
     /**

@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.program.Program;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 
 public class OpenCImp extends EclipseComponentImp implements OpenC {
 
@@ -40,7 +41,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openFile(String viewTitle, String... fileNodes)
         throws RemoteException {
         precondition(viewTitle);
-        view(viewTitle).bot().tree()
+        bot().view(viewTitle).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(fileNodes))
             .contextMenu(CM_OPEN).click();
 
@@ -65,14 +66,14 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         String... fileNodes) throws RemoteException {
         precondition(viewTitle);
 
-        view(viewTitle).bot().tree().selectTreeItem(fileNodes)
+        bot().view(viewTitle).bot_().tree().selectTreeItem(fileNodes)
             .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
 
-        shell(SHELL_EDITOR_SELECTION).waitUntilShellActive(
-            SHELL_EDITOR_SELECTION);
-        tableW.selectTableItem(whichEditor);
-        buttonW.waitUntilButtonEnabled(OK);
-        shell(SHELL_EDITOR_SELECTION).confirmShell(SHELL_EDITOR_SELECTION, OK);
+        Shell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
+        shell_bob.waitUntilActive();
+        stfTable.selectTableItem(whichEditor);
+        shell_bob.bot_().button(OK).waitUntilIsEnabled();
+        shell_bob.confirm(OK);
     }
 
     /**************************************************************
@@ -96,7 +97,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     protected void precondition(String viewTitle) throws RemoteException {
 
-        view(viewTitle).openById();
-        view(viewTitle).setFocus();
+        bot().openById(viewTitlesAndIDs.get(viewTitle));
+        bot().view(viewTitle).setFocus();
     }
 }

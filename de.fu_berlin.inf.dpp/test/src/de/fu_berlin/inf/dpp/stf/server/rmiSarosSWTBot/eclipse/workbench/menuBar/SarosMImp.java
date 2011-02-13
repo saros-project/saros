@@ -32,7 +32,7 @@ public class SarosMImp extends SarosPreferencesImp implements SarosM {
 
     public void creatAccount(JID jid, String password) throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        stfMenu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         confirmShellCreateNewXMPPAccount(jid, password);
     }
 

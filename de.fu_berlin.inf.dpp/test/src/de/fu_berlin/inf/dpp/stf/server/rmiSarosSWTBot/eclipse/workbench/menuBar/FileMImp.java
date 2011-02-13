@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 
 public class FileMImp extends EclipseComponentImp implements FileM {
 
@@ -34,7 +35,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     public void newProject(String projectName) throws RemoteException {
         if (!existsProjectNoGUI(projectName)) {
             precondition();
-            menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_PROJECT);
+            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_PROJECT);
             confirmWizardNewProject(projectName);
         }
     }
@@ -42,7 +43,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProjectNoGUI(projectName)) {
             precondition();
-            menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_JAVA_PROJECT);
+            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_JAVA_PROJECT);
             confirmShellNewJavaProject(projectName);
         }
     }
@@ -51,7 +52,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         precondition();
         if (!existsFolderNoGUI(folderNodes)) {
             try {
-                menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FOLDER);
+                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FOLDER);
                 confirmShellNewFolder(folderNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -67,7 +68,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             if (!existsPkgNoGUI(projectName, pkg))
                 try {
                     precondition();
-                    menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_PACKAGE);
+                    stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW,
+                        MENU_PACKAGE);
                     confirmShellNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
                     final String cause = "error creating new package";
@@ -84,7 +86,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         if (!existsFileNoGUI(getPath(fileNodes)))
             try {
                 precondition();
-                menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FILE);
+                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FILE);
                 confirmShellNewFile(fileNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -98,7 +100,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
             try {
                 precondition();
-                menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
+                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
                 confirmShellNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
@@ -112,24 +114,22 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         String className) throws RemoteException {
         if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
             precondition();
-            menuW.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
-            shell(SHELL_NEW_JAVA_CLASS).activateShell(SHELL_NEW_JAVA_CLASS);
+            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
+            bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             bot.textWithLabel(LABEL_SOURCE_FOLDER).setText(
                 projectName + "/" + SRC);
             bot.textWithLabel(LABEL_PACKAGE).setText(pkg);
             bot.textWithLabel(LABEL_NAME).setText(className);
             bot.button("Add...").click();
-            shell("Implemented Interfaces Selection").activateShellAndWait(
-                "Implemented Interfaces Selection");
+            bot().shell("Implemented Interfaces Selection").activateAndWait();
             bot.textWithLabel("Choose interfaces:").setText(
                 "java.lang.Runnable");
-            tableW.waitUntilTableHasRows(1);
+            stfTable.waitUntilTableHasRows(1);
             bot.button(OK).click();
-            bot.shell(SHELL_NEW_JAVA_CLASS).activate();
+            bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             bot.checkBox("Inherited abstract methods").click();
             bot.button(FINISH).click();
-            shell(SHELL_NEW_JAVA_CLASS).waitsUntilIsShellClosed(
-                SHELL_NEW_JAVA_CLASS);
+            bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_CLASS);
         }
     }
 
@@ -153,64 +153,64 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
         String className) throws RemoteException {
-        shell(SHELL_NEW_JAVA_CLASS).activateShell(SHELL_NEW_JAVA_CLASS);
+        bot().shell(SHELL_NEW_JAVA_CLASS).activate();
         bot.textWithLabel(LABEL_SOURCE_FOLDER).setText(projectName + "/" + SRC);
         bot.textWithLabel(LABEL_PACKAGE).setText(pkg);
         bot.textWithLabel(LABEL_NAME).setText(className);
         bot.button(FINISH).click();
-        shell(SHELL_NEW_JAVA_CLASS).waitsUntilIsShellClosed(
-            SHELL_NEW_JAVA_CLASS);
+        bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmWizardNewProject(String projectName)
         throws RemoteException {
-        shell(SHELL_NEW_PROJECT).confirmShellWithTree(SHELL_NEW_PROJECT, NEXT,
-            NODE_GENERAL, NODE_PROJECT);
+        bot().shell(SHELL_NEW_PROJECT).confirmShellWithTree(NEXT, NODE_GENERAL,
+            NODE_PROJECT);
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
-        buttonW.clickButton(FINISH);
-        shell(SHELL_NEW_PROJECT).waitsUntilIsShellClosed(SHELL_NEW_PROJECT);
-        bot.sleep(50);
+        bot.button(FINISH).click();
+        bot().waitsUntilIsShellClosed(SHELL_NEW_PROJECT);
+        // bot.sleep(50);
     }
 
     private void confirmShellNewFile(String... fileNodes)
         throws RemoteException {
-        shell(SHELL_NEW_FILE).activateShell(SHELL_NEW_FILE);
-        textW.setTextInTextWithLabel(getPath(getParentNodes(fileNodes)),
+        bot().shell(SHELL_NEW_FILE).activate();
+        stfText.setTextInTextWithLabel(getPath(getParentNodes(fileNodes)),
             LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
         bot.textWithLabel(LABEL_FILE_NAME).setText(getLastNode(fileNodes));
-        buttonW.waitUntilButtonEnabled(FINISH);
-        buttonW.clickButton(FINISH);
-        shell(SHELL_NEW_FILE).waitsUntilIsShellClosed(SHELL_NEW_FILE);
+        bot().shell(SHELL_NEW_FILE).bot_().button(FINISH).waitUntilIsEnabled();
+        bot.button(FINISH).click();
+        bot().waitsUntilIsShellClosed(SHELL_NEW_FILE);
     }
 
     private void confirmShellNewJavaPackage(String projectName, String pkg)
         throws RemoteException {
-        shell(SHELL_NEW_JAVA_PACKAGE).activateShell(SHELL_NEW_JAVA_PACKAGE);
+        bot().shell(SHELL_NEW_JAVA_PACKAGE).activate();
         bot.textWithLabel(LABEL_SOURCE_FOLDER).setText(
             (projectName + "/" + SRC));
         bot.textWithLabel(LABEL_NAME).setText(pkg);
-        buttonW.clickButton(FINISH);
-        shell(SHELL_NEW_JAVA_PACKAGE).waitsUntilIsShellClosed(
-            SHELL_NEW_JAVA_PACKAGE);
+        bot.button(FINISH).click();
+        if (bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT))
+            bot().waitsUntilIsShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
 
     private void confirmShellNewFolder(String... folderNodes)
         throws RemoteException {
-        shell(SHELL_NEW_FOLDER).activateShell(SHELL_NEW_FOLDER);
-        textW.setTextInTextWithLabel(getPath(getParentNodes(folderNodes)),
+        bot().shell(SHELL_NEW_FOLDER).activate();
+        stfText.setTextInTextWithLabel(getPath(getParentNodes(folderNodes)),
             LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
-        textW.setTextInTextWithLabel(getLastNode(folderNodes),
+        stfText.setTextInTextWithLabel(getLastNode(folderNodes),
             LABEL_FOLDER_NAME);
-        buttonW.clickButton(FINISH);
-        shell(SHELL_NEW_FOLDER).waitsUntilIsShellClosed(SHELL_NEW_FOLDER);
+        bot.button(FINISH).click();
+        bot().waitsUntilIsShellClosed(SHELL_NEW_FOLDER);
     }
 
     private void confirmShellNewJavaProject(String projectName)
         throws RemoteException {
-        shell(SHELL_NEW_JAVA_PROJECT).activateShell(SHELL_NEW_JAVA_PROJECT);
-        textW.setTextInTextWithLabel(projectName, LABEL_PROJECT_NAME);
-        buttonW.clickButton(FINISH);
-        shell(SHELL_NEW_JAVA_PROJECT).waitsUntilIsShellClosed(
-            SHELL_NEW_JAVA_PROJECT);
+        Shell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
+        shell.activate();
+        stfText.setTextInTextWithLabel(projectName, LABEL_PROJECT_NAME);
+        // bot.button(FINISH).click();
+        shell.bot_().button(FINISH).click();
+        bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_PROJECT);
     }
 }

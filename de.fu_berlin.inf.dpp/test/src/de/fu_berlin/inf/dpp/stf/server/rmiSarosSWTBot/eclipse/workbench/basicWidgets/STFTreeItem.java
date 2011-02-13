@@ -8,14 +8,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface TreeItem extends EclipseComponent {
+public interface STFTreeItem extends EclipseComponent {
     public void setSWTBotTreeItem(SWTBotTreeItem item) throws RemoteException;
 
     public void setSWTBotTree(SWTBotTree tree) throws RemoteException;
 
-    public Menu contextMenu(String text) throws RemoteException;
+    public STFMenu contextMenu(String text) throws RemoteException;
 
-    public Menu contextMenu(String... texts) throws RemoteException;
+    public STFMenu contextMenu(String... texts) throws RemoteException;
 
     public List<String> getSubItems() throws RemoteException;
 

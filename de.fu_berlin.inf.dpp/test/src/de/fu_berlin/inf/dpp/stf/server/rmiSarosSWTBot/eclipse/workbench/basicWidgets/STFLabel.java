@@ -6,14 +6,14 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface Label extends EclipseComponent {
+public interface STFLabel extends EclipseComponent {
 
     /**
      * 
      * @return the text of the first found {@link SWTBotLabel}
      * @throws RemoteException
      */
-    public String getTextOfLabel() throws RemoteException;
+    public String getText() throws RemoteException;
 
     public String getTextOfLabelInGroup(String inGroup) throws RemoteException;
 

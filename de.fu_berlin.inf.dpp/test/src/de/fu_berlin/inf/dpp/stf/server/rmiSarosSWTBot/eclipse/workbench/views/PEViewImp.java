@@ -3,14 +3,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTableImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private static transient PEViewImp pEViewImp;
 
     /**
-     * {@link TableImp} is a singleton, but inheritance is possible.
+     * {@link STFTableImp} is a singleton, but inheritance is possible.
      */
     public static PEViewImp getInstance() {
         if (pEViewImp != null)
@@ -32,14 +32,14 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **********************************************/
     public void selectProject(String projectName) throws RemoteException {
         precondition();
-        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
@@ -47,19 +47,19 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         precondition();
         String[] nodes = getClassNodes(projectName, pkg, className);
-        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
     public void selectFolder(String... folderNodes) throws RemoteException {
 
-        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(folderNodes));
     }
 
     public void selectFile(String... fileNodes) throws RemoteException {
 
-        view(VIEW_PACKAGE_EXPLORER).bot().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItemWithRegex(changeToRegex(fileNodes));
     }
 
@@ -70,8 +70,8 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        view(VIEW_PACKAGE_EXPLORER).openById();
-        view(VIEW_PACKAGE_EXPLORER).setFocus();
+        bot().openById(VIEW_PACKAGE_EXPLORER_ID);
+        bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
     }
 
 }

@@ -13,17 +13,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
-public class TableImp extends EclipseComponentImp implements Table {
+public class STFTableImp extends EclipseComponentImp implements STFTable {
 
-    private static transient TableImp tableImp;
+    private static transient STFTableImp tableImp;
 
     /**
-     * {@link TableImp} is a singleton, but inheritance is possible.
+     * {@link STFTableImp} is a singleton, but inheritance is possible.
      */
-    public static TableImp getInstance() {
+    public static STFTableImp getInstance() {
         if (tableImp != null)
             return tableImp;
-        tableImp = new TableImp();
+        tableImp = new STFTableImp();
         return tableImp;
     }
 
@@ -148,7 +148,7 @@ public class TableImp extends EclipseComponentImp implements Table {
      * waits until
      * 
      **********************************************/
-    public void waitUntilTableItemExisted(Table basic, String itemText)
+    public void waitUntilTableItemExisted(STFTable basic, String itemText)
         throws RemoteException {
         waitUntil(SarosConditions.existTableItem(this, itemText));
     }
@@ -157,7 +157,7 @@ public class TableImp extends EclipseComponentImp implements Table {
         waitUntil(tableHasRows(bot.table(), row));
     }
 
-    public void waitUntilIsContextMenuOfTableItemEnabled(Table basic,
+    public void waitUntilIsContextMenuOfTableItemEnabled(STFTable basic,
         String itemText, String contextName) throws RemoteException {
         waitUntil(SarosConditions.ExistContextMenuOfTableItem(this, itemText,
             contextName));

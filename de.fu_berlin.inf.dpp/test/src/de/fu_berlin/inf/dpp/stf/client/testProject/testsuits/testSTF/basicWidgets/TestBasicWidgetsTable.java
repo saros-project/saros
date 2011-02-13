@@ -29,7 +29,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void existsTableItemInView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
             bob.getBaseJid()));
         assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
@@ -38,7 +38,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void selectTableItemInView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION, bob.getBaseJid());
         assertTrue(alice.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
@@ -50,7 +50,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
 
         alice.table.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             bob.getBaseJid(), CM_RESTRICT_TO_READ_ONLY_ACCESS);
@@ -60,7 +60,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
             CM_RESTRICT_TO_READ_ONLY_ACCESS));
@@ -70,7 +70,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
             VIEW_SAROS_SESSION, bob.getBaseJid(),
             CM_RESTRICT_TO_READ_ONLY_ACCESS));

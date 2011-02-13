@@ -58,7 +58,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String participantLabel = getParticipantLabel(participantJID);
-        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+        stfTable.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             participantLabel, CM_GRANT_WRITE_ACCESS);
         waitUntilHasWriteAccessBy(participantJID);
     }
@@ -76,7 +76,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(participantJID);
-        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+        stfTable.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             contactLabel, CM_RESTRICT_TO_READ_ONLY_ACCESS);
         waitUntilHasReadOnlyAccessBy(participantJID);
     }
@@ -103,7 +103,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getParticipantLabel(followedUserJID);
-        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+        stfTable.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             contactLabel, CM_STOP_FOLLOWING_THIS_BUDDY);
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
@@ -165,10 +165,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (shell(SHELL_ERROR_IN_SAROS_PLUGIN).isShellActive(
-            SHELL_ERROR_IN_SAROS_PLUGIN)) {
-            shell(SHELL_ERROR_IN_SAROS_PLUGIN).confirmShell(
-                SHELL_ERROR_IN_SAROS_PLUGIN, OK);
+        if (bot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).isActive()) {
+            bot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).confirm(OK);
         }
     }
 
@@ -187,30 +185,23 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shell(SHELL_CONFIRM_LEAVING_SESSION).activateShellAndWait(
-            SHELL_CONFIRM_LEAVING_SESSION);
-        shell(SHELL_CONFIRM_LEAVING_SESSION).confirmShell(
-            SHELL_CONFIRM_LEAVING_SESSION, YES);
+        bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activateAndWait();
+        bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
         waitUntilIsNotInSession();
     }
 
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        shell(SHELL_CONFIRM_CLOSING_SESSION).activateShellAndWait(
-            SHELL_CONFIRM_CLOSING_SESSION);
-        shell(SHELL_CONFIRM_CLOSING_SESSION).confirmShell(
-            SHELL_CONFIRM_CLOSING_SESSION, YES);
+        bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activateAndWait();
+        bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
         waitUntilIsNotInSession();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
-        shell(SHELL_CLOSING_THE_SESSION).activateShellAndWait(
-            SHELL_CLOSING_THE_SESSION);
-        shell(SHELL_CLOSING_THE_SESSION).confirmShell(
-            SHELL_CLOSING_THE_SESSION, OK);
-        shell(SHELL_CLOSING_THE_SESSION).waitsUntilIsShellClosed(
-            SHELL_CLOSING_THE_SESSION);
+        bot().shell(SHELL_CLOSING_THE_SESSION).activateAndWait();
+        bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
+        bot().waitsUntilIsShellClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     public void openInvitationInterface(String... jidOfInvitees)
@@ -223,8 +214,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        shell(SHELL_PROGRESS_INFORMATION).waitsUntilIsShellClosed(
-            SHELL_PROGRESS_INFORMATION);
+        bot().waitsUntilIsShellClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -241,7 +231,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public boolean existsParticipant(JID participantJID) throws RemoteException {
         precondition();
         String participantLabel = getParticipantLabel(participantJID);
-        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
+        SWTBotTable table = stfTable.getTableInView(VIEW_SAROS_SESSION);
         for (int i = 0; i < table.rowCount(); i++) {
             if (table.getTableItem(i).getText().equals(participantLabel))
                 return true;
@@ -251,7 +241,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public boolean existsLabelInSessionView() throws RemoteException {
         precondition();
-        return labelW.existsLabelInView(VIEW_SAROS_SESSION);
+        return stfLabel.existsLabelInView(VIEW_SAROS_SESSION);
     }
 
     public boolean hasWriteAccess() throws RemoteException {
@@ -263,7 +253,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         precondition();
         boolean result = true;
         for (JID jid : jids) {
-            result &= !tableW.isContextMenuOfTableItemEnabledInView(
+            result &= !stfTable.isContextMenuOfTableItemEnabledInView(
                 VIEW_SAROS_SESSION, getParticipantLabel(jid),
                 CM_GRANT_WRITE_ACCESS)
                 && !getParticipantLabel(jid).contains(PERMISSION_NAME);
@@ -280,7 +270,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         precondition();
         boolean result = true;
         for (JID jid : jids) {
-            result &= !tableW.isContextMenuOfTableItemEnabledInView(
+            result &= !stfTable.isContextMenuOfTableItemEnabledInView(
                 VIEW_SAROS_SESSION, getParticipantLabel(jid),
                 CM_RESTRICT_TO_READ_ONLY_ACCESS)
                 && getParticipantLabel(jid).contains(PERMISSION_NAME);
@@ -291,7 +281,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public boolean isHost() throws RemoteException {
         precondition();
         String ownLabelsInSessionView = getParticipantLabel(localJID);
-        String talbeItem = tableW.getTableInView(VIEW_SAROS_SESSION)
+        String talbeItem = stfTable.getTableInView(VIEW_SAROS_SESSION)
             .getTableItem(0).getText();
         if (ownLabelsInSessionView.equals(talbeItem))
             return true;
@@ -301,7 +291,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public boolean isHost(JID jidOfParticipant) throws RemoteException {
         precondition();
         String participantLabelsInSessionView = getParticipantLabel(jidOfParticipant);
-        String talbeItem = tableW.getTableInView(VIEW_SAROS_SESSION)
+        String talbeItem = stfTable.getTableInView(VIEW_SAROS_SESSION)
             .getTableItem(0).getText();
         if (participantLabelsInSessionView.equals(talbeItem))
             return true;
@@ -337,7 +327,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public boolean isFollowingBuddy(JID buddyJID) throws RemoteException {
         try {
-            return tableW.isContextMenuOfTableItemEnabledInView(
+            return stfTable.isContextMenuOfTableItemEnabledInView(
                 VIEW_SAROS_SESSION, getParticipantLabel(buddyJID),
                 CM_STOP_FOLLOWING_THIS_BUDDY);
         } catch (WidgetNotFoundException e) {
@@ -347,7 +337,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelInSessionView())
-            return view(VIEW_SAROS_SESSION).bot2().label().getText();
+            return bot().view(VIEW_SAROS_SESSION).bot_().label().getText();
         return null;
     }
 
@@ -379,7 +369,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         throws RemoteException {
         precondition();
         List<String> allParticipantsName = new ArrayList<String>();
-        SWTBotTable table = tableW.getTableInView(VIEW_SAROS_SESSION);
+        SWTBotTable table = stfTable.getTableInView(VIEW_SAROS_SESSION);
         for (int i = 0; i < table.rowCount(); i++) {
             allParticipantsName.add(table.getTableItem(i).getText());
         }
@@ -681,9 +671,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        view(VIEW_SAROS_SESSION).openById();
-        view(VIEW_SAROS_SESSION).setViewTitle(VIEW_SAROS_SESSION);
-        view(VIEW_SAROS_SESSION).setFocus();
+        bot().openById(VIEW_SAROS_SESSION_ID);
+        bot().view(VIEW_SAROS_SESSION).setFocus();
     }
 
     private void clickContextMenuOfSelectedBuddy(JID jidOfSelectedUser,
@@ -695,7 +684,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
         workbench.captureScreenshot(workbench.getPathToScreenShot()
             + "/serverside_vor_jump_to_position.png");
-        tableW.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
+        stfTable.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
             contactLabel, context);
 
     }
@@ -707,23 +696,23 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
-        tableW.getTableItemInView(VIEW_SAROS_SESSION, contactLabel);
+        stfTable.getTableItemInView(VIEW_SAROS_SESSION, contactLabel);
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return toolbarButtonW.isToolbarButtonOnViewEnabled(VIEW_SAROS_SESSION,
-            tooltip);
+        return stfToolbarButton.isToolbarButtonOnViewEnabled(
+            VIEW_SAROS_SESSION, tooltip);
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        toolbarButtonW.clickToolbarButtonWithRegexTooltipOnView(
+        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_SAROS_SESSION, tooltipText);
     }
 
     private List<SWTBotToolbarButton> getToolbarButtons() {
-        return toolbarButtonW.getAllToolbarButtonsOnView(VIEW_SAROS_SESSION);
+        return stfToolbarButton.getAllToolbarButtonsOnView(VIEW_SAROS_SESSION);
     }
 
     /**

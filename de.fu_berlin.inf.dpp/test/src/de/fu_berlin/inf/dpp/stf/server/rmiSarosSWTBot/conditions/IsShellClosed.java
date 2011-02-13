@@ -1,30 +1,23 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class IsShellClosed extends DefaultCondition {
 
-    private SWTWorkbenchBot bot;
-    private String title;
+    private SWTBotShell shell;
 
-    IsShellClosed(SWTWorkbenchBot bot, String title) {
-        this.title = title;
-        this.bot = bot;
+    IsShellClosed(SWTBotShell shell) {
+
+        this.shell = shell;
     }
 
     public String getFailureMessage() {
 
-        return "Shell \"" + title + "\" still open.";
+        return "Shell is still open.";
     }
 
     public boolean test() throws Exception {
-        final SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().equals(title))
-                return false;
-        }
-        return true;
+        return !shell.isOpen();
     }
 }

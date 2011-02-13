@@ -63,21 +63,26 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
-        shell(shellTitle).activateShell(shellTitle);
+        stfMenu.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
+        bot().shell(shellTitle).activate();
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
-        buttonW.waitUntilButtonEnabled(buttonName);
+        bot().shell(shellTitle).bot_().button(buttonName).waitUntilIsEnabled();
         bot.button(buttonName).click();
-        shell(shellTitle).waitsUntilIsShellClosed(shellTitle);
+        if (bot().isShellOpen("Rename Compilation Unit")) {
+            bot().shell("Rename Compilation Unit").bot_().button(buttonName)
+                .click();
+        }
+        if (bot().isShellOpen(shellTitle))
+            bot().waitsUntilIsShellClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         precondition();
-        menuW.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
-        shell(shellTitle).waitUntilShellActive(shellTitle);
-        shell(shellTitle).confirmShellWithTree(shellTitle, buttonName, nodes);
-        shell(shellTitle).waitsUntilIsShellClosed(shellTitle);
+        stfMenu.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
+        bot().shell(shellTitle).waitUntilActive();
+        bot().shell(shellTitle).confirmShellWithTree(buttonName, nodes);
+        bot().waitsUntilIsShellClosed(shellTitle);
     }
 
     private void precondition() throws RemoteException {

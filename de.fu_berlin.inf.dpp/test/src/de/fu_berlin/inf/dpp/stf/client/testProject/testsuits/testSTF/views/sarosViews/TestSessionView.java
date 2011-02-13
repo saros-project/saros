@@ -38,17 +38,17 @@ public class TestSessionView extends STFTest {
     @Test
     public void testSetFocusOnSessionView() throws RemoteException {
         log.trace("alice set focus on session view.");
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
-        assertTrue(alice.commonWidgets().view(VIEW_SAROS_SESSION).isActive());
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
+        assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice close session view.");
         alice.view.closeById(VIEW_SAROS_SESSION_ID);
-        assertFalse(alice.commonWidgets().view(VIEW_SAROS_SESSION).isActive());
+        assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice open session view again");
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).openById();
-        assertTrue(alice.commonWidgets().view(VIEW_SAROS_SESSION).isActive());
+        alice.bot().openById(VIEW_SAROS_SESSION_ID);
+        assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice focus on saros buddies view.");
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).setFocus();
-        assertFalse(alice.commonWidgets().view(VIEW_SAROS_SESSION).isActive());
+        alice.bot().view(VIEW_SAROS_BUDDIES).setFocus();
+        assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("testSetFocusOnSessionView is done.");
     }
 
@@ -158,7 +158,7 @@ public class TestSessionView extends STFTest {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         shareYourScreen(alice, bob);
         bob.rSV.waitUntilRemoteScreenViewIsActive();
-        assertTrue(bob.commonWidgets().view(VIEW_REMOTE_SCREEN).isActive());
+        assertTrue(bob.bot().view(VIEW_REMOTE_SCREEN).isActive());
         alice.sarosSessionV.stopSessionWithBuddy(bob.jid);
     }
 

@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.views.sarosViews.RosterView;
 
 public class TestRosterView extends STFTest {
@@ -45,25 +46,23 @@ public class TestRosterView extends STFTest {
     @Test
     public void openCloseRosterView() throws RemoteException {
         alice.view.closeById(VIEW_SAROS_BUDDIES_ID);
-        assertEquals(false, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
-            .isOpen());
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
-        assertEquals(true, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
-            .isOpen());
+        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
+        alice.bot().openById(VIEW_SAROS_BUDDIES_ID);
+        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
     }
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).setFocus();
-        assertTrue(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
-        alice.view.closeById(VIEW_SAROS_BUDDIES_ID);
-        assertFalse(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
+        STFView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
+        view_buddies.setFocus();
+        assertTrue(view_buddies.isActive());
+        view_buddies.close();
+        assertFalse(view_buddies.isActive());
 
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
-        assertTrue(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
-
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).setFocus();
-        assertFalse(alice.commonWidgets().view(VIEW_SAROS_BUDDIES).isActive());
+        alice.bot().openById(VIEW_SAROS_BUDDIES_ID);
+        assertTrue(view_buddies.isActive());
+        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
+        assertFalse(alice.bot().view(VIEW_SAROS_BUDDIES).isActive());
     }
 
     /**

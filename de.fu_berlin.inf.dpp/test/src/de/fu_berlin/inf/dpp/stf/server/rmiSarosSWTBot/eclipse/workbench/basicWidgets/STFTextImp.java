@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class TextImp extends EclipseComponentImp implements Text {
+public class STFTextImp extends EclipseComponentImp implements STFText {
 
-    private static transient TextImp textImp;
+    private static transient STFTextImp textImp;
 
     /**
-     * {@link TableImp} is a singleton, but inheritance is possible.
+     * {@link STFTableImp} is a singleton, but inheritance is possible.
      */
-    public static TextImp getInstance() {
+    public static STFTextImp getInstance() {
         if (textImp != null)
             return textImp;
-        textImp = new TextImp();
+        textImp = new STFTextImp();
         return textImp;
     }
 

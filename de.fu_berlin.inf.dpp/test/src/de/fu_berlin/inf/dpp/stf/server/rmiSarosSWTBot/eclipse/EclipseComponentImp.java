@@ -25,16 +25,20 @@ import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.WorkbenchImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.LabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListWImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.MenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ShellImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFLabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFListImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFStyledTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFWorkbenchBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamCImp;
@@ -57,18 +61,20 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         .getLogger(EclipseComponentImp.class);
 
     // simple widgets
-    public static TableImp tableW = TableImp.getInstance();
-    public static TreeImp treeW = TreeImp.getInstance();
-    public static ButtonImp buttonW = ButtonImp.getInstance();
-    public static ToolbarButtonImp toolbarButtonW = ToolbarButtonImp
+    public static STFTableImp stfTable = STFTableImp.getInstance();
+    public static STFTreeImp stfTree = STFTreeImp.getInstance();
+    public static STFButtonImp stfButton = STFButtonImp.getInstance();
+    public static STFToolbarButtonImp stfToolbarButton = STFToolbarButtonImp
         .getInstance();
-    // public static ViewImp viewW = ViewImp.getInstance();
-    public static MenuImp menuW = MenuImp.getInstance();
-    public static LabelImp labelW = LabelImp.getInstance();
-    public static TextImp textW = TextImp.getInstance();
-    // public static Shell shellW = ShellImp.getInstance();
-    public static EditorImp editorW = EditorImp.getInstance();
-    public static ListWImp listW = ListWImp.getInstance();
+    public static STFViewImp stfView = STFViewImp.getInstance();
+    public static STFMenuImp stfMenu = STFMenuImp.getInstance();
+    public static STFLabelImp stfLabel = STFLabelImp.getInstance();
+    public static STFStyledTextImp stfStyledText = STFStyledTextImp
+        .getInstance();
+    public static STFTextImp stfText = STFTextImp.getInstance();
+    public static Shell stfShell = STFShellImp.getInstance();
+    public static EditorImp stfEditor = EditorImp.getInstance();
+    public static STFListImp stfList = STFListImp.getInstance();
 
     // workbench
     public static WorkbenchImp workbench = WorkbenchImp.getInstance();
@@ -172,7 +178,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public boolean existsFile(String viewTitle, String... fileNodes)
         throws RemoteException {
 
-        return view(viewTitle).bot().tree()
+        return bot().view(viewTitle).bot_().tree()
             .selectTreeItem(getParentNodes(fileNodes))
             .existsSubItemWithRegex(getLastNode(fileNodes + ".*"));
     }
@@ -254,15 +260,8 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         return content;
     }
 
-    protected ViewImp view(String viewTitle) throws RemoteException {
-        ViewImp view = ViewImp.getInstance();
-        view.setViewTitle(viewTitle);
-        return view;
-    }
-
-    protected ShellImp shell(String shellTitle) throws RemoteException {
-        ShellImp shell = ShellImp.getInstance();
-        shell.setShellTitle(shellTitle);
-        return shell;
+    protected STFWorkbenchBot bot() {
+        STFWorkbenchBotImp stfBot = STFWorkbenchBotImp.getInstance();
+        return stfBot;
     }
 }

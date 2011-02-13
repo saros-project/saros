@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface ToolbarButton extends EclipseComponent {
+public interface STFToolbarButton extends EclipseComponent {
 
     public void clickToolbarButtonInView(String viewTitle)
         throws RemoteException;

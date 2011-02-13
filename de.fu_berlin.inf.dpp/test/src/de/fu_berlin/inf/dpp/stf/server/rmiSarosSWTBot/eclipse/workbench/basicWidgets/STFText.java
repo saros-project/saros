@@ -6,7 +6,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponent;
 
-public interface Text extends EclipseComponent {
+public interface STFText extends EclipseComponent {
 
     /**
      * set the given text into the {@link SWTBotText} with the specified

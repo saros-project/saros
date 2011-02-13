@@ -26,44 +26,37 @@ public class TestBasicSarosElements extends STFTest {
     @Test
     public void testSessionView() throws RemoteException {
         alice.view.closeById(VIEW_SAROS_SESSION_ID);
-        assertEquals(false, alice.commonWidgets().view(VIEW_SAROS_SESSION)
-            .isOpen());
-        alice.commonWidgets().view(VIEW_SAROS_SESSION).openById();
+        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_SESSION));
+        alice.bot().openById(VIEW_SAROS_SESSION_ID);
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/session_view.png"));
-        assertEquals(true, alice.commonWidgets().view(VIEW_SAROS_SESSION)
-            .isOpen());
+        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_SESSION));
     }
 
     @Test
     public void testRosterView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).close();
-        assertEquals(false, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
-            .isOpen());
-        alice.commonWidgets().view(VIEW_SAROS_BUDDIES).openById();
+        alice.bot().view(VIEW_SAROS_BUDDIES).close();
+        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
+        alice.bot().openById(VIEW_SAROS_BUDDIES_ID);
         alice.workbench.captureScreenshot((alice.workbench
             .getPathToScreenShot() + "/roster_view.png"));
-        assertEquals(true, alice.commonWidgets().view(VIEW_SAROS_BUDDIES)
-            .isOpen());
+        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
     }
 
     @Test
     public void testChatView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_SAROS_CHAT).close();
-        assertEquals(false, alice.commonWidgets().view(VIEW_SAROS_CHAT)
-            .isOpen());
-        alice.commonWidgets().view(VIEW_SAROS_CHAT).openById();
-        assertEquals(true, alice.commonWidgets().view(VIEW_SAROS_CHAT).isOpen());
+        alice.bot().view(VIEW_SAROS_CHAT).close();
+        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_CHAT));
+        alice.bot().openById(VIEW_SAROS_CHAT_ID);
+        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_CHAT));
     }
 
     @Test
     public void testRemoteScreenView() throws RemoteException {
-        alice.commonWidgets().view(VIEW_REMOTE_SCREEN).close();
-        assertEquals(false, alice.commonWidgets().view(VIEW_REMOTE_SCREEN)
-            .isOpen());
-        alice.commonWidgets().view(VIEW_REMOTE_SCREEN).openById();
-        assertEquals(true, alice.commonWidgets().view(VIEW_REMOTE_SCREEN)
-            .isOpen());
+        alice.bot().view(VIEW_REMOTE_SCREEN).close();
+        assertEquals(false, alice.bot().isViewOpen(VIEW_REMOTE_SCREEN));
+        alice.bot().openById(VIEW_REMOTE_SCREEN_ID);
+        assertEquals(true, alice.bot().isViewOpen(VIEW_REMOTE_SCREEN));
     }
 
     @Test

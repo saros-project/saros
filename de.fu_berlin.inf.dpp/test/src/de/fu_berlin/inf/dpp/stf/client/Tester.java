@@ -10,20 +10,19 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.client.wrapper.CommonWidgetsWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.Workbench;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Bot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Button;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Label;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ListW;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Menu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFToolbarButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Table;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Text;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.ToolbarButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Tree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.TreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.View;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.SarosC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.contextMenu.TeamC;
@@ -57,18 +56,18 @@ public class Tester extends STF {
     public ChatView chatV;
     public ConsoleView consoleV;
 
-    public Bot bot;
-    public Table table;
-    public Tree tree;
-    public TreeItem treeItem;
-    public Button button;
-    public ToolbarButton toolbarButton;
+    public STFWorkbenchBot bot;
+    public STFTable table;
+    public STFTree tree;
+    public STFTreeItem treeItem;
+    public STFButton button;
+    public STFToolbarButton toolbarButton;
     public Shell shell;
-    public View view;
-    public Menu menu;
-    public Label label;
-    public Text text;
-    public ListW list;
+    public STFView view;
+    public STFMenu menu;
+    public STFLabel label;
+    public STFText text;
+    public STFList list;
 
     public Workbench workbench;
 
@@ -129,17 +128,17 @@ public class Tester extends STF {
             shell = (Shell) registry.lookup("shell");
             editor = (Editor) registry.lookup("eclipseEditor");
 
-            bot = (Bot) registry.lookup("bot");
-            table = (Table) registry.lookup("table");
-            tree = (Tree) registry.lookup("tree");
-            treeItem = (TreeItem) registry.lookup("treeItem");
-            button = (Button) registry.lookup("button");
-            toolbarButton = (ToolbarButton) registry.lookup("toolbarButton");
-            menu = (Menu) registry.lookup("menu");
-            view = (View) registry.lookup("view");
-            label = (Label) registry.lookup("label");
-            text = (Text) registry.lookup("text");
-            list = (ListW) registry.lookup("list");
+            bot = (STFWorkbenchBot) registry.lookup("bot");
+            table = (STFTable) registry.lookup("table");
+            tree = (STFTree) registry.lookup("tree");
+            treeItem = (STFTreeItem) registry.lookup("treeItem");
+            button = (STFButton) registry.lookup("button");
+            toolbarButton = (STFToolbarButton) registry.lookup("toolbarButton");
+            menu = (STFMenu) registry.lookup("menu");
+            view = (STFView) registry.lookup("view");
+            label = (STFLabel) registry.lookup("label");
+            text = (STFText) registry.lookup("text");
+            list = (STFList) registry.lookup("list");
             // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");
@@ -184,7 +183,7 @@ public class Tester extends STF {
         return jid.getDomain();
     }
 
-    public CommonWidgetsWrapper commonWidgets() {
-        return new CommonWidgetsWrapper(this);
+    public STFWorkbenchBot bot() {
+        return bot;
     }
 }

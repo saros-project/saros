@@ -4,9 +4,9 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFStyledText;
 
 public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
 
@@ -34,7 +34,7 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
      * 
      **********************************************/
     public String getTextInConsole() throws RemoteException {
-        return view(VIEW_CONSOLE).bot2().styledText().getText();
+        return bot().view(VIEW_CONSOLE).bot_().styledText().getText();
     }
 
     /**********************************************
@@ -46,7 +46,7 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 try {
-                    SWTBotStyledText styledText = view(VIEW_CONSOLE).bot2()
+                    STFStyledText styledText = bot().view(VIEW_CONSOLE).bot_()
                         .styledText();
                     if (styledText != null && styledText.getText() != null
                         && !styledText.getText().equals(""))

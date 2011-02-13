@@ -12,19 +12,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentImp;
 
-public class TreeImp extends EclipseComponentImp implements Tree {
+public class STFTreeImp extends EclipseComponentImp implements STFTree {
 
-    private static transient TreeImp treeImp;
+    private static transient STFTreeImp treeImp;
 
     private SWTBotTree swtBotTree;
 
     /**
-     * {@link TableImp} is a singleton, but inheritance is possible.
+     * {@link STFTableImp} is a singleton, but inheritance is possible.
      */
-    public static TreeImp getInstance() {
+    public static STFTreeImp getInstance() {
         if (treeImp != null)
             return treeImp;
-        treeImp = new TreeImp();
+        treeImp = new STFTreeImp();
         return treeImp;
     }
 
@@ -43,12 +43,12 @@ public class TreeImp extends EclipseComponentImp implements Tree {
      * actions
      * 
      **********************************************/
-    public TreeItem selectTreeItem(String... pathToTreeItem)
+    public STFTreeItem selectTreeItem(String... pathToTreeItem)
         throws RemoteException {
         try {
             SWTBotTreeItem item = swtBotTree.expandNode(pathToTreeItem)
                 .select();
-            TreeItem treeItem = TreeItemImp.getInstance();
+            STFTreeItem treeItem = STFTreeItemImp.getInstance();
             treeItem.setSWTBotTreeItem(item);
             treeItem.setSWTBotTree(swtBotTree);
             return treeItem;
@@ -59,7 +59,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         return null;
     }
 
-    public TreeItem selectTreeItemWithRegex(String... regexNodes)
+    public STFTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException {
         assert swtBotTree != null : "the passed tree is null.";
         SWTBotTreeItem currentItem = null;
@@ -89,7 +89,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         }
         if (currentItem != null) {
             SWTBotTreeItem item = currentItem.select();
-            TreeItem treeItem = TreeItemImp.getInstance();
+            STFTreeItem treeItem = STFTreeItemImp.getInstance();
             treeItem.setSWTBotTreeItem(item);
             treeItem.setSWTBotTree(swtBotTree);
             return treeItem;
@@ -97,7 +97,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
         return null;
     }
 
-    public TreeItem selectTreeItemAndWait(String... pathToTreeItem)
+    public STFTreeItem selectTreeItemAndWait(String... pathToTreeItem)
         throws RemoteException {
         SWTBotTreeItem selectedTreeItem = null;
         for (String node : pathToTreeItem) {
@@ -108,7 +108,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 } else {
 
-                    TreeItem treeItem = TreeItemImp.getInstance();
+                    STFTreeItem treeItem = STFTreeItemImp.getInstance();
                     treeItem.setSWTBotTreeItem(selectedTreeItem);
                     treeItem.setSWTBotTree(swtBotTree);
                     treeItem.waitUntilSubItemExists(node);
@@ -123,7 +123,7 @@ public class TreeImp extends EclipseComponentImp implements Tree {
             log.info("treeItem name: " + selectedTreeItem.getText());
 
             SWTBotTreeItem item = selectedTreeItem.select();
-            TreeItem treeItem = TreeItemImp.getInstance();
+            STFTreeItem treeItem = STFTreeItemImp.getInstance();
             treeItem.setSWTBotTreeItem(item);
             treeItem.setSWTBotTree(swtBotTree);
             return treeItem;

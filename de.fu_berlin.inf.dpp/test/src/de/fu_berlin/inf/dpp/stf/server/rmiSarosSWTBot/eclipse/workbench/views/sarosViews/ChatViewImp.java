@@ -56,7 +56,7 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
      * 
      **********************************************/
     public boolean isChatViewOpen() throws RemoteException {
-        return view(VIEW_SAROS_CHAT).isOpen();
+        return bot().isViewOpen(VIEW_SAROS_CHAT);
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
@@ -130,9 +130,8 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
      **********************************************/
     private void precondition() throws RemoteException {
         workbench.activateWorkbench();
-        view(VIEW_SAROS_CHAT).openById();
-        view(VIEW_SAROS_CHAT).setViewTitle(VIEW_SAROS_CHAT);
-        view(VIEW_SAROS_CHAT).setFocus();
+        bot().openById(VIEW_SAROS_CHAT_ID);
+        bot().view(VIEW_SAROS_CHAT).setFocus();
 
     }
 }

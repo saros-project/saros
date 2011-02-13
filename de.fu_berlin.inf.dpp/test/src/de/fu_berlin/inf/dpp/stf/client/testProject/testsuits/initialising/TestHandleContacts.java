@@ -146,12 +146,12 @@ public class TestHandleContacts extends STFTest {
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
-        alice.shell.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
-            labelsAndTexts, FINISH);
+        alice.bot().shell(SHELL_NEW_BUDDY)
+            .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
 
-        alice.shell.waitUntilShellActive(SHELL_BUDDY_LOOKUP_FAILED);
-        assertTrue(alice.shell.isShellActive(SHELL_BUDDY_LOOKUP_FAILED));
-        alice.shell.confirmShell(SHELL_BUDDY_LOOKUP_FAILED, NO);
+        alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).waitUntilActive();
+        assertTrue(alice.shell.isActive());
+        alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).confirm(NO);
 
     }
 
@@ -176,10 +176,10 @@ public class TestHandleContacts extends STFTest {
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
 
-        alice.shell.confirmShellWithTextFieldAndWait(SHELL_NEW_BUDDY,
-            labelsAndTexts, FINISH);
-        alice.shell.waitUntilShellActive(SHELL_BUDDY_ALREADY_ADDED);
-        assertTrue(alice.shell.isShellActive(SHELL_BUDDY_ALREADY_ADDED));
-        alice.shell.closeShell(SHELL_BUDDY_ALREADY_ADDED);
+        alice.bot().shell(SHELL_NEW_BUDDY)
+            .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
+        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).waitUntilActive();
+        assertTrue(alice.shell.isActive());
+        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).closeShell();
     }
 }
