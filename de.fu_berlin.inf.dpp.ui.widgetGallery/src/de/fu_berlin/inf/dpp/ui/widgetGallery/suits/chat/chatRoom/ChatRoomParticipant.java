@@ -11,7 +11,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
-import de.fu_berlin.inf.dpp.util.ColorUtil;
+import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 public class ChatRoomParticipant {
 	protected static String server = "jabber.ccc.de";
@@ -52,7 +52,7 @@ public class ChatRoomParticipant {
 
 			String nickname = nicknames[i];
 
-			Color color = new Color(parent.getDisplay(), ColorUtil.scaleColor(
+			Color color = new Color(parent.getDisplay(), ColorUtils.scaleColor(
 					colors[i], 0.75));
 
 			chatRoomParticipants[i] = new ChatRoomParticipant(connection,

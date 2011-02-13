@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryComposite;
-import de.fu_berlin.inf.dpp.util.ColorUtil;
+import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 public class ChatControlDemo extends Demo {
 	public String user1;
@@ -45,10 +45,10 @@ public class ChatControlDemo extends Demo {
 	@Override
 	public void createPartControls(Composite parent) {
 		Color red = new Color(parent.getDisplay(), 255, 128, 128);
-		Color lightRed = ColorUtil.scaleColor(red, .75);
+		Color lightRed = ColorUtils.scaleColor(red, .75);
 
 		Color green = new Color(Display.getDefault(), 128, 255, 128);
-		Color lightGreen = ColorUtil.scaleColor(green, .75);
+		Color lightGreen = ColorUtils.scaleColor(green, .75);
 
 		user1 = "bkahlert@saros-con.imp.fu-berlin.de/Saros";
 		user1_color = lightRed;
