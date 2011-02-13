@@ -340,9 +340,9 @@ public class SarosUI {
         } catch (InvocationTargetException e) {
             log.error("Internal Error: ", e);
             MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
-                "Permission change failed",
-                "Permission change failed because of an internal error. "
-                    + Utils.getUserDescription(user) + " Please try again.");
+                "Permission Change Failed",
+                "Permission change failed because of an internal error.\n\n"
+                    + " Please try again.");
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);
         }
