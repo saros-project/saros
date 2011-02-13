@@ -128,7 +128,6 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
-import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
@@ -138,6 +137,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtensio
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
@@ -343,7 +343,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(StreamServiceManager.class);
         this.container.addComponent(AudioServiceManager.class);
         this.container.addComponent(MixerManager.class);
-        this.container.addComponent(SubscriptionListener.class);
+        this.container.addComponent(SubscriptionManager.class);
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VideoSharing.class);
         this.container.addComponent(VersionManager.class);

@@ -1,11 +1,14 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.internal.subscriptionManager;
 
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -19,39 +22,58 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.SafePacketListener;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionReceivedEvent;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
  * 
  * If a request for subscription is received (when a buddy added the local user)
- * a dialog is shown to the user asking him/her to confirm the request. If he
- * accepts the request a new entry in the roster will be created and a
- * subscribed-message sent.
+ * all {@link SubscriptionManagerListener}s are notified. If at least one set
+ * the {@link SubscriptionReceivedEvent#autoSubscribe} flag to true the
+ * subscription request is automatically confirmed. Otherwise a dialog is shown
+ * to the user asking him/her to confirm the request. If he accepts the request
+ * a new entry in the {@link Roster} will be created and a subscribed-message
+ * sent.
  * 
  * If a request for removal is received (when a buddy deleted the local user
  * from his or her roster or rejected a request of subscription) the
  * corresponding entry is removed from the roster.
  * 
  * @author chjacob
- * 
+ * @author bkahlert
  */
 @Component(module = "net")
-public class SubscriptionListener implements IConnectionListener {
-
-    private static Logger log = Logger.getLogger(SubscriptionListener.class);
+public class SubscriptionManager {
+    private static Logger log = Logger.getLogger(SubscriptionManager.class);
 
     protected XMPPConnection connection = null;
+    /**
+     * It is generally possible that a smack thread iterates over this list
+     * whereas the GUI thread removes its listeners when its job is done
+     * parallel. Therefore we need a {@link CopyOnWriteArrayList}.
+     */
+    protected List<SubscriptionManagerListener> subscriptionManagerListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
+
+    protected IConnectionListener connectionListener = new IConnectionListener() {
+        public void connectionStateChanged(XMPPConnection connection,
+            ConnectionState newState) {
+            if (newState == ConnectionState.CONNECTED)
+                prepareConnection(connection);
+            else if (connection != null)
+                disposeConnection();
+        }
+    };
 
     protected PacketListener packetListener = new SafePacketListener(log,
         new PacketListener() {
-
             public void processPacket(Packet packet) {
 
-                if (!(packet instanceof Presence)) {
-                    // Only care for presence packages
+                // Only care for presence packages
+                if (!(packet instanceof Presence))
                     return;
-                }
 
                 if (packet.getFrom().equals(connection.getUser())) {
                     // If we receive a presence package from ourself, then we
@@ -70,15 +92,24 @@ public class SubscriptionListener implements IConnectionListener {
                     // Don't care for these presence infos
                     return;
                 default:
-                    // continue
+                    processPresence(presence);
                 }
-
-                processPresence(presence);
             }
         });
 
-    public SubscriptionListener(Saros saros) {
-        saros.addListener(this);
+    public SubscriptionManager(Saros saros) {
+        saros.addListener(connectionListener);
+    }
+
+    public void prepareConnection(XMPPConnection connection) {
+        this.connection = connection;
+        connection.addPacketListener(packetListener, new PacketTypeFilter(
+            Presence.class));
+    }
+
+    public void disposeConnection() {
+        connection.removePacketListener(packetListener);
+        connection = null;
     }
 
     public void processPresence(Presence presence) {
@@ -103,8 +134,16 @@ public class SubscriptionListener implements IConnectionListener {
         case subscribe:
             log.info("Buddy requests to subscribe to us: " + userName);
 
+            /*
+             * Notify listeners; if at least one set the autoSubscribe flag to
+             * true, do not ask the user for confirmation
+             */
+            boolean autoSubscribe = notifySubscriptionReceived(new JID(
+                presence.getFrom()));
+
             // ask user for confirmation of subscription
-            if (askUserForSubscriptionConfirmation(presence.getFrom())) {
+            if (autoSubscribe
+                || askUserForSubscriptionConfirmation(presence.getFrom())) {
 
                 // send message that we accept the request for
                 // subscription
@@ -184,22 +223,40 @@ public class SubscriptionListener implements IConnectionListener {
         });
     }
 
-    public void prepareConnection(XMPPConnection connection) {
-        this.connection = connection;
-        connection.addPacketListener(packetListener, new PacketTypeFilter(
-            Presence.class));
+    /**
+     * Adds a {@link SubscriptionManagerListener}
+     * 
+     * @param subscriptionManagerListener
+     */
+    public void addSubscriptionManagerListener(
+        SubscriptionManagerListener subscriptionManagerListener) {
+        this.subscriptionManagerListeners.add(subscriptionManagerListener);
     }
 
-    public void disposeConnection() {
-        connection.removePacketListener(packetListener);
-        connection = null;
+    /**
+     * Removes a {@link SubscriptionManagerListener}
+     * 
+     * @param subscriptionManagerListener
+     */
+    public void removeSubscriptionManagerListener(
+        SubscriptionManagerListener subscriptionManagerListener) {
+        this.subscriptionManagerListeners.remove(subscriptionManagerListener);
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
-        ConnectionState newState) {
-        if (newState == ConnectionState.CONNECTED)
-            prepareConnection(connection);
-        else if (this.connection != null)
-            disposeConnection();
+    /**
+     * Notify all {@link SubscriptionManagerListener}s about an updated feature
+     * support.
+     * 
+     * @return true if subscription request should automatically answered
+     */
+    public boolean notifySubscriptionReceived(JID jid) {
+        boolean autoSubscribe = false;
+        for (SubscriptionManagerListener subscriptionManagerListener : this.subscriptionManagerListeners) {
+            SubscriptionReceivedEvent event = new SubscriptionReceivedEvent(jid);
+            subscriptionManagerListener.subscriptionReceived(event);
+            if (event.autoSubscribe)
+                autoSubscribe = true;
+        }
+        return autoSubscribe;
     }
 }
