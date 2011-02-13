@@ -325,9 +325,8 @@ public class SarosUI {
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI
                                     .getAWorkbenchWindow().getShell(),
-                                    "Permission change failed",
-                                    "The permission change was canceled. "
-                                        + Utils.getUserDescription(user));
+                                    "Permission Change Canceled",
+                                    "The permission change was canceled.");
                             }
                         });
                     } catch (InterruptedException e) {
