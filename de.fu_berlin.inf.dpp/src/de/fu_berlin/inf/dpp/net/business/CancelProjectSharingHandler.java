@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class CancelProjectSharingHandler extends CancelProjectSharingExtension {
 
@@ -30,7 +30,7 @@ public class CancelProjectSharingHandler extends CancelProjectSharingExtension {
         ProjectNegotiation process = invitationProcesses
             .getProjectExchangeProcess(sender);
         if (process != null) {
-            log.debug("Inv" + Util.prefix(sender)
+            log.debug("Inv" + Utils.prefix(sender)
                 + ": Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {

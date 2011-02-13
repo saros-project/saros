@@ -78,7 +78,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -206,7 +206,7 @@ public class SarosSessionManager implements IConnectionListener,
      */
     public void stopSarosSession() {
 
-        if (Util.isSWT()) {
+        if (Utils.isSWT()) {
             log.warn("StopSharedProject should not be called from SWT",
                 new StackTrace());
         }
@@ -269,7 +269,7 @@ public class SarosSessionManager implements IConnectionListener,
             saros, description);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 process.acknowledgeInvitation();
                 sarosUI.showIncomingInvitationUI(process);
@@ -284,7 +284,7 @@ public class SarosSessionManager implements IConnectionListener,
             transmitter, from, description, projectExchangeProcesses,
             projectID, projectID, false, fileLists.get(0));
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
                 sarosUI.showIncomingProjectUI(process);
@@ -326,7 +326,7 @@ public class SarosSessionManager implements IConnectionListener,
     public void openInviteDialog(final @Nullable List<JID> toInvite) {
         final ISarosSession sarosSession = sarosSessionObservable.getValue();
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 // Instantiates and initializes the wizard
                 InvitationWizard wizard = new InvitationWizard(saros,
@@ -458,7 +458,7 @@ public class SarosSessionManager implements IConnectionListener,
         }
 
         protected void registerCancelListener() {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
                     SarosSessionManager.this
@@ -469,7 +469,7 @@ public class SarosSessionManager implements IConnectionListener,
         }
 
         protected void releaseCancelListener() {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
                     SarosSessionManager.this
@@ -598,7 +598,7 @@ public class SarosSessionManager implements IConnectionListener,
         }
 
         protected void registerCancelListener() {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
                     SarosSessionManager.this
@@ -609,7 +609,7 @@ public class SarosSessionManager implements IConnectionListener,
         }
 
         protected void releaseCancelListener() {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
                     SarosSessionManager.this

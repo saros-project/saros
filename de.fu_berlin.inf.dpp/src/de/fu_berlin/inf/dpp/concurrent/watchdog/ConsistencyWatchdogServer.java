@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This class is an eclipse job run on the host side ONLY.
@@ -168,7 +168,7 @@ public class ConsistencyWatchdogServer extends Job {
         final Set<SPath> localEditors, final Set<SPath> remoteEditors,
         final SPath docPath) {
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
 
                 IFile file = docPath.getFile();

@@ -110,7 +110,7 @@ public class StopWatch {
      * achieved when sending =length= number of bytes in getTime() ms.
      */
     public String throughput(long length) {
-        return Util.throughput(length, getTime());
+        return Utils.throughput(length, getTime());
     }
 
 }

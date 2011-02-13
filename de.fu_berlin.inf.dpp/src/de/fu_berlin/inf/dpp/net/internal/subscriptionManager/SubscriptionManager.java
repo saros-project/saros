@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SafePacketListener;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionReceivedEvent;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
@@ -84,7 +84,7 @@ public class SubscriptionManager {
 
                 final Presence presence = (Presence) packet;
                 log.debug("Received presence packet from: "
-                    + Util.prefix(new JID(presence.getFrom())) + " " + presence);
+                    + Utils.prefix(new JID(presence.getFrom())) + " " + presence);
 
                 switch (presence.getType()) {
                 case available:
@@ -113,7 +113,7 @@ public class SubscriptionManager {
     }
 
     public void processPresence(Presence presence) {
-        String userName = Util.prefix(new JID(presence.getFrom()));
+        String userName = Utils.prefix(new JID(presence.getFrom()));
         switch (presence.getType()) {
         case error:
             String message = MessageFormat.format("Received error "
@@ -200,7 +200,7 @@ public class SubscriptionManager {
     protected static boolean askUserForSubscriptionConfirmation(
         final String from) {
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 // TODO Should flash dialog
                 result.set(MessageDialog.openConfirm(EditorAPI.getShell(),
@@ -212,7 +212,7 @@ public class SubscriptionManager {
     }
 
     protected static void informUserAboutUnsubscription(final String from) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openInformation(EditorAPI.getShell(),
                     "Removal of subscription", "Buddy " + from

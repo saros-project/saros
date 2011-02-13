@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * @author s-lau
@@ -66,7 +66,7 @@ public class VideoSharingService extends StreamService {
     public boolean sessionRequest(final User from, Object initial) {
         if (!videoSharing.ready())
             return false; // TODO reason to initiator
-        return Util.popUpYesNoQuestion("Incoming screensharing session",
+        return Utils.popUpYesNoQuestion("Incoming screensharing session",
             "Accept screensharing request from " + from.getHumanReadableName()
                 + " ?", false);
     }

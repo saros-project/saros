@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class InvitationWizardUserSelectionPage extends WizardPage {
 
@@ -296,7 +296,7 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
      *            The JID of the user whose saros support should be discovered.
      */
     protected void refreshSarosSupport(final JID jid) {
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 boolean supported = discoveryManager.isSarosSupported(jid);
                 log.debug("discovered: " + supported);
@@ -306,7 +306,7 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
     }
 
     protected void refreshUserList() {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (!getControl().isDisposed()) {
                     userListViewer.refresh();

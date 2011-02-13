@@ -92,7 +92,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -292,7 +292,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             remoteWriteAccessManager = new RemoteWriteAccessManager(
                 sarosSession);
 
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
 
                     editorAPI.addEditorPartListener(EditorManager.this);
@@ -305,7 +305,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             assert sarosSession == oldSarosSession;
 
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
 
                     editorAPI.removeEditorPartListener(EditorManager.this);
@@ -346,7 +346,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         @Override
         public void projectAdded(String projectID) {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 /*
                  * When Alice invites Bob to a session with a project and Alice
@@ -696,7 +696,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void exec(final IActivity activity) {
 
-        assert Util.isSWT();
+        assert Utils.isSWT();
 
         User sender = activity.getSource();
         if (!sender.isInSarosSession()) {
@@ -1240,7 +1240,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         try {
-            Util.runSWTSync(new Callable<Object>() {
+            Utils.runSWTSync(new Callable<Object>() {
                 public Object call() throws Exception {
                     saveText(path);
                     return null;
@@ -1611,7 +1611,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             .getActiveEditor();
 
         if (activeEditor == null) {
-            log.info(Util.prefix(jumpTo.getJID()) + "has no editor open");
+            log.info(Utils.prefix(jumpTo.getJID()) + "has no editor open");
             return;
         }
 
@@ -1625,7 +1625,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         ILineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
-            log.warn(Util.prefix(jumpTo.getJID())
+            log.warn(Utils.prefix(jumpTo.getJID())
                 + "has no viewport in editor: " + activeEditor.getPath());
             return;
         }

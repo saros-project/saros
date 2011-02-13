@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Renames the nickname of the selected roster entry.
@@ -63,7 +63,7 @@ public class RenameContactAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runRename();
             }

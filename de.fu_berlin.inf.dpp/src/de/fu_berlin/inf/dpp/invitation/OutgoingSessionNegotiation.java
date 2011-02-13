@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -70,7 +70,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                     log.debug("", e);
                 }
                 log.debug("Inv"
-                    + Util.prefix(peer)
+                    + Utils.prefix(peer)
                     + ": Notifying participants that the invitation is complete.");
             }
         });
@@ -99,7 +99,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Invitation has started.");
+        log.debug("Inv" + Utils.prefix(peer) + ": Invitation has started.");
 
         monitor.beginTask("Invitation has started.", 101);
         this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
@@ -140,7 +140,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
             executeCancellation();
         } catch (Exception e) {
-            log.warn("Inv" + Util.prefix(peer)
+            log.warn("Inv" + Utils.prefix(peer)
                 + ": This type of Exception is not expected: ", e);
             String errorMsg = "Unknown error: " + e;
             if (e.getMessage() != null)
@@ -155,13 +155,13 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void checkAvailability(SubMonitor subMonitor)
         throws LocalCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Checking Saros support...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Checking Saros support...");
         subMonitor.setTaskName("Checking Saros support...");
 
         JID rqPeer = discoveryManager.getSupportingPresence(peer,
             Saros.NAMESPACE);
         if (rqPeer == null) {
-            log.debug("Inv" + Util.prefix(peer) + ": Saros is not supported.");
+            log.debug("Inv" + Utils.prefix(peer) + ": Saros is not supported.");
             if (!InvitationWizard.confirmUnsupportedSaros(peer)) {
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
                 throw new LocalCancellationException();
@@ -173,7 +173,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             rqPeer = new JID(peer.getBareJID() + "/" + Saros.RESOURCE);
             peerAdvertisesSarosSupport = false;
         } else {
-            log.debug("Inv" + Util.prefix(peer) + ": Saros is supported.");
+            log.debug("Inv" + Utils.prefix(peer) + ": Saros is supported.");
         }
         peer = rqPeer;
     }
@@ -186,7 +186,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void checkVersion(SubMonitor subMonitor)
         throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Checking peer's version...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Checking peer's version...");
         subMonitor.setTaskName("Checking version...");
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
 
@@ -198,11 +198,11 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             comp = versionInfo.compatibility;
 
             if (comp == VersionManager.Compatibility.OK) {
-                log.debug("Inv" + Util.prefix(peer)
+                log.debug("Inv" + Utils.prefix(peer)
                     + ": Saros versions are compatible, proceeding...");
                 this.versionInfo = versionInfo;
             } else {
-                log.debug("Inv" + Util.prefix(peer)
+                log.debug("Inv" + Utils.prefix(peer)
                     + ": Saros versions are not compatible.");
                 if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
                     versionManager.getVersion()))
@@ -213,7 +213,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                 }
             }
         } else {
-            log.debug("Inv" + Util.prefix(peer)
+            log.debug("Inv" + Utils.prefix(peer)
                 + ": Unable to obtain peer's version information.");
             if (!InvitationWizard.confirmUnknownVersion(peer,
                 versionManager.getVersion()))
@@ -232,7 +232,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void sendInvitation(SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Sending invitation...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Sending invitation...");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Sending invitation...");
@@ -284,7 +284,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             .getUserListRequestCollector(invitationID, userListRequestExtProv),
             10000, true);
 
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": User list request has received.");
     }
 
@@ -296,7 +296,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         synchronized (sarosSession) {
             User newUser = new User(sarosSession, peer, colorID);
             this.sarosSession.addUser(newUser);
-            log.debug(Util.prefix(peer) + " added to project, colorID: "
+            log.debug(Utils.prefix(peer) + " added to project, colorID: "
                 + colorID);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
@@ -325,7 +325,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     public void remoteCancel(String errorMsg) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log.debug("Inv" + Util.prefix(peer) + ": remoteCancel: " + errorMsg);
+        log.debug("Inv" + Utils.prefix(peer) + ": remoteCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new RemoteCancellationException(errorMsg);
@@ -334,7 +334,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void completeInvitation(SubMonitor subMonitor)
         throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for invitation complete confirmation...");
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Waiting for peer to complete invitation...");
@@ -357,7 +357,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         subMonitor.setTaskName("Invitation has completed successfully.");
 
         invitationProcesses.removeInvitationProcess(this);
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": Invitation has completed successfully.");
 
         sarosSessionManager.startSharingProjects(peer);
@@ -367,7 +367,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     public void localCancel(String errorMsg, CancelOption cancelOption) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log.debug("Inv" + Util.prefix(peer) + ": localCancel: " + errorMsg);
+        log.debug("Inv" + Utils.prefix(peer) + ": localCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new LocalCancellationException(errorMsg,
@@ -393,7 +393,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
      */
     protected void executeCancellation() throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": executeCancellation");
+        log.debug("Inv" + Utils.prefix(peer) + ": executeCancellation");
         if (!cancelled.get())
             throw new IllegalStateException(
                 "executeCancellation should only be called after localCancel or remoteCancel!");
@@ -411,18 +411,18 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             case DO_NOT_NOTIFY_PEER:
                 break;
             default:
-                log.warn("Inv" + Util.prefix(peer)
+                log.warn("Inv" + Utils.prefix(peer)
                     + ": This case is not expected here.");
             }
 
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled locally"
                     + " because of an error: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation failed. (" + errorMsg + ")");
             } else {
                 cancelMessage = "Invitation was cancelled by local user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation has been cancelled.");
             }
 
@@ -433,11 +433,11 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled by the remote user "
                     + " because of an error on his/her side: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation failed.");
             } else {
                 cancelMessage = "Invitation was cancelled by the remote user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation has been cancelled.");
             }
         } else {
@@ -462,17 +462,17 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void checkCancellation(CancelOption cancelOption)
         throws SarosCancellationException {
         if (cancelled.get()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             throw new SarosCancellationException();
         }
 
         if (monitor == null) {
-            log.warn("Inv" + Util.prefix(peer) + ": The monitor is null.");
+            log.warn("Inv" + Utils.prefix(peer) + ": The monitor is null.");
             return;
         }
 
         if (monitor.isCanceled()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             localCancel(null, cancelOption);
             throw new SarosCancellationException();
         }

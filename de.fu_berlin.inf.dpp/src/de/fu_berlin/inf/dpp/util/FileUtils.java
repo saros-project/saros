@@ -39,9 +39,13 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
  * @author orieger/chjacob
  * 
  */
-public class FileUtil {
+public class FileUtils {
 
-    private static Logger log = Logger.getLogger(FileUtil.class);
+    private static Logger log = Logger.getLogger(FileUtils.class);
+
+    private FileUtils() {
+        // no instantiation allowed
+    }
 
     /**
      * Calculate Adler32 checksum for given file.
@@ -278,7 +282,7 @@ public class FileUtil {
                 break;
             root = temp;
         }
-        boolean wasReadOnly = FileUtil.setReadOnly(root, false);
+        boolean wasReadOnly = FileUtils.setReadOnly(root, false);
 
         try {
             create(parent);
@@ -287,7 +291,7 @@ public class FileUtil {
             return false;
         } finally {
             if (wasReadOnly)
-                FileUtil.setReadOnly(root, true);
+                FileUtils.setReadOnly(root, true);
         }
         return true;
     }
@@ -355,7 +359,7 @@ public class FileUtil {
         try {
             dialog.run(true, false, new IRunnableWithProgress() {
                 public void run(final IProgressMonitor monitor) {
-                    FileUtil.setReadOnly(project, readonly, monitor);
+                    FileUtils.setReadOnly(project, readonly, monitor);
                 }
             });
         } catch (InvocationTargetException e) {

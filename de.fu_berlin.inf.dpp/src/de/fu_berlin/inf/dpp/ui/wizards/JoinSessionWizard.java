@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
@@ -152,7 +152,7 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
             }
@@ -195,7 +195,7 @@ public class JoinSessionWizard extends Wizard {
 
         final int pageChangesAtStart = pageChanges;
 
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 try {
                     Thread.sleep(1000);
@@ -204,7 +204,7 @@ public class JoinSessionWizard extends Wizard {
                     Thread.currentThread().interrupt();
                     return;
                 }
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
                         // User clicked next in the meantime
@@ -243,7 +243,7 @@ public class JoinSessionWizard extends Wizard {
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 Shell shell = wizardDialog.getShell();
                 if (shell == null || shell.isDisposed())
@@ -252,7 +252,7 @@ public class JoinSessionWizard extends Wizard {
             }
         });
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
             }

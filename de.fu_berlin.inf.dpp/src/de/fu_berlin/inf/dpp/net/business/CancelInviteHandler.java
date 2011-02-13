@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "net")
 public class CancelInviteHandler extends CancelInviteExtension {
@@ -35,7 +35,7 @@ public class CancelInviteHandler extends CancelInviteExtension {
         InvitationProcess process = invitationProcesses
             .getInvitationProcess(sender);
         if (process != null) {
-            log.debug("Inv" + Util.prefix(sender)
+            log.debug("Inv" + Utils.prefix(sender)
                 + ": Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {

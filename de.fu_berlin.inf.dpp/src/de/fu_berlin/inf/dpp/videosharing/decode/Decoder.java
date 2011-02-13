@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Codec;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.DecoderInitializationException;
@@ -145,7 +145,7 @@ public abstract class Decoder implements Runnable, Disposable {
      */
     public void startDecoder() {
         if (decoderThread == null)
-            decoderThread = Util
+            decoderThread = Utils
                 .runSafeAsync("VideoSharing-Decoder", log, this);
     }
 

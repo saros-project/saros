@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This UndoManager is not an implementation of the Eclipse IUndoManager. It
@@ -166,7 +166,7 @@ public class UndoManager implements Disposable, IActivityProvider {
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         log.debug("redoing operation " + operation);
                         redo(currentActiveEditor);
@@ -203,7 +203,7 @@ public class UndoManager implements Disposable, IActivityProvider {
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         log.debug("undoing operation " + operation);
                         undo(currentActiveEditor);

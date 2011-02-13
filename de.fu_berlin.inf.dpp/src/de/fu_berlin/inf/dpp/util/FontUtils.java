@@ -7,7 +7,12 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Label;
 
-public class FontUtil {
+public class FontUtils {
+
+    private FontUtils() {
+        // no instantiation allowed
+    }
+
     public static void changeFontSizeBy(Label label, int fontSizeInc) {
         FontData[] fontData = label.getFont().getFontData();
         for (int i = 0; i < fontData.length; ++i)

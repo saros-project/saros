@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.util.StopWatch;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Class responsible for testing the data transfer connection using the data
@@ -87,7 +87,7 @@ public class ConnectionTestManager {
 
                     result.dataHash = Arrays.hashCode(data);
 
-                    log.info(Util.prefix(new JID(packet.getFrom()))
+                    log.info(Utils.prefix(new JID(packet.getFrom()))
                         + "Connection Test Data received: " + data.length
                         + " bytes, hashCode==" + result.dataHash);
                 } catch (SarosCancellationException e) {
@@ -95,11 +95,11 @@ public class ConnectionTestManager {
                         "Connection Test failed because of an CancelationException",
                         e);
                     result.errorMessage = "SarosCancellationException: "
-                        + Util.getMessage(e);
+                        + Utils.getMessage(e);
                 } catch (IOException e) {
                     log.error(
                         "Connection Test failed because of an IOException", e);
-                    result.errorMessage = "IOException: " + Util.getMessage(e);
+                    result.errorMessage = "IOException: " + Utils.getMessage(e);
                 }
 
                 try {
@@ -111,7 +111,7 @@ public class ConnectionTestManager {
                 } catch (Exception e) {
                     log.error(
                         "Could not send test results to "
-                            + Util.prefix(new JID(packet.getFrom())), e);
+                            + Utils.prefix(new JID(packet.getFrom())), e);
                 }
             }
         }, new PacketFilter() {

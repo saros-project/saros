@@ -90,7 +90,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
@@ -191,7 +191,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         int colorID, VersionInfo versionInfo, String invitationID,
         DateTime sessionStart, boolean doStream, MUCSessionPreferences comPrefs) {
 
-        log.trace("Sending invitation to " + Util.prefix(guest)
+        log.trace("Sending invitation to " + Utils.prefix(guest)
             + " with description " + description);
 
         InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
@@ -233,14 +233,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     public void sendInvitationAcknowledgement(JID to, String invitationID) {
-        log.trace("Sending invitation acknowledgment to " + Util.prefix(to));
+        log.trace("Sending invitation acknowledgment to " + Utils.prefix(to));
         sendMessageToUser(to,
             invAcknowledgementExtProv.create(new DefaultInvitationInfo(
                 sessionID, invitationID)));
     }
 
     public void sendFileListRequest(JID to, String invitationID) {
-        log.trace("Sending request for FileList to " + Util.prefix(to));
+        log.trace("Sending request for FileList to " + Utils.prefix(to));
         sendMessageToUser(to,
             fileListRequestExtProv.create(new DefaultInvitationInfo(sessionID,
                 invitationID)));
@@ -397,13 +397,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     public void sendUserList(JID to, String invitationID, Collection<User> users) {
-        log.trace("Sending buddy list to " + Util.prefix(to));
+        log.trace("Sending buddy list to " + Utils.prefix(to));
         sendMessageToUser(to, userListExtProv.create(new UserListInfo(
             sessionID, invitationID, users)), true);
     }
 
     public void sendUserListConfirmation(JID to) {
-        log.trace("Sending buddy list confirmation to " + Util.prefix(to));
+        log.trace("Sending buddy list confirmation to " + Utils.prefix(to));
         sendMessageToUser(to,
             userListConfExtProv.create(new DefaultSessionInfo(sessionID)), true);
     }
@@ -442,10 +442,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 jid = new JID(result.getFrom());
                 if (!fromUserJIDs.remove(jid)) {
                     log.warn("Buddy list confirmation from unknown buddy: "
-                        + Util.prefix(jid));
+                        + Utils.prefix(jid));
                 } else {
                     log.debug("Buddy list confirmation from: "
-                        + Util.prefix(jid));
+                        + Utils.prefix(jid));
                 }
                 /*
                  * TODO: what if a user goes offline during the invitation? The
@@ -493,7 +493,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel Invitation to "
-            + Util.prefix(user)
+            + Utils.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
         sendMessageToUser(user,
@@ -502,7 +502,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     public void sendCancelSharingProjectMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel project sharing to "
-            + Util.prefix(user)
+            + Utils.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
         sendMessageToUser(user, cancelProjectSharingExtension.create(
@@ -532,7 +532,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             int expectedSequenceNumber = entry.getValue();
             log.info("Requesting old activityDataObject (sequence number="
                 + expectedSequenceNumber + "," + andup + ") from "
-                + Util.prefix(recipient));
+                + Utils.prefix(recipient));
             sendMessageToUser(recipient,
                 requestActivityExtension.create(expectedSequenceNumber, andup),
                 true);
@@ -580,7 +580,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
 
         String msg = "Sent (" + String.format("%03d", timedActivities.size())
-            + ") " + Util.prefix(recipient) + timedActivities;
+            + ") " + Utils.prefix(recipient) + timedActivities;
 
         // only log on debug level if there is more than a checksum
         if (LoggingUtils.containsChecksumsOnly(timedActivities))
@@ -687,7 +687,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                     sendMessageToUser(recipient, extension, true);
                 else {
                     log.error("Failed to sent packet extension by bytestream ("
-                        + Util.formatByte(data.length) + " bytes)");
+                        + Utils.formatByte(data.length) + " bytes)");
                     throw e;
                 }
             }
@@ -858,7 +858,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         if (sessionMembersOnly) {
             User participant = sarosSessionObservable.getValue().getUser(jid);
             if (participant == null) {
-                log.warn("Buddy not in session:" + Util.prefix(jid));
+                log.warn("Buddy not in session:" + Utils.prefix(jid));
                 return;
             }
 

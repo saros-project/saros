@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A collector class that collects local text edit activityDataObjects and
@@ -219,7 +219,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
             if (log.isTraceEnabled()) {
                 log.trace(String.format("Recieved chars written from %s "
                     + "(whitespaces omitted): %s [%s]", user.getJID(),
-                    textLength, Util.escapeForLogging(text)));
+                    textLength, Utils.escapeForLogging(text)));
             }
 
             if (textLength > 0) {

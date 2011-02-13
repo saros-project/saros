@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype
@@ -92,7 +92,7 @@ public class SkypeManager implements IConnectionListener {
         if (roster == null)
             return null;
 
-        for (Presence presence : Util.asIterable(roster.getPresences(jid))) {
+        for (Presence presence : Utils.asIterable(roster.getPresences(jid))) {
             if (presence.isAvailable()) {
                 String result = getSkypeURL(new JID(presence.getFrom()));
                 if (result != null)
@@ -153,7 +153,7 @@ public class SkypeManager implements IConnectionListener {
             return;
 
         for (RosterEntry rosterEntry : roster.getEntries()) {
-            for (Presence presence : Util.asIterable(roster
+            for (Presence presence : Utils.asIterable(roster
                 .getPresences(rosterEntry.getUser()))) {
                 if (presence.isAvailable()) {
                     IQ result = skypeProvider.createIQ(newSkypeName);

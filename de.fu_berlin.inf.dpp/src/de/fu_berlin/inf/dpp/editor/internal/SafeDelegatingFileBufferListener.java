@@ -5,7 +5,7 @@ import org.eclipse.core.filebuffers.IFileBuffer;
 import org.eclipse.core.filebuffers.IFileBufferListener;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A delegating IFileBufferListener which makes the calls to the listener safe
@@ -22,7 +22,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void bufferContentAboutToBeReplaced(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.bufferContentReplaced(buffer);
             }
@@ -30,7 +30,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void bufferContentReplaced(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.bufferContentReplaced(buffer);
             }
@@ -38,7 +38,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void bufferCreated(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.bufferCreated(buffer);
             }
@@ -46,7 +46,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void bufferDisposed(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.bufferDisposed(buffer);
 
@@ -56,7 +56,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
 
     public void dirtyStateChanged(final IFileBuffer buffer,
         final boolean isDirty) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.dirtyStateChanged(buffer, isDirty);
 
@@ -65,7 +65,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void stateChangeFailed(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.stateChangeFailed(buffer);
 
@@ -76,7 +76,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
 
     public void stateChanging(final IFileBuffer buffer) {
 
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.stateChanging(buffer);
 
@@ -86,7 +86,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
 
     public void stateValidationChanged(final IFileBuffer buffer,
         final boolean isStateValidated) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.stateValidationChanged(buffer, isStateValidated);
 
@@ -95,7 +95,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void underlyingFileDeleted(final IFileBuffer buffer) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.underlyingFileDeleted(buffer);
             }
@@ -103,7 +103,7 @@ public class SafeDelegatingFileBufferListener implements IFileBufferListener {
     }
 
     public void underlyingFileMoved(final IFileBuffer buffer, final IPath path) {
-        Util.wrapSafe(log, new Runnable() {
+        Utils.wrapSafe(log, new Runnable() {
             public void run() {
                 delegate.underlyingFileMoved(buffer, path);
             }

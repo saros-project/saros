@@ -12,7 +12,7 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Listener registered on Editors to be informed about their dirty state.
@@ -53,7 +53,7 @@ public class DirtyStateListener implements IElementStateListener {
             return;
         }
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
 
             public void run() {
 

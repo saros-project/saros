@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BinaryChannelTransferObject implements IncomingTransferObject {
 
@@ -101,7 +101,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
             byte[] data = BinaryChannel.getData(resultList);
 
             if (transferDescription.compressInDataTransferManager())
-                data = Util.inflate(data, progress.newChild(1));
+                data = Utils.inflate(data, progress.newChild(1));
 
             return data;
         } finally {

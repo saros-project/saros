@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Action to enter into FollowMode
@@ -82,9 +82,9 @@ public class FollowModeAction extends Action implements Disposable {
                  * As a HACK, we run this action 1s after the listener was
                  * called.
                  */
-                Util.runSafeAsync(log, Util.delay(1000, new Runnable() {
+                Utils.runSafeAsync(log, Utils.delay(1000, new Runnable() {
                     public void run() {
-                        Util.runSafeSWTAsync(log, new Runnable() {
+                        Utils.runSafeSWTAsync(log, new Runnable() {
                             public void run() {
                                 if (sessionManager.getSarosSession() != null) {
                                     FollowModeAction.this.run();
@@ -146,7 +146,7 @@ public class FollowModeAction extends Action implements Disposable {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
 
                 User toFollow = getNewToFollow();

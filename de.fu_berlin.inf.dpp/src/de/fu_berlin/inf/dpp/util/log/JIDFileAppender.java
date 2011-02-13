@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * FileAppender which can replace date patterns in the file name but also can
@@ -127,7 +127,7 @@ public class JIDFileAppender extends FileAppender {
         String actualFileName = directory + File.separator
             + new SimpleDateFormat(format).format(new Date());
 
-        if (!Util.mkdirs(actualFileName)) {
+        if (!Utils.mkdirs(actualFileName)) {
             LogLog.error("Could not create dirs for " + actualFileName);
         }
         setFile(actualFileName);

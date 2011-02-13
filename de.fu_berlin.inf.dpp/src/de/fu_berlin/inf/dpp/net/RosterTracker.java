@@ -11,7 +11,7 @@ import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The RosterTracker is responsible for offering an convenient access for
@@ -105,7 +105,7 @@ public class RosterTracker implements IConnectionListener {
         if (roster == null)
             return Collections.emptyList();
 
-        return Util.asIterable(roster.getPresences(from.toString()));
+        return Utils.asIterable(roster.getPresences(from.toString()));
     }
 
     /**

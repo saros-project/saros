@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The RemoteProgressManager is responsible for showing progress bars on the
@@ -78,7 +78,7 @@ public class RemoteProgressManager {
 
             // Run async, so we can continue to receive messages over the
             // network...
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     ProgressMonitorDialog dialog = new ProgressMonitorDialog(
                         EditorAPI.getAWorkbenchWindow().getShell());

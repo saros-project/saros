@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 
-import de.fu_berlin.inf.dpp.util.FontUtil;
+import de.fu_berlin.inf.dpp.util.FontUtils;
 
 /**
  * This is a convenience version of {@link RoundedComposite} that allows the
@@ -88,8 +88,8 @@ public class SimpleRoundedComposite extends RoundedComposite {
             label.setBackground(this.getBackground());
             label.setText(text);
 
-            FontUtil.changeFontSizeBy(label, -1);
-            FontUtil.makeBold(label);
+            FontUtils.changeFontSizeBy(label, -1);
+            FontUtils.makeBold(label);
 
             label.setLayoutData(new GridData(horizontalAlignment,
                 SWT.BEGINNING, grabExcessHorizontalSpace, false));

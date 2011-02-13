@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 @Component(module = "action")
@@ -99,12 +99,12 @@ public class ConsistencyAction extends Action {
                 final Set<SPath> paths = new HashSet<SPath>(
                     watchdogClient.getPathsWithWrongChecksums());
 
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
                         // set tooltip
                         setToolTipText("Inconsistency Detected in file/s "
-                            + Util.toOSString(paths));
+                            + Utils.toOSString(paths));
 
                         // TODO Balloon is too aggressive at the moment, when
                         // the host is slow in sending changes (for instance
@@ -130,7 +130,7 @@ public class ConsistencyAction extends Action {
 
     @Override
     public void run() {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
                 log.debug("Buddy activated CW recovery.");

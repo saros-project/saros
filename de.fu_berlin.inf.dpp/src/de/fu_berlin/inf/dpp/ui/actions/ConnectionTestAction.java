@@ -43,7 +43,7 @@ import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Action to start a test run using the {@link DataTransferManager}
@@ -109,7 +109,7 @@ public class ConnectionTestAction extends SelectionProviderAction {
                     "Connection Test failed",
                     "Connection Test with buddy " + recipient + " failed",
                     new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
-                        IStatus.ERROR, Util.getMessage(e.getCause()), e
+                        IStatus.ERROR, Utils.getMessage(e.getCause()), e
                             .getCause()));
             return;
         } catch (InterruptedException e) {
@@ -124,7 +124,7 @@ public class ConnectionTestAction extends SelectionProviderAction {
                 + " using "
                 + testResult[0].mode.toString()
                 + " "
-                + Util.throughput(testResult[0].dataSize,
+                + Utils.throughput(testResult[0].dataSize,
                     testResult[0].transferTime));
 
     }

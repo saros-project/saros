@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Action which triggers the viewport of the local user to be changed to a local
@@ -57,7 +57,7 @@ public class JumpToUserWithWriteAccessPositionAction extends SelectionProviderAc
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 User jumpTo = getSelectedUser();
                 assert jumpTo != null;

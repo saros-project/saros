@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
@@ -158,7 +158,7 @@ public class PacketExtensionUtils {
 
                 TransferDescription transferDescription = payload
                     .getTransferDescription();
-                if (!Util.equals(transferDescription.sessionID,
+                if (!Utils.equals(transferDescription.sessionID,
                     sessionID.getValue()))
                     return false;
 
@@ -189,13 +189,13 @@ public class PacketExtensionUtils {
                 }
                 TransferDescription transferDescription = payload
                     .getTransferDescription();
-                if (!Util.equals(transferDescription.sender, peer)) {
+                if (!Utils.equals(transferDescription.sender, peer)) {
                     return false;
                 }
-                if (!Util.equals(transferDescription.sessionID, sessionID)) {
+                if (!Utils.equals(transferDescription.sessionID, sessionID)) {
                     return false;
                 }
-                if (!Util.equals(transferDescription.projectID, projectID)) {
+                if (!Utils.equals(transferDescription.projectID, projectID)) {
                     return false;
                 }
 
@@ -233,7 +233,7 @@ public class PacketExtensionUtils {
                     return false;
                 }
 
-                if (!Util.equals(info.sessionID, sessionID.getValue()))
+                if (!Utils.equals(info.sessionID, sessionID.getValue()))
                     return false;
 
                 return true;

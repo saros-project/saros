@@ -373,7 +373,7 @@ public class VersionManager {
      * Returns the Version of the locally running Saros plugin
      */
     public Version getVersion() {
-        return Util.getBundleVersion(bundle);
+        return Utils.getBundleVersion(bundle);
     }
 
     /**
@@ -478,8 +478,8 @@ public class VersionManager {
      */
     public Compatibility determineCompatibility(String remoteVersionString) {
 
-        Version remoteVersion = Util.parseBundleVersion(remoteVersionString);
-        Version localVersion = Util.getBundleVersion(bundle);
+        Version remoteVersion = Utils.parseBundleVersion(remoteVersionString);
+        Version localVersion = Utils.getBundleVersion(bundle);
 
         return determineCompatibility(localVersion, remoteVersion);
     }

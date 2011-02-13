@@ -31,7 +31,7 @@ import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Transport class for SOCKS5 bytestreams. When a Request is received always it
@@ -128,7 +128,7 @@ public class Socks5Transport extends BytestreamTransport {
             @Override
             public void run() {
                 try {
-                    Util.closeQuietly(future.get());
+                    Utils.closeQuietly(future.get());
                 } catch (InterruptedException e) {
                     // nothing to do here
                 } catch (ExecutionException e) {
@@ -213,13 +213,13 @@ public class Socks5Transport extends BytestreamTransport {
                 + "but at least the server allows bidirectional connections. (using "
                 + (preferInSession ? "incoming session" : "outgoing session")
                 + ")");
-            Util.closeQuietly(preferInSession ? outSession : inSession);
+            Utils.closeQuietly(preferInSession ? outSession : inSession);
             return session;
         }
 
         if (inSession == null || outSession == null) {
-            Util.closeQuietly(inSession);
-            Util.closeQuietly(outSession);
+            Utils.closeQuietly(inSession);
+            Utils.closeQuietly(outSession);
             throw new IOException(
                 "Could only establish one unidirectional connection but need two for wrapping.");
         }
@@ -331,7 +331,7 @@ public class Socks5Transport extends BytestreamTransport {
         if (exchanger == null) {
             log.warn(prefix()
                 + "Received response connection without a running connect");
-            Util.closeQuietly(inSession);
+            Utils.closeQuietly(inSession);
             return;
         }
 
@@ -341,11 +341,11 @@ public class Socks5Transport extends BytestreamTransport {
         } catch (InterruptedException e) {
             log.debug(prefix()
                 + "Wrapping bidirectional stream was interrupted.");
-            Util.closeQuietly(inSession);
+            Utils.closeQuietly(inSession);
         } catch (TimeoutException e) {
             log.error(prefix()
                 + "Wrapping bidirectional stream timed out in Request! Shouldn't have happened.");
-            Util.closeQuietly(inSession);
+            Utils.closeQuietly(inSession);
         }
 
     }
@@ -406,7 +406,7 @@ public class Socks5Transport extends BytestreamTransport {
             if (outSession.isDirect()) {
                 log.debug(prefix()
                     + "newly established session is direct! Discarding the other.");
-                Util.closeQuietly(inSession);
+                Utils.closeQuietly(inSession);
                 return new BinaryChannel(outSession,
                     NetTransferMode.SOCKS5_DIRECT);
             }
@@ -519,13 +519,13 @@ public class Socks5Transport extends BytestreamTransport {
                 if (inSession.isDirect()) {
                     log.debug(prefix()
                         + "response connection is direct! Discarding the other.");
-                    Util.closeQuietly(outSession);
+                    Utils.closeQuietly(outSession);
                     return new BinaryChannel(inSession,
                         NetTransferMode.SOCKS5_DIRECT);
                 }
 
             } catch (TimeoutException e) {
-                Util.closeQuietly(outSession);
+                Utils.closeQuietly(outSession);
                 String msg = "waiting for a response session timed out ("
                     + WAIT_FOR_RESPONSE_CONNECTION + "ms)";
                 if (exception != null)

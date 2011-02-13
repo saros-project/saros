@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This component is responsible for handling Consistency Errors on the host
@@ -113,7 +113,7 @@ public class ConsistencyWatchdogHandler {
 
         log.debug("Received Checksum Error: " + checksumError);
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
 
                 final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
@@ -134,7 +134,7 @@ public class ConsistencyWatchdogHandler {
 
                 // Run async, so we can continue to receive messages over the
                 // network...
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         try {
                             dialog.run(true, true, new IRunnableWithProgress() {
@@ -283,7 +283,7 @@ public class ConsistencyWatchdogHandler {
                     final DocumentChecksum checksum = new DocumentChecksum(path);
                     checksum.bind(doc);
                     checksum.update();
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             sarosSession.activityCreated(new ChecksumActivity(
                                 user, path, checksum.getHash(), checksum
@@ -306,7 +306,7 @@ public class ConsistencyWatchdogHandler {
             // Tell the client to delete the file
             sarosSession.sendActivity(from,
                 FileActivity.removed(user, path, Purpose.RECOVERY));
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     sarosSession.activityCreated(ChecksumActivity.missing(user,
                         path));

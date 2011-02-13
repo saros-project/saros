@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Collects some general session data (session time, session ID, session count),
@@ -100,7 +100,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
         data.setJavaVersion(System.getProperty("java.version",
             "Unknown Java Version"));
         data.setOSName(System.getProperty("os.name", "Unknown OS"));
-        data.setEclipseVersion(Util.getEclipsePlatformInfo());
+        data.setEclipseVersion(Utils.getEclipsePlatformInfo());
         data.setFeedbackDisabled(feedbackManager.isFeedbackDisabled());
         data.setFeedbackInterval(feedbackManager.getSurveyInterval());
         data.setUserID(statisticManager.getUserID());

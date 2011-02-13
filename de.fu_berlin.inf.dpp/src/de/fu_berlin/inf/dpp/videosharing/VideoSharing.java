@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionVideoActivity;
@@ -210,7 +210,7 @@ public class VideoSharing {
 
             public VideoPlayerView call() throws Exception {
                 sarosUI.createVideoPlayerView();
-                IViewPart view = Util.findView(VideoPlayerView.class.getName());
+                IViewPart view = Utils.findView(VideoPlayerView.class.getName());
                 if (view instanceof VideoPlayerView) {
                     VideoPlayerView playerView = (VideoPlayerView) view;
                     return playerView;
@@ -224,7 +224,7 @@ public class VideoSharing {
         };
 
         try {
-            return Util.runSWTSync(getView);
+            return Utils.runSWTSync(getView);
         } catch (Exception e) {
             log.error("Received unexpected exception: ", e);
         }
@@ -268,7 +268,7 @@ public class VideoSharing {
     public static void reportErrorToUser(Exception e, final String title) {
         final String message = e.getMessage();
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
                     title, message);
@@ -490,7 +490,7 @@ public class VideoSharing {
 
             videoDisplay = getVideoPlayer();
 
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     sarosUI.activateVideoPlayerView();
                 }
@@ -503,7 +503,7 @@ public class VideoSharing {
 
             decoder.startDecoder();
 
-            errorThread = Util.runSafeAsync("VideoSharing-ErrorReceiver", log,
+            errorThread = Utils.runSafeAsync("VideoSharing-ErrorReceiver", log,
                 new Runnable() {
                     public void run() {
                         try {

@@ -73,7 +73,7 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -128,7 +128,7 @@ public class EditorAPI implements IEditorAPI {
      */
     public void addEditorPartListener(EditorManager editorManager) {
 
-        assert Util.isSWT();
+        assert Utils.isSWT();
 
         if (editorManager == null)
             throw new IllegalArgumentException();
@@ -574,7 +574,7 @@ public class EditorAPI implements IEditorAPI {
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
                     .getViewer(editorPart);
@@ -627,7 +627,7 @@ public class EditorAPI implements IEditorAPI {
     public void addSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
-        assert Util.isSWT();
+        assert Utils.isSWT();
 
         if (editorManager == null || editorPart == null)
             throw new IllegalArgumentException();
@@ -649,7 +649,7 @@ public class EditorAPI implements IEditorAPI {
     public void removeSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
-        assert Util.isSWT();
+        assert Utils.isSWT();
 
         if (editorManager == null || editorPart == null)
             throw new IllegalArgumentException();
@@ -789,7 +789,7 @@ public class EditorAPI implements IEditorAPI {
         final BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
         // save document
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 editor.doSave(monitor);
             }
@@ -856,7 +856,7 @@ public class EditorAPI implements IEditorAPI {
     public static boolean saveProject(final IProject projectToSave,
         final boolean confirm) {
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     /**
                      * TODO saveAllEditors does not save the Documents that we

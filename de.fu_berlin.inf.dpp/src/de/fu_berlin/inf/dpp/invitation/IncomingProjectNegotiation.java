@@ -48,9 +48,9 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -182,7 +182,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 this.projectID,
                 monitor.newChild(90, SubMonitor.SUPPRESS_ALL_LABELS), true);
 
-            log.debug("Inv" + Util.prefix(peer) + ": Archive received.");
+            log.debug("Inv" + Utils.prefix(peer) + ": Archive received.");
             checkCancellation();
 
             monitor.subTask("Extracting archive...");
@@ -190,7 +190,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             writeArchive(archiveStream, localProject,
                 monitor.newChild(5, SubMonitor.SUPPRESS_ALL_LABELS));
 
-            log.debug("Inv" + Util.prefix(peer)
+            log.debug("Inv" + Utils.prefix(peer)
                 + ": Archive has been written to disk.");
         }
         sessionManager.getSarosSession().addSharedProject(localProject,
@@ -244,7 +244,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         try {
-            this.localProject = Util.runSWTSync(new Callable<IProject>() {
+            this.localProject = Utils.runSWTSync(new Callable<IProject>() {
                 public IProject call() throws CoreException,
                     InterruptedException {
                     try {
@@ -271,7 +271,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     protected void checkCancellation() throws SarosCancellationException {
         if (cancelled.get()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             throw new SarosCancellationException();
         }
 
@@ -279,7 +279,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return;
 
         if (monitor.isCanceled()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             localCancel(null, CancelOption.NOTIFY_PEER);
             throw new SarosCancellationException();
         }
@@ -308,7 +308,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
         } else {
-            log.warn("Inv" + Util.prefix(peer)
+            log.warn("Inv" + Utils.prefix(peer)
                 + ": This type of Exception is not expected: ", e);
             String errorMsg = "Unknown error: " + e;
             if (e.getMessage() != null)
@@ -320,7 +320,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     protected void executeCancellation() throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": executeCancellation");
+        log.debug("Inv" + Utils.prefix(peer) + ": executeCancellation");
         if (!cancelled.get())
             throw new IllegalStateException(
                 "executeCancellation should only be called after localCancel or remoteCancel!");
@@ -338,17 +338,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             case DO_NOT_NOTIFY_PEER:
                 break;
             default:
-                log.warn("Inv" + Util.prefix(peer)
+                log.warn("Inv" + Utils.prefix(peer)
                     + ": This case is not expected here.");
             }
 
             if (errorMsg != null) {
                 cancelMessage = "Sharing project was cancelled locally"
                     + " because of an error: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
             } else {
                 cancelMessage = "Sharing project was cancelled by local user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
             }
 
         } else if (cancellationCause instanceof RemoteCancellationException) {
@@ -357,10 +357,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             if (errorMsg != null) {
                 cancelMessage = "Sharing project was cancelled by the remote user "
                     + " because of an error on his/her side: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
             } else {
                 cancelMessage = "Sharing project was cancelled by the remote user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
             }
         } else {
             log.error("This type of exception is not expected here: ",
@@ -407,13 +407,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     public void localCancel(String errorMsg, CancelOption cancelOption) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log.debug("Inv" + Util.prefix(peer) + ": localCancel: " + errorMsg);
+        log.debug("Inv" + Utils.prefix(peer) + ": localCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new LocalCancellationException(errorMsg,
             cancelOption);
         if (monitor == null) {
-            log.debug("Inv" + Util.prefix(peer)
+            log.debug("Inv" + Utils.prefix(peer)
                 + ": Closing JoinSessionWizard manually.");
             try {
                 executeCancellation();
@@ -437,14 +437,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (!cancelled.compareAndSet(false, true))
             return;
         log.debug("Inv"
-            + Util.prefix(peer)
+            + Utils.prefix(peer)
             + ": remoteCancel "
             + (errorMsg == null ? " by user" : " because of error: " + errorMsg));
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new RemoteCancellationException(errorMsg);
         if (monitor == null) {
-            log.debug("Inv" + Util.prefix(peer)
+            log.debug("Inv" + Utils.prefix(peer)
                 + ": Closing JoinSessionWizard manually.");
             try {
                 executeCancellation();
@@ -479,7 +479,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     protected IProject createNewProject(String newProjectName,
         final IProject baseProject) throws Exception {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Creating new project...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Creating new project...");
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
@@ -568,7 +568,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());
         if (missingFiles.isEmpty()) {
-            log.debug("Inv" + Util.prefix(peer)
+            log.debug("Inv" + Utils.prefix(peer)
                 + ": There are no files to synchronize.");
             /**
              * We send an empty file list to the host as a notification that we
@@ -597,7 +597,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     protected FileListDiff computeDiff(FileList localFileList,
         FileList remoteFileList, SubMonitor monitor)
         throws LocalCancellationException {
-        log.debug("Inv" + Util.prefix(peer) + ": Computing file list diff...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Computing file list diff...");
         monitor.beginTask("Preparing local project for incoming files", 100);
         try {
             monitor.subTask("Calculating Diff");
@@ -725,12 +725,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final IProject project, final SubMonitor subMonitor)
         throws LocalCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Writing archive to disk...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Writing archive to disk...");
         try {
             ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
-                        FileUtil.writeArchive(archiveStream, project,
+                        FileUtils.writeArchive(archiveStream, project,
                             subMonitor);
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,

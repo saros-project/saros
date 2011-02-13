@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamPacket;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamPath;
 import de.fu_berlin.inf.dpp.util.ThreadAccessRecorder;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This is a concrete session, based on a {@link StreamService}. It contains all
@@ -602,7 +602,7 @@ public class StreamSession implements Disposable {
                         if (StreamSession.this.resendThread[streamID] != null)
                             // another one waits already
                             return null;
-                        StreamSession.this.resendThread[streamID] = Util
+                        StreamSession.this.resendThread[streamID] = Utils
                             .runSafeAsync(StreamSession.this.toString()
                                 + "-dataWaiter-" + streamID, log,
                                 new Runnable() {
@@ -625,7 +625,7 @@ public class StreamSession implements Disposable {
                     }
                 }
                 byte[] data = output.toByteArray();
-                log.trace("Will read " + Util.formatByte(data.length));
+                log.trace("Will read " + Utils.formatByte(data.length));
                 output.reset();
                 if (StreamSession.this.resendThread[streamID] != null)
                     StreamSession.this.resendThread[streamID].interrupt();

@@ -52,7 +52,7 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The ActivitySequencer is responsible for making sure that activityDataObjects
@@ -493,7 +493,7 @@ public class ActivitySequencer {
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Util.runSafeSync(log, new Runnable() {
+                Utils.runSafeSync(log, new Runnable() {
                     public void run() {
                         flushTask();
                     }

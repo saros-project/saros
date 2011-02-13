@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business Logic for handling Invitation requests
@@ -49,11 +49,11 @@ public class UserListHandler {
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
 
-                log.debug("Inv" + Util.prefix(fromJID) + ": Received userList");
+                log.debug("Inv" + Utils.prefix(fromJID) + ": Received userList");
                 UserListInfo userListInfo = userListExtProv.getPayload(packet);
 
                 if (userListInfo == null) {
-                    log.warn("Inv" + Util.prefix(fromJID)
+                    log.warn("Inv" + Utils.prefix(fromJID)
                         + ": The received userList packet's"
                         + " payload is null.");
                     return;
@@ -67,7 +67,7 @@ public class UserListHandler {
                 if (fromUser == null || !fromUser.isHost()) {
                     log.error("Received userList from buddy who "
                         + "is not part of our session or is not host: "
-                        + Util.prefix(fromJID));
+                        + Utils.prefix(fromJID));
                     return;
                 }
 

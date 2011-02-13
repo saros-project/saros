@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "action")
 public class GiveWriteAccessAction extends SelectionProviderAction {
@@ -82,7 +82,7 @@ public class GiveWriteAccessAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 sarosUI.performPermissionChange(
                     GiveWriteAccessAction.this.selectedUser,

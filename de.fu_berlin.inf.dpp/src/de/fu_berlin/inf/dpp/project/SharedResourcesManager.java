@@ -66,8 +66,8 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.FileUtils;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -377,7 +377,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         final List<IResourceActivity> orderedActivities = pendingActivities
             .retrieveAll();
         log.trace("Sending activities " + orderedActivities.toString());
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 for (final IActivity activity : orderedActivities) {
                     /*
@@ -479,7 +479,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             log.info("Received consistency file: " + activity);
 
             if (log.isInfoEnabled() && (activity.getContents() != null)) {
-                Util.logDiff(log, activity.getSource().getJID(), path,
+                Utils.logDiff(log, activity.getSource().getJID(), path,
                     activity.getContents(), file);
             }
         }
@@ -490,14 +490,14 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             // TODO The progress should be reported to the user.
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
-                FileUtil.writeFile(
+                FileUtils.writeFile(
                     new ByteArrayInputStream(activity.getContents()), file,
                     monitor);
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
         } else if (type == FileActivity.Type.Removed) {
-            FileUtil.delete(file);
+            FileUtils.delete(file);
         } else if (type == FileActivity.Type.Moved) {
 
             IPath newFilePath = activity.getPath().getFile().getFullPath();
@@ -508,7 +508,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 log.error(".exec Old File is not availible while moving "
                     + activity.getOldPath());
             } else
-                FileUtil.move(newFilePath, oldResource);
+                FileUtils.move(newFilePath, oldResource);
 
             // while moving content of the file changed
             if (activity.getContents() != null) {
@@ -516,7 +516,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 SubMonitor monitor = SubMonitor
                     .convert(new NullProgressMonitor());
                 try {
-                    FileUtil.writeFile(
+                    FileUtils.writeFile(
                         new ByteArrayInputStream(activity.getContents()), file,
                         monitor);
                 } catch (Exception e) {
@@ -542,10 +542,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             path.getProjectRelativePath());
 
         if (activity.getType() == FolderActivity.Type.Created) {
-            FileUtil.create(folder);
+            FileUtils.create(folder);
         } else if (activity.getType() == FolderActivity.Type.Removed) {
             try {
-                FileUtil.delete(folder);
+                FileUtils.delete(folder);
             } catch (CoreException e) {
                 log.warn("Removing folder failed: " + folder);
             }
@@ -592,7 +592,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
                 throws InvocationTargetException, InterruptedException {
                     log.trace("progressMonitorDialog.run started");
-                    if (!Util.isSWT())
+                    if (!Utils.isSWT())
                         log.trace("not in SWT thread");
                     if (activityType == VCSActivity.Type.Connect) {
                         vcs.connect(project, url, directory, progress);

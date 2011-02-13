@@ -42,7 +42,7 @@ import org.eclipse.core.runtime.Path;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -389,7 +389,7 @@ public class FileList {
 
                 try {
                     FileListData data = new FileListData();
-                    data.checksum = FileUtil.checksum(file);
+                    data.checksum = FileUtils.checksum(file);
 
                     if (isManagedProject)
                         addVCSInfo(resource, data, vcs);

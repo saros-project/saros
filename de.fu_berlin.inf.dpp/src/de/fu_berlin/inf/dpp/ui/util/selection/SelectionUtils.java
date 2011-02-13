@@ -15,7 +15,11 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author bkahlert
  */
-public class SelectionUtil {
+public class SelectionUtils {
+
+    private SelectionUtils() {
+        // no instantiation allowed
+    }
 
     /**
      * Returns the {@link ISelectionService}

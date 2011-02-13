@@ -35,7 +35,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Add another IProject to the Saros session, on the fly.
@@ -119,7 +119,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
             }
             message += "\nAdding multiple projects is not supported yet.\nIf you continue only project "
                 + this.selectedProjects.get(0) + " will be added to session.";
-            if (!Util.popUpYesNoQuestion("Multiple Projects marked", message,
+            if (!Utils.popUpYesNoQuestion("Multiple Projects marked", message,
                 false)) {
                 return;
             }
@@ -130,7 +130,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
     }
 
     public void run(IAction action) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runSafe();
             }

@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Observable which keeps track of all InvitationProcesses currently running.
@@ -35,7 +35,7 @@ public class InvitationProcessObservable {
         if (oldProcess != null) {
             log.error("An internal error occurred:"
                 + " An existing invititation process with "
-                + Util.prefix(oldProcess.getPeer())
+                + Utils.prefix(oldProcess.getPeer())
                 + " was replace by a new one", new StackTrace());
         }
     }
@@ -44,7 +44,7 @@ public class InvitationProcessObservable {
         if (this.processes.remove(process.getPeer()) == null) {
             log.error("An internal error occurred:"
                 + " No invititation process with "
-                + Util.prefix(process.getPeer()) + " could be found",
+                + Utils.prefix(process.getPeer()) + " could be found",
                 new StackTrace());
         }
     }

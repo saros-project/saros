@@ -72,7 +72,7 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
@@ -150,7 +150,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * That's also the reason why we have to use Util.runSafeSWTSync in the
      * activityDispatcher thread.
      * 
-     * @see Util#runSafeSWTAsync(Logger, Runnable)
+     * @see Utils#runSafeSWTAsync(Logger, Runnable)
      * @see Display#asyncExec(Runnable)
      */
     /*
@@ -166,7 +166,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 while (!cancelActivityDispatcher) {
                     final List<IActivity> activities = pendingActivityLists
                         .take();
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             TransformationResult transformed = concurrentDocumentClient
                                 .transformIncoming(activities);
@@ -353,7 +353,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (user.isHost()) {
 
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     activityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
@@ -366,7 +366,7 @@ public class SarosSession implements ISarosSession, Disposable {
             StartHandle startHandle = stopManager.stop(user,
                 "Performing permission change", progress);
 
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     activityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
@@ -386,7 +386,7 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public void setPermission(final User user, final Permission permission) {
 
-        assert Util.isSWT() : "Must be called from SWT Thread";
+        assert Utils.isSWT() : "Must be called from SWT Thread";
 
         if (user == null || permission == null)
             throw new IllegalArgumentException();
@@ -402,7 +402,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * {@inheritDoc}
      */
     public void userInvitationCompleted(final User user) {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 userInvitationCompletedWrapped(user);
             }
@@ -411,14 +411,14 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void userInvitationCompletedWrapped(final User user) {
 
-        assert Util.isSWT() : "Must be called from SWT Thread";
+        assert Utils.isSWT() : "Must be called from SWT Thread";
 
         if (user == null)
             throw new IllegalArgumentException();
 
         user.invitationCompleted();
 
-        log.debug("The invitation of " + Util.prefix(user.getJID())
+        log.debug("The invitation of " + Utils.prefix(user.getJID())
             + " is now complete");
 
         listenerDispatch.invitationCompleted(user);
@@ -470,21 +470,21 @@ public class SarosSession implements ISarosSession, Disposable {
         JID jid = user.getJID();
 
         if (participants.putIfAbsent(jid, user) != null) {
-            log.error("Buddy " + Util.prefix(jid)
+            log.error("Buddy " + Utils.prefix(jid)
                 + " added twice to SarosSession", new StackTrace());
             throw new IllegalArgumentException();
         }
 
         listenerDispatch.userJoined(user);
 
-        log.info("Buddy " + Util.prefix(jid) + " joined session.");
+        log.info("Buddy " + Utils.prefix(jid) + " joined session.");
     }
 
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
             log.warn("Tried to remove buddy who was not in participants: "
-                + Util.prefix(jid));
+                + Utils.prefix(jid));
             return;
         }
         if (isHost()) {
@@ -496,7 +496,7 @@ public class SarosSession implements ISarosSession, Disposable {
         // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
 
-        log.info("Buddy " + Util.prefix(jid) + " left session");
+        log.info("Buddy " + Utils.prefix(jid) + " left session");
     }
 
     /*
@@ -581,7 +581,7 @@ public class SarosSession implements ISarosSession, Disposable {
         if (jid.isBareJID()) {
             throw new IllegalArgumentException(
                 "JIDs used for the SarosSession should always be resource qualified: "
-                    + Util.prefix(jid));
+                    + Utils.prefix(jid));
         }
 
         User user = participants.get(jid);
@@ -726,7 +726,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void activityCreated(IActivity activity) {
 
-        assert Util.isSWT() : "Must be called from the SWT Thread";
+        assert Utils.isSWT() : "Must be called from the SWT Thread";
 
         if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null");
@@ -828,7 +828,7 @@ public class SarosSession implements ISarosSession, Disposable {
         throws SarosCancellationException {
 
         Collection<User> participants = this.getParticipants();
-        log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
+        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist "
             + participants);
 
         SarosPacketCollector userListConfirmationCollector = transmitter
@@ -838,11 +838,11 @@ public class SarosSession implements ISarosSession, Disposable {
             transmitter.sendUserList(user.getJID(), invitationID, participants);
         }
 
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for user list confirmations...");
         transmitter.receiveUserListConfirmation(userListConfirmationCollector,
             this.getRemoteUsers(), monitor);
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": All user list confirmations have arrived.");
 
     }

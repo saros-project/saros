@@ -90,7 +90,7 @@ import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
 /**
@@ -165,7 +165,7 @@ public class SessionView extends ListExplanatoryViewPart {
      */
     protected class SessionRosterListener implements IRosterListener {
         public void changed(final Collection<String> addresses) {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     if (sarosSession == null)
                         return;
@@ -209,7 +209,7 @@ public class SessionView extends ListExplanatoryViewPart {
         }
 
         public void rosterChanged(Roster roster) {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     viewer.refresh();
                 }
@@ -302,7 +302,7 @@ public class SessionView extends ListExplanatoryViewPart {
         }
 
         public void refreshTable() {
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     tableViewer.refresh();
                 }
@@ -560,7 +560,7 @@ public class SessionView extends ListExplanatoryViewPart {
 
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     viewer.setInput(newSarosSession);
                     showExplanation(false);
@@ -571,7 +571,7 @@ public class SessionView extends ListExplanatoryViewPart {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             assert sarosSession == oldSarosSession;
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     showExplanation(true);
                     viewer.setInput(null);
@@ -582,9 +582,9 @@ public class SessionView extends ListExplanatoryViewPart {
     };
 
     public static void showNotification(final String title, final String text) {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                IViewPart sessionView = Util
+                IViewPart sessionView = Utils
                     .findView("de.fu_berlin.inf.dpp.ui.SessionView");
                 /*
                  * If no session view is open then show the balloon notification

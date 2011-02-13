@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This class is responsible for performing ServiceDiscovery for features such
@@ -306,7 +306,7 @@ public class DiscoveryManager implements Disposable {
         } catch (CacheMissException e) {
             supportExecutor.execute(new Runnable() {
                 public void run() {
-                    Util.runSafeAsync(log, new Runnable() {
+                    Utils.runSafeAsync(log, new Runnable() {
                         public void run() {
                             isSarosSupported(buddy);
                         }

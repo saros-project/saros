@@ -37,7 +37,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The SessionStatistic class wraps a Properties object in which the gathered
@@ -277,7 +277,7 @@ public class SessionStatistic {
         String dirName = "statistic_" + dateFormat.format(new Date());
         IPath filePath = path.append(dirName).append(filename);
 
-        if (!Util.mkdirs(filePath.toOSString())) {
+        if (!Utils.mkdirs(filePath.toOSString())) {
             log.error("Could not create the necessary directories to save"
                 + " the statistic as a file. Therefore the statistic could"
                 + " not be saved.");

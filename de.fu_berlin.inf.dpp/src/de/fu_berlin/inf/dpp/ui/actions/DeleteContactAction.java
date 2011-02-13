@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class DeleteContactAction extends SelectionProviderAction {
 
@@ -84,7 +84,7 @@ public class DeleteContactAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runDeleteAction();
             }

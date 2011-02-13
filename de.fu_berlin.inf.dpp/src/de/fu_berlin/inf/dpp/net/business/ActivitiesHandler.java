@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
@@ -62,7 +62,7 @@ public class ActivitiesHandler {
                         payload.getSessionID())) {
                         log.warn("Rcvd ("
                             + String.format("%03d", timedActivities.size())
-                            + ") " + Util.prefix(from)
+                            + ") " + Utils.prefix(from)
                             + "from an old/unknown session: " + timedActivities);
                         return;
                     }
@@ -98,13 +98,13 @@ public class ActivitiesHandler {
 
         if (session == null || session.getUser(fromJID) == null) {
             log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
-                + ") " + Util.prefix(fromJID)
+                + ") " + Utils.prefix(fromJID)
                 + " but buddy is no participant: " + timedActivities);
             return;
         } else {
             String msg = "Rcvd ("
                 + String.format("%03d", timedActivities.size()) + ") "
-                + Util.prefix(fromJID) + ": " + timedActivities;
+                + Utils.prefix(fromJID) + ": " + timedActivities;
 
             // only log on debug level if there is more than a checksum
             if (LoggingUtils.containsChecksumsOnly(timedActivities))

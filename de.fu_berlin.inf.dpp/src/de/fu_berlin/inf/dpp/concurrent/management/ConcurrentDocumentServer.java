@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The ConcurrentDocumentServer is responsible for coordinating all
@@ -121,7 +121,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
         assert sarosSession.isHost() : "CDS.transformIncoming may not be called on the Client!!";
 
-        assert !Util.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
+        assert !Utils.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
 
         TransformationResult result = new TransformationResult(
             sarosSession.getLocalUser());
@@ -171,7 +171,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
             if (to == null) {
                 log.error("Unknown buddy in transformation result: "
-                    + Util.prefix(jid));
+                    + Utils.prefix(jid));
                 continue;
             }
 
@@ -195,7 +195,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
         assert sarosSession.isHost();
 
-        log.debug("Resetting jupiter server for " + Util.prefix(jid) + ": "
+        log.debug("Resetting jupiter server for " + Utils.prefix(jid) + ": "
             + path.toString());
         this.server.reset(path, jid);
     }
@@ -224,7 +224,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
             if (to == null) {
                 log.error("Unknown buddy in transformation result: "
-                    + Util.prefix(jid));
+                    + Utils.prefix(jid));
                 continue;
             }
 

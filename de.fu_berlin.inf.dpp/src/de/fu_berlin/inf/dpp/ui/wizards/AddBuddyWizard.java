@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Wizard for adding a new buddy to the roster of the currently connected user.
@@ -173,7 +173,7 @@ public class AddBuddyWizard extends Wizard {
     protected boolean openQuestionDialog(final String title,
         final String message) {
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openQuestion(getShell(), title,
                         message);
@@ -199,7 +199,7 @@ public class AddBuddyWizard extends Wizard {
 
     protected void openError(final String title, final String message) {
         try {
-            Util.runSWTSync(new Callable<Void>() {
+            Utils.runSWTSync(new Callable<Void>() {
                 public Void call() {
                     MessageDialog.openError(getShell(), title, message);
                     return null;

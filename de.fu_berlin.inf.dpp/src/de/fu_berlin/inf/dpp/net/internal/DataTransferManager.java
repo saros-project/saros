@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
@@ -167,7 +167,7 @@ public class DataTransferManager implements IConnectionListener,
                     "[" + getTransferMode().toString()
                         + "] Finished incoming data transfer: "
                         + description.toString() + ", size: "
-                        + Util.throughput(content.length, duration),
+                        + Utils.throughput(content.length, duration),
                     description.logToDebug);
 
                 transferModeDispatch.transferFinished(description.getSender(),
@@ -307,7 +307,7 @@ public class DataTransferManager implements IConnectionListener,
             StopWatch watch = new StopWatch().start();
 
             if (transferData.compressInDataTransferManager()) {
-                input = Util.deflate(input, progress.newChild(15));
+                input = Utils.deflate(input, progress.newChild(15));
             }
 
             connection.send(transferData, input, progress);
@@ -319,7 +319,7 @@ public class DataTransferManager implements IConnectionListener,
         } catch (SarosCancellationException e) {
             throw e; // Rethrow to circumvrent the Exception catch below
         } catch (IOException e) {
-            log.error(Util.prefix(transferData.recipient) + "Failed to send "
+            log.error(Utils.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
                 + ":", e.getCause());
             throw e;
@@ -355,14 +355,14 @@ public class DataTransferManager implements IConnectionListener,
             try {
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
-                log.error(Util.prefix(recipient) + "Failed to connect using "
+                log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + ":",
                     e.getCause() == null ? e : e.getCause());
                 errors.put(transport.getDefaultNetTransferMode(), e.getCause());
             } catch (InterruptedException e) {
                 throw e;
             } catch (Exception e) {
-                log.error(Util.prefix(recipient) + "Failed to connect using "
+                log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + " because of an unknown error:", e);
                 errors.put(transport.getDefaultNetTransferMode(), e);
             }
@@ -382,7 +382,7 @@ public class DataTransferManager implements IConnectionListener,
 
             errorMsg.delete(errorMsg.length() - 2, errorMsg.length());
 
-            throw new IOException(Util.prefix(recipient) + errorMsg.toString());
+            throw new IOException(Utils.prefix(recipient) + errorMsg.toString());
         } else
             connectionChanged(recipient, connection);
         return connection;

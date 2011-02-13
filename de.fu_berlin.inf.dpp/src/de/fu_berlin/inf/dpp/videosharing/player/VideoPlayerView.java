@@ -69,7 +69,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
@@ -156,7 +156,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             .add(new ValueChangeListener<VideoSharingSession>() {
 
                 public void setValue(final VideoSharingSession newValue) {
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             if (newValue == null)
                                 reset();
@@ -326,11 +326,11 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         lastShownStatus = statistic;
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (!parent.isDisposed()) {
                     fps.setText(String.valueOf(lastShownStatus.getFps()));
-                    bitrate.setText(Util.formatByte(lastShownStatus.getBytes()));
+                    bitrate.setText(Utils.formatByte(lastShownStatus.getBytes()));
                     delay.setText(String.valueOf(lastShownStatus.getDelay()));
                 }
             }
@@ -358,7 +358,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();
@@ -390,7 +390,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();
@@ -422,7 +422,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();

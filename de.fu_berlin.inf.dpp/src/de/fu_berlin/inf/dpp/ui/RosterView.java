@@ -89,7 +89,7 @@ import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
@@ -209,7 +209,7 @@ public class RosterView extends ViewPart {
         public void connectionStateChanged(XMPPConnection connection,
             final ConnectionState newState) {
 
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     updateStatusInformation(newState);
                     updateEnablement();
@@ -227,7 +227,7 @@ public class RosterView extends ViewPart {
         public void featureSupportUpdated(JID jid, String feature,
             boolean isSupported) {
             if (Saros.NAMESPACE.equals(feature)) {
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         if (RosterView.this.viewer != null
                             && RosterView.this.viewer.getTree() != null
@@ -367,7 +367,7 @@ public class RosterView extends ViewPart {
             if (entry == null) {
                 return result;
             }
-            result.append(Util.getDisplayableName(entry));
+            result.append(Utils.getDisplayableName(entry));
 
             // Append presence information if available.
             final Presence presence = roster.getPresence(user);
@@ -426,7 +426,7 @@ public class RosterView extends ViewPart {
 
         @Override
         public String toString() {
-            return Util.getDisplayableName(roster.getEntry(jid));
+            return Utils.getDisplayableName(roster.getEntry(jid));
         }
     }
 
@@ -765,7 +765,7 @@ public class RosterView extends ViewPart {
             return;
         }
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (roster == null) {
                     return;
@@ -790,7 +790,7 @@ public class RosterView extends ViewPart {
      *            <code>false</code> otherwise.
      */
     public void refreshRosterTree(final boolean updateLabels) {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed()) {
                     return;

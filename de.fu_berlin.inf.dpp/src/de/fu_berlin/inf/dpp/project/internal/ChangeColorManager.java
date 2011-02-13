@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This manager is responsible for handling color changes.
@@ -132,7 +132,7 @@ public class ChangeColorManager implements IActivityProvider {
 
                 if (!ChangeColorManager.checkColor(rgbOfNewParticipant,
                     userList)) {
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             ColorDialog changeColor = new ColorDialog(EditorAPI
                                 .getShell());

@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Leaves the current Saros session. Is deactivated if there is no running
@@ -110,7 +110,7 @@ public class LeaveSessionAction extends Action {
         if (!reallyLeave)
             return;
 
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 runLeaveSession();
             }

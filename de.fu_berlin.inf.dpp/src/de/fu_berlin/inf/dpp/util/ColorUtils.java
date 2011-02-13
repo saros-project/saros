@@ -4,8 +4,12 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
-public class ColorUtil {
-    private static Logger log = Logger.getLogger(ColorUtil.class);
+public class ColorUtils {
+    private static Logger log = Logger.getLogger(ColorUtils.class);
+
+    private ColorUtils() {
+        // no instantiation allowed
+    }
 
     /**
      * Scales a color; the higher the ratio the lighter the color

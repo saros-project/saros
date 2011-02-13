@@ -84,9 +84,13 @@ import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 /**
  * Static Utility functions
  */
-public class Util {
+public class Utils {
 
-    private static final Logger log = Logger.getLogger(Util.class);
+    private static final Logger log = Logger.getLogger(Utils.class);
+
+    private Utils() {
+        // no instantiation allowed
+    }
 
     protected static final Base64 base64Codec = new Base64();
     protected static final URLCodec urlCodec = new URLCodec();
@@ -396,7 +400,7 @@ public class Util {
      * 
      * @param log
      *            The log to print any exception messages thrown which occur
-     *            when running the given runnable. If null, the {@link Util#log}
+     *            when running the given runnable. If null, the {@link Utils#log}
      *            is used.
      * 
      */
@@ -404,7 +408,7 @@ public class Util {
         final Runnable runnable) {
 
         if (log == null) {
-            log = Util.log;
+            log = Utils.log;
         }
         final Logger logToUse = log;
 
@@ -493,7 +497,7 @@ public class Util {
 
         final CallableResult<T> result = new CallableResult<T>();
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 try {
                     result.result = callable.call();
@@ -1079,7 +1083,7 @@ public class Util {
     }
 
     /**
-     * Serializes an {@link Serializable}. Errors are logged to {@link Util#log}
+     * Serializes an {@link Serializable}. Errors are logged to {@link Utils#log}
      * . .
      * 
      * @param o
@@ -1107,7 +1111,7 @@ public class Util {
 
     /**
      * Restores a serialized {@link Serializable}. Errors are logged to
-     * {@link Util#log}.
+     * {@link Utils#log}.
      * 
      * @param serialized
      *            serialized {@link Object}
@@ -1142,7 +1146,7 @@ public class Util {
         final boolean askAboutStatisticTransfer) {
 
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
 
                 public Boolean call() {
                     /*
@@ -1175,7 +1179,7 @@ public class Util {
         if (failSilently)
             return;
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), title, message);
             }
@@ -1194,7 +1198,7 @@ public class Util {
             return false;
 
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openQuestion(EditorAPI.getShell(),
                         title, message);

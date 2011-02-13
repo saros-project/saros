@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.InvitationWizardUserSelectionPage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -95,7 +95,7 @@ public class InvitationWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 /*
                  * If more than one person is in the session, it should not be
@@ -133,7 +133,7 @@ public class InvitationWizard extends Wizard {
      */
     public static synchronized boolean confirmUnsupportedSaros(final JID peer) {
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openConfirm(getAShell(),
                         "Invite buddy who does not support Saros?", "User "
@@ -211,7 +211,7 @@ public class InvitationWizard extends Wizard {
         }
 
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
                         message);
@@ -234,7 +234,7 @@ public class InvitationWizard extends Wizard {
             + localVersion.toString() + ".)\n\nDo you wish to proceed?";
 
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
                         message);
@@ -254,7 +254,7 @@ public class InvitationWizard extends Wizard {
             + ", the resources have to be saved. If you press 'No', "
             + "the invitation will be cancelled.\n\nSave changes?";
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
                         message);

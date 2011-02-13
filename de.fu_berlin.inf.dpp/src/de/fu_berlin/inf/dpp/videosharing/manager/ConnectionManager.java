@@ -29,7 +29,7 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 
@@ -65,9 +65,9 @@ public class ConnectionManager implements Disposable {
         this.videoSharingSession = videoSharingSession;
         this.encoderManager = new EncoderManager();
         this.decodingStatisticManager = new DecodingStatisticManager();
-        encoderManagerThread = Util.runSafeAsync("EncoderManager", log,
+        encoderManagerThread = Utils.runSafeAsync("EncoderManager", log,
             encoderManager);
-        decodingStatisticManagerThread = Util.runSafeAsync(
+        decodingStatisticManagerThread = Utils.runSafeAsync(
             "DecodingStatisticManager", log, decodingStatisticManager);
     }
 

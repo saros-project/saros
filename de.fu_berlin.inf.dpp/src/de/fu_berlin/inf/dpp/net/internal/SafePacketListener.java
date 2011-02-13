@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A packet listener which forwards calls to a another PacketListener, but
@@ -34,7 +34,7 @@ public class SafePacketListener implements PacketListener {
     }
 
     public void processPacket(final Packet packet) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.processPacket(packet);
             }

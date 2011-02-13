@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.Path;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Converter for {@link IPath} objects (and {@link Path} objects too) to strings
@@ -23,11 +23,11 @@ public class IPathConverter extends AbstractSingleValueConverter {
 
     @Override
     public Object fromString(String path) {
-        return Path.fromPortableString(Util.urlUnescape(path));
+        return Path.fromPortableString(Utils.urlUnescape(path));
     }
 
     @Override
     public String toString(Object obj) {
-        return Util.urlEscape(((IPath) obj).toPortableString());
+        return Utils.urlEscape(((IPath) obj).toPortableString());
     }
 }

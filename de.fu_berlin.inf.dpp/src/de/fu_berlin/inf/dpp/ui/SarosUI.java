@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
@@ -114,7 +114,7 @@ public class SarosUI {
 
         // Fixes #2727848: InvitationDialog is opened in the
         // background
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 EclipseUtils.openWindow(wizardDialog);
             }
@@ -132,7 +132,7 @@ public class SarosUI {
 
         wizardDialog.setHelpAvailable(false);
         projectWizard.setWizardDlg(wizardDialog);
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
                 EclipseUtils.openWindow(wizardDialog);
@@ -162,7 +162,7 @@ public class SarosUI {
      * @swt
      */
     public void createSessionView() {
-        if (Util.findView(SarosUI.SESSION_VIEW) == null)
+        if (Utils.findView(SarosUI.SESSION_VIEW) == null)
             createView(SarosUI.SESSION_VIEW);
     }
 
@@ -188,7 +188,7 @@ public class SarosUI {
      * @swt
      */
     public void createVideoPlayerView() {
-        if (Util.findView(SarosUI.VIDEO_PLAYER_VIEW) == null)
+        if (Utils.findView(SarosUI.VIDEO_PLAYER_VIEW) == null)
             createView(SarosUI.VIDEO_PLAYER_VIEW);
     }
 
@@ -321,13 +321,13 @@ public class SarosUI {
                     } catch (CancellationException e) {
                         log.warn("Permission change failed because buddy"
                             + " canceled the permission change");
-                        Util.runSafeSWTSync(log, new Runnable() {
+                        Utils.runSafeSWTSync(log, new Runnable() {
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI
                                     .getAWorkbenchWindow().getShell(),
                                     "Permission change failed",
                                     "The permission change was canceled. "
-                                        + Util.getUserDescription(user));
+                                        + Utils.getUserDescription(user));
                             }
                         });
                     } catch (InterruptedException e) {
@@ -342,7 +342,7 @@ public class SarosUI {
             MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
                 "Permission change failed",
                 "Permission change failed because of an internal error. "
-                    + Util.getUserDescription(user) + " Please try again.");
+                    + Utils.getUserDescription(user) + " Please try again.");
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);
         }

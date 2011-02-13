@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The ExecutorService under which all incoming activityDataObjects should be
@@ -33,7 +33,7 @@ public class DispatchThreadContext {
      * JupiterServer.
      */
     public void executeAsDispatch(Runnable runnable) {
-        dispatch.submit(Util.wrapSafe(log, runnable));
+        dispatch.submit(Utils.wrapSafe(log, runnable));
     }
 
     public ExecutorService getDispatchExecutor() {

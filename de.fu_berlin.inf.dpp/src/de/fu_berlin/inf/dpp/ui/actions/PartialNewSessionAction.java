@@ -25,7 +25,7 @@ import org.eclipse.jface.window.Window;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.PartialProjectSelectionDialog;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Start to share a project (a "session").
@@ -48,7 +48,7 @@ public class PartialNewSessionAction extends GeneralNewSessionAction {
             null, this.selectedProjects.get(0));
 
         if (dialog.open() == Window.OK) {
-            Util.runSafeSync(log, new Runnable() {
+            Utils.runSafeSync(log, new Runnable() {
                 public void run() {
                     runNewSession(dialog.getSelectedResources());
                 }

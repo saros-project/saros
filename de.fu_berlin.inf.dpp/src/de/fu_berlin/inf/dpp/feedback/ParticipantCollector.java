@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A Collector class that collects for each number of users the time they were
@@ -67,7 +67,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             // add the new user to the set
             users.add(user);
 
-            log.info(Util.prefix(user.getJID())
+            log.info(Utils.prefix(user.getJID())
                 + "joined. Session now contains " + currentNumberOfParticipants
                 + " buddies.");
         }
@@ -78,7 +78,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             // handle the event with the former number of users
             handleUserEvent(currentNumberOfParticipants + 1);
 
-            log.info(Util.prefix(user.getJID()) + "left. Session now contains "
+            log.info(Utils.prefix(user.getJID()) + "left. Session now contains "
                 + currentNumberOfParticipants + " buddies.");
         }
 

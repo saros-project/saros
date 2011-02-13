@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business Logic for handling Invitation requests
@@ -51,13 +51,13 @@ public class InvitationHandler {
                 InvitationInfo invInfo = invExtProv.getPayload(packet);
 
                 if (invInfo == null) {
-                    log.warn("Inv" + Util.prefix(fromJID)
+                    log.warn("Inv" + Utils.prefix(fromJID)
                         + ": The received invitation packet's"
                         + " payload is null.");
                     return;
                 }
 
-                log.debug("Inv" + Util.prefix(fromJID)
+                log.debug("Inv" + Utils.prefix(fromJID)
                     + ": Received invitation (invitationID: "
                     + invInfo.invitationID + ", sessionID: "
                     + invInfo.sessionID + ", colorID: " + invInfo.colorID

@@ -33,7 +33,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
@@ -143,7 +143,7 @@ public class InsertOperation implements ITextOperation {
     @Override
     public String toString() {
         return "Insert(" + this.position + ",'"
-            + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
+            + Utils.escapeForLogging(StringUtils.abbreviate(this.text, 150))
             + "'," + this.origin + ")";
     }
 

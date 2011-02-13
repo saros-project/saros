@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
@@ -291,7 +291,7 @@ public class User {
          * TODO This should use a subscription based mechanism or cache the
          * nick, to prevent this being called too many times
          */
-        String nickName = Util.getNickname(getSarosSession().getSaros(),
+        String nickName = Utils.getNickname(getSarosSession().getSaros(),
             getJID());
         String jidBase = getJID().getBase();
 

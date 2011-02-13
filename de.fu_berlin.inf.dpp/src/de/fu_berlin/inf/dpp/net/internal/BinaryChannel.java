@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * BinaryChannel is a class that encapsulates a bidirectional communication
@@ -284,7 +284,7 @@ public class BinaryChannel {
         ClassNotFoundException {
 
         TransferDescription transferDescription = TransferDescription
-            .fromByteArray(Util.inflate(description, progress.newChild(1)));
+            .fromByteArray(Utils.inflate(description, progress.newChild(1)));
         transferDescription.objectid = objectid;
         return transferDescription;
     }
@@ -324,7 +324,7 @@ public class BinaryChannel {
         transferDescription.objectid = objectid;
 
         byte[] descData = null;
-        descData = Util.deflate(transferDescription.toByteArray(),
+        descData = Utils.deflate(transferDescription.toByteArray(),
             progress.newChild(1));
         if (descData == null) {
             log.error(

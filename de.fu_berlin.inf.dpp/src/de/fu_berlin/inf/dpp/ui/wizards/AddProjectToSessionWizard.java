@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
@@ -154,7 +154,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 Shell shell = wizardDialog.getShell();
                 if (shell == null || shell.isDisposed())
@@ -163,7 +163,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
         });
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
             }
@@ -173,7 +173,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
             }
@@ -184,7 +184,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public boolean confirmOverwritingProjectResources(final String projectName,
         final FileListDiff diff) {
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
 
                     String message = "The selected project '"

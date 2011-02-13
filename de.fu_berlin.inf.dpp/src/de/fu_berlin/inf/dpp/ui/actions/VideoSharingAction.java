@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
@@ -100,7 +100,7 @@ public class VideoSharingAction extends Action {
 
     @Override
     public void run() {
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 VideoSharingSession videoSharingSession = sessionObservable
                     .getValue();
@@ -109,7 +109,7 @@ public class VideoSharingAction extends Action {
                         setEnabled(false);
                         videoSharing.startSharing(selectedUser);
                     } catch (final SarosCancellationException e) {
-                        Util.popUpFailureMessage(
+                        Utils.popUpFailureMessage(
                             "Could not establish screensharing",
                             e.getMessage(), false);
                         log.error("Could not establish screensharing: ", e);

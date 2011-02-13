@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Action to start an Invitation for the currently selected RosterEntries.
@@ -127,7 +127,7 @@ public class InviteAction extends SelectionProviderAction {
                 sessionManager.startSession(chosenProjects, null);
                 sessionManager.invite(getSelected(), makeDescription());
             } catch (final XMPPException e) {
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         ErrorDialog.openError(EditorAPI.getShell(),
                             "Error Starting Session",
@@ -141,7 +141,7 @@ public class InviteAction extends SelectionProviderAction {
         } else {
             // We are in an existing session. We are adding the user.
 
-            Util.runSafeSync(log, new Runnable() {
+            Utils.runSafeSync(log, new Runnable() {
                 public void run() {
                     sessionManager.invite(getSelected(), makeDescription());
                 }
@@ -156,7 +156,7 @@ public class InviteAction extends SelectionProviderAction {
 
     public void updateEnablement() {
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 setEnabled(canInviteSelected());
             }

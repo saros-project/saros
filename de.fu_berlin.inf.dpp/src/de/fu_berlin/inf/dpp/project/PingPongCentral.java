@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "net")
 public class PingPongCentral extends AbstractActivityProvider {
@@ -99,7 +99,7 @@ public class PingPongCentral extends AbstractActivityProvider {
             }
 
             return "Ping Stats "
-                + Util.prefix(user.getJID())
+                + Utils.prefix(user.getJID())
                 + "Round trip time: All == "
                 + getAverageRoundTripTime()
                 + "ms - "
@@ -163,7 +163,7 @@ public class PingPongCentral extends AbstractActivityProvider {
                 public void run() {
                     if (!sendPings)
                         return;
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             if (log.isDebugEnabled()) {
                                 log.debug(PingPongCentral.this.toString());

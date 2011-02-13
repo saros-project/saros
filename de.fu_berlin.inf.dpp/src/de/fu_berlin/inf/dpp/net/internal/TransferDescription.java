@@ -17,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
@@ -145,19 +145,19 @@ public class TransferDescription implements Serializable {
     public String toString() {
 
         if (FileTransferType.ARCHIVE_TRANSFER.equals(type)) {
-            return "Archive from " + Util.prefix(getSender()) + " [SID="
+            return "Archive from " + Utils.prefix(getSender()) + " [SID="
                 + sessionID + "]";
         } else if (FileTransferType.FILELIST_TRANSFER.equals(type)) {
-            return "FileList from " + Util.prefix(getSender()) + " [SID="
+            return "FileList from " + Utils.prefix(getSender()) + " [SID="
                 + sessionID + "]";
         } else if (FileTransferType.STREAM_DATA.equals(type)) {
-            return "Stream data from " + Util.prefix(getSender())
+            return "Stream data from " + Utils.prefix(getSender())
                 + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
         } else if (FileTransferType.STREAM_META.equals(type)) {
-            return "Stream metadata from " + Util.prefix(getSender())
+            return "Stream metadata from " + Utils.prefix(getSender())
                 + ": stream= " + file_project_path + " [SID=" + sessionID + "]";
         } else if (FileTransferType.CONNECTION_TEST.equals(type)) {
-            return "Connection test from " + Util.prefix(getSender());
+            return "Connection test from " + Utils.prefix(getSender());
         } else {
             StringBuilder sb = new StringBuilder("Bytestream transfer. type="
                 + type + " namespace=" + namespace);

@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 @Component(module = "core")
@@ -143,7 +143,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 if (stopActivity.getState() == State.INITIATED) {
                     addStartHandle(generateStartHandle(stopActivity));
                     // locks project and acknowledges
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             lockProject(true);
                             fireActivity(stopActivity
@@ -237,7 +237,7 @@ public class StopManager implements IActivityProvider, Disposable {
         final CountDownLatch doneSignal = new CountDownLatch(users.size());
 
         for (final User user : users) {
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     try {
                         StartHandle startHandle = stop(user, cause,
@@ -319,7 +319,7 @@ public class StopManager implements IActivityProvider, Disposable {
 
         // Short cut if affected user is local
         if (user.isLocal()) {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     lockProject(true);
                 }
@@ -330,14 +330,14 @@ public class StopManager implements IActivityProvider, Disposable {
         StopActivity expectedAck = stopActivity.generateAcknowledgment(user);
         expectedAcknowledgments.add(expectedAck);
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 fireActivity(stopActivity);
             }
         });
 
         // Block until user acknowledged
-        log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
+        log.debug("Waiting for acknowledgment " + Utils.prefix(user.getJID()));
         reentrantLock.lock();
         try {
             while (expectedAcknowledgments.contains(expectedAck)
@@ -355,7 +355,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 handle.start();
                 throw new CancellationException();
             }
-            log.debug("Acknowledgment arrived " + Util.prefix(user.getJID()));
+            log.debug("Acknowledgment arrived " + Utils.prefix(user.getJID()));
         } catch (InterruptedException e) {
             handle.start();
             throw new InterruptedException();
@@ -409,7 +409,7 @@ public class StopManager implements IActivityProvider, Disposable {
             log.debug(remainingHandles + " startHandles remaining.");
             return false;
         }
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 lockProject(false);
             }
@@ -441,7 +441,7 @@ public class StopManager implements IActivityProvider, Disposable {
             handle.getUser(), Type.UNLOCKREQUEST, State.INITIATED,
             handle.getHandleID());
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 fireActivity(activity);
             }

@@ -11,8 +11,8 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.util.ColorUtil;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.ColorUtils;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Abstract base class for {@link Annotation}s.
@@ -136,7 +136,7 @@ public abstract class SarosAnnotation extends Annotation {
         }
 
         try {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     EditorsUI.getPreferenceStore().setValue(
                         ap.getColorPreferenceKey(),
@@ -166,7 +166,7 @@ public abstract class SarosAnnotation extends Annotation {
      */
     public static Color getLightUserColor(User user) {
         Color userColor = SarosAnnotation.getUserColor(user);
-        Color userLightColor = ColorUtil.scaleColor(userColor,
+        Color userLightColor = ColorUtils.scaleColor(userColor,
             LIGHT_COLOR_SCALE);
 
         // The temporarily created color needs to be disposed

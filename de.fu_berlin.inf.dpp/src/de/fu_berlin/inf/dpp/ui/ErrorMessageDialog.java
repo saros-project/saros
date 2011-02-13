@@ -5,7 +5,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Eclipse Dialog to show Exception Messages.
@@ -25,7 +25,7 @@ public class ErrorMessageDialog {
      * @param exception
      */
     public static void showErrorMessage(final Exception exception) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), exception
                     .toString(), exception.getMessage());
@@ -38,7 +38,7 @@ public class ErrorMessageDialog {
      */
     public static void showErrorMessage(final String windowTitle,
         final Exception exception) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), windowTitle,
                     exception.toString());
@@ -61,7 +61,7 @@ public class ErrorMessageDialog {
         }
         final String error = exceptionMessage;
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),
                     "Error in Saros-Plugin", error);

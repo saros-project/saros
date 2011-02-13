@@ -52,7 +52,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Decorates Shared Project files.
@@ -306,7 +306,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected void updateDecoratorsAsync(final Object[] updateElements) {
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     SharedProjectFileDecorator.this, updateElements);

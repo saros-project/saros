@@ -14,7 +14,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.util.ColorUtil;
+import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 /**
  * The annotation that shows the viewports of users with
@@ -58,9 +58,9 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
         Display display = Display.getDefault();
         strokeColor = new Color(display,
-            ColorUtil.scaleColor(rgb, STROKE_SCALE));
+            ColorUtils.scaleColor(rgb, STROKE_SCALE));
         // FIXME: dispose strokeColor somewhere
-        fillColor = new Color(display, ColorUtil.scaleColor(rgb, FILL_SCALE));
+        fillColor = new Color(display, ColorUtils.scaleColor(rgb, FILL_SCALE));
         // FIXME: dispose fillColor somewhere
     }
 

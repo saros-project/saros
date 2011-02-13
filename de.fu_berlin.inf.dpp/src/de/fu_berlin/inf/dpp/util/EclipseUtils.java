@@ -7,6 +7,10 @@ import org.eclipse.swt.widgets.Shell;
 
 public class EclipseUtils {
 
+    private EclipseUtils() {
+        // no instantiation allowed
+    }
+
     /**
      * Calls open() on the given window (and returns the result), but before it
      * dispatches a call to forceActive (which gives a visual hint on the task

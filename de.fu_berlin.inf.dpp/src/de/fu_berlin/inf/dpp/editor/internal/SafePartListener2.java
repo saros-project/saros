@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A listener which forwards calls to a another IPartListener2, but catches all
@@ -34,7 +34,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partActivated(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partActivated(partRef);
             }
@@ -42,7 +42,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partBroughtToTop(partRef);
             }
@@ -50,7 +50,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partClosed(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partClosed(partRef);
             }
@@ -58,7 +58,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partDeactivated(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partDeactivated(partRef);
             }
@@ -66,7 +66,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partHidden(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partHidden(partRef);
             }
@@ -74,7 +74,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partInputChanged(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partInputChanged(partRef);
             }
@@ -82,7 +82,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partOpened(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partOpened(partRef);
             }
@@ -90,7 +90,7 @@ public class SafePartListener2 implements IPartListener2 {
     }
 
     public void partVisible(final IWorkbenchPartReference partRef) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.partVisible(partRef);
             }

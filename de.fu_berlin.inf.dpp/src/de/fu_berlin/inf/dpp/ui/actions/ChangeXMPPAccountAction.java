@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * In addition to the connect/disconnect action, this allows the user to switch
@@ -56,7 +56,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     @Override
     public void run() {
 
-        Util.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
+        Utils.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
@@ -116,7 +116,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     protected void connectWithThisAccount(int accountID) {
         accountService.setAccountActive(accountService.getAccount(accountID));
-        Util.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() {
+        Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() {
             public void run() {
                 reconnect();
             }

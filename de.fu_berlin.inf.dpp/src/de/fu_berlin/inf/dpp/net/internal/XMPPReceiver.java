@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
@@ -190,7 +190,7 @@ public class XMPPReceiver {
             return;
         }
 
-        extensionDownloadThreadPool.execute(Util.wrapSafe(log, new Runnable() {
+        extensionDownloadThreadPool.execute(Utils.wrapSafe(log, new Runnable() {
             public void run() {
 
                 processTransferObjectToPacket(description,

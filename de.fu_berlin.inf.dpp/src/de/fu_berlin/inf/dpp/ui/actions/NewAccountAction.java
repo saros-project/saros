@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "ui")
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
@@ -64,7 +64,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
      * @review runSafe OK
      */
     public void run(IAction action) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runNewAccount();
             }

@@ -66,7 +66,7 @@ import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.StreamJob;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Whole feature for sending a file among Saros-users.
@@ -169,7 +169,7 @@ public class SendFileAction extends Action {
      */
     protected static void errorPopup(final String title, final String message,
         Exception e, SubMonitor monitor) {
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
                     title, message);
@@ -534,7 +534,7 @@ public class SendFileAction extends Action {
 
             String filename = null;
             try {
-                filename = Util.runSWTSync(getFile);
+                filename = Utils.runSWTSync(getFile);
             } catch (Exception e) {
                 // should not happen
                 log.error("Unexpected error: ", e);
@@ -599,13 +599,13 @@ public class SendFileAction extends Action {
                         EditorAPI.getShell(),
                         "Incoming file transfer",
                         "Accept '" + description.name + "' ("
-                            + Util.formatByte(description.size) + ") from "
+                            + Utils.formatByte(description.size) + ") from "
                             + from + " ?");
                 }
             };
 
             try {
-                return Util.runSWTSync(askUser);
+                return Utils.runSWTSync(askUser);
             } catch (Exception e) {
                 log.error("Unexpected exception: ", e);
                 return false;

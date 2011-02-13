@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IAction;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Start to share a project (a "session"), but without support for version
@@ -43,7 +43,7 @@ public class NewSessionAction extends GeneralNewSessionAction {
      * @review runSafe OK
      */
     public void run(IAction action) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runNewSession(null);
             }

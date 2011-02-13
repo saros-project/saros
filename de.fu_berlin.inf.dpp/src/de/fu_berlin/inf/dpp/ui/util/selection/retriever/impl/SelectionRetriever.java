@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtil;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.ISelectionRetriever;
 
 /**
@@ -38,8 +38,8 @@ public class SelectionRetriever<AdapterType> implements
     public List<AdapterType> getSelection(String partId) {
         List<AdapterType> objects = new ArrayList<AdapterType>();
 
-        ISelection selection = (partId == null) ? SelectionUtil.getSelection()
-            : SelectionUtil.getSelection(partId);
+        ISelection selection = (partId == null) ? SelectionUtils.getSelection()
+            : SelectionUtils.getSelection(partId);
 
         for (AdapterType object : getAdaptableObjects(selection)) {
             objects.add(object);
@@ -51,7 +51,7 @@ public class SelectionRetriever<AdapterType> implements
     public List<AdapterType> getOverallSelection() {
         List<AdapterType> objects = new ArrayList<AdapterType>();
 
-        List<ISelection> selections = SelectionUtil.getOverallSelections();
+        List<ISelection> selections = SelectionUtils.getOverallSelections();
         for (ISelection selection : selections) {
             for (AdapterType object : this.getAdaptableObjects(selection)) {
                 objects.add(object);

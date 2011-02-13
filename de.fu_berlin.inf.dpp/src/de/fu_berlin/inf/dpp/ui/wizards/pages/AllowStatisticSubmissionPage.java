@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.util.LinkListener;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A WizardPage which lets the user specify whether he wants to submit statistic
@@ -85,7 +85,7 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
 
     @Override
     public void performHelp() {
-        Util.openExternalBrowser(StatisticManager.INFO_URL);
+        Utils.openExternalBrowser(StatisticManager.INFO_URL);
     }
 
     /**

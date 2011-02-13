@@ -160,7 +160,7 @@ import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
@@ -545,7 +545,7 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
-        sarosVersion = Util.getBundleVersion(getBundle(), "Unknown Version");
+        sarosVersion = Utils.getBundleVersion(getBundle(), "Unknown Version");
 
         sarosFeatureID = SAROS + "_" + sarosVersion;
 
@@ -577,7 +577,7 @@ public class Saros extends AbstractUIPlugin {
 
         setupLoggers();
         log.info("Starting Saros " + sarosVersion + " running:\n"
-            + Util.getPlatformInfo());
+            + Utils.getPlatformInfo());
 
         // Remove the Bundle if an instance of it was already registered
         container.removeComponent(Bundle.class);
@@ -642,7 +642,7 @@ public class Saros extends AbstractUIPlugin {
                  * FIXME Provide a unique thread context in which all
                  * connecting/disconnecting is done.
                  */
-                Util.runSafeAsync(log, new Runnable() {
+                Utils.runSafeAsync(log, new Runnable() {
                     public void run() {
                         disconnect();
                     }
@@ -731,7 +731,7 @@ public class Saros extends AbstractUIPlugin {
      * @nonBlocking
      */
     public void asyncConnect() {
-        Util.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
+        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
             public void run() {
                 connect(false);
             }
@@ -769,7 +769,7 @@ public class Saros extends AbstractUIPlugin {
             && errorLogManager.hasErrorLogAgreement();
 
         if (!hasUsername || !hasAgreement) {
-            boolean ok = Util.showConfigurationWizard(!hasUsername,
+            boolean ok = Utils.showConfigurationWizard(!hasUsername,
                 !hasAgreement);
             if (!ok)
                 return;
@@ -792,7 +792,7 @@ public class Saros extends AbstractUIPlugin {
              */
 
             while (prefStore.getString(PreferenceConstants.SERVER).equals("")) {
-                boolean ok = Util.showConfigurationWizard(true, false);
+                boolean ok = Utils.showConfigurationWizard(true, false);
                 if (!ok)
                     return;
             }
@@ -825,13 +825,13 @@ public class Saros extends AbstractUIPlugin {
 
         } catch (URISyntaxException e) {
             log.info("URI not parseable: " + e.getInput());
-            Util.popUpFailureMessage("URI not parseable", e.getInput()
+            Utils.popUpFailureMessage("URI not parseable", e.getInput()
                 + " is not a valid URI.", failSilently);
 
         } catch (IllegalArgumentException e) {
             log.info("Illegal argument: " + e.getMessage());
             setConnectionState(ConnectionState.ERROR, null);
-            Util.popUpFailureMessage("Illegal argument", e.getMessage(),
+            Utils.popUpFailureMessage("Illegal argument", e.getMessage(),
                 failSilently);
 
         } catch (XMPPException e) {
@@ -841,7 +841,7 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, cause);
 
             if (cause instanceof SaslException) {
-                Util.popUpFailureMessage("Error Connecting via SASL",
+                Utils.popUpFailureMessage("Error Connecting via SASL",
                     cause.getMessage(), failSilently);
             } else {
                 String question;
@@ -857,17 +857,17 @@ public class Saros extends AbstractUIPlugin {
                         + "' as user '" + username
                         + "'. Do You want to use other parameters?";
                 }
-                boolean showConfigurationWizard = Util.popUpYesNoQuestion(
+                boolean showConfigurationWizard = Utils.popUpYesNoQuestion(
                     "Error Connecting", question, failSilently);
                 if (showConfigurationWizard) {
-                    if (Util.showConfigurationWizard(true, false))
+                    if (Utils.showConfigurationWizard(true, false))
                         connect(failSilently);
                 }
             }
         } catch (Exception e) {
             log.warn("Unhandled exception:", e);
             setConnectionState(ConnectionState.ERROR, e);
-            Util.popUpFailureMessage("Error Connecting",
+            Utils.popUpFailureMessage("Error Connecting",
                 "Could not connect to server '" + server + "' as user '"
                     + username + "'.\nErrorMessage was:\n" + e.getMessage(),
                 failSilently);
@@ -1147,7 +1147,7 @@ public class Saros extends AbstractUIPlugin {
         if (connection != null) {
             String user = connection.getUser();
             if (user != null)
-                prefix = Util.prefix(new JID(user));
+                prefix = Utils.prefix(new JID(user));
         }
 
         if (error == null) {
@@ -1193,7 +1193,7 @@ public class Saros extends AbstractUIPlugin {
 
                 disconnect();
 
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         MessageDialog.openError(
                             EditorAPI.getShell(),
@@ -1214,7 +1214,7 @@ public class Saros extends AbstractUIPlugin {
 
             disconnectInternal();
 
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
 
                     Map<JID, Integer> expectedSequenceNumbers = Collections

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.WizardExportResourcesPage;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This Dialog is used to allow the host to share only part of a project
@@ -89,7 +89,7 @@ public class PartialProjectSelectionDialog {
         @Override
         protected boolean validateSourceGroup() {
 
-            for (IResource resource : Util
+            for (IResource resource : Utils
                 .asIterable((Iterator<IResource>) getSelectedResourcesIterator())) {
                 if (!project.equals(resource.getProject())) {
                     setErrorMessage("Currently only files from the main project can be shared");

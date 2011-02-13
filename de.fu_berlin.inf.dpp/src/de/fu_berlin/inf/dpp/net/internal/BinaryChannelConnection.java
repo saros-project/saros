@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Encapsulates a BinaryChannel to a particular peer
@@ -35,7 +35,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
     private JID peer;
 
     protected String prefix() {
-        return this.getMode().toString() + " " + Util.prefix(peer);
+        return this.getMode().toString() + " " + Utils.prefix(peer);
     }
 
     protected class ReceiverThread extends Thread {

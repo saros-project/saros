@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.EclipseComponentIm
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.STFTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.basicWidgets.Shell;
-import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 
 public class EditMImp extends EclipseComponentImp implements EditM {
 
@@ -141,7 +141,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         IProject[] projects = root.getProjects();
         for (int i = 0; i < projects.length; i++) {
             try {
-                FileUtil.delete(projects[i]);
+                FileUtils.delete(projects[i]);
                 root.refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch (CoreException e) {
                 log.debug("Couldn't delete files ", e);
@@ -168,7 +168,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         }
         if (resource.isAccessible()) {
             try {
-                FileUtil.delete(resource);
+                FileUtils.delete(resource);
                 root.refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch (CoreException e) {
                 log.debug("Couldn't delete the resource", e);

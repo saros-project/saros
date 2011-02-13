@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.util.DeferredValueChangeListener;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
@@ -92,7 +92,7 @@ public class LocalPresenceTracker {
                 windowChanges, 5, TimeUnit.SECONDS);
 
             protected void setActiveDeferred(final boolean active) {
-                Util.wrapSafe(log, new Runnable() {
+                Utils.wrapSafe(log, new Runnable() {
                     public void run() {
                         log.debug("Eclipse window now "
                             + (active ? "  " : "in") + "active.");

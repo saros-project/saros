@@ -43,7 +43,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryViewPart;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Saros' {@link ChatView}.
@@ -121,7 +121,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
                 new Date()));
 
             if (ChatView.this.isOwnJID(jid)) {
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         ChatView.this.hideExplanation();
                     }
@@ -134,7 +134,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
                 new Date()));
 
             if (ChatView.this.isOwnJID(jid)) {
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         ChatView.this.showExplanation(howtoExplanation);
                     }
@@ -151,7 +151,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
              * Beep when receiving a FOREIGN message
              */
             if (!ChatView.this.isOwnJID(jid)) {
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         imBeepAction.beep();
                     }
@@ -163,7 +163,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
             ChatView.log.debug("Received ChatState from " + sender + ": "
                 + state.toString());
 
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     if (mucManager.getMUCSession() != null) {
                         if (mucManager.getMUCSession().getForeignStatesCount(
@@ -299,7 +299,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
         final String sender = senderCache.get(jid);
         final Color color = colorCache.get(jid);
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (ChatView.this.chatControl == null
                     || ChatView.this.chatControl.isDisposed())

@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Decorates Shared Projects.
@@ -136,7 +136,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
      */
     protected void updateDecoratorsAsync(final Object... projects) {
         log.debug("LETS REPAINT THE DECORATOR");
-        Util.runSafeSWTAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     SharedProjectDecorator.this, projects);

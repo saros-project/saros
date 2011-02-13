@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * <p>
@@ -83,7 +83,7 @@ public class AudioServiceManager {
         public void errorOccured(StreamException e) {
             stopSession();
             log.error(e.getMessage());
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
                     EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
@@ -99,7 +99,7 @@ public class AudioServiceManager {
             audioListener.sessionStopped(session);
 
             session.dispose();
-            Util.runSafeSWTAsync(log, new Runnable() {
+            Utils.runSafeSWTAsync(log, new Runnable() {
 
                 public void run() {
                     EclipseUtils.openInformationMessageDialog(EditorAPI
@@ -110,7 +110,7 @@ public class AudioServiceManager {
 
             // shutdown Recorder, Player, Encoder + Decoder
             if (audioSenderRunnable != null)
-                Util.runSafeSync(log, new Runnable() {
+                Utils.runSafeSync(log, new Runnable() {
                     public void run() {
                         audioSenderRunnable.stop();
 
@@ -118,7 +118,7 @@ public class AudioServiceManager {
                 });
 
             if (audioReceiverRunnable != null)
-                Util.runSafeSync(log, new Runnable() {
+                Utils.runSafeSync(log, new Runnable() {
                     public void run() {
                         audioReceiverRunnable.stop();
                     }
@@ -162,7 +162,7 @@ public class AudioServiceManager {
                 monitor.worked(1);
             } catch (InterruptedException e) {
                 log.error(e.getMessage());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
                         EclipseUtils.openErrorMessageDialog(EditorAPI
@@ -173,7 +173,7 @@ public class AudioServiceManager {
                 return Status.CANCEL_STATUS;
             } catch (RemoteCancellationException e) {
                 log.error(e.getMessage());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
                         EclipseUtils.openErrorMessageDialog(EditorAPI
@@ -187,7 +187,7 @@ public class AudioServiceManager {
                 return Status.CANCEL_STATUS;
             } catch (ConnectionException e) {
                 log.error(e.getMessage());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
                         EclipseUtils.openErrorMessageDialog(EditorAPI
@@ -198,7 +198,7 @@ public class AudioServiceManager {
                 return Status.CANCEL_STATUS;
             } catch (TimeoutException e) {
                 log.error(e.getMessage());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
                         EclipseUtils.openErrorMessageDialog(EditorAPI
@@ -209,7 +209,7 @@ public class AudioServiceManager {
                 return Status.CANCEL_STATUS;
             } catch (ExecutionException e) {
                 log.error(e.getMessage());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
                         EclipseUtils.openErrorMessageDialog(EditorAPI
@@ -222,7 +222,7 @@ public class AudioServiceManager {
                 monitor.done();
             }
             log.debug("Starting new VoIP Session...");
-            Util.runSafeAsync("VoIPSession", log, new Runnable() {
+            Utils.runSafeAsync("VoIPSession", log, new Runnable() {
                 public void run() {
                     startSession(session);
                 }
@@ -266,7 +266,7 @@ public class AudioServiceManager {
             if (recordDeviceOk) {
                 audioSenderRunnable = new AudioSenderRunnable(session
                     .getOutputStream(0), this, preferenceUtils);
-                Util.runSafeAsync("audioSenderRunnable", log,
+                Utils.runSafeAsync("audioSenderRunnable", log,
                     audioSenderRunnable);
             }
             if (playbackDeviceOk) {

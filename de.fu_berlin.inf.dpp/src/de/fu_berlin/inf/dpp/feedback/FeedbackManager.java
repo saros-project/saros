@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackDialog;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The FeedbackManager registers himself as a listener with the
@@ -93,7 +93,7 @@ public class FeedbackManager extends AbstractFeedbackManager {
              * NOTE: If one ever wants to count the number of declined dialogs,
              * threading problems must be newly considered.
              */
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
 
                 public void run() {
                     if (showFeedbackDialog(FEEDBACK_REQUEST)) {
@@ -276,7 +276,7 @@ public class FeedbackManager extends AbstractFeedbackManager {
         resetSessionsUntilNextToInterval();
 
         try {
-            return Util.runSWTSync(new Callable<Boolean>() {
+            return Utils.runSWTSync(new Callable<Boolean>() {
 
                 public Boolean call() {
                     Dialog dialog = new FeedbackDialog(EditorAPI.getShell(),
@@ -306,10 +306,10 @@ public class FeedbackManager extends AbstractFeedbackManager {
     public int showSurvey() {
         int browserType = BROWSER_EXT;
 
-        if (!Util.openExternalBrowser(SURVEY_URL)) {
+        if (!Utils.openExternalBrowser(SURVEY_URL)) {
             browserType = BROWSER_INT;
 
-            if (!Util.openInternalBrowser(SURVEY_URL,
+            if (!Utils.openInternalBrowser(SURVEY_URL,
                 Messages.getString("feedback.dialog.title"))) {
                 browserType = BROWSER_NONE;
                 // last resort: present a link to the survey

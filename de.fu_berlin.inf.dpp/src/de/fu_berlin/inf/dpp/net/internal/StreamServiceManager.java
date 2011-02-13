@@ -80,7 +80,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
@@ -234,9 +234,9 @@ public class StreamServiceManager implements Startable {
 
     protected void startThreads() {
         sender = new PacketSender();
-        Util.runSafeAsync("StreamServiceManagers-senderThread", log, sender);
+        Utils.runSafeAsync("StreamServiceManagers-senderThread", log, sender);
         receiver = new PacketReceiver();
-        Util.runSafeAsync("StreamServiceManagers-receiverThread", log, receiver);
+        Utils.runSafeAsync("StreamServiceManagers-receiverThread", log, receiver);
         stopSessionExecutor = Executors.newScheduledThreadPool(5,
             new NamedThreadFactory("StreamSessionStopper-"));
 
@@ -400,7 +400,7 @@ public class StreamServiceManager implements Startable {
             sender.sendPacket(transferDescription,
                 StreamMetaPacketData.STOP.getIdentifier(), null);
 
-        Runnable stopThread = Util.wrapSafe(log, new SessionKiller(session));
+        Runnable stopThread = Utils.wrapSafe(log, new SessionKiller(session));
 
         if (stopSessionExecutor != null) {
             stopSessionExecutor.schedule(stopThread, SESSION_SHUTDOWN_LIMIT,
@@ -524,7 +524,7 @@ public class StreamServiceManager implements Startable {
             initiationID);
 
         if (initiationDescription != null) {
-            byte[] serializedInitial = Util.serialize(initiationDescription);
+            byte[] serializedInitial = Utils.serialize(initiationDescription);
             if (serializedInitial == null)
                 log.warn("Given serializable is not serializable! "
                     + initiationDescription);
@@ -848,7 +848,7 @@ public class StreamServiceManager implements Startable {
             byte[] serialized = new byte[data.length - 2];
             System.arraycopy(data, 2, serialized, 0, serialized.length);
 
-            return Util.deserialize(serialized);
+            return Utils.deserialize(serialized);
         }
 
         /**
@@ -859,7 +859,7 @@ public class StreamServiceManager implements Startable {
          * @return
          */
         protected byte[] serializeInto(Serializable o) {
-            byte[] serialized = Util.serialize(o);
+            byte[] serialized = Utils.serialize(o);
             if (serialized == null)
                 return new byte[] { this.identifier };
 
@@ -1431,7 +1431,7 @@ public class StreamServiceManager implements Startable {
                  * Ask service for accept and send decision to client. When
                  * accepted, a new session will be created.
                  */
-                negotiatesToUser.execute(Util.wrapSafe(log, new Runnable() {
+                negotiatesToUser.execute(Utils.wrapSafe(log, new Runnable() {
                     public void run() {
                         log.debug("Starting session request to service");
 
@@ -1472,7 +1472,7 @@ public class StreamServiceManager implements Startable {
                                 // can not create, not connected
                                 newSession.dispose();
 
-                            sessionDispatcher.execute(Util.wrapSafe(log,
+                            sessionDispatcher.execute(Utils.wrapSafe(log,
                                 new Runnable() {
                                     public void run() {
                                         service.startSession(newSession);
@@ -1515,7 +1515,7 @@ public class StreamServiceManager implements Startable {
                     log.error("Session " + session + " already stopped.");
                     return;
                 }
-                Runnable stopThread = Util.wrapSafe(log, new SessionKiller(
+                Runnable stopThread = Utils.wrapSafe(log, new SessionKiller(
                     session));
                 session.shutdown = stopThread;
 
@@ -1820,7 +1820,7 @@ public class StreamServiceManager implements Startable {
 
             TransferDescription transferDescription = payload
                 .getTransferDescription();
-            if (!Util.equals(transferDescription.sessionID,
+            if (!Utils.equals(transferDescription.sessionID,
                 sarosSessionID.getValue()))
                 return false;
 

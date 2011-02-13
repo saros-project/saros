@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Utility class for manipulation of {@link Viewer Viewers}.
@@ -25,9 +25,13 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author bkahlert
  */
-public class ViewerUtil {
+public class ViewerUtils {
 
-    public static final Logger log = Logger.getLogger(ViewerUtil.class);
+    public static final Logger log = Logger.getLogger(ViewerUtils.class);
+
+    private ViewerUtils() {
+        // no instantiation allowed
+    }
 
     /**
      * Sets a viewer's input and makes sure it runs in the SWT thread
@@ -38,7 +42,7 @@ public class ViewerUtil {
      * @see Viewer#setInput(Object)
      */
     public static void setInput(final Viewer viewer, final Object input) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -61,7 +65,7 @@ public class ViewerUtil {
      */
     public static void add(final Viewer viewer,
         final Object parentElementOrTreePath, final Object childElement) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -89,7 +93,7 @@ public class ViewerUtil {
      */
     public static void add(final Viewer viewer,
         final Object parentElementOrTreePath, final Object[] childElements) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -115,7 +119,7 @@ public class ViewerUtil {
      */
     public static void remove(final Viewer viewer,
         final Object elementsOrTreePaths) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -141,7 +145,7 @@ public class ViewerUtil {
      */
     public static void remove(final Viewer viewer,
         final Object[] elementsOrTreePaths) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -168,7 +172,7 @@ public class ViewerUtil {
      */
     public static void update(final Viewer viewer, final Object element,
         final String[] properties) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -195,7 +199,7 @@ public class ViewerUtil {
      */
     public static void update(final Viewer viewer, final Object[] elements,
         final String[] properties) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -220,7 +224,7 @@ public class ViewerUtil {
      * @see StructuredViewer#refresh(boolean)
      */
     public static void refresh(final Viewer viewer, final boolean updateLabels) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -244,7 +248,7 @@ public class ViewerUtil {
      * @see AbstractTreeViewer#expandAll()
      */
     public static void expandAll(final Viewer viewer) {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;

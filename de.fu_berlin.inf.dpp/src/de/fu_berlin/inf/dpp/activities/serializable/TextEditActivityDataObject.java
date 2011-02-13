@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
@@ -110,9 +110,9 @@ public class TextEditActivityDataObject extends
         return "TextEditActivityDataObject("
             + this.offset
             + ",new:'"
-            + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
+            + Utils.escapeForLogging(StringUtils.abbreviate(this.text, 150))
             + "',old:'"
-            + Util.escapeForLogging(StringUtils.abbreviate(this.replacedText,
+            + Utils.escapeForLogging(StringUtils.abbreviate(this.replacedText,
                 150)) + "',path:" + this.path.toString() + ",src:"
             + this.source + ")";
     }

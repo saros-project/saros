@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Abstract base class for an action to start sharing a project (a "session").
@@ -87,7 +87,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
                     }
                     message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
                         + this.selectedProjects.get(0) + " will be shared.";
-                    if (!Util.popUpYesNoQuestion("Multiple Projects marked",
+                    if (!Utils.popUpYesNoQuestion("Multiple Projects marked",
                         message, false)) {
                         return;
                     }
@@ -103,7 +103,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
                     }
                     message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
                         + this.selectedProjects.get(0) + " will be shared.";
-                    if (!Util.popUpYesNoQuestion("Multiple Projects marked",
+                    if (!Utils.popUpYesNoQuestion("Multiple Projects marked",
                         message, false)) {
                         return;
                     }
@@ -115,7 +115,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
                     .getAutoInviteUsers());
             }
         } catch (final XMPPException e) {
-            Util.runSafeSWTSync(log, new Runnable() {
+            Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     ErrorDialog.openError(EditorAPI.getShell(),
                         "Error Starting Session",

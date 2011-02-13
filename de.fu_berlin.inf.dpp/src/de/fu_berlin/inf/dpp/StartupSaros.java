@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * An instance of this class is instantiated when Eclipse starts, after the
@@ -115,9 +115,9 @@ public class StartupSaros implements IStartup {
 
     protected void startRmiBot(final int port, final int time) {
         log.info("start RMI Bot");
-        Util.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
+        Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
-                log.debug("Util.isSWT(): " + Util.isSWT());
+                log.debug("Util.isSWT(): " + Utils.isSWT());
                 STFController.sleepTime = time;
                 try {
                     STFController.exportedObjects(port, saros, sessionManager,
@@ -132,7 +132,7 @@ public class StartupSaros implements IStartup {
     }
 
     protected void showRoster() {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
                 IIntroPart i = m.getIntro();
@@ -148,7 +148,7 @@ public class StartupSaros implements IStartup {
     }
 
     protected void showConfigurationWizard() {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 // determine which pages have to be shown
                 boolean hasUsername = preferenceUtils.hasUserName();

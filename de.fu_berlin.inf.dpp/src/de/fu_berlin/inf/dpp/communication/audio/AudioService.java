@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Implemented {#link StreamService} for VoIP function
@@ -101,7 +101,7 @@ public class AudioService extends StreamService {
 
         }
         try {
-            return Util.runSWTSync(askUser);
+            return Utils.runSWTSync(askUser);
         } catch (Exception e) {
             log.error("Unexpected exception: ", e);
             return false;

@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionListener;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A connection listener which forwards calls to a another ConnectionListener,
@@ -33,7 +33,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void connectionClosed() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.connectionClosed();
             }
@@ -41,7 +41,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void connectionClosedOnError(final Exception e) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.connectionClosedOnError(e);
             }
@@ -49,7 +49,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectingIn(final int seconds) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectingIn(seconds);
             }
@@ -58,7 +58,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectionFailed(final Exception e) {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectionFailed(e);
             }
@@ -66,7 +66,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectionSuccessful() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectionSuccessful();
             }

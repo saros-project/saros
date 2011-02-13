@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class FileListManager implements IActivityProvider {
 
@@ -55,7 +55,7 @@ public class FileListManager implements IActivityProvider {
                 + " is not a participant in this Saros session");
         }
         if (!user.hasWriteAccess()) {
-            log.warn(Util.prefix(user.getJID())
+            log.warn(Utils.prefix(user.getJID())
                 + " send FileListActivity, but has no writing permission in session");
             return;
         }

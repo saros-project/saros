@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
  * Static utility methods for working with Eclipse Editors
@@ -59,7 +59,7 @@ public class EditorUtils {
 
         EditorManager.log.debug("Converting line delimiters...");
 
-        boolean wasReadOnly = FileUtil.setReadOnly(file, false);
+        boolean wasReadOnly = FileUtils.setReadOnly(file, false);
 
         // Now run the conversion operation
         IPath[] paths = new IPath[] { file.getFullPath() };
@@ -86,7 +86,7 @@ public class EditorUtils {
         }
 
         if (wasReadOnly) {
-            FileUtil.setReadOnly(file, true);
+            FileUtils.setReadOnly(file, true);
         }
     }
 

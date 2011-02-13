@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A action for skyping other users.
@@ -48,7 +48,7 @@ public class SkypeAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
+        Utils.runSafeSync(log, new Runnable() {
             public void run() {
                 runOpenSkype();
             }
@@ -78,15 +78,15 @@ public class SkypeAction extends SelectionProviderAction {
             setEnabled(false);
             return;
         }
-        Util.runSafeAsync("SkypeAction-", log, new Runnable() {
+        Utils.runSafeAsync("SkypeAction-", log, new Runnable() {
             public void run() {
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         setEnabled(false);
                     }
                 });
                 skypeURL = skypeManager.getSkypeURL(rosterEntry.getUser());
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         setEnabled(skypeURL != null);
                     }

@@ -21,7 +21,7 @@ import org.jivesoftware.smackx.jingle.media.PayloadType;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class JingleFileTransferSession extends JingleMediaSession implements
     BytestreamSession {
@@ -63,7 +63,7 @@ public class JingleFileTransferSession extends JingleMediaSession implements
 
     private void initializeAsClient() {
 
-        Callable<Socket> toExecute = Util.retryEveryXms(new Callable<Socket>() {
+        Callable<Socket> toExecute = Utils.retryEveryXms(new Callable<Socket>() {
             public Socket call() throws Exception {
                 log.debug("Jingle/TCP connection attempt to " + remoteIP + ":"
                     + remotePort);
@@ -183,7 +183,7 @@ public class JingleFileTransferSession extends JingleMediaSession implements
 
     // Bytestream Methods
     public void close() throws IOException {
-        Util.close(socket);
+        Utils.close(socket);
     }
 
     public InputStream getInputStream() throws IOException {

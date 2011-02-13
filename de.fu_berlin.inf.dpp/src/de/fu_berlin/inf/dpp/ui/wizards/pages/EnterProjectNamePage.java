@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
@@ -385,7 +385,7 @@ public class EnterProjectNamePage extends WizardPage {
     private void pressWizardButton(final int buttonID) {
         final int pageChangesAtStart = pageChanges;
 
-        Util.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 try {
                     Thread.sleep(1000);
@@ -394,7 +394,7 @@ public class EnterProjectNamePage extends WizardPage {
                     Thread.currentThread().interrupt();
                     return;
                 }
-                Util.runSafeSWTAsync(log, new Runnable() {
+                Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
                         // User clicked next in the meantime

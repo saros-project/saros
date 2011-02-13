@@ -27,7 +27,7 @@ public class LinkListener implements Listener {
     }
 
     public void handleEvent(Event event) {
-        if (!Util.openExternalBrowser(event.text)) {
+        if (!Utils.openExternalBrowser(event.text)) {
             log.error("Couldn't open link " + event.text
                 + " in external browser.");
         }

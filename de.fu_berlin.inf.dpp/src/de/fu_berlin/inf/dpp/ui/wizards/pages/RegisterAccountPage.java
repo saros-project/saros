@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 import de.fu_berlin.inf.dpp.util.LinkListener;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
@@ -182,7 +182,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    Util.runSafeSWTSync(log, new Runnable() {
+                    Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             openCreateAccount();
                         }

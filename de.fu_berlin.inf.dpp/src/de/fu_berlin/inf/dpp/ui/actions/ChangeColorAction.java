@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This action opens a color dialog and checks whether the chosen color is
@@ -70,7 +70,7 @@ public class ChangeColorAction extends SelectionProviderAction implements
      */
     @Override
     public void run() {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 boolean done = false;
                 ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());

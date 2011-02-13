@@ -11,7 +11,12 @@ import org.eclipse.swt.widgets.Layout;
  * The aim of this utility class is to limit layout variations in order to
  * create a more consistent look.
  */
-public class LayoutUtil {
+public class LayoutUtils {
+
+    private LayoutUtils() {
+        // no instantiation allowed
+    }
+
     /**
      * Creates a {@link GridLayout} with the the given parameters
      * 

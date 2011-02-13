@@ -96,7 +96,7 @@ public abstract class StreamJob extends Job {
 
         public void sessionStopped() {
             StreamJob.this.stopped = true;
-            Util.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     StreamJob.this.cancel();
                     try {

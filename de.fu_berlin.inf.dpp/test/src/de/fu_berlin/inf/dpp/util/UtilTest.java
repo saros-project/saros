@@ -25,13 +25,13 @@ public class UtilTest {
         }
         String longString = sb.toString();
 
-        byte[] compressedShort = Util.deflate(shortString.getBytes(),
+        byte[] compressedShort = Utils.deflate(shortString.getBytes(),
             SubMonitor.convert(new NullProgressMonitor()));
-        String shortResult = new String(Util.inflate(compressedShort,
+        String shortResult = new String(Utils.inflate(compressedShort,
             SubMonitor.convert(new NullProgressMonitor())));
-        byte[] compressedLong = Util.deflate(longString.getBytes(), SubMonitor
+        byte[] compressedLong = Utils.deflate(longString.getBytes(), SubMonitor
             .convert(new NullProgressMonitor()));
-        String longResult = new String(Util.inflate(compressedLong, SubMonitor
+        String longResult = new String(Utils.inflate(compressedLong, SubMonitor
             .convert(new NullProgressMonitor())));
 
         assertEquals(shortString, shortResult);
@@ -43,7 +43,7 @@ public class UtilTest {
         String source = "a\nb\rc\r\nd";
         InputStream stream = new ByteArrayInputStream(source.getBytes());
         String[] expected = new String[] { "a\\n", "b\\r", "c\\r\\n", "d" };
-        String[] actual = Util.readLinesAndEscapeNewlines(stream);
+        String[] actual = Utils.readLinesAndEscapeNewlines(stream);
         assertTrue(Arrays.equals(expected, actual));
     }
 }

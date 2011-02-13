@@ -9,7 +9,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.runtime.Platform;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * DateFormatFileAppender uses a SimpleDateFormat pattern to set the name of the
@@ -52,7 +52,7 @@ public class DateFormatFileAppender extends FileAppender {
             SimpleDateFormat sdf = new SimpleDateFormat(fileBackup);
             actualFileName = directory + File.separator
                 + sdf.format(new Date());
-            if (!Util.mkdirs(actualFileName)) {
+            if (!Utils.mkdirs(actualFileName)) {
                 LogLog.error("Could not create dirs for " + actualFileName);
             }
 

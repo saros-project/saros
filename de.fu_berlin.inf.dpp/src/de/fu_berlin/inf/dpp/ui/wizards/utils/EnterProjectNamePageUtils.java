@@ -17,7 +17,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class EnterProjectNamePageUtils {
 
@@ -77,7 +77,7 @@ public class EnterProjectNamePageUtils {
 
         ScanRunner runner = new ScanRunner(remoteFileList);
 
-        Util.runSafeSWTSync(log, runner);
+        Utils.runSafeSWTSync(log, runner);
 
         return runner.project;
     }

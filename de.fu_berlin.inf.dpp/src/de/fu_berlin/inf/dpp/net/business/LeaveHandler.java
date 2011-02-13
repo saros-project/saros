@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business logic for handling Leave Message
@@ -80,7 +80,7 @@ public class LeaveHandler {
                         + user.getHumanReadableName() + ".");
             } else {
                 // Client
-                Util.runSafeSWTSync(log, new Runnable() {
+                Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         // FIXME see above...
                         sarosSession.removeUser(user);

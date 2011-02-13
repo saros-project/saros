@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileZipper;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -126,7 +126,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             throw new LocalCancellationException(e.getMessage(),
                 CancelOption.NOTIFY_PEER);
         }
-        log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
         subMonitor.setTaskName("Sending file list...");
         this.sarosSession.sendActivity(sarosSession.getUser(peer),
             new FileListActivity(sarosSession.getLocalUser(), localFileList,
@@ -152,7 +152,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for remote file list...");
 
         if (localFileList.getVcsProviderID() != null) {
@@ -167,7 +167,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         FileList remoteFileList = transmitter.receiveFileList(projectID, peer,
             subMonitor, true);
-        log.debug("Inv" + Util.prefix(peer)
+        log.debug("Inv" + Utils.prefix(peer)
             + ": Remote file list has been received.");
 
         checkCancellation(CancelOption.NOTIFY_PEER);
@@ -197,17 +197,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected void checkCancellation(CancelOption cancelOption)
         throws SarosCancellationException {
         if (cancelled.get()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             throw new SarosCancellationException();
         }
 
         if (monitor == null) {
-            log.warn("Inv" + Util.prefix(peer) + ": The monitor is null.");
+            log.warn("Inv" + Utils.prefix(peer) + ": The monitor is null.");
             return;
         }
 
         if (monitor.isCanceled()) {
-            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
             localCancel(null, cancelOption);
             throw new SarosCancellationException();
         }
@@ -235,7 +235,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public void localCancel(String errorMsg, CancelOption cancelOption) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log.debug("Inv" + Util.prefix(peer) + ": localCancel: " + errorMsg);
+        log.debug("Inv" + Utils.prefix(peer) + ": localCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new LocalCancellationException(errorMsg,
@@ -261,7 +261,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      */
     protected void executeCancellation() throws SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": executeCancellation");
+        log.debug("Inv" + Utils.prefix(peer) + ": executeCancellation");
         if (!cancelled.get())
             throw new IllegalStateException(
                 "executeCancellation should only be called after localCancel or remoteCancel!");
@@ -279,18 +279,18 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             case DO_NOT_NOTIFY_PEER:
                 break;
             default:
-                log.warn("Inv" + Util.prefix(peer)
+                log.warn("Inv" + Utils.prefix(peer)
                     + ": This case is not expected here.");
             }
 
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled locally"
                     + " because of an error: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation failed. (" + errorMsg + ")");
             } else {
                 cancelMessage = "Invitation was cancelled by local user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation has been cancelled.");
             }
 
@@ -301,11 +301,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled by the remote user "
                     + " because of an error on his/her side: " + errorMsg;
-                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation failed.");
             } else {
                 cancelMessage = "Invitation was cancelled by the remote user.";
-                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
                 monitor.setTaskName("Invitation has been cancelled.");
             }
         } else {
@@ -336,7 +336,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
-        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+        log.debug("Inv" + Utils.prefix(peer) + ": Stopping users: "
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
@@ -378,8 +378,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
-                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
-                    + Util.prefix(startHandle.getUser().getJID()));
+                log.debug("Inv" + Utils.prefix(peer) + ": Starting user "
+                    + Utils.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
             this.projectExchangeProcesses.removeProjectExchangeProcess(this);
@@ -410,7 +410,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public void remoteCancel(String errorMsg) {
         if (!cancelled.compareAndSet(false, true))
             return;
-        log.debug("Inv" + Util.prefix(peer) + ": remoteCancel: " + errorMsg);
+        log.debug("Inv" + Utils.prefix(peer) + ": remoteCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
         cancellationCause = new RemoteCancellationException(errorMsg);
@@ -495,7 +495,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected void createArchive(SubMonitor subMonitor) throws IOException,
         SarosCancellationException {
 
-        log.debug("Inv" + Util.prefix(peer) + ": Creating archive...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Creating archive...");
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         subMonitor.setWorkRemaining(100);
@@ -513,7 +513,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
-        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+        log.debug("Inv" + Utils.prefix(peer) + ": Stopping users: "
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
@@ -560,8 +560,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
-                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
-                    + Util.prefix(startHandle.getUser().getJID()));
+                log.debug("Inv" + Utils.prefix(peer) + ": Starting user "
+                    + Utils.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
         }
@@ -572,10 +572,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         subMonitor.setWorkRemaining(100);
 
-        log.debug("Inv" + Util.prefix(peer) + ": Sending archive...");
+        log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
         subMonitor.setTaskName("Sending archive...");
         if (archive == null)
-            log.debug("Inv" + Util.prefix(peer) + ": The archive is empty.");
+            log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
         transmitter.sendProjectArchive(peer, projectID, archive,
             subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
         this.projectExchangeProcesses.removeProjectExchangeProcess(this);
