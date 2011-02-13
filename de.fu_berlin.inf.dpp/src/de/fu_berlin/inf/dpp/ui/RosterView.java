@@ -79,6 +79,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -367,7 +368,7 @@ public class RosterView extends ViewPart {
             if (entry == null) {
                 return result;
             }
-            result.append(Utils.getDisplayableName(entry));
+            result.append(RosterUtils.getDisplayableName(entry));
 
             // Append presence information if available.
             final Presence presence = roster.getPresence(user);
@@ -426,7 +427,7 @@ public class RosterView extends ViewPart {
 
         @Override
         public String toString() {
-            return Utils.getDisplayableName(roster.getEntry(jid));
+            return RosterUtils.getDisplayableName(roster.getEntry(jid));
         }
     }
 

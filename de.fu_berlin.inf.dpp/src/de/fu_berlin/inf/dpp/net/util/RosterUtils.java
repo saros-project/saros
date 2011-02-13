@@ -6,9 +6,11 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -20,6 +22,43 @@ public class RosterUtils {
 
     private RosterUtils() {
         // no instantiation allowed
+    }
+
+    /**
+     * @return The nickname associated with the given JID in the current roster
+     *         or null if the current roster is not available or the nickname
+     *         has not been set.
+     */
+    public static String getNickname(Saros saros, JID jid) {
+
+        if (saros == null)
+            return null;
+
+        XMPPConnection connection = saros.getConnection();
+        if (connection == null)
+            return null;
+
+        Roster roster = connection.getRoster();
+        if (roster == null)
+            return null;
+
+        RosterEntry entry = roster.getEntry(jid.getBase());
+        if (entry == null)
+            return null;
+
+        String nickName = entry.getName();
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName;
+        }
+        return null;
+    }
+
+    public static String getDisplayableName(RosterEntry entry) {
+        String nickName = entry.getName();
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName.trim();
+        }
+        return entry.getUser();
     }
 
     /**
