@@ -28,6 +28,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.eclipse.workbench.SarosComponentImp;
 
@@ -275,7 +276,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void deleteBuddyNoGUI(JID buddyJID) throws RemoteException,
         XMPPException {
-        saros.removeContact(saros.getRoster().getEntry(buddyJID.getBase()));
+        RosterUtils.removeFromRoster(saros.getConnection(), saros.getRoster()
+            .getEntry(buddyJID.getBase()));
     }
 
     public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException {

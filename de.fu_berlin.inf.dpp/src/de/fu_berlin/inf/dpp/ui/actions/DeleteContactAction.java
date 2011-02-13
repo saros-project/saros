@@ -34,6 +34,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
@@ -123,7 +124,7 @@ public class DeleteContactAction extends SelectionProviderAction {
                 + " from your buddies?")) {
 
             try {
-                saros.removeContact(entry);
+                RosterUtils.removeFromRoster(saros.getConnection(), entry);
             } catch (XMPPException e) {
                 log.error("Could not delete buddy " + toString(entry) + ":", e);
             }

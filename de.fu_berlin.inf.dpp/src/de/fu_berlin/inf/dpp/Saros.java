@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.security.sasl.SaslException;
@@ -39,7 +38,6 @@ import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -51,7 +49,6 @@ import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -1091,137 +1088,6 @@ public class Saros extends AbstractUIPlugin {
         } finally {
             monitor.done();
         }
-    }
-
-    /**
-     * Adds given buddy to the roster.
-     * 
-     * @blocking
-     * 
-     * @param jid
-     *            the JID of the contact.
-     * @param name
-     *            the nickname under which the new contact should appear in the
-     *            roster.
-     * @param groups
-     *            the groups to which the new contact should belong to. This
-     *            information will be saved on the server.
-     * @param monitor
-     *            a SubMonitor to report progress to
-     * @throws XMPPException
-     *             is thrown if no connection is established or an error
-     *             occurred when adding the user to the roster (which does not
-     *             mean that the user really exists on the server)
-     */
-    public void addContact(JID jid, String name, String[] groups,
-        SubMonitor monitor) throws XMPPException {
-
-        monitor.beginTask("Adding buddy " + jid + "...", 2);
-
-        try {
-            assertConnection();
-
-            monitor.worked(1);
-
-            if (connection.getRoster().contains(jid.toString())) {
-                monitor.worked(1);
-                throw new XMPPException("Buddy already exists.");
-            }
-
-            /*
-             * If user is trying to add himself, throw exception since there is
-             * a strange behaviour if he does (he appears as not using Saros).
-             */
-            if (jid.equals(getMyJID())) {
-                monitor.worked(1);
-                throw new XMPPException(
-                    "You can't add yourself to your own buddies.");
-            }
-
-            monitor.worked(1);
-
-            connection.getRoster().createEntry(jid.toString(), name, groups);
-        } finally {
-            monitor.done();
-        }
-    }
-
-    /**
-     * Given an XMPP Exception this method will return whether the exception
-     * thrown by isJIDonServer indicates that the server does not support
-     * ServiceDisco.<br>
-     * <br>
-     * In other words: If isJIDonServer throws an Exception and this method
-     * returns true on the exception, then we should call addContact anyway.
-     * 
-     * @return true, if the exception occurred because the server does not
-     *         support ServiceDiscovery
-     */
-    public static boolean isDiscoFailedException(XMPPException e) {
-
-        /* feature-not-implemented */
-        if (e.getMessage().contains("501"))
-            return true;
-
-        /* service-unavailable */
-        if (e.getMessage().contains("503"))
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Returns whether the given JID can be found on the server.
-     * 
-     * @blocking
-     * @cancelable
-     * 
-     * @param monitor
-     *            a SubMonitor to report progress to
-     * @throws XMPPException
-     *             if the service disco failed. Use isDiscoFailedException to
-     *             figure out, whether this might mean that the server does not
-     *             support disco at all.
-     */
-    public boolean isJIDonServer(JID jid, SubMonitor monitor)
-        throws XMPPException {
-        monitor.beginTask("Performing Service Discovery on JID " + jid, 2);
-
-        ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-            .getInstanceFor(connection);
-        monitor.worked(1);
-
-        if (monitor.isCanceled())
-            throw new CancellationException();
-
-        try {
-            boolean discovered = sdm.discoverInfo(jid.toString())
-                .getIdentities().hasNext();
-            /*
-             * discovery does not change any state, if the user wanted to cancel
-             * it, we can do that even after the execution finished
-             */
-            if (monitor.isCanceled())
-                throw new CancellationException();
-            return discovered;
-        } finally {
-            monitor.done();
-        }
-    }
-
-    /**
-     * Removes given buddy from the roster.
-     * 
-     * @blocking
-     * 
-     * @param rosterEntry
-     *            the buddy that is to be removed
-     * @throws XMPPException
-     *             is thrown if no connection is established.
-     */
-    public void removeContact(RosterEntry rosterEntry) throws XMPPException {
-        assertConnection();
-        this.connection.getRoster().removeEntry(rosterEntry);
     }
 
     public boolean isConnected() {

@@ -33,6 +33,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -97,7 +98,8 @@ public class AddBuddyWizard extends Wizard {
                         + "buddy list.");
                 }
 
-                else if (!saros.isJIDonServer(jid, monitor.newChild(1))) {
+                else if (!RosterUtils.isJIDonServer(saros.getConnection(), jid,
+                    monitor.newChild(1))) {
                     if (!openQuestionDialog("Buddy not found", "The buddy "
                         + jid + " could not be found on the server."
                         + " Please make sure you spelled the name correctly.\n"
@@ -132,8 +134,8 @@ public class AddBuddyWizard extends Wizard {
 
             // now add the buddy to the Roster
             try {
-                saros
-                    .addContact(jid, jid.toString(), null, monitor.newChild(1));
+                RosterUtils.addToRoster(saros.getConnection(), jid, jid.toString(),
+                    null, monitor.newChild(1));
             } catch (XMPPException e) {
                 throw new InvocationTargetException(e, "Couldn't add buddy "
                     + jid + " to Saros buddies: " + e.getMessage());
