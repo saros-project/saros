@@ -52,13 +52,13 @@ public class SarosPreferencesImp extends SarosComponentImp implements
             + ") doesn't exist yet!";
         if (isAccountActiveNoGUI(jid))
             return;
-        preCondition();
+        STFBotShell shell = preCondition();
         SWTBotList list = bot
             .listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
         list.select(jid.getBase());
         bot.buttonInGroup(GeneralPreferencePage.ACTIVATE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        assert stfLabel.existsLabel("Active: " + jid.getBase());
+        assert shell.bot_().existsLabel("Active: " + jid.getBase());
         bot.button(APPLY).click();
         bot.button(OK).click();
         bot().waitsUntilIsShellClosed(SHELL_PREFERNCES);
@@ -133,8 +133,9 @@ public class SarosPreferencesImp extends SarosComponentImp implements
 
         bot().shell(SHELL_PREFERNCES).bot_().tree()
             .selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
-        stfButton.selectCComboBox(0, encoder);
-        stfButton.selectCComboBox(1, videoResolution);
+        bot().shell(SHELL_PREFERNCES).bot_().ccomboBox(0).setSelection(encoder);
+        bot().shell(SHELL_PREFERNCES).bot_().ccomboBox(1)
+            .setSelection(videoResolution);
 
         bot.button(APPLY).click();
         bot.button(OK).click();
@@ -177,9 +178,10 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     }
 
     public boolean isAccountActive(JID jid) throws RemoteException {
-        preCondition();
-        String activeAccount = stfLabel
-            .getTextOfLabelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
+
+        STFBotShell shell = preCondition();
+        String activeAccount = shell.bot_()
+            .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
         boolean isActive = false;
         if (activeAccount.equals("Active: " + jid.getBase()))
             isActive = true;

@@ -27,6 +27,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPref
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
@@ -75,6 +77,8 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static STFBotEditorImp stfEditor = STFBotEditorImp.getInstance();
     public static STFBotListImp stfList = STFBotListImp.getInstance();
 
+    public static STFBotCComboImp stfCCombo = STFBotCComboImp.getInstance();
+    public static STFBotComboImp stfCombo = STFBotComboImp.getInstance();
     // workbench
     public static WorkbenchImp workbench = WorkbenchImp.getInstance();
 

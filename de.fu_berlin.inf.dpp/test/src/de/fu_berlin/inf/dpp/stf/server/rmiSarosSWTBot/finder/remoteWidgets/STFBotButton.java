@@ -2,49 +2,84 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
 public interface STFBotButton extends EclipseComponent {
 
     /**********************************************
      * 
-     * basic widget: {@link SWTBotButton}.
+     * actions
      * 
      **********************************************/
 
     /**
-     * clicks the button specified with the given mnemonicText.
-     * 
-     * @param mnemonicText
-     *            the mnemonicText on the widget, e.g. Button "Finish" in a
-     *            dialog.
+     * @see SWTBotButton#click()
      */
     public void click() throws RemoteException;
 
+    /**
+     * Click the button until it is enabled
+     * 
+     * @throws RemoteException
+     */
     public void clickAndWait() throws RemoteException;
 
-    public void selectCComboBox(int indexOfCComboBox, int indexOfSelection)
-        throws RemoteException;
+    /**
+     * @see SWTBotButton#setFocus()
+     * @throws RemoteException
+     */
+    public void setFocus() throws RemoteException;
 
-    public void clickCheckBox(String mnemonicText) throws RemoteException;
-
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     /**
      * 
      * 
-     * @return<tt>true</tt>, if the given button is enabled.
+     * @see SWTBotButton#isEnabled()
      * @throws RemoteException
      */
     public boolean isEnabled() throws RemoteException;
 
+    /**
+     * 
+     * @see SWTBotButton#isVisible()
+     * @throws RemoteException
+     */
     public boolean isVisible() throws RemoteException;
 
+    /**
+     * 
+     * @see SWTBotButton#isActive()
+     * @throws RemoteException
+     */
     public boolean isActive() throws RemoteException;
 
     /**
-     * Waits until the button is enabled.
      * 
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
+     * @see SWTBotButton#getText()
+     * @throws RemoteException
+     */
+    public String getText() throws RemoteException;
+
+    /**
+     * 
+     * @see SWTBotButton#getToolTipText()
+     * @throws RemoteException
+     */
+    public String getToolTipText() throws RemoteException;
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    /**
+     * Waits until the button is enabled.
      */
     public void waitUntilIsEnabled() throws RemoteException;
 

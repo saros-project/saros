@@ -2,14 +2,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class STFBotLabelImp extends EclipseComponentImp implements STFBotLabel {
 
-    private static transient STFBotLabelImp labelImp;
+    private static transient STFBotLabelImp self;
 
     private SWTBotLabel swtBotLabel;
 
@@ -17,10 +16,10 @@ public class STFBotLabelImp extends EclipseComponentImp implements STFBotLabel {
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
     public static STFBotLabelImp getInstance() {
-        if (labelImp != null)
-            return labelImp;
-        labelImp = new STFBotLabelImp();
-        return labelImp;
+        if (self != null)
+            return self;
+        self = new STFBotLabelImp();
+        return self;
     }
 
     public void setSwtBotLabel(SWTBotLabel label) {
@@ -35,33 +34,38 @@ public class STFBotLabelImp extends EclipseComponentImp implements STFBotLabel {
 
     /**********************************************
      * 
+     * actions
+     * 
+     **********************************************/
+
+    public void setFocus() throws RemoteException {
+        swtBotLabel.setFocus();
+    }
+
+    /**********************************************
+     * 
      * states
      * 
      **********************************************/
+
+    public boolean isEnabled() throws RemoteException {
+        return swtBotLabel.isEnabled();
+    }
+
+    public boolean isVisible() throws RemoteException {
+        return swtBotLabel.isVisible();
+    }
+
+    public boolean isActive() throws RemoteException {
+        return swtBotLabel.isActive();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return swtBotLabel.getText();
+    }
+
     public String getText() throws RemoteException {
-        return bot.label().getText();
+        return swtBotLabel.getText();
     }
 
-    public String getTextOfLabelInGroup(String inGroup) throws RemoteException {
-        return bot.labelInGroup(inGroup).getText();
-    }
-
-    public boolean existsLabel(String mnemonicText) throws RemoteException {
-        try {
-            bot.label(mnemonicText);
-
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
-
-    public boolean existsLabelInView(String viewTitle) throws RemoteException {
-        try {
-            bot().view(viewTitle).bot_().label();
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-    }
 }

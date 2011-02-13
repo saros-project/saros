@@ -2,17 +2,26 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
-
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFBotLabel extends EclipseComponent {
+public interface STFBotCCombo extends EclipseComponent {
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
+
+    public abstract void setSelection(int indexOfSelection)
+        throws RemoteException;
+
+    public abstract void selection() throws RemoteException;
+
+    public abstract void selectionIndex() throws RemoteException;
+
+    public abstract void setSelection(String text) throws RemoteException;
+
+    public abstract void setText(String text) throws RemoteException;
 
     public abstract void setFocus() throws RemoteException;
 
@@ -21,20 +30,19 @@ public interface STFBotLabel extends EclipseComponent {
      * states
      * 
      **********************************************/
-
     public abstract boolean isEnabled() throws RemoteException;
 
     public abstract boolean isVisible() throws RemoteException;
 
     public abstract boolean isActive() throws RemoteException;
 
+    public abstract String getText() throws RemoteException;
+
     public abstract String getToolTipText() throws RemoteException;
 
-    /**
-     * 
-     * @return the text of the first found {@link SWTBotLabel}
-     * @throws RemoteException
-     */
-    public String getText() throws RemoteException;
+    public abstract int itemCount() throws RemoteException;
 
+    public abstract String[] items() throws RemoteException;
+
+    public abstract int textLimit() throws RemoteException;
 }

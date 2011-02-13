@@ -7,20 +7,21 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFBotButtonImp extends EclipseComponentImp implements STFBotButton {
+public class STFBotButtonImp extends EclipseComponentImp implements
+    STFBotButton {
 
-    private static transient STFBotButtonImp buttonImp;
+    private static transient STFBotButtonImp self;
 
     private SWTBotButton swtBotButton;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
      */
     public static STFBotButtonImp getInstance() {
-        if (buttonImp != null)
-            return buttonImp;
-        buttonImp = new STFBotButtonImp();
-        return buttonImp;
+        if (self != null)
+            return self;
+        self = new STFBotButtonImp();
+        return self;
     }
 
     public void setSwtBotButton(SWTBotButton button) {
@@ -47,13 +48,8 @@ public class STFBotButtonImp extends EclipseComponentImp implements STFBotButton
         click();
     }
 
-    public void selectCComboBox(int indexOfCComboBox, int indexOfSelection)
-        throws RemoteException {
-        bot.ccomboBox(indexOfCComboBox).setSelection(indexOfSelection);
-    }
-
-    public void clickCheckBox(String mnemonicText) throws RemoteException {
-        bot.checkBox(mnemonicText).click();
+    public void setFocus() throws RemoteException {
+        swtBotButton.setFocus();
     }
 
     /**********************************************
@@ -71,6 +67,14 @@ public class STFBotButtonImp extends EclipseComponentImp implements STFBotButton
 
     public boolean isActive() throws RemoteException {
         return swtBotButton.isActive();
+    }
+
+    public String getText() throws RemoteException {
+        return swtBotButton.getText();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return swtBotButton.getText();
     }
 
     /**********************************************

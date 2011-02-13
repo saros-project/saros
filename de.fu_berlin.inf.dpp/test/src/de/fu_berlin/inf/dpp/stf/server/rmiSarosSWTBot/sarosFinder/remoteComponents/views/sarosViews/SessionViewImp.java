@@ -241,7 +241,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public boolean existsLabelInSessionView() throws RemoteException {
         precondition();
-        return stfLabel.existsLabelInView(VIEW_SAROS_SESSION);
+        return bot().view(VIEW_SAROS_SESSION).bot_()
+            .existsLabel(VIEW_SAROS_SESSION);
     }
 
     public boolean hasWriteAccess() throws RemoteException {
