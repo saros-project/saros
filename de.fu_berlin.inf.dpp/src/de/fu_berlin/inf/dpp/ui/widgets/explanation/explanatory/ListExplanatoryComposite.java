@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.List
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>{@link SWT#BORDER} - this style is only applied on the
- * {@link ListExplanationComposite} not on the {@link ListExplanatoryComposite}
- * itself</dd>
+ * <dd>{@link SWT#H_SCROLL}, {@link SWT#V_SCROLL}, {@link SWT#BORDER} - these
+ * styles are only applied on the {@link ListExplanationComposite} not on the
+ * {@link ListExplanatoryComposite} itself</dd>
  * <dd>Styles supported by {@link Composite}</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
@@ -43,10 +43,10 @@ public class ListExplanatoryComposite extends ExplanatoryComposite {
      * @param style
      */
     public ListExplanatoryComposite(Composite parent, int style) {
-        super(parent, style & ~SWT.BORDER);
+        super(parent, style & ~(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
 
         this.explanationComposite = new ListExplanationComposite(this, style
-            & SWT.BORDER);
+            & (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
     }
 
     /**

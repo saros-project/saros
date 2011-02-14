@@ -19,8 +19,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.Si
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>{@link SWT#BORDER} - this style is only applied on the
- * {@link SimpleExplanationComposite} not on the
+ * <dd>{@link SWT#H_SCROLL}, {@link SWT#V_SCROLL}, {@link SWT#BORDER} - these
+ * styles is only applied on the {@link SimpleExplanationComposite} not on the
  * {@link SimpleExplanatoryComposite} itself</dd>
  * <dd>Styles supported by {@link Composite}</dd>
  * <dt><b>Events:</b></dt>
@@ -77,10 +77,10 @@ public class SimpleExplanatoryComposite extends ExplanatoryComposite {
      * @param style
      */
     public SimpleExplanatoryComposite(Composite parent, int style) {
-        super(parent, style & ~SWT.BORDER);
+        super(parent, style & ~(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
 
         this.explanationComposite = new SimpleExplanationComposite(this, style
-            & SWT.BORDER);
+            & (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
     }
 
     /**

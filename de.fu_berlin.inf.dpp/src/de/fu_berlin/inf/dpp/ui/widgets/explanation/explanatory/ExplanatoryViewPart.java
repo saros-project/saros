@@ -11,7 +11,8 @@ public abstract class ExplanatoryViewPart extends ViewPart {
 
     @Override
     final public void createPartControl(Composite parent) {
-        this.explanatoryComposite = new ExplanatoryComposite(parent, SWT.NONE);
+        this.explanatoryComposite = new ExplanatoryComposite(parent,
+            SWT.H_SCROLL | SWT.V_SCROLL);
         Composite contentComposite = new Composite(this.explanatoryComposite,
             SWT.NONE);
         this.explanatoryComposite.setContentControl(contentComposite);

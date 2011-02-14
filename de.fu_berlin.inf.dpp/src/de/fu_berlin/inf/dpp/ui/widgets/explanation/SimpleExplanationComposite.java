@@ -3,16 +3,12 @@ package de.fu_berlin.inf.dpp.ui.widgets.explanation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.Listener;
 
 /**
  * This composite displays a simple {@link ExplanationComposite} and allows it's
@@ -120,34 +116,8 @@ public class SimpleExplanationComposite extends ExplanationComposite {
      *            Style constants
      */
     public SimpleExplanationComposite(Composite parent, int style) {
-        super(parent, style & ~(SWT.V_SCROLL | SWT.V_SCROLL | SWT.BORDER), null);
-
+        super(parent, style, null);
         super.setLayout(new FillLayout());
-
-        this.scrolledComposite = new ScrolledComposite(this, style);
-        this.scrolledComposite.setExpandHorizontal(true);
-        this.scrolledComposite.setExpandVertical(true);
-
-        this.explanationLabel = new Label(this.scrolledComposite, SWT.WRAP);
-        this.scrolledComposite.setContent(this.explanationLabel);
-
-        this.scrolledComposite.addListener(SWT.Resize, new Listener() {
-            public void handleEvent(Event event) {
-                Rectangle clientArea = SimpleExplanationComposite.this.scrolledComposite
-                    .getClientArea();
-
-                int verticalBarWidth = ((SimpleExplanationComposite.this.scrolledComposite
-                    .getVerticalBar() != null) ? SimpleExplanationComposite.this.scrolledComposite
-                    .getVerticalBar().getSize().x : 0);
-
-                Point minSize = explanationLabel.computeSize(clientArea.width
-                    - verticalBarWidth, SWT.DEFAULT);
-
-                SimpleExplanationComposite.this.layout();
-
-                scrolledComposite.setMinSize(minSize);
-            }
-        });
     }
 
     /**
@@ -168,7 +138,7 @@ public class SimpleExplanationComposite extends ExplanationComposite {
     }
 
     /**
-     * Sets the explanation text
+     * Sets the explanation content
      * 
      * @param simpleExplanation
      *            Explanation to be displayed by the
@@ -177,9 +147,31 @@ public class SimpleExplanationComposite extends ExplanationComposite {
     public void setExplanation(SimpleExplanation simpleExplanation) {
         this.setExplanationImage((simpleExplanation != null) ? simpleExplanation.explanationImage
             : null);
-        this.explanationLabel
-            .setText((simpleExplanation != null && simpleExplanation.explanationText != null) ? simpleExplanation.explanationText
-                : "");
+        if (this.explanationLabel != null
+            && !this.explanationLabel.isDisposed()) {
+            if (simpleExplanation != null
+                && simpleExplanation.explanationText != null) {
+                // label exists, explanation text exists
+                this.explanationLabel
+                    .setText(simpleExplanation.explanationText);
+            } else {
+                // label exists, explanation text not exists
+                this.explanationLabel.dispose();
+            }
+        } else {
+            if (simpleExplanation != null
+                && simpleExplanation.explanationText != null) {
+                // label not exists, explanation text exists
+                this.explanationLabel = new Label(this, SWT.WRAP);
+                this.explanationLabel.setForeground(this.getForeground());
+                this.explanationLabel
+                    .setText(simpleExplanation.explanationText);
+            } else {
+                // label not exists, explanation text not exists
+                // do nothing
+            }
+        }
+
         this.layout();
     }
 

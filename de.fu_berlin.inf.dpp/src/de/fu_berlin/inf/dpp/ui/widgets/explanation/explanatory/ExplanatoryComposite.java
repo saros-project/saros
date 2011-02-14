@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Layout;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.exceptions.ContentControlInvalidException;
 
-
 /**
  * Instances of this class are controls which are capable of containing exactly
  * <strong>one</strong> content {@link Control} and {@link ExplanationComposite}
@@ -89,8 +88,8 @@ public class ExplanatoryComposite extends Composite {
     };
 
     /**
-     * Constructs a new {@link SimpleExplanatoryComposite} with a given parent
-     * and the passed style information.
+     * Constructs a new {@link ExplanatoryComposite} with a given parent and the
+     * passed style information.
      * 
      * @param parent
      * @param style

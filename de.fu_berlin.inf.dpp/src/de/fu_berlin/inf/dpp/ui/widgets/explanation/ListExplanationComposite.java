@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.widgets.explanation;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -11,8 +12,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 
 /**
- * This composite displays a simple {@link ExplanationComposite} and allows it's
- * content to be scrollable if the composite becomes to small.
+ * This composite displays a {@link ExplanationComposite} with list items as its
+ * content.
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout and adding
  * sub {@link Control}s correctly.
@@ -91,20 +92,25 @@ public class ListExplanationComposite extends ExplanationComposite {
     }
 
     /**
-     * Instances of this class layout text in the form of an intro text and list
-     * items.
+     * Instances of this class layout text in the form of an introducing text
+     * and a list of items.
      * 
      * @see ListExplanationComposite
      */
     protected static class ListExplanationContentComposite extends Composite {
-        /* number of columns used for layout */
+        /**
+         * Number of columns used for layout
+         */
         final int numCols = 2;
 
         public ListExplanationContentComposite(Composite parent, int style,
             ListExplanation listExplanation) {
             super(parent, style);
 
-            this.setLayout(new GridLayout(numCols, false));
+            GridLayout gridLayout = new GridLayout(numCols, false);
+            gridLayout.marginWidth = 0;
+            gridLayout.marginHeight = 0;
+            this.setLayout(gridLayout);
 
             /*
              * Introductory text
@@ -151,7 +157,10 @@ public class ListExplanationComposite extends ExplanationComposite {
     public ListExplanationComposite(Composite parent, int style) {
         super(parent, style, null);
 
-        super.setLayout(new GridLayout(1, false));
+        GridLayout gridLayout = new GridLayout(1, false);
+        gridLayout.marginWidth = 0;
+        gridLayout.marginHeight = 0;
+        super.setLayout(gridLayout);
     }
 
     /**
@@ -186,10 +195,23 @@ public class ListExplanationComposite extends ExplanationComposite {
         if (this.contentComposite != null
             && !this.contentComposite.isDisposed())
             this.contentComposite.dispose();
+
         this.contentComposite = new ListExplanationContentComposite(this,
             SWT.NONE, listExplanation);
         this.contentComposite.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.CENTER, true, true));
+            SWT.BEGINNING, true, true));
+
+        /*
+         * If scrolling is enabled, set minimum size so that scroll bars appear.
+         * Because the inner ListExplanationContentComposite uses a GridLayout
+         * the composite would collapse without a minimum size.
+         */
+        if (this.getHorizontalBar() != null || this.getVerticalBar() != null) {
+            Point size = this.contentComposite.computeSize(SWT.DEFAULT,
+                SWT.DEFAULT);
+            this.setMinSize(size);
+        }
+
         this.layout();
     }
 

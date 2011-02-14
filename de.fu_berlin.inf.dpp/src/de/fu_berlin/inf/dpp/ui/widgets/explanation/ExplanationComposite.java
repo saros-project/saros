@@ -8,6 +8,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ScrollBar;
+
+import de.fu_berlin.inf.dpp.ui.widgets.MinSizeComposite;
 
 /**
  * This composite displays a descriptive icon and a {@link Control} that
@@ -23,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
  * </dl>
  * 
  * <p>
- * This class may be subclassed by custom control implementors who are building
+ * This class may be sub classed by custom control implementors who are building
  * controls that are constructed from aggregates of other controls.
  * </p>
  * 
@@ -31,10 +34,12 @@ import org.eclipse.swt.widgets.Control;
  * @author bkahlert
  * 
  */
-public class ExplanationComposite extends Composite {
-    public static final int MARGIN_WIDTH = 15;
-    public static final int MARGIN_HEIGHT = 10;
-    public static final int SPACING = 20;
+public class ExplanationComposite extends MinSizeComposite {
+    /**
+     * If set to true a border around the {@link #getClientArea() clientArea} is
+     * drawn.
+     */
+    protected static final boolean DEBUG = false;
 
     /**
      * The image containing explanatory information.
@@ -42,9 +47,9 @@ public class ExplanationComposite extends Composite {
     protected Image explanationImage;
 
     /**
-     * The minimal size
+     * The space between explanation image and explanation
      */
-    protected Point minSize;
+    protected int spacing = 20;
 
     /**
      * Used by the paint listener to correctly place the backgroundImage.
@@ -79,7 +84,6 @@ public class ExplanationComposite extends Composite {
     public ExplanationComposite(Composite parent, int style,
         Image explanationImage) {
         super(parent, style);
-
         setExplanationImage(explanationImage);
 
         /*
@@ -93,12 +97,17 @@ public class ExplanationComposite extends Composite {
         this.addPaintListener(new PaintListener() {
             public void paintControl(PaintEvent e) {
                 Image explanationImage = ExplanationComposite.this.explanationImage;
-                if (explanationImage == null)
+                if (explanationImage == null || explanationImage.isDisposed())
                     return;
 
                 Rectangle clientArea = ExplanationComposite.this.cachedClientArea;
                 if (clientArea == null)
                     clientArea = getClientArea();
+
+                if (DEBUG) {
+                    e.gc.drawRectangle(clientArea.x, clientArea.y,
+                        clientArea.width - 1, clientArea.height - 1);
+                }
 
                 Rectangle bounds = ExplanationComposite.this.getBounds();
                 int x, y = 0;
@@ -108,38 +117,47 @@ public class ExplanationComposite extends Composite {
                     x = (bounds.width - explanationImage.getBounds().width) / 2;
                     y = (bounds.height - explanationImage.getBounds().height) / 2;
                 } else {
-                    // If child elements exist, place the icon to their left
                     x = clientArea.x - explanationImage.getBounds().width
-                        - SPACING;
-                    y = clientArea.y + clientArea.height / 2
-                        - explanationImage.getBounds().height / 2;
+                        - getSpacing();
+                    y = (bounds.height - explanationImage.getBounds().height) / 2;
                 }
+
+                /*
+                 * Consider the scroll bars
+                 */
+                ScrollBar hBar = getHorizontalBar();
+                if (hBar != null && hBar.isVisible())
+                    y -= hBar.getSize().y / 2;
+
                 e.gc.drawImage(explanationImage, x, y);
             }
         });
     }
 
-    /**
-     * Returns the minimal size
-     * 
-     * @return
-     */
-    public Point getMinSize() {
-        return minSize;
+    @Override
+    public void layout(boolean changed) {
+        super.layout(changed);
+        if (DEBUG)
+            this.redraw();
     }
 
     /**
-     * Sets the minimal size.
-     * <p>
-     * If the parent composite is smaller it won't affect the explanation
-     * composite's size anymore.
+     * Returns the space between explanation image and explanation
      * 
-     * @param minSize
-     *            for this composite; if you only want to set one dimension, set
-     *            {@link SWT#DEFAULT} for the other
+     * @return
      */
-    public void setMinSize(Point minSize) {
-        this.minSize = minSize;
+    public int getSpacing() {
+        return spacing;
+    }
+
+    /**
+     * Sets the spacing between explanation image and explanation
+     * 
+     * @param spacing
+     */
+    public void setSpacing(int spacing) {
+        this.spacing = spacing;
+        this.layout();
     }
 
     /**
@@ -173,77 +191,97 @@ public class ExplanationComposite extends Composite {
 
     @Override
     public Rectangle getClientArea() {
-        int imageWidth = ((explanationImage != null) ? SPACING
-            + explanationImage.getBounds().width : 0);
-
-        /*
-         * Does consider eventually limited clientArea
-         */
         Rectangle clientArea = super.getClientArea();
 
-        clientArea.width -= 2 * MARGIN_WIDTH + imageWidth;
+        int extraLeftMargin = getExtraLeftMargin();
 
         /*
-         * Check whether preferred client size fits into the available width; if
-         * not re-compute client size with limited width.
+         * Check whether preferred client size fits into the available size; if
+         * not re-compute client size with available size.
          */
-        Point preferredClientSize = this.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        if (preferredClientSize.x <= clientArea.width) {
-            clientArea.width = preferredClientSize.x;
-            clientArea.height = Math.min(clientArea.height,
-                preferredClientSize.y);
-        } else {
-            Point limitedClientSize = this.computeSize(clientArea.width,
-                SWT.DEFAULT);
-            clientArea.width = Math.min(clientArea.width, limitedClientSize.x);
-            clientArea.height = Math
-                .min(clientArea.height, limitedClientSize.y);
-        }
+        Point newClientSize = this
+            .computeSizeTrimless(SWT.DEFAULT, SWT.DEFAULT);
 
-        /*
-         * Respect the margins
-         */
-        if (clientArea.width > super.getClientArea().width - 2 * MARGIN_WIDTH) {
-            clientArea.width = super.getClientArea().width - 2 * MARGIN_WIDTH;
-        }
-
-        if (clientArea.height > super.getClientArea().height - 2
-            * MARGIN_HEIGHT) {
-            clientArea.height = super.getClientArea().height - 2
-                * MARGIN_HEIGHT;
-        }
-
-        /*
-         * Respect the minimal size
-         */
-        if (this.minSize != null) {
-            if (this.minSize.x != SWT.DEFAULT
-                && clientArea.width < this.minSize.x)
-                clientArea.width = this.minSize.x;
-            if (this.minSize.y != SWT.DEFAULT
-                && clientArea.height < this.minSize.y)
-                clientArea.height = this.minSize.y;
+        int wHint = SWT.DEFAULT, hHint = SWT.DEFAULT;
+        if (newClientSize.x > clientArea.width)
+            /*
+             * Because newClientSize contains the trim, we have to subtract the
+             * trim for wHint.
+             */
+            wHint = Math.max(clientArea.width - extraLeftMargin, getMinWidth());
+        if (newClientSize.y > clientArea.height)
+            /*
+             * Because newClientSize contains the trim, we have to subtract the
+             * trim for hHint.
+             */
+            hHint = Math.max(clientArea.height, getMinHeight());
+        if (wHint != SWT.DEFAULT || hHint != SWT.DEFAULT) {
+            newClientSize = this.computeSizeTrimless(wHint, hHint);
         }
 
         /*
          * Center the unit of explanationImage and child composites.
          */
-        clientArea.x += (this.getBounds().width - clientArea.width + imageWidth) / 2;
-        clientArea.y = Math.max(clientArea.y,
-            (this.getBounds().height - clientArea.height) / 2);
+        clientArea.x += Math.max(
+            (clientArea.width - newClientSize.x + extraLeftMargin) / 2,
+            extraLeftMargin);
+        clientArea.y += Math.max((clientArea.height - newClientSize.y) / 2, 0);
 
-        /*
-         * Don't allow negative coordinates
-         */
-        int minX = MARGIN_WIDTH + imageWidth;
-        int minY = 0;
-        if (clientArea.x < minX)
-            clientArea.x = minX;
-        if (clientArea.y < minY)
-            clientArea.y = minY;
-
+        clientArea.width = newClientSize.x;
+        clientArea.height = newClientSize.y;
         this.cachedClientArea = clientArea;
 
         return clientArea;
+    }
+
+    @Override
+    public Rectangle computeTrim(int x, int y, int width, int height) {
+        if (isNoTrimComputation())
+            return new Rectangle(x, y, width, height);
+
+        width += getExtraLeftMargin();
+
+        if (getExplanationImageHeight() > height)
+            height = getExplanationImageHeight();
+
+        return super.computeTrim(x, y, width, height);
+    }
+
+    /**
+     * Gets the extra left margin needed to correctly display the
+     * {@link #explanationImage}.
+     * 
+     * @return
+     */
+    protected int getExtraLeftMargin() {
+        Point explanationImageSize = getExplanationImageSize();
+        return explanationImageSize != null ? explanationImageSize.x
+            + getSpacing() : 0;
+    }
+
+    /**
+     * Returns the {@link #explanationImage}'s dimensions.
+     * 
+     * @return null if explanation image not set
+     */
+    protected Point getExplanationImageSize() {
+        if (this.explanationImage != null
+            && !this.explanationImage.isDisposed()) {
+            Rectangle bounds = this.explanationImage.getBounds();
+            return new Point(bounds.width, bounds.height);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the {@link #explanationImage}'s height.
+     * 
+     * @return 0 if explanation image not set
+     */
+    protected int getExplanationImageHeight() {
+        Point getExplanationImageSize = getExplanationImageSize();
+        return (getExplanationImageSize != null) ? getExplanationImageSize.y
+            : 0;
     }
 }
