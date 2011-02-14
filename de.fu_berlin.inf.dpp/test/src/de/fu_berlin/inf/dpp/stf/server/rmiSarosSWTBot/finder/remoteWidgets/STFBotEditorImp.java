@@ -19,14 +19,18 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor {
+public class STFBotEditorImp extends EclipseComponentImp implements
+    STFBotEditor {
 
     private static transient STFBotEditorImp self;
+
+    private String title;
+    private String id;
+    private SWTBotEclipseEditor editor;
 
     /* error messages */
     private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
@@ -42,6 +46,20 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
         return self;
     }
 
+    public void setTitle(String title) {
+        // if (this.title == null || !this.title.equals(title)) {
+        this.title = title;
+        this.editor = bot.editorByTitle(title).toTextEditor();
+        // }
+    }
+
+    public void setId(String id) {
+        if (this.id == null || !this.id.equals(id)) {
+            this.id = id;
+            this.editor = bot.editorById(id).toTextEditor();
+        }
+    }
+
     /***********************************************************************
      * 
      * exported functions
@@ -53,69 +71,21 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
      * actions
      * 
      **********************************************/
-    public void activateEditor(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        try {
-            getEditor(fileName).setFocus();
-        } catch (TimeoutException e) {
-            log.warn("The tab of the editor with the title " + fileName
-                + " can't be activated.", e);
-        }
+    public void activate() throws RemoteException {
+        editor.setFocus();
     }
 
-    public void activateJavaEditor(String className) throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        try {
-            getJavaEditor(className).setFocus();
-        } catch (TimeoutException e) {
-            log.warn("The tab of the editor with the title " + className
-                + SUFFIX_JAVA + " can't be activated.", e);
-        }
+    public void closeWithSave() throws RemoteException {
+        editor.save();
+        editor.close();
     }
 
-    public void closeEditorWithSave(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        if (isEditorOpen(fileName)) {
-            activateEditor(fileName);
-            getEditor(fileName).save();
-            getEditor(fileName).close();
-        }
-    }
+    public void closeWithoutSave() throws RemoteException {
+        editor.close();
+        if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
+            && bot().shell(SHELL_SAVE_RESOURCE).isActive())
+            confirmShellSaveSource(YES);
 
-    public void closeEditorWithoutSave(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        if (isEditorOpen(fileName)) {
-            activateEditor(fileName);
-            getEditor(fileName).close();
-            if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
-                && bot().shell(SHELL_SAVE_RESOURCE).isActive())
-                confirmShellSaveSource(YES);
-        }
-    }
-
-    public void closeJavaEditorWithSave(String className)
-        throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        closeEditorWithSave(className + SUFFIX_JAVA);
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // IWorkbenchPage page = win.getActivePage();
-        // if (page != null) {
-        // page.closeEditor(page.getActiveEditor(), true);
-        // STFBotShell activateShell = Display.getCurrent().getActiveShell();
-        // activateShell.close();
-        //
-        // }
-        // }
-        // });
-    }
-
-    public void closejavaEditorWithoutSave(String className)
-        throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        closeEditorWithoutSave(className + SUFFIX_JAVA);
     }
 
     public void confirmShellSaveSource(String buttonType)
@@ -125,41 +95,12 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
         bot().shell(SHELL_SAVE_ALL_FILES_NOW).confirm(buttonType);
     }
 
-    public void setTextInEditorWithSave(String contentPath, String... fileNodes)
+    public void setTextInEditorWithSave(String contentPath)
         throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
-        String fileName = fileNodes[fileNodes.length - 1];
-        precondition(fileNodes);
-        // e.setFocus();
-        // e.pressShortcut(Keystrokes.LF);
-        getEditor(fileName).setText(contents);
-        getEditor(fileName).save();
-    }
 
-    public void setTextInJavaEditorWithSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        setTextInEditorWithSave(contentPath,
-            getClassNodes(projectName, packageName, className));
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        // log.debug("shell name: " + win.getShell().getText());
-        // win.getShell().forceActive();
-        // win.getShell().forceFocus();
-        // }
-        // });
-        // e.setFocus();
-
-        // e.typeText("hallo wie geht es dir !%%%");
-        // e.pressShortcut(Keystrokes.LF);
-        // e.typeText("mir geht es gut!");
-        // delegate.sleep(2000);
-        //
-        // delegate.sleep(2000);
-
-        // editorObject.setTextinEditorWithSave(contents, className + ".java");
+        editor.setText(contents);
+        editor.save();
     }
 
     public void setTextInEditorWithoutSave(String contentPath,
@@ -420,7 +361,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
 
     public int getJavaCursorLinePosition(String className)
         throws RemoteException {
-        activateJavaEditor(className);
+        // activate();
         return getJavaEditor(className).cursorPosition().line;
     }
 
@@ -463,7 +404,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
         if (!isJavaEditorOpen(className))
             openC.openClass(VIEW_PACKAGE_EXPLORER, projectName, pkg, className);
         if (!isJavaEditorActive(className))
-            activateJavaEditor(className);
+            activate();
         return getJavaEditor(className).isDirty();
         // return isFileDirty(getClassNodes(projectName, pkg, className));
         // final List<Boolean> results = new ArrayList<Boolean>();
@@ -596,7 +537,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements STFBotEditor
             openC.openFile(VIEW_PACKAGE_EXPLORER, fileNodes);
         }
         if (!isEditorActive(fileName)) {
-            activateEditor(fileName);
+            activate();
         }
     }
 

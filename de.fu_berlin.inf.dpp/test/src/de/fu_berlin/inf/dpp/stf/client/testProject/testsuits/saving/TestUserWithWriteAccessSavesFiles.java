@@ -142,7 +142,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
         String dirtyCls2ContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS2);
-        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text STFBotEditor",
+        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
             PROJECT1, PKG1, CLS2);
 
         carl.editor.waitUntilJavaEditorContentSame(dirtyCls2ContentOfAlice,
@@ -178,12 +178,11 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS2);
-        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text STFBotEditor",
+        carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
             PROJECT1, PKG1, CLS2);
-        carl.editor.closeJavaEditorWithSave(CLS2);
+        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
 
-        alice.editor.setTextInJavaEditorWithSave(CP2_CHANGE, PROJECT1, PKG1,
-            CLS2);
+        alice.bot().editor(CLS2_SUFFIX).setTextInEditorWithSave(CP2_CHANGE);
         String dirtyCls2ChangeContentOfAlice = alice.editor
             .getTextOfJavaEditor(PROJECT1, PKG1, CLS2);
         dave.editor.waitUntilJavaEditorContentSame(
@@ -209,7 +208,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         String contentOfCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,
             CLS2);
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
-        carl.editor.closeJavaEditorWithSave(CLS2);
+        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
     }
 
     /**
@@ -234,7 +233,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         String clsConentofBob = bob.editor
             .getClassContent(PROJECT1, PKG1, CLS1);
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         String clsConentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 
@@ -254,7 +253,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         String clsContentChangeOfCarl = carl.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS1);
         assertTrue(clsContentChangeOfCarl.equals(clsConentOfAlice));
-        carl.editor.closeJavaEditorWithSave(CLS1);
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
     }
 
 }

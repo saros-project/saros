@@ -78,7 +78,7 @@ public class RmiTest extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
         assertTrue(dirtyClsContentOfAlice.equals(clsContentOfAlice));
@@ -91,7 +91,7 @@ public class RmiTest extends STFTest {
         alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
         String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
             PROJECT2, PKG1, CLS1);
-        alice.editor.closejavaEditorWithoutSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
         assertFalse(dirtyClsContentOfAlice.equals(clsContentOfAlice));
@@ -102,7 +102,8 @@ public class RmiTest extends STFTest {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertFalse(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
-        alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).setTextInEditorWithSave(CP1);
+
         assertTrue(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
             ID_JAVA_EDITOR));
     }

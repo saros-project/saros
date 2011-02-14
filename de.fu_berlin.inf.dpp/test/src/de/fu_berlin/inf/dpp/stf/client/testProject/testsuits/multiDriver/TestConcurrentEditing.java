@@ -40,7 +40,7 @@ public class TestConcurrentEditing extends STFTest {
         String[] path = { PROJECT1, FILE };
         alice.fileM.newFile(path);
         alice.editor.waitUntilEditorOpen(FILE);
-        alice.editor.setTextInEditorWithSave("test/STF/lorem.txt", path);
+        alice.bot().editor(FILE).setTextInEditorWithSave("test/STF/lorem.txt");
         alice.editor.navigateInEditor(FILE, 0, 6);
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
@@ -57,13 +57,14 @@ public class TestConcurrentEditing extends STFTest {
         alice.workbench.activateWorkbench();
         int waitActivate = 100;
         alice.workbench.sleep(waitActivate);
-        alice.editor.activateEditor(FILE);
+        alice.bot().editor(FILE).activate();
+
         alice.editor.waitUntilEditorActive(FILE);
         alice.editor.pressShortcut(FILE, "DELETE");
         // at the same time, Bob enters L at 0,30
         bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
-        bob.editor.activateEditor(FILE);
+        bob.bot().editor(FILE).activate();
         bob.editor.waitUntilEditorActive(FILE);
         bob.editor.typeTextInEditor("L", path);
         // both sleep for less than 1000ms
@@ -72,13 +73,13 @@ public class TestConcurrentEditing extends STFTest {
         // Alice hits Delete again
         alice.workbench.activateWorkbench();
         alice.workbench.sleep(waitActivate);
-        alice.editor.activateEditor(FILE);
+        alice.bot().editor(FILE).activate();
         alice.editor.waitUntilEditorActive(FILE);
         alice.editor.pressShortcut(FILE, "DELETE");
         // Bob enters o
         bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
-        bob.editor.activateEditor(FILE);
+        bob.bot().editor(FILE).activate();
         bob.editor.waitUntilEditorActive(FILE);
         bob.editor.typeTextInEditor("o", path);
 

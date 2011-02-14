@@ -92,7 +92,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void activateEditor(String fileName) throws RemoteException;
+    public void activate() throws RemoteException;
 
     /**
      * waits until the editor specified with the given fileName is active
@@ -102,15 +102,6 @@ public interface STFBotEditor extends EclipseComponent {
      * @throws RemoteException
      */
     public void waitUntilEditorActive(String fileName) throws RemoteException;
-
-    /**
-     * activate the java editor specified with the given className
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void activateJavaEditor(String className) throws RemoteException;
 
     /**
      * waits until the java editor specified with the given className is active
@@ -149,7 +140,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void closeEditorWithSave(String fileName) throws RemoteException;
+    public void closeWithSave() throws RemoteException;
 
     /**
      * close the editor without saving it. The editor must belong to this
@@ -162,7 +153,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void closeEditorWithoutSave(String fileName) throws RemoteException;
+    public void closeWithoutSave() throws RemoteException;
 
     /**
      * waits until the editor specified with the given fileName is closed
@@ -172,26 +163,6 @@ public interface STFBotEditor extends EclipseComponent {
      * @throws RemoteException
      */
     public void waitUntilEditorClosed(String fileName) throws RemoteException;
-
-    /**
-     * Save the java editor and close it.
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void closeJavaEditorWithSave(String className)
-        throws RemoteException;
-
-    /**
-     * close the java editor without saving it.
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void closejavaEditorWithoutSave(String className)
-        throws RemoteException;
 
     /**
      * waits until the java editor specified with the given className is closed
@@ -342,8 +313,8 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @return only the saved content of the specified file, if it is dirty.
      *         This method is different from
-     *         {@link STFBotEditor#getTextOfEditor(String...)}, which can return a not
-     *         saved content.
+     *         {@link STFBotEditor#getTextOfEditor(String...)}, which can return
+     *         a not saved content.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException
@@ -361,8 +332,8 @@ public interface STFBotEditor extends EclipseComponent {
      *            name of the class without suffix, e.g. MyClass
      * @return only the saved content of the specified class file, if it is
      *         dirty. This method is different from
-     *         {@link STFBotEditor#getTextOfJavaEditor(String, String, String)} ,
-     *         which can return a not saved content.
+     *         {@link STFBotEditor#getTextOfJavaEditor(String, String, String)}
+     *         , which can return a not saved content.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException
@@ -387,7 +358,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @throws RemoteException
      */
-    public void setTextInEditorWithSave(String contentPath, String... fileNodes)
+    public void setTextInEditorWithSave(String contentPath)
         throws RemoteException;
 
     /**
@@ -411,26 +382,6 @@ public interface STFBotEditor extends EclipseComponent {
      */
     public void waitUntilEditorContentSame(String otherClassContent,
         String... fileNodes) throws RemoteException;
-
-    /**
-     * Opens the specified class in an editor, set the given contents to the
-     * editor and saves it.
-     * 
-     * @param contentPath
-     *            the path to the test file whose content should be set in the
-     *            text editor. All such test files are located in the directory
-     *            [Saros]/test/STF.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param packageName
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @throws RemoteException
-     */
-    public void setTextInJavaEditorWithSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException;
 
     /**
      * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of

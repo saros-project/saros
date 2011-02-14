@@ -126,7 +126,7 @@ public class TestFileOperations extends STFTest {
         assertTrue(bob.pEV.existsClassNoGUI(PROJECT1, PKG2, CLS1));
         assertTrue(carl.pEV.existsClassNoGUI(PROJECT1, PKG2, CLS1));
 
-        alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG2, CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1);
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG2,
             CLS1);
         carl.editor.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,

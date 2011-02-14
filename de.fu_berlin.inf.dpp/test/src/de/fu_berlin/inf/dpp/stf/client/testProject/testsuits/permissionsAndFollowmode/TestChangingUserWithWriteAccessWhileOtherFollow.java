@@ -109,7 +109,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         resetFollowModeSequentially(alice, bob, dave);
         carl.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
-        carl.editor.closeJavaEditorWithSave(CLS1);
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         String dirtyClsChangeContentOfCarl = carl.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS1);
 

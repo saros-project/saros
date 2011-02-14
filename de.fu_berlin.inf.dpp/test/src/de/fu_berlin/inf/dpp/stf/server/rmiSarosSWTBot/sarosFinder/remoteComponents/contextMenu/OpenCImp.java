@@ -69,6 +69,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         bot().view(viewTitle).bot_().tree().selectTreeItem(fileNodes)
             .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
 
+        bot().waitUntilShellOpen(SHELL_EDITOR_SELECTION);
         STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         shell_bob.waitUntilActive();
         stfTable.selectTableItem(whichEditor);
@@ -97,7 +98,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     protected void precondition(String viewTitle) throws RemoteException {
 
-        bot().openById(viewTitlesAndIDs.get(viewTitle));
+        bot().openViewById(viewTitlesAndIDs.get(viewTitle));
         bot().view(viewTitle).setFocus();
     }
 }

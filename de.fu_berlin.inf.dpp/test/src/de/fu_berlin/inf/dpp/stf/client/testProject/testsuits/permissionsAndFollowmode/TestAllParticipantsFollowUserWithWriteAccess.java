@@ -62,7 +62,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
         throws RemoteException {
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         bob.editor.waitUntilJavaEditorClosed(CLS1);
         carl.editor.waitUntilJavaEditorClosed(CLS1);
         dave.editor.waitUntilJavaEditorClosed(CLS1);
@@ -126,11 +126,10 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
             ID_JAVA_EDITOR));
         assertTrue(dave.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1)
             .equals(dirtyClsContentOfAlice));
-
-        bob.editor.closeJavaEditorWithSave(CLS1);
-        carl.editor.closeJavaEditorWithSave(CLS1);
-        dave.editor.closeJavaEditorWithSave(CLS1);
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
     }
 
     /**
@@ -164,7 +163,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
 
         alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
             CLS1);
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 

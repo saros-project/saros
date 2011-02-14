@@ -241,8 +241,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public boolean existsLabelInSessionView() throws RemoteException {
         precondition();
-        return bot().view(VIEW_SAROS_SESSION).bot_()
-            .existsLabel(VIEW_SAROS_SESSION);
+        return bot().view(VIEW_SAROS_SESSION).bot_().existsLabel();
     }
 
     public boolean hasWriteAccess() throws RemoteException {
@@ -672,7 +671,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
      **************************************************************/
 
     protected void precondition() throws RemoteException {
-        bot().openById(VIEW_SAROS_SESSION_ID);
+        bot().openViewById(VIEW_SAROS_SESSION_ID);
         bot().view(VIEW_SAROS_SESSION).setFocus();
     }
 

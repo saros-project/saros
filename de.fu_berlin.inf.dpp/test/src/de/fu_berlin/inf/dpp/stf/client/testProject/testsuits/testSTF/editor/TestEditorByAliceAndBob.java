@@ -20,20 +20,22 @@ public class TestEditorByAliceAndBob extends STFTest {
         setUpWorkbench();
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        if (alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA))
+            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        alice.editor.closejavaEditorWithoutSave(CLS1);
+        if (alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA))
+            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
     }
 
     @Test
     public void isJavaEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.editor.closeJavaEditorWithSave(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
     }
 
@@ -47,7 +49,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     public void isEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
-        alice.editor.closeEditorWithSave(CLS1 + SUFFIX_JAVA);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
     }
 
@@ -84,7 +86,8 @@ public class TestEditorByAliceAndBob extends STFTest {
         bob.editor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.editor.isJavaEditorActive(CLS1));
         assertFalse(bob.editor.isJavaEditorActive(CLS2));
-        alice.editor.closejavaEditorWithoutSave(CLS1);
+
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
         bob.editor.waitUntilJavaEditorClosed(CLS1);
         assertFalse(bob.editor.isJavaEditorOpen(CLS1));
 

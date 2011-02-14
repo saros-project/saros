@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspectiveImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
@@ -68,6 +69,8 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static STFBotToolbarButtonImp stfToolbarButton = STFBotToolbarButtonImp
         .getInstance();
     public static STFBotViewImp stfView = STFBotViewImp.getInstance();
+    public static STFBotPerspectiveImp stfPerspective = STFBotPerspectiveImp
+        .getInstance();
     public static STFBotMenuImp stfMenu = STFBotMenuImp.getInstance();
     public static STFBotLabelImp stfLabel = STFBotLabelImp.getInstance();
     public static STFBotStyledTextImp stfStyledText = STFBotStyledTextImp

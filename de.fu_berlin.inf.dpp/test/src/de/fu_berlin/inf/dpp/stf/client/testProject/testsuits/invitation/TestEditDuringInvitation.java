@@ -67,7 +67,8 @@ public class TestEditDuringInvitation extends STFTest {
         carl.sarosC.confirmShellSessionnInvitation();
 
         log.trace("bob.setTextInJavaEditor");
-        bob.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1);
 
         log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);

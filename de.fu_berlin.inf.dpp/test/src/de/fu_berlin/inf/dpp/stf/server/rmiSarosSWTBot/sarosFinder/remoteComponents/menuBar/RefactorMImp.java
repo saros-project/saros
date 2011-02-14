@@ -80,7 +80,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         throws RemoteException {
         precondition();
         stfMenu.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
-        bot().shell(shellTitle).waitUntilActive();
+        // bot().shell(shellTitle).waitUntilActive();
         bot().shell(shellTitle).confirmShellWithTree(buttonName, nodes);
         bot().waitsUntilIsShellClosed(shellTitle);
     }

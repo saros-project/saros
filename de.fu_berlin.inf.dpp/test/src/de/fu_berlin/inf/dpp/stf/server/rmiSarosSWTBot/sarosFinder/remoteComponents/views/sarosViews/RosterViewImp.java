@@ -386,7 +386,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
      * @throws RemoteException
      */
     protected void precondition() throws RemoteException {
-        bot().openById(VIEW_SAROS_BUDDIES_ID);
+        bot().openViewById(VIEW_SAROS_BUDDIES_ID);
         bot().view(VIEW_SAROS_BUDDIES).setFocus();
     }
 

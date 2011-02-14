@@ -316,9 +316,18 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     }
 
-    public boolean existsLabel(String title) throws RemoteException {
+    public boolean existsLabel() throws RemoteException {
         try {
-            swtBot.label(title);
+            swtBot.label();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public boolean existsLabel(String text) throws RemoteException {
+        try {
+            swtBot.label(text);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;

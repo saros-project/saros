@@ -79,7 +79,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
      **************************************************************/
 
     private void preCondition() throws RemoteException {
-        bot().openById(VIEW_PROGRESS_ID);
+        bot().openViewById(VIEW_PROGRESS_ID);
         bot().view(VIEW_PROGRESS).setFocus();
     }
 

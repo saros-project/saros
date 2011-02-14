@@ -34,6 +34,31 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
         return self;
     }
 
+    public void setViewTitle(String title) throws RemoteException {
+        if (this.viewTitle == null || !viewTitle.equals(title)) {
+            this.viewTitle = title;
+            if (viewTitlesAndIDs.containsKey(viewTitle))
+                this.viewId = viewTitlesAndIDs.get(viewTitle);
+            swtbotView = bot.viewByTitle(title);
+        }
+
+    }
+
+    public void setId(String id) {
+        if (this.viewId == null || !this.viewId.equals(id)) {
+            this.viewId = id;
+            if (viewTitlesAndIDs.containsValue(viewId)) {
+                String[] titles = (String[]) viewTitlesAndIDs.keySet()
+                    .toArray();
+                for (int i = 0; i < viewTitlesAndIDs.values().size(); i++) {
+                    if (viewTitlesAndIDs.values().toArray()[i].equals(id))
+                        this.viewTitle = titles[i];
+                }
+                swtbotView = bot.viewById(id);
+            }
+        }
+    }
+
     /**************************************************************
      * 
      * exported functions
@@ -44,16 +69,6 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
         STFBotImp botImp = STFBotImp.getInstance();
         botImp.setBot(bot.viewByTitle(viewTitle).bot());
         return botImp;
-    }
-
-    public void setViewTitle(String title) throws RemoteException {
-        if (this.viewTitle == null || !viewTitle.equals(title)) {
-            this.viewTitle = title;
-            if (viewTitlesAndIDs.containsKey(viewTitle))
-                this.viewId = viewTitlesAndIDs.get(viewTitle);
-            swtbotView = bot.viewByTitle(title);
-        }
-
     }
 
     /**********************************************

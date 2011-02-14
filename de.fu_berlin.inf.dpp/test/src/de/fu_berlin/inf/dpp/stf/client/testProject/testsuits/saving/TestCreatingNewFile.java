@@ -103,7 +103,7 @@ public class TestCreatingNewFile extends STFTest {
         bob.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
-        alice.editor.setTextInEditorWithSave(CP1, PROJECT1, FOLDER2, FILE2);
+        alice.bot().editor(FILE2).setTextInEditorWithSave(CP1);
 
         String file2ContentOfAlice = alice.editor.getTextOfEditor(PROJECT1,
             FOLDER2, FILE2);

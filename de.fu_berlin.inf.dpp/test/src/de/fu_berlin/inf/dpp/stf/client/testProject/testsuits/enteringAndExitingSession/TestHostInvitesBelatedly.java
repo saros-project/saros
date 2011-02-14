@@ -81,8 +81,8 @@ public class TestHostInvitesBelatedly extends STFTest {
         String dirtyContent1ByAlice = alice.editor.getTextOfJavaEditor(
             PROJECT1, PKG1, CLS1);
 
-        bob.editor
-            .setTextInJavaEditorWithSave(CP1_CHANGE, PROJECT1, PKG1, CLS1);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1_CHANGE);
 
         alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT1, PKG1, CLS2);
         String dirtyContent2ByAlice = alice.editor.getTextOfJavaEditor(

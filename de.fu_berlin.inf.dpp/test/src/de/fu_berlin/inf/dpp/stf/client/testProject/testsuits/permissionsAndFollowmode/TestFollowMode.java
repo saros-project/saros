@@ -37,7 +37,8 @@ public class TestFollowMode extends STFTest {
      */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.editor.setTextInJavaEditorWithSave(CP1, PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1);
         bob.sarosSessionV.followThisBuddy(alice.jid);
         bob.editor.waitUntilJavaEditorActive(CLS1);
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
@@ -63,7 +64,7 @@ public class TestFollowMode extends STFTest {
          * to comment out, otherwise you should get WidgetNotFoundException.
          */
         // alice.sessionV.followThisUser(bob.state);
-        bob.editor.activateJavaEditor(CLS1);
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).activate();
         alice.editor.waitUntilJavaEditorActive(CLS1);
         assertTrue(alice.sarosSessionV.isInFollowModeNoGUI());
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
@@ -71,7 +72,7 @@ public class TestFollowMode extends STFTest {
         bob.sarosSessionV.followThisBuddy(alice.jid);
         alice.fileM.newClass(PROJECT1, PKG1, CLS3);
         alice.editor.waitUntilJavaEditorActive(CLS3);
-        alice.editor.setTextInJavaEditorWithSave(CP3, PROJECT1, PKG1, CLS3);
+        alice.bot().editor(CLS3_SUFFIX).setTextInEditorWithSave(CP3);
         alice.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);

@@ -446,7 +446,7 @@ public class STF {
     protected final static String CM_OPEN = "Open";
     protected final static String CM_OPEN_WITH = "Open With";
     protected final static String CM_OTHER = "Other...";
-    protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text STFBotEditor";
+    protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text Editor";
 
     /**********************************************
      * 
@@ -469,7 +469,7 @@ public class STF {
     protected final static String VIEW_PACKAGE_EXPLORER = "Package Explorer";
     protected final static String VIEW_PACKAGE_EXPLORER_ID = "org.eclipse.jdt.ui.PackageExplorer";
 
-    protected final static String SHELL_EDITOR_SELECTION = "STFBotEditor Selection";
+    protected final static String SHELL_EDITOR_SELECTION = "Editor Selection";
 
     protected final static String TB_COLLAPSE_ALL = "Collapse All";
 

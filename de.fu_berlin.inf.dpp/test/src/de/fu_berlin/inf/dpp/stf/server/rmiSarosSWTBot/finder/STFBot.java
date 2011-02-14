@@ -317,7 +317,9 @@ public interface STFBot extends EclipseComponent {
     public STFBotLabel labelInGroup(String mnemonicText, String inGroup,
         int index) throws RemoteException;
 
-    public boolean existsLabel(String title) throws RemoteException;
+    public boolean existsLabel() throws RemoteException;
+
+    public boolean existsLabel(String text) throws RemoteException;
 
     /**********************************************
      * 

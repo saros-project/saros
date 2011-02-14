@@ -44,7 +44,7 @@ public class TestSessionView extends STFTest {
         alice.view.closeById(VIEW_SAROS_SESSION_ID);
         assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice open session view again");
-        alice.bot().openById(VIEW_SAROS_SESSION_ID);
+        alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
         assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice focus on saros buddies view.");
         alice.bot().view(VIEW_SAROS_BUDDIES).setFocus();
@@ -103,7 +103,7 @@ public class TestSessionView extends STFTest {
         alice.sarosSessionV.followThisBuddy(bob.jid);
         assertTrue(alice.sarosSessionV.isFollowingBuddy(bob.jid));
 
-        bob.editor.closeJavaEditorWithSave(CLS1);
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         alice.editor.waitUntilJavaEditorClosed(CLS1);
         assertFalse(alice.editor.isJavaEditorOpen(CLS1));
     }
@@ -144,7 +144,7 @@ public class TestSessionView extends STFTest {
         assertTrue(bob.editor.isJavaEditorActive(CLS2));
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        alice.editor.activateJavaEditor(CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).activate();
         assertTrue(alice.editor.isJavaEditorActive(CLS1));
         assertFalse(bob.editor.isJavaEditorOpen(CLS1));
         bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);

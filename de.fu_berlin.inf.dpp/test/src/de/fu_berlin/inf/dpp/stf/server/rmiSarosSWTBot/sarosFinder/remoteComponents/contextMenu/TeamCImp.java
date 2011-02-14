@@ -112,7 +112,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             shareProjectShell.close();
             // in svn repos view: enter url
 
-            bot().openById(VIEW_SVN_REPOSITORIES_ID);
+            bot().openViewById(VIEW_SVN_REPOSITORIES_ID);
             STFBotView view = bot().view(VIEW_SVN_REPOSITORIES);
             view.setViewTitle("SVN Repositories");
             view.setFocus();
@@ -348,7 +348,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     }
 
     protected void precondition(String viewTitle) throws RemoteException {
-        bot().openById(viewTitlesAndIDs.get(viewTitle));
+        bot().openViewById(viewTitlesAndIDs.get(viewTitle));
         bot().view(viewTitle).setViewTitle(viewTitle);
         bot().view(viewTitle).setFocus();
     }

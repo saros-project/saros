@@ -259,8 +259,7 @@ public class TestSVNStateInitialization extends STFTest {
         assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
         String cls1_content_before = alice.editor.getTextOfJavaEditor(
             SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        alice.editor.setTextInJavaEditorWithSave(CP1, SVN_PROJECT, SVN_PKG,
-            SVN_CLS1);
+        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTextInEditorWithSave(CP1);
         String cls1_content_after = alice.editor.getTextOfJavaEditor(
             SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertFalse(cls1_content_after.equals(cls1_content_before));
