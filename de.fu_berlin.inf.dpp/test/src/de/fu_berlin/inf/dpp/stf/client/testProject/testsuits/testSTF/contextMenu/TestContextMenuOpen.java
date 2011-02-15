@@ -35,41 +35,41 @@ public class TestContextMenuOpen extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isEditorOpen(FILE1));
-        alice.bot().editor(FILE1).closeWithSave();
-        assertFalse(alice.editor.isEditorOpen(FILE1));
+        assertTrue(alice.bot().isEditorOpen(FILE1));
+        alice.bot().editor(FILE1).closeAndSave();
+        assertFalse(alice.bot().isEditorOpen(FILE1));
         alice.openC.openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isEditorOpen(FILE1));
+        assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.editM.deleteFile();
-        assertFalse(alice.editor.isEditorOpen(FILE1));
+        assertFalse(alice.bot().isEditorOpen(FILE1));
     }
 
     @Test
     public void testOpenClass() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
         alice.editM.deleteFile();
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenClassWith() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
         alice.editM.deleteFile();
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
@@ -77,13 +77,13 @@ public class TestContextMenuOpen extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.bot().editor(FILE1).closeWithSave();
+        alice.bot().editor(FILE1).closeAndSave();
         alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.editor.isEditorOpen(FILE1));
+        assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
         alice.editM.deleteFile();
-        assertFalse(alice.editor.isEditorOpen(FILE1));
+        assertFalse(alice.bot().isEditorOpen(FILE1));
     }
 
     @Test

@@ -1,18 +1,16 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
 public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
-    private static final Logger log = Logger
-        .getLogger(TestWriteAccessChangeAndImmediateWrite.class);
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
@@ -26,27 +24,36 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
     /**
      * Steps:
      * 
-     * 1. alice grants write access to bob
+     * 1. alice restrict to read only access.
      * 
-     * 2. bob immediately begins to write it.
+     * 2. bob try to create inconsistency (set Text)
+     * 
+     * 3. alice grants write access to bob
+     * 
+     * 4. bob immediately begins to write it.
      * 
      * Expected Results:
      * 
-     * 2. No inconsistency should occur.
+     * 2. inconsistency should occur by bob.
+     * 
+     * 4. no inconsistency occur by bob.
      * 
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
 
-        bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        bob.workbench.sleep(5000);
-        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
+        alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        bob.sarosSessionV.waitUntilIsInconsistencyDetected();
+        assertTrue(bob.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
-        alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
-            CLS1);
-        bob.workbench.sleep(5000);
-        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
+        bob.sarosSessionV.inconsistencyDetected();
 
+        alice.sarosSessionV.grantWriteAccess(bob.jid);
+        bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP2);
+        bob.workbench.sleep(5000);
+        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
+            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
     }
 }

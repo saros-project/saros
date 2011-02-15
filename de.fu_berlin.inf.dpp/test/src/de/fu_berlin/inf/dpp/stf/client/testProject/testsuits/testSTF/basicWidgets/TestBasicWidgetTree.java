@@ -108,13 +108,13 @@ public class TestBasicWidgetTree extends STFTest {
     public void selectTreeItemInView() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
-            .selectTreeItem(PROJECT1, SRC, PKG1, CLS1 + SUFFIX_JAVA);
+            .selectTreeItem(PROJECT1, SRC, PKG1, CLS1_SUFFIX);
         alice.menu.clickMenuWithTexts(MENU_FILE, MENU_CLOSE);
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
@@ -153,9 +153,8 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
             SVN_CLS1);
-        alice.editor.setTextInEditorWithoutSave(CP1, SVN_CLS1_SUFFIX);
-        assertTrue(alice.editor.isClassDirty(SVN_PROJECT_COPY, SVN_PKG,
-            SVN_CLS1, ID_JAVA_EDITOR));
+        alice.bot().editor(SVN_CLS1_SUFFIX).setTextWithoutSave(CP1);
+        assertTrue(alice.bot().editor(SVN_CLS1_SUFFIX).isFileDirty());
         alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
             VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
 
@@ -167,8 +166,7 @@ public class TestBasicWidgetTree extends STFTest {
             .selectTreeItemWithRegex(
                 changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
         alice.menu.clickMenuWithTexts(MENU_FILE, MENU_SAVE);
-        assertFalse(alice.editor.isClassDirty(SVN_PROJECT_COPY, SVN_PKG,
-            SVN_CLS1, ID_JAVA_EDITOR));
+        assertFalse(alice.bot().editor(SVN_CLS1_SUFFIX).isFileDirty());
     }
 
     @Test

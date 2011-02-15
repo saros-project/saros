@@ -77,37 +77,34 @@ public class TestHostInvitesBelatedly extends STFTest {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        String dirtyContent1ByAlice = alice.editor.getTextOfJavaEditor(
-            PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1_CHANGE);
+        bob.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1_CHANGE);
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP2, PROJECT1, PKG1, CLS2);
-        String dirtyContent2ByAlice = alice.editor.getTextOfJavaEditor(
-            PROJECT1, PKG1, CLS2);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
+        alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
+        String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
 
-        bob.editor.setTextInJavaEditorWithoutSave(CP2_CHANGE, PROJECT1, PKG1,
-            CLS2);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
+        bob.editor.setTextWithoutSave(CP2_CHANGE);
         // bob.editor.closeJavaEditorWithSave(CLS1);
         // bob.editor.closeJavaEditorWithSave(CLS2);
 
         inviteBuddies(PROJECT1, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
 
-        bob.editor.waitUntilJavaEditorContentSame(dirtyContent1ByAlice,
-            PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorContentSame(dirtyContent2ByAlice,
-            PROJECT1, PKG1, CLS2);
-        String CLSContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
-            PKG1, CLS1);
-        String CLS2ContentOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
-            PKG1, CLS2);
+        bob.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyContent1ByAlice);
+        bob.bot().editor(CLS2_SUFFIX)
+            .waitUntilContentSame(dirtyContent2ByAlice);
 
-        String CLSContentOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
-        String CLS2ContentOfBob = bob.editor.getTextOfJavaEditor(PROJECT1,
-            PKG1, CLS2);
+        String CLSContentOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
+        String CLS2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX).getText();
+
+        String CLSContentOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
+        String CLS2ContentOfBob = bob.bot().editor(CLS2_SUFFIX).getText();
 
         assertEquals(CLSContentOfAlice, CLSContentOfBob);
         assertEquals(CLS2ContentOfAlice, CLS2ContentOfBob);

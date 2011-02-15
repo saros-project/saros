@@ -257,11 +257,14 @@ public class TestSVNStateInitialization extends STFTest {
     @Test
     public void testCheckoutWithModification() throws RemoteException {
         assertTrue(alice.fileM.existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
-        String cls1_content_before = alice.editor.getTextOfJavaEditor(
-            SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTextInEditorWithSave(CP1);
-        String cls1_content_after = alice.editor.getTextOfJavaEditor(
-            SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
+            SVN_CLS1);
+
+        String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
+            .getText();
+        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTextAndSave(CP1);
+        String cls1_content_after = alice.bot().editor(SVN_CLS1_SUFFIX)
+            .getText();
         assertFalse(cls1_content_after.equals(cls1_content_before));
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
@@ -271,8 +274,9 @@ public class TestSVNStateInitialization extends STFTest {
         bob.sarosSessionV.waitUntilIsInSession();
 
         assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(cls1_content_after,
-            bob.editor.getTextOfJavaEditor(SVN_PROJECT, SVN_PKG, SVN_CLS1));
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
+            SVN_CLS1);
+        assertEquals(cls1_content_after, bob.bot().editor(SVN_CLS1_SUFFIX)
+            .getText());
     }
-
 }

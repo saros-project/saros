@@ -42,11 +42,9 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>alice grants carl exclusive write access.</li>
-     * <li>read-only users are in follow mode.</li>
-     * <li>carl opens a file and edit it.</li>
-     * <li>read-only users leave follow mode after they saw the opened file.</li>
-     * <li>carl continue to edit the opened file, but doesn't save</li>
+     * <li>alice opens a file and edit it.</li>
+     * <li>participants leave follow mode after they saw the opened file.</li>
+     * <li>alice continue to edit the opened file, but doesn't save</li>
      * </ol>
      * 
      * Result:
@@ -54,14 +52,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
      * <li></li>
      * <li></li>
      * <li>read-only users saw the opened file and the dirty flag of the file,</li>
-     * <li></li>
-     * <li></li>
-     * <li>Edited file is opened and not saved at every user with read-only
-     * access</li>
      * </ol>
-     * 
-     * TODO: Tt exists still some bugs in saros by granding write access, so you
-     * may get exception by perform this test.
      * 
      * @throws CoreException
      * @throws IOException
@@ -84,36 +75,32 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // bob.bot.waitUntilFollowed(carl.getBaseJid());
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
-        carl.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        String dirtyClsContentOfCarl = carl.editor.getTextOfJavaEditor(
-            PROJECT1, PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
+            .getText();
 
-        alice.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorActive(CLS1));
-        assertTrue(alice.editor.isClassDirty(PROJECT1, PKG1, CLS1,
-            ID_JAVA_EDITOR));
+        carl.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
 
-        bob.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
-        assertTrue(bob.editor
-            .isClassDirty(PROJECT1, PKG1, CLS1, ID_JAVA_EDITOR));
+        bob.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
 
-        dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfCarl,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(dave.editor.isJavaEditorActive(CLS1));
-        assertTrue(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
-            ID_JAVA_EDITOR));
+        dave.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
 
-        resetFollowModeSequentially(alice, bob, dave);
-        carl.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
-            CLS1);
-        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        String dirtyClsChangeContentOfCarl = carl.editor.getTextOfJavaEditor(
-            PROJECT1, PKG1, CLS1);
+        resetFollowModeSequentially(carl, bob, dave);
+        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
+        // alice.bot().editor(CLS1_SUFFIX).closeAndSave();
 
-        assertTrue(alice.editor.isJavaEditorActive(CLS1));
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
         /*
          * TODO alice can still see the changes maded by carl, although she
          * already leave follow mode. There is a bug here (see Bug 3094186)and
@@ -126,7 +113,8 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // assertFalse(alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
 
         /*
          * TODO bob can still see the changes maded by carl, although he already
@@ -139,8 +127,8 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // assertFalse(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(dave.editor.isJavaEditorActive(CLS1));
-
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
         /*
          * TODO dave can still see the changes , although he already leave
          * follow mode. There is a bug here (see Bug 3094186) and it should be

@@ -17,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
@@ -73,9 +72,11 @@ public class STFBotEditorImp extends EclipseComponentImp implements
      **********************************************/
     public void activate() throws RemoteException {
         editor.setFocus();
+        editor.show();
+        editor.setFocus();
     }
 
-    public void closeWithSave() throws RemoteException {
+    public void closeAndSave() throws RemoteException {
         editor.save();
         editor.close();
     }
@@ -84,7 +85,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         editor.close();
         if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
             && bot().shell(SHELL_SAVE_RESOURCE).isActive())
-            confirmShellSaveSource(YES);
+            confirmShellSaveSource(NO);
 
     }
 
@@ -95,90 +96,36 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         bot().shell(SHELL_SAVE_ALL_FILES_NOW).confirm(buttonType);
     }
 
-    public void setTextInEditorWithSave(String contentPath)
-        throws RemoteException {
+    public void setTextAndSave(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
-
         editor.setText(contents);
         editor.save();
     }
 
-    public void setTextInEditorWithoutSave(String contentPath,
-        String... fileNodes) throws RemoteException {
+    public void setTextWithoutSave(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
-        String fileName = fileNodes[fileNodes.length - 1];
-        precondition(fileNodes);
-        getEditor(fileName).setText(contents);
+        editor.setText(contents);
     }
 
-    public void setTextInJavaEditorWithoutSave(String contentPath,
-        String projectName, String packageName, String className)
-        throws RemoteException {
-        setTextInEditorWithoutSave(contentPath,
-            getClassNodes(projectName, packageName, className));
-    }
-
-    public void typeTextInEditor(String text, String... fileNodes)
-        throws RemoteException {
-        String fileName = fileNodes[fileNodes.length - 1];
-        precondition(fileNodes);
-        workbench.activateWorkbench();
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void typeText(String text) throws RemoteException {
         editor.setFocus();
         editor.typeText(text);
-
-        // e.navigateTo(3, 0);
-        // e.autoCompleteProposal("main", "main - main method");
-        // e.autoCompleteProposal("sys", "sysout - print to standard out");
-        // e.typeText("System.currentTimeMillis()");
-        // // SWTBotPreferences.KEYBOARD_LAYOUT = "EN_US";
-        // // SWTBotEclipseEditor e = getTextEditor(fileName);
-        // // e.navigateTo(3, 0);
-        // // e.pressShortcut(SWT.CTRL, '.');
-        // // e.quickfix("Add unimplemented methods");
-        // // e.navigateTo(7, 0);
-        // //
-        // // e.navigateTo(3, 0);
-        // // e.autoCompleteProposal("main", "main - main method");
-        // // e.autoCompleteProposal("sys", "sysout - print to standard out");
-        // // e.typeText("System.currentTimeMillis()");
-        //
-        // // e.typeText("thread.start();\n");
-        // // e.typeText("thread.join();");
-        // // SWTBotPreferences.KEYBOARD_LAYOUT = "DE_DE";
-        // // e.quickfix("Add throws declaration");
-        // // e.pressShortcut(SWT.NONE, (char) 27);
-        // // e.pressShortcut(SWT.NmainONE, '\n');
-        // //
-        // // e.pressShortcut(SWT.CTRL, 's');
-        // //
-        // // e.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        // // e.pressShortcut(SWT.NONE, 'j');
     }
 
-    public void typeTextInJavaEditor(String text, String projectName,
-        String packageName, String className) throws RemoteException {
-        typeTextInEditor(checkInputText(text),
-            getClassNodes(projectName, packageName, className));
-    }
+    public void navigateTo(int line, int column) throws RemoteException {
 
-    public void navigateInEditor(String fileName, int line, int column)
-        throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
         editor.setFocus();
         editor.navigateTo(line, column);
     }
 
-    public void selectCurrentLine(String fileName) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void selectCurrentLine() throws RemoteException {
         editor.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
         workbench.sleep(500);
     }
 
-    public void selectLine(String fileName, int line) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void selectLine(int line) throws RemoteException {
         editor.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
@@ -186,19 +133,15 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     }
 
-    public void selectRange(String fileName, int line, int column, int length)
+    public void selectRange(int line, int column, int length)
         throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
         editor.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
         workbench.sleep(800);
     }
 
-    public void pressShortcut(String fileName, String... keys)
-        throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void pressShortcut(String... keys) throws RemoteException {
         editor.setFocus();
         for (String key : keys) {
             try {
@@ -209,34 +152,30 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         }
     }
 
-    public void pressShortCut(String fileName, int modificationKeys, char c)
+    public void pressShortCut(int modificationKeys, char c)
         throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
         editor.pressShortcut(modificationKeys, c);
     }
 
-    public void pressShortCutDelete(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        pressShortcut(fileName, IKeyLookup.DELETE_NAME);
+    public void pressShortCutDelete() throws RemoteException {
+
+        pressShortcut(IKeyLookup.DELETE_NAME);
     }
 
-    public void pressShortCutEnter(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        pressShortcut(fileName, IKeyLookup.LF_NAME);
+    public void pressShortCutEnter() throws RemoteException {
+        pressShortcut(IKeyLookup.LF_NAME);
     }
 
-    public void pressShortCutSave(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void pressShortCutSave() throws RemoteException {
+
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, 's');
         else
             editor.pressShortcut(SWT.CTRL, 's');
     }
 
-    public void pressShortRunAsJavaApplication(String fileName)
-        throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void pressShortRunAsJavaApplication() throws RemoteException {
+
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
@@ -245,10 +184,8 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         editor.pressShortcut(SWT.NONE, 'j');
     }
 
-    public void pressShortCutNextAnnotation(String fileName)
-        throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void pressShortCutNextAnnotation() throws RemoteException {
+
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, '.');
         else
@@ -256,9 +193,9 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         workbench.sleep(20);
     }
 
-    public void pressShortCutQuickAssignToLocalVariable(String fileName)
+    public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, '2');
         else
@@ -268,27 +205,22 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     }
 
-    public void autoCompleteProposal(String fileName, String insertText,
-        String proposalText) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void autoCompleteProposal(String insertText, String proposalText)
+        throws RemoteException {
         editor.autoCompleteProposal(checkInputText(insertText), proposalText);
     }
 
-    public void quickfix(String fileName, String quickFixName)
-        throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void quickfix(String quickFixName) throws RemoteException {
         editor.quickfix(quickFixName);
     }
 
-    public void quickfix(String fileName, int index) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
+    public void quickfix(int index) throws RemoteException {
         editor.quickfix(index);
     }
 
-    public void setBreakPoint(int line, String projectName, String packageName,
-        String className) throws RemoteException {
-        precondition(getClassNodes(projectName, packageName, className));
-        selectLine(className + SUFFIX_JAVA, line);
+    public void setBreakPoint(int line) throws RemoteException {
+
+        selectLine(line);
         stfMenu.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
@@ -298,76 +230,95 @@ public class STFBotEditorImp extends EclipseComponentImp implements
      * 
      **********************************************/
 
-    public boolean isEditorOpen(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        return getTitlesOfAllOpenedEditors().contains(fileName);
+    public String getText() throws RemoteException {
+        return editor.getText();
     }
 
-    public boolean isJavaEditorOpen(String className) throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        return isEditorOpen(className + SUFFIX_JAVA);
+    public String getTextOnCurrentLine() throws RemoteException {
+        return editor.getTextOnCurrentLine();
     }
 
-    public boolean isEditorActive(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        try {
-            return bot.activeEditor().getTitle().equals(fileName);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+    public String getTextOnLine(int line) throws RemoteException {
+        return editor.getTextOnLine(line);
     }
 
-    public boolean isJavaEditorActive(String className) throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        if (!isJavaEditorOpen(className))
-            return false;
-        return isEditorActive(className + SUFFIX_JAVA);
+    public int getCursorLine() throws RemoteException {
+        return editor.cursorPosition().line;
     }
 
-    public String getTextOfEditor(String... fileNodes) throws RemoteException {
-        String fileName = fileNodes[fileNodes.length - 1];
-        precondition(fileNodes);
-        return getEditor(fileName).getText();
+    public int getCursorColumn() throws RemoteException {
+        return editor.cursorPosition().column;
     }
 
-    public String getTextOfJavaEditor(String projectName, String pkg,
-        String className) throws RemoteException {
-        precondition(getClassNodes(projectName, pkg, className));
-        return getJavaEditor(className).getText();
+    public RGB getLineBackground(int line) throws RemoteException {
+        return editor.getLineBackground(line);
     }
 
-    public String getTextOnCurrentLine(String fileName) throws RemoteException {
-        return getEditor(fileName).getTextOnCurrentLine();
+    public boolean isFileDirty() throws RemoteException {
+        return editor.isDirty();
     }
 
-    public String getTextOnLine(String fileName, int line)
+    public String getSelection() throws RemoteException {
+
+        return editor.getSelection();
+    }
+
+    public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException {
-        return getEditor(fileName).getTextOnLine(line);
+
+        return editor.getAutoCompleteProposals(insertText);
     }
 
-    public String getJavaTextOnLine(String projectName, String pkg,
-        String className, int line) throws RemoteException {
-        precondition(getClassNodes(projectName, pkg, className));
-        return getJavaEditor(className).getTextOnLine(line);
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+
+    public void waitUntilIsActive() throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isActive();
+            }
+
+            public String getFailureMessage() {
+                return "The editor is not open.";
+            }
+        });
     }
 
-    public int getCursorLine(String fileName) throws RemoteException {
-        return getEditor(fileName).cursorPosition().line;
+    public boolean isActive() throws RemoteException {
+        return editor.isActive();
     }
 
-    public int getCursorColumn(String fileName) throws RemoteException {
-        return getEditor(fileName).cursorPosition().column;
-    }
-
-    public int getJavaCursorLinePosition(String className)
+    public void waitUntilContentSame(final String otherClassContent)
         throws RemoteException {
-        // activate();
-        return getJavaEditor(className).cursorPosition().line;
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getText().equals(otherClassContent);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+
     }
 
-    public RGB getJavaLineBackground(String className, int line)
-        throws RemoteException {
-        return getJavaEditor(className).getLineBackground(line);
+    /**********************************************
+     * 
+     * inner functions
+     * 
+     **********************************************/
+
+    /**
+     * @return all filenames on the editors which are opened currently
+     */
+    public List<String> getTitlesOfAllOpenedEditors() {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotEditor editor : bot.editors())
+            list.add(editor.getTitle());
+        return list;
     }
 
     public String getClassContent(String projectName, String pkg,
@@ -393,110 +344,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         return ConvertStreamToString(file.getContents());
     }
 
-    public boolean isFileDirty(String... fileNodes) throws RemoteException {
-        String fileName = fileNodes[fileNodes.length - 1];
-        precondition(fileNodes);
-        return getEditor(fileName).isDirty();
-    }
-
-    public boolean isClassDirty(String projectName, String pkg,
-        String className, final String idOfEditor) throws RemoteException {
-        if (!isJavaEditorOpen(className))
-            openC.openClass(VIEW_PACKAGE_EXPLORER, projectName, pkg, className);
-        if (!isJavaEditorActive(className))
-            activate();
-        return getJavaEditor(className).isDirty();
-        // return isFileDirty(getClassNodes(projectName, pkg, className));
-        // final List<Boolean> results = new ArrayList<Boolean>();
-        // IPath path = new Path(getClassPath(projectName, pkg, className));
-        // final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-        // .getFile(path);
-        //
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // final IWorkbench wb = PlatformUI.getWorkbench();
-        // final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-        //
-        // IWorkbenchPage page = win.getActivePage();
-        // if (page != null) {
-        // IEditorInput editorInput = new FileEditorInput(file);
-        // try {
-        // page.openEditor(editorInput, idOfEditor);
-        // } catch (PartInitException e) {
-        // log.debug("", e);
-        // }
-        // results.add(page.findEditor(editorInput).isDirty());
-        // }
-        // }
-        // });
-        // return results.get(0);
-    }
-
-    public String getSelection(String fileName) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
-        return editor.getSelection();
-    }
-
-    public List<String> getAutoCompleteProposals(String fileName,
-        String insertText) throws RemoteException {
-        SWTBotEclipseEditor editor = getEditor(fileName);
-        return editor.getAutoCompleteProposals(insertText);
-    }
-
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
-
-    public void waitUntilEditorOpen(final String fileName)
-        throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return isEditorOpen(fileName);
-            }
-
-            public String getFailureMessage() {
-                return "The editor " + fileName + "is not open.";
-            }
-        });
-    }
-
-    public void waitUntilJavaEditorOpen(String className)
-        throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorOpen(className + SUFFIX_JAVA);
-    }
-
-    public void waitUntilEditorActive(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        waitUntil(SarosConditions.isEditorActive(this, fileName));
-    }
-
-    public void waitUntilJavaEditorActive(String className)
-        throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorActive(className + SUFFIX_JAVA);
-    }
-
-    public void waitUntilEditorClosed(String fileName) throws RemoteException {
-        assert fileName.contains(".") : ERROR_MESSAGE_FOR_INVALID_FILENAME;
-        waitUntil(SarosConditions.isEditorClosed(this, fileName));
-    }
-
-    public void waitUntilJavaEditorClosed(String className)
-        throws RemoteException {
-        assert !className.contains(".") : ERROR_MESSAGE_FOR_INVALID_CLASSNAME;
-        waitUntilEditorClosed(className + SUFFIX_JAVA);
-    }
-
-    public void waitUntilFileContentSame(String otherClassContent,
-        String... fileNodes) throws RemoteException {
-        waitUntil(SarosConditions.isFileContentsSame(this, otherClassContent,
-            fileNodes));
-    }
-
     public void waitUntilClassContentsSame(final String projectName,
         final String pkg, final String className, final String otherClassContent)
         throws RemoteException {
@@ -512,68 +359,10 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         });
     }
 
-    public void waitUntilEditorContentSame(String otherClassContent,
+    public void waitUntilFileContentSame(String otherClassContent,
         String... fileNodes) throws RemoteException {
-        waitUntil(SarosConditions.isEditorContentsSame(this, otherClassContent,
+        waitUntil(SarosConditions.isFileContentsSame(this, otherClassContent,
             fileNodes));
-    }
-
-    public void waitUntilJavaEditorContentSame(String otherClassContent,
-        String projectName, String pkg, String className)
-        throws RemoteException {
-        waitUntilEditorContentSame(otherClassContent,
-            getClassNodes(projectName, pkg, className));
-    }
-
-    /**********************************************
-     * 
-     * inner functions
-     * 
-     **********************************************/
-
-    private void precondition(String... fileNodes) throws RemoteException {
-        String fileName = fileNodes[fileNodes.length - 1];
-        if (!isEditorOpen(fileName)) {
-            openC.openFile(VIEW_PACKAGE_EXPLORER, fileNodes);
-        }
-        if (!isEditorActive(fileName)) {
-            activate();
-        }
-    }
-
-    /**
-     * @return all filenames on the editors which are opened currently
-     */
-    public List<String> getTitlesOfAllOpenedEditors() {
-        ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotEditor editor : bot.editors())
-            list.add(editor.getTitle());
-        return list;
-    }
-
-    /**
-     * 
-     * @param fileName
-     *            the filename on the editor tab
-     * @return an editor specified by the given fileName which provides methods
-     *         for text editors.
-     * 
-     */
-    public SWTBotEclipseEditor getEditor(String fileName) {
-        SWTBotEditor editor = bot.editorByTitle(fileName);
-        return editor.toTextEditor();
-    }
-
-    /**
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @return an editor specified by the given className which provides methods
-     *         for text editors.
-     * 
-     */
-    public SWTBotEclipseEditor getJavaEditor(String className) {
-        return getEditor(className + SUFFIX_JAVA);
     }
 
 }

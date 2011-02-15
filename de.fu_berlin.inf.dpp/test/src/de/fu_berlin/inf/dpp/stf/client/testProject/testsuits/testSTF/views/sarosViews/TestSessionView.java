@@ -97,15 +97,15 @@ public class TestSessionView extends STFTest {
         assertTrue(bob.sarosSessionV.isFollowingBuddy(alice.jid));
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorOpen(CLS1);
-        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
+        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
 
         alice.sarosSessionV.followThisBuddy(bob.jid);
         assertTrue(alice.sarosSessionV.isFollowingBuddy(bob.jid));
 
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        alice.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
@@ -133,22 +133,22 @@ public class TestSessionView extends STFTest {
     @Test
     public void jumpToSelectedBuddy() throws RemoteException {
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
-        alice.editor.waitUntilJavaEditorOpen(CLS2);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS2));
-        assertFalse(bob.editor.isJavaEditorOpen(CLS2));
+        alice.bot().waitUntilEditorOpen(CLS2_SUFFIX);
+        assertTrue(alice.bot().isEditorOpen(CLS2_SUFFIX));
+        assertFalse(bob.bot().isEditorOpen(CLS2_SUFFIX));
         bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
             + "/vor_jump_to_position.png");
         bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);
         bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
             + "/after_jump_to_position.png");
-        assertTrue(bob.editor.isJavaEditorActive(CLS2));
+        assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1 + SUFFIX_JAVA).activate();
-        assertTrue(alice.editor.isJavaEditorActive(CLS1));
-        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
+        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
         bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
     }
 
     @Test
@@ -164,18 +164,17 @@ public class TestSessionView extends STFTest {
 
     @Test
     public void inconsistencyDetectedGUI() throws RemoteException {
-        String editorTextOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1,
-            PKG1, CLS1);
+        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        String editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
-        bob.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        String editorTextOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
+        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
         bob.sarosSessionV.waitUntilIsInconsistencyDetected();
         bob.sarosSessionV.inconsistencyDetected();
-        editorTextOfAlice = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
-        editorTextOfBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1);
+        editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
+        editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertTrue(editorTextOfAlice.equals(editorTextOfBob));
     }
 

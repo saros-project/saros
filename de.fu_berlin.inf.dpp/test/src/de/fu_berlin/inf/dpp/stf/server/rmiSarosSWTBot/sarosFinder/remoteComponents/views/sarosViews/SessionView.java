@@ -604,6 +604,9 @@ public interface SessionView extends SarosComponent {
     public void waitUntilHasReadOnlyAccessBy(final JID jid)
         throws RemoteException;
 
+    public void waitUntilIsFollowingBuddy(final JID followedBuddyJID)
+        throws RemoteException;
+
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException;
 

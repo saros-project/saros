@@ -472,16 +472,16 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         });
     }
 
-    public void waitUntilIsFollowingBuddy(final String baseJIDOfFollowedUser)
+    public void waitUntilIsFollowingBuddy(final JID followedBuddyJID)
         throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return isFollowingBuddyNoGUI(baseJIDOfFollowedUser);
+                return isFollowingBuddy(followedBuddyJID);
             }
 
             public String getFailureMessage() {
                 return localJID.getBase() + " is not folloing the user "
-                    + baseJIDOfFollowedUser;
+                    + followedBuddyJID.getName();
             }
         });
 

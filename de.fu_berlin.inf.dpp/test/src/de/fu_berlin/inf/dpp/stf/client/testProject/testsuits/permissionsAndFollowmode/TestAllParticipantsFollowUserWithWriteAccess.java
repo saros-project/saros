@@ -62,23 +62,23 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
         throws RemoteException {
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        bob.editor.waitUntilJavaEditorClosed(CLS1);
-        carl.editor.waitUntilJavaEditorClosed(CLS1);
-        dave.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
-        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
-        assertFalse(dave.editor.isJavaEditorOpen(CLS1));
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
 
-        bob.editor.waitUntilJavaEditorOpen(CLS1);
-        carl.editor.waitUntilJavaEditorOpen(CLS1);
-        dave.editor.waitUntilJavaEditorOpen(CLS1);
+        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        dave.bot().waitUntilEditorOpen(CLS1_SUFFIX);
 
-        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
-        assertTrue(carl.editor.isJavaEditorOpen(CLS1));
-        assertTrue(dave.editor.isJavaEditorOpen(CLS1));
+        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(carl.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
     }
 
@@ -99,37 +99,34 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
      */
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
-        alice.editor.setTextInJavaEditorWithoutSave(CP1, PROJECT1, PKG1, CLS1);
-        String dirtyClsContentOfAlice = alice.editor.getTextOfJavaEditor(
-            PROJECT1, PKG1, CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
+            .getText();
 
-        bob.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
-        assertTrue(bob.editor
-            .isClassDirty(PROJECT1, PKG1, CLS1, ID_JAVA_EDITOR));
-        assertTrue(bob.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1).equals(
-            dirtyClsContentOfAlice));
-
-        carl.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(carl.editor.isJavaEditorActive(CLS1));
-        assertTrue(carl.editor.isClassDirty(PROJECT1, PKG1, CLS1,
-            ID_JAVA_EDITOR));
-        assertTrue(carl.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1)
+        bob.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
 
-        dave.editor.waitUntilJavaEditorContentSame(dirtyClsContentOfAlice,
-            PROJECT1, PKG1, CLS1);
-        assertTrue(dave.editor.isJavaEditorActive(CLS1));
-        assertTrue(dave.editor.isClassDirty(PROJECT1, PKG1, CLS1,
-            ID_JAVA_EDITOR));
-        assertTrue(dave.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1)
+        carl.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+
+        dave.bot().editor(CLS1_SUFFIX)
+            .waitUntilContentSame(dirtyClsContentOfAlice);
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).getText()
+            .equals(dirtyClsContentOfAlice));
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
     }
 
     /**
@@ -154,25 +151,24 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorOpen(CLS1);
-        carl.editor.waitUntilJavaEditorOpen(CLS1);
-        dave.editor.waitUntilJavaEditorOpen(CLS1);
-        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
-        assertTrue(carl.editor.isJavaEditorOpen(CLS1));
-        assertTrue(dave.editor.isJavaEditorOpen(CLS1));
+        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        dave.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(carl.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.editor.setTextInJavaEditorWithoutSave(CP1_CHANGE, PROJECT1, PKG1,
-            CLS1);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
 
-        bob.editor.waitUntilJavaEditorClosed(CLS1);
-        carl.editor.waitUntilJavaEditorClosed(CLS1);
-        dave.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
-        assertFalse(carl.editor.isJavaEditorOpen(CLS1));
-        assertFalse(dave.editor.isJavaEditorOpen(CLS1));
+        bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
         assertTrue(bob.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
             clsContentOfAlice));

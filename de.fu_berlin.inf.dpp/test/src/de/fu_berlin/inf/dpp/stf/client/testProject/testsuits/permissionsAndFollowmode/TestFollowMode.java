@@ -29,8 +29,6 @@ public class TestFollowMode extends STFTest {
     }
 
     /**
-     * TODO: It exists still some bugs in saros by granting write access, so you
-     * may get exception by perform this test.
      * 
      * @throws IOException
      * @throws CoreException
@@ -38,11 +36,11 @@ public class TestFollowMode extends STFTest {
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        alice.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1);
+        alice.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1);
         bob.sarosSessionV.followThisBuddy(alice.jid);
-        bob.editor.waitUntilJavaEditorActive(CLS1);
+        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
         String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
             CLS1);
@@ -54,26 +52,20 @@ public class TestFollowMode extends STFTest {
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);
-        bob.editor.waitUntilJavaEditorActive(CLS2);
-        assertTrue(bob.editor.isJavaEditorActive(CLS2));
+        bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
+        assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        /*
-         * After new release 10.10.28 all read-only users are automatically in
-         * follow mode(are the read-only users really in follow mode???) when
-         * host give someone exclusive write access. So the following line have
-         * to comment out, otherwise you should get WidgetNotFoundException.
-         */
-        // alice.sessionV.followThisUser(bob.state);
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).activate();
-        alice.editor.waitUntilJavaEditorActive(CLS1);
+        alice.sarosSessionV.followThisBuddy(bob.jid);
+        bob.bot().editor(CLS1_SUFFIX).activate();
+        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(alice.sarosSessionV.isInFollowModeNoGUI());
-        assertTrue(alice.editor.isJavaEditorActive(CLS1));
+        assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
 
-        bob.sarosSessionV.followThisBuddy(alice.jid);
-        alice.fileM.newClass(PROJECT1, PKG1, CLS3);
-        alice.editor.waitUntilJavaEditorActive(CLS3);
-        alice.bot().editor(CLS3_SUFFIX).setTextInEditorWithSave(CP3);
-        alice.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);
+        // bob.sarosSessionV.followThisBuddy(alice.jid);
+        // alice.fileM.newClass(PROJECT1, PKG1, CLS3);
+        // alice.editor.waitUntilJavaEditorActive(CLS3);
+        // alice.bot().editor(CLS3_SUFFIX).setTextAndSave(CP3);
+        // alice.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);
         // alice.debugJavaFile(BotConfiguration.PROJECTNAME,
         // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
         // bob.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);

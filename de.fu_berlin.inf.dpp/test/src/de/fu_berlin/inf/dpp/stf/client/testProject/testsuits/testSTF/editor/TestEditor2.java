@@ -23,12 +23,14 @@ public class TestEditor2 extends STFTest {
     public void testConcurrentEditing() throws RemoteException {
         // no session!
         String aliceText = "a";
-        alice.editor.typeTextInEditor(aliceText, path);
+        alice.openC.openFile(VIEW_PACKAGE_EXPLORER, path);
+        alice.bot().editor(FILE3).typeText(aliceText);
 
         String bobText = "b";
-        bob.editor.typeTextInEditor(bobText, path);
+        bob.openC.openFile(VIEW_PACKAGE_EXPLORER, path);
+        bob.bot().editor(FILE3).typeText(bobText);
 
-        assertEquals(aliceText, alice.editor.getTextOfEditor(path));
-        assertEquals(bobText, bob.editor.getTextOfEditor(path));
+        assertEquals(aliceText, alice.bot().editor(FILE3).getText());
+        assertEquals(bobText, bob.bot().editor(FILE3).getText());
     }
 }

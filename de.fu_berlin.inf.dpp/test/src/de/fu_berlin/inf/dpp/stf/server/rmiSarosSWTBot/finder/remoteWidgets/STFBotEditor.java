@@ -43,49 +43,6 @@ public interface STFBotEditor extends EclipseComponent {
      **********************************************/
 
     /**
-     * 
-     * @param fileName
-     *            the filename on the editor tab, e.g. myFile.xml or
-     *            MyClass.java
-     * @return <tt>true</tt>, if the editor specified with the given fileName is
-     *         open
-     * @throws RemoteException
-     */
-    public boolean isEditorOpen(String fileName) throws RemoteException;
-
-    /**
-     * waits until the editor specified with the given fileName is open
-     * 
-     * @param fileName
-     *            the filename on the editor tab, e.g. myFile.xml or
-     *            MyClass.java
-     * @throws RemoteException
-     */
-    public void waitUntilEditorOpen(String fileName) throws RemoteException;
-
-    /**
-     * This method is special for java file, you need to only pass the name of
-     * the java file without suffix ".java".
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @return<tt>true</tt>, if the java editor specified with the given
-     *                       className is open
-     * @throws RemoteException
-     */
-    public boolean isJavaEditorOpen(String className) throws RemoteException;
-
-    /**
-     * waits until the java editor specified with the given className is open
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void waitUntilJavaEditorOpen(String className)
-        throws RemoteException;
-
-    /**
      * activate the editor specified with the given fileName
      * 
      * @param fileName
@@ -101,37 +58,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void waitUntilEditorActive(String fileName) throws RemoteException;
-
-    /**
-     * waits until the java editor specified with the given className is active
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void waitUntilJavaEditorActive(String className)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param fileName
-     *            the filename on the editor tab
-     * @return <tt>true</tt>, if the editor specified with the given fileName is
-     *         active
-     * @throws RemoteException
-     */
-    public boolean isEditorActive(String fileName) throws RemoteException;
-
-    /**
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @return<tt>true</tt>, if the java editor specified with the given
-     *                       className is active
-     * @throws RemoteException
-     */
-    public boolean isJavaEditorActive(String className) throws RemoteException;
+    public void waitUntilIsActive() throws RemoteException;
 
     /**
      * Saves and closes the given editor.
@@ -140,7 +67,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void closeWithSave() throws RemoteException;
+    public void closeAndSave() throws RemoteException;
 
     /**
      * close the editor without saving it. The editor must belong to this
@@ -154,25 +81,6 @@ public interface STFBotEditor extends EclipseComponent {
      * @throws RemoteException
      */
     public void closeWithoutSave() throws RemoteException;
-
-    /**
-     * waits until the editor specified with the given fileName is closed
-     * 
-     * @param fileName
-     *            the filename on the editor tab
-     * @throws RemoteException
-     */
-    public void waitUntilEditorClosed(String fileName) throws RemoteException;
-
-    /**
-     * waits until the java editor specified with the given className is closed
-     * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
-     * @throws RemoteException
-     */
-    public void waitUntilJavaEditorClosed(String className)
-        throws RemoteException;
 
     /**
      * if you try to close a editor which is dirty, you will get this popup
@@ -200,56 +108,15 @@ public interface STFBotEditor extends EclipseComponent {
      *         given array, which my be dirty.
      * @throws RemoteException
      */
-    public String getTextOfEditor(String... filenodes) throws RemoteException;
+    public String getText() throws RemoteException;
 
-    /**
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param packageName
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class, e.g. MyClass
-     * @return the content of the editor specified with the given className,
-     *         which may be dirty.
-     * @throws RemoteException
-     */
-    public String getTextOfJavaEditor(String projectName, String packageName,
-        String className) throws RemoteException;
+    public String getTextOnCurrentLine() throws RemoteException;
 
-    public String getTextOnCurrentLine(String fileName) throws RemoteException;
+    public String getTextOnLine(int line) throws RemoteException;
 
-    public String getTextOnLine(String fileName, int line)
-        throws RemoteException;
+    public int getCursorLine() throws RemoteException;
 
-    /**
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param packageName
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @param line
-     *            the line number, 0 based.
-     * @return the text on the given line number, without the line delimiters.
-     * @throws RemoteException
-     */
-    public String getJavaTextOnLine(String projectName, String packageName,
-        String className, int line) throws RemoteException;
-
-    public int getCursorLine(String fileName) throws RemoteException;
-
-    public int getCursorColumn(String fileName) throws RemoteException;
-
-    /**
-     * 
-     * @param className
-     *            the filename on the editor tab
-     * @return the line number of the current position of the cursor
-     * @throws RemoteException
-     */
-    public int getJavaCursorLinePosition(String className)
-        throws RemoteException;
+    public int getCursorColumn() throws RemoteException;
 
     /**
      * 
@@ -260,8 +127,9 @@ public interface STFBotEditor extends EclipseComponent {
      * @return the color of the background on the specified line.
      * @throws RemoteException
      */
-    public RGB getJavaLineBackground(String className, int line)
-        throws RemoteException;
+    public RGB getLineBackground(int line) throws RemoteException;
+
+    public boolean isActive() throws RemoteException;
 
     /**
      * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
@@ -358,8 +226,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @throws RemoteException
      */
-    public void setTextInEditorWithSave(String contentPath)
-        throws RemoteException;
+    public void setTextAndSave(String contentPath) throws RemoteException;
 
     /**
      * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
@@ -380,33 +247,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      */
-    public void waitUntilEditorContentSame(String otherClassContent,
-        String... fileNodes) throws RemoteException;
-
-    /**
-     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
-     * file, which is modified by another peer (e.g. Alice). Because of data
-     * transfer delay Bob need to wait a minute to see the changes. So it will
-     * be a good idea that you give bob some time before you compare the two
-     * class files between Alice and Bob.
-     * <p>
-     * <b>Note:</b> the method is different from
-     * {@link STFBotEditor#waitUntilClassContentsSame(String, String, String, String)}
-     * , which compare the contents of the class files which isn't dirty.
-     * </p>
-     * 
-     * @param otherClassContent
-     *            the class content of another peer, to which you want to
-     *            compare.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     */
-    public void waitUntilJavaEditorContentSame(String otherClassContent,
-        String projectName, String pkg, String className)
+    public void waitUntilContentSame(String otherClassContent)
         throws RemoteException;
 
     /**
@@ -423,26 +264,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @throws RemoteException
      */
-    public void setTextInEditorWithoutSave(String contentPath,
-        String... fileNodes) throws RemoteException;
-
-    /**
-     * 
-     * @param contentPath
-     *            the path to the test file whose content should be set in the
-     *            text editor. All such test files are located in the directory
-     *            [Saros]/test/STF.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @throws RemoteException
-     */
-    public void setTextInJavaEditorWithoutSave(String contentPath,
-        String projectName, String pkg, String className)
-        throws RemoteException;
+    public void setTextWithoutSave(String contentPath) throws RemoteException;
 
     /**
      * 
@@ -458,24 +280,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @throws RemoteException
      */
-    public void typeTextInEditor(String text, String... fileNodes)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param text
-     *            the text to type.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @throws RemoteException
-     * @see STFBotEditor#typeTextInEditor(String, String...)
-     */
-    public void typeTextInJavaEditor(String text, String projectName,
-        String pkg, String className) throws RemoteException;
+    public void typeText(String text) throws RemoteException;
 
     /**
      * <p>
@@ -487,26 +292,7 @@ public interface STFBotEditor extends EclipseComponent {
      *         saving, and <code>false</code> if they have not changed since the
      *         last save.
      */
-    public boolean isFileDirty(String... fileNodes) throws RemoteException;
-
-    /**
-     * <p>
-     * <b>Note:</b> if the class file isn't open, it will be opened first using
-     * the given parameter "idOfEditor".
-     * </p>
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @return <code>true</code> if the contents have been modified and need
-     *         saving, and <code>false</code> if they have not changed since the
-     *         last save
-     */
-    public boolean isClassDirty(String projectName, String pkg,
-        String className, final String idOfEditor) throws RemoteException;
+    public boolean isFileDirty() throws RemoteException;
 
     /**********************************************
      * 
@@ -526,8 +312,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            name of the class without suffix, e.g. MyClass
      * @throws RemoteException
      */
-    public void setBreakPoint(int line, String projectName, String pkg,
-        String className) throws RemoteException;
+    public void setBreakPoint(int line) throws RemoteException;
 
     /**
      * Changes the cursor position in editor.
@@ -541,8 +326,7 @@ public interface STFBotEditor extends EclipseComponent {
      * @see SWTBotStyledText#navigateTo(int, int)
      * @throws RemoteException
      */
-    public void navigateInEditor(String fileName, int line, int column)
-        throws RemoteException;
+    public void navigateTo(int line, int column) throws RemoteException;
 
     /**
      * Presses the shortcut specified by the given keys.
@@ -555,8 +339,7 @@ public interface STFBotEditor extends EclipseComponent {
      * @see IKeyLookup
      * @see SWTBotEclipseEditor#pressShortcut(org.eclipse.jface.bindings.keys.KeyStroke...)
      */
-    public void pressShortcut(String fileName, String... keys)
-        throws RemoteException;
+    public void pressShortcut(String... keys) throws RemoteException;
 
     /**
      * 
@@ -566,46 +349,43 @@ public interface STFBotEditor extends EclipseComponent {
      * @throws RemoteException
      * @see SWTBotEclipseEditor#autoCompleteProposal(String, String)
      */
-    public void autoCompleteProposal(String fileName, String insertText,
-        String proposalText) throws RemoteException;
-
-    public List<String> getAutoCompleteProposals(String fileName,
-        String insertText) throws RemoteException;
-
-    public void quickfix(String fileName, String quickFixName)
+    public void autoCompleteProposal(String insertText, String proposalText)
         throws RemoteException;
 
-    public void quickfix(String fileName, int index) throws RemoteException;
-
-    public void selectCurrentLine(String fileName) throws RemoteException;
-
-    public void selectLine(String fileName, int line) throws RemoteException;
-
-    public void selectRange(String fileName, int line, int column, int length)
+    public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException;
 
-    public String getSelection(String fileName) throws RemoteException;
+    public void quickfix(String quickFixName) throws RemoteException;
+
+    public void quickfix(int index) throws RemoteException;
+
+    public void selectCurrentLine() throws RemoteException;
+
+    public void selectLine(int line) throws RemoteException;
+
+    public void selectRange(int line, int column, int length)
+        throws RemoteException;
+
+    public String getSelection() throws RemoteException;
 
     /**
      * 
      * @param fileName
      * @throws RemoteException
      */
-    public void pressShortCutDelete(String fileName) throws RemoteException;
+    public void pressShortCutDelete() throws RemoteException;
 
-    public void pressShortCutEnter(String fileName) throws RemoteException;
+    public void pressShortCutEnter() throws RemoteException;
 
-    public void pressShortCutSave(String fileName) throws RemoteException;
+    public void pressShortCutSave() throws RemoteException;
 
-    public void pressShortRunAsJavaApplication(String fileName)
+    public void pressShortRunAsJavaApplication() throws RemoteException;
+
+    public void pressShortCutNextAnnotation() throws RemoteException;
+
+    public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException;
 
-    public void pressShortCutNextAnnotation(String fileName)
-        throws RemoteException;
-
-    public void pressShortCutQuickAssignToLocalVariable(String fileName)
-        throws RemoteException;
-
-    public void pressShortCut(String fileName, int modificationKeys, char c)
+    public void pressShortCut(int modificationKeys, char c)
         throws RemoteException;
 }

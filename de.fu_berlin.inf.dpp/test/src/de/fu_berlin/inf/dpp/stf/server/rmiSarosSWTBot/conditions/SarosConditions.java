@@ -35,7 +35,8 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(STFBotTable table, String tableItemName) {
+    public static ICondition existTableItem(STFBotTable table,
+        String tableItemName) {
         return new ExistsTableItem(table, tableItemName);
     }
 
@@ -49,17 +50,19 @@ public class SarosConditions extends Conditions {
      * conditions for editor
      * 
      **********************************************/
-    public static ICondition isEditorOpen(STFBotEditor editor, String name) {
-        return new IsEditorOpen(editor, name);
-    }
-
-    public static ICondition isEditorActive(STFBotEditor editor, String name) {
-        return new IsEditorActive(editor, name);
-    }
-
-    public static ICondition isEditorClosed(STFBotEditor editor, String name) {
-        return new IsEditorClosed(editor, name);
-    }
+    // public static ICondition isEditorOpen(STFBotEditor editor, String name) {
+    // return new IsEditorOpen(editor, name);
+    // }
+    //
+    // public static ICondition isEditorActive(STFBotEditor editor, String name)
+    // {
+    // return new IsEditorActive(editor, name);
+    // }
+    //
+    // public static ICondition isEditorClosed(STFBotEditor editor, String name)
+    // {
+    // return new IsEditorClosed(editor, name);
+    // }
 
     public static ICondition isShellClosed(SWTBotShell shell) {
         return new IsShellClosed(shell);
@@ -93,11 +96,6 @@ public class SarosConditions extends Conditions {
     public static ICondition isChatMessageExist(ChatViewImp chatV, String jid,
         String message) {
         return new ExistsChatMessage(chatV, jid, message);
-    }
-
-    public static ICondition isEditorContentsSame(STFBotEditor editor,
-        String otherContent, String... filePath) {
-        return new IsEditorContentsSame(editor, otherContent, filePath);
     }
 
     public static ICondition isRevisionSame(String fullPath, String revisionID) {

@@ -188,7 +188,7 @@ public class STFTest extends STF {
 
     @Before
     public void before() throws Exception {
-        resetWorkbenches();
+        closeAllShells();
     }
 
     @After
@@ -339,6 +339,12 @@ public class STFTest extends STF {
         }
     }
 
+    public static void closeAllShells() throws RemoteException {
+        for (Tester tester : activeTesters) {
+            tester.workbench.closeAllShells();
+        }
+    }
+
     public static void resetDefaultAccount() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
@@ -451,7 +457,7 @@ public class STFTest extends STF {
         for (Tester tester : testers) {
             tester.fileM.newProject(PROJECT1);
             tester.fileM.newFile(path);
-            tester.editor.waitUntilEditorOpen(FILE3);
+            tester.bot().waitUntilEditorOpen(FILE3);
         }
     }
 

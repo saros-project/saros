@@ -126,4 +126,9 @@ public interface STFWorkbenchBot extends STFBot {
     public void resetActivePerspective() throws RemoteException;
 
     public void closeAllShells() throws RemoteException;
+
+    public void waitUntilEditorOpen(final String title) throws RemoteException;
+
+    public void waitUntilEditorClosed(final String title)
+        throws RemoteException;
 }

@@ -21,7 +21,7 @@ public class TestEditorByAliceAndBob extends STFTest {
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         if (alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA))
-            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
@@ -34,23 +34,23 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void isJavaEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isJavaEditorOpen(CLS1));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test(expected = AssertionError.class)
     public void isJavaEditorOpenWithAssertError() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        assertFalse(alice.editor.isJavaEditorOpen(CLS1));
+        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void isEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        assertTrue(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.editor.isEditorOpen(CLS1 + SUFFIX_JAVA));
+        assertTrue(alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA));
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        assertFalse(alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA));
     }
 
     @Test
@@ -59,23 +59,29 @@ public class TestEditorByAliceAndBob extends STFTest {
         setFollowMode(alice, bob);
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorOpen(CLS1);
-        assertTrue(bob.editor.isJavaEditorOpen(CLS1));
+        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void waitUntilBobJavaEditorActive() throws RemoteException,
         InterruptedException {
-        setFollowMode(alice, bob);
-        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
-        bob.editor.waitUntilJavaEditorActive(CLS2);
-        assertTrue(bob.editor.isJavaEditorActive(CLS2));
-        assertFalse(bob.editor.isJavaEditorActive(CLS1));
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
-        assertFalse(bob.editor.isJavaEditorActive(CLS2));
+        setFollowMode(alice, bob);
+        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+
+        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
+        bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
+        assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
+        assertFalse(bob.bot().editor(CLS1_SUFFIX).isActive());
+
+        alice.bot().editor(CLS1_SUFFIX).activate();
+        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
+        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertFalse(bob.bot().editor(CLS2_SUFFIX).isActive());
     }
 
     @Test
@@ -83,13 +89,12 @@ public class TestEditorByAliceAndBob extends STFTest {
         InterruptedException {
         setFollowMode(alice, bob);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorActive(CLS1);
-        assertTrue(bob.editor.isJavaEditorActive(CLS1));
-        assertFalse(bob.editor.isJavaEditorActive(CLS2));
+        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
-        bob.editor.waitUntilJavaEditorClosed(CLS1);
-        assertFalse(bob.editor.isJavaEditorOpen(CLS1));
+        alice.bot().editor(CLS1_SUFFIX).closeWithoutSave();
+        bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(bob.bot().isEditorOpen(CLS1));
 
     }
 

@@ -37,7 +37,6 @@ public class TestEditDuringInvitation extends STFTest {
      * <ol>
      * <li>Alice invites Bob.</li>
      * <li>Bob accepts the invitation</li>
-     * <li>Alice grants Bob write access</li>
      * <li>Alice invites Carl</li>
      * <li>Bob changes data during the running invtiation of Carl.</li>
      * </ol>
@@ -53,38 +52,32 @@ public class TestEditDuringInvitation extends STFTest {
      */
     @Test
     public void testEditDuringInvitation() throws RemoteException {
-        log.trace("starting testEditDuringInvitation, alice.buildSession");
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
 
         assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
 
-        log.trace("alice.inviteUser(carl");
         alice.sarosSessionV.openInvitationInterface(carl.getBaseJid());
-
-        log.trace("carl.confirmSessionInvitationWindowStep1");
         carl.sarosC.confirmShellSessionnInvitation();
 
-        log.trace("bob.setTextInJavaEditor");
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.bot().editor(CLS1_SUFFIX).setTextInEditorWithSave(CP1);
+        bob.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1);
+        String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
+        // System.out.println(texByBob);
 
-        log.trace("carl.confirmSessionInvitationWindowStep2UsingNewproject");
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
 
-        log.trace("getTextOfJavaEditor");
-        String textFromCarl = carl.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
-        String textFormAlice = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
+        alice.bot().editor(CLS1_SUFFIX).waitUntilContentSame(texByBob);
+        String textByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
-        String textFormBob = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
-        assertTrue(textFromCarl.equals(textFormAlice));
-        assertTrue(textFromCarl.equals(textFormBob));
-        // assertTrue(carl.sessionV.isInconsistencyDetectedEnabled());
+        // There are bugs here, carl get completely different content as bob.
+        carl.bot().editor(CLS1_SUFFIX).waitUntilContentSame(texByBob);
+        String textByCarl = carl.bot().editor(CLS1_SUFFIX).getText();
+        System.out.println(textByCarl);
 
-        log.trace("testEditDuringInvitation done");
+        assertTrue(textByCarl.equals(texByBob));
+        assertTrue(textByAlice.equals(texByBob));
     }
 }

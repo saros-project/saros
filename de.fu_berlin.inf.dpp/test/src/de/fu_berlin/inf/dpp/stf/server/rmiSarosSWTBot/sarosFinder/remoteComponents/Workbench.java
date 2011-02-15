@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 
-
 /**
  * This interface contains convenience APIs to perform actions in the workbench.
  * The main tasks are to setUp/cleanUp the saros_instance_workbench.
@@ -48,6 +47,8 @@ public interface Workbench extends EclipseComponent {
      * @throws RemoteException
      */
     public void resetWorkbench() throws RemoteException;
+
+    public void closeAllShells() throws RemoteException;
 
     /**
      * Activate the saros-instance.This method is very useful, wenn you test

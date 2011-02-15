@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -146,6 +147,32 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
 
     public void saveAllEditors() throws RemoteException {
         bot.saveAllEditors();
+    }
+
+    public void waitUntilEditorOpen(final String title) throws RemoteException {
+
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isEditorOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return "The editor " + title + "is not open.";
+            }
+        });
+    }
+
+    public void waitUntilEditorClosed(final String title)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isEditorOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return "The editor is not open.";
+            }
+        });
     }
 
     public void resetActivePerspective() throws RemoteException {

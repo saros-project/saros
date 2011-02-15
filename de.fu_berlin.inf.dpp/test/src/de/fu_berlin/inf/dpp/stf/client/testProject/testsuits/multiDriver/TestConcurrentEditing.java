@@ -39,17 +39,17 @@ public class TestConcurrentEditing extends STFTest {
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
         String[] path = { PROJECT1, FILE };
         alice.fileM.newFile(path);
-        alice.editor.waitUntilEditorOpen(FILE);
-        alice.bot().editor(FILE).setTextInEditorWithSave("test/STF/lorem.txt");
-        alice.editor.navigateInEditor(FILE, 0, 6);
+        alice.bot().waitUntilEditorOpen(FILE);
+        alice.bot().editor(FILE).setTextAndSave("test/STF/lorem.txt");
+        alice.bot().editor(FILE).navigateTo(0, 6);
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
         bob.openC.openFile(VIEW_PACKAGE_EXPLORER, path);
 
-        bob.editor.waitUntilEditorOpen(FILE);
-        bob.editor.navigateInEditor(FILE, 0, 30);
+        bob.bot().waitUntilEditorOpen(FILE);
+        bob.bot().editor(FILE).navigateTo(0, 30);
 
         bob.workbench.sleep(1000);
 
@@ -59,14 +59,14 @@ public class TestConcurrentEditing extends STFTest {
         alice.workbench.sleep(waitActivate);
         alice.bot().editor(FILE).activate();
 
-        alice.editor.waitUntilEditorActive(FILE);
-        alice.editor.pressShortcut(FILE, "DELETE");
+        alice.bot().editor(FILE).waitUntilIsActive();
+        alice.bot().editor(FILE).pressShortcut("DELETE");
         // at the same time, Bob enters L at 0,30
         bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
         bob.bot().editor(FILE).activate();
-        bob.editor.waitUntilEditorActive(FILE);
-        bob.editor.typeTextInEditor("L", path);
+        bob.bot().editor(FILE).waitUntilIsActive();
+        bob.bot().editor(FILE).typeText("L");
         // both sleep for less than 1000ms
         alice.workbench.sleep(300);
 
@@ -74,18 +74,18 @@ public class TestConcurrentEditing extends STFTest {
         alice.workbench.activateWorkbench();
         alice.workbench.sleep(waitActivate);
         alice.bot().editor(FILE).activate();
-        alice.editor.waitUntilEditorActive(FILE);
-        alice.editor.pressShortcut(FILE, "DELETE");
+        alice.bot().editor(FILE).waitUntilIsActive();
+        alice.bot().editor(FILE).pressShortcut("DELETE");
         // Bob enters o
         bob.workbench.activateWorkbench();
         bob.workbench.sleep(waitActivate);
         bob.bot().editor(FILE).activate();
-        bob.editor.waitUntilEditorActive(FILE);
-        bob.editor.typeTextInEditor("o", path);
+        bob.bot().editor(FILE).waitUntilIsActive();
+        bob.bot().editor(FILE).typeText("o");
 
         alice.workbench.sleep(5000);
-        String aliceText = alice.editor.getTextOfEditor(path);
-        String bobText = bob.editor.getTextOfEditor(path);
+        String aliceText = alice.bot().editor(FILE).getText();
+        String bobText = bob.bot().editor(FILE).getText();
         assertEquals(aliceText, bobText);
     }
 
@@ -97,29 +97,29 @@ public class TestConcurrentEditing extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.editor.waitUntilJavaEditorActive(CLS1);
+        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
 
-        String fileName = CLS1 + SUFFIX_JAVA;
-        alice.editor.navigateInEditor(fileName, 3, 0);
-        bob.editor.navigateInEditor(fileName, 3, 0);
+        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        bob.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         char[] content = "Merry Christmas and Happy New Year!".toCharArray();
         for (int i = 0; i < content.length; i++) {
-            alice.editor.typeTextInJavaEditor(content[i] + "", PROJECT1, PKG1,
-                CLS1);
+            alice.bot().editor(CLS1_SUFFIX).typeText(content[i] + "");
             Thread.sleep(100);
             if (i != 0 && i % 2 == 0) {
-                bob.editor.navigateInEditor(fileName, 3, i);
-                bob.editor.pressShortcut(fileName, IKeyLookup.DELETE_NAME,
-                    IKeyLookup.DELETE_NAME);
+                bob.bot().editor(CLS1_SUFFIX).navigateTo(3, i);
+                bob.bot()
+                    .editor(CLS1_SUFFIX)
+                    .pressShortcut(IKeyLookup.DELETE_NAME,
+                        IKeyLookup.DELETE_NAME);
             }
         }
 
-        String aliceText = alice.editor.getTextOfJavaEditor(PROJECT1, PKG1,
-            CLS1);
-        String bobText = bob.editor.getTextOfJavaEditor(PROJECT1, PKG1, CLS1);
+        String aliceText = alice.bot().editor(CLS1_SUFFIX).getText();
+        String bobText = bob.bot().editor(CLS1_SUFFIX).getText();
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
+        bob.workbench.sleep(5000);
         assertTrue(bob.toolbarButton.isToolbarButtonOnViewEnabled(
             VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
 

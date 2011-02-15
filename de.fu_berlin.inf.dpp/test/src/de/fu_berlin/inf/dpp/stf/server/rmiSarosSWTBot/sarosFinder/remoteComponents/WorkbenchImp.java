@@ -11,7 +11,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
-
 public class WorkbenchImp extends EclipseComponentImp implements Workbench {
 
     private static transient WorkbenchImp self;
@@ -64,6 +63,21 @@ public class WorkbenchImp extends EclipseComponentImp implements Workbench {
                 IWorkbenchPage page = win.getActivePage();
                 if (page != null) {
                     page.closeAllEditors(false);
+                }
+            }
+        });
+    }
+
+    public void closeAllShells() throws RemoteException {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                final IWorkbench wb = PlatformUI.getWorkbench();
+                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+                Shell[] shells = Display.getCurrent().getShells();
+                for (Shell shell : shells) {
+                    if (shell != null && shell != win.getShell()) {
+                        shell.close();
+                    }
                 }
             }
         });

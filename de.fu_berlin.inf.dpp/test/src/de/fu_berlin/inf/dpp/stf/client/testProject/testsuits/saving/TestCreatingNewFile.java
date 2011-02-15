@@ -103,20 +103,15 @@ public class TestCreatingNewFile extends STFTest {
         bob.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
-        alice.bot().editor(FILE2).setTextInEditorWithSave(CP1);
+        alice.bot().editor(FILE2).setTextAndSave(CP1);
 
-        String file2ContentOfAlice = alice.editor.getTextOfEditor(PROJECT1,
-            FOLDER2, FILE2);
-        carl.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT1,
-            FOLDER2, FILE2);
-        String file2ContentOfCarl = carl.editor.getTextOfEditor(PROJECT1,
-            FOLDER2, FILE2);
+        String file2ContentOfAlice = alice.bot().editor(FILE2).getText();
+        carl.bot().editor(FILE2).waitUntilContentSame(file2ContentOfAlice);
+        String file2ContentOfCarl = carl.bot().editor(FILE2).getText();
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
 
-        bob.editor.waitUntilEditorContentSame(file2ContentOfAlice, PROJECT1,
-            FOLDER2, FILE2);
-        String file2ContentOfBob = bob.editor.getTextOfEditor(PROJECT1,
-            FOLDER2, FILE2);
+        bob.bot().editor(FILE2).waitUntilContentSame(file2ContentOfAlice);
+        String file2ContentOfBob = bob.bot().editor(FILE2).getText();
         assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
 
     }
