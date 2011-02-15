@@ -169,7 +169,7 @@
             objectClass="org.eclipse.core.resources.IResource"
             sibling_order="&lt;action&#x0A;               class=&quot;de.fu_berlin.inf.dpp.ui.actions.NewSessionAction&quot;&#x0A;               icon=&quot;icons/transmit.png&quot;&#x0A;               id=&quot;Saros.action1&quot;&#x0A;               label=&quot;Share project...&quot;&gt;&#x0A;         &lt;/action&gt;">
          <menu
-               icon="icons/etool16/saros.png"
+               icon="icons/etool16/saros_menu.png"
                id="sarosSubMenu"
                label="Saros">
                <separator name="Saros"/>
