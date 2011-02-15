@@ -36,6 +36,7 @@ public class NoteComposite extends RoundedComposite {
      */
     public void setExplanation(SimpleExplanation simpleExplanation) {
         this.explanationComposite.setExplanation(simpleExplanation);
+        this.layout();
     }
 
     @Override
