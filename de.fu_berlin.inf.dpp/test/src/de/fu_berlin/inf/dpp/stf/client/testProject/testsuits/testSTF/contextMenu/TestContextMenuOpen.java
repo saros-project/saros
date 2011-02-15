@@ -36,7 +36,7 @@ public class TestContextMenuOpen extends STFTest {
         alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
-        alice.bot().editor(FILE1).closeAndSave();
+        alice.bot().editor(FILE1).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(FILE1));
         alice.openC.openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
@@ -49,7 +49,7 @@ public class TestContextMenuOpen extends STFTest {
     public void testOpenClass() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
@@ -62,7 +62,7 @@ public class TestContextMenuOpen extends STFTest {
     public void testOpenClassWith() throws RemoteException {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
@@ -77,7 +77,7 @@ public class TestContextMenuOpen extends STFTest {
         alice.fileM.newJavaProject(PROJECT1);
         alice.fileM.newFolder(PROJECT1, FOLDER1);
         alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.bot().editor(FILE1).closeAndSave();
+        alice.bot().editor(FILE1).closeWithSave();
         alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));

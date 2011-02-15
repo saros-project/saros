@@ -81,26 +81,26 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
             .getText();
 
         carl.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
 
         bob.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
 
         dave.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
 
         resetFollowModeSequentially(carl, bob, dave);
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
         // alice.bot().editor(CLS1_SUFFIX).closeAndSave();
 
         assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
         /*
          * TODO alice can still see the changes maded by carl, although she
          * already leave follow mode. There is a bug here (see Bug 3094186)and
@@ -114,7 +114,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // dirtyClsChangeContentOfCarl));
 
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
 
         /*
          * TODO bob can still see the changes maded by carl, although he already
@@ -128,7 +128,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // dirtyClsChangeContentOfCarl));
 
         assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
         /*
          * TODO dave can still see the changes , although he already leave
          * follow mode. There is a bug here (see Bug 3094186) and it should be

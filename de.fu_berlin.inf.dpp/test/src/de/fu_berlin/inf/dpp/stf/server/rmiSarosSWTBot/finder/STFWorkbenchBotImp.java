@@ -38,7 +38,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
 
     /**********************************************
      * 
-     * states
+     * view
      * 
      **********************************************/
     public STFBotView view(String viewTitle) throws RemoteException {
@@ -85,6 +85,21 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
         return getTitlesOfOpenedViews().contains(title);
     }
 
+    public STFBotView viewById(String id) throws RemoteException {
+        stfView.setId(id);
+        return stfView;
+    }
+
+    public STFBotView activeView() throws RemoteException {
+        return view(bot.activeView().getTitle());
+    }
+
+    /**********************************************
+     * 
+     * perspective
+     * 
+     **********************************************/
+
     public STFBotPerspective perspectiveByLabel(String label)
         throws RemoteException {
         stfPerspective.setLabel(label);
@@ -96,14 +111,23 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
         return stfPerspective;
     }
 
-    public STFBotView viewById(String id) throws RemoteException {
-        stfView.setId(id);
-        return stfView;
+    public STFBotPerspective activePerspective() throws RemoteException {
+        return perspectiveByLabel(bot.activePerspective().getLabel());
     }
 
-    public STFBotView activeView() throws RemoteException {
-        return view(bot.activeView().getTitle());
+    public STFBotPerspective defaultPerspective() throws RemoteException {
+        return perspectiveByLabel(bot.defaultPerspective().getLabel());
     }
+
+    public void resetActivePerspective() throws RemoteException {
+        bot.resetActivePerspective();
+    }
+
+    /**********************************************
+     * 
+     * editor
+     * 
+     **********************************************/
 
     public STFBotEditor editor(String fileName) throws RemoteException {
         stfEditor.setTitle(fileName);
@@ -126,19 +150,6 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     public STFBotEditor activeEditor() throws RemoteException {
         return editor(bot.activeEditor().getTitle());
 
-    }
-
-    public STFBotPerspective activePerspective() throws RemoteException {
-        return perspectiveByLabel(bot.activePerspective().getLabel());
-    }
-
-    public void resetWorkbench() throws RemoteException {
-        bot.resetWorkbench();
-
-    }
-
-    public STFBotPerspective defaultPerspective() throws RemoteException {
-        return perspectiveByLabel(bot.defaultPerspective().getLabel());
     }
 
     public void closeAllEditors() throws RemoteException {
@@ -175,12 +186,14 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
         });
     }
 
-    public void resetActivePerspective() throws RemoteException {
-        bot.resetActivePerspective();
-    }
+    /**********************************************
+     * 
+     * workbench
+     * 
+     **********************************************/
 
-    public void closeAllShells() throws RemoteException {
-        bot.closeAllShells();
+    public void resetWorkbench() throws RemoteException {
+        bot.resetWorkbench();
 
     }
 

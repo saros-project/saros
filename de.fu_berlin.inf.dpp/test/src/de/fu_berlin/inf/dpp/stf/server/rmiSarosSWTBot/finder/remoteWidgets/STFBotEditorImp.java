@@ -1,25 +1,16 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class STFBotEditorImp extends EclipseComponentImp implements
@@ -46,10 +37,8 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void setTitle(String title) {
-        // if (this.title == null || !this.title.equals(title)) {
         this.title = title;
         this.editor = bot.editorByTitle(title).toTextEditor();
-        // }
     }
 
     public void setId(String id) {
@@ -76,27 +65,23 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         editor.setFocus();
     }
 
-    public void closeAndSave() throws RemoteException {
+    public void closeWithSave() throws RemoteException {
         editor.save();
         editor.close();
+    }
+
+    public void save() throws RemoteException {
+        editor.save();
     }
 
     public void closeWithoutSave() throws RemoteException {
         editor.close();
         if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
             && bot().shell(SHELL_SAVE_RESOURCE).isActive())
-            confirmShellSaveSource(NO);
-
+            bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
     }
 
-    public void confirmShellSaveSource(String buttonType)
-        throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_SAVE_ALL_FILES_NOW);
-        bot().shell(SHELL_SAVE_ALL_FILES_NOW).activate();
-        bot().shell(SHELL_SAVE_ALL_FILES_NOW).confirm(buttonType);
-    }
-
-    public void setTextAndSave(String contentPath) throws RemoteException {
+    public void setTexWithSave(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
         editor.setText(contents);
         editor.save();
@@ -113,7 +98,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void navigateTo(int line, int column) throws RemoteException {
-
         editor.setFocus();
         editor.navigateTo(line, column);
     }
@@ -158,7 +142,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void pressShortCutDelete() throws RemoteException {
-
         pressShortcut(IKeyLookup.DELETE_NAME);
     }
 
@@ -167,7 +150,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void pressShortCutSave() throws RemoteException {
-
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, 's');
         else
@@ -175,7 +157,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void pressShortRunAsJavaApplication() throws RemoteException {
-
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
@@ -185,7 +166,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
     }
 
     public void pressShortCutNextAnnotation() throws RemoteException {
-
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, '.');
         else
@@ -195,7 +175,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
-
         if (getOS() == TypeOfOS.MAC)
             editor.pressShortcut(SWT.COMMAND, '2');
         else
@@ -216,12 +195,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     public void quickfix(int index) throws RemoteException {
         editor.quickfix(index);
-    }
-
-    public void setBreakPoint(int line) throws RemoteException {
-
-        selectLine(line);
-        stfMenu.clickMenuWithTexts("Run", "Toggle Breakpoint");
     }
 
     /**********************************************
@@ -254,7 +227,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         return editor.getLineBackground(line);
     }
 
-    public boolean isFileDirty() throws RemoteException {
+    public boolean isDirty() throws RemoteException {
         return editor.isDirty();
     }
 
@@ -265,7 +238,6 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException {
-
         return editor.getAutoCompleteProposals(insertText);
     }
 
@@ -291,11 +263,11 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         return editor.isActive();
     }
 
-    public void waitUntilContentSame(final String otherClassContent)
+    public void waitUntilIsTextSame(final String otherText)
         throws RemoteException {
         waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return getText().equals(otherClassContent);
+                return getText().equals(otherText);
             }
 
             public String getFailureMessage() {
@@ -310,59 +282,5 @@ public class STFBotEditorImp extends EclipseComponentImp implements
      * inner functions
      * 
      **********************************************/
-
-    /**
-     * @return all filenames on the editors which are opened currently
-     */
-    public List<String> getTitlesOfAllOpenedEditors() {
-        ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotEditor editor : bot.editors())
-            list.add(editor.getTitle());
-        return list;
-    }
-
-    public String getClassContent(String projectName, String pkg,
-        String className) throws RemoteException, IOException, CoreException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
-        log.info("Checking full path: \"" + file.getFullPath().toOSString()
-            + "\"");
-        return ConvertStreamToString(file.getContents());
-    }
-
-    public String getFileContent(String... nodes) throws RemoteException,
-        IOException, CoreException {
-        IPath path = new Path(getPath(nodes));
-        log.info("Checking existence of file \"" + path + "\"");
-        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getFile(path);
-
-        log.info("Checking full path: \"" + file.getFullPath().toOSString()
-            + "\"");
-        return ConvertStreamToString(file.getContents());
-    }
-
-    public void waitUntilClassContentsSame(final String projectName,
-        final String pkg, final String className, final String otherClassContent)
-        throws RemoteException {
-        waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return getClassContent(projectName, pkg, className).equals(
-                    otherClassContent);
-            }
-
-            public String getFailureMessage() {
-                return "The both contents are not" + " same.";
-            }
-        });
-    }
-
-    public void waitUntilFileContentSame(String otherClassContent,
-        String... fileNodes) throws RemoteException {
-        waitUntil(SarosConditions.isFileContentsSame(this, otherClassContent,
-            fileNodes));
-    }
 
 }

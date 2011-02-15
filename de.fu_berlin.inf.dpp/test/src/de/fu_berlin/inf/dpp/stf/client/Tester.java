@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotList;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
@@ -23,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
@@ -57,6 +57,7 @@ public class Tester extends STF {
     public ConsoleView consoleV;
 
     public STFWorkbenchBot bot;
+    public NoBot noBot;
     public STFBotTable table;
     public STFBotTree tree;
     public STFBotTreeItem treeItem;
@@ -70,8 +71,6 @@ public class Tester extends STF {
     public STFBotList list;
 
     public Workbench workbench;
-
-    public STFBotEditor editor;
 
     // menuBar
     public FileM fileM;
@@ -126,14 +125,16 @@ public class Tester extends STF {
             consoleV = (ConsoleView) registry.lookup("consoleView");
             workbench = (Workbench) registry.lookup("workbench");
             shell = (STFBotShell) registry.lookup("shell");
-            editor = (STFBotEditor) registry.lookup("eclipseEditor");
+            // editor = (STFBotEditor) registry.lookup("eclipseEditor");
 
             bot = (STFWorkbenchBot) registry.lookup("bot");
+            noBot = (NoBot) registry.lookup("noBot");
             table = (STFBotTable) registry.lookup("table");
             tree = (STFBotTree) registry.lookup("tree");
             treeItem = (STFBotTreeItem) registry.lookup("treeItem");
             button = (STFBotButton) registry.lookup("button");
-            toolbarButton = (STFBotToolbarButton) registry.lookup("toolbarButton");
+            toolbarButton = (STFBotToolbarButton) registry
+                .lookup("toolbarButton");
             menu = (STFBotMenu) registry.lookup("menu");
             view = (STFBotView) registry.lookup("view");
             label = (STFBotLabel) registry.lookup("label");
@@ -185,5 +186,9 @@ public class Tester extends STF {
 
     public STFWorkbenchBot bot() {
         return bot;
+    }
+
+    public NoBot noBot() {
+        return noBot;
     }
 }

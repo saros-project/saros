@@ -8,7 +8,6 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
@@ -70,11 +69,6 @@ public class SarosConditions extends Conditions {
 
     public static ICondition isViewActive(SWTWorkbenchBot bot, String name) {
         return new IsViewActive(bot, name);
-    }
-
-    public static ICondition isFileContentsSame(STFBotEditor state,
-        String otherClassContent, String... fileNodes) {
-        return new IsFileContentsSame(state, otherClassContent, fileNodes);
     }
 
     public static ICondition isNotInSVN(String projectName) {

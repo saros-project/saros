@@ -262,7 +262,7 @@ public class TestSVNStateInitialization extends STFTest {
 
         String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
             .getText();
-        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTextAndSave(CP1);
+        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTexWithSave(CP1);
         String cls1_content_after = alice.bot().editor(SVN_CLS1_SUFFIX)
             .getText();
         assertFalse(cls1_content_after.equals(cls1_content_before));

@@ -62,18 +62,18 @@ public class TestEditDuringInvitation extends STFTest {
         carl.sarosC.confirmShellSessionnInvitation();
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1);
+        bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
         // System.out.println(texByBob);
 
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
         carl.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
 
-        alice.bot().editor(CLS1_SUFFIX).waitUntilContentSame(texByBob);
+        alice.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
         String textByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
         // There are bugs here, carl get completely different content as bob.
-        carl.bot().editor(CLS1_SUFFIX).waitUntilContentSame(texByBob);
+        carl.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
         String textByCarl = carl.bot().editor(CLS1_SUFFIX).getText();
         System.out.println(textByCarl);
 

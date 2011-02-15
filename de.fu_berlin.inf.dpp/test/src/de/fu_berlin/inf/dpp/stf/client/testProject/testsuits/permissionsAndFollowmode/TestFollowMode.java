@@ -36,19 +36,19 @@ public class TestFollowMode extends STFTest {
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        alice.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1);
+        alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         bob.sarosSessionV.followThisBuddy(alice.jid);
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
+        String clsContentOfAlice = alice.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
 
-        bob.editor.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
-            clsContentOfAlice);
-        String clsContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
+        bob.noBot().waitUntilFileContentSame(clsContentOfAlice,
+            getClassPath(PROJECT1, PKG1, CLS1));
+        String clsContentOfBob = bob.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
         alice.fileM.newClass(PROJECT1, PKG1, CLS2);

@@ -40,7 +40,7 @@ public class TestConcurrentEditing extends STFTest {
         String[] path = { PROJECT1, FILE };
         alice.fileM.newFile(path);
         alice.bot().waitUntilEditorOpen(FILE);
-        alice.bot().editor(FILE).setTextAndSave("test/STF/lorem.txt");
+        alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
         alice.bot().editor(FILE).navigateTo(0, 6);
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,

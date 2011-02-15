@@ -64,6 +64,11 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
      * 
      **********************************************/
 
+    public void closeAllShells() throws RemoteException {
+        bot.closeAllShells();
+
+    }
+
     public STFBotShell shell(String title) throws RemoteException {
         stfShell.setShellTitle(title);
         return stfShell;

@@ -126,17 +126,17 @@ public class TestFileOperations extends STFTest {
         assertTrue(bob.pEV.existsClassNoGUI(PROJECT1, PKG2, CLS1));
         assertTrue(carl.pEV.existsClassNoGUI(PROJECT1, PKG2, CLS1));
 
-        alice.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1);
-        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG2,
-            CLS1);
-        carl.editor.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
-            clsContentOfAlice);
-        bob.editor.waitUntilClassContentsSame(PROJECT1, PKG2, CLS1,
-            clsContentOfAlice);
-        String clsContentOfBob = bob.editor.getClassContent(PROJECT1, PKG2,
-            CLS1);
-        String clsContentOfCarl = carl.editor.getClassContent(PROJECT1, PKG2,
-            CLS1);
+        alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
+        String clsContentOfAlice = alice.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG2, CLS1));
+        carl.noBot().waitUntilFileContentSame(clsContentOfAlice,
+            getClassPath(PROJECT1, PKG2, CLS1));
+        bob.noBot().waitUntilFileContentSame(clsContentOfAlice,
+            getClassPath(PROJECT1, PKG2, CLS1));
+        String clsContentOfBob = bob.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG2, CLS1));
+        String clsContentOfCarl = carl.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG2, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
         assertTrue(clsContentOfCarl.equals(clsContentOfAlice));
     }

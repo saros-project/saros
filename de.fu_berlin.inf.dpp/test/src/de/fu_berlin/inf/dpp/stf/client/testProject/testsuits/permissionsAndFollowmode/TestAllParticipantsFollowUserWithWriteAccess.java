@@ -62,7 +62,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
         throws RemoteException {
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -104,29 +104,29 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
             .getText();
 
         bob.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
 
         carl.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
         assertTrue(carl.bot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
 
         dave.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
         assertTrue(dave.bot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
-        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
-        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
     }
 
     /**
@@ -159,9 +159,9 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertTrue(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
-        String clsContentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        String clsContentOfAlice = alice.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
 
         bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -170,11 +170,14 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
         assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
-        assertTrue(bob.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
-            clsContentOfAlice));
-        assertTrue(carl.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
-            clsContentOfAlice));
-        assertTrue(bob.editor.getClassContent(PROJECT1, PKG1, CLS1).equals(
-            clsContentOfAlice));
+        assertTrue(bob.noBot()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
+            .equals(clsContentOfAlice));
+        assertTrue(carl.noBot()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
+            .equals(clsContentOfAlice));
+        assertTrue(bob.noBot()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
+            .equals(clsContentOfAlice));
     }
 }

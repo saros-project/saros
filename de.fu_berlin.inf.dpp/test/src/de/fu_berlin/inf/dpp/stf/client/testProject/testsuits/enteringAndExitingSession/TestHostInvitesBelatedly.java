@@ -82,23 +82,23 @@ public class TestHostInvitesBelatedly extends STFTest {
         String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        bob.bot().editor(CLS1_SUFFIX).setTextAndSave(CP1_CHANGE);
+        bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
         String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
-        bob.editor.setTextWithoutSave(CP2_CHANGE);
+        bob.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);
         // bob.editor.closeJavaEditorWithSave(CLS1);
         // bob.editor.closeJavaEditorWithSave(CLS2);
 
         inviteBuddies(PROJECT1, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
 
         bob.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyContent1ByAlice);
+            .waitUntilIsTextSame(dirtyContent1ByAlice);
         bob.bot().editor(CLS2_SUFFIX)
-            .waitUntilContentSame(dirtyContent2ByAlice);
+            .waitUntilIsTextSame(dirtyContent2ByAlice);
 
         String CLSContentOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         String CLS2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX).getText();

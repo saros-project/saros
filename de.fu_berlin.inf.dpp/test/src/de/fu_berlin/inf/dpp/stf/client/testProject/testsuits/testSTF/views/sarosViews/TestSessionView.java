@@ -103,7 +103,7 @@ public class TestSessionView extends STFTest {
         alice.sarosSessionV.followThisBuddy(bob.jid);
         assertTrue(alice.sarosSessionV.isFollowingBuddy(bob.jid));
 
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         alice.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }

@@ -108,9 +108,9 @@ public class TestEditorByAlice extends STFTest {
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         alice.bot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("main", "main - main method");
-        assertTrue(alice.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertTrue(alice.bot().editor(CLS1_SUFFIX).isDirty());
         alice.bot().editor(CLS1_SUFFIX).pressShortCutSave();
-        assertFalse(alice.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertFalse(alice.bot().editor(CLS1_SUFFIX).isDirty());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class TestEditorByAlice extends STFTest {
             .getTextOnLine(3));
         alice.bot().editor(CLS1_SUFFIX).pressShortCut(SWT.NONE, '\n');
         alice.bot().editor(CLS1_SUFFIX).pressShortCutSave();
-        assertFalse(alice.bot().editor(CLS1_SUFFIX).isFileDirty());
+        assertFalse(alice.bot().editor(CLS1_SUFFIX).isDirty());
         alice.workbench.sleep(100);
         alice.bot().editor(CLS1_SUFFIX).pressShortRunAsJavaApplication();
         alice.consoleV.waitUntilTextInViewConsoleExists();

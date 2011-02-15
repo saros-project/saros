@@ -70,18 +70,19 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
 
-        dave.editor.confirmShellSaveSource(NO);
-        edna.editor.confirmShellSaveSource(NO);
+        dave.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        edna.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
 
-        String contentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
-        String contentOfDave = dave.editor
-            .getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfAlice = alice.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
+        String contentOfDave = dave.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
 
-        String contentOfEdna = edna.editor
-            .getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfEdna = edna.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
 
-        String contentOfBob = bob.editor.getClassContent(PROJECT1, PKG1, CLS1);
+        String contentOfBob = bob.noBot().getFileContent(
+            getClassPath(PROJECT1, PKG1, CLS1));
 
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

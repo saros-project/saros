@@ -73,10 +73,10 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         throws IOException, CoreException {
         // assertFalse(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
         // assertFalse(dave.bot().editor(CLS2_SUFFIX).isFileDirty());
-        assertFalse(dave.bot().editor(CLS3_SUFFIX).isFileDirty());
+        assertFalse(dave.bot().editor(CLS3_SUFFIX).isDirty());
         // assertFalse(edna.bot().editor(CLS1_SUFFIX).isFileDirty());
         // assertFalse(edna.bot().editor(CLS2_SUFFIX).isFileDirty());
-        assertFalse(edna.bot().editor(CLS3_SUFFIX).isFileDirty());
+        assertFalse(edna.bot().editor(CLS3_SUFFIX).isDirty());
 
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
@@ -84,13 +84,13 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
 
         dave.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         dave.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
+        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
 
         edna.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         edna.bot().editor(CLS1_SUFFIX)
-            .waitUntilContentSame(dirtyClsContentOfAlice);
-        assertTrue(edna.bot().editor(CLS1_SUFFIX).isFileDirty());
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
+        assertTrue(edna.bot().editor(CLS1_SUFFIX).isDirty());
     }
 
     /**
@@ -113,10 +113,10 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
-        String cls2ContentOfAlice = alice.editor.getClassContent(PROJECT1,
-            PKG1, CLS2);
-        String cls2ContentOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
-            CLS2);
+        String cls2ContentOfAlice = alice.noBot().getFileContent(getClassPath(PROJECT1,
+            PKG1, CLS2));
+        String cls2ContentOfBob = bob.noBot().getFileContent(getClassPath(PROJECT1, PKG1,
+            CLS2));
         assertFalse(cls2ContentOfBob.equals(dirtyCls2ContentOfAlice));
         assertTrue(cls2ContentOfBob.equals(cls2ContentOfAlice));
     }
@@ -144,8 +144,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             PROJECT1, PKG1, CLS2);
 
         carl.bot().editor(CLS2_SUFFIX)
-            .waitUntilContentSame(dirtyCls2ContentOfAlice);
-        assertTrue(carl.bot().editor(CLS2_SUFFIX).isFileDirty());
+            .waitUntilIsTextSame(dirtyCls2ContentOfAlice);
+        assertTrue(carl.bot().editor(CLS2_SUFFIX).isDirty());
         String dirtyCls2ContentOfCarl = carl.bot().editor(CLS2_SUFFIX)
             .getText();
         assertTrue(dirtyCls2ContentOfCarl.equals(dirtyCls2ContentOfAlice));
@@ -177,35 +177,35 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         carl.openC.openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor",
             PROJECT1, PKG1, CLS2);
-        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeAndSave();
+        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
 
-        alice.bot().editor(CLS2_SUFFIX).setTextAndSave(CP2_CHANGE);
+        alice.bot().editor(CLS2_SUFFIX).setTexWithSave(CP2_CHANGE);
         String dirtyCls2ChangeContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
         dave.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         dave.bot().editor(CLS2_SUFFIX)
-            .waitUntilContentSame(dirtyCls2ChangeContentOfAlice);
-        assertFalse(dave.bot().editor(CLS2_SUFFIX).isFileDirty());
+            .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
+        assertFalse(dave.bot().editor(CLS2_SUFFIX).isDirty());
 
         edna.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         edna.bot().editor(CLS2_SUFFIX)
-            .waitUntilContentSame(dirtyCls2ChangeContentOfAlice);
-        assertFalse(edna.bot().editor(CLS2_SUFFIX).isFileDirty());
+            .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
+        assertFalse(edna.bot().editor(CLS2_SUFFIX).isDirty());
 
         // bob.state.waitUntilClassContentsSame(PROJECT1, PKG1, CLS2,
         // dirtyCls2ChangeContentOfAlice);
-        String contentChangeOfBob = bob.editor.getClassContent(PROJECT1, PKG1,
-            CLS2);
+        String contentChangeOfBob = bob.noBot().getFileContent(getClassPath(PROJECT1, PKG1,
+            CLS2));
         System.out.println(contentChangeOfBob);
         System.out.println(dirtyCls2ChangeContentOfAlice);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
         carl.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         carl.bot().editor(CLS2_SUFFIX)
-            .waitUntilContentSame(dirtyCls2ChangeContentOfAlice);
+            .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
         String contentOfCarl = carl.bot().editor(CLS2_SUFFIX).getText();
         assertTrue(contentOfCarl.equals(dirtyCls2ChangeContentOfAlice));
-        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeAndSave();
+        carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
     }
 
     /**
@@ -227,21 +227,21 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testCloseDirtyFileByAlice() throws RemoteException,
         IOException, CoreException {
-        String clsConentofBob = bob.editor
-            .getClassContent(PROJECT1, PKG1, CLS1);
+        String clsConentofBob = bob.noBot()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
-        String clsConentOfAlice = alice.editor.getClassContent(PROJECT1, PKG1,
-            CLS1);
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        String clsConentOfAlice = alice.noBot().getFileContent(getClassPath(PROJECT1, PKG1,
+            CLS1));
 
         dave.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        dave.editor.waitUntilClassContentsSame(PROJECT1, PKG1, CLS1,
-            clsConentOfAlice);
-        assertFalse(dave.bot().editor(CLS1_SUFFIX).isFileDirty());
+        dave.noBot().waitUntilFileContentSame(
+            clsConentOfAlice, getClassPath(PROJECT1, PKG1, CLS1));
+        assertFalse(dave.bot().editor(CLS1_SUFFIX).isDirty());
 
         edna.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        edna.bot().editor(CLS1_SUFFIX).waitUntilContentSame(clsConentOfAlice);
-        assertFalse(edna.bot().editor(CLS1_SUFFIX).isFileDirty());
+        edna.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(clsConentOfAlice);
+        assertFalse(edna.bot().editor(CLS1_SUFFIX).isDirty());
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         String clsContentChangeOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
@@ -251,6 +251,6 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         String clsContentChangeOfCarl = carl.bot().editor(CLS1_SUFFIX)
             .getText();
         assertTrue(clsContentChangeOfCarl.equals(clsConentOfAlice));
-        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
     }
 }

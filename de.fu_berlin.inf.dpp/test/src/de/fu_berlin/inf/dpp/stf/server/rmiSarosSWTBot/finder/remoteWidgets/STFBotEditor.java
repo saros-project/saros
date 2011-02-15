@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -67,7 +65,9 @@ public interface STFBotEditor extends EclipseComponent {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void closeAndSave() throws RemoteException;
+    public void closeWithSave() throws RemoteException;
+
+    public void save() throws RemoteException;
 
     /**
      * close the editor without saving it. The editor must belong to this
@@ -81,17 +81,6 @@ public interface STFBotEditor extends EclipseComponent {
      * @throws RemoteException
      */
     public void closeWithoutSave() throws RemoteException;
-
-    /**
-     * if you try to close a editor which is dirty, you will get this popup
-     * window.
-     * 
-     * @param buttonType
-     *            YES or NO
-     * @throws RemoteException
-     */
-    public void confirmShellSaveSource(String buttonType)
-        throws RemoteException;
 
     /**********************************************
      * 
@@ -131,84 +120,6 @@ public interface STFBotEditor extends EclipseComponent {
 
     public boolean isActive() throws RemoteException;
 
-    /**
-     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
-     * file, which is modified by another peer (e.g. Alice). Because of data
-     * transfer delay Bob need to wait a minute to see the changes . So it will
-     * be a good idea that you give bob some time before you compare the two
-     * files from Alice and Bob.
-     * 
-     * <p>
-     * <b>Note:</b> the mothod is different from
-     * {@link STFBotEditor#waitUntilEditorContentSame(String, String...)}, which
-     * compare the contents which may be dirty.
-     * </p>
-     * 
-     * @param otherFileContent
-     *            the file content of another peer, with which you want to
-     *            compare your file content.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
-     */
-    public void waitUntilFileContentSame(String otherFileContent,
-        String... fileNodes) throws RemoteException;
-
-    /**
-     * 
-     * @param otherClassContent
-     *            the class content of another peer, with which you want to
-     *            compare your class content.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * 
-     * @throws RemoteException
-     * @see STFBotEditor#waitUntilFileContentSame(String, String...)
-     */
-    public void waitUntilClassContentsSame(String projectName, String pkg,
-        String className, String otherClassContent) throws RemoteException;
-
-    /**
-     * 
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
-     * @return only the saved content of the specified file, if it is dirty.
-     *         This method is different from
-     *         {@link STFBotEditor#getTextOfEditor(String...)}, which can return
-     *         a not saved content.
-     * @throws RemoteException
-     * @throws IOException
-     * @throws CoreException
-     */
-    public String getFileContent(String... fileNodes) throws RemoteException,
-        IOException, CoreException;
-
-    /**
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @return only the saved content of the specified class file, if it is
-     *         dirty. This method is different from
-     *         {@link STFBotEditor#getTextOfJavaEditor(String, String, String)}
-     *         , which can return a not saved content.
-     * @throws RemoteException
-     * @throws IOException
-     * @throws CoreException
-     */
-    public String getClassContent(String projectName, String pkg,
-        String className) throws RemoteException, IOException, CoreException;
-
     /**********************************************
      * 
      * set contents of a editor
@@ -226,7 +137,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @throws RemoteException
      */
-    public void setTextAndSave(String contentPath) throws RemoteException;
+    public void setTexWithSave(String contentPath) throws RemoteException;
 
     /**
      * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
@@ -247,7 +158,7 @@ public interface STFBotEditor extends EclipseComponent {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      */
-    public void waitUntilContentSame(String otherClassContent)
+    public void waitUntilIsTextSame(String otherClassContent)
         throws RemoteException;
 
     /**
@@ -292,27 +203,13 @@ public interface STFBotEditor extends EclipseComponent {
      *         saving, and <code>false</code> if they have not changed since the
      *         last save.
      */
-    public boolean isFileDirty() throws RemoteException;
+    public boolean isDirty() throws RemoteException;
 
     /**********************************************
      * 
      * infos about debug
      * 
      **********************************************/
-    /**
-     * set break point.
-     * 
-     * @param line
-     *            the line number, 0 based.
-     * @param projectName
-     *            name of the java project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg
-     * @param className
-     *            name of the class without suffix, e.g. MyClass
-     * @throws RemoteException
-     */
-    public void setBreakPoint(int line) throws RemoteException;
 
     /**
      * Changes the cursor position in editor.

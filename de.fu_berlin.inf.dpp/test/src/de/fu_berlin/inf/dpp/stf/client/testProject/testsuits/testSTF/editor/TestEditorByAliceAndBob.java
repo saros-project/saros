@@ -21,7 +21,7 @@ public class TestEditorByAliceAndBob extends STFTest {
         setUpSaros();
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         if (alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA))
-            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+            alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
@@ -35,7 +35,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     public void isJavaEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
@@ -49,7 +49,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     public void isEditorOpen() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeAndSave();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA));
     }
 

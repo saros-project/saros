@@ -31,6 +31,9 @@ public interface STFBot extends EclipseComponent {
      * Widget shell
      * 
      **********************************************/
+
+    public void closeAllShells() throws RemoteException;
+
     /**
      * 
      * @see SWTBot#shell(String)
