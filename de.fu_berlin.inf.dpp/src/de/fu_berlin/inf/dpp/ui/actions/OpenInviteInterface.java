@@ -39,7 +39,7 @@ public class OpenInviteInterface extends Action {
         this.sessionManager = sessionManager;
 
         setImageDescriptor(SarosUI
-            .getImageDescriptor("/icons/elcl16/inv_wiz.png"));
+            .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
         setToolTipText("Open invitation interface");
 
         sessionManager.addSarosSessionListener(sessionListener);

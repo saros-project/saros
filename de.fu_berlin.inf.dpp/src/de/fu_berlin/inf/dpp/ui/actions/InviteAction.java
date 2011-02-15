@@ -87,7 +87,7 @@ public class InviteAction extends SelectionProviderAction {
         setToolTipText("Invites the selected buddies to a Saros session. A new session will be started if none exists.");
 
         setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/elcl16/inv_wiz.png"));
+            .getImageDescriptor("icons/elcl16/project_share_tsk.png"));
 
         this.sessionManager = sessionManager;
         this.saros = saros;
