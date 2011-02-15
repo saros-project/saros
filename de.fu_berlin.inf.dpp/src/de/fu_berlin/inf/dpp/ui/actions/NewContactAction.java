@@ -41,9 +41,9 @@ public class NewContactAction extends Action {
     protected Saros saros;
 
     public NewContactAction(Saros saros) {
-        setToolTipText("Add a new buddy");
+        setToolTipText("Add a New Buddy");
         setImageDescriptor(SarosUI
-            .getImageDescriptor("/icons/elcl16/addcontact.png"));
+            .getImageDescriptor("/icons/elcl16/buddy_add_tsk.png"));
 
         this.saros = saros;
 
