@@ -19,11 +19,14 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
 public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
 
     private static transient STFWorkbenchBotImp self;
+
+    private static STFBotViewImp view;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -32,6 +35,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
         if (self != null)
             return self;
         self = new STFWorkbenchBotImp();
+        view = STFBotViewImp.getInstance();
 
         return self;
     }
@@ -43,8 +47,8 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      **********************************************/
     public STFBotView view(String viewTitle) throws RemoteException {
         new SWTWorkbenchBot();
-        stfView.setViewTitle(viewTitle);
-        return stfView;
+        view.setViewTitle(viewTitle);
+        return view;
     }
 
     public void openViewById(final String viewId) throws RemoteException {
@@ -86,8 +90,8 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     }
 
     public STFBotView viewById(String id) throws RemoteException {
-        stfView.setId(id);
-        return stfView;
+        view.setId(id);
+        return view;
     }
 
     public STFBotView activeView() throws RemoteException {

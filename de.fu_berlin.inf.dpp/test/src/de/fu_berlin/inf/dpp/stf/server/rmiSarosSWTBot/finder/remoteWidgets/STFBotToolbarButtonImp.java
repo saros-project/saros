@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
@@ -12,15 +13,21 @@ public class STFBotToolbarButtonImp extends EclipseComponentImp implements
     STFBotToolbarButton {
 
     private static transient STFBotToolbarButtonImp ToolbarButtonImp;
+    private SWTBotToolbarButton toolbarButton;
 
     /**
-     * {@link STFBotToolbarButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotToolbarButtonImp} is a singleton, but inheritance is
+     * possible.
      */
     public static STFBotToolbarButtonImp getInstance() {
         if (ToolbarButtonImp != null)
             return ToolbarButtonImp;
         ToolbarButtonImp = new STFBotToolbarButtonImp();
         return ToolbarButtonImp;
+    }
+
+    public void setSwtBotToolbarButton(SWTBotToolbarButton toolbarButton) {
+        this.toolbarButton = toolbarButton;
     }
 
     /**************************************************************

@@ -44,16 +44,37 @@ public interface STFBotView extends EclipseComponent {
      */
     public void close() throws RemoteException;
 
-    /**
-     * close the given view specified with the viewId.
-     * 
-     * @param viewId
-     *            the id of the view, which you want to close.
-     */
-    public void closeById(final String viewId) throws RemoteException;
+    // /**
+    // * close the given view specified with the viewId.
+    // *
+    // * @param viewId
+    // * the id of the view, which you want to close.
+    // */
+    // public void closeById(final String viewId) throws RemoteException;
 
     public void setViewTitle(String title) throws RemoteException;
 
     public STFBot bot_() throws RemoteException;
+
+    public STFBotViewMenu menu(String label) throws RemoteException;
+
+    public STFBotViewMenu menu(String label, int index) throws RemoteException;
+
+    public STFBotToolbarButton toolbarButton(String tooltip)
+        throws RemoteException;
+
+    public STFBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
+        throws RemoteException;
+
+    public STFBotToolbarRadioButton toolbarRadioButton(String tooltip)
+        throws RemoteException;
+
+    public STFBotToolbarPushButton toolbarPushButton(String tooltip)
+        throws RemoteException;
+
+    public STFBotToolbarToggleButton toolbarToggleButton(String tooltip)
+        throws RemoteException;
+
+    public String getTitle() throws RemoteException;
 
 }

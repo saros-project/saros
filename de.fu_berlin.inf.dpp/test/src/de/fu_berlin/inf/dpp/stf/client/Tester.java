@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
@@ -64,7 +63,7 @@ public class Tester extends STF {
     public STFBotButton button;
     public STFBotToolbarButton toolbarButton;
     public STFBotShell shell;
-    public STFBotView view;
+    // public STFBotView view;
     public STFBotMenu menu;
     public STFBotLabel label;
     public STFBotText text;
@@ -136,7 +135,7 @@ public class Tester extends STF {
             toolbarButton = (STFBotToolbarButton) registry
                 .lookup("toolbarButton");
             menu = (STFBotMenu) registry.lookup("menu");
-            view = (STFBotView) registry.lookup("view");
+            // view = (STFBotView) registry.lookup("view");
             label = (STFBotLabel) registry.lookup("label");
             text = (STFBotText) registry.lookup("text");
             list = (STFBotList) registry.lookup("list");

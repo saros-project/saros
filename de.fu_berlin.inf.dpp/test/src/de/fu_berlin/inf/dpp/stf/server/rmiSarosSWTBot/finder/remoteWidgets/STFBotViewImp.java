@@ -2,16 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
@@ -65,10 +64,66 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
      * 
      **************************************************************/
 
+    /**********************************************
+     * 
+     * Finders
+     * 
+     **********************************************/
     public STFBot bot_() {
         STFBotImp botImp = STFBotImp.getInstance();
         botImp.setBot(bot.viewByTitle(viewTitle).bot());
         return botImp;
+    }
+
+    public STFBotViewMenu menu(String label) throws RemoteException {
+        SWTBotViewMenu viewMenu = swtbotView.menu(label);
+        stfViewMenu.setSwtBotViewMenu(viewMenu);
+        return stfViewMenu;
+    }
+
+    public STFBotViewMenu menu(String label, int index) throws RemoteException {
+        SWTBotViewMenu viewMenu = swtbotView.menu(label, index);
+        stfViewMenu.setSwtBotViewMenu(viewMenu);
+        return stfViewMenu;
+    }
+
+    public STFBotToolbarButton toolbarButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarButton toolbarButton = swtbotView.toolbarButton(tooltip);
+        stfToolbarButton.setSwtBotToolbarButton(toolbarButton);
+        return stfToolbarButton;
+    }
+
+    public STFBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarDropDownButton toolbarButton = swtbotView
+            .toolbarDropDownButton(tooltip);
+        stfToolbarDropDownButton.setSwtBotToolbarDropDownButton(toolbarButton);
+        return stfToolbarDropDownButton;
+    }
+
+    public STFBotToolbarRadioButton toolbarRadioButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarRadioButton toolbarButton = swtbotView
+            .toolbarRadioButton(tooltip);
+        stfToolbarRadioButton.setSwtBotToolbarRadioButton(toolbarButton);
+        return stfToolbarRadioButton;
+    }
+
+    public STFBotToolbarPushButton toolbarPushButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarPushButton toolbarButton = swtbotView
+            .toolbarPushButton(tooltip);
+        stfToolbarPushButton.setSwtBotToolbarPushButton(toolbarButton);
+        return stfToolbarPushButton;
+    }
+
+    public STFBotToolbarToggleButton toolbarToggleButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarToggleButton toolbarButton = swtbotView
+            .toolbarToggleButton(tooltip);
+        stfToolbarToggleButton.setSwtBotToolbarToggleButton(toolbarButton);
+        return stfToolbarToggleButton;
     }
 
     /**********************************************
@@ -78,38 +133,25 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
      **********************************************/
 
     public void close() throws RemoteException {
-        bot.viewByTitle(viewTitle).close();
-    }
-
-    public void closeById(final String viewId) throws RemoteException {
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                final IWorkbench wb = PlatformUI.getWorkbench();
-                final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-                IWorkbenchPage page = win.getActivePage();
-                final IViewPart view = page.findView(viewId);
-                if (view != null) {
-                    page.hideView(view);
-                }
-            }
-        });
+        swtbotView.close();
     }
 
     public void setFocus() throws RemoteException {
-        try {
-            bot.viewByTitle(viewTitle).setFocus();
-            waitUntilIsActive();
-        } catch (WidgetNotFoundException e) {
-            log.warn("view not found '" + viewTitle + "'", e);
-        }
+        swtbotView.setFocus();
+        waitUntilIsActive();
     }
 
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public boolean isActive() throws RemoteException {
-        try {
-            return bot.activeView().getTitle().equals(viewTitle);
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
+        return swtbotView.isActive();
+    }
+
+    public String getTitle() throws RemoteException {
+        return swtbotView.getTitle();
     }
 
     /**********************************************
@@ -118,7 +160,16 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
      * 
      **********************************************/
     public void waitUntilIsActive() throws RemoteException {
-        waitUntil(SarosConditions.isViewActive(bot, viewTitle));
+
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isActive();
+            }
+
+            public String getFailureMessage() {
+                return "Can't activate this view.";
+            }
+        });
     }
 
     /**************************************************************

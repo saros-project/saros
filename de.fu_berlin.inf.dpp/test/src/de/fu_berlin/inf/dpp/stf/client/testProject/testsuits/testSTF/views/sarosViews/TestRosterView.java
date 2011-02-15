@@ -45,7 +45,7 @@ public class TestRosterView extends STFTest {
 
     @Test
     public void openCloseRosterView() throws RemoteException {
-        alice.view.closeById(VIEW_SAROS_BUDDIES_ID);
+        alice.bot().view(VIEW_SAROS_BUDDIES).close();
         assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
         alice.bot().openViewById(VIEW_SAROS_BUDDIES_ID);
         assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
@@ -58,9 +58,8 @@ public class TestRosterView extends STFTest {
         assertTrue(view_buddies.isActive());
         view_buddies.close();
         assertFalse(view_buddies.isActive());
-
         alice.bot().openViewById(VIEW_SAROS_BUDDIES_ID);
-        assertTrue(view_buddies.isActive());
+        assertTrue(alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
         alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         assertFalse(alice.bot().view(VIEW_SAROS_BUDDIES).isActive());
     }

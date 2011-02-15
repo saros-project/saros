@@ -25,7 +25,7 @@ public class TestBasicSarosElements extends STFTest {
 
     @Test
     public void testSessionView() throws RemoteException {
-        alice.view.closeById(VIEW_SAROS_SESSION_ID);
+        alice.bot().view(VIEW_SAROS_SESSION).close();
         assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_SESSION));
         alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
         alice.workbench.captureScreenshot((alice.workbench

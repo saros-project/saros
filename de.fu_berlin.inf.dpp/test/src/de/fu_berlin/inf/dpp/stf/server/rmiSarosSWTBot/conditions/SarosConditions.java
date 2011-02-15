@@ -67,10 +67,6 @@ public class SarosConditions extends Conditions {
         return new IsShellClosed(shell);
     }
 
-    public static ICondition isViewActive(SWTWorkbenchBot bot, String name) {
-        return new IsViewActive(bot, name);
-    }
-
     public static ICondition isNotInSVN(String projectName) {
         return new IsNotInSVN(projectName);
     }

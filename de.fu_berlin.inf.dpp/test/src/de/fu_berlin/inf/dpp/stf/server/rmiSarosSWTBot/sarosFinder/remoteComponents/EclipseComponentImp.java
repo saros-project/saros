@@ -26,7 +26,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
@@ -34,14 +33,16 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspectiveImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarPushButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarRadioButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarToggleButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewMenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
@@ -63,12 +64,24 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         .getLogger(EclipseComponentImp.class);
 
     // simple widgets
+
+    public static STFBotViewMenuImp stfViewMenu = STFBotViewMenuImp
+        .getInstance();
+    public static STFBotToolbarDropDownButtonImp stfToolbarDropDownButton = STFBotToolbarDropDownButtonImp
+        .getInstance();
+    public static STFBotToolbarPushButtonImp stfToolbarPushButton = STFBotToolbarPushButtonImp
+        .getInstance();
+    public static STFBotToolbarRadioButtonImp stfToolbarRadioButton = STFBotToolbarRadioButtonImp
+        .getInstance();
+    public static STFBotToolbarToggleButtonImp stfToolbarToggleButton = STFBotToolbarToggleButtonImp
+        .getInstance();
+
     public static STFBotTableImp stfTable = STFBotTableImp.getInstance();
     public static STFBotTreeImp stfTree = STFBotTreeImp.getInstance();
-    public static STFBotButtonImp stfButton = STFBotButtonImp.getInstance();
+    // public static STFBotButtonImp stfButton = STFBotButtonImp.getInstance();
     public static STFBotToolbarButtonImp stfToolbarButton = STFBotToolbarButtonImp
         .getInstance();
-    public static STFBotViewImp stfView = STFBotViewImp.getInstance();
+    // public static STFBotViewImp stfView = STFBotViewImp.getInstance();
     public static STFBotPerspectiveImp stfPerspective = STFBotPerspectiveImp
         .getInstance();
     public static STFBotMenuImp stfMenu = STFBotMenuImp.getInstance();
@@ -76,7 +89,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static STFBotStyledTextImp stfStyledText = STFBotStyledTextImp
         .getInstance();
     public static STFBotTextImp stfText = STFBotTextImp.getInstance();
-    public static STFBotShell stfShell = STFBotShellImp.getInstance();
+    // public static STFBotShell stfShell = STFBotShellImp.getInstance();
     public static STFBotEditorImp stfEditor = STFBotEditorImp.getInstance();
     public static STFBotListImp stfList = STFBotListImp.getInstance();
 
