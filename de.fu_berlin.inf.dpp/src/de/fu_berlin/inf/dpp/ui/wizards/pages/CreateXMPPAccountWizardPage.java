@@ -36,14 +36,14 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Utils;
 
-public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
+public class CreateXMPPAccountWizardPage extends WizardPage implements IWizardPage2 {
 
     private static final Logger log = Logger
-        .getLogger(RegisterAccountPage.class.getName());
+        .getLogger(CreateXMPPAccountWizardPage.class.getName());
 
     public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/InstallUsing#Using_Public_XMPP_Servers";
 
@@ -80,7 +80,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
      *            default value for activating this account
      * @param preferenceUtils
      */
-    public RegisterAccountPage(Saros saros, boolean createAccount,
+    public CreateXMPPAccountWizardPage(Saros saros, boolean createAccount,
         boolean showUseNowButton, boolean useNow,
         PreferenceUtils preferenceUtils) {
 
@@ -213,7 +213,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             Shell shell = new Shell(this.getShell());
             shell.setLocation(loc.x - 250, loc.y - 50);
 
-            CreateAccountWizard wizard = new CreateAccountWizard(saros,
+            CreateXMPPAccountWizard wizard = new CreateXMPPAccountWizard(saros,
                 preferenceUtils, true, false, false);
             WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.create();

@@ -19,13 +19,13 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
  * 
  * @author rdjemili
  */
-public class GeneralSettingsPage extends WizardPage implements IWizardPage2 {
+public class GeneralSettingsWizardPage extends WizardPage implements IWizardPage2 {
 
     protected final Saros saros;
 
     protected PreferenceUtils preferenceUtils;
 
-    public GeneralSettingsPage(Saros saros, PreferenceUtils preferenceUtils) {
+    public GeneralSettingsWizardPage(Saros saros, PreferenceUtils preferenceUtils) {
         super("general settings");
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;

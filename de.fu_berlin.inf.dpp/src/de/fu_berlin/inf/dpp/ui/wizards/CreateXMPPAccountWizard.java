@@ -24,7 +24,7 @@ import org.eclipse.jface.wizard.Wizard;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.RegisterAccountPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
 /**
  * An wizard that is used to create XMPP accounts.
@@ -32,13 +32,13 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.RegisterAccountPage;
  * @author rdjemili
  * @author coezbek
  */
-public class CreateAccountWizard extends Wizard {
+public class CreateXMPPAccountWizard extends Wizard {
 
-    public final RegisterAccountPage page;
+    public final CreateXMPPAccountWizardPage page;
 
     protected final Saros saros;
 
-    public CreateAccountWizard(Saros saros, PreferenceUtils preferenceUtils,
+    public CreateXMPPAccountWizard(Saros saros, PreferenceUtils preferenceUtils,
         boolean createAccount, boolean showUseNowButton, boolean useNowDefault) {
 
         if (createAccount) {
@@ -46,7 +46,7 @@ public class CreateAccountWizard extends Wizard {
         } else {
             setWindowTitle("Enter User Account");
         }
-        this.page = new RegisterAccountPage(saros, createAccount,
+        this.page = new CreateXMPPAccountWizardPage(saros, createAccount,
             showUseNowButton, useNowDefault, preferenceUtils);
         setNeedsProgressMonitor(true);
         setHelpAvailable(false);

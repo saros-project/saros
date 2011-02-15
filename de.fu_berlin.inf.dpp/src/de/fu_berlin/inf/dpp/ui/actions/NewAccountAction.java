@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "ui")
@@ -73,7 +73,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     public void runNewAccount() {
         Shell shell = this.window.getShell();
-        WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(saros, preferenceUtils, true, true, false));
+        WizardDialog wd = new WizardDialog(shell, new CreateXMPPAccountWizard(saros, preferenceUtils, true, true, false));
         wd.setHelpAvailable(false);
         // open() blocks until the user closed the dialog
         wd.open();

@@ -31,9 +31,9 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AllowStatisticSubmissionPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.RegisterAccountPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic
@@ -76,9 +76,9 @@ public class ConfigurationWizard extends Wizard {
         Saros.injectDependenciesOnly(this);
 
         if (askForAccount) {
-            this.pages.add(new RegisterAccountPage(saros, false,
+            this.pages.add(new CreateXMPPAccountWizardPage(saros, false,
                 showUseNowButton, !showUseNowButton, preferenceUtils));
-            this.pages.add(new GeneralSettingsPage(saros, preferenceUtils));
+            this.pages.add(new GeneralSettingsWizardPage(saros, preferenceUtils));
         }
         if (askAboutStatisticSubmission) {
             this.pages.add(new AllowStatisticSubmissionPage(statisticManager,
