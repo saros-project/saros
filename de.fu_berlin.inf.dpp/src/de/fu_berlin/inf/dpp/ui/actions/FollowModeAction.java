@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -131,7 +131,7 @@ public class FollowModeAction extends Action implements Disposable {
         this.sessionManager = sessionManager;
         this.editorManager = editorManager;
 
-        setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
+        setImageDescriptor(ImageManager.getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/disable follow mode");
         setId(ACTION_ID);
 

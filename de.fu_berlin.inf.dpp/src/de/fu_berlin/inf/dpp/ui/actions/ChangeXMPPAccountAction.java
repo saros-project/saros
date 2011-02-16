@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -141,27 +141,27 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             switch (state) {
             case CONNECTED:
                 setText("Disconnect");
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("/icons/elcl16/connect.png"));
                 break;
             case CONNECTING:
                 setText("Connecting");
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("/icons/elcl16/connecting.png"));
                 break;
             case ERROR:
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("/icons/elcl16/conn_err.png"));
                 break;
             case NOT_CONNECTED:
                 setText("Connect");
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("/icons/elcl16/disconnected.png"));
                 break;
             case DISCONNECTING:
             default:
                 setText("Disconnecting");
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("/icons/elcl16/disconnecting.png"));
                 break;
             }

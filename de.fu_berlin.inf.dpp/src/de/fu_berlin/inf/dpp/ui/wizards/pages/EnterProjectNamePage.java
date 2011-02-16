@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -136,7 +136,7 @@ public class EnterProjectNamePage extends WizardPage {
         case JINGLETCP:
         case JINGLEUDP:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/jingle.png"));
             break;
         case SOCKS5_MEDIATED:
@@ -146,13 +146,13 @@ public class EnterProjectNamePage extends WizardPage {
             else
                 setDescription("Attention: direct file transfer connections with SOCKS5 protocol are deactivated.\n"
                     + "To activate uncheck 'Disable local file transfer proxy for direct connections'.");
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
         case SOCKS5:
         case SOCKS5_DIRECT:
             setDescription("Direct file transfer connection with SOCKS5 protocol available.\nThis means that sharing a project from scratch will be fast.");
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5.png"));
             break;
         case UNKNOWN:
@@ -168,7 +168,7 @@ public class EnterProjectNamePage extends WizardPage {
                     + '\n'
                     + "Suggestions: Update an existing project or copy resources from another project.");
             }
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/ibb.png"));
         }
     }

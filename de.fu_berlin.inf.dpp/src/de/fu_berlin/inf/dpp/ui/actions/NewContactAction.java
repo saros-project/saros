@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -42,7 +42,7 @@ public class NewContactAction extends Action {
 
     public NewContactAction(Saros saros) {
         setToolTipText("Add a New Buddy");
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("/icons/elcl16/buddy_add_tsk.png"));
 
         this.saros = saros;

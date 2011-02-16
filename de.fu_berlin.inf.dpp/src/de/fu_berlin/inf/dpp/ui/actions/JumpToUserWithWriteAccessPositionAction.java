@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -37,7 +37,7 @@ public class JumpToUserWithWriteAccessPositionAction extends SelectionProviderAc
         super(provider, "Jump to position of selected buddy");
 
         setToolTipText("Jump to position of selected buddy");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/elcl16/jump.png"));
+        setImageDescriptor(ImageManager.getImageDescriptor("icons/elcl16/jump.png"));
 
         this.saros = saros;
         this.editorManager = editorManager;

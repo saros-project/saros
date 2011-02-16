@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -58,7 +59,7 @@ public class GiveWriteAccessAction extends SelectionProviderAction {
 
     public GiveWriteAccessAction(ISelectionProvider provider) {
         super(provider, "Grant write access");
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/grantwriteaccess.png"));
         setToolTipText("Grant write access to this buddy");
 

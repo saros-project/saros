@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -81,7 +82,7 @@ public class RestrictInviteesToReadOnlyAccessAction extends Action {
         super("Restrict invitees to read-only access");
         this.sessionManager = sessionManager;
 
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/restrictinviteestoreadonlyaccess.png"));
         setToolTipText("Restrict Invitees To Read-Only Access");
         setId(ACTION_ID);

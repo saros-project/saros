@@ -25,8 +25,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class MessagingAction extends SelectionProviderAction {
 
@@ -43,7 +43,7 @@ public class MessagingAction extends SelectionProviderAction {
         selectionChanged((IStructuredSelection) provider.getSelection());
 
         setToolTipText("Start a IM session with this buddy");
-        setImageDescriptor(SarosUI.getImageDescriptor("XXX")); // please read
+        setImageDescriptor(ImageManager.getImageDescriptor("XXX")); // please read
                                                                // http://wiki.eclipse.org/User_Interface_Guidelines#Naming_Conventions
                                                                // for correct
                                                                // naming of icon

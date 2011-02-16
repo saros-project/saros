@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AllowStatisticSubmissionPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
@@ -66,7 +66,7 @@ public class ConfigurationWizard extends Wizard {
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
-        setDefaultPageImageDescriptor(SarosUI
+        setDefaultPageImageDescriptor(ImageManager
             .getImageDescriptor("icons/wizban/conf.png"));
 
         /*

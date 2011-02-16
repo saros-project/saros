@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -53,7 +53,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     private static final Logger log = Logger
         .getLogger(SharedProjectDecorator.class.getName());
 
-    public static final ImageDescriptor projectDescriptor = SarosUI
+    public static final ImageDescriptor projectDescriptor = ImageManager
         .getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
 
     protected ISarosSession sarosSession;

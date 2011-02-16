@@ -12,8 +12,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -40,7 +40,7 @@ public class SkypeAction extends SelectionProviderAction {
         setEnabled(false);
 
         setToolTipText("Start a Skype-VoIP session with this buddy");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/telephone.png"));
+        setImageDescriptor(ImageManager.getImageDescriptor("icons/telephone.png"));
     }
 
     /**

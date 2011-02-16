@@ -47,8 +47,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -86,7 +86,7 @@ public class InviteAction extends SelectionProviderAction {
         super(provider, "Invite buddy...");
         setToolTipText("Invites the selected buddies to a Saros session. A new session will be started if none exists.");
 
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/project_share_tsk.png"));
 
         this.sessionManager = sessionManager;

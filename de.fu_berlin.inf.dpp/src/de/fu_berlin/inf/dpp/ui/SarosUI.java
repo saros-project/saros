@@ -28,21 +28,15 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -71,44 +65,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
-
-    public static ImageDescriptor OVERLAY_FOLLOWMODE = getImageDescriptor("icons/ovr16/followmode.png");
-    public static ImageDescriptor OVERLAY_READONLY = getImageDescriptor("icons/ovr16/readonly.png");
-    public static ImageDescriptor OVERLAY_AWAY = getImageDescriptor("icons/ovr16/away.png");
-
-    public static ImageDescriptor WIZBAN_ADD_BUDDY = getImageDescriptor("icons/wizban/buddy_add_wiz.gif");
-    public static ImageDescriptor WIZBAN_SHARE_PROJECT_OUTGOING = getImageDescriptor("icons/wizban/share_project_outgoing_wiz.gif");
-    public static ImageDescriptor WIZBAN_SHARE_PROJECT_INCOMING = getImageDescriptor("icons/wizban/share_project_incoming_wiz.gif");
-
-    public static Image ICON_GROUP = getImage("icons/obj16/group_obj.png");
-    public static Image ICON_BUDDY = getImage("icons/obj16/buddy_obj.png");
-    public static Image ICON_BUDDY_OFFLINE = getImage("icons/obj16/buddy_offline_obj.png");
-    public static Image ICON_BUDDY_AWAY = new DecorationOverlayIcon(ICON_BUDDY,
-        OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
-    public static Image ICON_BUDDY_SAROS = getImage("icons/obj16/buddy_saros_obj.png");
-
-    public static Image ICON_BUDDY_SAROS_FOLLOWMODE = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS, OVERLAY_FOLLOWMODE, IDecoration.TOP_LEFT)
-        .createImage();
-    public static Image ICON_BUDDY_SAROS_FOLLOWMODE_READONLY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS_FOLLOWMODE, OVERLAY_READONLY, IDecoration.BOTTOM_RIGHT)
-        .createImage();
-    public static Image ICON_BUDDY_SAROS_FOLLOWMODE_READONLY_AWAY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS_FOLLOWMODE_READONLY, OVERLAY_AWAY,
-        IDecoration.TOP_RIGHT).createImage();
-    public static Image ICON_BUDDY_SAROS_FOLLOWMODE_AWAY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS_FOLLOWMODE, OVERLAY_AWAY, IDecoration.TOP_RIGHT)
-        .createImage();
-
-    public static Image ICON_BUDDY_SAROS_READONLY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS, OVERLAY_READONLY, IDecoration.BOTTOM_RIGHT)
-        .createImage();
-    public static Image ICON_BUDDY_SAROS_READONLY_AWAY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS_READONLY, OVERLAY_AWAY, IDecoration.TOP_RIGHT)
-        .createImage();
-
-    public static Image ICON_BUDDY_SAROS_AWAY = new DecorationOverlayIcon(
-        ICON_BUDDY_SAROS, OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
 
     private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
 
@@ -314,24 +270,6 @@ public class SarosUI {
         label.setText(text);
 
         return composite;
-    }
-
-    public static Image getImage(String path) {
-        return new Image(Display.getDefault(), SarosUI.getImageDescriptor(path)
-            .getImageData());
-    }
-
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path.
-     * 
-     * @param path
-     *            the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(
-            "de.fu_berlin.inf.dpp", path);
     }
 
     /**

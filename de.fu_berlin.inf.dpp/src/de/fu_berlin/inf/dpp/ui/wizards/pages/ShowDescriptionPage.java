@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -30,7 +30,7 @@ public class ShowDescriptionPage extends WizardPage {
         setTitle("Session Invitation");
         setDescription("You have been invited to join a Saros session."
             + " Click next if you want to accept the invitation.");
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/wizban/invitation.png"));
 
         /*

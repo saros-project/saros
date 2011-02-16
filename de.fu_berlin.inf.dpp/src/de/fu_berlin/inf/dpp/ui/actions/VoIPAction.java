@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
@@ -150,22 +150,22 @@ public class VoIPAction extends Action {
     protected void changeButton() {
         switch (audioServiceManager.getStatus()) {
         case RUNNING:
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/stopvoip.png"));
             setToolTipText("Stop VoIP Session...");
             break;
         case STOPPED:
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/stoppedvoip.png"));
             setToolTipText("Start a VoIP Session...");
             break;
         case STOPPING:
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/stoppingvoip.png"));
             setToolTipText("Stop VoIP Session...");
             break;
         default:
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/startvoip.png"));
             setToolTipText("Start a VoIP Session...");
             break;

@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.model.CheckBoxTreeElement;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 
@@ -80,14 +80,14 @@ public class RosterEntryElement extends CheckBoxTreeElement {
 
         if (presence.isAvailable()) {
             if (presence.isAway()) {
-                return sarosSupported ? SarosUI.ICON_BUDDY_SAROS_AWAY
-                    : SarosUI.ICON_BUDDY_AWAY;
+                return sarosSupported ? ImageManager.ICON_BUDDY_SAROS_AWAY
+                    : ImageManager.ICON_BUDDY_AWAY;
             } else {
-                return sarosSupported ? SarosUI.ICON_BUDDY_SAROS
-                    : SarosUI.ICON_BUDDY;
+                return sarosSupported ? ImageManager.ICON_BUDDY_SAROS
+                    : ImageManager.ICON_BUDDY;
             }
         } else {
-            return SarosUI.ICON_BUDDY_OFFLINE;
+            return ImageManager.ICON_BUDDY_OFFLINE;
         }
     }
 

@@ -11,7 +11,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.model.CheckBoxTreeElement;
 
 /**
@@ -36,7 +36,7 @@ public class RosterGroupElement extends CheckBoxTreeElement {
 
     @Override
     public Image getImage() {
-        return SarosUI.ICON_GROUP;
+        return ImageManager.ICON_GROUP;
     }
 
     @Override

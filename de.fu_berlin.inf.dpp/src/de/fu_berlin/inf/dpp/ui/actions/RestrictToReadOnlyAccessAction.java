@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -57,7 +58,7 @@ public class RestrictToReadOnlyAccessAction extends SelectionProviderAction {
         super(provider, "Restrict to read-only access");
         this.sessionManager = sessionManager;
 
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/restricttoreadonlyaccess.png"));
 
         setToolTipText("Restrict To Read-Only Access");

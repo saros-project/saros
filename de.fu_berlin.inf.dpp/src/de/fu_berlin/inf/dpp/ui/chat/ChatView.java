@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
@@ -57,13 +57,13 @@ public class ChatView extends SimpleExplanatoryViewPart {
     /**
      * Default image for ChatView.
      */
-    public static final Image chatViewImage = SarosUI
+    public static final Image chatViewImage = ImageManager
         .getImage("icons/view16/chat_misc.png");
 
     /**
      * Image while composing a message.
      */
-    public static final Image composingImage = SarosUI
+    public static final Image composingImage = ImageManager
         .getImage("icons/view16/cmpsg_misc.png");
 
     protected SimpleExplanation howtoExplanation = new SimpleExplanation(

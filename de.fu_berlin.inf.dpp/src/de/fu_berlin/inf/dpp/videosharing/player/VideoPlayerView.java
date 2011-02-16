@@ -65,7 +65,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
@@ -342,7 +342,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         public ChangeSourceModeAction() {
             setToolTipText("Change mode of image source");
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/chvdsrc.png"));
 
             videoSharingSessionObservable
@@ -407,7 +407,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     class PauseVideoSessionAction extends Action {
 
         public PauseVideoSessionAction() {
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/pausevideo.gif"));
             setToolTipText("Pause");
             setEnabled(false);
@@ -443,16 +443,16 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             setEnabled(enabled);
             if (enabled && session != null) {
                 if (session.isPaused()) {
-                    setImageDescriptor(SarosUI
+                    setImageDescriptor(ImageManager
                         .getImageDescriptor("icons/elcl16/resumevideo.gif"));
                     setToolTipText("Resume");
                 } else {
-                    setImageDescriptor(SarosUI
+                    setImageDescriptor(ImageManager
                         .getImageDescriptor("icons/elcl16/pausevideo.gif"));
                     setToolTipText("Pause");
                 }
             } else {
-                setImageDescriptor(SarosUI
+                setImageDescriptor(ImageManager
                     .getImageDescriptor("icons/elcl16/pausevideo.gif"));
                 setToolTipText(null);
             }

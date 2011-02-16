@@ -82,13 +82,13 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         + " any effect until you rejoin the session (restart if you're the creator).";
 
     // icons
-    public static final Image ADD_IMAGE = SarosUI
+    public static final Image ADD_IMAGE = ImageManager
         .getImage("icons/btn/addaccount.png");
-    public static final Image ACTIVATE_IMAGE = SarosUI
+    public static final Image ACTIVATE_IMAGE = ImageManager
         .getImage("icons/btn/activateaccount.png");
-    public static final Image DELETE_IMAGE = SarosUI
+    public static final Image DELETE_IMAGE = ImageManager
         .getImage("icons/btn/deleteaccount.png");
-    public static final Image CHANGE_IMAGE = SarosUI
+    public static final Image CHANGE_IMAGE = ImageManager
         .getImage("icons/btn/changeaccount.png");
 
     @Inject

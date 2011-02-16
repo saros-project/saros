@@ -6,7 +6,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 
 public class IMBeepAction extends Action {
     public IMBeepAction(String text) {
@@ -42,10 +42,10 @@ public class IMBeepAction extends Action {
 
     public void updateIcon() {
         if (this.isOn()) {
-            this.setImageDescriptor(SarosUI
+            this.setImageDescriptor(ImageManager
                 .getImageDescriptor("/icons/elcl16/speakeron.png"));
         } else {
-            this.setImageDescriptor(SarosUI
+            this.setImageDescriptor(ImageManager
                 .getImageDescriptor("/icons/elcl16/speakeroff.png"));
         }
     }

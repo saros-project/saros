@@ -104,13 +104,13 @@ public class SessionView extends ListExplanatoryViewPart {
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
 
-    public static final Image awayImage = SarosUI
+    public static final Image awayImage = ImageManager
         .getImage("icons/elcl16/away.png");
-    public static final Image userImage = SarosUI
+    public static final Image userImage = ImageManager
         .getImage("icons/obj16/user.png");
-    public static final Image participantImage = SarosUI
+    public static final Image participantImage = ImageManager
         .getImage("icons/obj16/participant.png");
-    public static final Image participantReadOnlyImage = SarosUI
+    public static final Image participantReadOnlyImage = ImageManager
         .getImage("icons/obj16/participant_readonly.png");
 
     protected IRosterListener rosterListener;

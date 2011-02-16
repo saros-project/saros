@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
@@ -400,7 +401,7 @@ public class SarosSessionManager implements IConnectionListener,
             this.peer = process.getPeer().getBase();
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
-                SarosUI
+                ImageManager
                     .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
         }
 
@@ -548,7 +549,7 @@ public class SarosSessionManager implements IConnectionListener,
             this.peer = process.getPeer().getBase();
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
-                SarosUI.getImageDescriptor("/icons/invites.png"));
+                ImageManager.getImageDescriptor("/icons/invites.png"));
         }
 
         @Override

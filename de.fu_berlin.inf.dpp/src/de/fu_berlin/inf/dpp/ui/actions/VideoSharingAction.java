@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -133,12 +133,12 @@ public class VideoSharingAction extends Action {
 
     protected void changeButton() {
         if (sessionObservable.getValue() != null) {
-            setImageDescriptor(SarosUI
+            setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/elcl16/stopvideo.png"));
             setToolTipText(TOOLTIP_STOP_SESSION);
             return;
         }
-        setImageDescriptor(SarosUI
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/startvideo.png"));
         setToolTipText(TOOLTIP_START_SESSION);
     }
