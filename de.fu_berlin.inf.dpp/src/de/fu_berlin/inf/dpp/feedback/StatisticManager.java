@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
+import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**

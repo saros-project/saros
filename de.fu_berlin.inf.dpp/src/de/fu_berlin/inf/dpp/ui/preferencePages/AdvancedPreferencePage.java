@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui;
+package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;

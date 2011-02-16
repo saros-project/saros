@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
-import de.fu_berlin.inf.dpp.ui.GeneralPreferencePage;
+import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
 public class SarosPreferencesImp extends SarosComponentImp implements
     SarosPreferences {

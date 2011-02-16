@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui;
+package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import javax.sound.sampled.Mixer;
 

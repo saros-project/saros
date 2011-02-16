@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
+import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
 /**
  * The ErrorLogManager is supposed to upload an error log file to our server at
