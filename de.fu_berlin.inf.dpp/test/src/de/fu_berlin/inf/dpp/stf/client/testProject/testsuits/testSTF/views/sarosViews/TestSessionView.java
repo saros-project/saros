@@ -45,7 +45,7 @@ public class TestSessionView extends STFTest {
         assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice open session view again");
         alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
-        assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
+        assertTrue(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
         log.trace("alice focus on saros buddies view.");
         alice.bot().view(VIEW_SAROS_BUDDIES).setFocus();
         assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
@@ -182,10 +182,12 @@ public class TestSessionView extends STFTest {
     public void testRestrictInviteesToReadOnlyAccessGUI()
         throws RemoteException {
         assertTrue(alice.sarosSessionV.isHost());
-        assertTrue(alice.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS));
-        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS));
+        assertTrue(alice.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
+            .isEnabled());
+        assertFalse(bob.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
+            .isEnabled());
 
         assertTrue(alice.sarosSessionV.hasWriteAccess());
         assertTrue(bob.sarosSessionV.hasWriteAccess());

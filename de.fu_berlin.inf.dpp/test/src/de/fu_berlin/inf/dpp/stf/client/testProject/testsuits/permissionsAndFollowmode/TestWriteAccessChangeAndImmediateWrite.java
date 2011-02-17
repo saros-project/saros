@@ -46,14 +46,16 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         bob.sarosSessionV.waitUntilIsInconsistencyDetected();
-        assertTrue(bob.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
+        assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_INCONSISTENCY_DETECTED)
+            .isEnabled());
         bob.sarosSessionV.inconsistencyDetected();
 
         alice.sarosSessionV.grantWriteAccess(bob.jid);
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP2);
         bob.workbench.sleep(5000);
-        assertFalse(bob.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
+        assertFalse(bob.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_INCONSISTENCY_DETECTED)
+            .isEnabled());
     }
 }

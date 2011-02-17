@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
@@ -744,4 +745,174 @@ public interface STFBot extends EclipseComponent {
     public STFBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
         int index) throws RemoteException;
 
+    public STFBotToolbarButton toolbarButton() throws RemoteException;
+
+    public STFBotToolbarButton toolbarButton(int index) throws RemoteException;
+
+    public boolean existsToolbarButton() throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>mnemonicText</code>.
+     */
+    public STFBotToolbarButton toolbarButton(String mnemonicText)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>mnemonicText</code>.
+     */
+
+    public STFBotToolbarButton toolbarButton(String mnemonicText, int index)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>tooltip</code>.
+     */
+    public STFBotToolbarButton toolbarButtonWithTooltip(String tooltip)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>tooltip</code>.
+     */
+
+    public STFBotToolbarButton toolbarButtonWithTooltip(String tooltip,
+        int index) throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>key/value</code>.
+     */
+    public STFBotToolbarButton toolbarButtonWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>key/value</code>.
+     */
+
+    public STFBotToolbarButton toolbarButtonWithId(String key, String value,
+        int index) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>value</code>.
+     */
+    public STFBotToolbarButton toolbarButtonWithId(String value)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>value</code>.
+     */
+
+    public STFBotToolbarButton toolbarButtonWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>inGroup</code>.
+     */
+    public STFBotToolbarButton toolbarButtonInGroup(String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>inGroup</code>.
+     */
+
+    public STFBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+    public STFBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+
+    public STFBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
+     */
+    public STFBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToolbarButton} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
+     */
+
+    public STFBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException;
 }

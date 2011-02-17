@@ -35,22 +35,27 @@ public class ProgressViewImp extends EclipseComponentImp implements
 
     public void removeProgress() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonInView(VIEW_PROGRESS);
+        bot().view(VIEW_PROGRESS).bot_().toolbarButton()
+            .click();
+
     }
 
     public void removeProcess(int index) throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithTooltipOnView(VIEW_PROGRESS,
-            TB_REMOVE_ALL_FINISHED_OPERATIONS);
-        stfToolbarButton
-            .clickToolbarButtonWithIndexInView(VIEW_PROGRESS, index);
+        bot().view(VIEW_PROGRESS)
+            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS)
+            .click();
+        bot().view(VIEW_PROGRESS).bot_().toolbarButton(index)
+            .click();
+
     }
 
     public boolean existPorgress() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithTooltipOnView(VIEW_PROGRESS,
-            TB_REMOVE_ALL_FINISHED_OPERATIONS);
-        return stfToolbarButton.existstoolbarButonInView(VIEW_PROGRESS);
+        bot().view(VIEW_PROGRESS)
+            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS)
+            .click();
+        return bot().view(VIEW_PROGRESS).bot_().existsToolbarButton();
     }
 
     /**********************************************

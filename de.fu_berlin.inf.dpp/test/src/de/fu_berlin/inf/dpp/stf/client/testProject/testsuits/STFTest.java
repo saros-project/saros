@@ -600,8 +600,9 @@ public class STFTest extends STF {
         MakeOperationConcurrently.workAll(leaveTasks);
         if (host != null) {
             host.sarosSessionV.waitUntilAllPeersLeaveSession(peerJIDs);
-            host.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-                VIEW_SAROS_SESSION, TB_LEAVE_THE_SESSION);
+            host.bot().view(VIEW_SAROS_SESSION)
+                .toolbarButton(TB_LEAVE_THE_SESSION)
+                .click();
             host.sarosSessionV.waitUntilIsNotInSession();
         }
 

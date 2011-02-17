@@ -18,7 +18,6 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
@@ -29,7 +28,6 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
 
 /**
@@ -217,12 +215,28 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void waitUntilIsConnected() throws RemoteException {
         precondition();
-        waitUntil(SarosConditions.isConnect(getToolbarButtons(), TB_DISCONNECT));
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isConnected();
+            }
+
+            public String getFailureMessage() {
+                return "Can't connect.";
+            }
+        });
     }
 
     public void waitUntilDisConnected() throws RemoteException {
-        waitUntil(SarosConditions.isDisConnected(getToolbarButtons(),
-            TB_CONNECT));
+        precondition();
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isConnected();
+            }
+
+            public String getFailureMessage() {
+                return "Can't disconnect.";
+            }
+        });
     }
 
     /**********************************************
@@ -302,7 +316,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         for (RosterEntry entry : entries) {
             log.debug("roster entry.getName(): " + entry.getName());
             log.debug("roster entry.getuser(): " + entry.getUser());
-            log.debug("roster entry.getStatus(): " + entry.getStatus());
+            // log.debug("roster entry.getStatus(): " + entry.getStatus());
             log.debug("roster entry.getType(): " + entry.getType());
         }
         return roster.contains(baseJID);
@@ -365,8 +379,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_SAROS_BUDDIES, tooltipText);
+        if (bot().view(VIEW_SAROS_BUDDIES).existsToolbarButton(tooltipText))
+            bot().view(VIEW_SAROS_BUDDIES).toolbarButton(tooltipText).click();
     }
 
     /**
@@ -392,12 +406,15 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return stfToolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_BUDDIES, tooltip);
+        return bot().view(VIEW_SAROS_BUDDIES).existsToolbarButton(tooltip)
+            && bot().view(VIEW_SAROS_BUDDIES).toolbarButton(tooltip)
+                .isEnabled();
+
     }
 
-    protected List<SWTBotToolbarButton> getToolbarButtons() {
-        return stfToolbarButton.getAllToolbarButtonsOnView(VIEW_SAROS_BUDDIES);
+    protected List<String> getToolTipTextOfToolbarButtons()
+        throws RemoteException {
+        return bot().view(VIEW_SAROS_BUDDIES).getToolTipTextOfToolbarButtons();
     }
 
     @SuppressWarnings("static-access")

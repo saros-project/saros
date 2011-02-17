@@ -471,7 +471,7 @@ public class STF {
 
     protected final static String SHELL_EDITOR_SELECTION = "Editor Selection";
 
-    protected final static String TB_COLLAPSE_ALL = "Collapse All";
+    protected final static String TB_COLLAPSE_ALL = "Collapse All.*";
 
     /**********************************************
      * 

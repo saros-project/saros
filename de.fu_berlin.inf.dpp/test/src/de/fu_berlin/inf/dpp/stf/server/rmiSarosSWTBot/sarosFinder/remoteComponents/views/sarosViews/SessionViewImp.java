@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -701,18 +700,18 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     private boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
-        return stfToolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, tooltip);
+        return bot().view(VIEW_SAROS_SESSION)
+            .toolbarButtonWithRegex(tooltip + ".*").isEnabled();
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_SAROS_SESSION, tooltipText);
+        bot().view(VIEW_SAROS_SESSION)
+            .toolbarButtonWithRegex(tooltipText + ".*").click();
     }
 
-    private List<SWTBotToolbarButton> getToolbarButtons() {
-        return stfToolbarButton.getAllToolbarButtonsOnView(VIEW_SAROS_SESSION);
+    private List<String> getToolbarButtons() throws RemoteException {
+        return bot().view(VIEW_SAROS_SESSION).getToolTipTextOfToolbarButtons();
     }
 
     /**

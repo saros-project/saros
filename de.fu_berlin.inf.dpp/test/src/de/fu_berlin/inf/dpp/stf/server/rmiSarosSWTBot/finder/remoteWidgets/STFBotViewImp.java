@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
@@ -23,6 +25,13 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
 
     private SWTBotView swtbotView;
 
+    private static STFBotViewMenuImp stfViewMenu;
+    private static STFBotToolbarDropDownButtonImp stfToolbarDropDownButton;
+    private static STFBotToolbarPushButtonImp stfToolbarPushButton;
+    private static STFBotToolbarRadioButtonImp stfToolbarRadioButton;
+    private static STFBotToolbarToggleButtonImp stfToolbarToggleButton;
+    public static STFBotToolbarButtonImp stfToolbarButton;
+
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
@@ -30,6 +39,12 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
         if (self != null)
             return self;
         self = new STFBotViewImp();
+        stfViewMenu = STFBotViewMenuImp.getInstance();
+        stfToolbarDropDownButton = STFBotToolbarDropDownButtonImp.getInstance();
+        stfToolbarPushButton = STFBotToolbarPushButtonImp.getInstance();
+        stfToolbarRadioButton = STFBotToolbarRadioButtonImp.getInstance();
+        stfToolbarToggleButton = STFBotToolbarToggleButtonImp.getInstance();
+        stfToolbarButton = STFBotToolbarButtonImp.getInstance();
         return self;
     }
 
@@ -87,11 +102,38 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
         return stfViewMenu;
     }
 
+    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
+        List<String> tooltips = new ArrayList<String>();
+        for (SWTBotToolbarButton button : swtbotView.getToolbarButtons()) {
+            tooltips.add(button.getToolTipText());
+        }
+        return tooltips;
+    }
+
+    public boolean existsToolbarButton(String tooltip) throws RemoteException {
+        return getToolTipOfAllToolbarbuttons().contains(tooltip);
+    }
+
     public STFBotToolbarButton toolbarButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarButton toolbarButton = swtbotView.toolbarButton(tooltip);
         stfToolbarButton.setSwtBotToolbarButton(toolbarButton);
+
         return stfToolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithRegex(String regex)
+        throws RemoteException {
+        for (String tooltip : getToolTipTextOfToolbarButtons()) {
+            System.out.println(tooltip + ":");
+            if (tooltip.matches(regex)) {
+                SWTBotToolbarButton toolbarButton = swtbotView
+                    .toolbarButton(tooltip);
+                stfToolbarButton.setSwtBotToolbarButton(toolbarButton);
+                return stfToolbarButton;
+            }
+        }
+        return null;
     }
 
     public STFBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
@@ -137,8 +179,9 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
     }
 
     public void setFocus() throws RemoteException {
-        swtbotView.setFocus();
-        waitUntilIsActive();
+        swtbotView.show();
+        // swtbotView.setFocus();
+        // waitUntilIsActive();
     }
 
     /**********************************************
@@ -152,6 +195,14 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
 
     public String getTitle() throws RemoteException {
         return swtbotView.getTitle();
+    }
+
+    public List<String> getToolTipTextOfToolbarButtons() throws RemoteException {
+        List<String> toolbarButtons = new ArrayList<String>();
+        for (SWTBotToolbarButton toolbarButton : swtbotView.getToolbarButtons()) {
+            toolbarButtons.add(toolbarButton.getToolTipText());
+        }
+        return toolbarButtons;
     }
 
     /**********************************************

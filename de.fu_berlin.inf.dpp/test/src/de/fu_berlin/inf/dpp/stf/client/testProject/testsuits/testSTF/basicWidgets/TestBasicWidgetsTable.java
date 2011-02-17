@@ -40,12 +40,14 @@ public class TestBasicWidgetsTable extends STFTest {
     public void selectTableItemInView() throws RemoteException {
         alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION, bob.getBaseJid());
-        assertTrue(alice.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
+        assertTrue(alice.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY)
+            .isEnabled());
         alice.table.selectTableItemInView(VIEW_SAROS_SESSION,
             OWN_PARTICIPANT_NAME);
-        assertFalse(alice.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_SHARE_SCREEN_WITH_BUDDY));
+        assertFalse(alice.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY)
+            .isEnabled());
     }
 
     @Test

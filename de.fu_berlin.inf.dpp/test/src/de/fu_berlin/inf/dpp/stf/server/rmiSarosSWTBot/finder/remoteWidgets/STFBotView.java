@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 
@@ -63,6 +64,13 @@ public interface STFBotView extends EclipseComponent {
     public STFBotToolbarButton toolbarButton(String tooltip)
         throws RemoteException;
 
+    public boolean existsToolbarButton(String tooltip) throws RemoteException;
+
+    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException;
+
+    public STFBotToolbarButton toolbarButtonWithRegex(String regex)
+        throws RemoteException;
+
     public STFBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
         throws RemoteException;
 
@@ -76,5 +84,7 @@ public interface STFBotView extends EclipseComponent {
         throws RemoteException;
 
     public String getTitle() throws RemoteException;
+
+    public List<String> getToolTipTextOfToolbarButtons() throws RemoteException;
 
 }

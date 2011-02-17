@@ -32,32 +32,32 @@ public class RSViewImp extends SarosComponentImp implements RSView {
      **********************************************/
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_REMOTE_SCREEN, TB_CHANGE_MODE_IMAGE_SOURCE);
+        bot().view(VIEW_REMOTE_SCREEN)
+            .toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE)
+            .click();
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_REMOTE_SCREEN, TB_STOP_RUNNING_SESSION);
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_STOP_RUNNING_SESSION)
+            .click();
     }
 
     public void clickTBResume() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_REMOTE_SCREEN, TB_RESUME);
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_RESUME)
+            .click();
     }
 
     public void clickTBPause() throws RemoteException {
         preCondition();
-        stfToolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_REMOTE_SCREEN, TB_PAUSE);
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_PAUSE)
+            .click();
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)
         throws RemoteException {
-        bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
-            .confirm(YesOrNot);
+        bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).confirm(YesOrNot);
     }
 
     /**********************************************

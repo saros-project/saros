@@ -12,12 +12,19 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
@@ -29,6 +36,12 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     private static STFBotShellImp shell;
     private static STFBotButtonImp button;
+    private static STFBotTreeImp tree;
+    private static STFBotLabelImp label;
+    private static STFBotStyledTextImp styledText;
+    private static STFBotComboImp comboBox;
+    private static STFBotCComboImp ccomboBox;
+    private static STFBotToolbarButtonImp toolbarButton;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -40,6 +53,12 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         swtBot = bot;
         shell = STFBotShellImp.getInstance();
         button = STFBotButtonImp.getInstance();
+        tree = STFBotTreeImp.getInstance();
+        label = STFBotLabelImp.getInstance();
+        styledText = STFBotStyledTextImp.getInstance();
+        comboBox = STFBotComboImp.getInstance();
+        ccomboBox = STFBotCComboImp.getInstance();
+        toolbarButton = STFBotToolbarButtonImp.getInstance();
 
         return self;
     }
@@ -61,7 +80,7 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
      **********************************************/
 
     public STFBotTree tree() throws RemoteException {
-        stfTree.setSWTBotTree(swtBot.tree());
+        tree.setSWTBotTree(swtBot.tree());
         return stfTree;
     }
 
@@ -249,81 +268,80 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
      * 
      **********************************************/
     public STFBotLabel label() throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.label());
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.label());
+        return label;
     }
 
     public STFBotLabel label(String mnemonicText) throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.label(mnemonicText));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.label(mnemonicText));
+        return label;
 
     }
 
     public STFBotLabel label(String mnemonicText, int index)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.label(mnemonicText, index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.label(mnemonicText, index));
+        return label;
 
     }
 
     public STFBotLabel labelWithId(String key, String value)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelWithId(key, value));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelWithId(key, value));
+        return label;
 
     }
 
     public STFBotLabel labelWithId(String key, String value, int index)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelWithId(key, value, index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelWithId(key, value, index));
+        return label;
 
     }
 
     public STFBotLabel labelWithId(String value) throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelWithId(value));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelWithId(value));
+        return label;
 
     }
 
     public STFBotLabel labelWithId(String value, int index)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelWithId(value, index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelWithId(value, index));
+        return label;
 
     }
 
     public STFBotLabel labelInGroup(String inGroup) throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelInGroup(inGroup));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelInGroup(inGroup));
+        return label;
 
     }
 
     public STFBotLabel labelInGroup(String inGroup, int index)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelInGroup(inGroup, index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelInGroup(inGroup, index));
+        return label;
 
     }
 
     public STFBotLabel label(int index) throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.label(index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.label(index));
+        return label;
 
     }
 
     public STFBotLabel labelInGroup(String mnemonicText, String inGroup)
         throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelInGroup(MENU_CLASS, inGroup));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelInGroup(MENU_CLASS, inGroup));
+        return label;
 
     }
 
     public STFBotLabel labelInGroup(String mnemonicText, String inGroup,
         int index) throws RemoteException {
-        stfLabel.setSwtBotLabel(swtBot.labelInGroup(mnemonicText, inGroup,
-            index));
-        return stfLabel;
+        label.setSwtBotLabel(swtBot.labelInGroup(mnemonicText, inGroup, index));
+        return label;
 
     }
 
@@ -353,65 +371,64 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     public STFBotStyledText styledTextWithLabel(String label)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithLabel(label, 0));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextWithLabel(label, 0));
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithLabel(String label, int index)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithLabel(label,
-            index));
-        return stfStyledText;
+        styledText
+            .setSwtBotStyledText(swtBot.styledTextWithLabel(label, index));
+        return styledText;
     }
 
     public STFBotStyledText styledText(String text) throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledText(text));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledText(text));
+        return styledText;
     }
 
     public STFBotStyledText styledText(String text, int index)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledText(text, index));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledText(text, index));
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithId(String key, String value)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithId(key, value));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextWithId(key, value));
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithId(String key, String value, int index)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithId(key, value,
+        styledText.setSwtBotStyledText(swtBot.styledTextWithId(key, value,
             index));
-        return stfStyledText;
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithId(String value)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithId(value));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextWithId(value));
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithId(String value, int index)
         throws RemoteException {
-        stfStyledText
-            .setSwtBotStyledText(swtBot.styledTextWithId(value, index));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextWithId(value, index));
+        return styledText;
     }
 
     public STFBotStyledText styledTextInGroup(String inGroup)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextInGroup(inGroup));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextInGroup(inGroup));
+        return styledText;
     }
 
     public STFBotStyledText styledTextInGroup(String inGroup, int index)
         throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextInGroup(inGroup,
-            index));
-        return stfStyledText;
+        styledText
+            .setSwtBotStyledText(swtBot.styledTextInGroup(inGroup, index));
+        return styledText;
     }
 
     public STFBotStyledText styledText() throws RemoteException {
@@ -419,8 +436,8 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
     }
 
     public STFBotStyledText styledText(int index) throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledText(index));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledText(index));
+        return styledText;
     }
 
     public STFBotStyledText styledTextWithLabelInGroup(String label,
@@ -430,9 +447,9 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     public STFBotStyledText styledTextWithLabelInGroup(String label,
         String inGroup, int index) throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextWithLabelInGroup(
-            label, inGroup, index));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextWithLabelInGroup(label,
+            inGroup, index));
+        return styledText;
     }
 
     public STFBotStyledText styledTextInGroup(String text, String inGroup)
@@ -442,9 +459,9 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     public STFBotStyledText styledTextInGroup(String text, String inGroup,
         int index) throws RemoteException {
-        stfStyledText.setSwtBotStyledText(swtBot.styledTextInGroup(text,
-            inGroup, index));
-        return stfStyledText;
+        styledText.setSwtBotStyledText(swtBot.styledTextInGroup(text, inGroup,
+            index));
+        return styledText;
     }
 
     /**********************************************
@@ -453,188 +470,314 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
      * 
      **********************************************/
     public STFBotCombo comboBoxWithLabel(String label) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithLabel(label));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithLabel(label));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithLabel(String label, int index)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithLabel(label, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithLabel(label, index));
+        return comboBox;
     }
 
     public STFBotCombo comboBox(String text) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBox(text));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBox(text));
+        return comboBox;
     }
 
     public STFBotCombo comboBox(String text, int index) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBox(text, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBox(text, index));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithId(String key, String value)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithId(key, value));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithId(key, value));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithId(String key, String value, int index)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithId(key, value, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithId(key, value, index));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithId(String value) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithId(value));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithId(value));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithId(String value, int index)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithId(value, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithId(value, index));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxInGroup(String inGroup) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxInGroup(inGroup));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxInGroup(inGroup));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxInGroup(String inGroup, int index)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxInGroup(inGroup, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxInGroup(inGroup, index));
+        return comboBox;
     }
 
     public STFBotCombo comboBox() throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBox());
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBox());
+        return comboBox;
     }
 
     public STFBotCombo comboBox(int index) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBox(index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBox(index));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithLabelInGroup(String label, String inGroup)
         throws RemoteException {
-        stfCombo
+        comboBox
             .setSwtBotCombo(swtBot.comboBoxWithLabelInGroup(label, inGroup));
-        return stfCombo;
+        return comboBox;
     }
 
     public STFBotCombo comboBoxWithLabelInGroup(String label, String inGroup,
         int index) throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxWithLabelInGroup(label, inGroup,
+        comboBox.setSwtBotCombo(swtBot.comboBoxWithLabelInGroup(label, inGroup,
             index));
-        return stfCombo;
+        return comboBox;
     }
 
     public STFBotCombo comboBoxInGroup(String text, String inGroup)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxInGroup(text, inGroup));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxInGroup(text, inGroup));
+        return comboBox;
     }
 
     public STFBotCombo comboBoxInGroup(String text, String inGroup, int index)
         throws RemoteException {
-        stfCombo.setSwtBotCombo(swtBot.comboBoxInGroup(text, inGroup, index));
-        return stfCombo;
+        comboBox.setSwtBotCombo(swtBot.comboBoxInGroup(text, inGroup, index));
+        return comboBox;
     }
 
+    /**********************************************
+     * 
+     * Widget ccomboBox
+     * 
+     **********************************************/
     public STFBotCCombo ccomboBox(String text) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBox(text));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBox(text));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBox(String text, int index)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBox(text, index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBox(text, index));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithLabel(String label) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithLabel(label));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithLabel(label));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithLabel(String label, int index)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithLabel(label, index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithLabel(label, index));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithId(String key, String value)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithId(key, value));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithId(key, value));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithId(String key, String value, int index)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithId(key, value, index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithId(key, value, index));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithId(String value) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithId(value));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithId(value));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithId(String value, int index)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithId(value, index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithId(value, index));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxInGroup(String inGroup) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxInGroup(inGroup));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxInGroup(inGroup));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxInGroup(String inGroup, int index)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxInGroup(inGroup, index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxInGroup(inGroup, index));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBox() throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBox());
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBox());
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBox(int index) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBox(index));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBox(index));
+        return ccomboBox;
 
     }
 
     public STFBotCCombo ccomboBoxInGroup(String text, String inGroup)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxInGroup(text, inGroup));
-        return stfCCombo;
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxInGroup(text, inGroup));
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxInGroup(String text, String inGroup, int index)
         throws RemoteException {
-        stfCCombo
+        ccomboBox
             .setSwtBotCCombo(swtBot.ccomboBoxInGroup(text, inGroup, index));
-        return stfCCombo;
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup)
         throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithLabelInGroup(label,
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithLabelInGroup(label,
             inGroup));
-        return stfCCombo;
+        return ccomboBox;
     }
 
     public STFBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
         int index) throws RemoteException {
-        stfCCombo.setSwtBotCCombo(swtBot.ccomboBoxWithLabelInGroup(label,
+        ccomboBox.setSwtBotCCombo(swtBot.ccomboBoxWithLabelInGroup(label,
             inGroup, index));
-        return stfCCombo;
+        return ccomboBox;
     }
 
+    /**********************************************
+     * 
+     * Widget toolbarButton
+     * 
+     **********************************************/
+    public STFBotToolbarButton toolbarButton() throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButton());
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButton(int index) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButton(index));
+        return toolbarButton;
+    }
+
+    public boolean existsToolbarButton() throws RemoteException {
+        try {
+            swtBot.toolbarButton();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public STFBotToolbarButton toolbarButton(String mnemonicText)
+        throws RemoteException {
+        toolbarButton
+            .setSwtBotToolbarButton(swtBot.toolbarButton(mnemonicText));
+        return toolbarButton;
+
+    }
+
+    public STFBotToolbarButton toolbarButton(String mnemonicText, int index)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButton(mnemonicText,
+            index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithTooltip(String tooltip)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot
+            .toolbarButtonWithTooltip(tooltip));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithTooltip(String tooltip,
+        int index) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonWithTooltip(
+            tooltip, index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithId(String key, String value)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonWithId(key,
+            value));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithId(String key, String value,
+        int index) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonWithId(key,
+            value, index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithId(String value)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonWithId(value));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithId(String value, int index)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonWithId(value,
+            index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonInGroup(String inGroup)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot
+            .toolbarButtonInGroup(inGroup));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
+        throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonInGroup(
+            inGroup, index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonInGroup(
+            mnemonicText, inGroup));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot.toolbarButtonInGroup(
+            mnemonicText, inGroup, index));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot
+            .toolbarButtonWithTooltipInGroup(tooltip, inGroup));
+        return toolbarButton;
+    }
+
+    public STFBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        toolbarButton.setSwtBotToolbarButton(swtBot
+            .toolbarButtonWithTooltipInGroup(tooltip, inGroup, index));
+        return toolbarButton;
+    }
 }

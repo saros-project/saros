@@ -120,8 +120,9 @@ public class TestConcurrentEditing extends STFTest {
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
         bob.workbench.sleep(5000);
-        assertTrue(bob.toolbarButton.isToolbarButtonOnViewEnabled(
-            VIEW_SAROS_SESSION, TB_INCONSISTENCY_DETECTED));
+        assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
+            .toolbarButton(TB_INCONSISTENCY_DETECTED)
+            .isEnabled());
 
     }
 }

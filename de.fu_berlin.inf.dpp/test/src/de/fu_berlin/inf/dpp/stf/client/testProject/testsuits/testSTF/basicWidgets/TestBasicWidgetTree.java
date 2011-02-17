@@ -109,8 +109,8 @@ public class TestBasicWidgetTree extends STFTest {
         alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
+        alice.bot().view(VIEW_PACKAGE_EXPLORER)
+            .toolbarButtonWithRegex(TB_COLLAPSE_ALL).click();
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItem(PROJECT1, SRC, PKG1, CLS1_SUFFIX);
         alice.menu.clickMenuWithTexts(MENU_FILE, MENU_CLOSE);
@@ -155,8 +155,8 @@ public class TestBasicWidgetTree extends STFTest {
             SVN_CLS1);
         alice.bot().editor(SVN_CLS1_SUFFIX).setTextWithoutSave(CP1);
         assertTrue(alice.bot().editor(SVN_CLS1_SUFFIX).isDirty());
-        alice.toolbarButton.clickToolbarButtonWithRegexTooltipOnView(
-            VIEW_PACKAGE_EXPLORER, TB_COLLAPSE_ALL);
+        alice.bot().view(VIEW_PACKAGE_EXPLORER)
+            .toolbarButtonWithRegex(TB_COLLAPSE_ALL + ".*").click();
 
         alice
             .bot()

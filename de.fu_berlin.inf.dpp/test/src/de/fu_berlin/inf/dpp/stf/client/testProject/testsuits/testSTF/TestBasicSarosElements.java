@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,10 +17,10 @@ public class TestBasicSarosElements extends STFTest {
         setUpWorkbench();
     }
 
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        disConnectByActiveTesters();
-    }
+    // @After
+    // public void runAfterEveryTest() throws RemoteException {
+    // disConnectByActiveTesters();
+    // }
 
     @Test
     public void testSessionView() throws RemoteException {

@@ -16,10 +16,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  */
 public class SarosConditions extends Conditions {
 
-    public static ICondition isConnect(List<SWTBotToolbarButton> buttons,
-        String tooltipText) {
-        return new IsConnect(buttons, tooltipText);
-    }
+    // public static ICondition isConnect(List<SWTBotToolbarButton> buttons,
+    // String tooltipText) {
+    // return new IsConnect(buttons, tooltipText);
+    // }
 
     public static ICondition isDisConnected(List<SWTBotToolbarButton> buttons,
         String tooltipText) {
