@@ -53,7 +53,8 @@ public class TestSarosPreferences extends STFTest {
     @Test
     public void createAccountWhichAlreadyExisted() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
-        alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateAndWait();
+        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activate();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put(LABEL_XMPP_JABBER_SERVER, SERVER);
@@ -78,15 +79,18 @@ public class TestSarosPreferences extends STFTest {
     public void createAccountWithDismatchedPassword() throws RemoteException {
 
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        shell_alice.activateAndWait();
+        shell_alice.activate();
+        shell_alice.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+            .setText(SERVER);
+        shell_alice.bot_().textWithLabel(LABEL_USER_NAME)
+            .setText(NEW_USER_NAME);
+        shell_alice.bot_().textWithLabel(LABEL_PASSWORD).setText(PASSWORD);
+        shell_alice.bot_().textWithLabel(LABEL_REPEAT_PASSWORD)
+            .setText(NO_MATCHED_REPEAT_PASSWORD);
 
-        alice.text.setTextInTextWithLabel(SERVER, LABEL_XMPP_JABBER_SERVER);
-        alice.text.setTextInTextWithLabel(NEW_USER_NAME, LABEL_USER_NAME);
-        alice.text.setTextInTextWithLabel(PASSWORD, LABEL_PASSWORD);
-        alice.text.setTextInTextWithLabel(NO_MATCHED_REPEAT_PASSWORD,
-            LABEL_REPEAT_PASSWORD);
         assertFalse(shell_alice.bot_().button(FINISH).isEnabled());
         String errorMessage = shell_alice.getErrorMessageInShell();
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
@@ -97,9 +101,10 @@ public class TestSarosPreferences extends STFTest {
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        shell_alice.activateAndWait();
+        shell_alice.activate();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put(LABEL_XMPP_JABBER_SERVER, INVALID_SERVER_NAME);

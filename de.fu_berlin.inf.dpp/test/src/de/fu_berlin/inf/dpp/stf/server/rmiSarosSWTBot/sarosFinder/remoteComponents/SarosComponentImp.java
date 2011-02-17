@@ -22,14 +22,15 @@ public class SarosComponentImp extends EclipseComponentImp implements
      **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
+        bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell.activate();
+        shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+            .setText(jid.getDomain());
+        shell.bot_().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot_().textWithLabel(LABEL_PASSWORD).setText(password);
+        shell.bot_().textWithLabel(LABEL_REPEAT_PASSWORD).setText(password);
 
-        shell.activateAndWait();
-        stfText.setTextInTextWithLabel(jid.getDomain(),
-            LABEL_XMPP_JABBER_SERVER);
-        stfText.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
-        stfText.setTextInTextWithLabel(password, LABEL_PASSWORD);
-        stfText.setTextInTextWithLabel(password, LABEL_REPEAT_PASSWORD);
         shell.bot_().button(FINISH).click();
         try {
             shell.waitShortUntilIsShellClosed();
@@ -48,12 +49,14 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
+        bot().waitUntilShellOpen(SHELL_SAROS_CONFIGURATION);
         STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
-        shell.activateAndWait();
-        stfText.setTextInTextWithLabel(jid.getDomain(),
-            LABEL_XMPP_JABBER_SERVER);
-        stfText.setTextInTextWithLabel(jid.getName(), LABEL_USER_NAME);
-        stfText.setTextInTextWithLabel(password, LABEL_PASSWORD);
+        shell.activate();
+        shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+            .setText(jid.getDomain());
+        shell.bot_().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot_().textWithLabel(LABEL_PASSWORD).setText(password);
+
         shell.bot_().button(NEXT).click();
         shell.bot_().button(FINISH).click();
     }
@@ -61,8 +64,8 @@ public class SarosComponentImp extends EclipseComponentImp implements
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
         bot().waitUntilShellOpen(SHELL_INVITATION);
-        bot().shell(SHELL_INVITATION).activate();
-        bot().shell(SHELL_INVITATION).confirmWindowWithCheckBoxs(FINISH,
-            baseJIDOfinvitees);
+        STFBotShell shell = bot().shell(SHELL_INVITATION);
+        shell.activate();
+        shell.confirmWindowWithCheckBoxs(FINISH, baseJIDOfinvitees);
     }
 }

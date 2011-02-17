@@ -73,7 +73,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         // shell_bob.waitUntilActive();
         shell_bob.activate();
-        stfTable.selectTableItem(whichEditor);
+        shell_bob.bot_().table().getTableItem(whichEditor).select();
         shell_bob.bot_().button(OK).waitUntilIsEnabled();
         shell_bob.confirm(OK);
     }

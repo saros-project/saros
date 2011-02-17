@@ -24,10 +24,12 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         STFBotShell shell_preferences = preCondition();
         bot.buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .click();
-        bot().shell(SHELL_SAROS_CONFIGURATION).activateAndWait();
+        bot().waitUntilShellOpen(SHELL_SAROS_CONFIGURATION);
+        bot().shell(SHELL_SAROS_CONFIGURATION).activate();
         bot.buttonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT).click();
 
-        bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activateAndWait();
+        bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activate();
         confirmShellCreateNewXMPPAccount(jid, password);
         bot.button(NEXT).click();
         bot.button(FINISH).click();
@@ -40,7 +42,8 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         preCondition();
         bot.buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        bot().shell(SHELL_SAROS_CONFIGURATION).activateAndWait();
+        bot().waitUntilShellOpen(SHELL_SAROS_CONFIGURATION);
+        bot().shell(SHELL_SAROS_CONFIGURATION).activate();
         confirmWizardSarosConfiguration(jid, password);
         bot.button(APPLY).click();
         bot.button(OK).click();
@@ -79,11 +82,14 @@ public class SarosPreferencesImp extends SarosComponentImp implements
 
     public void confirmShellChangeXMPPAccount(String newServer,
         String newUserName, String newPassword) throws RemoteException {
-        bot().shell(SHELL_CHANGE_ACCOUNT).activateAndWait();
-        stfText.setTextInTextWithLabel(newServer, "Server");
-        stfText.setTextInTextWithLabel(newUserName, "Username:");
-        stfText.setTextInTextWithLabel(newPassword, "Password:");
-        stfText.setTextInTextWithLabel(newPassword, "Confirm:");
+        bot().waitUntilShellOpen(SHELL_CHANGE_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CHANGE_ACCOUNT);
+        shell.activate();
+        shell.bot_().textWithLabel("Server").setText(newServer);
+        shell.bot_().textWithLabel("Username:").setText(newUserName);
+        shell.bot_().textWithLabel("Password:").setText(newPassword);
+        shell.bot_().textWithLabel("Confirm:").setText(newPassword);
+
         bot.button(FINISH).click();
     }
 
@@ -97,7 +103,8 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         bot.buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         if (isAccountActiveNoGUI(jid)) {
-            bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).activateAndWait();
+            bot().waitUntilShellOpen(SHELL_DELETING_ACTIVE_ACCOUNT);
+            bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).activate();
             assert bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive();
             throw new RuntimeException(
                 "It's not allowd to delete a active account");
@@ -129,7 +136,8 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
-        bot().shell(SHELL_PREFERNCES).activateAndWait();
+        bot().waitUntilShellOpen(SHELL_PREFERNCES);
+        bot().shell(SHELL_PREFERNCES).activate();
 
         bot().shell(SHELL_PREFERNCES).bot_().tree()
             .selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
@@ -145,7 +153,8 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     public void disableAutomaticReminder() throws RemoteException {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
-            bot().shell(SHELL_PREFERNCES).activateAndWait();
+            bot().waitUntilShellOpen(SHELL_PREFERNCES);
+            bot().shell(SHELL_PREFERNCES).activate();
             bot().shell(SHELL_PREFERNCES).bot_().tree()
                 .selectTreeItem(NODE_SAROS, NODE_SAROS_FEEDBACK);
             bot.radioInGroup(Messages.getString("feedback.page.radio.disable"),
@@ -258,8 +267,9 @@ public class SarosPreferencesImp extends SarosComponentImp implements
      */
     private STFBotShell preCondition() throws RemoteException {
         clickMenuSarosPreferences();
+        bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = bot().shell(SHELL_PREFERNCES);
-        shell.activateAndWait();
+        shell.activate();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
         return shell;
     }

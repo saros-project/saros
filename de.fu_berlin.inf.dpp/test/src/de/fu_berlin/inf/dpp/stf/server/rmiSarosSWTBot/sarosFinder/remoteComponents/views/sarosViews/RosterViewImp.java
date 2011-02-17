@@ -112,7 +112,9 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
                 .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
                     buddyNickName + ".*").contextMenu(CM_DELETE).click();
 
-            bot().shell(CONFIRM_DELETE).confirmShellAndWait(YES);
+            bot().waitUntilShellOpen(CONFIRM_DELETE);
+            bot().shell(CONFIRM_DELETE).activate();
+            bot().shell(CONFIRM_DELETE).bot_().button(YES).click();
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }

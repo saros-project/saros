@@ -6,16 +6,18 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
 public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
 
     private static transient STFBotTableImp tableImp;
+    private SWTBotTable table;
+    private static STFBotMenuImp menu;
+    private static STFBotTableItemImp tableItem;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -24,7 +26,13 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
         if (tableImp != null)
             return tableImp;
         tableImp = new STFBotTableImp();
+        menu = STFBotMenuImp.getInstance();
+        tableItem = STFBotTableItemImp.getInstance();
         return tableImp;
+    }
+
+    public void setSwtBotTable(SWTBotTable table) {
+        this.table = table;
     }
 
     /**************************************************************
@@ -39,61 +47,38 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      * 
      **********************************************/
     public boolean existsTableItem(String itemText) throws RemoteException {
-        return existsTableItem(bot.table(), itemText);
-    }
 
-    public boolean existsTableItemInView(String viewTitle, String itemText)
-        throws RemoteException {
-        return existsTableItem(getTableInView(viewTitle), itemText);
-    }
-
-    public boolean existsTableItem(SWTBotTable table, String itemText) {
         return table.containsItem(itemText);
-    }
 
-    public boolean existsContextMenuOfTableItem(String itemName,
-        String contextName) throws RemoteException {
-        return existsContextMenuOfTableItem(bot.table(), itemName, contextName);
-    }
-
-    public boolean existsContextMenuOfTableItemInView(String viewName,
-        String itemName, String contextName) throws RemoteException {
-        return existsContextMenuOfTableItem(getTableInView(viewName), itemName,
-            contextName);
-    }
-
-    public boolean existsContextMenuOfTableItem(SWTBotTable table,
-        String itemText, String contextName) {
-        selectTableItem(table, itemText);
-        return ContextMenuHelper.existsContextMenu(table, contextName);
-    }
-
-    public boolean isContextMenuOfTableItemVisible(String itemText,
-        String contextName) throws RemoteException {
-        return isContextMenuOfTableItemVisible(bot.table(), itemText,
-            contextName);
-    }
-
-    public boolean isContextMenuOfTableItemVisibleInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        return isContextMenuOfTableItemVisible(getTableInView(viewTitle),
-            itemText, contextName);
-    }
-
-    public boolean isContextMenuOfTableItemEnabled(String itemText,
-        String contextName) throws RemoteException {
-        return isContextMenuOfTableItemEnabled(bot.table(), itemText,
-            contextName);
-    }
-
-    public boolean isContextMenuOfTableItemEnabledInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        return isContextMenuOfTableItemEnabled(getTableInView(viewTitle),
-            itemText, contextName);
     }
 
     public List<String> getTableColumns() throws RemoteException {
-        return bot.table().columns();
+        return table.columns();
+    }
+
+    /**********************************************
+     * 
+     * finder
+     * 
+     **********************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        menu.setWidget(table.contextMenu(text));
+        return menu;
+    }
+
+    public void header(String label) throws RemoteException {
+        table.header(label);
+    }
+
+    public STFBotTableItem getTableItem(String itemText) throws RemoteException {
+        tableItem.setSwtBotTable(table.getTableItem(itemText));
+        return tableItem;
+    }
+
+    public STFBotTableItem getTableItem(int row) throws RemoteException {
+        tableItem.setSwtBotTable(table.getTableItem(row));
+        return tableItem;
     }
 
     /**********************************************
@@ -101,46 +86,100 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      * actions
      * 
      **********************************************/
-    public void selectTableItem(String itemText) throws RemoteException {
-        selectTableItem(bot.table(), itemText);
+
+    public void select(String... items) throws RemoteException {
+        table.select(items);
     }
 
-    public void selectTableItemInView(String viewTitle, String itemText)
-        throws RemoteException {
-        selectTableItem(getTableInView(viewTitle), itemText);
+    public void click(int row, int column) throws RemoteException {
+        table.click(row, column);
     }
 
-    public void clickContextMenuOfTableItem(String itemText, String contextName)
-        throws RemoteException {
-        clickContextMenuOfTableItem(bot.table(), itemText, contextName);
+    public void selection() throws RemoteException {
+        table.selection();
     }
 
-    public void clickContextMenuOfTableItemInView(String viewTitle,
-        String itemText, String contextName) throws RemoteException {
-        clickContextMenuOfTableItem(getTableInView(viewTitle), itemText,
-            contextName);
+    public void unselect() throws RemoteException {
+        table.unselect();
     }
 
-    public void selectCheckBoxInTable(String itemText) throws RemoteException {
-        for (int i = 0; i < bot.table().rowCount(); i++) {
-            if (bot.table().getTableItem(i).getText(0).equals(itemText)) {
-                bot.table().getTableItem(i).check();
-                log.debug("Found checkbox item \"" + itemText + "\".");
-                return;
-            }
+    public void selectionCount() throws RemoteException {
+        table.selectionCount();
+    }
+
+    public void check(int row, int column) throws RemoteException {
+        table.cell(row, column);
+    }
+
+    public void check(int row, String columnName) throws RemoteException {
+        table.cell(row, columnName);
+    }
+
+    public void setFocus() throws RemoteException {
+        table.setFocus();
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public int indexOfColumn(String column) throws RemoteException {
+        return table.indexOfColumn(column);
+    }
+
+    public int indexOf(String item) throws RemoteException {
+        return table.indexOf(item);
+    }
+
+    public int indexOf(String item, int column) throws RemoteException {
+        return table.indexOf(item, column);
+    }
+
+    public int indexOf(String item, String column) throws RemoteException {
+        return table.indexOf(item, column);
+    }
+
+    public int rowCount() throws RemoteException {
+        return table.rowCount();
+    }
+
+    public int columnCount() throws RemoteException {
+        return table.columnCount();
+    }
+
+    public List<String> columns() throws RemoteException {
+        return table.columns();
+    }
+
+    public boolean existsContextMenu(String contextName) throws RemoteException {
+        try {
+            table.contextMenu(contextName);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
         }
-        throw new WidgetNotFoundException("No checkbox item found with text \""
-            + itemText + "\".");
+
     }
 
-    public void selectCheckBoxsInTable(List<String> itemTexts)
-        throws RemoteException {
-        for (int i = 0; i < bot.table().rowCount(); i++) {
-            String next = bot.table().getTableItem(i).getText(0);
-            if (itemTexts.contains(next)) {
-                bot.table().getTableItem(i).check();
-            }
-        }
+    public boolean isEnabled() throws RemoteException {
+        return table.isEnabled();
+    }
+
+    public boolean isVisible() throws RemoteException {
+        return table.isVisible();
+    }
+
+    public boolean isActive() throws RemoteException {
+        return table.isActive();
+    }
+
+    public String getText() throws RemoteException {
+        return table.getText();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return table.getText();
     }
 
     /**********************************************
@@ -148,104 +187,17 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      * waits until
      * 
      **********************************************/
-    public void waitUntilTableItemExisted(STFBotTable basic, String itemText)
-        throws RemoteException {
-        waitUntil(SarosConditions.existTableItem(this, itemText));
+    public void waitUntilIsEnabled() throws RemoteException {
+        waitUntil(Conditions.widgetIsEnabled(table));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        waitUntil(tableHasRows(bot.table(), row));
+        waitUntil(tableHasRows(table, row));
     }
 
-    public void waitUntilIsContextMenuOfTableItemEnabled(STFBotTable basic,
-        String itemText, String contextName) throws RemoteException {
-        waitUntil(SarosConditions.ExistContextMenuOfTableItem(this, itemText,
-            contextName));
-    }
-
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
-    /**
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @return a {@link SWTBotTable} with the specified <code>none</code> in the
-     *         given view.
-     */
-    public SWTBotTable getTableInView(String viewTitle) {
-        return bot.viewByTitle(viewTitle).bot().table();
-    }
-
-    public void clickContextMenuOfTableItem(SWTBotTable table, String itemText,
-        String contextName) {
-        selectTableItem(table, itemText);
-        ContextMenuHelper.clickContextMenu(table, contextName);
-    }
-
-    public void selectTableItem(SWTBotTable table, String itemText) {
-        try {
-            table.getTableItem(itemText).select();
-        } catch (WidgetNotFoundException e) {
-            log.warn("tableItem matching the itemText " + itemText
-                + " doesn't exist.", e);
-        }
-    }
-
-    public boolean isContextMenuOfTableItemEnabled(SWTBotTable table,
-        String itemText, String contextName) {
-        selectTableItem(table, itemText);
-        return ContextMenuHelper.isContextMenuEnabled(table, contextName);
-    }
-
-    public boolean isContextMenuOfTableItemVisible(SWTBotTable table,
-        String itemText, String contextName) {
-        return getTableItem(table, itemText).contextMenu(contextName)
-            .isVisible();
-    }
-
-    /**
-     * 
-     * @param itemText
-     *            the table item' name, which you want to select.
-     * @return a {@link SWTBotTableItem} specified with the given label.
-     */
-    public SWTBotTableItem getTableItem(String itemText) {
-        return getTableItem(bot.table(), itemText);
-    }
-
-    /**
-     * 
-     * @param viewTitle
-     *            the title on the view tab.
-     * @param itemText
-     *            the table item' name
-     * @return a {@link SWTBotTableItem} specified with the given label in the
-     *         given view.
-     */
-    public SWTBotTableItem getTableItemInView(String viewTitle, String itemText) {
-        return getTableItem(getTableInView(viewTitle), itemText);
-    }
-
-    /**
-     * 
-     * @param table
-     *            the parent widget of the found tableItem.
-     * @param itemText
-     *            the table item' name
-     * @return a {@link SWTBotTableItem} in the given table specified with the
-     *         given itemText.
-     */
-    public SWTBotTableItem getTableItem(SWTBotTable table, String itemText) {
-        try {
-            return table.getTableItem(itemText);
-        } catch (WidgetNotFoundException e) {
-            log.warn("tableItem matching the itemText " + itemText
-                + " doesn't exist.", e);
-        }
-        return null;
+    public void waitUntilTableItemExisted(String itemText)
+        throws RemoteException {
+        waitUntil(SarosConditions.existTableItem(this, itemText));
     }
 
 }

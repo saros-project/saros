@@ -21,6 +21,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
@@ -42,6 +46,8 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
     private static STFBotComboImp comboBox;
     private static STFBotCComboImp ccomboBox;
     private static STFBotToolbarButtonImp toolbarButton;
+    private static STFBotTextImp text;
+    private static STFBotTableImp table;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -59,6 +65,8 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         comboBox = STFBotComboImp.getInstance();
         ccomboBox = STFBotCComboImp.getInstance();
         toolbarButton = STFBotToolbarButtonImp.getInstance();
+        text = STFBotTextImp.getInstance();
+        table = STFBotTableImp.getInstance();
 
         return self;
     }
@@ -780,4 +788,218 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
             .toolbarButtonWithTooltipInGroup(tooltip, inGroup, index));
         return toolbarButton;
     }
+
+    /**********************************************
+     * 
+     * Widget text
+     * 
+     **********************************************/
+    public STFBotText textWithLabel(String label) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithLabel(label));
+        return text;
+    }
+
+    public STFBotText textWithLabel(String label, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithLabel(label, index));
+        return text;
+    }
+
+    public STFBotText text(String txt) throws RemoteException {
+        text.setSwtBotText(swtBot.text(txt));
+        return text;
+    }
+
+    public STFBotText text(String txt, int index) throws RemoteException {
+        text.setSwtBotText(swtBot.text(txt, index));
+        return text;
+
+    }
+
+    public STFBotText textWithTooltip(String tooltip) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithTooltip(tooltip));
+        return text;
+
+    }
+
+    public STFBotText textWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithTooltip(tooltip, index));
+        return text;
+
+    }
+
+    public STFBotText textWithMessage(String message) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithMessage(message));
+        return text;
+
+    }
+
+    public STFBotText textWithMessage(String message, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithMessage(message, index));
+        return text;
+
+    }
+
+    public STFBotText textWithId(String key, String value)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithId(key, value));
+        return text;
+
+    }
+
+    public STFBotText textWithId(String key, String value, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithId(key, value, index));
+        return text;
+
+    }
+
+    public STFBotText textWithId(String value) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithId(value));
+        return text;
+
+    }
+
+    public STFBotText textWithId(String value, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithId(value, index));
+        return text;
+
+    }
+
+    public STFBotText textInGroup(String inGroup) throws RemoteException {
+        text.setSwtBotText(swtBot.textInGroup(inGroup));
+        return text;
+
+    }
+
+    public STFBotText textInGroup(String inGroup, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textInGroup(inGroup, index));
+        return text;
+
+    }
+
+    public STFBotText text() throws RemoteException {
+        text.setSwtBotText(swtBot.text());
+        return text;
+
+    }
+
+    public STFBotText text(int index) throws RemoteException {
+        text.setSwtBotText(swtBot.text(index));
+        return text;
+
+    }
+
+    public STFBotText textWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithLabel(label));
+        return text;
+
+    }
+
+    public STFBotText textWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithLabelInGroup(label, inGroup, index));
+        return text;
+
+    }
+
+    public STFBotText textInGroup(String txt, String inGroup)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textInGroup(txt, inGroup));
+        return text;
+
+    }
+
+    public STFBotText textInGroup(String txt, String inGroup, int index)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textInGroup(txt, inGroup, index));
+        return text;
+
+    }
+
+    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException {
+        text.setSwtBotText(swtBot.textWithTooltipInGroup(tooltip, inGroup));
+        return text;
+
+    }
+
+    /**********************************************
+     * 
+     * Widget table
+     * 
+     **********************************************/
+    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException {
+        text.setSwtBotText(swtBot.textWithTooltipInGroup(tooltip, inGroup,
+            index));
+        return text;
+    }
+
+    public STFBotTable tableWithLabel(String label) throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithLabel(label));
+        return table;
+    }
+
+    public STFBotTable tableWithLabel(String label, int index)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithLabel(label, index));
+        return table;
+    }
+
+    public STFBotTable tableWithId(String key, String value)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithId(key, value));
+        return table;
+    }
+
+    public STFBotTable tableWithId(String key, String value, int index)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithId(key, value, index));
+        return table;
+    }
+
+    public STFBotTable tableWithId(String value) throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithId(value));
+        return table;
+    }
+
+    public STFBotTable tableWithId(String value, int index)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithId(value, index));
+        return table;
+    }
+
+    public STFBotTable tableInGroup(String inGroup) throws RemoteException {
+        table.setSwtBotTable(swtBot.tableInGroup(inGroup));
+        return table;
+    }
+
+    public STFBotTable tableInGroup(String inGroup, int index)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableInGroup(inGroup, index));
+        return table;
+    }
+
+    public STFBotTable table() throws RemoteException {
+        table.setSwtBotTable(swtBot.table());
+        return table;
+    }
+
+    public STFBotTable table(int index) throws RemoteException {
+        table.setSwtBotTable(swtBot.table(index));
+        return table;
+    }
+
+    public STFBotTable tableWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        table.setSwtBotTable(swtBot.tableWithLabelInGroup(label, inGroup));
+        return table;
+    }
+
 }

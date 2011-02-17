@@ -22,8 +22,6 @@ public interface STFBotShell extends EclipseComponent {
      */
     public boolean activate() throws RemoteException;
 
-    public boolean activateAndWait() throws RemoteException;
-
     public boolean isActive() throws RemoteException;
 
     public void closeShell() throws RemoteException;
@@ -104,8 +102,6 @@ public interface STFBotShell extends EclipseComponent {
      * 
      */
     public void confirm(String buttonText) throws RemoteException;
-
-    public void confirmShellAndWait(String buttonText) throws RemoteException;
 
     /**
      * confirm a pop-up window with a tree. You should first select a tree node

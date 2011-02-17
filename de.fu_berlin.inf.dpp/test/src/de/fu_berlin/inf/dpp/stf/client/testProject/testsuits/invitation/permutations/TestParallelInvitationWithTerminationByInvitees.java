@@ -71,11 +71,13 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.sarosC.shareProject(PROJECT1, bob.getBaseJid(),
-            dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
+        alice.sarosC.shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1,
+            bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid(),
+            edna.getBaseJid());
 
+        bob.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
-        shell_bob.activateAndWait();
+        shell_bob.activate();
         shell_bob.bot_().button(CANCEL).click();
 
         STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
@@ -95,8 +97,9 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             carl.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
+        dave.bot().waitsUntilIsShellClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
-        shell_dave.activateAndWait();
+        shell_dave.activate();
         dave.sarosC.confirmShellSessionnInvitation();
         shell_dave.bot_().button(CANCEL).click();
 

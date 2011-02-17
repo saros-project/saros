@@ -39,30 +39,6 @@ public class SarosConditions extends Conditions {
         return new ExistsTableItem(table, tableItemName);
     }
 
-    public static ICondition ExistContextMenuOfTableItem(STFBotTable table,
-        String itemName, String contextName) {
-        return new ExistsContextMenuOfTableItem(table, itemName, contextName);
-    }
-
-    /**********************************************
-     * 
-     * conditions for editor
-     * 
-     **********************************************/
-    // public static ICondition isEditorOpen(STFBotEditor editor, String name) {
-    // return new IsEditorOpen(editor, name);
-    // }
-    //
-    // public static ICondition isEditorActive(STFBotEditor editor, String name)
-    // {
-    // return new IsEditorActive(editor, name);
-    // }
-    //
-    // public static ICondition isEditorClosed(STFBotEditor editor, String name)
-    // {
-    // return new IsEditorClosed(editor, name);
-    // }
-
     public static ICondition isShellClosed(SWTBotShell shell) {
         return new IsShellClosed(shell);
     }

@@ -2,11 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class STFBotTextImp extends EclipseComponentImp implements STFBotText {
 
     private static transient STFBotTextImp textImp;
+
+    private SWTBotText swtBotText;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -16,6 +20,10 @@ public class STFBotTextImp extends EclipseComponentImp implements STFBotText {
             return textImp;
         textImp = new STFBotTextImp();
         return textImp;
+    }
+
+    public void setSwtBotText(SWTBotText text) {
+        this.swtBotText = text;
     }
 
     /**************************************************************
@@ -30,9 +38,8 @@ public class STFBotTextImp extends EclipseComponentImp implements STFBotText {
      * 
      **********************************************/
 
-    public void setTextInTextWithLabel(String text, String label)
-        throws RemoteException {
-        bot.textWithLabel(label).setText(text);
+    public void setText(String text) throws RemoteException {
+        swtBotText.setText(text);
     }
 
     /**********************************************
@@ -40,8 +47,8 @@ public class STFBotTextImp extends EclipseComponentImp implements STFBotText {
      * states
      * 
      **********************************************/
-    public String getTextInTextWithLabel(String label) throws RemoteException {
-        return bot.textWithLabel(label).getText();
+    public String getText() throws RemoteException {
+        return swtBotText.getText();
     }
 
 }

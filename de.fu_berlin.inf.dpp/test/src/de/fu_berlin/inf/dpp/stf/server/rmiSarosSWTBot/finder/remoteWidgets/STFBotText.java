@@ -17,8 +17,7 @@ public interface STFBotText extends EclipseComponent {
      *            the label on the widget.
      * @throws RemoteException
      */
-    public void setTextInTextWithLabel(String text, String label)
-        throws RemoteException;
+    public void setText(String text) throws RemoteException;
 
     /**
      * 
@@ -27,5 +26,5 @@ public interface STFBotText extends EclipseComponent {
      * @return the text in the given {@link SWTBotText}
      * @throws RemoteException
      */
-    public String getTextInTextWithLabel(String label) throws RemoteException;
+    public String getText() throws RemoteException;
 }

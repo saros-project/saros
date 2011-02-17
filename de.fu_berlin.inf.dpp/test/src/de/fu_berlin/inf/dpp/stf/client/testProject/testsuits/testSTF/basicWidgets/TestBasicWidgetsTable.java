@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 
 public class TestBasicWidgetsTable extends STFTest {
 
@@ -29,54 +30,56 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void existsTableItemInView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
-        assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
-            bob.getBaseJid()));
-        assertTrue(alice.table.existsTableItemInView(VIEW_SAROS_SESSION,
-            OWN_PARTICIPANT_NAME));
+        STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        view.setFocus();
+        assertTrue(view.bot_().table().existsTableItem(bob.getBaseJid()));
+        assertTrue(view.bot_().table().existsTableItem(OWN_PARTICIPANT_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
-        alice.table.selectTableItemInView(VIEW_SAROS_SESSION, bob.getBaseJid());
-        assertTrue(alice.bot().view(VIEW_SAROS_SESSION)
-            .toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY)
-            .isEnabled());
-        alice.table.selectTableItemInView(VIEW_SAROS_SESSION,
-            OWN_PARTICIPANT_NAME);
-        assertFalse(alice.bot().view(VIEW_SAROS_SESSION)
-            .toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY)
-            .isEnabled());
+        STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        view.setFocus();
+        view.bot_().table().getTableItem(bob.getBaseJid()).select();
+
+        assertTrue(view.toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY).isEnabled());
+
+        view.bot_().table().getTableItem(OWN_PARTICIPANT_NAME).select();
+
+        assertFalse(view.toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY).isEnabled());
     }
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
+        STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        view.setFocus();
+        view.bot_().table().getTableItem(bob.getBaseJid())
+            .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
 
-        alice.table.clickContextMenuOfTableItemInView(VIEW_SAROS_SESSION,
-            bob.getBaseJid(), CM_RESTRICT_TO_READ_ONLY_ACCESS);
         bob.sarosSessionV.waitUntilHasReadOnlyAccess();
         assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
     }
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
-        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(),
-            CM_RESTRICT_TO_READ_ONLY_ACCESS));
-        assertTrue(alice.table.isContextMenuOfTableItemVisibleInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(), CM_CHANGE_COLOR));
+        STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        view.setFocus();
+
+        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+            .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isVisible());
+
+        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+            .contextMenu(CM_CHANGE_COLOR).isVisible());
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
-        assertTrue(alice.table.isContextMenuOfTableItemEnabledInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(),
-            CM_RESTRICT_TO_READ_ONLY_ACCESS));
-        assertFalse(alice.table.isContextMenuOfTableItemEnabledInView(
-            VIEW_SAROS_SESSION, bob.getBaseJid(), CM_CHANGE_COLOR));
+        STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        view.setFocus();
+
+        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+            .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled());
+        assertFalse(view.bot_().table().getTableItem(bob.getBaseJid())
+            .contextMenu(CM_CHANGE_COLOR).isEnabled());
     }
 }

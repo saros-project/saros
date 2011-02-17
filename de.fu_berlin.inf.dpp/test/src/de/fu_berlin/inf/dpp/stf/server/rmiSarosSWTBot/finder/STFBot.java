@@ -11,6 +11,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
@@ -915,4 +917,341 @@ public interface STFBot extends EclipseComponent {
 
     public STFBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
         String inGroup, int index) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget text
+     * 
+     **********************************************/
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotText} with the specified <code>label</code>.
+     */
+    public STFBotText textWithLabel(String label) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>label</code>.
+     */
+
+    public STFBotText textWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param text
+     *            the text on the widget.
+     * @return a {@link STFBotText} with the specified <code>text</code>.
+     */
+    public STFBotText text(String text) throws RemoteException;
+
+    /**
+     * @param text
+     *            the text on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>text</code>.
+     */
+
+    public STFBotText text(String text, int index) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @return a {@link STFBotText} with the specified <code>tooltip</code>.
+     */
+    public STFBotText textWithTooltip(String tooltip) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>tooltip</code>.
+     */
+
+    public STFBotText textWithTooltip(String tooltip, int index)
+        throws RemoteException;
+
+    /**
+     * @param message
+     *            the message on the widget.
+     * @return a {@link STFBotText} with the specified <code>message</code>.
+     */
+    public STFBotText textWithMessage(String message) throws RemoteException;
+
+    /**
+     * @param message
+     *            the message on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>message</code>.
+     */
+
+    public STFBotText textWithMessage(String message, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotText} with the specified <code>key/value</code>.
+     */
+    public STFBotText textWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>key/value</code>.
+     */
+
+    public STFBotText textWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotText} with the specified <code>value</code>.
+     */
+    public STFBotText textWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>value</code>.
+     */
+
+    public STFBotText textWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotText} with the specified <code>inGroup</code>.
+     */
+    public STFBotText textInGroup(String inGroup) throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotText textInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotText} with the specified <code>none</code>.
+     */
+    public STFBotText text() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>none</code>.
+     */
+
+    public STFBotText text(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotText} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotText textWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+
+    public STFBotText textWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException;
+
+    /**
+     * @param text
+     *            the text on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotText} with the specified <code>text</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotText textInGroup(String text, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param text
+     *            the text on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>text</code> with
+     *         the specified <code>inGroup</code>.
+     */
+
+    public STFBotText textInGroup(String text, String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotText} with the specified <code>tooltip</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotText} with the specified <code>tooltip</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget table
+     * 
+     **********************************************/
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotTable} with the specified <code>label</code>.
+     */
+    public STFBotTable tableWithLabel(String label) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTable} with the specified <code>label</code>.
+     */
+
+    public STFBotTable tableWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotTable} with the specified <code>key/value</code>.
+     */
+    public STFBotTable tableWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTable} with the specified <code>key/value</code>.
+     */
+
+    public STFBotTable tableWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotTable} with the specified <code>value</code>.
+     */
+    public STFBotTable tableWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTable} with the specified <code>value</code>.
+     */
+
+    public STFBotTable tableWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotTable} with the specified <code>inGroup</code>.
+     */
+    public STFBotTable tableInGroup(String inGroup) throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTable} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotTable tableInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotTable} with the specified <code>none</code>.
+     */
+    public STFBotTable table() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTable} with the specified <code>none</code>.
+     */
+
+    public STFBotTable table(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotTable} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotTable tableWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
 }

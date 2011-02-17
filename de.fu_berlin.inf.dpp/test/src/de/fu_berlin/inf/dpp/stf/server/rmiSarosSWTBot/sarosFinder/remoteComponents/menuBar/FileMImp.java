@@ -121,10 +121,12 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             bot.textWithLabel(LABEL_PACKAGE).setText(pkg);
             bot.textWithLabel(LABEL_NAME).setText(className);
             bot.button("Add...").click();
-            bot().shell("Implemented Interfaces Selection").activateAndWait();
-            bot.textWithLabel("Choose interfaces:").setText(
-                "java.lang.Runnable");
-            stfTable.waitUntilTableHasRows(1);
+            bot().waitUntilShellOpen("Implemented Interfaces Selection");
+            STFBotShell shell = bot().shell("Implemented Interfaces Selection");
+            shell.activate();
+            shell.bot_().textWithLabel("Choose interfaces:")
+                .setText("java.lang.Runnable");
+            shell.bot_().table().waitUntilTableHasRows(1);
             bot.button(OK).click();
             bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             bot.checkBox("Inherited abstract methods").click();
@@ -173,11 +175,14 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmShellNewFile(String... fileNodes)
         throws RemoteException {
-        bot().shell(SHELL_NEW_FILE).activate();
-        stfText.setTextInTextWithLabel(getPath(getParentNodes(fileNodes)),
-            LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
-        bot.textWithLabel(LABEL_FILE_NAME).setText(getLastNode(fileNodes));
-        bot().shell(SHELL_NEW_FILE).bot_().button(FINISH).waitUntilIsEnabled();
+        STFBotShell shell = bot().shell(SHELL_NEW_FILE);
+        shell.activate();
+        shell.bot_().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
+            .setText(getPath(getParentNodes(fileNodes)));
+
+        shell.bot_().textWithLabel(LABEL_FILE_NAME)
+            .setText(getLastNode(fileNodes));
+        shell.bot_().button(FINISH).waitUntilIsEnabled();
         bot.button(FINISH).click();
         bot().waitsUntilIsShellClosed(SHELL_NEW_FILE);
     }
@@ -195,11 +200,14 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     private void confirmShellNewFolder(String... folderNodes)
         throws RemoteException {
-        bot().shell(SHELL_NEW_FOLDER).activate();
-        stfText.setTextInTextWithLabel(getPath(getParentNodes(folderNodes)),
-            LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER);
-        stfText.setTextInTextWithLabel(getLastNode(folderNodes),
-            LABEL_FOLDER_NAME);
+        STFBotShell shell = bot().shell(SHELL_NEW_FOLDER);
+        shell.activate();
+        shell.bot_().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
+            .setText(getPath(getParentNodes(folderNodes)));
+
+        shell.bot_().textWithLabel(LABEL_FOLDER_NAME)
+            .setText(getLastNode(folderNodes));
+
         bot.button(FINISH).click();
         bot().waitsUntilIsShellClosed(SHELL_NEW_FOLDER);
     }
@@ -208,7 +216,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
         shell.activate();
-        stfText.setTextInTextWithLabel(projectName, LABEL_PROJECT_NAME);
+        shell.bot_().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+
         // bot.button(FINISH).click();
         shell.bot_().button(FINISH).click();
         bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_PROJECT);

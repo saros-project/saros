@@ -30,8 +30,9 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        alice.bot().waitUntilShellOpen(SHELL_SHOW_VIEW);
         STFBotShell shell = alice.bot.shell(SHELL_SHOW_VIEW);
-        shell.activateAndWait();
+        shell.activate();
         assertTrue(shell.bot_().tree().selectTreeItem(NODE_GENERAL)
             .existsSubItem(NODE_CONSOLE));
 
@@ -40,8 +41,9 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
-        shell.activateAndWait();
+        shell.activate();
         assertTrue(shell.bot_().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
             .existsSubItem(NODE_ANNOTATIONS));
@@ -50,8 +52,9 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
-        shell.activateAndWait();
+        shell.activate();
         assertTrue(shell.bot_().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
             .existsSubItemWithRegex(NODE_ANNOTATIONS));
@@ -120,8 +123,9 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemInShell() throws RemoteException {
         alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot.shell(SHELL_PREFERNCES);
-        shell.activateAndWait();
+        shell.activate();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
         assertTrue(shell
             .bot_()
@@ -228,6 +232,7 @@ public class TestBasicWidgetTree extends STFTest {
             .selectTreeItem(PROJECT1).contextMenu(CM_SAROS, CM_SHARE_PROJECT)
             .click();
 
-        assertTrue(alice.bot().shell(SHELL_INVITATION).activateAndWait());
+        alice.bot().waitUntilShellOpen(SHELL_INVITATION);
+        assertTrue(alice.bot().shell(SHELL_INVITATION).activate());
     }
 }

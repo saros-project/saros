@@ -51,26 +51,6 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
     public boolean activate() throws RemoteException {
         swtBotShell.activate();
         return true;
-        // SWTBotShell[] shells = bot.shells();
-        // for (SWTBotShell shell : shells) {
-        // if (shell.getText().equals(shellTitle)) {
-        // log.debug("STFBotShell \"" + shellTitle + "\" found.");
-        // if (!shell.isActive()) {
-        // shell.activate();
-        // // waitUntilShellActive(title);
-        // }
-        // return true;
-        // }
-        // }
-        // log.error("No shell found matching \"" + title + "\"!");
-        // return false;
-    }
-
-    public boolean activateAndWait() throws RemoteException {
-        if (!activate())
-            bot().waitUntilShellOpen(shellTitle);
-        return activate();
-
     }
 
     public boolean activateShellWithRegexText(String matchText)
@@ -95,14 +75,8 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
     }
 
     public void confirm(String buttonText) throws RemoteException {
-        if (activate()) {
-            bot_().button(buttonText).click();
-        }
-    }
-
-    public void confirmShellAndWait(String buttonText) throws RemoteException {
-        activateAndWait();
-        confirm(buttonText);
+        activate();
+        bot_().button(buttonText).click();
     }
 
     public void confirmShellWithTree(String buttonText, String... nodes)
@@ -116,17 +90,18 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
     public void confirmShellWithTextField(String textLabel, String text,
         String buttonText) throws RemoteException {
         activate();
-        stfText.setTextInTextWithLabel(textLabel, text);
+        bot_().textWithLabel(textLabel).setText(text);
+
         bot_().button(buttonText).waitUntilIsEnabled();
         bot_().button(buttonText).click();
     }
 
     public void confirmWithTextFieldAndWait(Map<String, String> labelsAndTexts,
         String buttonText) throws RemoteException {
-        activateAndWait();
+        activate();
         for (String label : labelsAndTexts.keySet()) {
             String text = labelsAndTexts.get(label);
-            stfText.setTextInTextWithLabel(text, label);
+            bot_().textWithLabel(label).setText(text);
         }
         bot_().button(buttonText).waitUntilIsEnabled();
         bot_().button(buttonText).click();
@@ -154,7 +129,7 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
         String... itemNames) throws RemoteException {
         waitUntilActive();
         for (String itemName : itemNames) {
-            stfTable.selectCheckBoxInTable(itemName);
+            bot_().table().getTableItem(itemName).check();
         }
         bot_().button(buttonText).waitUntilIsEnabled();
         bot_().button(buttonText).click();

@@ -76,14 +76,18 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 .selectTreeItem(projectName, SRC, item).contextMenu(CM_DELETE)
                 .click();
 
-            bot().shell(CONFIRM_DELETE).confirmShellAndWait(OK);
+            bot().waitUntilShellOpen(CONFIRM_DELETE);
+            bot().shell(CONFIRM_DELETE).activate();
+            bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
         }
     }
 
     public void deleteFile() throws RemoteException {
         precondition();
         stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
-        bot().shell(CONFIRM_DELETE).confirmShellAndWait(OK);
+        bot().waitUntilShellOpen(CONFIRM_DELETE);
+        bot().shell(CONFIRM_DELETE).activate();
+        bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
         bot.sleep(300);
     }
 
@@ -97,7 +101,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
         STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
         shell.activate();
-        stfText.setTextInTextWithLabel(target, "Project name:");
+        shell.bot_().textWithLabel("Project name:").setText(target);
         shell.bot_().button(OK).click();
         bot().waitsUntilIsShellClosed(SHELL_COPY_PROJECT);
         bot.sleep(1000);

@@ -118,10 +118,10 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             view.setFocus();
             final boolean viewWasOpen = bot().isViewOpen(VIEW_SVN_REPOSITORIES);
             bot().view(VIEW_SVN_REPOSITORIES)
-                .toolbarButton("Add SVN Repository")
-                .click();
+                .toolbarButton("Add SVN Repository").click();
 
-            bot().shell("Add SVN Repository").activateAndWait();
+            bot().waitUntilShellOpen("Add SVN Repository");
+            bot().shell("Add SVN Repository").activate();
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             bot.button(FINISH).click();
             bot().waitsUntilIsShellClosed("Add SVN Repository");
