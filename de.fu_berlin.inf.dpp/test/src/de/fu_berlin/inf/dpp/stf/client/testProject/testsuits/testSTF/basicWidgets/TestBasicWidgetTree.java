@@ -29,7 +29,8 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemInShell() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        alice.bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
+            .click();
         alice.bot().waitUntilShellOpen(SHELL_SHOW_VIEW);
         STFBotShell shell = alice.bot.shell(SHELL_SHOW_VIEW);
         shell.activate();
@@ -40,7 +41,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
         alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
@@ -51,7 +52,8 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
+
         alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
@@ -116,13 +118,15 @@ public class TestBasicWidgetTree extends STFTest {
             .toolbarButtonWithRegex(TB_COLLAPSE_ALL).click();
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItem(PROJECT1, SRC, PKG1, CLS1_SUFFIX);
-        alice.menu.clickMenuWithTexts(MENU_FILE, MENU_CLOSE);
+        alice.bot().menu(MENU_FILE).menu(MENU_CLOSE).click();
+
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void selectTreeItemInShell() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
+
         alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot.shell(SHELL_PREFERNCES);
         shell.activate();
@@ -169,7 +173,7 @@ public class TestBasicWidgetTree extends STFTest {
             .tree()
             .selectTreeItemWithRegex(
                 changeToRegex(getClassNodes(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)));
-        alice.menu.clickMenuWithTexts(MENU_FILE, MENU_SAVE);
+        alice.bot().menu(MENU_FILE).menu(MENU_SAVE).click();
         assertFalse(alice.bot().editor(SVN_CLS1_SUFFIX).isDirty());
     }
 

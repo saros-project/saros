@@ -4,9 +4,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotCComboImp extends EclipseComponentImp implements
+public class STFBotCComboImp extends AbstractRmoteWidget implements
     STFBotCCombo {
 
     private static transient STFBotCComboImp self;

@@ -5,9 +5,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotToolbarButtonImp extends EclipseComponentImp implements
+public class STFBotToolbarButtonImp extends AbstractRmoteWidget implements
     STFBotToolbarButton {
 
     private static transient STFBotToolbarButtonImp ToolbarButtonImp;
@@ -85,7 +83,7 @@ public class STFBotToolbarButtonImp extends EclipseComponentImp implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(toolbarButton));
+        bot.waitUntil(Conditions.widgetIsEnabled(toolbarButton));
     }
 
 }

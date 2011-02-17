@@ -63,7 +63,8 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         precondition();
-        stfMenu.clickMenuWithTexts(MENU_REFACTOR, MENU_RENAME);
+        bot().menu(MENU_REFACTOR).menu(MENU_RENAME).click();
+
         bot().shell(shellTitle).activate();
         bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
         bot().shell(shellTitle).bot_().button(buttonName).waitUntilIsEnabled();
@@ -79,7 +80,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         precondition();
-        stfMenu.clickMenuWithTexts(MENU_REFACTOR, MENU_MOVE);
+        bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
         // bot().shell(shellTitle).waitUntilActive();
         bot().shell(shellTitle).confirmShellWithTree(buttonName, nodes);
         bot().waitsUntilIsShellClosed(shellTitle);

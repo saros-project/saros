@@ -69,9 +69,10 @@ public class SarosPreferencesImp extends SarosComponentImp implements
 
     public void changeAccount(JID jid, String newUserName, String newPassword,
         String newServer) throws RemoteException {
-        preCondition();
-        stfList.selectListItemInGroup(jid.getBase(),
-            GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
+        STFBotShell shell = preCondition();
+        shell.bot_().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
+            .select(jid.getBase());
+
         bot.buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         confirmShellChangeXMPPAccount(newServer, newUserName, newPassword);
@@ -96,9 +97,9 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     public void deleteAccount(JID jid, String password) throws RemoteException {
         if (!isAccountExistNoGUI(jid, password))
             return;
-        preCondition();
-        stfList.selectListItemInGroup(jid.getBase(),
-            GeneralPreferencePage.ACCOUNT_GROUP_TITLE);
+        STFBotShell shell = preCondition();
+        shell.bot_().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
+            .select(jid.getBase());
 
         bot.buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
             GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
@@ -115,16 +116,20 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
-        preCondition();
-        for (String item : stfList
-            .getListItemsInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)) {
-            stfList.selectListItemInGroup(item,
-                GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
-            bot.buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
+        STFBotShell shell = preCondition();
+        String[] items = shell.bot_()
+            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
+        for (String item : items) {
+            shell.bot_().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+                .select(item);
+            shell
+                .bot_()
+                .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
+                    GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
             if (bot().isShellOpen(SHELL_DELETING_ACTIVE_ACCOUNT)
                 && bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive()) {
-                bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).confirm(OK);
+                bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).bot_().button(OK)
+                    .click();
                 continue;
             }
         }
@@ -281,7 +286,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
      */
     private void clickMenuSarosPreferences() throws RemoteException {
         workbench.activateWorkbench();
-        stfMenu.clickMenuWithTexts(MENU_SAROS, MENU_PREFERENCES);
+        bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
     }
 
     /**

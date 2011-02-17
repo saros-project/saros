@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface STFBotCheckBox extends EclipseComponent {
+public interface STFBotCheckBox extends Remote {
 
     /**********************************************
      * 
@@ -12,11 +11,11 @@ public interface STFBotCheckBox extends EclipseComponent {
      * 
      **********************************************/
 
-    public abstract void click(String mnemonicText) throws RemoteException;
+    public abstract void click() throws RemoteException;
 
-    public abstract void select(String dd) throws RemoteException;
+    public abstract void select() throws RemoteException;
 
-    public abstract void deselect(String dd) throws RemoteException;
+    public abstract void deselect() throws RemoteException;
 
     public abstract void setFocus() throws RemoteException;
 

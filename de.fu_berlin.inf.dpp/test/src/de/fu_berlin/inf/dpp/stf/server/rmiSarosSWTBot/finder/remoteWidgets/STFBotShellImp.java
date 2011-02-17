@@ -8,23 +8,18 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
-public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
+public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
     private static transient STFBotShellImp self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
 
     private SWTBotShell swtBotShell;
-    private String shellTitle;
-
-    // Title of Shells
 
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
@@ -34,6 +29,10 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
             return self;
         self = new STFBotShellImp();
         return self;
+    }
+
+    public void setWidget(SWTBotShell shell) {
+        this.swtBotShell = shell;
     }
 
     /**************************************************************
@@ -53,24 +52,7 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
         return true;
     }
 
-    public boolean activateShellWithRegexText(String matchText)
-        throws RemoteException {
-        SWTBotShell[] shells = bot.shells();
-        for (SWTBotShell shell : shells) {
-            if (shell.getText().matches(matchText)) {
-                log.debug("shell found matching \"" + matchText + "\"");
-                if (!shell.isActive()) {
-                    shell.activate();
-                }
-                return shell.isActive();
-            }
-        }
-        final String message = "No shell found matching \"" + matchText + "\"!";
-        log.error(message);
-        throw new RemoteException(message);
-    }
-
-    public void closeShell() throws RemoteException {
+    public void close() throws RemoteException {
         swtBotShell.close();
     }
 
@@ -110,8 +92,6 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
 
     public void confirmShellWithTreeWithWaitingExpand(String buttonText,
         String... nodes) throws RemoteException {
-        SWTBotTree tree = bot.tree();
-        log.info("allItems " + tree.getAllItems().length);
         bot_().tree().selectTreeItemAndWait(nodes);
         bot_().button(buttonText).click();
     }
@@ -120,13 +100,13 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
         throws RemoteException {
         activate();
         if (isChecked)
-            bot.checkBox().click();
+            bot_().checkBox().click();
         bot_().button(buttonText).click();
 
     }
 
-    public void confirmWindowWithCheckBoxs(String buttonText,
-        String... itemNames) throws RemoteException {
+    public void confirmShellithCheckBoxs(String buttonText, String... itemNames)
+        throws RemoteException {
         waitUntilActive();
         for (String itemName : itemNames) {
             bot_().table().getTableItem(itemName).check();
@@ -139,7 +119,7 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
         throws RemoteException {
         // waitUntilShellActive(shellName);
         try {
-            bot.table().select(itemName);
+            bot_().table().select(itemName);
             bot_().button(buttonText).waitUntilIsEnabled();
             bot_().button(buttonText).click();
             // waitUntilShellCloses(shellName);
@@ -151,7 +131,7 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
     public void confirmShellWithTreeWithFilterText(String rootOfTreeNode,
         String teeNode, String buttonText) throws RemoteException {
         // waitUntilShellActive(shellName);
-        bot.text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
+        bot_().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
         bot_().tree().waitUntilSubItemExists(rootOfTreeNode);
         // SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
         // bot_().tree().waitUntilSubItemExists(teeNode);
@@ -170,11 +150,6 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
     public boolean isActive() throws RemoteException {
 
         return swtBotShell.isActive();
-    }
-
-    public String getTextOfActiveShell() throws RemoteException {
-        final SWTBotShell activeShell = bot.activeShell();
-        return activeShell == null ? null : activeShell.getText();
     }
 
     public String getErrorMessageInShell() throws RemoteException {
@@ -206,26 +181,18 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
      **********************************************/
 
     public void waitUntilActive() throws RemoteException {
-        waitUntil(SarosConditions.ShellActive(swtBotShell));
+        bot.waitUntil(SarosConditions.ShellActive(swtBotShell));
         // if (!isShellActive(title))
         // throw new RemoteException("Couldn't activate shell \"" + title
         // + "\"");
     }
 
     public void waitShortUntilIsShellClosed() throws RemoteException {
-        waitShortUntil(SarosConditions.isShellClosed(swtBotShell));
+        bot.waitShortUntil(SarosConditions.isShellClosed(swtBotShell));
     }
 
     public void waitLongUntilShellClosed() throws RemoteException {
-        waitLongUntil(SarosConditions.isShellClosed(swtBotShell));
-    }
-
-    public void setShellTitle(String title) throws RemoteException {
-        // if (shellTitle == null || !shellTitle.equals(title)) {
-        this.shellTitle = title;
-        swtBotShell = bot.shell(title);
-        // }
-
+        bot.waitLongUntil(SarosConditions.isShellClosed(swtBotShell));
     }
 
     public STFBot bot_() {
@@ -233,4 +200,5 @@ public class STFBotShellImp extends EclipseComponentImp implements STFBotShell {
         botImp.setBot(swtBotShell.bot());
         return botImp;
     }
+
 }

@@ -348,11 +348,15 @@ public class STFTest extends STF {
     public static void resetDefaultAccount() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
+                // if (!tester.sarosM.isAccountExist(tester.jid))
+                // tester.sarosM.addAccount(tester.jid, tester.password);
+                // if (!tester.sarosM.isAccountActive(tester.jid))
+                // tester.sarosM.activateAccount(tester.jid);
+                tester.sarosM.deleteAllNoActiveAccounts();
                 if (!tester.sarosM.isAccountExist(tester.jid))
                     tester.sarosM.addAccount(tester.jid, tester.password);
                 if (!tester.sarosM.isAccountActive(tester.jid))
                     tester.sarosM.activateAccount(tester.jid);
-                tester.sarosM.deleteAllNoActiveAccounts();
 
             }
         }

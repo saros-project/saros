@@ -1,13 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface STFBotTree extends EclipseComponent {
+public interface STFBotTree extends Remote {
 
     /**********************************************
      * 
@@ -26,7 +25,8 @@ public interface STFBotTree extends EclipseComponent {
      *            path specified by the node array parameter.
      * @throws RemoteException
      */
-    public STFBotTreeItem selectTreeItem(String... nodes) throws RemoteException;
+    public STFBotTreeItem selectTreeItem(String... nodes)
+        throws RemoteException;
 
     /***************** select tree item with regexs ******************/
 

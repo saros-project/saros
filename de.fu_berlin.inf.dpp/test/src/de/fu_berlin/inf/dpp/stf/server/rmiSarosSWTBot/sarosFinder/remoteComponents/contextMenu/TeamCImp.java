@@ -114,7 +114,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
             bot().openViewById(VIEW_SVN_REPOSITORIES_ID);
             STFBotView view = bot().view(VIEW_SVN_REPOSITORIES);
-            view.setViewTitle("SVN Repositories");
+
             view.setFocus();
             final boolean viewWasOpen = bot().isViewOpen(VIEW_SVN_REPOSITORIES);
             bot().view(VIEW_SVN_REPOSITORIES)
@@ -152,8 +152,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
-
-        stfMenu.clickMenuWithTexts("File", "Import...");
+        bot().menu(MENU_FILE).menu("Import...").click();
         bot().shell(SHELL_IMPORT).confirmShellWithTreeWithFilterText(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
         if (bot.table().containsItem(repositoryURL)) {
@@ -350,7 +349,6 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     protected void precondition(String viewTitle) throws RemoteException {
         bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).setViewTitle(viewTitle);
         bot().view(viewTitle).setFocus();
     }
 }

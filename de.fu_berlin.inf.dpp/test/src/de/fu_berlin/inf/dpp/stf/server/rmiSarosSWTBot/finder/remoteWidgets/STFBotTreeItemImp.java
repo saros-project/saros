@@ -8,10 +8,10 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
 
-public class STFBotTreeItemImp extends EclipseComponentImp implements STFBotTreeItem {
+public class STFBotTreeItemImp extends AbstractRmoteWidget implements
+    STFBotTreeItem {
     private static transient STFBotTreeItemImp self;
 
     private SWTBotTreeItem swtBotTreeItem;
@@ -76,7 +76,7 @@ public class STFBotTreeItemImp extends EclipseComponentImp implements STFBotTree
 
     public void waitUntilSubItemExists(final String subItemText)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existsSubItem(subItemText);
             }

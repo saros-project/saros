@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -7,9 +8,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFBotView extends EclipseComponent {
+public interface STFBotView extends Remote {
 
     /**
      * Waits until the {@link SarosSWTBotPreferences#SAROS_TIMEOUT} is reached
@@ -53,7 +53,7 @@ public interface STFBotView extends EclipseComponent {
     // */
     // public void closeById(final String viewId) throws RemoteException;
 
-    public void setViewTitle(String title) throws RemoteException;
+    // public void setViewTitle(String title) throws RemoteException;
 
     public STFBot bot_() throws RemoteException;
 

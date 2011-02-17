@@ -15,13 +15,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
+public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
 
     private static transient STFBotViewImp self;
-    private String viewTitle;
-    private String viewId;
 
     private SWTBotView swtbotView;
 
@@ -48,30 +45,31 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
         return self;
     }
 
-    public void setViewTitle(String title) throws RemoteException {
-        if (this.viewTitle == null || !viewTitle.equals(title)) {
-            this.viewTitle = title;
-            if (viewTitlesAndIDs.containsKey(viewTitle))
-                this.viewId = viewTitlesAndIDs.get(viewTitle);
-            swtbotView = bot.viewByTitle(title);
-        }
+    public void setViewTitle(SWTBotView view) {
+        // if (this.viewTitle == null || !viewTitle.equals(title)) {
+        // this.viewTitle = title;
+        // if (viewTitlesAndIDs.containsKey(viewTitle))
+        // this.viewId = viewTitlesAndIDs.get(viewTitle);
+        // swtbotView = bot.viewByTitle(title);
+        // }
+        swtbotView = view;
 
     }
 
-    public void setId(String id) {
-        if (this.viewId == null || !this.viewId.equals(id)) {
-            this.viewId = id;
-            if (viewTitlesAndIDs.containsValue(viewId)) {
-                String[] titles = (String[]) viewTitlesAndIDs.keySet()
-                    .toArray();
-                for (int i = 0; i < viewTitlesAndIDs.values().size(); i++) {
-                    if (viewTitlesAndIDs.values().toArray()[i].equals(id))
-                        this.viewTitle = titles[i];
-                }
-                swtbotView = bot.viewById(id);
-            }
-        }
-    }
+    // public void setId(String id) {
+    // if (this.viewId == null || !this.viewId.equals(id)) {
+    // this.viewId = id;
+    // if (viewTitlesAndIDs.containsValue(viewId)) {
+    // String[] titles = (String[]) viewTitlesAndIDs.keySet()
+    // .toArray();
+    // for (int i = 0; i < viewTitlesAndIDs.values().size(); i++) {
+    // if (viewTitlesAndIDs.values().toArray()[i].equals(id))
+    // this.viewTitle = titles[i];
+    // }
+    // swtbotView = bot.viewById(id);
+    // }
+    // }
+    // }
 
     /**************************************************************
      * 
@@ -86,7 +84,7 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
      **********************************************/
     public STFBot bot_() {
         STFBotImp botImp = STFBotImp.getInstance();
-        botImp.setBot(bot.viewByTitle(viewTitle).bot());
+        botImp.setBot(swtbotView.bot());
         return botImp;
     }
 
@@ -212,7 +210,7 @@ public class STFBotViewImp extends EclipseComponentImp implements STFBotView {
      **********************************************/
     public void waitUntilIsActive() throws RemoteException {
 
-        waitUntil(new DefaultCondition() {
+        bot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isActive();
             }

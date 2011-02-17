@@ -66,6 +66,6 @@ public class SarosComponentImp extends EclipseComponentImp implements
         bot().waitUntilShellOpen(SHELL_INVITATION);
         STFBotShell shell = bot().shell(SHELL_INVITATION);
         shell.activate();
-        shell.confirmWindowWithCheckBoxs(FINISH, baseJIDOfinvitees);
+        shell.confirmShellithCheckBoxs(FINISH, baseJIDOfinvitees);
     }
 }

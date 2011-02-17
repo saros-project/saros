@@ -4,9 +4,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotCheckBoxImp extends EclipseComponentImp implements
+public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
     STFBotCheckBox {
 
     private static transient STFBotCheckBoxImp self;
@@ -39,15 +37,15 @@ public class STFBotCheckBoxImp extends EclipseComponentImp implements
      * 
      **********************************************/
 
-    public void click(String mnemonicText) throws RemoteException {
+    public void click() throws RemoteException {
         swtBotCheckBox.click();
     }
 
-    public void select(String dd) throws RemoteException {
+    public void select() throws RemoteException {
         swtBotCheckBox.select();
     }
 
-    public void deselect(String dd) throws RemoteException {
+    public void deselect() throws RemoteException {
         swtBotCheckBox.deselect();
 
     }

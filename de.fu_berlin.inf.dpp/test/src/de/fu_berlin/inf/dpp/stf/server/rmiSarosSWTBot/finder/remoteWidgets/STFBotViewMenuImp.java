@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotViewMenuImp extends EclipseComponentImp implements
+public class STFBotViewMenuImp extends AbstractRmoteWidget implements
     STFBotViewMenu {
 
     private static transient STFBotViewMenuImp self;

@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
+import java.rmi.Remote;
 
-public interface STFBotViewMenu extends EclipseComponent {
+public interface STFBotViewMenu extends Remote {
 
 }

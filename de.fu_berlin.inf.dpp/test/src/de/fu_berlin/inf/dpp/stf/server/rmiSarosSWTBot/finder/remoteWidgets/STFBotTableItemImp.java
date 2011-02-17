@@ -6,14 +6,13 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotTableItemImp extends EclipseComponentImp implements
+public class STFBotTableItemImp extends AbstractRmoteWidget implements
     STFBotTableItem {
 
     private static transient STFBotTableItemImp tableItemImp;
+    private static STFBotMenuImp stfBotMenu;
+
     private SWTBotTableItem tableItem;
-    private static STFBotMenuImp menu;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -22,7 +21,7 @@ public class STFBotTableItemImp extends EclipseComponentImp implements
         if (tableItemImp != null)
             return tableItemImp;
         tableItemImp = new STFBotTableItemImp();
-        menu = STFBotMenuImp.getInstance();
+        stfBotMenu = STFBotMenuImp.getInstance();
         return tableItemImp;
     }
 
@@ -43,8 +42,8 @@ public class STFBotTableItemImp extends EclipseComponentImp implements
      **********************************************/
 
     public STFBotMenu contextMenu(String text) throws RemoteException {
-        menu.setWidget(tableItem.contextMenu(text));
-        return menu;
+        stfBotMenu.setWidget(tableItem.contextMenu(text));
+        return stfBotMenu;
     }
 
     public void select() throws RemoteException {
@@ -130,6 +129,6 @@ public class STFBotTableItemImp extends EclipseComponentImp implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(tableItem));
+        bot.waitUntil(Conditions.widgetIsEnabled(tableItem));
     }
 }

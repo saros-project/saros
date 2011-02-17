@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotToolbarDropDownButtonImp extends EclipseComponentImp
+public class STFBotToolbarDropDownButtonImp extends AbstractRmoteWidget
     implements STFBotToolbarDropDownButton {
     private static transient STFBotToolbarDropDownButtonImp self;
 
@@ -20,7 +18,8 @@ public class STFBotToolbarDropDownButtonImp extends EclipseComponentImp
         return self;
     }
 
-    public void setSwtBotToolbarDropDownButton(SWTBotToolbarDropDownButton toolbarDropDownButton) {
+    public void setSwtBotToolbarDropDownButton(
+        SWTBotToolbarDropDownButton toolbarDropDownButton) {
         this.toolbarDropDownButton = toolbarDropDownButton;
     }
 

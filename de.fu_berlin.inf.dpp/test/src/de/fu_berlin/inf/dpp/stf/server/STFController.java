@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.AbstractRmoteWidget;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
@@ -82,6 +83,7 @@ public class STFController {
         throws RemoteException {
 
         EclipseComponentImp.saros = saros;
+        AbstractRmoteWidget.saros = saros;
         EclipseComponentImp.sessionManager = sessionManager;
         EclipseComponentImp.dataTransferManager = dataTransferManager;
         EclipseComponentImp.editorManager = editorManager;

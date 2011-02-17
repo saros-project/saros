@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFBotShell extends EclipseComponent {
+public interface STFBotShell extends Remote {
 
     /**********************************************
      * 
@@ -24,19 +24,13 @@ public interface STFBotShell extends EclipseComponent {
 
     public boolean isActive() throws RemoteException;
 
-    public void closeShell() throws RemoteException;
+    public void close() throws RemoteException;
 
     /**********************************************
      * 
      * get
      * 
      **********************************************/
-    /**
-     * 
-     * @return the title of the active shell.
-     * @throws RemoteException
-     */
-    public String getTextOfActiveShell() throws RemoteException;
 
     public String getErrorMessageInShell() throws RemoteException;
 
@@ -82,8 +76,6 @@ public interface STFBotShell extends EclipseComponent {
      * @throws RemoteException
      */
     public void waitLongUntilShellClosed() throws RemoteException;
-
-    public void setShellTitle(String title) throws RemoteException;
 
     public STFBot bot_() throws RemoteException;
 
@@ -153,7 +145,7 @@ public interface STFBotShell extends EclipseComponent {
      *            the labels of the checkboxs, which you want to select.
      * 
      */
-    public void confirmWindowWithCheckBoxs(String buttonText,
+    public void confirmShellithCheckBoxs(String buttonText,
         String... itemNames) throws RemoteException;
 
     /**

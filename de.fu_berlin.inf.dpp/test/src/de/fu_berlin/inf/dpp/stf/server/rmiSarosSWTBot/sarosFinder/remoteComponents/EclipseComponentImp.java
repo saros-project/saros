@@ -26,17 +26,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspectiveImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
@@ -57,23 +46,6 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     protected static final transient Logger log = Logger
         .getLogger(EclipseComponentImp.class);
 
-    // simple widgets
-
-    public static STFBotTableImp stfTable = STFBotTableImp.getInstance();
-    public static STFBotTreeImp stfTree = STFBotTreeImp.getInstance();
-
-    public static STFBotPerspectiveImp stfPerspective = STFBotPerspectiveImp
-        .getInstance();
-    public static STFBotMenuImp stfMenu = STFBotMenuImp.getInstance();
-    public static STFBotLabelImp stfLabel = STFBotLabelImp.getInstance();
-    public static STFBotStyledTextImp stfStyledText = STFBotStyledTextImp
-        .getInstance();
-    public static STFBotTextImp stfText = STFBotTextImp.getInstance();
-    public static STFBotEditorImp stfEditor = STFBotEditorImp.getInstance();
-    public static STFBotListImp stfList = STFBotListImp.getInstance();
-
-    public static STFBotCComboImp stfCCombo = STFBotCComboImp.getInstance();
-    public static STFBotComboImp stfCombo = STFBotComboImp.getInstance();
     // workbench
     public static WorkbenchImp workbench = WorkbenchImp.getInstance();
 
@@ -235,19 +207,19 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
      * Inner functions
      * 
      **********************************************/
-    protected void waitUntil(ICondition condition) {
+    public void waitUntil(ICondition condition) throws RemoteException {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
 
-    protected void waitLongUntil(ICondition condition) {
+    public void waitLongUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 
-    protected void waitShortUntil(ICondition condition) {
+    public void waitShortUntil(ICondition condition) {
         bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
     }
 
-    protected String getFileContentNoGUI(String filePath) {
+    public String getFileContentNoGUI(String filePath) {
         Bundle bundle = saros.getBundle();
         String content;
         try {

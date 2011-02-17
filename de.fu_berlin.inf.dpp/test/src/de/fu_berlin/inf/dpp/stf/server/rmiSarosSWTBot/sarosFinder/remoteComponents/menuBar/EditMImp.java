@@ -61,7 +61,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteProject() throws RemoteException {
         precondition();
-        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+        bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
         bot().shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(OK, true);
         bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
     }
@@ -84,7 +84,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteFile() throws RemoteException {
         precondition();
-        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_DELETE);
+        bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
         bot().waitUntilShellOpen(CONFIRM_DELETE);
         bot().shell(CONFIRM_DELETE).activate();
         bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
@@ -97,8 +97,8 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 + " , the target already exists.");
         }
         precondition();
-        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_COPY);
-        stfMenu.clickMenuWithTexts(MENU_EDIT, MENU_PASTE);
+        bot().menu(MENU_EDIT).menu(MENU_COPY).click();
+        bot().menu(MENU_EDIT).menu(MENU_PASTE).click();
         STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
         shell.activate();
         shell.bot_().textWithLabel("Project name:").setText(target);

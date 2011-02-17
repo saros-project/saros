@@ -2,13 +2,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotMenuImp extends EclipseComponentImp implements STFBotMenu {
+public class STFBotMenuImp extends AbstractRmoteWidget implements STFBotMenu {
 
     private static transient STFBotMenuImp menuImp;
 
@@ -56,25 +53,6 @@ public class STFBotMenuImp extends EclipseComponentImp implements STFBotMenu {
      * actions
      * 
      **********************************************/
-
-    public void clickMenuWithTexts(String... texts) throws RemoteException {
-        workbench.activateWorkbench();
-        SWTBotMenu selectedmenu = null;
-        for (String text : texts) {
-            try {
-                if (selectedmenu == null) {
-                    selectedmenu = bot.menu(text);
-                } else {
-                    selectedmenu = selectedmenu.menu(text);
-                }
-            } catch (WidgetNotFoundException e) {
-                log.error("menu \"" + text + "\" not found!");
-                throw e;
-            }
-        }
-        if (selectedmenu != null)
-            selectedmenu.click();
-    }
 
     public void click() throws RemoteException {
         widget.click();
@@ -124,6 +102,6 @@ public class STFBotMenuImp extends EclipseComponentImp implements STFBotMenu {
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(widget));
+        bot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 }

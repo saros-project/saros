@@ -207,11 +207,11 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
     }
 
     public void closeShellInvitationCancelled() throws RemoteException {
-        bot().shell(SHELL_INVITATION_CANCELLED).closeShell();
+        bot().shell(SHELL_INVITATION_CANCELLED).close();
     }
 
     public void closeShellSessionInvitation() throws RemoteException {
-        bot().shell(SHELL_SESSION_INVITATION).closeShell();
+        bot().shell(SHELL_SESSION_INVITATION).close();
     }
 
     public void clickContextMenushareProject(String viewTitle,
@@ -312,7 +312,6 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     protected void precondition(String viewTitle) throws RemoteException {
         bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).setViewTitle(viewTitle);
         bot().view(viewTitle).setFocus();
     }
 }

@@ -60,9 +60,9 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
 
     public void clickMenuPreferences() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            stfMenu.clickMenuWithTexts("Eclipse", "Preferences...");
+            bot().menu("Eclipse").menu(MENU_PREFERENCES).click();
         else
-            stfMenu.clickMenuWithTexts(MENU_WINDOW, MENU_PREFERENCES);
+            bot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
     }
 
     public void showViewProblems() throws RemoteException {
@@ -78,7 +78,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
         workbench.activateWorkbench();
-        stfMenu.clickMenuWithTexts(MENU_WINDOW, MENU_SHOW_VIEW, MENU_OTHER);
+        bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
         bot().shell(SHELL_SHOW_VIEW).confirmShellWithTreeWithFilterText(
             parentNode, node, OK);
     }
@@ -124,17 +124,17 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (bot.radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            bot().shell(SHELL_PREFERNCES).closeShell();
+            bot().shell(SHELL_PREFERNCES).close();
             return "Default";
         } else if (bot.radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
             SWTBotCombo combo = bot
                 .comboBoxInGroup("New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            bot().shell(SHELL_PREFERNCES).closeShell();
+            bot().shell(SHELL_PREFERNCES).close();
             return itemName;
         }
-        bot().shell(SHELL_PREFERNCES).closeShell();
+        bot().shell(SHELL_PREFERNCES).close();
         return "";
     }
 

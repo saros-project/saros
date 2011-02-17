@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 
 public class Bot extends Wrapper {
 
@@ -18,10 +17,10 @@ public class Bot extends Wrapper {
     // return tester.view;
     // }
 
-    public STFBotShell shell(String title) throws RemoteException {
-        tester.shell.setShellTitle(title);
-        return tester.shell;
-    }
+    // public STFBotShell shell(String title) throws RemoteException {
+    // tester.shell.setShellTitle(title);
+    // return tester.shell;
+    // }
 
     public STFBot bot() throws RemoteException {
         return tester.bot;

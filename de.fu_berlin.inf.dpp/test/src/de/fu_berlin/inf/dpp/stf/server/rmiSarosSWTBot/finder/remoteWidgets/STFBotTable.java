@@ -1,11 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface STFBotTable extends EclipseComponent {
+public interface STFBotTable extends Remote {
     /**********************************************
      * 
      * states
@@ -23,8 +22,6 @@ public interface STFBotTable extends EclipseComponent {
 
     public STFBotMenu contextMenu(String text) throws RemoteException;
 
-    public void header(String label) throws RemoteException;
-
     public STFBotTableItem getTableItem(String itemText) throws RemoteException;
 
     public STFBotTableItem getTableItem(int row) throws RemoteException;
@@ -38,8 +35,6 @@ public interface STFBotTable extends EclipseComponent {
     public void select(String... items) throws RemoteException;
 
     public void click(int row, int column) throws RemoteException;
-
-    public void selection() throws RemoteException;
 
     public void unselect() throws RemoteException;
 
@@ -91,7 +86,7 @@ public interface STFBotTable extends EclipseComponent {
 
     public void waitUntilTableHasRows(int row) throws RemoteException;
 
-    public void waitUntilTableItemExisted(String itemText)
+    public void waitUntilTableItemExists(String itemText)
         throws RemoteException;
 
 }

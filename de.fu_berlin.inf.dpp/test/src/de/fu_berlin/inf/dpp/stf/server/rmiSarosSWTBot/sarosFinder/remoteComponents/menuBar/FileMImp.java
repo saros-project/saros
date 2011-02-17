@@ -35,7 +35,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     public void newProject(String projectName) throws RemoteException {
         if (!existsProjectNoGUI(projectName)) {
             precondition();
-            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_PROJECT);
+            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PROJECT).click();
+
             confirmWizardNewProject(projectName);
         }
     }
@@ -43,7 +44,9 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     public void newJavaProject(String projectName) throws RemoteException {
         if (!existsProjectNoGUI(projectName)) {
             precondition();
-            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_JAVA_PROJECT);
+            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_JAVA_PROJECT)
+                .click();
+
             confirmShellNewJavaProject(projectName);
         }
     }
@@ -52,7 +55,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         precondition();
         if (!existsFolderNoGUI(folderNodes)) {
             try {
-                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FOLDER);
+                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FOLDER).click();
                 confirmShellNewFolder(folderNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -68,8 +71,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             if (!existsPkgNoGUI(projectName, pkg))
                 try {
                     precondition();
-                    stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW,
-                        MENU_PACKAGE);
+                    bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE)
+                        .click();
                     confirmShellNewJavaPackage(projectName, pkg);
                 } catch (WidgetNotFoundException e) {
                     final String cause = "error creating new package";
@@ -86,7 +89,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         if (!existsFileNoGUI(getPath(fileNodes)))
             try {
                 precondition();
-                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_FILE);
+                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FILE).click();
                 confirmShellNewFile(fileNodes);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -100,7 +103,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
             try {
                 precondition();
-                stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
+                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
                 confirmShellNewJavaClass(projectName, pkg, className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
@@ -114,7 +117,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         String className) throws RemoteException {
         if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
             precondition();
-            stfMenu.clickMenuWithTexts(MENU_FILE, MENU_NEW, MENU_CLASS);
+            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
+
             bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             bot.textWithLabel(LABEL_SOURCE_FOLDER).setText(
                 projectName + "/" + SRC);

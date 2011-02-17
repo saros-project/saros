@@ -13,10 +13,16 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCheckBox;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCheckBoxImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
@@ -48,6 +54,9 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
     private static STFBotToolbarButtonImp toolbarButton;
     private static STFBotTextImp text;
     private static STFBotTableImp table;
+    private static STFBotMenuImp menu;
+    private static STFBotListImp list;
+    private static STFBotCheckBoxImp checkbox;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -67,6 +76,9 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         toolbarButton = STFBotToolbarButtonImp.getInstance();
         text = STFBotTextImp.getInstance();
         table = STFBotTableImp.getInstance();
+        menu = STFBotMenuImp.getInstance();
+        list = STFBotListImp.getInstance();
+        checkbox = STFBotCheckBoxImp.getInstance();
 
         return self;
     }
@@ -89,7 +101,7 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     public STFBotTree tree() throws RemoteException {
         tree.setSWTBotTree(swtBot.tree());
-        return stfTree;
+        return tree;
     }
 
     /**********************************************
@@ -98,13 +110,8 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
      * 
      **********************************************/
 
-    public void closeAllShells() throws RemoteException {
-        bot.closeAllShells();
-
-    }
-
     public STFBotShell shell(String title) throws RemoteException {
-        shell.setShellTitle(title);
+        shell.setWidget(swtBot.shell(title));
         return shell;
     }
 
@@ -144,6 +151,11 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
                 return null;
             }
         });
+    }
+
+    public String getTextOfActiveShell() throws RemoteException {
+        final SWTBotShell activeShell = bot.activeShell();
+        return activeShell == null ? null : activeShell.getText();
     }
 
     /**********************************************
@@ -1000,6 +1012,242 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         throws RemoteException {
         table.setSwtBotTable(swtBot.tableWithLabelInGroup(label, inGroup));
         return table;
+    }
+
+    public STFBotMenu menu(String text) throws RemoteException {
+        menu.setWidget(swtBot.menu(text));
+        return menu;
+    }
+
+    public STFBotMenu menu(String text, int index) throws RemoteException {
+        menu.setWidget(swtBot.menu(text, index));
+        return menu;
+    }
+
+    public STFBotMenu menuWithId(String value) throws RemoteException {
+        menu.setWidget(swtBot.menuWithId(value));
+        return menu;
+    }
+
+    public STFBotMenu menuWithId(String value, int index)
+        throws RemoteException {
+        menu.setWidget(swtBot.menuWithId(value, index));
+        return menu;
+    }
+
+    public STFBotMenu menuWithId(String key, String value)
+        throws RemoteException {
+        menu.setWidget(swtBot.menuWithId(key, value));
+        return menu;
+    }
+
+    public STFBotMenu menuWithId(String key, String value, int index)
+        throws RemoteException {
+        menu.setWidget(swtBot.menuWithId(key, value, index));
+        return menu;
+    }
+
+    /**********************************************
+     * 
+     * Widget table
+     * 
+     **********************************************/
+
+    public STFBotList listWithLabel(String label) throws RemoteException {
+        list.setWidget(swtBot.listWithLabel(label));
+        return list;
+    }
+
+    public STFBotList listWithLabel(String label, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithLabel(label, index));
+        return list;
+    }
+
+    public STFBotList listWithId(String key, String value)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(key, value));
+        return list;
+    }
+
+    public STFBotList listWithId(String key, String value, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(key, value, index));
+        return list;
+    }
+
+    public STFBotList listWithId(String value) throws RemoteException {
+        list.setWidget(swtBot.listWithId(value));
+        return list;
+    }
+
+    public STFBotList listWithId(String value, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(value, index));
+        return list;
+    }
+
+    public STFBotList listInGroup(String inGroup) throws RemoteException {
+        list.setWidget(swtBot.listInGroup(inGroup));
+        return list;
+    }
+
+    public STFBotList listInGroup(String inGroup, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listInGroup(inGroup, index));
+        return list;
+    }
+
+    public STFBotList list() throws RemoteException {
+        list.setWidget(swtBot.list());
+        return list;
+    }
+
+    public STFBotList list(int index) throws RemoteException {
+        list.setWidget(swtBot.list(index));
+        return list;
+    }
+
+    public STFBotList listWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithLabelInGroup(label, inGroup));
+        return list;
+    }
+
+    public STFBotList listWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        list.setWidget(swtBot.listWithLabelInGroup(label, inGroup, index));
+        return list;
+    }
+
+    /**********************************************
+     * 
+     * Widget table
+     * 
+     **********************************************/
+    public STFBotCheckBox checkBoxWithLabel(String label)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithLabel(label));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithLabel(String label, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithLabel(label, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBox(String mnemonicText) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBox(mnemonicText));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBox(String mnemonicText, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBox(mnemonicText, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithTooltip(String tooltip)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithTooltip(tooltip));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithTooltip(tooltip, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithId(String key, String value)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithId(key, value));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithId(String key, String value, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithId(key, value, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithId(String value) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithId(value));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithId(String value, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithId(value, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxInGroup(String inGroup)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxInGroup(inGroup));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxInGroup(String inGroup, int index)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxInGroup(inGroup, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBox() throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBox());
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBox(int index) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBox(index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot
+            .checkBoxWithLabelInGroup(label, inGroup));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithLabelInGroup(label,
+            inGroup, index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup,
+            index));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithTooltipInGroup(tooltip,
+            inGroup));
+        return checkbox;
+    }
+
+    public STFBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        checkbox.setSWTBotWidget(swtBot.checkBoxWithTooltipInGroup(tooltip,
+            inGroup, index));
+        return checkbox;
+    }
+
+    public void sleep(long millis) throws RemoteException {
+        swtBot.sleep(millis);
     }
 
 }

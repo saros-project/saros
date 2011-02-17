@@ -7,8 +7,11 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
@@ -34,8 +37,6 @@ public interface STFBot extends EclipseComponent {
      * Widget shell
      * 
      **********************************************/
-
-    public void closeAllShells() throws RemoteException;
 
     /**
      * 
@@ -1254,4 +1255,419 @@ public interface STFBot extends EclipseComponent {
      */
     public STFBotTable tableWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget menu
+     * 
+     **********************************************/
+
+    /**
+     * @param text
+     *            the text on the menu.
+     * @return a menu item that matches the specified text.
+     */
+    public STFBotMenu menu(String text) throws RemoteException;
+
+    /**
+     * @param text
+     *            the text on the menu.
+     * @param index
+     *            the index of the menu, in case there are multiple menus with
+     *            the same text.
+     * @return a menu item that matches the specified text.
+     */
+    public STFBotMenu menu(String text, int index) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value of the id.
+     * @return a wrapper around a @{link Menu} with the specified key/value pair
+     *         for its id.
+     */
+    public STFBotMenu menuWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value of the id.
+     * @param index
+     *            the index of the menu item, in case there are multiple shells
+     *            with the same text.
+     * @return a wrapper around a @{link Menu} with the specified key/value pair
+     *         for its id.
+     */
+    public STFBotMenu menuWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key of the id.
+     * @param value
+     *            the value of the id.
+     * @return a wrapper around a @{link Menu} with the specified key/value pair
+     *         for its id.
+     */
+    public STFBotMenu menuWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key of the id.
+     * @param value
+     *            the value of the id.
+     * @param index
+     *            the index of the menu item, in case there are multiple shells
+     *            with the same text.
+     * @return a wrapper around a @{link Menu} with the specified key/value pair
+     *         for its id.
+     */
+    public STFBotMenu menuWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget list
+     * 
+     **********************************************/
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotList} with the specified <code>label</code>.
+     */
+    public STFBotList listWithLabel(String label) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>label</code>.
+     */
+
+    public STFBotList listWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotList} with the specified <code>key/value</code>.
+     */
+    public STFBotList listWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>key/value</code>.
+     */
+
+    public STFBotList listWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotList} with the specified <code>value</code>.
+     */
+    public STFBotList listWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>value</code>.
+     */
+
+    public STFBotList listWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotList} with the specified <code>inGroup</code>.
+     */
+    public STFBotList listInGroup(String inGroup) throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotList listInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotList} with the specified <code>none</code>.
+     */
+    public STFBotList list() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>none</code>.
+     */
+
+    public STFBotList list(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotList} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotList listWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotList} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+
+    public STFBotList listWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException;
+
+    /**
+     * 
+     * @return the title of the active shell.
+     * @throws RemoteException
+     */
+    public String getTextOfActiveShell() throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>label</code>.
+     */
+    public STFBotCheckBox checkBoxWithLabel(String label)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>label</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>mnemonicText</code>.
+     */
+    public STFBotCheckBox checkBox(String mnemonicText) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>mnemonicText</code>.
+     */
+
+    public STFBotCheckBox checkBox(String mnemonicText, int index)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>tooltip</code>.
+     */
+    public STFBotCheckBox checkBoxWithTooltip(String tooltip)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>tooltip</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithTooltip(String tooltip, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>key/value</code>.
+     */
+    public STFBotCheckBox checkBoxWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>key/value</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotCheckBox} with the specified <code>value</code>.
+     */
+    public STFBotCheckBox checkBoxWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>value</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>inGroup</code>.
+     */
+    public STFBotCheckBox checkBoxInGroup(String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotCheckBox checkBoxInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotCheckBox} with the specified <code>none</code>.
+     */
+    public STFBotCheckBox checkBox() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>none</code>.
+     */
+
+    public STFBotCheckBox checkBox(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
+     */
+    public STFBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+    public STFBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+
+    public STFBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
+     */
+    public STFBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotCheckBox} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
+     */
+
+    public STFBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException;
+
+    public void sleep(long millis) throws RemoteException;
 }

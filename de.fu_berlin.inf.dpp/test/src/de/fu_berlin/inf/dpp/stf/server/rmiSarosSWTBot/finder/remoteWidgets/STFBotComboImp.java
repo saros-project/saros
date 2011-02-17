@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotComboImp extends EclipseComponentImp implements STFBotCombo {
+public class STFBotComboImp extends AbstractRmoteWidget implements STFBotCombo {
 
     private static transient STFBotComboImp self;
 

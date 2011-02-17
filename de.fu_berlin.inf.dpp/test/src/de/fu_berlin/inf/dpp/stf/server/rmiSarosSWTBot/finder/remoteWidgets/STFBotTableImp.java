@@ -10,14 +10,14 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
+public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
 
     private static transient STFBotTableImp tableImp;
+    private static STFBotMenuImp stfBotMenu;
+    private static STFBotTableItemImp stfBotTableItem;
+
     private SWTBotTable table;
-    private static STFBotMenuImp menu;
-    private static STFBotTableItemImp tableItem;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -26,8 +26,8 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
         if (tableImp != null)
             return tableImp;
         tableImp = new STFBotTableImp();
-        menu = STFBotMenuImp.getInstance();
-        tableItem = STFBotTableItemImp.getInstance();
+        stfBotMenu = STFBotMenuImp.getInstance();
+        stfBotTableItem = STFBotTableItemImp.getInstance();
         return tableImp;
     }
 
@@ -47,9 +47,7 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      * 
      **********************************************/
     public boolean existsTableItem(String itemText) throws RemoteException {
-
         return table.containsItem(itemText);
-
     }
 
     public List<String> getTableColumns() throws RemoteException {
@@ -63,22 +61,18 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      **********************************************/
 
     public STFBotMenu contextMenu(String text) throws RemoteException {
-        menu.setWidget(table.contextMenu(text));
-        return menu;
-    }
-
-    public void header(String label) throws RemoteException {
-        table.header(label);
+        stfBotMenu.setWidget(table.contextMenu(text));
+        return stfBotMenu;
     }
 
     public STFBotTableItem getTableItem(String itemText) throws RemoteException {
-        tableItem.setSwtBotTable(table.getTableItem(itemText));
-        return tableItem;
+        stfBotTableItem.setSwtBotTable(table.getTableItem(itemText));
+        return stfBotTableItem;
     }
 
     public STFBotTableItem getTableItem(int row) throws RemoteException {
-        tableItem.setSwtBotTable(table.getTableItem(row));
-        return tableItem;
+        stfBotTableItem.setSwtBotTable(table.getTableItem(row));
+        return stfBotTableItem;
     }
 
     /**********************************************
@@ -93,10 +87,6 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
 
     public void click(int row, int column) throws RemoteException {
         table.click(row, column);
-    }
-
-    public void selection() throws RemoteException {
-        table.selection();
     }
 
     public void unselect() throws RemoteException {
@@ -152,6 +142,7 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
         return table.columns();
     }
 
+    // FIXME this method doesn't work.
     public boolean existsContextMenu(String contextName) throws RemoteException {
         try {
             table.contextMenu(contextName);
@@ -159,7 +150,6 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
         } catch (WidgetNotFoundException e) {
             return false;
         }
-
     }
 
     public boolean isEnabled() throws RemoteException {
@@ -188,16 +178,16 @@ public class STFBotTableImp extends EclipseComponentImp implements STFBotTable {
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        waitUntil(Conditions.widgetIsEnabled(table));
+        bot.waitUntil(Conditions.widgetIsEnabled(table));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        waitUntil(tableHasRows(table, row));
+        bot.waitUntil(tableHasRows(table, row));
     }
 
-    public void waitUntilTableItemExisted(String itemText)
+    public void waitUntilTableItemExists(String itemText)
         throws RemoteException {
-        waitUntil(SarosConditions.existTableItem(this, itemText));
+        bot.waitUntil(SarosConditions.existTableItem(this, itemText));
     }
 
 }

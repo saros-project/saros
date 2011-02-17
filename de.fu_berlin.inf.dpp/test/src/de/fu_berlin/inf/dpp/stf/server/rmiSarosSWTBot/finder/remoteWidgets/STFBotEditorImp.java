@@ -11,15 +11,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotEditorImp extends EclipseComponentImp implements
+public class STFBotEditorImp extends AbstractRmoteWidget implements
     STFBotEditor {
 
     private static transient STFBotEditorImp self;
 
-    private String title;
-    private String id;
     private SWTBotEclipseEditor editor;
 
     /* error messages */
@@ -36,16 +32,8 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         return self;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-        this.editor = bot.editorByTitle(title).toTextEditor();
-    }
-
-    public void setId(String id) {
-        if (this.id == null || !this.id.equals(id)) {
-            this.id = id;
-            this.editor = bot.editorById(id).toTextEditor();
-        }
+    public void setTitle(SWTBotEclipseEditor editor) {
+        this.editor = editor;
     }
 
     /***********************************************************************
@@ -76,9 +64,9 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     public void closeWithoutSave() throws RemoteException {
         editor.close();
-        if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
-            && bot().shell(SHELL_SAVE_RESOURCE).isActive())
-            bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        if (bot.isShellOpen(SHELL_SAVE_RESOURCE)
+            && bot.shell(SHELL_SAVE_RESOURCE).isActive())
+            bot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
     }
 
     public void setTexWithSave(String contentPath) throws RemoteException {
@@ -106,14 +94,14 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         editor.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbench.sleep(500);
+        bot.sleep(500);
     }
 
     public void selectLine(int line) throws RemoteException {
         editor.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbench.sleep(1000);
+        bot.sleep(1000);
 
     }
 
@@ -122,7 +110,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         editor.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        workbench.sleep(800);
+        bot.sleep(800);
     }
 
     public void pressShortcut(String... keys) throws RemoteException {
@@ -161,7 +149,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
             editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        workbench.sleep(1000);
+        bot.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'j');
     }
 
@@ -170,7 +158,8 @@ public class STFBotEditorImp extends EclipseComponentImp implements
             editor.pressShortcut(SWT.COMMAND, '.');
         else
             editor.pressShortcut(SWT.CTRL, '.');
-        workbench.sleep(20);
+
+        bot.sleep(20);
     }
 
     public void pressShortCutQuickAssignToLocalVariable()
@@ -179,7 +168,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
             editor.pressShortcut(SWT.COMMAND, '2');
         else
             editor.pressShortcut(SWT.CTRL, '2');
-        workbench.sleep(1000);
+        bot.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'l');
 
     }
@@ -248,7 +237,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
      **********************************************/
 
     public void waitUntilIsActive() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot.waitUntil1(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isActive();
             }
@@ -265,7 +254,7 @@ public class STFBotEditorImp extends EclipseComponentImp implements
 
     public void waitUntilIsTextSame(final String otherText)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot.waitUntil1(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getText().equals(otherText);
             }
@@ -276,11 +265,5 @@ public class STFBotEditorImp extends EclipseComponentImp implements
         });
 
     }
-
-    /**********************************************
-     * 
-     * inner functions
-     * 
-     **********************************************/
 
 }

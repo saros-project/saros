@@ -11,16 +11,6 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotList;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
@@ -57,17 +47,6 @@ public class Tester extends STF {
 
     public STFWorkbenchBot bot;
     public NoBot noBot;
-    public STFBotTable table;
-    public STFBotTree tree;
-    public STFBotTreeItem treeItem;
-    public STFBotButton button;
-    public STFBotToolbarButton toolbarButton;
-    public STFBotShell shell;
-    // public STFBotView view;
-    public STFBotMenu menu;
-    public STFBotLabel label;
-    public STFBotText text;
-    public STFBotList list;
 
     public Workbench workbench;
 
@@ -109,6 +88,9 @@ public class Tester extends STF {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
 
+            bot = (STFWorkbenchBot) registry.lookup("bot");
+            noBot = (NoBot) registry.lookup("noBot");
+
             chatV = (ChatView) registry.lookup("chatView");
             sarosBuddiesV = (RosterView) registry.lookup("rosterView");
             sarosSessionV = (SessionView) registry.lookup("sessionView");
@@ -123,23 +105,7 @@ public class Tester extends STF {
             progressV = (ProgressView) registry.lookup("progressView");
             consoleV = (ConsoleView) registry.lookup("consoleView");
             workbench = (Workbench) registry.lookup("workbench");
-            shell = (STFBotShell) registry.lookup("shell");
-            // editor = (STFBotEditor) registry.lookup("eclipseEditor");
 
-            bot = (STFWorkbenchBot) registry.lookup("bot");
-            noBot = (NoBot) registry.lookup("noBot");
-            table = (STFBotTable) registry.lookup("table");
-            tree = (STFBotTree) registry.lookup("tree");
-            treeItem = (STFBotTreeItem) registry.lookup("treeItem");
-            button = (STFBotButton) registry.lookup("button");
-            toolbarButton = (STFBotToolbarButton) registry
-                .lookup("toolbarButton");
-            menu = (STFBotMenu) registry.lookup("menu");
-            // view = (STFBotView) registry.lookup("view");
-            label = (STFBotLabel) registry.lookup("label");
-            text = (STFBotText) registry.lookup("text");
-            list = (STFBotList) registry.lookup("list");
-            // menus in menu bar
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");
             refactorM = (RefactorM) registry.lookup("refactorM");

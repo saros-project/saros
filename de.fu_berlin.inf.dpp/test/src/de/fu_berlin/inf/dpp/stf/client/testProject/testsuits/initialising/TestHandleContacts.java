@@ -142,8 +142,7 @@ public class TestHandleContacts extends STFTest {
     @Test
     public void testAddNoValidContact() throws RemoteException {
         alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_CONTACT)
-            .click();
+            .toolbarButton(TB_ADD_A_NEW_CONTACT).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
@@ -151,7 +150,7 @@ public class TestHandleContacts extends STFTest {
             .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
 
         alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).waitUntilActive();
-        assertTrue(alice.shell.isActive());
+        assertTrue(alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).isActive());
         alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).confirm(NO);
 
     }
@@ -173,15 +172,14 @@ public class TestHandleContacts extends STFTest {
     @Test
     public void testAddExistedContact() throws RemoteException {
         alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_CONTACT)
-            .click();
+            .toolbarButton(TB_ADD_A_NEW_CONTACT).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
 
         alice.bot().shell(SHELL_NEW_BUDDY)
             .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
         alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).waitUntilActive();
-        assertTrue(alice.shell.isActive());
-        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).closeShell();
+        assertTrue(alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).isActive());
+        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).close();
     }
 }

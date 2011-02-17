@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.hamcrest.Matcher;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
@@ -129,4 +130,8 @@ public interface STFWorkbenchBot extends STFBot {
 
     public void waitUntilEditorClosed(final String title)
         throws RemoteException;
+
+    public void closeAllShells() throws RemoteException;
+
+    public void waitUntil1(ICondition condition) throws RemoteException;
 }

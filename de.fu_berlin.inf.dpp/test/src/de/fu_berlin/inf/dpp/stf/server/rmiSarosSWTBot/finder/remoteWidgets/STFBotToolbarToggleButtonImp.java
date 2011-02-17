@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-
-public class STFBotToolbarToggleButtonImp extends EclipseComponentImp implements
+public class STFBotToolbarToggleButtonImp extends AbstractRmoteWidget implements
     STFBotToolbarToggleButton {
 
     private static transient STFBotToolbarToggleButtonImp self;

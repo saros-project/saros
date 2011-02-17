@@ -52,7 +52,8 @@ public class TestSarosPreferences extends STFTest {
 
     @Test
     public void createAccountWhichAlreadyExisted() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
+
         alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activate();
 
@@ -77,8 +78,8 @@ public class TestSarosPreferences extends STFTest {
 
     @Test
     public void createAccountWithDismatchedPassword() throws RemoteException {
+        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
         alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
@@ -100,7 +101,7 @@ public class TestSarosPreferences extends STFTest {
 
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
-        alice.menu.clickMenuWithTexts(MENU_SAROS, MENU_CREATE_ACCOUNT);
+        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
         alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
@@ -183,6 +184,7 @@ public class TestSarosPreferences extends STFTest {
     }
 
     @Test(expected = RuntimeException.class)
+    @Ignore
     public void deleteActiveAccount() throws RemoteException {
         assertTrue(alice.sarosM.isAccountExist(alice.jid));
         alice.sarosM.deleteAccount(alice.jid, alice.password);
