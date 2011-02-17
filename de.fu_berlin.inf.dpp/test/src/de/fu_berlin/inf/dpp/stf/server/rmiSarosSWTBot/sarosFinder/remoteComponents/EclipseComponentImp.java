@@ -61,9 +61,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     public static STFBotTableImp stfTable = STFBotTableImp.getInstance();
     public static STFBotTreeImp stfTree = STFBotTreeImp.getInstance();
-    // public static STFBotButtonImp stfButton = STFBotButtonImp.getInstance();
 
-    // public static STFBotViewImp stfView = STFBotViewImp.getInstance();
     public static STFBotPerspectiveImp stfPerspective = STFBotPerspectiveImp
         .getInstance();
     public static STFBotMenuImp stfMenu = STFBotMenuImp.getInstance();
@@ -71,7 +69,6 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static STFBotStyledTextImp stfStyledText = STFBotStyledTextImp
         .getInstance();
     public static STFBotTextImp stfText = STFBotTextImp.getInstance();
-    // public static STFBotShell stfShell = STFBotShellImp.getInstance();
     public static STFBotEditorImp stfEditor = STFBotEditorImp.getInstance();
     public static STFBotListImp stfList = STFBotListImp.getInstance();
 
