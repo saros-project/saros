@@ -230,22 +230,22 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="de.fu_berlin.inf.dpp.ui.GeneralPreferencePage"
+            class="de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences"
             name="Saros"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.AdvancedPreferencePage"
+            class="de.fu_berlin.inf.dpp.ui.preferencePages.AdvancedPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.advanced"
             name="Advanced"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage"
+            class="de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
             name="Feedback"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.ui.CommunicationPreferencePage"
+            class="de.fu_berlin.inf.dpp.ui.preferencePages.CommunicationPreferencePage"
             id="de.fu_berlin.dpp.preferences.communication"
             name="Communication">
       </page>
