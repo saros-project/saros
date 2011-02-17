@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp.ui;
+package de.fu_berlin.inf.dpp.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;

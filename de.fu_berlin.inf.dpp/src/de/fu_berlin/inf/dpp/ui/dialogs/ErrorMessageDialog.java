@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui;
+package de.fu_berlin.inf.dpp.ui.dialogs;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;

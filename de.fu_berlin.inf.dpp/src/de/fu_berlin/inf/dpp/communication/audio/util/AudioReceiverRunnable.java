@@ -12,7 +12,7 @@ import org.xiph.speex.spi.Speex2PcmAudioInputStream;
 
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
 
 /**
  * The {@link AudioReceiverRunnable} manages all packets which will be received

@@ -24,7 +24,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.ui.PartialProjectSelectionDialog;
+import de.fu_berlin.inf.dpp.ui.dialogs.PartialProjectSelectionDialog;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**

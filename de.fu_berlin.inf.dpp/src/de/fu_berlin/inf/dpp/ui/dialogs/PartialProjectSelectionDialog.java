@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui;
+package de.fu_berlin.inf.dpp.ui.dialogs;
 
 import java.util.Iterator;
 import java.util.List;

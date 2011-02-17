@@ -20,11 +20,11 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
+import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
-import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
