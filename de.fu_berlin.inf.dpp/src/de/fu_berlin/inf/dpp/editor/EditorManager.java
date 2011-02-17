@@ -121,7 +121,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected static Logger log = Logger.getLogger(EditorManager.class
         .getName());
 
-    protected SharedEditorListenerDispatch editorListener = new SharedEditorListenerDispatch();
+    protected SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
 
     protected IEditorAPI editorAPI;
 
@@ -384,6 +384,27 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
+    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+
+        @Override
+        public void activeEditorChanged(User user, SPath path) {
+
+            Predicate<SarosAnnotation> p = new Predicate<SarosAnnotation>() {
+                public boolean evaluate(SarosAnnotation annotation) {
+                    return annotation instanceof ViewportAnnotation;
+                }
+            };
+
+            for (SPath localEditor : locallyOpenEditors) {
+                if (!localEditor.equals(path)) {
+                    for (IEditorPart match : editorPool.getEditors(localEditor)) {
+                        removeAllAnnotations(match, p);
+                    }
+                }
+            }
+        }
+    };
+
     @Inject
     protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -406,6 +427,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorAPI = editorApi;
         sessionManager.addSarosSessionListener(this.sessionListener);
+        addSharedEditorListener(sharedEditorListener);
 
         stopManager.addBlockable(stopManagerListener);
         this.stopManager = stopManager;
@@ -467,11 +489,11 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
-        this.editorListener.add(editorListener);
+        this.editorListenerDispatch.add(editorListener);
     }
 
     public void removeSharedEditorListener(ISharedEditorListener editorListener) {
-        this.editorListener.remove(editorListener);
+        this.editorListenerDispatch.remove(editorListener);
     }
 
     /**
@@ -503,7 +525,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (path != null)
             this.locallyOpenEditors.add(path);
 
-        editorListener.activeEditorChanged(sarosSession.getLocalUser(), path);
+        editorListenerDispatch.activeEditorChanged(sarosSession.getLocalUser(),
+            path);
 
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Activated, path));
@@ -548,7 +571,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         fireActivity(new ViewportActivity(sarosSession.getLocalUser(),
             viewport, path));
 
-        editorListener.viewportGenerated(part, viewport, path);
+        editorListenerDispatch.viewportGenerated(part, viewport, path);
 
     }
 
@@ -667,8 +690,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListener.textEditRecieved(sarosSession.getLocalUser(), path,
-            text, replacedText, offset);
+        editorListenerDispatch.textEditRecieved(sarosSession.getLocalUser(),
+            path, text, replacedText, offset);
 
         /*
          * TODO Investigate if this is really needed here
@@ -782,7 +805,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListener.textEditRecieved(user, path, textEdit.getText(),
+        editorListenerDispatch.textEditRecieved(user, path, textEdit.getText(),
             textEdit.getReplacedText(), textEdit.getOffset());
     }
 
@@ -814,7 +837,7 @@ public class EditorManager implements IActivityProvider, Disposable {
          * inform all registered ISharedEditorListeners about a text selection
          * made
          */
-        editorListener.textSelectionMade(selection);
+        editorListenerDispatch.textSelectionMade(selection);
     }
 
     protected void execViewport(ViewportActivity viewport) {
@@ -866,7 +889,7 @@ public class EditorManager implements IActivityProvider, Disposable {
          * inform all registered ISharedEditorListeners about a change in
          * viewport
          */
-        editorListener.viewportChanged(viewport);
+        editorListenerDispatch.viewportChanged(viewport);
 
     }
 
@@ -874,7 +897,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         log.trace("EditorManager.execActivated invoked");
 
-        editorListener.activeEditorChanged(user, path);
+        editorListenerDispatch.activeEditorChanged(user, path);
 
         /**
          * Path null means this user with {@link User.Permission#WRITE_ACCESS}
@@ -889,7 +912,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         log.trace("EditorManager.execClosed invoked");
 
-        editorListener.editorRemoved(user, path);
+        editorListenerDispatch.editorRemoved(user, path);
 
         if (user.equals(getFollowedUser())) {
             for (IEditorPart part : editorPool.getEditors(path)) {
@@ -899,7 +922,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     protected void execColorChanged() {
-        editorListener.colorChanged();
+        editorListenerDispatch.colorChanged();
     }
 
     /**
@@ -1061,7 +1084,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         this.locallyOpenEditors.remove(path);
 
-        editorListener.editorRemoved(sarosSession.getLocalUser(), path);
+        editorListenerDispatch.editorRemoved(sarosSession.getLocalUser(), path);
 
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Closed, path));
@@ -1304,7 +1327,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        editorListener.userWithWriteAccessEditorSaved(path, true);
+        editorListenerDispatch.userWithWriteAccessEditorSaved(path, true);
 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
@@ -1394,7 +1417,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         // editorPool, or?
         // What is the reason of this?
 
-        editorListener.userWithWriteAccessEditorSaved(path, false);
+        editorListenerDispatch.userWithWriteAccessEditorSaved(path, false);
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Saved, path));
     }
@@ -1527,7 +1550,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         this.userToFollow = userToFollow;
 
-        editorListener.followModeChanged(this.userToFollow);
+        editorListenerDispatch.followModeChanged(this.userToFollow);
 
         if (this.userToFollow != null)
             this.jumpToUser(this.userToFollow);
@@ -1585,7 +1608,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             RemoteEditorState remoteEditorState = remoteEditorManager
                 .getEditorState(user);
-            if (!remoteEditorState.isRemoteOpenEditor(path)) {
+            if (!(remoteEditorState.isRemoteOpenEditor(path) && remoteEditorState
+                .isRemoteActiveEditor(path))) {
                 continue;
             }
 
@@ -1636,7 +1660,7 @@ public class EditorManager implements IActivityProvider, Disposable {
          * inform all registered ISharedEditorListeners about this jump
          * performed
          */
-        editorListener.jumpedToUser(jumpTo);
+        editorListenerDispatch.jumpedToUser(jumpTo);
     }
 
     /**
