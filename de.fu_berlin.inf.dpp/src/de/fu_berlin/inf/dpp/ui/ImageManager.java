@@ -7,6 +7,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import de.fu_berlin.inf.dpp.Saros;
+
 /**
  * Handles references to all used images throughout this plug-in.
  */
@@ -16,7 +18,9 @@ public class ImageManager {
     public static ImageDescriptor OVERLAY_READONLY = getImageDescriptor("icons/ovr16/readonly.png");
     public static ImageDescriptor OVERLAY_AWAY = getImageDescriptor("icons/ovr16/away.png");
 
-    public static ImageDescriptor WIZBAN_ADD_BUDDY = getImageDescriptor("icons/wizban/buddy_add_wiz.gif");
+    public static ImageDescriptor WIZBAN_CONFIGURATION = getImageDescriptor("icons/wizban/configuration_wiz.gif");
+    public static ImageDescriptor WIZBAN_CREATE_XMPP_ACCOUNT = getImageDescriptor("icons/wizban/create_xmpp_account_wiz.gif");
+    public static ImageDescriptor WIZBAN_ADD_BUDDY = getImageDescriptor("icons/wizban/add_buddy_wiz.gif");
     public static ImageDescriptor WIZBAN_SHARE_PROJECT_OUTGOING = getImageDescriptor("icons/wizban/share_project_outgoing_wiz.gif");
     public static ImageDescriptor WIZBAN_SHARE_PROJECT_INCOMING = getImageDescriptor("icons/wizban/share_project_incoming_wiz.gif");
 
@@ -71,8 +75,7 @@ public class ImageManager {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(
-            "de.fu_berlin.inf.dpp", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(Saros.SAROS, path);
     }
 
 }
