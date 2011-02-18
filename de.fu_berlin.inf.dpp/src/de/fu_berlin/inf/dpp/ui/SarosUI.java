@@ -51,10 +51,10 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -112,7 +112,7 @@ public class SarosUI {
         // background
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                EclipseUtils.openWindow(wizardDialog);
+                DialogUtils.openWindow(wizardDialog);
             }
         });
         return sessionWizard;
@@ -131,7 +131,7 @@ public class SarosUI {
         Utils.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
-                EclipseUtils.openWindow(wizardDialog);
+                DialogUtils.openWindow(wizardDialog);
             }
         });
         return projectWizard;

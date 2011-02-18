@@ -31,10 +31,10 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class AddProjectToSessionWizard extends Wizard {
@@ -229,13 +229,13 @@ public class AddProjectToSessionWizard extends Wizard {
         if (errorMsg != null) {
             switch (cancelLocation) {
             case LOCAL:
-                EclipseUtils.openErrorMessageDialog(getShell(),
+                DialogUtils.openErrorMessageDialog(getShell(),
                     "Invitation Cancelled",
                     "Your invitation has been cancelled "
                         + "locally because of an error:\n\n" + errorMsg);
                 break;
             case REMOTE:
-                EclipseUtils.openErrorMessageDialog(getShell(),
+                DialogUtils.openErrorMessageDialog(getShell(),
                     "Invitation Cancelled",
                     "Your invitation has been cancelled " + "remotely by "
                         + peer + " because of an error:\n\n" + errorMsg);
@@ -245,7 +245,7 @@ public class AddProjectToSessionWizard extends Wizard {
             case LOCAL:
                 break;
             case REMOTE:
-                EclipseUtils.openInformationMessageDialog(getShell(),
+                DialogUtils.openInformationMessageDialog(getShell(),
                     "Invitation Cancelled",
                     "Your invitation has been cancelled remotely by " + peer
                         + "!");

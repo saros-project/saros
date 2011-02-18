@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
@@ -270,7 +270,7 @@ public class VideoSharing {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
+                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(),
                     title, message);
             }
         });

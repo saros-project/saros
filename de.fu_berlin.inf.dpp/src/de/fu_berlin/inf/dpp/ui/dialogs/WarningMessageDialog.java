@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.dialogs;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class WarningMessageDialog {
@@ -19,7 +19,7 @@ public class WarningMessageDialog {
         final String message) {
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                EclipseUtils.openWarningMessageDialog(EditorAPI.getShell(),
+                DialogUtils.openWarningMessageDialog(EditorAPI.getShell(),
                     title, message);
             }
         });

@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -77,7 +77,7 @@ public class AudioService extends StreamService {
 
                 public Boolean call() throws Exception {
 
-                    return EclipseUtils
+                    return DialogUtils
                         .openQuestionMessageDialog(
                             EditorAPI.getShell(),
                             "Incoming VoIP Invitation",
@@ -92,7 +92,7 @@ public class AudioService extends StreamService {
 
                 public Boolean call() throws Exception {
 
-                    return EclipseUtils.openQuestionMessageDialog(
+                    return DialogUtils.openQuestionMessageDialog(
                         EditorAPI.getShell(), "Incoming VoIP Invitation",
                         "Accept new VoIP Invitation from " + from.getJID()
                             + " ?");

@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -86,7 +86,7 @@ public class AudioServiceManager {
             Utils.runSafeSWTSync(log, new Runnable() {
 
                 public void run() {
-                    EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
+                    DialogUtils.openErrorMessageDialog(EditorAPI.getShell(),
                         "VoIP Session Error", "Unknown session error");
                 }
             });
@@ -102,7 +102,7 @@ public class AudioServiceManager {
             Utils.runSafeSWTAsync(log, new Runnable() {
 
                 public void run() {
-                    EclipseUtils.openInformationMessageDialog(EditorAPI
+                    DialogUtils.openInformationMessageDialog(EditorAPI
                         .getShell(), "VoIP Session stopped",
                         "The VoIP Session has been stopped!");
                 }
@@ -165,7 +165,7 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        EclipseUtils.openErrorMessageDialog(EditorAPI
+                        DialogUtils.openErrorMessageDialog(EditorAPI
                             .getShell(), "VoIP Session Error",
                             "The Invitation was interrupted.");
                     }
@@ -176,7 +176,7 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        EclipseUtils.openErrorMessageDialog(EditorAPI
+                        DialogUtils.openErrorMessageDialog(EditorAPI
                             .getShell(), "VoIP Session was rejected", target
                             .getJID()
                             + " has not accepted your VoIP Invitation.");
@@ -190,7 +190,7 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        EclipseUtils.openErrorMessageDialog(EditorAPI
+                        DialogUtils.openErrorMessageDialog(EditorAPI
                             .getShell(), "VoIP Session Error",
                             "Connection Error. Can't send any data!");
                     }
@@ -201,7 +201,7 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        EclipseUtils.openErrorMessageDialog(EditorAPI
+                        DialogUtils.openErrorMessageDialog(EditorAPI
                             .getShell(), "VoIP Session Error",
                             "Timeout (1000ms) reached. Negotiation canceled");
                     }
@@ -212,7 +212,7 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        EclipseUtils.openErrorMessageDialog(EditorAPI
+                        DialogUtils.openErrorMessageDialog(EditorAPI
                             .getShell(), "VoIP Session Error",
                             "Unkown Connection Error");
                     }

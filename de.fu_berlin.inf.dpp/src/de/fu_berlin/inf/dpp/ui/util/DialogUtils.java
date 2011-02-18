@@ -1,13 +1,13 @@
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.ui.util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
-public class EclipseUtils {
+public class DialogUtils {
 
-    private EclipseUtils() {
+    private DialogUtils() {
         // no instantiation allowed
     }
 

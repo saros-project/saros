@@ -63,7 +63,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
-import de.fu_berlin.inf.dpp.util.EclipseUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.StreamJob;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -171,7 +171,7 @@ public class SendFileAction extends Action {
         Exception e, SubMonitor monitor) {
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                EclipseUtils.openErrorMessageDialog(EditorAPI.getShell(),
+                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(),
                     title, message);
             }
         });
@@ -520,7 +520,7 @@ public class SendFileAction extends Action {
                         file = new File(destinationFilename);
 
                         if (file.exists()) {
-                            again = !EclipseUtils.openQuestionMessageDialog(
+                            again = !DialogUtils.openQuestionMessageDialog(
                                 EditorAPI.getShell(), "File exists",
                                 "Overwrite chosen file?");
 
@@ -595,7 +595,7 @@ public class SendFileAction extends Action {
 
                 public Boolean call() throws Exception {
 
-                    return EclipseUtils.openQuestionMessageDialog(
+                    return DialogUtils.openQuestionMessageDialog(
                         EditorAPI.getShell(),
                         "Incoming file transfer",
                         "Accept '" + description.name + "' ("
