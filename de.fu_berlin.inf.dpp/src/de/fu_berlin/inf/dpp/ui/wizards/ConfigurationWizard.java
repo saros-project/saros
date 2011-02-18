@@ -31,9 +31,9 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AllowStatisticSubmissionPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic
@@ -66,8 +66,7 @@ public class ConfigurationWizard extends Wizard {
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
-        setDefaultPageImageDescriptor(ImageManager
-            .getImageDescriptor("icons/wizban/conf.png"));
+        setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
 
         /*
          * HACK Changing UI components like the configuration wizard should not
@@ -78,7 +77,8 @@ public class ConfigurationWizard extends Wizard {
         if (askForAccount) {
             this.pages.add(new CreateXMPPAccountWizardPage(saros, false,
                 showUseNowButton, !showUseNowButton, preferenceUtils));
-            this.pages.add(new GeneralSettingsWizardPage(saros, preferenceUtils));
+            this.pages
+                .add(new GeneralSettingsWizardPage(saros, preferenceUtils));
         }
         if (askAboutStatisticSubmission) {
             this.pages.add(new AllowStatisticSubmissionPage(statisticManager,
