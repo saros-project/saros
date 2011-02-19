@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.Mixer;
 
+import org.eclipse.jface.preference.PreferenceStore;
 import org.xiph.speex.spi.SpeexEncoding;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -53,10 +54,30 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns the user name from the PreferenceStore. Might be an empty string
-     * but never null.
+     * Returns the server from the {@link PreferenceStore}.<br/>
+     * Might be an empty string but never null.
      * 
-     * @return the user name
+     * @return
+     */
+    public String getServer() {
+        return saros.getPreferenceStore().getString(PreferenceConstants.SERVER);
+    }
+
+    /**
+     * Returns the default server.<br/>
+     * Is never empty or null.
+     * 
+     * @return
+     */
+    public String getDefaultServer() {
+        return "saros-con.imp.fu-berlin.de";
+    }
+
+    /**
+     * Returns the user name from the {@link PreferenceStore}.<br/>
+     * Might be an empty string but never null.
+     * 
+     * @return
      */
     public String getUserName() {
         return saros.getPreferenceStore().getString(
@@ -95,8 +116,9 @@ public class PreferenceUtils {
 
     /**
      * Returns the port for SOCKS5 file transfer. If
-     * PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER is set, a negative
-     * number is returned (smacks will try next free ports above this number)
+     * {@link PreferenceConstants#USE_NEXT_PORTS_FOR_FILE_TRANSFER} is set, a
+     * negative number is returned (smacks will try next free ports above this
+     * number)
      * 
      * @return port for smacks configuration (negative if to try out ports
      *         above)
