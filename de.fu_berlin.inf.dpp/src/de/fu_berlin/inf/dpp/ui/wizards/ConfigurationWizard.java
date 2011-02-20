@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AllowStatisticSubmissionPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.StatisticSubmissionWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.GeneralSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
@@ -81,7 +81,7 @@ public class ConfigurationWizard extends Wizard {
                 .add(new GeneralSettingsWizardPage(saros, preferenceUtils));
         }
         if (askAboutStatisticSubmission) {
-            this.pages.add(new AllowStatisticSubmissionPage(statisticManager,
+            this.pages.add(new StatisticSubmissionWizardPage(statisticManager,
                 errorLogManager));
         }
     }

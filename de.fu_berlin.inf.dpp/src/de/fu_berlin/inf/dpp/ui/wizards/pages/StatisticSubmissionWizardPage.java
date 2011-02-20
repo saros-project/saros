@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author Lisa Dohrmann
  */
-public class AllowStatisticSubmissionPage extends WizardPage implements
+public class StatisticSubmissionWizardPage extends WizardPage implements
     IWizardPage2 {
 
     protected Button allowButton;
@@ -30,7 +30,7 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
     protected StatisticManager statisticManager;
     protected ErrorLogManager errorLogManager;
 
-    public AllowStatisticSubmissionPage(StatisticManager statisticManager,
+    public StatisticSubmissionWizardPage(StatisticManager statisticManager,
         ErrorLogManager errorLogManager) {
         super("statistics"); //$NON-NLS-1$
 
