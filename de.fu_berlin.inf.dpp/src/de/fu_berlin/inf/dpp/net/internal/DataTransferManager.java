@@ -286,8 +286,8 @@ public class DataTransferManager implements IConnectionListener,
      * Dispatch to Transmitter.
      * 
      * @throws SarosCancellationException
-     *             It will be thrown if the local or buddy has canceled
-     *             the transfer.
+     *             It will be thrown if the local or buddy has canceled the
+     *             transfer.
      * @throws IOException
      *             If a technical problem occurred.
      */
@@ -326,6 +326,15 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
+    /**
+     * 
+     * @return a connection to the recipient. If no connection is established
+     *         yet, a new one will be created.
+     * @throws IOException
+     *             if establishing a new connection failed
+     * @throws SarosCancellationException
+     *             if establishing a new connection was interrupted
+     */
     public IBytestreamConnection getConnection(JID recipient,
         SubMonitor progress) throws IOException, SarosCancellationException {
 
