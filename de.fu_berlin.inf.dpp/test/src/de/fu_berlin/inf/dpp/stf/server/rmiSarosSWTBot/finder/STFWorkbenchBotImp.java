@@ -57,7 +57,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      * 
      **********************************************/
     public STFBotView view(String viewTitle) throws RemoteException {
-        view.setViewTitle(sarosSwtBot.viewByTitle(viewTitle));
+        view.setWidget(sarosSwtBot.viewByTitle(viewTitle));
         return view;
     }
 
@@ -100,7 +100,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     }
 
     public STFBotView viewById(String id) throws RemoteException {
-        view.setViewTitle(sarosSwtBot.viewById(id));
+        view.setWidget(sarosSwtBot.viewById(id));
         return view;
     }
 

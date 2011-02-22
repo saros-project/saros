@@ -135,7 +135,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (bot().shell(SHELL_SHELL_ADD_PROJECT).isActive()) {
+        if (bot().isShellOpen(SHELL_SHELL_ADD_PROJECT)) {
             try {
                 bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilShellClosed();
             } catch (Exception e) {

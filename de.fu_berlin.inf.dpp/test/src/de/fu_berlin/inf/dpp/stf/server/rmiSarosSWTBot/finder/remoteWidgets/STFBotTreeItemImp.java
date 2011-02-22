@@ -16,11 +16,13 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
 
     private SWTBotTreeItem swtBotTreeItem;
 
+    private SWTBotTree swtBotTree;
+
+    private static STFBotMenuImp menu;
+
     public SWTBotTreeItem getSwtBotTreeItem() throws RemoteException {
         return swtBotTreeItem;
     }
-
-    private SWTBotTree swtBotTree;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -29,6 +31,7 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
         if (self != null)
             return self;
         self = new STFBotTreeItemImp();
+        menu = STFBotMenuImp.getInstance();
         return self;
     }
 
@@ -40,14 +43,24 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
         this.swtBotTree = tree;
     }
 
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * finder
+     * 
+     **********************************************/
+
     public STFBotMenu contextMenu(String text) throws RemoteException {
-        STFBotMenuImp menu = STFBotMenuImp.getInstance();
         menu.setWidget(swtBotTreeItem.contextMenu(text));
         return menu;
     }
 
     public STFBotMenu contextMenu(String... texts) throws RemoteException {
-        STFBotMenuImp menu = STFBotMenuImp.getInstance();
         menu.setWidget(ContextMenuHelper.getContextMenu(swtBotTree, texts));
         return menu;
     }

@@ -32,7 +32,7 @@ public class TestBasicWidgetsTable extends STFTest {
     public void existsTableItemInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
         view.setFocus();
-        assertTrue(view.bot_().table().existsTableItem(bob.getBaseJid()));
+
         assertTrue(view.bot_().table().existsTableItem(OWN_PARTICIPANT_NAME));
     }
 

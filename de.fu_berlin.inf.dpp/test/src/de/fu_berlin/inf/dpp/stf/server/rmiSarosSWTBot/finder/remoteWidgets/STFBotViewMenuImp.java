@@ -34,4 +34,5 @@ public class STFBotViewMenuImp extends AbstractRmoteWidget implements
      * actions
      * 
      **********************************************/
+
 }

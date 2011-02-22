@@ -60,6 +60,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             .getTableItem(participantLabel).contextMenu(CM_GRANT_WRITE_ACCESS)
             .click();
         waitUntilHasWriteAccessBy(participantJID);
+        bot.sleep(300);
     }
 
     public void restrictToReadOnlyAccess(final JID participantJID)

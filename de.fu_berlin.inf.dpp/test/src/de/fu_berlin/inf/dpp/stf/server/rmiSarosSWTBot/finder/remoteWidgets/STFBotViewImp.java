@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
@@ -14,7 +13,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 
 public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
 
@@ -45,31 +43,11 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
         return self;
     }
 
-    public void setViewTitle(SWTBotView view) {
-        // if (this.viewTitle == null || !viewTitle.equals(title)) {
-        // this.viewTitle = title;
-        // if (viewTitlesAndIDs.containsKey(viewTitle))
-        // this.viewId = viewTitlesAndIDs.get(viewTitle);
-        // swtbotView = bot.viewByTitle(title);
-        // }
+    public void setWidget(SWTBotView view) {
+
         swtbotView = view;
 
     }
-
-    // public void setId(String id) {
-    // if (this.viewId == null || !this.viewId.equals(id)) {
-    // this.viewId = id;
-    // if (viewTitlesAndIDs.containsValue(viewId)) {
-    // String[] titles = (String[]) viewTitlesAndIDs.keySet()
-    // .toArray();
-    // for (int i = 0; i < viewTitlesAndIDs.values().size(); i++) {
-    // if (viewTitlesAndIDs.values().toArray()[i].equals(id))
-    // this.viewTitle = titles[i];
-    // }
-    // swtbotView = bot.viewById(id);
-    // }
-    // }
-    // }
 
     /**************************************************************
      * 
@@ -83,33 +61,18 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      * 
      **********************************************/
     public STFBot bot_() {
-        STFBotImp botImp = STFBotImp.getInstance();
-        botImp.setBot(swtbotView.bot());
-        return botImp;
+        bot.setBot(swtbotView.bot());
+        return bot;
     }
 
     public STFBotViewMenu menu(String label) throws RemoteException {
-        SWTBotViewMenu viewMenu = swtbotView.menu(label);
-        stfViewMenu.setSwtBotViewMenu(viewMenu);
+        stfViewMenu.setSwtBotViewMenu(swtbotView.menu(label));
         return stfViewMenu;
     }
 
     public STFBotViewMenu menu(String label, int index) throws RemoteException {
-        SWTBotViewMenu viewMenu = swtbotView.menu(label, index);
-        stfViewMenu.setSwtBotViewMenu(viewMenu);
+        stfViewMenu.setSwtBotViewMenu(swtbotView.menu(label, index));
         return stfViewMenu;
-    }
-
-    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
-        List<String> tooltips = new ArrayList<String>();
-        for (SWTBotToolbarButton button : swtbotView.getToolbarButtons()) {
-            tooltips.add(button.getToolTipText());
-        }
-        return tooltips;
-    }
-
-    public boolean existsToolbarButton(String tooltip) throws RemoteException {
-        return getToolTipOfAllToolbarbuttons().contains(tooltip);
     }
 
     public STFBotToolbarButton toolbarButton(String tooltip)
@@ -187,6 +150,18 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      * states
      * 
      **********************************************/
+    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
+        List<String> tooltips = new ArrayList<String>();
+        for (SWTBotToolbarButton button : swtbotView.getToolbarButtons()) {
+            tooltips.add(button.getToolTipText());
+        }
+        return tooltips;
+    }
+
+    public boolean existsToolbarButton(String tooltip) throws RemoteException {
+        return getToolTipOfAllToolbarbuttons().contains(tooltip);
+    }
+
     public boolean isActive() throws RemoteException {
         return swtbotView.isActive();
     }
@@ -220,11 +195,5 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
             }
         });
     }
-
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
 
 }

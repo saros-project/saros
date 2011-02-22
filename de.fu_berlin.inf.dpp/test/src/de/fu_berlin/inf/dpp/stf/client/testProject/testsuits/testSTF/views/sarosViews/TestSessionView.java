@@ -41,8 +41,9 @@ public class TestSessionView extends STFTest {
         alice.bot().view(VIEW_SAROS_SESSION).setFocus();
         assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice close session view.");
+
         alice.bot().view(VIEW_SAROS_SESSION).close();
-        assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
+        assertFalse(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
         log.trace("alice open session view again");
         alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
         assertTrue(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
@@ -86,6 +87,7 @@ public class TestSessionView extends STFTest {
 
         assertFalse(alice.sarosSessionV.hasReadOnlyAccessBy(bob.jid));
         assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
+
     }
 
     @Test
