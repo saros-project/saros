@@ -14,6 +14,64 @@ public class ColorUtils {
     }
 
     /**
+     * Increases a color's lightness
+     * 
+     * @param rgb
+     *            that defines the color
+     * @param lightness
+     *            by which the color's lightness should be increased;<br/>
+     *            range: -1 (results in black) to +1 (+1 results in white)
+     * @return
+     * 
+     * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
+     */
+    public static RGB addLightness(RGB rgb, float lightness) {
+        /*
+         * Convert to HLS; HLS and HSL are synonym
+         */
+        float[] hls = ColorSpaceConversion.RGBtoHLS((float) rgb.red / 255,
+            (float) rgb.green / 255, (float) rgb.blue / 255);
+
+        /*
+         * Scale the lightness
+         */
+        hls[1] += lightness;
+        if (hls[1] < 0)
+            hls[1] = 0;
+        if (hls[1] > 1)
+            hls[1] = 1;
+
+        /*
+         * Convert back from HLS to RGB
+         */
+        float[] newRGB = ColorSpaceConversion.HLStoRGB(hls[0], hls[1], hls[2]);
+
+        return new RGB(Math.round(newRGB[0] * 255),
+            Math.round(newRGB[1] * 255), Math.round(newRGB[2] * 255));
+    }
+
+    /**
+     * Increases a color's lightness
+     * 
+     * @param color
+     * @param lightness
+     *            by which the color's lightness should be increased;<br/>
+     *            range: -1 (results in black) to +1 (+1 results in white)
+     * @return the new color
+     *         <p>
+     *         Note: Please keep in mind that a <strong>new</strong> color is
+     *         created. Both the already existing and the scaled need to be
+     *         disposed after usage!
+     * 
+     * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
+     */
+    public static Color addLightness(Color color, float lightness) {
+        RGB newRGB = addLightness(color.getRGB(), lightness);
+        Color newColor = new Color(color.getDevice(), newRGB);
+        return newColor;
+    }
+
+    /**
      * Scales a color's lightness; the higher the ratio the lighter the color
      * 
      * @param rgb
