@@ -138,8 +138,7 @@ public class XMPPAccountStore {
             }
         }
         checkActiveAccountCount(cntActiveAccounts);
-        setAccountDataToPreferenceStore(activeAccount.getUsername(),
-            activeAccount.getServer(), activeAccount.getPassword());
+        updateAccountDataToPreferenceStore();
     }
 
     protected void checkActiveAccountCount(int cntActiveAccounts) {
@@ -150,23 +149,24 @@ public class XMPPAccountStore {
         }
     }
 
-    /**
-     * 
-     * @param username
-     *            the username to store.
-     * @param server
-     *            the servername to store.
-     * @param password
-     *            the password to store.
-     */
-    protected void setAccountDataToPreferenceStore(String username,
-        String server, String password) {
-        preferenceStore.setValue(PreferenceConstants.USERNAME,
-            activeAccount.getUsername());
-        preferenceStore.setValue(PreferenceConstants.SERVER,
-            activeAccount.getServer());
-        preferenceStore.setValue(PreferenceConstants.PASSWORD,
-            activeAccount.getPassword());
+    protected void updateAccountDataToPreferenceStore() {
+        String username = activeAccount.getUsername();
+        String server = activeAccount.getServer();
+        String password = activeAccount.getPassword();
+
+        /*
+         * Google Talk users have to keep their server portion in the username;
+         * see http://code.google.com/apis/talk/talk_developers_home.html
+         */
+        if (server.equals("gmail.com") || server.equals("googlemail.com")) {
+            if (!username.contains("@")) {
+                username += "@" + server;
+            }
+        }
+
+        preferenceStore.setValue(PreferenceConstants.USERNAME, username);
+        preferenceStore.setValue(PreferenceConstants.SERVER, server);
+        preferenceStore.setValue(PreferenceConstants.PASSWORD, password);
     }
 
     /**
@@ -265,8 +265,7 @@ public class XMPPAccountStore {
         accountToChange.setPassword(password);
         accountToChange.setServer(server);
         if (id == activeAccount.getId()) {
-            setAccountDataToPreferenceStore(accountToChange.getUsername(),
-                accountToChange.getServer(), accountToChange.getPassword());
+            updateAccountDataToPreferenceStore();
         }
         saveAccounts();
     }

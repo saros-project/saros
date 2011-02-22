@@ -777,9 +777,8 @@ public class Saros extends AbstractUIPlugin {
 
         IPreferenceStore prefStore = getPreferenceStore();
 
-        final String server = prefStore.getString(PreferenceConstants.SERVER);
-        final String username = prefStore
-            .getString(PreferenceConstants.USERNAME);
+        String server = prefStore.getString(PreferenceConstants.SERVER);
+        String username = prefStore.getString(PreferenceConstants.USERNAME);
 
         try {
             if (isConnected()) {

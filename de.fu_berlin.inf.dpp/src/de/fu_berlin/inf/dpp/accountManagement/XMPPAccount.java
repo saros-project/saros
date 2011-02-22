@@ -72,21 +72,49 @@ public class XMPPAccount implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s@%s", username, server);
+        if (username.contains("@")) {
+            return String.format("%s [%s]", username, server);
+        } else {
+            return String.format("%s@%s", username, server);
+        }
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((server == null) ? 0 : server.hashCode());
+        result = prime * result
+            + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-
-        if (!(o instanceof XMPPAccount))
+        if (obj == null)
             return false;
-
-        XMPPAccount otherAcc = (XMPPAccount) o;
-
-        return this.username.equals(otherAcc.username)
-            && this.server.equals(otherAcc.server)
-            && this.password.equals(otherAcc.password);
+        if (getClass() != obj.getClass())
+            return false;
+        XMPPAccount other = (XMPPAccount) obj;
+        if (password == null) {
+            if (other.password != null)
+                return false;
+        } else if (!password.equals(other.password))
+            return false;
+        if (server == null) {
+            if (other.server != null)
+                return false;
+        } else if (!server.equals(other.server))
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        return true;
     }
 }
