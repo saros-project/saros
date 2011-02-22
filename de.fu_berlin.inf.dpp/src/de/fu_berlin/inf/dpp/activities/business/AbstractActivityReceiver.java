@@ -67,7 +67,7 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
-    public void receive(FileListActivity fileListActivity) {
+    public void receive(ProjectsAddedActivity fileListActivity) {
         // do nothing
 
     }

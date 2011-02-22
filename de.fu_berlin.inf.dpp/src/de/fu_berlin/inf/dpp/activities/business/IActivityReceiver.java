@@ -42,5 +42,5 @@ public interface IActivityReceiver {
 
     void receive(ChangeColorActivity changeColorActivity);
 
-    void receive(FileListActivity fileListActivity);
+    void receive(ProjectsAddedActivity fileListActivity);
 }

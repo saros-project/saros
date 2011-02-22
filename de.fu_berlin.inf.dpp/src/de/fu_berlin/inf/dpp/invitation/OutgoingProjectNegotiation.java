@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
-import de.fu_berlin.inf.dpp.activities.business.FileListActivity;
+import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -152,7 +152,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
         subMonitor.setTaskName("Sending file list...");
         this.sarosSession.sendActivity(sarosSession.getUser(peer),
-            new FileListActivity(sarosSession.getLocalUser(), pInfos,
+            new ProjectsAddedActivity(sarosSession.getLocalUser(), pInfos,
                 processID, this.doStream));
         subMonitor.done();
 

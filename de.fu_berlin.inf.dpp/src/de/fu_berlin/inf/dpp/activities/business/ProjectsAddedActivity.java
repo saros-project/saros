@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfoDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileListActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ProjectsAddedActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -15,13 +15,13 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * It contains the information about the Project see:
  * {@link ProjectExchangeInfo}
  */
-public class FileListActivity extends AbstractActivity {
+public class ProjectsAddedActivity extends AbstractActivity {
 
     protected List<ProjectExchangeInfo> projectInfos;
     protected String processID;
     protected boolean doStream;
 
-    public FileListActivity(User source,
+    public ProjectsAddedActivity(User source,
         List<ProjectExchangeInfo> projectInfos, String processID,
         boolean doStream) {
         super(source);
@@ -40,7 +40,7 @@ public class FileListActivity extends AbstractActivity {
         for (ProjectExchangeInfo fileList : this.projectInfos) {
             pInfos.add(fileList.toProjectInfoDataObject());
         }
-        return new FileListActivityDataObject(this.source.getJID(),
+        return new ProjectsAddedActivityDataObject(this.source.getJID(),
             pInfos, processID, doStream);
     }
 

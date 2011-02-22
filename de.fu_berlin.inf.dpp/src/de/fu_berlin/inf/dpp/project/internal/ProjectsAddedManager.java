@@ -8,7 +8,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.FileListActivity;
+import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -22,11 +22,11 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * This class processes incoming {@link FileListActivity FileListActivities}
+ * This class processes incoming {@link ProjectsAddedActivity ProjectsAddedActivities}
  */
-public class FileListManager implements IActivityProvider {
+public class ProjectsAddedManager implements IActivityProvider {
 
-    private static Logger log = Logger.getLogger(FileListManager.class);
+    private static Logger log = Logger.getLogger(ProjectsAddedManager.class);
 
     protected ISarosSession sarosSession;
     protected SarosSessionManager sessionManager;
@@ -36,19 +36,19 @@ public class FileListManager implements IActivityProvider {
     @Inject
     protected SessionIDObservable sessionIDObservable;
 
-    public FileListManager(SarosSessionManager sessionManager) {
+    public ProjectsAddedManager(SarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
     protected AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(FileListActivity fileListActivity) {
+        public void receive(ProjectsAddedActivity fileListActivity) {
             handleFileListActivity(fileListActivity);
         }
     };
 
-    protected void handleFileListActivity(FileListActivity fileListActivity) {
+    protected void handleFileListActivity(ProjectsAddedActivity fileListActivity) {
 
         User user = fileListActivity.getSource();
         if (!user.isInSarosSession()) {
@@ -82,13 +82,13 @@ public class FileListManager implements IActivityProvider {
 
         @Override
         public void sessionStarted(ISarosSession session) {
-            session.addActivityProvider(FileListManager.this);
+            session.addActivityProvider(ProjectsAddedManager.this);
             sarosSession = session;
         }
 
         @Override
         public void sessionEnded(ISarosSession project) {
-            project.removeActivityProvider(FileListManager.this);
+            project.removeActivityProvider(ProjectsAddedManager.this);
             sarosSession = null;
         }
     };

@@ -152,7 +152,7 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.project.internal.FileListManager;
+import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
@@ -350,7 +350,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(XMPPTransmitter.class);
         this.container.addComponent(RemoteProgressManager.class);
         this.container.addComponent(XMPPAccountStore.class);
-        this.container.addComponent(FileListManager.class);
+        this.container.addComponent(ProjectsAddedManager.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
