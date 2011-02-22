@@ -108,7 +108,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
 
-    private MappedList<IActivityDataObject> queuedActivities = new MappedList<IActivityDataObject>();
+    private MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
 
     /* Instance fields */
     protected User localUser;
@@ -131,6 +131,11 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected SharedProject sharedProject;
 
+    /**
+     * projectID => SharedProject
+     * 
+     * TODO: Think of joining this with the projectMapper
+     */
     protected Map<String, SharedProject> sharedProjects = new HashMap<String, SharedProject>();
 
     public boolean cancelActivityDispatcher = false;

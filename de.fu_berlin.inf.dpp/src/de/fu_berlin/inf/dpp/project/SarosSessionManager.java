@@ -49,6 +49,7 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
@@ -71,6 +72,7 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -164,6 +166,8 @@ public class SarosSessionManager implements IConnectionListener,
             .nextInt(Integer.MAX_VALUE)));
         this.partialProjectResources = partialProjectResources;
 
+        this.prefStore = saros.getPreferenceStore();
+
         SarosSession sarosSession = new SarosSession(this.transmitter,
             dispatchThreadContext, new DateTime());
 
@@ -174,7 +178,9 @@ public class SarosSessionManager implements IConnectionListener,
         notifySarosSessionStarted(sarosSession);
 
         for (IProject project : projects) {
-            sarosSession.addSharedProject(project, project.getName());
+            String projectID = String.valueOf(sessionRandom
+                .nextInt(Integer.MAX_VALUE));
+            sarosSession.addSharedProject(project, projectID);
             notifyProjectAdded(project);
         }
 
@@ -279,11 +285,26 @@ public class SarosSessionManager implements IConnectionListener,
         });
     }
 
-    public void incomingProjectReceived(JID from, List<FileList> fileLists,
-        final SarosUI sarosUI, String description, String projectID) {
+    /**
+     * This method is called when a new project was added to the session
+     * 
+     * @param from
+     *            The one who added the project.
+     * @param projectInfos
+     *            what projects where added ({@link FileList}, projectName etc.)
+     *            see: {@link ProjectExchangeInfo}
+     * @param processID
+     *            ID of the exchanging process
+     * @param doStream
+     *            If <code>true</code>, the files of the projects will be
+     *            streamed.
+     */
+    public void incomingProjectReceived(JID from, final SarosUI sarosUI,
+        List<ProjectExchangeInfo> projectInfos, String processID,
+        boolean doStream) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            transmitter, from, description, projectExchangeProcesses,
-            projectID, projectID, false, fileLists.get(0));
+            transmitter, from, projectExchangeProcesses, processID,
+            projectInfos, doStream);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -495,11 +516,13 @@ public class SarosSessionManager implements IConnectionListener,
             this.getSarosSession().addSharedProject(project, project.getName());
             notifyProjectAdded(project);
         }
+        boolean doStream = prefStore
+            .getBoolean(PreferenceConstants.STREAM_PROJECT);
         for (User user : this.getSarosSession().getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                transmitter, user.getJID(), this.getSarosSession(), null,
+                transmitter, user.getJID(), this.getSarosSession(),
                 projectsToAdd, projectExchangeProcesses, stopManager,
-                sessionID, false);
+                sessionID, doStream);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -514,14 +537,15 @@ public class SarosSessionManager implements IConnectionListener,
      *            JID of session participant to share projects with
      */
     public void startSharingProjects(JID user) {
+        boolean doStream = prefStore
+            .getBoolean(PreferenceConstants.STREAM_PROJECT);
         List<IProject> projectsToShare = new ArrayList<IProject>(this
             .getSarosSession().getProjects());
 
         if (!projectsToShare.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                transmitter, user, this.getSarosSession(), null,
-                projectsToShare, projectExchangeProcesses, stopManager,
-                sessionID, false);
+                transmitter, user, this.getSarosSession(), projectsToShare,
+                projectExchangeProcesses, stopManager, sessionID, doStream);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -544,7 +568,7 @@ public class SarosSessionManager implements IConnectionListener,
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
             super("Sharing project "
-                + outgoingProjectNegotiation.getProjectName() + ".");
+                + outgoingProjectNegotiation.getProjectNames() + ".");
             this.process = outgoingProjectNegotiation;
             this.peer = process.getPeer().getBase();
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);

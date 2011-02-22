@@ -1169,4 +1169,45 @@ public class Utils {
             //
         }
     }
+
+    /**
+     * Concat <code>strings</code>. If <code>seperator</code> is not
+     * <code><b>null</b></code> or empty the seperator will be put between the
+     * strings but not after the last one
+     * 
+     * Example: <br />
+     * <code>
+     * separator = "-"; <br />
+     * strings = ['a','b','c']; <br />
+     * join(separator, strings) => 'a-b-c'</code>
+     * 
+     * @param separator
+     * @param strings
+     * @return
+     */
+    public static String join(String separator, String... strings) {
+        String sep = separator;
+        if (strings.length < 1) {
+            return "";
+        }
+        if (sep == null) {
+            sep = "";
+        }
+        int length = strings.length;
+        String result = "";
+        for (int i = 0; i < length - 1; i++) {
+            result += strings[i];
+            result += separator;
+        }
+        result += strings[length - 1];
+        return result;
+    }
+
+    /**
+     * @see #join(String, String...)
+     * 
+     */
+    public static String join(String seperator, List<String> strings) {
+        return join(seperator, (String[]) strings.toArray());
+    }
 }

@@ -1,23 +1,33 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.FileList;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.serializable.FileListActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfoDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileListActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
+/**
+ * This Activity is created when a user adds one or more projects to the session
+ * It contains the information about the Project see:
+ * {@link ProjectExchangeInfo}
+ */
 public class FileListActivity extends AbstractActivity {
 
-    protected FileList fileList;
-    protected String description;
-    protected String projectID;
+    protected List<ProjectExchangeInfo> projectInfos;
+    protected String processID;
+    protected boolean doStream;
 
-    public FileListActivity(User source, FileList fileList, String description,
-        String projectID) {
+    public FileListActivity(User source,
+        List<ProjectExchangeInfo> projectInfos, String processID,
+        boolean doStream) {
         super(source);
-        this.fileList = fileList;
-        this.description = description;
-        this.projectID = projectID;
+        this.projectInfos = projectInfos;
+        this.processID = processID;
+        this.doStream = doStream;
     }
 
     public void dispatch(IActivityReceiver receiver) {
@@ -25,19 +35,24 @@ public class FileListActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+        List<ProjectExchangeInfoDataObject> pInfos = new ArrayList<ProjectExchangeInfoDataObject>(
+            this.projectInfos.size());
+        for (ProjectExchangeInfo fileList : this.projectInfos) {
+            pInfos.add(fileList.toProjectInfoDataObject());
+        }
         return new FileListActivityDataObject(this.source.getJID(),
-            this.fileList, description, projectID);
+            pInfos, processID, doStream);
     }
 
-    public FileList getFileList() {
-        return this.fileList;
+    public List<ProjectExchangeInfo> getProjectInfos() {
+        return this.projectInfos;
     }
 
-    public String getDescription() {
-        return description;
+    public String getProcessID() {
+        return processID;
     }
 
-    public String getProjectID() {
-        return projectID;
+    public boolean doStream() {
+        return doStream;
     }
 }

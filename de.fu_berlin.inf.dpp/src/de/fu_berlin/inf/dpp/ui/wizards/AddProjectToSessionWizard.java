@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -46,68 +49,93 @@ public class AddProjectToSessionWizard extends Wizard {
     protected WizardDialogAccessable wizardDialog;
     protected IncomingProjectNegotiation process;
     protected JID peer;
-    protected FileList fileList;
-    protected String remoteProjectName;
+    protected List<FileList> fileLists;
+    /**
+     * projectID => projectName
+     * 
+     */
+    protected Map<String, String> remoteProjectNames;
     protected DataTransferManager dataTransferManager;
     protected PreferenceUtils preferenceUtils;
 
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         DataTransferManager dataTransferManager,
-        PreferenceUtils preferenceUtils, JID peer, FileList fileList,
-        String projectName) {
+        PreferenceUtils preferenceUtils, JID peer, List<FileList> fileLists,
+        Map<String, String> projectNames) {
         this.process = process;
         this.peer = peer;
-        this.fileList = fileList;
-        this.remoteProjectName = projectName;
+        this.fileLists = fileLists;
+        this.remoteProjectNames = projectNames;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
-        setWindowTitle("Add Project");
+        setWindowTitle("Add Projects");
+        this.setNeedsProgressMonitor(true);
     }
 
     @Override
     public void addPages() {
+        // this.namePage = new EnterProjectNamePage(dataTransferManager,
+        // preferenceUtils, fileLists, peer, remoteProjectName, wizardDialog);
         this.namePage = new EnterProjectNamePage(dataTransferManager,
-            preferenceUtils, fileList, peer, remoteProjectName, wizardDialog);
+            preferenceUtils, fileLists, peer, this.remoteProjectNames,
+            wizardDialog);
         addPage(namePage);
     }
 
     @Override
     public boolean performFinish() {
 
-        final IProject source = namePage.getSourceProject();
-        final String target = namePage.getTargetProjectName();
-        final boolean skip = namePage.isSyncSkippingSelected();
+        Map<String, IProject> sources = new HashMap<String, IProject>();
+        final Map<String, String> projectNames = new HashMap<String, String>();
+        final Map<String, Boolean> skipProjectSyncing = new HashMap<String, Boolean>();
+        final boolean useVersionControl = namePage.useVersionControl();
+
+        for (FileList fList : this.fileLists) {
+            sources.put(fList.getProjectID(),
+                namePage.getSourceProject(fList.getProjectID()));
+            projectNames.put(fList.getProjectID(),
+                namePage.getTargetProjectName(fList.getProjectID()));
+            skipProjectSyncing.put(
+                fList.getProjectID(),
+                new Boolean(namePage.isSyncSkippingSelected(fList
+                    .getProjectID())));
+        }
 
         /*
          * Ask the user whether to overwrite local resources only if resources
          * are supposed to be overwritten based on the synchronization options
          * and if there are differences between the remote and local project.
          */
-        if (namePage.overwriteProjectResources()
-            && !preferenceUtils.isAutoReuseExisting()) {
-            FileListDiff diff;
+        for (String projectID : sources.keySet()) {
+            if (namePage.overwriteProjectResources(projectID)
+                && !preferenceUtils.isAutoReuseExisting()) {
+                FileListDiff diff;
 
-            if (!source.isOpen()) {
-                try {
-                    source.open(null);
-                } catch (CoreException e1) {
-                    log.debug("An error occur while opening the source file",
-                        e1);
+                if (!sources.get(projectID).isOpen()) {
+                    try {
+                        sources.get(projectID).open(null);
+                    } catch (CoreException e1) {
+                        log.debug(
+                            "An error occur while opening the source file", e1);
+                    }
                 }
-            }
 
-            try {
-                diff = FileListDiff.diff(new FileList(source),
-                    process.getRemoteFileList());
-            } catch (CoreException e) {
-                MessageDialog.openError(getShell(), "Error computing FileList",
-                    "Could not compute local FileList: " + e.getMessage());
-                return false;
-            }
-            if (diff.getRemovedPaths().size() > 0
-                || diff.getAlteredPaths().size() > 0)
-                if (!confirmOverwritingProjectResources(source.getName(), diff))
+                try {
+                    diff = FileListDiff.diff(
+                        new FileList(sources.get(projectID)),
+                        process.getRemoteFileList(projectID));
+                } catch (CoreException e) {
+                    MessageDialog.openError(getShell(),
+                        "Error computing FileList",
+                        "Could not compute local FileList: " + e.getMessage());
                     return false;
+                }
+                if (diff.getRemovedPaths().size() > 0
+                    || diff.getAlteredPaths().size() > 0)
+                    if (!confirmOverwritingProjectResources(
+                        sources.get(projectID).getName(), diff))
+                        return false;
+            }
         }
 
         try {
@@ -115,10 +143,12 @@ public class AddProjectToSessionWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        // JoinSessionWizard.this.process.accept(source, target,
-                        // skip, SubMonitor.convert(monitor));
-                        AddProjectToSessionWizard.this.process.accept(source,
-                            SubMonitor.convert(monitor), target, skip);
+
+                        // AddProjectToSessionWizard.this.process.accept(source,
+                        // SubMonitor.convert(monitor), target, skip);
+                        AddProjectToSessionWizard.this.process.accept(
+                            projectNames, SubMonitor.convert(monitor),
+                            skipProjectSyncing, useVersionControl);
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }

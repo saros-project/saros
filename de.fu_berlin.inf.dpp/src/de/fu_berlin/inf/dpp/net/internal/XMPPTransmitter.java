@@ -70,7 +70,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
@@ -272,14 +271,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return FileList.fromXML(fileListAsString);
     }
 
-    public FileList receiveFileList(String projectID, JID peer,
+    public List<FileList> receiveFileLists(String processID, JID peer,
         SubMonitor monitor, boolean forceWait)
         throws SarosCancellationException, IOException {
 
-        log.trace("Waiting for FileList from ");
+        log.trace("Waiting for FileList from " + peer.getBareJID());
 
         PacketFilter filter = PacketExtensionUtils.getIncomingFileListFilter(
-            incomingExtProv, sessionID.getValue(), projectID, peer);
+            incomingExtProv, sessionID.getValue(), processID, peer);
         SarosPacketCollector collector = installReceiver(filter);
 
         IncomingTransferObject result = incomingExtProv.getPayload(receive(
@@ -297,9 +296,23 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (UnsupportedEncodingException e) {
             fileListAsString = new String(data);
         }
+        log.debug(fileListAsString);
 
-        // should return null if it's not parseable.
-        return FileList.fromXML(fileListAsString);
+        // We disassemble the complete fileListString to an array of
+        // fileListStrings...
+        String[] fileListStrings = fileListAsString.split("---next---");
+
+        List<FileList> fileLists = new ArrayList<FileList>();
+
+        // and make a new FileList out of each XML-String
+        for (int i = 0; i < fileListStrings.length; i++) {
+            FileList fileList = FileList.fromXML(fileListStrings[i]);
+            if (fileList != null) {
+                fileLists.add(fileList);
+            }
+        }
+
+        return fileLists;
     }
 
     public SarosPacketCollector getInvitationCollector(String invitationID,
@@ -312,44 +325,20 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return installReceiver(filter);
     }
 
-    /**
-     * TODO: think about handling timeouts.
-     */
-    public InputStream receiveArchive(SarosPacketCollector collector,
-        SubMonitor monitor, boolean forceWait) throws IOException,
-        SarosCancellationException {
-
-        monitor.beginTask("Receiving archive", 100);
-
-        try {
-            IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(10), collector, 1000, forceWait));
-
-            if (monitor.isCanceled()) {
-                result.reject();
-                throw new LocalCancellationException();
-            }
-            byte[] data = result.accept(monitor.newChild(90));
-
-            return new ByteArrayInputStream(data);
-        } finally {
-            monitor.done();
-        }
-    }
-
-    public InputStream receiveArchive(String projectID, SubMonitor monitor,
+    public InputStream receiveArchive(String processID, SubMonitor monitor,
         boolean forceWait) throws IOException, SarosCancellationException {
 
         monitor.beginTask("Receiving archive", 100);
+        log.debug("Receiving archive");
         PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
-                projectID, FileTransferType.ARCHIVE_TRANSFER);
+                processID, FileTransferType.ARCHIVE_TRANSFER);
 
         SarosPacketCollector collector = installReceiver(filter);
 
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(10), collector, 1000, forceWait));
+                monitor.newChild(10), collector, 10000, forceWait));
 
             if (monitor.isCanceled()) {
                 result.reject();
@@ -713,9 +702,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             return;
         }
 
-        if (dataManager.getTransferMode(recipient) == NetTransferMode.NONE)
-            throw new IOException("No bytestream connection available");
-
         try {
             dataManager.sendData(transferDescription, data,
                 SubMonitor.convert(new NullProgressMonitor()));
@@ -728,8 +714,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     /**
      * {@inheritDoc}
      */
-    public void sendFileList(JID recipient, String projectID,
-        FileList fileList, SubMonitor progress) throws IOException,
+    public void sendFileLists(JID recipient, String processID,
+        List<FileList> fileLists, SubMonitor progress) throws IOException,
         SarosCancellationException {
 
         String user = connection.getUser();
@@ -741,9 +727,16 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(user),
-                sessionID.getValue(), projectID);
+                sessionID.getValue(), processID);
 
-        String xml = fileList.toXML();
+        log.debug("fileLists.size(): " + fileLists.size());
+        String[] xmlArray = new String[fileLists.size()];
+        // Now we convert each FileList into an XML representation...
+        for (int i = 0; i < xmlArray.length; i++) {
+            xmlArray[i] = fileLists.get(i).toXML();
+        }
+        // ...and queue them.
+        String xml = Utils.join("---next---", xmlArray);
 
         byte[] content = xml.getBytes("UTF-8");
 
@@ -827,7 +820,15 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     /**
-     * The recipient has to be in the session or the message will not be sent.
+     * Sends a message to a buddy
+     * 
+     * @param jid
+     *            buddy the message is send to
+     * @param extension
+     *            extension that is send
+     * @param sessionMembersOnly
+     *            if true extension is only send if the buddy is in the same
+     *            session
      */
     public void sendMessageToUser(JID jid, PacketExtension extension,
         boolean sessionMembersOnly) {

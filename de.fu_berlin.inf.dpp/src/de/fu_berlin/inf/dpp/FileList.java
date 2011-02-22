@@ -80,6 +80,9 @@ public class FileList {
     /** VCS internal information. */
     protected VCSResourceInfo vcsProjectInfo;
 
+    /** ID of Project this list of files belog to */
+    protected String projectID;
+
     static class FileListData {
         /** Checksum of this file. */
         public long checksum;
@@ -450,5 +453,13 @@ public class FileList {
 
     public String getRepositoryRoot() {
         return vcsRepositoryRoot;
+    }
+
+    public String getProjectID() {
+        return projectID;
+    }
+
+    public void setProjectID(String projectID) {
+        this.projectID = projectID;
     }
 }

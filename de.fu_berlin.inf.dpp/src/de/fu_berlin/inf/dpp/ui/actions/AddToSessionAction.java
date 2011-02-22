@@ -83,12 +83,17 @@ public class AddToSessionAction implements IObjectActionDelegate {
         }
         /*
          * Enable button if we are connected, have a session, have at least one
-         * project selected, every selected is accessible and not already shared
+         * project selected, we have write access, every selected project is
+         * accessible and not already shared
          */
-        action.setEnabled(saros.isConnected()
-            && sessionManager.getSarosSession() != null
-            && !this.selectedProjects.isEmpty() && allAccessible
-            && !oneIsShared);
+        action
+            .setEnabled(saros.isConnected()
+                && sessionManager.getSarosSession() != null
+                && !this.selectedProjects.isEmpty()
+                && allAccessible
+                && !oneIsShared
+                && sessionManager.getSarosSession().getLocalUser()
+                    .hasWriteAccess());
     }
 
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {

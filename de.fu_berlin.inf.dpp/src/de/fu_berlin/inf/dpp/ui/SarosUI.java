@@ -20,6 +20,8 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
@@ -39,10 +41,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
@@ -120,9 +124,16 @@ public class SarosUI {
 
     public AddProjectToSessionWizard showIncomingProjectUI(
         IncomingProjectNegotiation process) {
+        List<ProjectExchangeInfo> pInfos = process.getProjectInfos();
+        List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
+
+        for (ProjectExchangeInfo pInfo : pInfos) {
+            fileLists.add(pInfo.getFileList());
+        }
+
         AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
             process, dataTransferManager, preferenceUtils, process.getPeer(),
-            process.getRemoteFileList(), process.getProjectName());
+            fileLists, process.getProjectNames());
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), projectWizard);
 

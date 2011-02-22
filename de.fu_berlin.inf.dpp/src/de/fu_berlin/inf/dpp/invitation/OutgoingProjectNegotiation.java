@@ -7,8 +7,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -17,13 +20,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.business.FileListActivity;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -32,16 +35,15 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileZipper;
+import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
@@ -49,42 +51,44 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private static Logger log = Logger
         .getLogger(OutgoingProjectNegotiation.class);
 
-    protected List<IProject> projects;
+    /**
+     * this maps the currently exchanging projects. projectID => project in
+     * workspace
+     */
+    protected Map<String, IProject> projects;
     protected boolean doStream;
 
-    protected List<IResource> partialProjectResources;
-    protected File archive;
     protected ISarosSession sarosSession;
 
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SubMonitor monitor;
     protected SarosCancellationException cancellationCause;
-    protected List<IPath> toSend = new LinkedList<IPath>();
+    /**
+     * projectID => List of {@link IPath files} that will be send to peer
+     */
+    protected MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
     protected StopManager stopManager;
     protected SessionIDObservable sessionID;
-    protected String projectID;
-    protected SarosPacketCollector fileListCollector;
+    protected final static Random INVITATION_RAND = new Random();
 
     protected boolean useVersionControl;
-    protected FileList localFileList;
 
     public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
-        ISarosSession sarosSession, List<IResource> partialProjectResources,
-        List<IProject> projects,
+        ISarosSession sarosSession, List<IProject> projects,
         ProjectNegotiationObservable projectExchangeProcesses,
         StopManager stopManager, SessionIDObservable sessionID, boolean doStream) {
         super(transmitter, to, projectExchangeProcesses);
 
+        this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.projectExchangeProcesses = projectExchangeProcesses;
-        this.projects = projects;
-        this.projectID = projects.get(0).getName();
         this.doStream = doStream;
         this.sarosSession = sarosSession;
         this.sessionID = sessionID;
-        this.partialProjectResources = partialProjectResources;
         this.stopManager = stopManager;
-        fileListCollector = transmitter.getInvitationCollector(projectID,
-            FileTransferType.FILELIST_TRANSFER);
+        this.projects = new HashMap<String, IProject>();
+        for (IProject project : projects) {
+            this.projects.put(sarosSession.getProjectID(project), project);
+        }
 
     }
 
@@ -92,12 +96,26 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.monitor = monitor;
         sendFileList(monitor.newChild(1));
         try {
-            getRemoteFileList(monitor.newChild(1));
+            getRemoteFileList(monitor.newChild(2));
             if (doStream) {
-                streamArchive(monitor.newChild(98));
+                streamArchive(monitor.newChild(97));
             } else {
-                createArchive(monitor.newChild(8));
-                sendArchive(monitor.newChild(90));
+                // pack each project into one archive
+                List<File> projectArchives = createProjectArchives(
+                    monitor.newChild(8), this.projectFilesToSend);
+                File zipArchive = null;
+                if (projectArchives.size() > 0) {
+                    // pack all archive files into one big archive
+                    zipArchive = File
+                        .createTempFile("SarosSyncArchive", ".zip");
+                    FileZipper.zipFiles(projectArchives, zipArchive,
+                        monitor.newChild(2));
+                }
+                // send the big archive
+                sendArchive(monitor.newChild(87), zipArchive, processID);
+
+                this.projectExchangeProcesses
+                    .removeProjectExchangeProcess(this);
             }
         } catch (IOException e) {
             String errorMsg = "Unknown error: " + e;
@@ -105,6 +123,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
             executeCancellation();
+        } finally {
+            monitor.done();
         }
     }
 
@@ -114,13 +134,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         subMonitor.setTaskName("Creating file list...");
         subMonitor.worked(50);
         useVersionControl = sarosSession.useVersionControl();
+        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
+            this.projects.size());
         try {
-            if (this.partialProjectResources != null) {
-                IResource[] resourceArray = partialProjectResources
-                    .toArray(new IResource[partialProjectResources.size()]);
-                localFileList = new FileList(resourceArray, useVersionControl);
-            } else {
-                localFileList = new FileList(projects.get(0), useVersionControl);
+            for (IProject project : projects.values()) {
+                FileList fileList = new FileList(project, useVersionControl);
+                fileList.setProjectID(sarosSession.getProjectID(project));
+                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
+                    sarosSession.getProjectID(project), "", project.getName(),
+                    fileList);
+                pInfos.add(pInfo);
             }
         } catch (CoreException e) {
             throw new LocalCancellationException(e.getMessage(),
@@ -129,8 +152,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
         subMonitor.setTaskName("Sending file list...");
         this.sarosSession.sendActivity(sarosSession.getUser(peer),
-            new FileListActivity(sarosSession.getLocalUser(), localFileList,
-                "", projectID));
+            new FileListActivity(sarosSession.getLocalUser(), pInfos,
+                processID, this.doStream));
         subMonitor.done();
 
     }
@@ -155,34 +178,37 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for remote file list...");
 
-        if (localFileList.getVcsProviderID() != null) {
-            // The shared project is under version control.
-            subMonitor.setTaskName("Waiting for the peer to check out the "
-                + "project...");
-        } else {
-            subMonitor.setTaskName("Waiting for the peer's file list...");
-        }
+        subMonitor.setTaskName("Waiting for the peer's file list...");
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        FileList remoteFileList = transmitter.receiveFileList(projectID, peer,
-            subMonitor, true);
+        List<FileList> remoteFileLists = transmitter.receiveFileLists(
+            processID, peer, subMonitor, true);
         log.debug("Inv" + Utils.prefix(peer)
             + ": Remote file list has been received.");
 
         checkCancellation(CancelOption.NOTIFY_PEER);
+        for (FileList fileList : remoteFileLists) {
+            this.projectFilesToSend.put(fileList.getProjectID(),
+                fileList.getPaths());
+            log.debug(fileList.toString());
+        }
 
-        toSend.addAll(remoteFileList.getPaths());
+        // toSend.addAll(remoteFileLists.getPaths());
     }
 
     @Override
-    public String getProjectName() {
-        return this.projects.get(0).getName();
+    public Map<String, String> getProjectNames() {
+        Map<String, String> result = new HashMap<String, String>();
+        for (IProject project : this.projects.values()) {
+            result.put(sarosSession.getProjectID(project), project.getName());
+        }
+        return result;
     }
 
     @Override
-    public String getProjectID() {
-        return this.projectID;
+    public String getProcessID() {
+        return this.processID;
     }
 
     /**
@@ -351,27 +377,28 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             // they have changed. How to ask Eclipse whether there are resource
             // changes?
             // if (outInvitationUI.confirmProjectSave(peer))
-            for (IProject project : projects) {
+            for (IProject project : projects.values()) {
                 EditorAPI.saveProject(project, false);
             }
             // else
             // throw new LocalCancellationException();
 
-            // if (toSend.size() != 0) {
-
             // TODO: User is not needed here. it is just handed through to the
             // point where user.getJID() is called
+            int numberOfFilesToSend = 0;
+            for (List<IPath> l : this.projectFilesToSend.values()) {
+                numberOfFilesToSend += l.size();
+            }
             streamSession = streamServiceManager.createSession(
                 archiveStreamService, sarosSession.getUser(this.peer),
-                new Integer(toSend.size()), sessionListener);
+                new Integer(numberOfFilesToSend), sessionListener);
 
             streamSession.setListener(sessionListener);
 
             subMonitor.setTaskName("Streaming archive...");
 
             performFileStream(archiveStreamService, streamSession,
-                subMonitor.newChild(75));
-            // }
+                subMonitor.newChild(75), numberOfFilesToSend);
 
         } catch (Exception e) {
             log.error("Error while executing archive stream: ", e);
@@ -387,7 +414,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     public FileList getRemoteFileList() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -417,8 +443,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void performFileStream(StreamService streamService,
-        final StreamSession session, SubMonitor subMonitor)
-        throws SarosCancellationException {
+        final StreamSession session, SubMonitor subMonitor,
+        int numberOfFilesToSend) throws SarosCancellationException {
 
         OutputStream output = session.getOutputStream(0);
         ZipOutputStream zout = new ZipOutputStream(output);
@@ -427,46 +453,49 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         int filesSent = 0;
         double increment = 0.0;
 
-        if (toSend.size() >= 1) {
-            increment = (double) 100 / toSend.size();
+        if (numberOfFilesToSend >= 1) {
+            increment = (double) 100 / numberOfFilesToSend;
             subMonitor.beginTask("Streaming files...", 100);
         } else {
             subMonitor.worked(100);
         }
 
         try {
-            for (IPath path : toSend) {
-                // IFile file = this.project.getFile(path);
-                IFile file = this.projects.get(0).getFile(path);
-                String absPath = file.getLocation().toPortableString();
+            for (String projectID : this.projectFilesToSend.keySet()) {
+                List<IPath> toSend = this.projectFilesToSend.get(projectID);
+                zout = new ZipOutputStream(output);
+                for (IPath path : toSend) {
+                    IFile file = this.projects.get(projectID).getFile(path);
+                    String absPath = file.getLocation().toPortableString();
 
-                byte[] buffer = new byte[streamService.getChunkSize()[0]];
-                InputStream input = new FileInputStream(absPath);
+                    byte[] buffer = new byte[streamService.getChunkSize()[0]];
+                    InputStream input = new FileInputStream(absPath);
 
-                ZipEntry ze = new ZipEntry(path.toPortableString());
-                zout.putNextEntry(ze);
+                    ZipEntry ze = new ZipEntry(path.toPortableString());
+                    ze.setExtra(projectID.getBytes());
+                    zout.putNextEntry(ze);
 
-                int numRead = 0;
-                while ((numRead = input.read(buffer)) > 0) {
-                    zout.write(buffer, 0, numRead);
+                    int numRead = 0;
+                    while ((numRead = input.read(buffer)) > 0) {
+                        zout.write(buffer, 0, numRead);
+                    }
+                    input.close();
+                    zout.flush();
+                    zout.closeEntry();
+
+                    // Progress monitor
+                    worked = (int) Math.round(increment * filesSent);
+
+                    if ((worked - lastWorked) > 0) {
+                        subMonitor.worked((worked - lastWorked));
+                        lastWorked = worked;
+                    }
+
+                    filesSent++;
+
+                    checkCancellation(CancelOption.NOTIFY_PEER);
                 }
-                input.close();
-                zout.flush();
-                zout.closeEntry();
-
-                // Progress monitor
-                worked = (int) Math.round(increment * filesSent);
-
-                if ((worked - lastWorked) > 0) {
-                    subMonitor.worked((worked - lastWorked));
-                    lastWorked = worked;
-                }
-
-                filesSent++;
-
-                checkCancellation(CancelOption.NOTIFY_PEER);
             }
-
         } catch (IOException e) {
             error = true;
             log.error("Error while sending file: ", e);
@@ -492,7 +521,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         subMonitor.done();
     }
 
-    protected void createArchive(SubMonitor subMonitor) throws IOException,
+    /**
+     * 
+     * @param projectFilesToSend
+     *            projectID => List of {@link IPath files} that will be sent to
+     *            peer
+     * @return List of project archives
+     */
+    protected List<File> createProjectArchives(SubMonitor subMonitor,
+        MappedList<String, IPath> projectFilesToSend) throws IOException,
         SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Creating archive...");
@@ -524,39 +561,19 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
 
         try {
-            // TODO: Ask the user whether to save the resources, but only if
-            // they have changed. How to ask Eclipse whether there are resource
-            // changes?
-            // if (outInvitationUI.confirmProjectSave(peer))
-            // TODO What if we're not a driver right now?
-            for (IProject project : this.projects) {
-                EditorAPI.saveProject(project, false);
-            }
-
-            // else
-            // throw new LocalCancellationException();
-
-            /**
-             * If the filelist <code>toSend</code> is empty, the projects are
-             * identical, so we only send a "empty" archive.
-             */
-            archive = null;
-            SubMonitor archiveMonitor = subMonitor.newChild(25,
+            SubMonitor archiveMonitor = subMonitor.newChild(50,
                 SubMonitor.SUPPRESS_ALL_LABELS);
-            if (toSend.size() != 0) {
-                /*
-                 * FIX #2836964: Prefix string too short
-                 * 
-                 * Do not delete the "SarosSyncArchive" prefix.
-                 */
-                archive = File.createTempFile("SarosSyncArchive-"
-                    + getPeer().getName(), ".zip");
-                FileZipper.createProjectZipArchive(toSend, archive,
-                    this.projects.get(0), archiveMonitor);
+            List<File> archivesToSend = new LinkedList<File>();
+            for (String projectID : projectFilesToSend.keySet()) {
+                List<IPath> toSend = projectFilesToSend.get(projectID);
+                File projectArchive = createProjectArchive(archiveMonitor,
+                    toSend, projectID);
+                if (projectArchive != null) {
+                    archivesToSend.add(projectArchive);
+                }
             }
-            archiveMonitor.done();
-
             subMonitor.worked(25);
+            return archivesToSend;
         } finally {
             // START all users
             for (StartHandle startHandle : startHandles) {
@@ -567,8 +584,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    protected void sendArchive(SubMonitor subMonitor)
-        throws SarosCancellationException, IOException {
+    protected void sendArchive(SubMonitor subMonitor, File archive,
+        String projectID) throws SarosCancellationException, IOException {
 
         subMonitor.setWorkRemaining(100);
 
@@ -578,7 +595,35 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
         transmitter.sendProjectArchive(peer, projectID, archive,
             subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
-        this.projectExchangeProcesses.removeProjectExchangeProcess(this);
     }
 
+    private File createProjectArchive(SubMonitor archiveMonitor,
+        List<IPath> toSend, String projectID) throws IOException,
+        SarosCancellationException {
+        IProject project = sarosSession.getProject(projectID);
+        log.debug("Got project from session");
+        /*
+         * TODO: Ask the user whether to save the resources, but only if they
+         * have changed. How to ask Eclipse whether there are resource changes?
+         * if (outInvitationUI.confirmProjectSave(peer)) getOpenEditors =>
+         * filter per Project => if dirty ask to save
+         */
+
+        EditorAPI.saveProject(project, false);
+        String prefix = projectID + this.projectIDDelimiter;
+        if (project == null) {
+            log.debug(projectID + ": is null");
+        }
+
+        File tempArchive = null;
+        if (toSend.size() > 0) {
+
+            tempArchive = File.createTempFile(prefix, ".zip");
+            FileZipper.createProjectZipArchive(toSend, tempArchive, project,
+                archiveMonitor);
+        }
+
+        archiveMonitor.done();
+        return tempArchive;
+    }
 }

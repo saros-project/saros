@@ -177,7 +177,7 @@ public class PacketExtensionUtils {
 
     public static PacketFilter getIncomingFileListFilter(
         final IncomingTransferObjectExtensionProvider extProv,
-        final String sessionID, final String projectID, final JID peer) {
+        final String sessionID, final String processID, final JID peer) {
         return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
 
             public boolean accept(Packet packet) {
@@ -195,7 +195,7 @@ public class PacketExtensionUtils {
                 if (!Utils.equals(transferDescription.sessionID, sessionID)) {
                     return false;
                 }
-                if (!Utils.equals(transferDescription.projectID, projectID)) {
+                if (!Utils.equals(transferDescription.processID, processID)) {
                     return false;
                 }
 

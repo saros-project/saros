@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -28,6 +30,18 @@ public abstract class ProjectNegotiation {
     protected ITransmitter transmitter;
     protected boolean error = false;
     protected StreamSession streamSession;
+    protected String processID;
+
+    /**
+     * While sending all the projects with a big archive containing the project
+     * archives, we create a temp-File. This file is named "projectID" +
+     * projectIDDelimiter + "a random number chosen by 'Java'" + ".zip" This
+     * delimiter is the string that separates projectID and this random number.
+     * Now we can assign the zip archive to the matching project.
+     * 
+     * WARNING: If changed compatibility is broken
+     */
+    protected final String projectIDDelimiter = "&&&&";
 
     @Inject
     protected StreamServiceManager streamServiceManager;
@@ -63,11 +77,12 @@ public abstract class ProjectNegotiation {
 
     /**
      * 
-     * @return the name of the project that is shared by the peer.
+     * @return the names of the projects that are shared by the peer. projectID
+     *         => projectName
      */
-    public abstract String getProjectName();
+    public abstract Map<String, String> getProjectNames();
 
-    public abstract String getProjectID();
+    public abstract String getProcessID();
 
     public JID getPeer() {
         return this.peer;

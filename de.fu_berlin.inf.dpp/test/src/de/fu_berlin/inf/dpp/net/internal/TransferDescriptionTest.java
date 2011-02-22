@@ -12,17 +12,17 @@ public class TransferDescriptionTest {
     private TransferDescription td;
     private JID recipient;
     private JID sender;
-    private String projectID;
+    private String processID;
     private String sessionID;
 
     @Before
     public void setUp() throws Exception {
         recipient = new JID("receiver@foo");
         sender = new JID("sender@bar");
-        projectID = "Project1";
+        processID = "Process1";
         sessionID = "session";
         td = TransferDescription.createFileListTransferDescription(recipient,
-            sender, sessionID, projectID);
+            sender, sessionID, processID);
     }
 
     @Test
@@ -30,7 +30,7 @@ public class TransferDescriptionTest {
         byte[] data = td.toByteArray();
         TransferDescription td2 = TransferDescription.fromByteArray(data);
         assertEquals(td.sessionID, td2.sessionID);
-        assertEquals(td.projectID, td2.projectID);
+        assertEquals(td.processID, td2.processID);
         assertEquals(td.sender, td2.sender);
         assertEquals(td.recipient, td2.recipient);
     }

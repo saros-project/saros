@@ -26,6 +26,11 @@ public class ProjectNegotiationObservable {
 
     private int addings = 0;
 
+    /**
+     * JID => ProjectNegotiation
+     * 
+     * You can have only one ProjectNegotiation with each session member.
+     */
     protected Map<JID, ProjectNegotiation> processes = new HashMap<JID, ProjectNegotiation>();
 
     /**
@@ -41,9 +46,9 @@ public class ProjectNegotiationObservable {
     }
 
     public synchronized ProjectNegotiation getProjectExchangeProcess(
-        String projectID) {
+        String processID) {
         for (ProjectNegotiation projectNegotiation : this.processes.values()) {
-            if (projectNegotiation.getProjectID() == projectID) {
+            if (projectNegotiation.getProcessID() == processID) {
                 return projectNegotiation;
             }
         }

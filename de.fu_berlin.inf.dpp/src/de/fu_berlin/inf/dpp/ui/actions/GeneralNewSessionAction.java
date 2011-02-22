@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,7 +29,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.XMPPException;
@@ -41,6 +39,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -72,45 +71,16 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
      */
     public void runNewSession(List<IResource> resource) {
         try {
-            boolean running = sessionManager.getSarosSession() != null;
-            boolean connected = saros.isConnected();
 
-            if (!connected) {
+            if (!saros.isConnected()) {
                 saros.connect(false);
             }
-            if (running) {
-                // sessionManager.openInviteDialog(null);
-                if (this.selectedProjects.size() > 1) {
-                    String message = "You selected the Projects:\n";
-                    for (IProject p : this.selectedProjects) {
-                        message += "- " + p.getName() + "\n";
-                    }
-                    message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
-                        + this.selectedProjects.get(0) + " will be shared.";
-                    if (!Utils.popUpYesNoQuestion("Multiple Projects marked",
-                        message, false)) {
-                        return;
-                    }
-                }
-                List<IProject> projectsToShare = new ArrayList<IProject>();
-                projectsToShare.add(this.selectedProjects.get(0));
-                sessionManager.addProjectsToSession(projectsToShare);
+            if (sessionManager.getSarosSession() != null) {
+                // we already have a session
+                sessionManager.addProjectsToSession(this.selectedProjects);
             } else {
-                if (this.selectedProjects.size() > 1) {
-                    String message = "You selected the Projects:\n";
-                    for (IProject p : this.selectedProjects) {
-                        message += "- " + p.getName() + "\n";
-                    }
-                    message += "\nSharing multiple projects is not supported yet.\nIf you continue only project "
-                        + this.selectedProjects.get(0) + " will be shared.";
-                    if (!Utils.popUpYesNoQuestion("Multiple Projects marked",
-                        message, false)) {
-                        return;
-                    }
-                }
-                List<IProject> projectsToShare = new ArrayList<IProject>();
-                projectsToShare.add(this.selectedProjects.get(0));
-                sessionManager.startSession(projectsToShare, resource);
+                // we want to start a new session
+                sessionManager.startSession(this.selectedProjects, resource);
                 sessionManager.openInviteDialog(preferenceUtils
                     .getAutoInviteUsers());
             }
@@ -128,7 +98,8 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
     }
 
     public void selectionChanged(IAction action, ISelection selection) {
-        this.selectedProjects = getProjects(selection);
+        this.selectedProjects = SelectionRetrieverFactory
+            .getSelectionRetriever(IProject.class, false).getSelection();
         action.setEnabled(true);
     }
 
@@ -136,16 +107,4 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
         // We deal with everything in selectionChanged
     }
 
-    protected List<IProject> getProjects(ISelection selection) {
-        List<IProject> result = new ArrayList<IProject>();
-        IStructuredSelection elements = ((IStructuredSelection) selection);
-        for (Object element : elements.toArray()) {
-            if (element instanceof IResource
-                && (!result.contains(((IResource) element).getProject()))) {
-                result.add(((IResource) element).getProject());
-            }
-        }
-
-        return result;
-    }
 }

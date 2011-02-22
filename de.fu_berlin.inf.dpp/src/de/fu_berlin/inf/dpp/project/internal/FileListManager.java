@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.FileListActivity;
@@ -23,6 +21,9 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
+/**
+ * This class processes incoming {@link FileListActivity FileListActivities}
+ */
 public class FileListManager implements IActivityProvider {
 
     private static Logger log = Logger.getLogger(FileListManager.class);
@@ -59,13 +60,10 @@ public class FileListManager implements IActivityProvider {
                 + " send FileListActivity, but has no writing permission in session");
             return;
         }
-        List<FileList> fileLists = new ArrayList<FileList>();
-        fileLists.add(fileListActivity.getFileList());
         JID from = fileListActivity.getSource().getJID();
-        String description = fileListActivity.getDescription();
-        String projectID = fileListActivity.getProjectID();
-        sessionManager.incomingProjectReceived(from, fileLists, sarosUI,
-            description, projectID);
+        sessionManager.incomingProjectReceived(from, sarosUI,
+            fileListActivity.getProjectInfos(),
+            fileListActivity.getProcessID(), fileListActivity.doStream());
     }
 
     public void exec(IActivity activity) {

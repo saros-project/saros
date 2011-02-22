@@ -100,8 +100,8 @@ public interface ITransmitter {
      * @param jid
      *            the JID of the user to which the file list is to be sent.
      * 
-     * @param fileList
-     *            the file list that is to be sent.
+     * @param fileLists
+     *            the file lists that are to be sent.
      * 
      * @param monitor
      *            a monitor to which progress will be reported and which is
@@ -121,8 +121,9 @@ public interface ITransmitter {
      *             if the operation fails because of a problem with the XMPP
      *             Connection.
      */
-    public void sendFileList(JID jid, String invitationID, FileList fileList,
-        SubMonitor monitor) throws IOException, SarosCancellationException;
+    public void sendFileLists(JID jid, String processID,
+        List<FileList> fileLists, SubMonitor monitor) throws IOException,
+        SarosCancellationException;
 
     /**
      * 
@@ -162,7 +163,7 @@ public interface ITransmitter {
 
     /**
      * 
-     * @param projectID
+     * @param processID
      * @param peer
      *            TODO
      * @blocking If forceWait is true.
@@ -170,23 +171,19 @@ public interface ITransmitter {
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
      */
-    public FileList receiveFileList(String projectID, JID peer,
+    public List<FileList> receiveFileLists(String processID, JID peer,
         SubMonitor monitor, boolean forceWait)
         throws SarosCancellationException, IOException;
 
     /**
-     * @param b
-     * @param archiveCollector
-     * @throws IOException
-     *             If the operation fails because of a problem with the XMPP
-     *             Connection.
-     * @throws SarosCancellationException
+     * 
+     * @param processID
+     *            ID to separate the project exchanging processes from one
+     *            another
+     * @param forceWait
+     * @return The archive as an {@link InputStream}
      */
-    public InputStream receiveArchive(SarosPacketCollector archiveCollector,
-        SubMonitor monitor, boolean b) throws IOException,
-        SarosCancellationException;
-
-    public InputStream receiveArchive(String projectID, SubMonitor monitor,
+    public InputStream receiveArchive(String processID, SubMonitor monitor,
         boolean forceWait) throws IOException, SarosCancellationException;
 
     /**
