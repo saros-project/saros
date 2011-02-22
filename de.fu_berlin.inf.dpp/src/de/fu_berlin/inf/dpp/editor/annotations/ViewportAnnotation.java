@@ -33,9 +33,9 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     private static final int INSET = 2;
 
-    private static final double STROKE_SCALE = 0.5;
+    private static final float STROKE_SCALE = 1.05f;
 
-    private static final double FILL_SCALE = 0.9;
+    private static final float FILL_SCALE = 1.22f;
 
     private Color strokeColor;
 
@@ -57,10 +57,10 @@ public class ViewportAnnotation extends SarosAnnotation implements
             annotationPreference.getColorPreferenceKey());
 
         Display display = Display.getDefault();
-        strokeColor = new Color(display,
-            ColorUtils.scaleColor(rgb, STROKE_SCALE));
+        strokeColor = new Color(display, ColorUtils.scaleColorBy(rgb,
+            STROKE_SCALE));
         // FIXME: dispose strokeColor somewhere
-        fillColor = new Color(display, ColorUtils.scaleColor(rgb, FILL_SCALE));
+        fillColor = new Color(display, ColorUtils.scaleColorBy(rgb, FILL_SCALE));
         // FIXME: dispose fillColor somewhere
     }
 

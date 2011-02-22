@@ -24,7 +24,7 @@ public abstract class SarosAnnotation extends Annotation {
      * The ratio by which a light color is lighter than it's corresponding
      * normal color.
      */
-    public static final double LIGHT_COLOR_SCALE = 0.75;
+    public static final float LIGHT_COLOR_SCALE = 1.22f;
 
     private static Logger log = Logger.getLogger(SarosAnnotation.class);
 
@@ -166,7 +166,7 @@ public abstract class SarosAnnotation extends Annotation {
      */
     public static Color getLightUserColor(User user) {
         Color userColor = SarosAnnotation.getUserColor(user);
-        Color userLightColor = ColorUtils.scaleColor(userColor,
+        Color userLightColor = ColorUtils.scaleColorBy(userColor,
             LIGHT_COLOR_SCALE);
 
         // The temporarily created color needs to be disposed
