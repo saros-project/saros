@@ -79,8 +79,9 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
              * treatment should be done, so that the following tests still will
              * be run.
              */
-            workbench.captureScreenshot(workbench.getPathToScreenShot()
-                + "/sessionInvitationFailedUsingNewProject.png");
+            bot().captureScreenshot(
+                bot().getPathToScreenShot()
+                    + "/sessionInvitationFailedUsingNewProject.png");
             if (bot.activeShell().getText().equals(SHELL_SHELL_ADD_PROJECT)) {
                 bot.activeShell().bot().toggleButton().click();
             }
@@ -91,7 +92,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_SHELL_ADD_PROJECT);
+        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
         bot().shell(SHELL_SHELL_ADD_PROJECT).activate();
         bot.radio(RADIO_USING_EXISTING_PROJECT).click();
 
@@ -139,8 +140,9 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
             try {
                 bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilShellClosed();
             } catch (Exception e) {
-                workbench.captureScreenshot(workbench.getPathToScreenShot()
-                    + "/sessionInvitationFailedUsingExistProject.png");
+                bot().captureScreenshot(
+                    bot().getPathToScreenShot()
+                        + "/sessionInvitationFailedUsingExistProject.png");
                 if (bot.activeShell().getText().equals(SHELL_SHELL_ADD_PROJECT)) {
                     bot.activeShell().bot().toggleButton().click();
                 }
@@ -150,7 +152,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_SHELL_ADD_PROJECT);
+        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
         bot().shell(SHELL_SHELL_ADD_PROJECT).activate();
         bot.radio("Use existing project").click();
         bot.textWithLabel("Project name", 1).setText(projectName);
@@ -186,7 +188,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_SHELL_ADD_PROJECT);
+        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
         bot().shell(SHELL_SHELL_ADD_PROJECT).activate();
         switch (usingWhichProject) {
         case NEW_PROJECT:

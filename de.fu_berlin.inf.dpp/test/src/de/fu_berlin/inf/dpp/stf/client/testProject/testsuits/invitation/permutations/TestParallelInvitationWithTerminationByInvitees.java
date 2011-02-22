@@ -75,7 +75,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid(),
             edna.getBaseJid());
 
-        bob.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell_bob.activate();
         shell_bob.bot_().button(CANCEL).click();
@@ -87,7 +87,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         shell_alice.bot_().button(OK).click();
 
         STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
-        carl.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
         carl.sarosC.confirmShellSessionnInvitation();
         shell_carl.bot_().button(CANCEL).click();
@@ -97,7 +97,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             carl.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
-        dave.bot().waitsUntilIsShellClosed(SHELL_SESSION_INVITATION);
+        dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
         dave.sarosC.confirmShellSessionnInvitation();
@@ -108,7 +108,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             dave.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
-        edna.bot().waitUntilShellOpen(SHELL_SESSION_INVITATION);
+        edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
         edna.sarosC.confirmShellSessionnInvitation();
         edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);

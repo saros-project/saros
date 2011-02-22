@@ -102,6 +102,6 @@ public class STFBotMenuImp extends AbstractRmoteWidget implements STFBotMenu {
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        bot.waitUntil(Conditions.widgetIsEnabled(widget));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 }

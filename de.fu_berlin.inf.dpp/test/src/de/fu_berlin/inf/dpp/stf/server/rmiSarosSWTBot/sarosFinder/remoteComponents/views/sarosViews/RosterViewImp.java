@@ -112,7 +112,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
                 .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
                     buddyNickName + ".*").contextMenu(CM_DELETE).click();
 
-            bot().waitUntilShellOpen(CONFIRM_DELETE);
+            bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
             bot().shell(CONFIRM_DELETE).bot_().button(YES).click();
         } catch (WidgetNotFoundException e) {
@@ -122,7 +122,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
         if (!bot().isShellOpen(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            bot().waitUntilShellOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
+            bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
     }

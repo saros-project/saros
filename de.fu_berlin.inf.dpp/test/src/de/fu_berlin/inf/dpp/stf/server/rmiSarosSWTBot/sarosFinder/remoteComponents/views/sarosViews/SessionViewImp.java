@@ -189,7 +189,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void leaveTheSessionByPeer() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        bot().waitUntilShellOpen(SHELL_CONFIRM_LEAVING_SESSION);
+        bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
         bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
         bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
         waitUntilIsNotInSession();
@@ -198,17 +198,17 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void leaveTheSessionByHost() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
-        bot().waitUntilShellOpen(SHELL_CONFIRM_CLOSING_SESSION);
+        bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
         bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
         bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
         waitUntilIsNotInSession();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_CLOSING_THE_SESSION);
+        bot().waitUntilShellIsOpen(SHELL_CLOSING_THE_SESSION);
         bot().shell(SHELL_CLOSING_THE_SESSION).activate();
         bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
-        bot().waitsUntilIsShellClosed(SHELL_CLOSING_THE_SESSION);
+        bot().waitsUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     public void openInvitationInterface(String... jidOfInvitees)
@@ -221,7 +221,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     public void inconsistencyDetected() throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        bot().waitsUntilIsShellClosed(SHELL_PROGRESS_INFORMATION);
+        bot().waitsUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -692,8 +692,9 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
-        workbench.captureScreenshot(workbench.getPathToScreenShot()
-            + "/serverside_vor_jump_to_position.png");
+        bot().captureScreenshot(
+            bot().getPathToScreenShot()
+                + "/serverside_vor_jump_to_position.png");
 
         bot().view(VIEW_SAROS_SESSION).bot_().table()
             .getTableItem(contactLabel).contextMenu(context).click();

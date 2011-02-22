@@ -178,16 +178,16 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        bot.waitUntil(Conditions.widgetIsEnabled(table));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(table));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        bot.waitUntil(tableHasRows(table, row));
+        stfBot.waitUntil(tableHasRows(table, row));
     }
 
     public void waitUntilTableItemExists(String itemText)
         throws RemoteException {
-        bot.waitUntil(SarosConditions.existTableItem(this, itemText));
+        stfBot.waitUntil(SarosConditions.existTableItem(this, itemText));
     }
 
 }

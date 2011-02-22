@@ -54,7 +54,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
 
                 shell.confirmWindowWithCheckBox(OK, true);
-                bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
+                bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }
@@ -63,7 +63,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         precondition();
         bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
         bot().shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(OK, true);
-        bot().waitsUntilIsShellClosed(SHELL_DELETE_RESOURCE);
+        bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
@@ -76,7 +76,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
                 .selectTreeItem(projectName, SRC, item).contextMenu(CM_DELETE)
                 .click();
 
-            bot().waitUntilShellOpen(CONFIRM_DELETE);
+            bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
             bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
         }
@@ -85,7 +85,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     public void deleteFile() throws RemoteException {
         precondition();
         bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
-        bot().waitUntilShellOpen(CONFIRM_DELETE);
+        bot().waitUntilShellIsOpen(CONFIRM_DELETE);
         bot().shell(CONFIRM_DELETE).activate();
         bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
         bot.sleep(300);
@@ -103,7 +103,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         shell.activate();
         shell.bot_().textWithLabel("Project name:").setText(target);
         shell.bot_().button(OK).click();
-        bot().waitsUntilIsShellClosed(SHELL_COPY_PROJECT);
+        bot().waitsUntilShellIsClosed(SHELL_COPY_PROJECT);
         bot.sleep(1000);
     }
 
@@ -160,7 +160,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
      **************************************************************/
 
     private void precondition() throws RemoteException {
-        workbench.activateWorkbench();
+        bot().activateWorkbench();
     }
 
     private void deleteNoGUI(IPath path) {

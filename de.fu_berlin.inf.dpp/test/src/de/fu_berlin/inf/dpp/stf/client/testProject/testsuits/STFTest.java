@@ -223,13 +223,33 @@ public class STFTest extends STF {
      */
     public static void setUpWorkbench() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.workbench.activateWorkbench();
-            tester.workbench.setUpWorkbench();
+            tester.bot().activateWorkbench();
             if (tester.bot.isViewOpen("Welcome"))
                 tester.bot().view("Welcome").close();
             tester.windowM.openPerspective();
-            tester.workbench.closeUnnecessaryViews();
+            closeUnnecessaryViews(tester);
+            tester.bot().resetWorkbench();
+            tester.editM.deleteAllProjectsNoGUI();
+            tester.editM.deleteAllProjects(VIEW_PACKAGE_EXPLORER);
         }
+    }
+
+    public static void closeUnnecessaryViews(Tester tester)
+        throws RemoteException {
+        if (tester.bot().isViewOpen("Problems"))
+            tester.bot().view("Problems").close();
+
+        if (tester.bot().isViewOpen("Javadoc"))
+            tester.bot().view("Javadoc").close();
+
+        if (tester.bot().isViewOpen("Declaration"))
+            tester.bot().view("Declaration").close();
+
+        if (tester.bot().isViewOpen("Task List"))
+            tester.bot().view("Task List").close();
+
+        if (tester.bot().isViewOpen("Outline"))
+            tester.bot().view("Outline").close();
     }
 
     /**
@@ -335,13 +355,13 @@ public class STFTest extends STF {
 
     public static void resetWorkbenches() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.workbench.resetWorkbench();
+            tester.bot().resetWorkbench();
         }
     }
 
     public static void closeAllShells() throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.workbench.closeAllShells();
+            tester.bot().closeAllShells();
         }
     }
 
@@ -648,12 +668,12 @@ public class STFTest extends STF {
         for (Tester peer : peers) {
             if (!host.sarosBuddiesV.hasBuddyNoGUI(peer.jid)) {
                 host.sarosBuddiesV.addANewBuddy(peer.jid);
-                peer.bot().waitUntilShellOpen(
+                peer.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
                 peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
                     .button(OK).click();
 
-                host.bot().waitUntilShellOpen(
+                host.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
                 host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
                     .button(OK).click();
@@ -694,7 +714,7 @@ public class STFTest extends STF {
     public static void shareYourScreen(Tester buddy, Tester selectedBuddy)
         throws RemoteException {
         buddy.sarosSessionV.shareYourScreenWithSelectedBuddy(selectedBuddy.jid);
-        selectedBuddy.bot().waitUntilShellOpen(
+        selectedBuddy.bot().waitUntilShellIsOpen(
             SHELL_INCOMING_SCREENSHARING_SESSION);
         selectedBuddy.bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot_()
             .button(YES).click();
@@ -736,7 +756,7 @@ public class STFTest extends STF {
 
     public void waitsUntilTransferedDataIsArrived(Tester buddy)
         throws RemoteException {
-        buddy.workbench.sleep(500);
+        buddy.bot().sleep(500);
     }
 
     /**********************************************

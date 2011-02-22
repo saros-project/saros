@@ -181,18 +181,18 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
      **********************************************/
 
     public void waitUntilActive() throws RemoteException {
-        bot.waitUntil(SarosConditions.ShellActive(swtBotShell));
+        stfBot.waitUntil(SarosConditions.ShellActive(swtBotShell));
         // if (!isShellActive(title))
         // throw new RemoteException("Couldn't activate shell \"" + title
         // + "\"");
     }
 
     public void waitShortUntilIsShellClosed() throws RemoteException {
-        bot.waitShortUntil(SarosConditions.isShellClosed(swtBotShell));
+        stfBot.waitShortUntil(SarosConditions.isShellClosed(swtBotShell));
     }
 
     public void waitLongUntilShellClosed() throws RemoteException {
-        bot.waitLongUntil(SarosConditions.isShellClosed(swtBotShell));
+        stfBot.waitLongUntil(SarosConditions.isShellClosed(swtBotShell));
     }
 
     public STFBot bot_() {

@@ -6,17 +6,19 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspective;
@@ -31,7 +33,6 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     private static transient STFWorkbenchBotImp self;
 
     private static STFBotViewImp view;
-
     private static STFBotPerspectiveImp stfBotPers;
     private static STFBotEditorImp stfBotEditor;
 
@@ -90,7 +91,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
 
     public List<String> getTitlesOfOpenedViews() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotView view : bot.views())
+        for (SWTBotView view : sarosSwtBot.views())
             list.add(view.getTitle());
         return list;
     }
@@ -105,7 +106,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     }
 
     public STFBotView activeView() throws RemoteException {
-        return view(bot.activeView().getTitle());
+        return view(sarosSwtBot.activeView().getTitle());
     }
 
     /**********************************************
@@ -113,6 +114,50 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      * perspective
      * 
      **********************************************/
+
+    public boolean isPerspectiveOpen(String title) throws RemoteException {
+        return getPerspectiveTitles().contains(title);
+    }
+
+    public boolean isPerspectiveActive(String id) throws RemoteException {
+        return sarosSwtBot.perspectiveById(id).isActive();
+    }
+
+    public List<String> getPerspectiveTitles() throws RemoteException {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotPerspective perspective : sarosSwtBot.perspectives())
+            list.add(perspective.getLabel());
+        return list;
+    }
+
+    public void openPerspectiveWithId(final String persID)
+        throws RemoteException {
+        if (!isPerspectiveActive(persID)) {
+            try {
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        final IWorkbench wb = PlatformUI.getWorkbench();
+                        IPerspectiveDescriptor[] descriptors = wb
+                            .getPerspectiveRegistry().getPerspectives();
+                        for (IPerspectiveDescriptor per : descriptors) {
+                            log.debug("installed perspective id:" + per.getId());
+                        }
+                        final IWorkbenchWindow win = wb
+                            .getActiveWorkbenchWindow();
+                        try {
+                            wb.showPerspective(persID, win);
+                        } catch (WorkbenchException e) {
+                            log.debug("couldn't open perspective wit ID"
+                                + persID, e);
+                        }
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                log.debug("Couldn't initialize perspective with ID" + persID,
+                    e.getCause());
+            }
+        }
+    }
 
     public STFBotPerspective perspectiveByLabel(String label)
         throws RemoteException {
@@ -126,15 +171,15 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     }
 
     public STFBotPerspective activePerspective() throws RemoteException {
-        return perspectiveByLabel(bot.activePerspective().getLabel());
+        return perspectiveByLabel(sarosSwtBot.activePerspective().getLabel());
     }
 
     public STFBotPerspective defaultPerspective() throws RemoteException {
-        return perspectiveByLabel(bot.defaultPerspective().getLabel());
+        return perspectiveByLabel(sarosSwtBot.defaultPerspective().getLabel());
     }
 
     public void resetActivePerspective() throws RemoteException {
-        bot.resetActivePerspective();
+        sarosSwtBot.resetActivePerspective();
     }
 
     /**********************************************
@@ -144,17 +189,18 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      **********************************************/
 
     public STFBotEditor editor(String fileName) throws RemoteException {
-        stfBotEditor.setTitle(bot.editorByTitle(fileName).toTextEditor());
+        stfBotEditor.setTitle(sarosSwtBot.editorByTitle(fileName)
+            .toTextEditor());
         return stfBotEditor;
     }
 
     public STFBotEditor editorById(String id) throws RemoteException {
-        stfBotEditor.setTitle(bot.editorById(id).toTextEditor());
+        stfBotEditor.setTitle(sarosSwtBot.editorById(id).toTextEditor());
         return stfBotEditor;
     }
 
     public boolean isEditorOpen(String fileName) throws RemoteException {
-        for (SWTBotEditor editor : bot.editors()) {
+        for (SWTBotEditor editor : sarosSwtBot.editors()) {
             if (editor.getTitle().equals(fileName))
                 return true;
         }
@@ -162,21 +208,21 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
     }
 
     public STFBotEditor activeEditor() throws RemoteException {
-        return editor(bot.activeEditor().getTitle());
+        return editor(sarosSwtBot.activeEditor().getTitle());
 
     }
 
     public void closeAllEditors() throws RemoteException {
-        bot.closeAllEditors();
+        sarosSwtBot.closeAllEditors();
     }
 
     public void saveAllEditors() throws RemoteException {
-        bot.saveAllEditors();
+        sarosSwtBot.saveAllEditors();
     }
 
     public void waitUntilEditorOpen(final String title) throws RemoteException {
 
-        waitUntil(new DefaultCondition() {
+        sarosSwtBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isEditorOpen(title);
             }
@@ -189,7 +235,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
 
     public void waitUntilEditorClosed(final String title)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        sarosSwtBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isEditorOpen(title);
             }
@@ -207,7 +253,28 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      **********************************************/
 
     public void resetWorkbench() throws RemoteException {
-        bot.resetWorkbench();
+        closeAllShells();
+        // saveAllEditors();
+        closeAllEditors();
+        openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
+    }
+
+    public void activateWorkbench() throws RemoteException {
+        getWorkbench().activate().setFocus();
+    }
+
+    public SWTBotShell getWorkbench() throws RemoteException {
+        SWTBotShell[] shells = sarosSwtBot.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(".+? - .+")) {
+                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+                return shell;
+            }
+        }
+        final String message = "No shell found matching \"" + ".+? - .+"
+            + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
     }
 
     /**********************************************
@@ -217,19 +284,7 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      **********************************************/
 
     public void closeAllShells() throws RemoteException {
-        bot.closeAllShells();
-    }
-
-    public void waitUntil1(ICondition condition) throws RemoteException {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
-    }
-
-    public void waitLongUntil1(ICondition condition) throws RemoteException {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-    }
-
-    public void waitShortUntil1(ICondition condition) throws RemoteException {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
+        sarosSwtBot.closeAllShells();
     }
 
 }

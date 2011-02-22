@@ -83,7 +83,7 @@ public class STFBotToolbarButtonImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        bot.waitUntil(Conditions.widgetIsEnabled(toolbarButton));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(toolbarButton));
     }
 
 }

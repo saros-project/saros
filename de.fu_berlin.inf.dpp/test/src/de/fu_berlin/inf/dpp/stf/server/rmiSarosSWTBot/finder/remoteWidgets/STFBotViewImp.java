@@ -61,8 +61,8 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      * 
      **********************************************/
     public STFBot bot_() {
-        bot.setBot(swtbotView.bot());
-        return bot;
+        stfBot.setBot(swtbotView.bot());
+        return stfBot;
     }
 
     public STFBotViewMenu menu(String label) throws RemoteException {
@@ -185,7 +185,7 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      **********************************************/
     public void waitUntilIsActive() throws RemoteException {
 
-        bot.waitUntil(new DefaultCondition() {
+        stfBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isActive();
             }

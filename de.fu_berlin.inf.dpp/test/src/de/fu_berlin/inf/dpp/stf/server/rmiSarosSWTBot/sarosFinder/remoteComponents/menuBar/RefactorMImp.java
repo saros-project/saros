@@ -74,7 +74,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
                 .click();
         }
         if (bot().isShellOpen(shellTitle))
-            bot().waitsUntilIsShellClosed(shellTitle);
+            bot().waitsUntilShellIsClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
@@ -83,11 +83,11 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
         // bot().shell(shellTitle).waitUntilActive();
         bot().shell(shellTitle).confirmShellWithTree(buttonName, nodes);
-        bot().waitsUntilIsShellClosed(shellTitle);
+        bot().waitsUntilShellIsClosed(shellTitle);
     }
 
     private void precondition() throws RemoteException {
-        workbench.activateWorkbench();
+        bot().activateWorkbench();
     }
 
 }

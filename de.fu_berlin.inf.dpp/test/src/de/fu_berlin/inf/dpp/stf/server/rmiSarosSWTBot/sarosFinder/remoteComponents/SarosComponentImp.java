@@ -22,7 +22,7 @@ public class SarosComponentImp extends EclipseComponentImp implements
      **********************************************/
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell.activate();
         shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
@@ -49,7 +49,7 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_SAROS_CONFIGURATION);
+        bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
         STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
         shell.activate();
         shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
@@ -63,7 +63,7 @@ public class SarosComponentImp extends EclipseComponentImp implements
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-        bot().waitUntilShellOpen(SHELL_INVITATION);
+        bot().waitUntilShellIsOpen(SHELL_INVITATION);
         STFBotShell shell = bot().shell(SHELL_INVITATION);
         shell.activate();
         shell.confirmShellithCheckBoxs(FINISH, baseJIDOfinvitees);

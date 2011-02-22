@@ -64,9 +64,9 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void closeWithoutSave() throws RemoteException {
         editor.close();
-        if (bot.isShellOpen(SHELL_SAVE_RESOURCE)
-            && bot.shell(SHELL_SAVE_RESOURCE).isActive())
-            bot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        if (stfBot.isShellOpen(SHELL_SAVE_RESOURCE)
+            && stfBot.shell(SHELL_SAVE_RESOURCE).isActive())
+            stfBot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
     }
 
     public void setTexWithSave(String contentPath) throws RemoteException {
@@ -94,14 +94,14 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
         editor.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        bot.sleep(500);
+        stfBot.sleep(500);
     }
 
     public void selectLine(int line) throws RemoteException {
         editor.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        bot.sleep(1000);
+        stfBot.sleep(1000);
 
     }
 
@@ -110,7 +110,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
         editor.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        bot.sleep(800);
+        stfBot.sleep(800);
     }
 
     public void pressShortcut(String... keys) throws RemoteException {
@@ -149,7 +149,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
             editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        bot.sleep(1000);
+        stfBot.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'j');
     }
 
@@ -159,7 +159,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
         else
             editor.pressShortcut(SWT.CTRL, '.');
 
-        bot.sleep(20);
+        stfBot.sleep(20);
     }
 
     public void pressShortCutQuickAssignToLocalVariable()
@@ -168,7 +168,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
             editor.pressShortcut(SWT.COMMAND, '2');
         else
             editor.pressShortcut(SWT.CTRL, '2');
-        bot.sleep(1000);
+        stfBot.sleep(1000);
         editor.pressShortcut(SWT.NONE, 'l');
 
     }
@@ -237,7 +237,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
      **********************************************/
 
     public void waitUntilIsActive() throws RemoteException {
-        bot.waitUntil1(new DefaultCondition() {
+        stfBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isActive();
             }
@@ -254,7 +254,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void waitUntilIsTextSame(final String otherText)
         throws RemoteException {
-        bot.waitUntil1(new DefaultCondition() {
+        stfBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getText().equals(otherText);
             }

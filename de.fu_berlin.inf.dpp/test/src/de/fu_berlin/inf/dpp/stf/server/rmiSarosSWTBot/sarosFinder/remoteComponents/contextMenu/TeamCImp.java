@@ -64,7 +64,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         }
         shell.bot_().button(FINISH).waitUntilIsEnabled();
         shell.bot_().button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_SHARE_PROJECT);
+        bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
@@ -82,7 +82,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         log.debug("SVN share project text: " + bot.text());
         shell.bot_().button(FINISH).waitUntilIsEnabled();
         shell.bot_().button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_SHARE_PROJECT);
+        bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectWithSVNUsingSpecifiedFolderName(String viewTitle,
@@ -120,11 +120,11 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             bot().view(VIEW_SVN_REPOSITORIES)
                 .toolbarButton("Add SVN Repository").click();
 
-            bot().waitUntilShellOpen("Add SVN Repository");
+            bot().waitUntilShellIsOpen("Add SVN Repository");
             bot().shell("Add SVN Repository").activate();
             bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             bot.button(FINISH).click();
-            bot().waitsUntilIsShellClosed("Add SVN Repository");
+            bot().waitsUntilShellIsClosed("Add SVN Repository");
             if (!viewWasOpen)
                 bot().view(VIEW_SVN_REPOSITORIES).close();
             // recur...
@@ -168,7 +168,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().shell("Checkout from SVN").confirmShellWithTreeWithWaitingExpand(
             "Checkout from SVN", FINISH, repositoryURL, "trunk", "examples");
         bot().shell("SVN Checkout").waitUntilActive();
-        bot().waitsUntilIsShellClosed("SVN Checkout");
+        bot().waitsUntilShellIsClosed("SVN Checkout");
     }
 
     public void disConnect(String viewTitle, String projectName)
@@ -194,7 +194,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             .contextMenu(contexts).click();
 
         bot().shell(SHELL_REVERT).confirm(OK);
-        bot().waitsUntilIsShellClosed(SHELL_REVERT);
+        bot().waitsUntilShellIsClosed(SHELL_REVERT);
     }
 
     public void updateProject(String viewTitle, String projectName,
@@ -223,7 +223,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().shell(SHELL_SWITCH).waitUntilActive();
         bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
         bot.button(OK).click();
-        bot().waitsUntilIsShellClosed(SHELL_SVN_SWITCH);
+        bot().waitsUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
     public void switchProject(String projectName, String url)
@@ -269,7 +269,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot.textWithLabel(LABEL_REVISION).setText(versionID);
         bot.button(OK).click();
         if (bot().isShellOpen(SHELL_SVN_SWITCH))
-            bot().waitsUntilIsShellClosed(SHELL_SVN_SWITCH);
+            bot().waitsUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
     /**********************************************
@@ -324,7 +324,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
      **********************************************/
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
-        bot().waitsUntilIsShellClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+        bot().waitsUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
     public void waitUntilProjectInSVN(String projectName)

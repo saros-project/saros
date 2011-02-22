@@ -51,39 +51,39 @@ public class TestConcurrentEditing extends STFTest {
         bob.bot().waitUntilEditorOpen(FILE);
         bob.bot().editor(FILE).navigateTo(0, 30);
 
-        bob.workbench.sleep(1000);
+        bob.bot().sleep(1000);
 
         // Alice goes to 0,6 and hits Delete
-        alice.workbench.activateWorkbench();
+        alice.bot().activateWorkbench();
         int waitActivate = 100;
-        alice.workbench.sleep(waitActivate);
+        alice.bot().sleep(waitActivate);
         alice.bot().editor(FILE).activate();
 
         alice.bot().editor(FILE).waitUntilIsActive();
         alice.bot().editor(FILE).pressShortcut("DELETE");
         // at the same time, Bob enters L at 0,30
-        bob.workbench.activateWorkbench();
-        bob.workbench.sleep(waitActivate);
+        bob.bot().activateWorkbench();
+        bob.bot().sleep(waitActivate);
         bob.bot().editor(FILE).activate();
         bob.bot().editor(FILE).waitUntilIsActive();
         bob.bot().editor(FILE).typeText("L");
         // both sleep for less than 1000ms
-        alice.workbench.sleep(300);
+        alice.bot().sleep(300);
 
         // Alice hits Delete again
-        alice.workbench.activateWorkbench();
-        alice.workbench.sleep(waitActivate);
+        alice.bot().activateWorkbench();
+        alice.bot().sleep(waitActivate);
         alice.bot().editor(FILE).activate();
         alice.bot().editor(FILE).waitUntilIsActive();
         alice.bot().editor(FILE).pressShortcut("DELETE");
         // Bob enters o
-        bob.workbench.activateWorkbench();
-        bob.workbench.sleep(waitActivate);
+        bob.bot().activateWorkbench();
+        bob.bot().sleep(waitActivate);
         bob.bot().editor(FILE).activate();
         bob.bot().editor(FILE).waitUntilIsActive();
         bob.bot().editor(FILE).typeText("o");
 
-        alice.workbench.sleep(5000);
+        alice.bot().sleep(5000);
         String aliceText = alice.bot().editor(FILE).getText();
         String bobText = bob.bot().editor(FILE).getText();
         assertEquals(aliceText, bobText);
@@ -119,10 +119,9 @@ public class TestConcurrentEditing extends STFTest {
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
-        bob.workbench.sleep(5000);
+        bob.bot().sleep(5000);
         assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
-            .toolbarButton(TB_INCONSISTENCY_DETECTED)
-            .isEnabled());
+            .toolbarButton(TB_INCONSISTENCY_DETECTED).isEnabled());
 
     }
 }

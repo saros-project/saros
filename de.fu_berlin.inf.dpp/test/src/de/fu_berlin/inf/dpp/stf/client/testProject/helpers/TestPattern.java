@@ -77,9 +77,9 @@ public class TestPattern extends STFTest {
      */
     @After
     public void cleanUp() throws RemoteException {
-        bob.workbench.resetWorkbench();
-        carl.workbench.resetWorkbench();
-        alice.workbench.resetWorkbench();
+        bob.bot().resetWorkbench();
+        carl.bot().resetWorkbench();
+        alice.bot().resetWorkbench();
     }
 
     /**

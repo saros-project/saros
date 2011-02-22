@@ -17,10 +17,10 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.AbstractRmoteWidget;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.WorkbenchImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
@@ -82,8 +81,7 @@ public class STFController {
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
 
-        EclipseComponentImp.saros = saros;
-        AbstractRmoteWidget.saros = saros;
+        STF.saros = saros;
         EclipseComponentImp.sessionManager = sessionManager;
         EclipseComponentImp.dataTransferManager = dataTransferManager;
         EclipseComponentImp.editorManager = editorManager;
@@ -117,7 +115,6 @@ public class STFController {
         exportObject(SessionViewImp.getInstance(), "sessionView");
         exportObject(RSViewImp.getInstance(), "remoteScreenView");
         exportObject(ChatViewImp.getInstance(), "chatView");
-        exportObject(WorkbenchImp.getInstance(), "workbench");
         exportObject(ConsoleViewImp.getInstance(), "consoleView");
         exportObject(FileMImp.getInstance(), "fileM");
         exportObject(EditMImp.getInstance(), "editM");

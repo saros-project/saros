@@ -89,7 +89,7 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
 
     public void waitUntilSubItemExists(final String subItemText)
         throws RemoteException {
-        bot.waitUntil(new DefaultCondition() {
+        stfBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existsSubItem(subItemText);
             }

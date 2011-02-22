@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.hamcrest.Matcher;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
@@ -97,6 +96,50 @@ public interface STFWorkbenchBot extends STFBot {
     public STFBotEditor activeEditor() throws RemoteException;
 
     /**
+     * 
+     * @param title
+     *            the title of a perspective.
+     * @return<tt>true</tt>, if the perspective specified with the given title
+     *                       is open.
+     */
+    public boolean isPerspectiveOpen(String title) throws RemoteException;
+
+    /**
+     * 
+     * @param id
+     *            id which identify a perspective
+     * @return<tt>true</tt>, if the perspective specified with the given id is
+     *                       active.
+     */
+    public boolean isPerspectiveActive(String id) throws RemoteException;
+
+    /**
+     * 
+     * @return titles of all available perspectives.
+     */
+    public List<String> getPerspectiveTitles() throws RemoteException;
+
+    /**
+     * Open a perspective using Window->Open Perspective->Other... The method is
+     * defined as helper method for other openPerspective* methods and should
+     * not be exported using rmi.
+     * 
+     * 1. if the perspective already exist, return.
+     * 
+     * 2. activate the saros-instance-window(alice / bob / carl). If the
+     * workbench isn't active, delegate can't find the main menus.
+     * 
+     * 3. click main menus Window -> Open perspective -> Other....
+     * 
+     * 4. confirm the pop-up window "Open Perspective".
+     * 
+     * @param persID
+     *            example: "org.eclipse.jdt.ui.JavaPerspective"
+     */
+    public void openPerspectiveWithId(final String persID)
+        throws RemoteException;
+
+    /**
      * @return the active perspective in the active workbench page
      */
     public STFBotPerspective activePerspective() throws RemoteException;
@@ -113,6 +156,14 @@ public interface STFWorkbenchBot extends STFBot {
      * <ul>
      */
     public void resetWorkbench() throws RemoteException;
+
+    /**
+     * Activate the saros-instance.This method is very useful, wenn you test
+     * saros under MAC
+     * 
+     * @throws RemoteException
+     */
+    public void activateWorkbench() throws RemoteException;
 
     /**
      * Returns the default perspective as defined in the WorkbenchAdvisor of the
@@ -133,5 +184,4 @@ public interface STFWorkbenchBot extends STFBot {
 
     public void closeAllShells() throws RemoteException;
 
-    public void waitUntil1(ICondition condition) throws RemoteException;
 }

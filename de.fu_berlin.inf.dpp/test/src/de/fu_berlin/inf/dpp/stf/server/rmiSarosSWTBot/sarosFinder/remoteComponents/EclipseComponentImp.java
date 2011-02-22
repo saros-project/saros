@@ -13,7 +13,6 @@ import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.osgi.framework.Bundle;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -47,7 +46,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         .getLogger(EclipseComponentImp.class);
 
     // workbench
-    public static WorkbenchImp workbench = WorkbenchImp.getInstance();
+    // public static WorkbenchImp workbench = WorkbenchImp.getInstance();
 
     // Views
     public static RosterViewImp rosterV = RosterViewImp.getInstance();
@@ -70,7 +69,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public static OpenCImp openC = OpenCImp.getInstance();
 
     // Picocontainer initiated by STFController.
-    public static Saros saros;
+
     public static SarosSessionManager sessionManager;
     public static DataTransferManager dataTransferManager;
     public static EditorManager editorManager;

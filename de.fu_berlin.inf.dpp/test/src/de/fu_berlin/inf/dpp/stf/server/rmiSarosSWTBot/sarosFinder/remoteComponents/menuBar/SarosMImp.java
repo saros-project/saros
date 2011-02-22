@@ -43,6 +43,6 @@ public class SarosMImp extends SarosPreferencesImp implements SarosM {
      **********************************************/
 
     protected void precondition() throws RemoteException {
-        workbench.activateWorkbench();
+        bot().activateWorkbench();
     }
 }

@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCCombo;
@@ -18,9 +20,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface STFBot extends EclipseComponent {
+public interface STFBot extends Remote {
 
     /**********************************************
      * 
@@ -31,6 +32,120 @@ public interface STFBot extends EclipseComponent {
      * @see SWTBot#tree()
      */
     public STFBotTree tree() throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotTree} with the specified <code>label</code>.
+     */
+    public STFBotTree treeWithLabel(String label) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>label</code>.
+     */
+
+    public STFBotTree treeWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotTree} with the specified <code>key/value</code>.
+     */
+    public STFBotTree treeWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>key/value</code>.
+     */
+
+    public STFBotTree treeWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotTree} with the specified <code>value</code>.
+     */
+    public STFBotTree treeWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>value</code>.
+     */
+
+    public STFBotTree treeWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotTree} with the specified <code>inGroup</code>.
+     */
+    public STFBotTree treeInGroup(String inGroup) throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotTree treeInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>none</code>.
+     */
+
+    public STFBotTree tree(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotTree} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotTree treeWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotTree} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+
+    public STFBotTree treeWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException;
 
     /**********************************************
      * 
@@ -69,7 +184,7 @@ public interface STFBot extends EclipseComponent {
      * @throws RemoteException
      *             ;;
      */
-    public void waitsUntilIsShellClosed(final String title)
+    public void waitsUntilShellIsClosed(final String title)
         throws RemoteException;
 
     /**
@@ -80,7 +195,7 @@ public interface STFBot extends EclipseComponent {
      * @throws RemoteException
      *             ;;
      */
-    public void waitUntilShellOpen(final String title) throws RemoteException;
+    public void waitUntilShellIsOpen(final String title) throws RemoteException;
 
     /**********************************************
      * 
@@ -1670,4 +1785,18 @@ public interface STFBot extends EclipseComponent {
         String inGroup, int index) throws RemoteException;
 
     public void sleep(long millis) throws RemoteException;
+
+    /**
+     * @see SWTBot#captureScreenshot(String)
+     * @throws RemoteException
+     */
+    public void captureScreenshot(String fileName) throws RemoteException;
+
+    public String getPathToScreenShot() throws RemoteException;
+
+    public void waitUntil(ICondition condition) throws RemoteException;
+
+    public void waitLongUntil(ICondition condition) throws RemoteException;
+
+    public void waitShortUntil(ICondition condition) throws RemoteException;
 }

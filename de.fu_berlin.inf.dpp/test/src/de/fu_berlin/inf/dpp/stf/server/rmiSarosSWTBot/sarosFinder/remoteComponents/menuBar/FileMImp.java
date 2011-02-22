@@ -125,7 +125,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             bot.textWithLabel(LABEL_PACKAGE).setText(pkg);
             bot.textWithLabel(LABEL_NAME).setText(className);
             bot.button("Add...").click();
-            bot().waitUntilShellOpen("Implemented Interfaces Selection");
+            bot().waitUntilShellIsOpen("Implemented Interfaces Selection");
             STFBotShell shell = bot().shell("Implemented Interfaces Selection");
             shell.activate();
             shell.bot_().textWithLabel("Choose interfaces:")
@@ -135,7 +135,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             bot.checkBox("Inherited abstract methods").click();
             bot.button(FINISH).click();
-            bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_CLASS);
+            bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
         }
     }
 
@@ -154,7 +154,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
      * 
      **************************************************************/
     protected void precondition() throws RemoteException {
-        workbench.activateWorkbench();
+        bot().activateWorkbench();
     }
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
@@ -164,7 +164,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.textWithLabel(LABEL_PACKAGE).setText(pkg);
         bot.textWithLabel(LABEL_NAME).setText(className);
         bot.button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_CLASS);
+        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmWizardNewProject(String projectName)
@@ -173,7 +173,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             NODE_PROJECT);
         bot.textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         bot.button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_NEW_PROJECT);
+        bot().waitsUntilShellIsClosed(SHELL_NEW_PROJECT);
         // bot.sleep(50);
     }
 
@@ -188,7 +188,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             .setText(getLastNode(fileNodes));
         shell.bot_().button(FINISH).waitUntilIsEnabled();
         bot.button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_NEW_FILE);
+        bot().waitsUntilShellIsClosed(SHELL_NEW_FILE);
     }
 
     private void confirmShellNewJavaPackage(String projectName, String pkg)
@@ -199,7 +199,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         bot.textWithLabel(LABEL_NAME).setText(pkg);
         bot.button(FINISH).click();
         if (bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT))
-            bot().waitsUntilIsShellClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            bot().waitsUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
 
     private void confirmShellNewFolder(String... folderNodes)
@@ -213,7 +213,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             .setText(getLastNode(folderNodes));
 
         bot.button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_NEW_FOLDER);
+        bot().waitsUntilShellIsClosed(SHELL_NEW_FOLDER);
     }
 
     private void confirmShellNewJavaProject(String projectName)
@@ -224,6 +224,6 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
         // bot.button(FINISH).click();
         shell.bot_().button(FINISH).click();
-        bot().waitsUntilIsShellClosed(SHELL_NEW_JAVA_PROJECT);
+        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_PROJECT);
     }
 }

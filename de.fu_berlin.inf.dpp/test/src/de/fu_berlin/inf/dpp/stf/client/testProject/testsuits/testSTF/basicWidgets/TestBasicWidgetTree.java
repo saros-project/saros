@@ -31,7 +31,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemInShell() throws RemoteException {
         alice.bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
             .click();
-        alice.bot().waitUntilShellOpen(SHELL_SHOW_VIEW);
+        alice.bot().waitUntilShellIsOpen(SHELL_SHOW_VIEW);
         STFBotShell shell = alice.bot.shell(SHELL_SHOW_VIEW);
         shell.activate();
         assertTrue(shell.bot_().tree().selectTreeItem(NODE_GENERAL)
@@ -42,7 +42,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemInShell2() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
-        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
+        alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         assertTrue(shell.bot_().tree()
@@ -54,7 +54,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemWithRegexsInShell() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
 
-        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
+        alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         assertTrue(shell.bot_().tree()
@@ -127,7 +127,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void selectTreeItemInShell() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
 
-        alice.bot().waitUntilShellOpen(SHELL_PREFERNCES);
+        alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
         STFBotShell shell = alice.bot.shell(SHELL_PREFERNCES);
         shell.activate();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
@@ -236,7 +236,7 @@ public class TestBasicWidgetTree extends STFTest {
             .selectTreeItem(PROJECT1).contextMenu(CM_SAROS, CM_SHARE_PROJECT)
             .click();
 
-        alice.bot().waitUntilShellOpen(SHELL_INVITATION);
+        alice.bot().waitUntilShellIsOpen(SHELL_INVITATION);
         assertTrue(alice.bot().shell(SHELL_INVITATION).activate());
     }
 }

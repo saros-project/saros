@@ -129,6 +129,6 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        bot.waitUntil(Conditions.widgetIsEnabled(tableItem));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(tableItem));
     }
 }

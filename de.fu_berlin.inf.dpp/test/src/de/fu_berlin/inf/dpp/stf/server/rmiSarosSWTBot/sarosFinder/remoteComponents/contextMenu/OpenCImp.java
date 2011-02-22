@@ -69,7 +69,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         bot().view(viewTitle).bot_().tree().selectTreeItem(fileNodes)
             .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
 
-        bot().waitUntilShellOpen(SHELL_EDITOR_SELECTION);
+        bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
         STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         // shell_bob.waitUntilActive();
         shell_bob.activate();

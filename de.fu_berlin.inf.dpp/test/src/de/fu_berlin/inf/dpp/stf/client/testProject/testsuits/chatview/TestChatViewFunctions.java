@@ -81,10 +81,10 @@ public class TestChatViewFunctions extends STFTest {
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
-        alice.workbench.sleep(1000);
+        alice.bot().sleep(1000);
         String messageByAlice = alice.chatV.getTextOfLastChatLine();
 
-        bob.workbench.sleep(1000);
+        bob.bot().sleep(1000);
         String messageByBob = bob.chatV.getTextOfLastChatLine();
         assertEquals(messageByAlice, messageByBob);
         System.out.println(bob.chatV

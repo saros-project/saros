@@ -11,9 +11,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
+import de.fu_berlin.inf.dpp.Saros;
+
 public class STF {
+
+    protected static final transient Logger log = Logger.getLogger(STF.class);
+
+    public static Saros saros;
 
     protected final static String CONFIRM_DELETE = "Confirm Delete";
     protected final static String SHELL_COPY_PROJECT = "Copy Project";

@@ -54,7 +54,7 @@ public class TestSarosPreferences extends STFTest {
     public void createAccountWhichAlreadyExisted() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
-        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         alice.bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT).activate();
 
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
@@ -80,7 +80,7 @@ public class TestSarosPreferences extends STFTest {
     public void createAccountWithDismatchedPassword() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
-        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.activate();
@@ -102,7 +102,7 @@ public class TestSarosPreferences extends STFTest {
     @Test
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
-        alice.bot().waitUntilShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.activate();

@@ -78,7 +78,7 @@ public class TestSVNStateUpdates extends STFTest {
         for (final Tester tester : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.workbench.resetWorkbench();
+                    tester.bot().resetWorkbench();
                     tester.pEV.selectProject(SVN_PROJECT_COPY);
                     tester.editM.copyProject(SVN_PROJECT);
                     assertTrue(tester.fileM.existsProjectNoGUI(SVN_PROJECT));
@@ -165,7 +165,7 @@ public class TestSVNStateUpdates extends STFTest {
         assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
         bob.fileM.newPackage(SVN_PROJECT, "new_package");
         alice.fileM.waitUntilPkgExists(SVN_PROJECT, "new_package");
-        bob.workbench.sleep(1000);
+        bob.bot().sleep(1000);
         bob.pEV.selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
         bob.refactorM.moveClassTo(SVN_PROJECT, "new_package");

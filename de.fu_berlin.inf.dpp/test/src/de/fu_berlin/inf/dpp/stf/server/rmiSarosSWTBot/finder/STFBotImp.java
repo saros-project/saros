@@ -7,8 +7,12 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.osgi.framework.Bundle;
 
+import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCCombo;
@@ -35,10 +39,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class STFBotImp extends EclipseComponentImp implements STFBot {
+public class STFBotImp extends STF implements STFBot {
 
     private static transient STFBotImp self;
 
@@ -65,7 +69,8 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         if (self != null)
             return self;
         self = new STFBotImp();
-        swtBot = bot;
+        swtBot = SarosSWTBot.getInstance();
+
         shell = STFBotShellImp.getInstance();
         button = STFBotButtonImp.getInstance();
         tree = STFBotTreeImp.getInstance();
@@ -104,6 +109,68 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         return tree;
     }
 
+    public STFBotTree treeWithLabel(String label) throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithLabel(label));
+        return tree;
+    }
+
+    public STFBotTree treeWithLabel(String label, int index)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithLabel(label, index));
+        return tree;
+    }
+
+    public STFBotTree treeWithId(String key, String value)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithId(key, value));
+        return tree;
+    }
+
+    public STFBotTree treeWithId(String key, String value, int index)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithId(key, value, index));
+        return tree;
+    }
+
+    public STFBotTree treeWithId(String value) throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithId(value));
+        return tree;
+    }
+
+    public STFBotTree treeWithId(String value, int index)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithId(value, index));
+        return tree;
+    }
+
+    public STFBotTree treeInGroup(String inGroup) throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeInGroup(inGroup));
+        return tree;
+    }
+
+    public STFBotTree treeInGroup(String inGroup, int index)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeInGroup(inGroup, index));
+        return tree;
+    }
+
+    public STFBotTree tree(int index) throws RemoteException {
+        tree.setSWTBotTree(swtBot.tree(index));
+        return tree;
+    }
+
+    public STFBotTree treeWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithLabelInGroup(label, inGroup));
+        return tree;
+    }
+
+    public STFBotTree treeWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        tree.setSWTBotTree(swtBot.treeWithLabelInGroup(label, inGroup, index));
+        return tree;
+    }
+
     /**********************************************
      * 
      * Widget shell
@@ -117,7 +184,7 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
 
     public List<String> getTitlesOfOpenedShells() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotShell shell : bot.shells())
+        for (SWTBotShell shell : swtBot.shells())
             list.add(shell.getText());
         return list;
     }
@@ -126,9 +193,9 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         return getTitlesOfOpenedShells().contains(title);
     }
 
-    public void waitsUntilIsShellClosed(final String title)
+    public void waitsUntilShellIsClosed(final String title)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        swtBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isShellOpen(title);
             }
@@ -137,12 +204,11 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
                 return null;
             }
         });
-
-        bot.sleep(10);
+        swtBot.sleep(10);
     }
 
-    public void waitUntilShellOpen(final String title) throws RemoteException {
-        waitUntil(new DefaultCondition() {
+    public void waitUntilShellIsOpen(final String title) throws RemoteException {
+        swtBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isShellOpen(title);
             }
@@ -154,7 +220,7 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
     }
 
     public String getTextOfActiveShell() throws RemoteException {
-        final SWTBotShell activeShell = bot.activeShell();
+        final SWTBotShell activeShell = swtBot.activeShell();
         return activeShell == null ? null : activeShell.getText();
     }
 
@@ -1246,8 +1312,46 @@ public class STFBotImp extends EclipseComponentImp implements STFBot {
         return checkbox;
     }
 
+    /**********************************************
+     * 
+     * Wait until
+     * 
+     **********************************************/
+    public void waitUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
+    }
+
+    public void waitLongUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+    }
+
+    public void waitShortUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
+    }
+
+    /**********************************************
+     * 
+     * Others
+     * 
+     **********************************************/
     public void sleep(long millis) throws RemoteException {
         swtBot.sleep(millis);
+    }
+
+    public void captureScreenshot(String fileName) throws RemoteException {
+        swtBot.captureScreenshot(fileName);
+    }
+
+    public String getPathToScreenShot() throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        log.debug("screenshot's directory: "
+            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
+        if (getOS() == TypeOfOS.WINDOW)
+            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        else if (getOS() == TypeOfOS.MAC) {
+            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        }
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
     }
 
 }

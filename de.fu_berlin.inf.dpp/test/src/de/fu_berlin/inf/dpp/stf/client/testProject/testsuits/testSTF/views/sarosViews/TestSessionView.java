@@ -138,11 +138,11 @@ public class TestSessionView extends STFTest {
         alice.bot().waitUntilEditorOpen(CLS2_SUFFIX);
         assertTrue(alice.bot().isEditorOpen(CLS2_SUFFIX));
         assertFalse(bob.bot().isEditorOpen(CLS2_SUFFIX));
-        bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
-            + "/vor_jump_to_position.png");
+        bob.bot().captureScreenshot(
+            bob.bot().getPathToScreenShot() + "/vor_jump_to_position.png");
         bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);
-        bob.workbench.captureScreenshot(bob.workbench.getPathToScreenShot()
-            + "/after_jump_to_position.png");
+        bob.bot().captureScreenshot(
+            bob.bot().getPathToScreenShot() + "/after_jump_to_position.png");
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);

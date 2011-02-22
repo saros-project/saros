@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Workbench;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
@@ -47,8 +46,6 @@ public class Tester extends STF {
 
     public STFWorkbenchBot bot;
     public NoBot noBot;
-
-    public Workbench workbench;
 
     // menuBar
     public FileM fileM;
@@ -104,7 +101,6 @@ public class Tester extends STF {
             pEV = (PEView) registry.lookup("packageExplorerView");
             progressV = (ProgressView) registry.lookup("progressView");
             consoleV = (ConsoleView) registry.lookup("consoleView");
-            workbench = (Workbench) registry.lookup("workbench");
 
             fileM = (FileM) registry.lookup("fileM");
             editM = (EditM) registry.lookup("editM");
