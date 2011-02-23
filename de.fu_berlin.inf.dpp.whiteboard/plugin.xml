@@ -3,14 +3,11 @@
 <plugin>
 	<extension
          point="org.eclipse.ui.views">
-    <category
-            id="Saros"
-            name="Saros"/>
 	<view
-            category="Saros"
+			id="de.fu_berlin.inf.dpp.whiteboard.WhiteboardView"
+            category="de.fu_berlin.inf.dpp.Saros"
             class="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
-            icon="icons/etool16/saros_menu.png"
-            id="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
+            icon="icons/view16/whiteboard_misc.png"
             name="Saros Whiteboard"/>
 	</extension>
 	<extension
