@@ -8,8 +8,7 @@
             name="Saros"/>
       <category
             id="de.fu_berlin.inf.dpp.Developer"
-            name="Developer"
-            parentCategory="de.fu_berlin.inf.dpp.Saros">
+            name="Saros Development">
       </category>
       <view
             category="de.fu_berlin.inf.dpp.Saros"
