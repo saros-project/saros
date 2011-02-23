@@ -75,6 +75,13 @@ public class ConcurrentDocumentServer implements Disposable {
     public class HostSideProjectListener extends AbstractSharedProjectListener {
 
         @Override
+        public void userJoined(User user) {
+            if (user.hasWriteAccess()) {
+                server.addUser(user);
+            }
+        }
+
+        @Override
         public void permissionChanged(User user) {
 
             if (user.isHost())
