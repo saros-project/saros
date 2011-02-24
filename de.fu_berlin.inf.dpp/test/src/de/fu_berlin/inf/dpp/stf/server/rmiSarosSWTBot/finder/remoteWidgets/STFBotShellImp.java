@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
     private static transient STFBotShellImp self;
@@ -46,6 +47,9 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
      * actions
      * 
      **********************************************/
+    public void setFocus() throws RemoteException {
+        swtBotShell.setFocus();
+    }
 
     public boolean activate() throws RemoteException {
         swtBotShell.activate();
@@ -148,8 +152,23 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
      * 
      **********************************************/
     public boolean isActive() throws RemoteException {
-
         return swtBotShell.isActive();
+    }
+
+    public boolean isEnabled() throws RemoteException {
+        return swtBotShell.isEnabled();
+    }
+
+    public boolean isVisible() throws RemoteException {
+        return swtBotShell.isVisible();
+    }
+
+    public String getText() throws RemoteException {
+        return swtBotShell.getText();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return swtBotShell.getText();
     }
 
     public String getErrorMessageInShell() throws RemoteException {
@@ -197,7 +216,8 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
 
     public STFBot bot_() {
         STFBotImp botImp = STFBotImp.getInstance();
-        botImp.setBot(swtBotShell.bot());
+        // botImp.setBot(swtBotShell.bot());
+        botImp.setBot(SarosSWTBot.getInstance());
         return botImp;
     }
 

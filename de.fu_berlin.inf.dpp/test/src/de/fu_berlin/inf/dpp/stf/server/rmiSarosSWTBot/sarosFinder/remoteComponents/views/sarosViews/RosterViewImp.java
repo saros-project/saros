@@ -17,8 +17,6 @@ import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
@@ -28,6 +26,9 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
 
 /**
@@ -139,11 +140,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
             .contextMenu(CM_RENAME).click();
 
-        if (!bot().shell(SHELL_SET_NEW_NICKNAME).activate()) {
-            bot().shell(SHELL_SET_NEW_NICKNAME).waitUntilActive();
+        STFBotShell shell = bot().shell(SHELL_SET_NEW_NICKNAME);
+        if (!shell.activate()) {
+            shell.waitUntilActive();
         }
-        bot.text(buddyNickName).setText(newBuddyName);
-        bot.button(OK).click();
+        shell.bot_().text(buddyNickName).setText(newBuddyName);
+        shell.bot_().button(OK).click();
     }
 
     public void inviteBuddy(JID buddyJID) throws RemoteException {
@@ -217,7 +219,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void waitUntilIsConnected() throws RemoteException {
         precondition();
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isConnected();
             }
@@ -230,7 +232,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void waitUntilDisConnected() throws RemoteException {
         precondition();
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isConnected();
             }
@@ -259,7 +261,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             if (!sarosM.isAccountActiveNoGUI(jid))
                 sarosM.activateAccountNoGUI(jid);
             saros.connect(true);
-            waitUntil(new DefaultCondition() {
+            bot().waitUntil(new DefaultCondition() {
                 public boolean test() throws Exception {
                     return isConnectedNoGUI();
                 }
@@ -346,7 +348,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void waitUntilIsConnectedNoGUI() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isConnectedNoGUI();
             }
@@ -362,7 +364,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void waitUntilDisConnectedNoGUI() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isConnectedNoGUI();
             }
@@ -420,8 +422,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     @SuppressWarnings("static-access")
-    private void selectConnectAccount(String baseJID) {
-        SWTBotToolbarDropDownButton b = bot.viewById(VIEW_SAROS_BUDDIES_ID)
+    private void selectConnectAccount(String baseJID) throws RemoteException {
+        STFBotToolbarDropDownButton b = bot().viewById(VIEW_SAROS_BUDDIES_ID)
             .toolbarDropDownButton(TB_CONNECT);
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
@@ -433,14 +435,14 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private boolean isConnectAccountExist(String baseJID) {
+    private boolean isConnectAccountExist(String baseJID)
+        throws RemoteException {
         Matcher matcher = allOf(widgetOfType(MenuItem.class));
-        SWTBotToolbarDropDownButton b = bot.viewById(VIEW_SAROS_BUDDIES_ID)
+        STFBotToolbarDropDownButton b = bot().viewById(VIEW_SAROS_BUDDIES_ID)
             .toolbarDropDownButton(TB_CONNECT);
-        List<? extends SWTBotMenu> accounts = b.menuItems(matcher);
+        List<? extends STFBotMenu> accounts = b.menuItems(matcher);
         b.pressShortcut(Keystrokes.ESC);
-        for (SWTBotMenu account : accounts) {
+        for (STFBotMenu account : accounts) {
             log.debug("existed account: " + account.getText() + "hier");
             if (account.getText().trim().equals(baseJID)) {
                 return true;

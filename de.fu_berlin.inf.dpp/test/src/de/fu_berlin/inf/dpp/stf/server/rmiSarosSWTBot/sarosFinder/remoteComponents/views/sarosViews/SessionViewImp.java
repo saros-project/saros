@@ -60,7 +60,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             .getTableItem(participantLabel).contextMenu(CM_GRANT_WRITE_ACCESS)
             .click();
         waitUntilHasWriteAccessBy(participantJID);
-        bot.sleep(300);
+        bot().sleep(300);
     }
 
     public void restrictToReadOnlyAccess(final JID participantJID)
@@ -109,7 +109,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             .getTableItem(contactLabel)
             .contextMenu(CM_STOP_FOLLOWING_THIS_BUDDY).click();
 
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isFollowingBuddy(followedUserJID);
             }
@@ -397,7 +397,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
      **********************************************/
 
     public void waitUntilIsInSession() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isInSession();
             }
@@ -414,7 +414,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     }
 
     public void waitUntilIsNotInSession() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isInSession();
             }
@@ -431,7 +431,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     }
 
     public void waitUntilHasWriteAccess() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return hasWriteAccess();
             }
@@ -444,7 +444,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     }
 
     public void waitUntilHasWriteAccessBy(final JID jid) throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return hasWriteAccessBy(jid);
             }
@@ -456,7 +456,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
     }
 
     public void waitUntilHasReadOnlyAccess() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !hasWriteAccess();
             }
@@ -470,7 +470,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public void waitUntilHasReadOnlyAccessBy(final JID jid)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !hasWriteAccessBy(jid);
             }
@@ -484,7 +484,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public void waitUntilIsFollowingBuddy(final JID followedBuddyJID)
         throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isFollowingBuddy(followedBuddyJID);
             }
@@ -499,7 +499,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 for (JID jid : jidsOfAllParticipants) {
                     if (isParticipantNoGUI(jid))
@@ -516,7 +516,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
 
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
         precondition();
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isToolbarButtonEnabled(TB_INCONSISTENCY_DETECTED);
             }

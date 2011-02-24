@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class RefactorMImp extends EclipseComponentImp implements RefactorM {
@@ -65,10 +66,11 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         precondition();
         bot().menu(MENU_REFACTOR).menu(MENU_RENAME).click();
 
-        bot().shell(shellTitle).activate();
-        bot.textWithLabel(LABEL_NEW_NAME).setText(newName);
+        STFBotShell shell = bot().shell(shellTitle);
+        shell.activate();
+        shell.bot_().textWithLabel(LABEL_NEW_NAME).setText(newName);
         bot().shell(shellTitle).bot_().button(buttonName).waitUntilIsEnabled();
-        bot.button(buttonName).click();
+        shell.bot_().button(buttonName).click();
         if (bot().isShellOpen("Rename Compilation Unit")) {
             bot().shell("Rename Compilation Unit").bot_().button(buttonName)
                 .click();

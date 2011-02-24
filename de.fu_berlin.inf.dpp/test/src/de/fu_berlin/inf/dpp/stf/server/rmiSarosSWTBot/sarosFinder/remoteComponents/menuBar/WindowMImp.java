@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Perspective;
 
 public class WindowMImp extends SarosPreferencesImp implements WindowM {
@@ -33,19 +33,23 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
-        SWTBotTree tree = bot.tree();
+        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
+        STFBotTree tree = shell.bot_().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
         if (OS.equals("Default")) {
-            bot.radioInGroup("Default", "New text file line delimiter").click();
+            shell.bot_()
+                .radioInGroup("Default", "New text file line delimiter")
+                .click();
         } else {
-            bot.radioInGroup("Other:", "New text file line delimiter").click();
-            bot.comboBoxInGroup("New text file line delimiter")
+            shell.bot_().radioInGroup("Other:", "New text file line delimiter")
+                .click();
+            shell.bot_().comboBoxInGroup("New text file line delimiter")
                 .setSelection(OS);
         }
-        bot.button(APPLY).click();
-        bot.button(OK).click();
+        shell.bot_().button(APPLY).click();
+        shell.bot_().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
@@ -110,22 +114,25 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      **********************************************/
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
-        SWTBotTree tree = bot.tree();
+        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
+        STFBotTree tree = shell.bot_().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
-        if (bot.radioInGroup("Default", "New text file line delimiter")
+        if (shell.bot_()
+            .radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
-            bot().shell(SHELL_PREFERNCES).close();
+            shell.close();
             return "Default";
-        } else if (bot.radioInGroup("Other:", "New text file line delimiter")
+        } else if (shell.bot_()
+            .radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
-            SWTBotCombo combo = bot
-                .comboBoxInGroup("New text file line delimiter");
+            STFBotCombo combo = shell.bot_().comboBoxInGroup(
+                "New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
             bot().shell(SHELL_PREFERNCES).close();
             return itemName;
         }
-        bot().shell(SHELL_PREFERNCES).close();
+        shell.close();
         return "";
     }
 

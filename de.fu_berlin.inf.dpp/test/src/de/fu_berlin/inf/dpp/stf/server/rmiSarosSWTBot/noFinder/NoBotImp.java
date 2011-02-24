@@ -42,7 +42,7 @@ public class NoBotImp extends EclipseComponentImp implements NoBot {
     public void waitUntilFileContentSame(final String otherClassContent,
         final String... fileNodes) throws RemoteException {
 
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getFileContent(fileNodes).equals(otherClassContent);
             }

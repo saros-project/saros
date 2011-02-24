@@ -54,6 +54,10 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
         return table.columns();
     }
 
+    public boolean containsItem(String item) throws RemoteException {
+        return table.containsItem(item);
+    }
+
     /**********************************************
      * 
      * finder

@@ -111,4 +111,16 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
         return ContextMenuHelper.existsContextMenu(swtBotTree, contextNames);
     }
 
+    public void select() throws RemoteException {
+        swtBotTreeItem.select();
+    }
+
+    public void select(String item) throws RemoteException {
+        swtBotTreeItem.select(item);
+    }
+
+    public void select(String... items) throws RemoteException {
+        swtBotTreeItem.select(items);
+    }
+
 }

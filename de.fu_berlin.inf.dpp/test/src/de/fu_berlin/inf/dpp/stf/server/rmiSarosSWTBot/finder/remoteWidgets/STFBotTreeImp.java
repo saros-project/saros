@@ -15,6 +15,7 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
     private static transient STFBotTreeImp treeImp;
 
     private SWTBotTree swtBotTree;
+    private static STFBotTreeItemImp stfBotTreeItem;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -23,6 +24,7 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
         if (treeImp != null)
             return treeImp;
         treeImp = new STFBotTreeImp();
+        stfBotTreeItem = STFBotTreeItemImp.getInstance();
         return treeImp;
     }
 
@@ -41,6 +43,12 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
      * actions
      * 
      **********************************************/
+
+    public STFBotTreeItem expandNode(String... nodes) throws RemoteException {
+        stfBotTreeItem.setSWTBotTreeItem(swtBotTree.expandNode(nodes));
+        return stfBotTreeItem;
+    }
+
     public STFBotTreeItem selectTreeItem(String... pathToTreeItem)
         throws RemoteException {
         try {

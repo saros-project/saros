@@ -88,7 +88,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         bot().waitUntilShellIsOpen(CONFIRM_DELETE);
         bot().shell(CONFIRM_DELETE).activate();
         bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
-        bot.sleep(300);
+        bot().sleep(300);
     }
 
     public void copyProject(String target) throws RemoteException {
@@ -104,7 +104,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         shell.bot_().textWithLabel("Project name:").setText(target);
         shell.bot_().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_COPY_PROJECT);
-        bot.sleep(1000);
+        bot().sleep(1000);
     }
 
     /**************************************************************

@@ -8,13 +8,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -54,13 +52,13 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
         STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmShellWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
-        log.debug("SVN share project text: " + bot.text());
-        if (bot.table().containsItem(repositoryURL)) {
+
+        if (shell.bot_().table().containsItem(repositoryURL)) {
             shell.confirmShellWithTable(repositoryURL, NEXT);
         } else {
-            bot.radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
-            bot.button(NEXT).click();
-            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            shell.bot_().radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+            shell.bot_().button(NEXT).click();
+            shell.bot_().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
         }
         shell.bot_().button(FINISH).waitUntilIsEnabled();
         shell.bot_().button(FINISH).click();
@@ -79,7 +77,7 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
         STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmShellWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
-        log.debug("SVN share project text: " + bot.text());
+        log.debug("SVN share project text: " + shell.bot_().text());
         shell.bot_().button(FINISH).waitUntilIsEnabled();
         shell.bot_().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
@@ -99,17 +97,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().shell(SHELL_SHARE_PROJECT).confirmShellWithTable(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
 
-        SWTBotTable table = null;
-        final SWTBotShell shareProjectShell = bot.shell(SHELL_SHARE_PROJECT);
-        try {
-            table = shareProjectShell.bot().table();
-        } catch (WidgetNotFoundException e) {
-            //
-        }
+        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        STFBotTable table = shell.bot_().table();
 
         if (table == null || !table.containsItem(repositoryURL)) {
             // close window
-            shareProjectShell.close();
+            shell.close();
             // in svn repos view: enter url
 
             bot().openViewById(VIEW_SVN_REPOSITORIES_ID);
@@ -121,9 +114,10 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
                 .toolbarButton("Add SVN Repository").click();
 
             bot().waitUntilShellIsOpen("Add SVN Repository");
-            bot().shell("Add SVN Repository").activate();
-            bot.comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
-            bot.button(FINISH).click();
+            STFBotShell shell2 = bot().shell("Add SVN Repository");
+            shell2.activate();
+            shell2.bot_().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            shell2.bot_().button(FINISH).click();
             bot().waitsUntilShellIsClosed("Add SVN Repository");
             if (!viewWasOpen)
                 bot().view(VIEW_SVN_REPOSITORIES).close();
@@ -135,10 +129,10 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
         bot().shell(SHELL_SHARE_PROJECT).confirmShellWithTable(repositoryURL,
             NEXT);
-
-        bot.radio("Use specified folder name:").click();
-        bot.text().setText(specifiedFolderName);
-        bot.button(FINISH).click();
+        STFBotShell shell3 = bot().shell(SHELL_SHARE_PROJECT);
+        shell3.bot_().radio("Use specified folder name:").click();
+        shell3.bot_().text().setText(specifiedFolderName);
+        shell3.bot_().button(FINISH).click();
         bot().shell("Remote Project Exists").waitUntilActive();
         bot().shell("Remote Project Exists").confirm(YES);
         try {
@@ -153,16 +147,17 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         bot().menu(MENU_FILE).menu("Import...").click();
-        bot().shell(SHELL_IMPORT).confirmShellWithTreeWithFilterText(
+        STFBotShell shell = bot().shell(SHELL_IMPORT);
+        shell.confirmShellWithTreeWithFilterText(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
-        if (bot.table().containsItem(repositoryURL)) {
+        if (shell.bot_().table().containsItem(repositoryURL)) {
             bot().shell("Checkout from SVN").confirmShellWithTable(
                 repositoryURL, NEXT);
         } else {
-            bot.radio("Create a new repository location").click();
-            bot.button(NEXT).click();
-            bot.comboBoxWithLabel("Url:").setText(repositoryURL);
-            bot.button(NEXT).click();
+            shell.bot_().radio("Create a new repository location").click();
+            shell.bot_().button(NEXT).click();
+            shell.bot_().comboBoxWithLabel("Url:").setText(repositoryURL);
+            shell.bot_().button(NEXT).click();
             bot().shell("Checkout from SVN").waitUntilActive();
         }
         bot().shell("Checkout from SVN").confirmShellWithTreeWithWaitingExpand(
@@ -219,10 +214,11 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().view(viewTitle).bot_().tree()
             .selectTreeItem(changeToRegex(projectName)).contextMenu(contexts)
             .click();
+        STFBotShell shell = bot().shell(SHELL_SWITCH);
 
-        bot().shell(SHELL_SWITCH).waitUntilActive();
-        bot.comboBoxWithLabel(LABEL_TO_URL).setText(url);
-        bot.button(OK).click();
+        shell.waitUntilActive();
+        shell.bot_().comboBoxWithLabel(LABEL_TO_URL).setText(url);
+        shell.bot_().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
@@ -263,11 +259,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().view(viewTitle).bot_().tree().selectTreeItemWithRegex(matchTexts)
             .contextMenu(contexts).click();
 
-        bot().shell(SHELL_SWITCH).waitUntilActive();
-        if (bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
-            bot.checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
-        bot.textWithLabel(LABEL_REVISION).setText(versionID);
-        bot.button(OK).click();
+        STFBotShell shell = bot().shell(SHELL_SWITCH);
+        shell.waitUntilActive();
+        if (shell.bot_().checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
+            shell.bot_().checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
+        shell.bot_().textWithLabel(LABEL_REVISION).setText(versionID);
+        shell.bot_().button(OK).click();
         if (bot().isShellOpen(SHELL_SVN_SWITCH))
             bot().waitsUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
@@ -329,22 +326,22 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
 
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
-        waitUntil(SarosConditions.isInSVN(projectName));
+        bot().waitUntil(SarosConditions.isInSVN(projectName));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
-        waitUntil(SarosConditions.isNotInSVN(projectName));
+        bot().waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
     public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
-        waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
+        bot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
     }
 
     public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException {
-        waitUntil(SarosConditions.isUrlSame(fullPath, url));
+        bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
     }
 
     protected void precondition(String viewTitle) throws RemoteException {

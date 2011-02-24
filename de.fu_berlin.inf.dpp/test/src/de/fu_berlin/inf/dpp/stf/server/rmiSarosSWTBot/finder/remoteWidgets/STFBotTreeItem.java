@@ -31,4 +31,10 @@ public interface STFBotTreeItem extends Remote {
         throws RemoteException;
 
     public SWTBotTreeItem getSwtBotTreeItem() throws RemoteException;
+
+    public void select() throws RemoteException;
+
+    public void select(String item) throws RemoteException;
+
+    public void select(String... items) throws RemoteException;
 }

@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -10,7 +9,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
-import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
@@ -22,7 +20,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
@@ -42,11 +39,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public class EclipseComponentImp extends STF implements EclipseComponent {
-    protected static final transient Logger log = Logger
-        .getLogger(EclipseComponentImp.class);
-
-    // workbench
-    // public static WorkbenchImp workbench = WorkbenchImp.getInstance();
 
     // Views
     public static RosterViewImp rosterV = RosterViewImp.getInstance();
@@ -97,14 +89,14 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
-        waitUntil(SarosConditions.isResourceExist(fullPath));
+        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            waitUntil(SarosConditions.isResourceExist(getPkgPath(projectName,
-                pkg)));
+            bot().waitUntil(
+                SarosConditions.isResourceExist(getPkgPath(projectName, pkg)));
         } else {
             throw new RuntimeException(
                 "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
@@ -114,8 +106,9 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public void waitUntilPkgNotExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            waitUntil(SarosConditions.isResourceNotExist(getPkgPath(
-                projectName, pkg)));
+            bot().waitUntil(
+                SarosConditions
+                    .isResourceNotExist(getPkgPath(projectName, pkg)));
         } else {
             throw new RuntimeException(
                 "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
@@ -124,19 +117,19 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     public void waitUntilFileExists(String... fileNodes) throws RemoteException {
         String fullPath = getPath(fileNodes);
-        waitUntil(SarosConditions.isResourceExist(fullPath));
+        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilClassExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
-        waitUntil(SarosConditions.isResourceExist(path));
+        bot().waitUntil(SarosConditions.isResourceExist(path));
     }
 
     public void waitUntilClassNotExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
-        waitUntil(SarosConditions.isResourceNotExist(path));
+        bot().waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
     /**********************************************
@@ -206,17 +199,6 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
      * Inner functions
      * 
      **********************************************/
-    public void waitUntil(ICondition condition) throws RemoteException {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
-    }
-
-    public void waitLongUntil(ICondition condition) {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-    }
-
-    public void waitShortUntil(ICondition condition) {
-        bot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
-    }
 
     public String getFileContentNoGUI(String filePath) {
         Bundle bundle = saros.getBundle();

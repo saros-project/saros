@@ -14,10 +14,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotList;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotRadio;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToggleButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 
@@ -1570,6 +1572,8 @@ public interface STFBot extends Remote {
      */
     public String getTextOfActiveShell() throws RemoteException;
 
+    public STFBotShell activeShell() throws RemoteException;
+
     /**
      * @param label
      *            the label on the widget.
@@ -1784,6 +1788,463 @@ public interface STFBot extends Remote {
     public STFBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
         String inGroup, int index) throws RemoteException;
 
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotRadio} with the specified <code>label</code>.
+     */
+    public STFBotRadio radioWithLabel(String label) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>label</code>.
+     */
+
+    public STFBotRadio radioWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @return a {@link STFBotRadio} with the specified
+     *         <code>mnemonicText</code>.
+     */
+    public STFBotRadio radio(String mnemonicText) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified
+     *         <code>mnemonicText</code>.
+     */
+
+    public STFBotRadio radio(String mnemonicText, int index)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @return a {@link STFBotRadio} with the specified <code>tooltip</code>.
+     */
+    public STFBotRadio radioWithTooltip(String tooltip) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>tooltip</code>.
+     */
+
+    public STFBotRadio radioWithTooltip(String tooltip, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotRadio} with the specified <code>key/value</code>.
+     */
+    public STFBotRadio radioWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>key/value</code>.
+     */
+
+    public STFBotRadio radioWithId(String key, String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotRadio} with the specified <code>value</code>.
+     */
+    public STFBotRadio radioWithId(String value) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>value</code>.
+     */
+
+    public STFBotRadio radioWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotRadio} with the specified <code>inGroup</code>.
+     */
+    public STFBotRadio radioInGroup(String inGroup) throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>inGroup</code>.
+     */
+
+    public STFBotRadio radioInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotRadio} with the specified <code>none</code>.
+     */
+    public STFBotRadio radio() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>none</code>.
+     */
+
+    public STFBotRadio radio(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotRadio} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+    public STFBotRadio radioWithLabelInGroup(String label, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>label</code> with
+     *         the specified <code>inGroup</code>.
+     */
+
+    public STFBotRadio radioWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotRadio} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+    public STFBotRadio radioInGroup(String mnemonicText, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+
+    public STFBotRadio radioInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotRadio} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
+     */
+    public STFBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotRadio} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
+     */
+
+    public STFBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget toggleButton
+     * 
+     **********************************************/
+    /**
+     * @param label
+     *            the label on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>label</code>.
+     */
+    public STFBotToggleButton toggleButtonWithLabel(String label)
+        throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>label</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithLabel(String label, int index)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>mnemonicText</code>.
+     */
+    public STFBotToggleButton toggleButton(String mnemonicText)
+        throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>mnemonicText</code>.
+     */
+
+    public STFBotToggleButton toggleButton(String mnemonicText, int index)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>tooltip</code>.
+     */
+    public STFBotToggleButton toggleButtonWithTooltip(String tooltip)
+        throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>tooltip</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>key/value</code>.
+     */
+    public STFBotToggleButton toggleButtonWithId(String key, String value)
+        throws RemoteException;
+
+    /**
+     * @param key
+     *            the key set on the widget.
+     * @param value
+     *            the value for the key.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>key/value</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithId(String key, String value,
+        int index) throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>value</code>.
+     */
+    public STFBotToggleButton toggleButtonWithId(String value)
+        throws RemoteException;
+
+    /**
+     * @param value
+     *            the value for the key
+     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
+     *            .
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>value</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithId(String value, int index)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>inGroup</code>.
+     */
+    public STFBotToggleButton toggleButtonInGroup(String inGroup)
+        throws RemoteException;
+
+    /**
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>inGroup</code>.
+     */
+
+    public STFBotToggleButton toggleButtonInGroup(String inGroup, int index)
+        throws RemoteException;
+
+    /**
+     * @return a {@link STFBotToggleButton} with the specified <code>none</code>
+     *         .
+     */
+    public STFBotToggleButton toggleButton() throws RemoteException;
+
+    /**
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified <code>none</code>
+     *         .
+     */
+
+    public STFBotToggleButton toggleButton(int index) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>label</code> with the specified <code>inGroup</code>.
+     */
+    public STFBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param label
+     *            the label on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>label</code> with the specified <code>inGroup</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+    public STFBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param mnemonicText
+     *            the mnemonicText on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
+     *         .
+     */
+
+    public STFBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
+     */
+    public STFBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException;
+
+    /**
+     * @param tooltip
+     *            the tooltip on the widget.
+     * @param inGroup
+     *            the inGroup on the widget.
+     * @param index
+     *            the index of the widget.
+     * @return a {@link STFBotToggleButton} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
+     */
+
+    public STFBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Wait until
+     * 
+     **********************************************/
+    public void waitUntil(ICondition condition) throws RemoteException;
+
+    public void waitLongUntil(ICondition condition) throws RemoteException;
+
+    public void waitShortUntil(ICondition condition) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Others
+     * 
+     **********************************************/
+
     public void sleep(long millis) throws RemoteException;
 
     /**
@@ -1794,9 +2255,4 @@ public interface STFBot extends Remote {
 
     public String getPathToScreenShot() throws RemoteException;
 
-    public void waitUntil(ICondition condition) throws RemoteException;
-
-    public void waitLongUntil(ICondition condition) throws RemoteException;
-
-    public void waitShortUntil(ICondition condition) throws RemoteException;
 }

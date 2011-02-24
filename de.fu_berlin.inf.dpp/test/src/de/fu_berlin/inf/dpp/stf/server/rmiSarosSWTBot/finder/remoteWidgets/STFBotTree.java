@@ -28,6 +28,8 @@ public interface STFBotTree extends Remote {
     public STFBotTreeItem selectTreeItem(String... nodes)
         throws RemoteException;
 
+    public STFBotTreeItem expandNode(String... nodes) throws RemoteException;
+
     /***************** select tree item with regexs ******************/
 
     /**

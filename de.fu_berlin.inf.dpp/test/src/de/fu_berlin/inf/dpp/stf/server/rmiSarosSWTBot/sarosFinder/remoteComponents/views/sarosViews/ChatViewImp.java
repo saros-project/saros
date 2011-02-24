@@ -120,7 +120,7 @@ public class ChatViewImp extends SarosComponentImp implements ChatView {
      **********************************************/
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException {
-        waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
+        bot().waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
     }
 
     /**********************************************

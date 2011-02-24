@@ -13,6 +13,8 @@ public interface STFBotShell extends Remote {
      * open/close/activate the view
      * 
      **********************************************/
+    public void setFocus() throws RemoteException;
+
     /**
      * activate the shell specified with the given title.
      * 
@@ -23,6 +25,14 @@ public interface STFBotShell extends Remote {
     public boolean activate() throws RemoteException;
 
     public boolean isActive() throws RemoteException;
+
+    public boolean isEnabled() throws RemoteException;
+
+    public boolean isVisible() throws RemoteException;
+
+    public String getText() throws RemoteException;
+
+    public String getToolTipText() throws RemoteException;
 
     public void close() throws RemoteException;
 
@@ -145,8 +155,8 @@ public interface STFBotShell extends Remote {
      *            the labels of the checkboxs, which you want to select.
      * 
      */
-    public void confirmShellithCheckBoxs(String buttonText,
-        String... itemNames) throws RemoteException;
+    public void confirmShellithCheckBoxs(String buttonText, String... itemNames)
+        throws RemoteException;
 
     /**
      * confirm a pop-up window with a table. You should first select a table

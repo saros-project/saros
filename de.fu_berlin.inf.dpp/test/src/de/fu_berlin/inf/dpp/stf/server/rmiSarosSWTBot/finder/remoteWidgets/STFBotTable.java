@@ -14,6 +14,8 @@ public interface STFBotTable extends Remote {
 
     public List<String> getTableColumns() throws RemoteException;
 
+    public boolean containsItem(String item) throws RemoteException;
+
     /**********************************************
      * 
      * finder

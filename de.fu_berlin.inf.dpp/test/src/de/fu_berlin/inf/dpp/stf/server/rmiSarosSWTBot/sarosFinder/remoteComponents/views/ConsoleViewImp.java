@@ -43,11 +43,11 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
      * 
      **********************************************/
     public void waitUntilTextInViewConsoleExists() throws RemoteException {
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 try {
-                    STFBotStyledText styledText = bot().view(VIEW_CONSOLE).bot_()
-                        .styledText();
+                    STFBotStyledText styledText = bot().view(VIEW_CONSOLE)
+                        .bot_().styledText();
                     if (styledText != null && styledText.getText() != null
                         && !styledText.getText().equals(""))
                         return true;

@@ -27,6 +27,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotRadio;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotRadioImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
@@ -35,6 +37,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToggleButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToggleButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
@@ -61,6 +65,8 @@ public class STFBotImp extends STF implements STFBot {
     private static STFBotMenuImp menu;
     private static STFBotListImp list;
     private static STFBotCheckBoxImp checkbox;
+    private static STFBotRadioImp radio;
+    private static STFBotToggleButtonImp toggleButton;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -84,6 +90,7 @@ public class STFBotImp extends STF implements STFBot {
         menu = STFBotMenuImp.getInstance();
         list = STFBotListImp.getInstance();
         checkbox = STFBotCheckBoxImp.getInstance();
+        radio = STFBotRadioImp.getInstance();
 
         return self;
     }
@@ -217,6 +224,12 @@ public class STFBotImp extends STF implements STFBot {
                 return null;
             }
         });
+    }
+
+    public STFBotShell activeShell() throws RemoteException {
+        shell.setWidget(swtBot.activeShell());
+        return shell;
+
     }
 
     public String getTextOfActiveShell() throws RemoteException {
@@ -1310,6 +1323,254 @@ public class STFBotImp extends STF implements STFBot {
         checkbox.setSWTBotWidget(swtBot.checkBoxWithTooltipInGroup(tooltip,
             inGroup, index));
         return checkbox;
+    }
+
+    /**********************************************
+     * 
+     * Widget: Radio
+     * 
+     **********************************************/
+    public STFBotRadio radioWithLabel(String label) throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabel(label));
+        return radio;
+    }
+
+    public STFBotRadio radioWithLabel(String label, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabel(label));
+        return radio;
+    }
+
+    public STFBotRadio radio(String mnemonicText) throws RemoteException {
+        radio.setWidget(SarosSWTBot.getInstance().radio(mnemonicText));
+        return radio;
+    }
+
+    public STFBotRadio radio(String mnemonicText, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radio(mnemonicText, index));
+        return radio;
+    }
+
+    public STFBotRadio radioWithTooltip(String tooltip) throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltip(tooltip));
+        return radio;
+    }
+
+    public STFBotRadio radioWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltip(tooltip, index));
+        return radio;
+    }
+
+    public STFBotRadio radioWithId(String key, String value)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(key, value));
+        return radio;
+    }
+
+    public STFBotRadio radioWithId(String key, String value, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(key, value, index));
+        return radio;
+    }
+
+    public STFBotRadio radioWithId(String value) throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(value));
+        return radio;
+    }
+
+    public STFBotRadio radioWithId(String value, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(value, index));
+        return radio;
+    }
+
+    public STFBotRadio radioInGroup(String inGroup) throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(inGroup));
+        return radio;
+    }
+
+    public STFBotRadio radioInGroup(String inGroup, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(inGroup, index));
+        return radio;
+    }
+
+    public STFBotRadio radio() throws RemoteException {
+        radio.setWidget(swtBot.radio());
+        return radio;
+    }
+
+    public STFBotRadio radio(int index) throws RemoteException {
+        radio.setWidget(swtBot.radio(index));
+        return radio;
+    }
+
+    public STFBotRadio radioWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabelInGroup(label, inGroup));
+        return radio;
+    }
+
+    public STFBotRadio radioWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabelInGroup(label, inGroup, index));
+        return radio;
+    }
+
+    public STFBotRadio radioInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(mnemonicText, inGroup));
+        return radio;
+    }
+
+    public STFBotRadio radioInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(mnemonicText, inGroup, index));
+        return radio;
+    }
+
+    public STFBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup));
+        return radio;
+    }
+
+    public STFBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException {
+        radio
+            .setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup, index));
+        return radio;
+    }
+
+    /**********************************************
+     * 
+     * Widget toggleButton
+     * 
+     **********************************************/
+    public STFBotToggleButton toggleButtonWithLabel(String label)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithLabel(String label, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButton(String mnemonicText)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(mnemonicText));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButton(String mnemonicText, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(mnemonicText, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithTooltip(String tooltip)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltip(tooltip));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltip(tooltip, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithId(String key, String value)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(key, value));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithId(String key, String value,
+        int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(key, value));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithId(String value)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(value));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithId(String value, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(value, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonInGroup(String inGroup)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(inGroup));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonInGroup(String inGroup, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(inGroup, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButton() throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton());
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButton(int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabelInGroup(label,
+            inGroup));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabelInGroup(label,
+            inGroup, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot
+            .toggleButtonInGroup(mnemonicText, inGroup));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(mnemonicText,
+            inGroup, index));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
+            inGroup));
+        return toggleButton;
+    }
+
+    public STFBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
+            inGroup, index));
+        return toggleButton;
     }
 
     /**********************************************

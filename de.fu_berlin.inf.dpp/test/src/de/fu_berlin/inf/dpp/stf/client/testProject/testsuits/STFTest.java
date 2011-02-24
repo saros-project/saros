@@ -670,11 +670,15 @@ public class STFTest extends STF {
                 host.sarosBuddiesV.addANewBuddy(peer.jid);
                 peer.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
+                    .activate();
                 peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
                     .button(OK).click();
 
                 host.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+                host.bot.shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
+                    .activate();
                 host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
                     .button(OK).click();
 

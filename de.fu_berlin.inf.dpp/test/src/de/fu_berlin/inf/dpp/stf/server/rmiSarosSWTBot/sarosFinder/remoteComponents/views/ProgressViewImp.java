@@ -35,26 +35,22 @@ public class ProgressViewImp extends EclipseComponentImp implements
 
     public void removeProgress() throws RemoteException {
         preCondition();
-        bot().view(VIEW_PROGRESS).bot_().toolbarButton()
-            .click();
+        bot().view(VIEW_PROGRESS).bot_().toolbarButton().click();
 
     }
 
     public void removeProcess(int index) throws RemoteException {
         preCondition();
         bot().view(VIEW_PROGRESS)
-            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS)
-            .click();
-        bot().view(VIEW_PROGRESS).bot_().toolbarButton(index)
-            .click();
+            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
+        bot().view(VIEW_PROGRESS).bot_().toolbarButton(index).click();
 
     }
 
     public boolean existPorgress() throws RemoteException {
         preCondition();
         bot().view(VIEW_PROGRESS)
-            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS)
-            .click();
+            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
         return bot().view(VIEW_PROGRESS).bot_().existsToolbarButton();
     }
 
@@ -65,7 +61,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
      **********************************************/
     public void waitUntilProgressNotExists() throws RemoteException {
         preCondition();
-        waitUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !existPorgress();
             }
