@@ -70,7 +70,8 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
         assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
 
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
@@ -150,7 +151,8 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         dave.bot().waitUntilEditorOpen(CLS1_SUFFIX);

@@ -142,9 +142,12 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemWithRegexs() throws RemoteException {
         alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
-        alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-            VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
-            SVN_PROJECT_PATH);
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .team()
+            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
+                SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
 
         STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
@@ -157,12 +160,19 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void selectTreeItemWithRegexsInView() throws RemoteException {
         alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
-        alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-            VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
-            SVN_PROJECT_PATH);
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .team()
+            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
+                SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
-            SVN_CLS1);
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .open()
+            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
+                SVN_CLS1);
         alice.bot().editor(SVN_CLS1_SUFFIX).setTextWithoutSave(CP1);
         assertTrue(alice.bot().editor(SVN_CLS1_SUFFIX).isDirty());
         alice.bot().view(VIEW_PACKAGE_EXPLORER)

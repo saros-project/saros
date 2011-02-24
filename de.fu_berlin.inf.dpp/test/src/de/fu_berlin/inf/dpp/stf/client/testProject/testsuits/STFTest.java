@@ -528,12 +528,21 @@ public class STFTest extends STF {
         Tester... invitees) throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-        inviter.sarosC.shareProjectWith(viewTitle, projectName,
-            howToShareProject, baseJIDOfInvitees);
+        inviter
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProjectWith(viewTitle, projectName, howToShareProject,
+                baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.sarosC.confirmShellSessionnInvitation();
-            invitee.sarosC.confirmShellAddProjectUsingWhichProject(projectName,
-                usingWhichProject);
+            invitee.sarosBot().packageExplorerView().saros()
+                .confirmShellSessionnInvitation();
+            invitee
+                .sarosBot()
+                .packageExplorerView()
+                .saros()
+                .confirmShellAddProjectUsingWhichProject(projectName,
+                    usingWhichProject);
         }
     }
 
@@ -545,16 +554,25 @@ public class STFTest extends STF {
         Tester... invitees) throws RemoteException, InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter.sarosC.shareProjectWith(viewTitle, projectName,
-            howToShareProject, getPeersBaseJID(invitees));
+        inviter
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProjectWith(viewTitle, projectName, howToShareProject,
+                getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.sarosC.confirmShellSessionnInvitation();
-                    invitee.sarosC.confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
+                    invitee.sarosBot().packageExplorerView().saros()
+                        .confirmShellSessionnInvitation();
+                    invitee
+                        .sarosBot()
+                        .packageExplorerView()
+                        .saros()
+                        .confirmShellAddProjectUsingWhichProject(projectName,
+                            usingWhichProject);
                     invitee.sarosBot().sessionView().waitUntilIsInSession();
                     return null;
                 }
@@ -764,9 +782,14 @@ public class STFTest extends STF {
         for (final Tester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosC.confirmShellSessionnInvitation();
-                    tester.sarosC.confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
+                    tester.sarosBot().packageExplorerView().saros()
+                        .confirmShellSessionnInvitation();
+                    tester
+                        .sarosBot()
+                        .packageExplorerView()
+                        .saros()
+                        .confirmShellAddProjectUsingWhichProject(projectName,
+                            usingWhichProject);
                     return null;
                 }
             });

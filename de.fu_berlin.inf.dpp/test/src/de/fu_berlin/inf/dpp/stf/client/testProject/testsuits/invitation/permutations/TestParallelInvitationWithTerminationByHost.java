@@ -70,27 +70,37 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.sarosC.shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid());
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
+                dave.getBaseJid(), carl.getBaseJid());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         bob.bot().shell(SHELL_SESSION_INVITATION).activate();
         alice.sarosBot().progressView().removeProcess(0);
         bob.bot().waitUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         bob.bot().shell(SHELL_INVITATION_CANCELLED).activate();
-        bob.sarosC.closeShellInvitationCancelled();
+        bob.sarosBot().packageExplorerView().saros()
+            .closeShellInvitationCancelled();
 
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
-        carl.sarosC.confirmShellSessionnInvitation();
+        carl.sarosBot().packageExplorerView().saros()
+            .confirmShellSessionnInvitation();
         alice.sarosBot().progressView().removeProcess(0);
-        carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
-        assertTrue(carl.sarosC.isShellInvitationCancelledActive());
-        carl.sarosC.closeShellInvitationCancelled();
+        carl.sarosBot().packageExplorerView().saros()
+            .waitUntilIsShellInvitationCnacelledActive();
+        assertTrue(carl.sarosBot().packageExplorerView().saros()
+            .isShellInvitationCancelledActive());
+        carl.sarosBot().packageExplorerView().saros()
+            .closeShellInvitationCancelled();
 
         dave.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         dave.bot().shell(SHELL_SESSION_INVITATION).activate();
-        dave.sarosC.confirmShellSessionnInvitation();
+        dave.sarosBot().packageExplorerView().saros()
+            .confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);
         alice.sarosBot().progressView().removeProcess(0);
@@ -100,9 +110,12 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         // canceling
         // this process, so dave should never get the window
         // "Invitation canceled".
-        dave.sarosC.waitUntilIsShellInvitationCnacelledActive();
-        assertTrue(dave.sarosC.isShellInvitationCancelledActive());
-        dave.sarosC.closeShellInvitationCancelled();
+        dave.sarosBot().packageExplorerView().saros()
+            .waitUntilIsShellInvitationCnacelledActive();
+        assertTrue(dave.sarosBot().packageExplorerView().saros()
+            .isShellInvitationCancelledActive());
+        dave.sarosBot().packageExplorerView().saros()
+            .closeShellInvitationCancelled();
 
     }
 }

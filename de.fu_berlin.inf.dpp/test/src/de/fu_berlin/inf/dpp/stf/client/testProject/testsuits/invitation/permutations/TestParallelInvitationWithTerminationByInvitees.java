@@ -71,9 +71,12 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.sarosC.shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            bob.getBaseJid(), dave.getBaseJid(), carl.getBaseJid(),
-            edna.getBaseJid());
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
+                dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
@@ -82,36 +85,43 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
-            bob.getName() + ".*"));
+        assertTrue(alice.sarosBot().packageExplorerView().saros()
+            .getSecondLabelOfShellProblemOccurred()
+            .matches(bob.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
         STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
-        carl.sarosC.confirmShellSessionnInvitation();
+        carl.sarosBot().packageExplorerView().saros()
+            .confirmShellSessionnInvitation();
         shell_carl.bot_().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
-            carl.getName() + ".*"));
+        assertTrue(alice.sarosBot().packageExplorerView().saros()
+            .getSecondLabelOfShellProblemOccurred()
+            .matches(carl.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
         dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
-        dave.sarosC.confirmShellSessionnInvitation();
+        dave.sarosBot().packageExplorerView().saros()
+            .confirmShellSessionnInvitation();
         shell_dave.bot_().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosC.getSecondLabelOfShellProblemOccurred().matches(
-            dave.getName() + ".*"));
+        assertTrue(alice.sarosBot().packageExplorerView().saros()
+            .getSecondLabelOfShellProblemOccurred()
+            .matches(dave.getName() + ".*"));
         shell_alice.bot_().button(OK).click();
 
         edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
-        edna.sarosC.confirmShellSessionnInvitation();
-        edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
+        edna.sarosBot().packageExplorerView().saros()
+            .confirmShellSessionnInvitation();
+        edna.sarosBot().packageExplorerView().saros()
+            .confirmShellAddProjectWithNewProject(PROJECT1);
         edna.sarosBot().sessionView().leaveTheSessionByPeer();
         assertFalse(edna.sarosBot().sessionView().isInSession());
         assertFalse(alice.sarosBot().sessionView()

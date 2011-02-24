@@ -59,9 +59,13 @@ public class TestSVNStateInitialization extends STFTest {
         setUpSaros();
         if (!alice.sarosBot().file().existsProjectNoGUI(SVN_PROJECT_COPY)) {
             alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
-            alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-                VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
-                SVN_PROJECT_PATH);
+            alice
+                .sarosBot()
+                .packageExplorerView()
+                .team()
+                .shareProjectWithSVNUsingSpecifiedFolderName(
+                    VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY,
+                    SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         }
     }
 
@@ -93,7 +97,8 @@ public class TestSVNStateInitialization extends STFTest {
         alice.sarosBot().packageExplorerView().selectProject(SVN_PROJECT_COPY);
         alice.sarosBot().edit().copyProject(SVN_PROJECT);
         assertTrue(alice.sarosBot().file().existsProjectNoGUI(SVN_PROJECT));
-        assertTrue(alice.team.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(alice.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
         assertTrue(alice.sarosBot().file().existsFileNoGUI(SVN_CLS1_FULL_PATH));
     }
 
@@ -127,7 +132,8 @@ public class TestSVNStateInitialization extends STFTest {
             alice, bob);
         alice.sarosBot().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
-        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
+        assertTrue(bob.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
 
         assertTrue(alice.sarosBot().sessionView().hasWriteAccessNoGUI());
         assertTrue(alice.sarosBot().sessionView().isParticipantNoGUI(bob.jid));
@@ -154,17 +160,24 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithUpdate() throws RemoteException {
-        alice.team.updateClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
-            SVN_CLS1, SVN_CLS1_REV1);
-        assertEquals(SVN_CLS1_REV1, alice.team.getRevision(SVN_CLS1_FULL_PATH));
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .team()
+            .updateClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG, SVN_CLS1,
+                SVN_CLS1_REV1);
+        assertEquals(SVN_CLS1_REV1, alice.sarosBot().packageExplorerView()
+            .team().getRevision(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
         alice.sarosBot().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
 
-        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(SVN_CLS1_REV1, bob.team.getRevision(SVN_CLS1_FULL_PATH));
+        assertTrue(bob.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(SVN_CLS1_REV1, bob.sarosBot().packageExplorerView().team()
+            .getRevision(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -187,9 +200,11 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithSwitch() throws RemoteException {
-        alice.team.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
+        alice.sarosBot().packageExplorerView().team()
+            .switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            alice.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+            alice.sarosBot().packageExplorerView().team()
+                .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
@@ -197,9 +212,12 @@ public class TestSVNStateInitialization extends STFTest {
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
         bob.sarosBot().sessionView().waitUntilIsInSession();
 
-        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(SVN_CLS1_SWITCHED_URL,
-            bob.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertTrue(bob.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(
+            SVN_CLS1_SWITCHED_URL,
+            bob.sarosBot().packageExplorerView().team()
+                .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -222,11 +240,17 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithSwitch2() throws RemoteException {
-        alice.team.switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL,
-            SVN_CLS1_REV3);
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .team()
+            .switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL,
+                SVN_CLS1_REV3);
         assertEquals(SVN_CLS1_SWITCHED_URL,
-            alice.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        assertEquals(SVN_CLS1_REV3, alice.team.getRevision(SVN_CLS1_FULL_PATH));
+            alice.sarosBot().packageExplorerView().team()
+                .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, alice.sarosBot().packageExplorerView()
+            .team().getRevision(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
@@ -234,10 +258,14 @@ public class TestSVNStateInitialization extends STFTest {
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
         bob.sarosBot().sessionView().waitUntilIsInSession();
 
-        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
-        assertEquals(SVN_CLS1_SWITCHED_URL,
-            bob.team.getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        assertEquals(SVN_CLS1_REV3, bob.team.getRevision(SVN_CLS1_FULL_PATH));
+        assertTrue(bob.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
+        assertEquals(
+            SVN_CLS1_SWITCHED_URL,
+            bob.sarosBot().packageExplorerView().team()
+                .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
+        assertEquals(SVN_CLS1_REV3, bob.sarosBot().packageExplorerView().team()
+            .getRevision(SVN_CLS1_FULL_PATH));
     }
 
     /**
@@ -262,8 +290,8 @@ public class TestSVNStateInitialization extends STFTest {
     public void testCheckoutWithModification() throws RemoteException {
         assertTrue(alice.sarosBot().file()
             .existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
-            SVN_CLS1);
+        alice.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG, SVN_CLS1);
 
         String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
             .getText();
@@ -279,9 +307,10 @@ public class TestSVNStateInitialization extends STFTest {
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
         bob.sarosBot().sessionView().waitUntilIsInSession();
 
-        assertTrue(bob.team.isProjectManagedBySVN(SVN_PROJECT));
-        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG,
-            SVN_CLS1);
+        assertTrue(bob.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(SVN_PROJECT));
+        bob.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG, SVN_CLS1);
         assertEquals(cls1_content_after, bob.bot().editor(SVN_CLS1_SUFFIX)
             .getText());
     }

@@ -22,7 +22,7 @@ public class ConfigTester {
         Tester tester = new Tester(new JID(jid), pw, host, port);
         try {
             log.trace("initBot");
-            tester.initBot();
+            tester.getRegistriedRmiObject();
         } catch (AccessException e) {
             log.debug("", e);
         } catch (NotBoundException e) {

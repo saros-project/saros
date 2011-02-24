@@ -95,11 +95,16 @@ public class TestMenuRefactor extends STFTest {
     @Test
     public void testShareProjectWithSVN() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
-        assertFalse(alice.team.isProjectManagedBySVN(PROJECT1));
-        alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
-            VIEW_PACKAGE_EXPLORER, PROJECT1, SVN_REPOSITORY_URL,
-            SVN_PROJECT_PATH);
-        assertTrue(alice.team.isProjectManagedBySVN(PROJECT1));
+        assertFalse(alice.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(PROJECT1));
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .team()
+            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
+                PROJECT1, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+        assertTrue(alice.sarosBot().packageExplorerView().team()
+            .isProjectManagedBySVN(PROJECT1));
     }
 
     /**

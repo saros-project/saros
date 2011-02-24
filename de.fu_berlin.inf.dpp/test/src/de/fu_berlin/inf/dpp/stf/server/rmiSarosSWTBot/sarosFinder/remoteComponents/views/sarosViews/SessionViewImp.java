@@ -358,13 +358,19 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
                 contactLabel = OWN_PARTICIPANT_NAME;
             else
                 contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
-        } else if (rosterV.hasBuddyNickNameNoGUI(participantJID)) {
+        } else if (sarosBot().buddiesView().hasBuddyNickNameNoGUI(
+            participantJID)) {
             if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID)
+                contactLabel = sarosBot().buddiesView().getBuddyNickNameNoGUI(
+                    participantJID)
                     + " (" + participantJID.getBase() + ")";
             else
-                contactLabel = rosterV.getBuddyNickNameNoGUI(participantJID)
-                    + " (" + participantJID.getBase() + ")" + " "
+                contactLabel = sarosBot().buddiesView().getBuddyNickNameNoGUI(
+                    participantJID)
+                    + " ("
+                    + participantJID.getBase()
+                    + ")"
+                    + " "
                     + PERMISSION_NAME;
         } else {
             if (hasWriteAccessByNoGUI(participantJID))

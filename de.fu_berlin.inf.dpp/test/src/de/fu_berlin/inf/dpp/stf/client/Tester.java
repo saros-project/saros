@@ -7,29 +7,20 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
  * interfaces to help testwriters to write their STF tests nicely. STF is short
  * for Sandor's Test Framework.
  */
-public class Tester extends STF {
+public class Tester {
 
     private STFWorkbenchBot bot;
     private NoBot noBot;
     private SarosBot sarosBot;
-
-    // contextMenu
-    public TeamC team;
-    public SarosC sarosC;
-    public OpenC openC;
 
     public JID jid;
     public String password;
@@ -44,27 +35,13 @@ public class Tester extends STF {
         this.port = port;
     }
 
-    /*************** init Methods ******************/
-
-    public void initBot() throws AccessException, RemoteException,
-        NotBoundException {
-        log.trace("initBot enter, initRmi");
-        getRegistriedRmiObject();
-    }
-
-    private void getRegistriedRmiObject() throws RemoteException,
+    public void getRegistriedRmiObject() throws RemoteException,
         NotBoundException, AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
-
             bot = (STFWorkbenchBot) registry.lookup("bot");
             noBot = (NoBot) registry.lookup("noBot");
             sarosBot = (SarosBot) registry.lookup("sarosBot");
-
-            // contextMenu
-            team = (TeamC) registry.lookup("team");
-            sarosC = (SarosC) registry.lookup("saros");
-            openC = (OpenC) registry.lookup("open");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid

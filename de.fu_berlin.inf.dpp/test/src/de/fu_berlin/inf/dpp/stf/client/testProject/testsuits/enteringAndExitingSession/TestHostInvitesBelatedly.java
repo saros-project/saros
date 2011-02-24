@@ -79,18 +79,22 @@ public class TestHostInvitesBelatedly extends STFTest {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
-        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
 
-        alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
+        alice.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
         String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
 
-        bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
+        bob.sarosBot().packageExplorerView().open()
+            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);
         // bob.editor.closeJavaEditorWithSave(CLS1);
         // bob.editor.closeJavaEditorWithSave(CLS2);
